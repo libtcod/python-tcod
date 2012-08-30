@@ -1,0 +1,751 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: package tdl</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>tdl</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:///C:/python32/lib/site-packages/tdl/__init__.py">c:\python32\lib\site-packages\tdl\__init__.py</a></font></td></tr></table>
+    <p><tt>tdl&nbsp;is&nbsp;a&nbsp;ctypes&nbsp;port&nbsp;of&nbsp;The&nbsp;Doryen&nbsp;Library.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Package Contents</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="tdl.event.html">event</a><br>
+</td><td width="25%" valign=top><a href="tdl.local.html">local</a><br>
+</td><td width="25%" valign=top><a href="tdl.tcod.html">tcod</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="builtins.html#Exception">builtins.Exception</a>(<a href="builtins.html#BaseException">builtins.BaseException</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="tdl.html#TDLError">TDLError</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="tdl.html#TDLBlitError">TDLBlitError</a>
+</font></dt><dt><font face="helvetica, arial"><a href="tdl.html#TDLDrawError">TDLDrawError</a>
+</font></dt><dt><font face="helvetica, arial"><a href="tdl.html#TDLIndexError">TDLIndexError</a>
+</font></dt></dl>
+</dd>
+</dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="tdl.html#Console">Console</a>
+</font></dt><dt><font face="helvetica, arial"><a href="tdl.html#Window">Window</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Console">class <strong>Console</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>The&nbsp;<a href="#Console">Console</a>&nbsp;is&nbsp;the&nbsp;main&nbsp;<a href="builtins.html#object">object</a>&nbsp;of&nbsp;the&nbsp;tdl&nbsp;library.<br>
+&nbsp;<br>
+The&nbsp;console&nbsp;created&nbsp;by&nbsp;the&nbsp;init&nbsp;function&nbsp;is&nbsp;the&nbsp;root&nbsp;console&nbsp;and&nbsp;is&nbsp;the<br>
+consle&nbsp;that&nbsp;is&nbsp;rendered&nbsp;to&nbsp;the&nbsp;screen&nbsp;with&nbsp;flush.<br>
+&nbsp;<br>
+Any&nbsp;console&nbsp;made&nbsp;from&nbsp;<a href="#Console">Console</a>&nbsp;is&nbsp;an&nbsp;off&nbsp;screen&nbsp;console&nbsp;that&nbsp;must&nbsp;be&nbsp;blited<br>
+to&nbsp;the&nbsp;root&nbsp;console&nbsp;to&nbsp;be&nbsp;visisble.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Console-__del__"><strong>__del__</strong></a>(self)</dt><dd><tt>If&nbsp;the&nbsp;main&nbsp;console&nbsp;is&nbsp;garbage&nbsp;collected&nbsp;then&nbsp;the&nbsp;window&nbsp;will&nbsp;be&nbsp;closed&nbsp;as&nbsp;well</tt></dd></dl>
+
+<dl><dt><a name="Console-__init__"><strong>__init__</strong></a>(self, width, height)</dt></dl>
+
+<dl><dt><a name="Console-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Console-blit"><strong>blit</strong></a>(self, source, x<font color="#909090">=0</font>, y<font color="#909090">=0</font>, width<font color="#909090">=None</font>, height<font color="#909090">=None</font>, srcx<font color="#909090">=0</font>, srcy<font color="#909090">=0</font>, fgAlpha<font color="#909090">=1.0</font>, bgAlpha<font color="#909090">=1.0</font>)</dt><dd><tt>Blit&nbsp;another&nbsp;console&nbsp;or&nbsp;<a href="#Window">Window</a>&nbsp;onto&nbsp;the&nbsp;current&nbsp;console.<br>
+&nbsp;<br>
+By&nbsp;default&nbsp;it&nbsp;blits&nbsp;the&nbsp;entire&nbsp;source&nbsp;to&nbsp;the&nbsp;topleft&nbsp;corner.</tt></dd></dl>
+
+<dl><dt><a name="Console-clear"><strong>clear</strong></a>(self, fgcolor<font color="#909090">=(255, 255, 255)</font>, bgcolor<font color="#909090">=(0, 0, 0)</font>)</dt><dd><tt>Clears&nbsp;the&nbsp;entire&nbsp;console.</tt></dd></dl>
+
+<dl><dt><a name="Console-drawChar"><strong>drawChar</strong></a>(self, char, x<font color="#909090">=None</font>, y<font color="#909090">=None</font>, fgcolor<font color="#909090">=None</font>, bgcolor<font color="#909090">=None</font>, bgblend<font color="#909090">=1</font>)</dt><dd><tt>Draws&nbsp;a&nbsp;single&nbsp;character.<br>
+&nbsp;<br>
+char&nbsp;should&nbsp;be&nbsp;an&nbsp;integer&nbsp;but&nbsp;can&nbsp;be&nbsp;a&nbsp;None&nbsp;if&nbsp;you&nbsp;only&nbsp;want&nbsp;to&nbsp;change<br>
+colors&nbsp;of&nbsp;the&nbsp;tile&nbsp;or&nbsp;it&nbsp;can&nbsp;be&nbsp;a&nbsp;single&nbsp;charecter&nbsp;string&nbsp;or&nbsp;unicode.<br>
+&nbsp;<br>
+For&nbsp;fgcolor&nbsp;and&nbsp;bgcolor&nbsp;you&nbsp;use&nbsp;a&nbsp;3&nbsp;item&nbsp;<a href="builtins.html#object">object</a>&nbsp;or&nbsp;a&nbsp;Color&nbsp;<a href="builtins.html#object">object</a>.&nbsp;None<br>
+will&nbsp;keep&nbsp;the&nbsp;color&nbsp;unchanged.<br>
+&nbsp;<br>
+bgblend&nbsp;is&nbsp;used&nbsp;to&nbsp;tell&nbsp;how&nbsp;the&nbsp;bgcolor&nbsp;blends&nbsp;into&nbsp;the&nbsp;background.&nbsp;The<br>
+default&nbsp;is&nbsp;BND_SET.<br>
+&nbsp;<br>
+Having&nbsp;the&nbsp;x&nbsp;or&nbsp;y&nbsp;values&nbsp;outside&nbsp;of&nbsp;the&nbsp;console&nbsp;will&nbsp;raise&nbsp;a<br>
+tdl.BadIndex&nbsp;error.</tt></dd></dl>
+
+<dl><dt><a name="Console-drawFrame"><strong>drawFrame</strong></a>(self, char, x<font color="#909090">=0</font>, y<font color="#909090">=0</font>, width<font color="#909090">=None</font>, height<font color="#909090">=None</font>, fgcolor<font color="#909090">=None</font>, bgcolor<font color="#909090">=None</font>, bgblend<font color="#909090">=1</font>)</dt></dl>
+
+<dl><dt><a name="Console-drawRect"><strong>drawRect</strong></a>(self, char, x<font color="#909090">=0</font>, y<font color="#909090">=0</font>, width<font color="#909090">=None</font>, height<font color="#909090">=None</font>, fgcolor<font color="#909090">=None</font>, bgcolor<font color="#909090">=None</font>, bgblend<font color="#909090">=1</font>)</dt></dl>
+
+<dl><dt><a name="Console-drawStr"><strong>drawStr</strong></a>(self, string, x<font color="#909090">=None</font>, y<font color="#909090">=None</font>, fgcolor<font color="#909090">=None</font>, bgcolor<font color="#909090">=None</font>, bgblend<font color="#909090">=1</font>)</dt></dl>
+
+<dl><dt><a name="Console-draw_rect"><strong>draw_rect</strong></a>(self, fgcolor, bgcolor, char, x<font color="#909090">=0</font>, y<font color="#909090">=0</font>, width<font color="#909090">=None</font>, height<font color="#909090">=None</font>, filled<font color="#909090">=True</font>, bgblend<font color="#909090">=1</font>)</dt><dd><tt>Draws&nbsp;a&nbsp;rectangle&nbsp;starting&nbsp;from&nbsp;x&nbsp;and&nbsp;y&nbsp;and&nbsp;extending&nbsp;to&nbsp;width&nbsp;and<br>
+height.&nbsp;&nbsp;If&nbsp;width&nbsp;or&nbsp;height&nbsp;are&nbsp;None&nbsp;then&nbsp;it&nbsp;will&nbsp;extend&nbsp;to&nbsp;the&nbsp;edge<br>
+of&nbsp;the&nbsp;console.&nbsp;&nbsp;The&nbsp;rest&nbsp;are&nbsp;the&nbsp;same&nbsp;as&nbsp;draw_char.</tt></dd></dl>
+
+<dl><dt><a name="Console-draw_str"><strong>draw_str</strong></a>(self, fgcolor, bgcolor, string, x, y, bgblend<font color="#909090">=1</font>)</dt><dd><tt>Draws&nbsp;a&nbsp;string&nbsp;starting&nbsp;at&nbsp;x&nbsp;and&nbsp;y.<br>
+&nbsp;<br>
+A&nbsp;string&nbsp;that&nbsp;goes&nbsp;past&nbsp;the&nbsp;end&nbsp;will&nbsp;wrap&nbsp;around.&nbsp;&nbsp;No&nbsp;warning&nbsp;will&nbsp;be<br>
+made&nbsp;if&nbsp;it&nbsp;reaches&nbsp;the&nbsp;end&nbsp;of&nbsp;the&nbsp;console.<br>
+&nbsp;<br>
+\r&nbsp;and&nbsp;\n&nbsp;are&nbsp;drawn&nbsp;on&nbsp;the&nbsp;console&nbsp;as&nbsp;normal&nbsp;character&nbsp;tiles.<br>
+&nbsp;<br>
+For&nbsp;fgcolor&nbsp;and&nbsp;bgcolor,&nbsp;None&nbsp;will&nbsp;keep&nbsp;the&nbsp;color&nbsp;unchanged.<br>
+&nbsp;<br>
+If&nbsp;a&nbsp;large&nbsp;enough&nbsp;tileset&nbsp;is&nbsp;loaded&nbsp;you&nbsp;can&nbsp;use&nbsp;a&nbsp;unicode&nbsp;string.</tt></dd></dl>
+
+<dl><dt><a name="Console-getChar"><strong>getChar</strong></a>(self, x, y)</dt><dd><tt>Return&nbsp;the&nbsp;character&nbsp;and&nbsp;colors&nbsp;of&nbsp;a&nbsp;cell&nbsp;as&nbsp;(ch,&nbsp;fg,&nbsp;bg)<br>
+&nbsp;<br>
+The&nbsp;charecter&nbsp;is&nbsp;returned&nbsp;as&nbsp;a&nbsp;number.</tt></dd></dl>
+
+<dl><dt><a name="Console-getSize"><strong>getSize</strong></a>(self)</dt><dd><tt>Return&nbsp;the&nbsp;size&nbsp;of&nbsp;the&nbsp;console&nbsp;as&nbsp;(width,&nbsp;height)</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>cursorX</strong></dt>
+</dl>
+<dl><dt><strong>cursorY</strong></dt>
+</dl>
+<dl><dt><strong>height</strong></dt>
+</dl>
+<dl><dt><strong>width</strong></dt>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="TDLBlitError">class <strong>TDLBlitError</strong></a>(<a href="tdl.html#TDLError">TDLError</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="tdl.html#TDLBlitError">TDLBlitError</a></dd>
+<dd><a href="tdl.html#TDLError">TDLError</a></dd>
+<dd><a href="builtins.html#Exception">builtins.Exception</a></dd>
+<dd><a href="builtins.html#BaseException">builtins.BaseException</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data descriptors inherited from <a href="tdl.html#TDLError">TDLError</a>:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Methods inherited from <a href="builtins.html#Exception">builtins.Exception</a>:<br>
+<dl><dt><a name="TDLBlitError-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLBlitError-__init__">__init__</a>(...)&nbsp;initializes&nbsp;x;&nbsp;see&nbsp;help(type(x))&nbsp;for&nbsp;signature</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="builtins.html#Exception">builtins.Exception</a>:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object&gt;<dd><tt>T.<a href="#TDLBlitError-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;<a href="builtins.html#object">object</a>&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+<hr>
+Methods inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
+<dl><dt><a name="TDLBlitError-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLBlitError-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="TDLBlitError-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLBlitError-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="TDLBlitError-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="TDLBlitError-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLBlitError-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="TDLBlitError-__setattr__"><strong>__setattr__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLBlitError-__setattr__">__setattr__</a>('name',&nbsp;value)&nbsp;&lt;==&gt;&nbsp;x.name&nbsp;=&nbsp;value</tt></dd></dl>
+
+<dl><dt><a name="TDLBlitError-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="TDLBlitError-__str__"><strong>__str__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLBlitError-__str__">__str__</a>()&nbsp;&lt;==&gt;&nbsp;str(x)</tt></dd></dl>
+
+<dl><dt><a name="TDLBlitError-with_traceback"><strong>with_traceback</strong></a>(...)</dt><dd><tt><a href="builtins.html#Exception">Exception</a>.<a href="#TDLBlitError-with_traceback">with_traceback</a>(tb)&nbsp;--<br>
+set&nbsp;self.<strong>__traceback__</strong>&nbsp;to&nbsp;tb&nbsp;and&nbsp;return&nbsp;self.</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
+<dl><dt><strong>__cause__</strong></dt>
+<dd><tt>exception&nbsp;cause</tt></dd>
+</dl>
+<dl><dt><strong>__context__</strong></dt>
+<dd><tt>exception&nbsp;context</tt></dd>
+</dl>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__traceback__</strong></dt>
+</dl>
+<dl><dt><strong>args</strong></dt>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="TDLDrawError">class <strong>TDLDrawError</strong></a>(<a href="tdl.html#TDLError">TDLError</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="tdl.html#TDLDrawError">TDLDrawError</a></dd>
+<dd><a href="tdl.html#TDLError">TDLError</a></dd>
+<dd><a href="builtins.html#Exception">builtins.Exception</a></dd>
+<dd><a href="builtins.html#BaseException">builtins.BaseException</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data descriptors inherited from <a href="tdl.html#TDLError">TDLError</a>:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Methods inherited from <a href="builtins.html#Exception">builtins.Exception</a>:<br>
+<dl><dt><a name="TDLDrawError-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLDrawError-__init__">__init__</a>(...)&nbsp;initializes&nbsp;x;&nbsp;see&nbsp;help(type(x))&nbsp;for&nbsp;signature</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="builtins.html#Exception">builtins.Exception</a>:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object&gt;<dd><tt>T.<a href="#TDLDrawError-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;<a href="builtins.html#object">object</a>&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+<hr>
+Methods inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
+<dl><dt><a name="TDLDrawError-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLDrawError-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="TDLDrawError-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLDrawError-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="TDLDrawError-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="TDLDrawError-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLDrawError-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="TDLDrawError-__setattr__"><strong>__setattr__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLDrawError-__setattr__">__setattr__</a>('name',&nbsp;value)&nbsp;&lt;==&gt;&nbsp;x.name&nbsp;=&nbsp;value</tt></dd></dl>
+
+<dl><dt><a name="TDLDrawError-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="TDLDrawError-__str__"><strong>__str__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLDrawError-__str__">__str__</a>()&nbsp;&lt;==&gt;&nbsp;str(x)</tt></dd></dl>
+
+<dl><dt><a name="TDLDrawError-with_traceback"><strong>with_traceback</strong></a>(...)</dt><dd><tt><a href="builtins.html#Exception">Exception</a>.<a href="#TDLDrawError-with_traceback">with_traceback</a>(tb)&nbsp;--<br>
+set&nbsp;self.<strong>__traceback__</strong>&nbsp;to&nbsp;tb&nbsp;and&nbsp;return&nbsp;self.</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
+<dl><dt><strong>__cause__</strong></dt>
+<dd><tt>exception&nbsp;cause</tt></dd>
+</dl>
+<dl><dt><strong>__context__</strong></dt>
+<dd><tt>exception&nbsp;context</tt></dd>
+</dl>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__traceback__</strong></dt>
+</dl>
+<dl><dt><strong>args</strong></dt>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="TDLError">class <strong>TDLError</strong></a>(<a href="builtins.html#Exception">builtins.Exception</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="tdl.html#TDLError">TDLError</a></dd>
+<dd><a href="builtins.html#Exception">builtins.Exception</a></dd>
+<dd><a href="builtins.html#BaseException">builtins.BaseException</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Methods inherited from <a href="builtins.html#Exception">builtins.Exception</a>:<br>
+<dl><dt><a name="TDLError-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLError-__init__">__init__</a>(...)&nbsp;initializes&nbsp;x;&nbsp;see&nbsp;help(type(x))&nbsp;for&nbsp;signature</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="builtins.html#Exception">builtins.Exception</a>:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object&gt;<dd><tt>T.<a href="#TDLError-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;<a href="builtins.html#object">object</a>&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+<hr>
+Methods inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
+<dl><dt><a name="TDLError-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLError-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="TDLError-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLError-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="TDLError-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="TDLError-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLError-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="TDLError-__setattr__"><strong>__setattr__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLError-__setattr__">__setattr__</a>('name',&nbsp;value)&nbsp;&lt;==&gt;&nbsp;x.name&nbsp;=&nbsp;value</tt></dd></dl>
+
+<dl><dt><a name="TDLError-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="TDLError-__str__"><strong>__str__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLError-__str__">__str__</a>()&nbsp;&lt;==&gt;&nbsp;str(x)</tt></dd></dl>
+
+<dl><dt><a name="TDLError-with_traceback"><strong>with_traceback</strong></a>(...)</dt><dd><tt><a href="builtins.html#Exception">Exception</a>.<a href="#TDLError-with_traceback">with_traceback</a>(tb)&nbsp;--<br>
+set&nbsp;self.<strong>__traceback__</strong>&nbsp;to&nbsp;tb&nbsp;and&nbsp;return&nbsp;self.</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
+<dl><dt><strong>__cause__</strong></dt>
+<dd><tt>exception&nbsp;cause</tt></dd>
+</dl>
+<dl><dt><strong>__context__</strong></dt>
+<dd><tt>exception&nbsp;context</tt></dd>
+</dl>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__traceback__</strong></dt>
+</dl>
+<dl><dt><strong>args</strong></dt>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="TDLIndexError">class <strong>TDLIndexError</strong></a>(<a href="tdl.html#TDLError">TDLError</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="tdl.html#TDLIndexError">TDLIndexError</a></dd>
+<dd><a href="tdl.html#TDLError">TDLError</a></dd>
+<dd><a href="builtins.html#Exception">builtins.Exception</a></dd>
+<dd><a href="builtins.html#BaseException">builtins.BaseException</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data descriptors inherited from <a href="tdl.html#TDLError">TDLError</a>:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Methods inherited from <a href="builtins.html#Exception">builtins.Exception</a>:<br>
+<dl><dt><a name="TDLIndexError-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLIndexError-__init__">__init__</a>(...)&nbsp;initializes&nbsp;x;&nbsp;see&nbsp;help(type(x))&nbsp;for&nbsp;signature</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="builtins.html#Exception">builtins.Exception</a>:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object&gt;<dd><tt>T.<a href="#TDLIndexError-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;<a href="builtins.html#object">object</a>&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+<hr>
+Methods inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
+<dl><dt><a name="TDLIndexError-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLIndexError-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="TDLIndexError-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLIndexError-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="TDLIndexError-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="TDLIndexError-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLIndexError-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="TDLIndexError-__setattr__"><strong>__setattr__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLIndexError-__setattr__">__setattr__</a>('name',&nbsp;value)&nbsp;&lt;==&gt;&nbsp;x.name&nbsp;=&nbsp;value</tt></dd></dl>
+
+<dl><dt><a name="TDLIndexError-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="TDLIndexError-__str__"><strong>__str__</strong></a>(...)</dt><dd><tt>x.<a href="#TDLIndexError-__str__">__str__</a>()&nbsp;&lt;==&gt;&nbsp;str(x)</tt></dd></dl>
+
+<dl><dt><a name="TDLIndexError-with_traceback"><strong>with_traceback</strong></a>(...)</dt><dd><tt><a href="builtins.html#Exception">Exception</a>.<a href="#TDLIndexError-with_traceback">with_traceback</a>(tb)&nbsp;--<br>
+set&nbsp;self.<strong>__traceback__</strong>&nbsp;to&nbsp;tb&nbsp;and&nbsp;return&nbsp;self.</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
+<dl><dt><strong>__cause__</strong></dt>
+<dd><tt>exception&nbsp;cause</tt></dd>
+</dl>
+<dl><dt><strong>__context__</strong></dt>
+<dd><tt>exception&nbsp;context</tt></dd>
+</dl>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__traceback__</strong></dt>
+</dl>
+<dl><dt><strong>args</strong></dt>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Window">class <strong>Window</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;<a href="#Window">Window</a>&nbsp;contains&nbsp;a&nbsp;small&nbsp;isolated&nbsp;part&nbsp;of&nbsp;a&nbsp;<a href="#Console">Console</a>.<br>
+&nbsp;<br>
+Drawing&nbsp;on&nbsp;the&nbsp;<a href="#Window">Window</a>&nbsp;draws&nbsp;on&nbsp;the&nbsp;<a href="#Console">Console</a>.&nbsp;&nbsp;This&nbsp;works&nbsp;both&nbsp;ways.<br>
+&nbsp;<br>
+If&nbsp;you&nbsp;make&nbsp;a&nbsp;<a href="#Window">Window</a>&nbsp;without&nbsp;setting&nbsp;its&nbsp;size&nbsp;(or&nbsp;set&nbsp;the&nbsp;width&nbsp;and&nbsp;height<br>
+as&nbsp;None)&nbsp;it&nbsp;will&nbsp;extend&nbsp;to&nbsp;the&nbsp;edge&nbsp;of&nbsp;the&nbsp;console.<br>
+&nbsp;<br>
+You&nbsp;can't&nbsp;blit&nbsp;<a href="#Window">Window</a>&nbsp;instances&nbsp;but&nbsp;drawing&nbsp;works&nbsp;as&nbsp;expected.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Window-__init__"><strong>__init__</strong></a>(self, console, x<font color="#909090">=0</font>, y<font color="#909090">=0</font>, width<font color="#909090">=None</font>, height<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Window-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Window-blit"><strong>blit</strong></a>(self, source, x<font color="#909090">=0</font>, y<font color="#909090">=0</font>, width<font color="#909090">=None</font>, height<font color="#909090">=None</font>, srcx<font color="#909090">=0</font>, srcy<font color="#909090">=0</font>, alpha<font color="#909090">=255</font>)</dt></dl>
+
+<dl><dt><a name="Window-clear"><strong>clear</strong></a>(self, fgcolor<font color="#909090">=(255, 255, 255)</font>, bgcolor<font color="#909090">=(0, 0, 0)</font>)</dt><dd><tt>Clears&nbsp;the&nbsp;entire&nbsp;<a href="#Window">Window</a>.</tt></dd></dl>
+
+<dl><dt><a name="Window-drawChar"><strong>drawChar</strong></a>(self, char, x<font color="#909090">=None</font>, y<font color="#909090">=None</font>, fgcolor<font color="#909090">=None</font>, bgcolor<font color="#909090">=None</font>, bgblend<font color="#909090">=1</font>)</dt></dl>
+
+<dl><dt><a name="Window-draw_rect"><strong>draw_rect</strong></a>(self, fgcolor, bgcolor, char, x<font color="#909090">=0</font>, y<font color="#909090">=0</font>, width<font color="#909090">=None</font>, height<font color="#909090">=None</font>, filled<font color="#909090">=True</font>, bgblend<font color="#909090">=1</font>)</dt></dl>
+
+<dl><dt><a name="Window-draw_str"><strong>draw_str</strong></a>(self, fgcolor, bgcolor, string, x, y, bgblend<font color="#909090">=1</font>)</dt></dl>
+
+<dl><dt><a name="Window-getChar"><strong>getChar</strong></a>(self, x, y)</dt><dd><tt>Return&nbsp;the&nbsp;character&nbsp;and&nbsp;colors&nbsp;of&nbsp;a&nbsp;cell&nbsp;as&nbsp;(ch,&nbsp;fg,&nbsp;bg)</tt></dd></dl>
+
+<dl><dt><a name="Window-getSize"><strong>getSize</strong></a>(self)</dt><dd><tt>Return&nbsp;the&nbsp;size&nbsp;of&nbsp;the&nbsp;<a href="#Window">Window</a>&nbsp;as&nbsp;(width,&nbsp;height)</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>console</strong></dt>
+</dl>
+<dl><dt><strong>cursorX</strong></dt>
+</dl>
+<dl><dt><strong>cursorY</strong></dt>
+</dl>
+<dl><dt><strong>height</strong></dt>
+</dl>
+<dl><dt><strong>width</strong></dt>
+</dl>
+<dl><dt><strong>x</strong></dt>
+</dl>
+<dl><dt><strong>y</strong></dt>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-BND_addalpha"><strong>BND_addalpha</strong></a>(alpha)</dt></dl>
+ <dl><dt><a name="-BND_alpha"><strong>BND_alpha</strong></a>(alpha)</dt></dl>
+ <dl><dt><a name="-bresenham"><strong>bresenham</strong></a>(startx, starty, endx, endy)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;points&nbsp;between&nbsp;and&nbsp;including&nbsp;the&nbsp;start&nbsp;and&nbsp;end&nbsp;points.<br>
+The&nbsp;points&nbsp;create&nbsp;a&nbsp;bresenham&nbsp;line.</tt></dd></dl>
+ <dl><dt><a name="-flush"><strong>flush</strong></a>()</dt><dd><tt>Make&nbsp;all&nbsp;changes&nbsp;visible&nbsp;and&nbsp;update&nbsp;the&nbsp;screen.</tt></dd></dl>
+ <dl><dt><a name="-forceResolution"><strong>forceResolution</strong></a>(width, height)</dt><dd><tt>Change&nbsp;the&nbsp;fullscreen&nbsp;resoulution</tt></dd></dl>
+ <dl><dt><a name="-getFPS"><strong>getFPS</strong></a>()</dt><dd><tt>Return&nbsp;the&nbsp;frames&nbsp;per&nbsp;second.</tt></dd></dl>
+ <dl><dt><a name="-getFade"><strong>getFade</strong></a>()</dt><dd><tt>Return&nbsp;the&nbsp;current&nbsp;fade&nbsp;of&nbsp;the&nbsp;screen&nbsp;as&nbsp;(color,&nbsp;fade)</tt></dd></dl>
+ <dl><dt><a name="-getFullscreen"><strong>getFullscreen</strong></a>()</dt><dd><tt>Returns&nbsp;if&nbsp;the&nbsp;window&nbsp;is&nbsp;fullscreen<br>
+&nbsp;<br>
+The&nbsp;user&nbsp;can't&nbsp;make&nbsp;the&nbsp;window&nbsp;fullscreen&nbsp;so&nbsp;you&nbsp;must&nbsp;use&nbsp;the<br>
+set_fullscreen&nbsp;function</tt></dd></dl>
+ <dl><dt><a name="-init"><strong>init</strong></a>(width, height, title<font color="#909090">='TDL'</font>, fullscreen<font color="#909090">=False</font>)</dt><dd><tt>Start&nbsp;the&nbsp;main&nbsp;console&nbsp;with&nbsp;the&nbsp;given&nbsp;width&nbsp;and&nbsp;height&nbsp;and&nbsp;return&nbsp;the<br>
+root&nbsp;console.<br>
+&nbsp;<br>
+Remember&nbsp;to&nbsp;use&nbsp;<a href="#-flush">flush</a>()&nbsp;to&nbsp;make&nbsp;what's&nbsp;drawn&nbsp;visible&nbsp;on&nbsp;all&nbsp;consoles.<br>
+&nbsp;<br>
+After&nbsp;the&nbsp;root&nbsp;console&nbsp;is&nbsp;garbage&nbsp;collected&nbsp;the&nbsp;window&nbsp;will&nbsp;close.</tt></dd></dl>
+ <dl><dt><a name="-screenshot"><strong>screenshot</strong></a>(fileobj<font color="#909090">=None</font>)</dt><dd><tt>Capture&nbsp;the&nbsp;screen&nbsp;and&nbsp;place&nbsp;it&nbsp;in&nbsp;fileobj.<br>
+&nbsp;<br>
+fileobj&nbsp;can&nbsp;be&nbsp;a&nbsp;filelike&nbsp;<a href="builtins.html#object">object</a>&nbsp;or&nbsp;a&nbsp;filepath&nbsp;to&nbsp;save&nbsp;the&nbsp;screenshot<br>
+if&nbsp;fileobj&nbsp;is&nbsp;none&nbsp;the&nbsp;file&nbsp;will&nbsp;be&nbsp;placed&nbsp;in&nbsp;the&nbsp;current&nbsp;folder&nbsp;with&nbsp;named<br>
+screenshotNNNN.png</tt></dd></dl>
+ <dl><dt><a name="-setFPS"><strong>setFPS</strong></a>(fps)</dt><dd><tt>Set&nbsp;the&nbsp;frames&nbsp;per&nbsp;second.<br>
+&nbsp;<br>
+You&nbsp;can&nbsp;set&nbsp;no&nbsp;limit&nbsp;by&nbsp;using&nbsp;None&nbsp;or&nbsp;0.</tt></dd></dl>
+ <dl><dt><a name="-setFade"><strong>setFade</strong></a>(color, fade)</dt><dd><tt>Have&nbsp;the&nbsp;screen&nbsp;fade&nbsp;out&nbsp;into&nbsp;a&nbsp;color.<br>
+&nbsp;<br>
+color&nbsp;is&nbsp;a&nbsp;3&nbsp;item&nbsp;tuple&nbsp;or&nbsp;list.<br>
+fade&nbsp;is&nbsp;a&nbsp;number&nbsp;between&nbsp;0&nbsp;and&nbsp;255&nbsp;with&nbsp;0&nbsp;making&nbsp;the&nbsp;screen&nbsp;one&nbsp;solid&nbsp;color<br>
+and&nbsp;255&nbsp;turning&nbsp;the&nbsp;fade&nbsp;effect&nbsp;off.</tt></dd></dl>
+ <dl><dt><a name="-setFont"><strong>setFont</strong></a>(path, width, height, flags)</dt><dd><tt>Changes&nbsp;the&nbsp;font&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;this&nbsp;session<br>
+This&nbsp;should&nbsp;be&nbsp;called&nbsp;before&nbsp;tdl.init<br>
+&nbsp;<br>
+path&nbsp;must&nbsp;be&nbsp;a&nbsp;string&nbsp;for&nbsp;where&nbsp;a&nbsp;bitmap&nbsp;file&nbsp;is&nbsp;found.<br>
+&nbsp;<br>
+width&nbsp;and&nbsp;height&nbsp;should&nbsp;be&nbsp;of&nbsp;an&nbsp;individual&nbsp;tile.<br>
+&nbsp;<br>
+flags&nbsp;are&nbsp;used&nbsp;to&nbsp;define&nbsp;the&nbsp;characters&nbsp;layout&nbsp;in&nbsp;the&nbsp;bitmap&nbsp;and&nbsp;the&nbsp;font&nbsp;type&nbsp;:<br>
+FONT_LAYOUT_ASCII_INCOL&nbsp;:&nbsp;characters&nbsp;in&nbsp;ASCII&nbsp;order,&nbsp;code&nbsp;0-15&nbsp;in&nbsp;the&nbsp;first&nbsp;column<br>
+FONT_LAYOUT_ASCII_INROW&nbsp;:&nbsp;characters&nbsp;in&nbsp;ASCII&nbsp;order,&nbsp;code&nbsp;0-15&nbsp;in&nbsp;the&nbsp;first&nbsp;row<br>
+FONT_LAYOUT_TCOD&nbsp;:&nbsp;simplified&nbsp;layout,&nbsp;see&nbsp;libtcod&nbsp;documents<br>
+FONT_TYPE_GREYSCALE&nbsp;:&nbsp;create&nbsp;an&nbsp;anti-aliased&nbsp;font&nbsp;from&nbsp;a&nbsp;greyscale&nbsp;bitmap</tt></dd></dl>
+ <dl><dt><a name="-setFullscreen"><strong>setFullscreen</strong></a>(fullscreen)</dt><dd><tt>Sets&nbsp;the&nbsp;fullscreen&nbsp;state&nbsp;to&nbsp;the&nbsp;boolen&nbsp;value</tt></dd></dl>
+ <dl><dt><a name="-setTitle"><strong>setTitle</strong></a>(title)</dt><dd><tt>Change&nbsp;the&nbsp;window&nbsp;title.</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>BND_ADD</strong> = 8<br>
+<strong>BND_ADDA</strong> = 9<br>
+<strong>BND_ALPH</strong> = 12<br>
+<strong>BND_BURN</strong> = 10<br>
+<strong>BND_DARKEN</strong> = 4<br>
+<strong>BND_DODGE</strong> = 6<br>
+<strong>BND_LIGHTEN</strong> = 3<br>
+<strong>BND_MULTIPLY</strong> = 2<br>
+<strong>BND_NONE</strong> = 0<br>
+<strong>BND_OVERLAY</strong> = 11<br>
+<strong>BND_SCREEN</strong> = 5<br>
+<strong>BND_SET</strong> = 1<br>
+<strong>CHAR_ARROW_E</strong> = 26<br>
+<strong>CHAR_ARROW_N</strong> = 24<br>
+<strong>CHAR_ARROW_S</strong> = 25<br>
+<strong>CHAR_ARROW_W</strong> = 27<br>
+<strong>CHAR_BLOCK</strong> = 219<br>
+<strong>CHAR_BLOCK1</strong> = 178<br>
+<strong>CHAR_BLOCK2</strong> = 177<br>
+<strong>CHAR_BLOCK3</strong> = 176<br>
+<strong>CHAR_BLOCK_B</strong> = 220<br>
+<strong>CHAR_BLOCK_T</strong> = 223<br>
+<strong>CHAR_CHECKER</strong> = 178<br>
+<strong>CHAR_CROSS</strong> = 197<br>
+<strong>CHAR_DHLINE</strong> = 205<br>
+<strong>CHAR_DNE</strong> = 187<br>
+<strong>CHAR_DNW</strong> = 201<br>
+<strong>CHAR_DSE</strong> = 188<br>
+<strong>CHAR_DSW</strong> = 200<br>
+<strong>CHAR_DS_CROSSH</strong> = 216<br>
+<strong>CHAR_DS_CROSSV</strong> = 215<br>
+<strong>CHAR_DTEEE</strong> = 198<br>
+<strong>CHAR_DTEEN</strong> = 208<br>
+<strong>CHAR_DTEES</strong> = 210<br>
+<strong>CHAR_DTEEW</strong> = 181<br>
+<strong>CHAR_DVLINE</strong> = 186<br>
+<strong>CHAR_HLINE</strong> = 196<br>
+<strong>CHAR_LIGHT</strong> = 15<br>
+<strong>CHAR_NE</strong> = 191<br>
+<strong>CHAR_NW</strong> = 218<br>
+<strong>CHAR_SE</strong> = 217<br>
+<strong>CHAR_SW</strong> = 192<br>
+<strong>CHAR_TEEE</strong> = 195<br>
+<strong>CHAR_TEEN</strong> = 193<br>
+<strong>CHAR_TEES</strong> = 194<br>
+<strong>CHAR_TEEW</strong> = 180<br>
+<strong>CHAR_TREE</strong> = 5<br>
+<strong>CHAR_VLINE</strong> = 179<br>
+<strong>C_ALICEBLUE</strong> = (240, 248, 255)<br>
+<strong>C_ANTIQUEWHITE</strong> = (250, 235, 215)<br>
+<strong>C_AQUA</strong> = (0, 255, 255)<br>
+<strong>C_AQUAMARINE</strong> = (127, 255, 212)<br>
+<strong>C_AZURE</strong> = (240, 255, 255)<br>
+<strong>C_BEIGE</strong> = (245, 245, 220)<br>
+<strong>C_BISQUE</strong> = (255, 228, 196)<br>
+<strong>C_BLACK</strong> = (0, 0, 0)<br>
+<strong>C_BLANCHEDALMOND</strong> = (255, 235, 205)<br>
+<strong>C_BLUE</strong> = (0, 0, 255)<br>
+<strong>C_BLUEVIOLET</strong> = (138, 43, 226)<br>
+<strong>C_BROWN</strong> = (165, 42, 42)<br>
+<strong>C_BURLYWOOD</strong> = (222, 184, 135)<br>
+<strong>C_CADETBLUE</strong> = (95, 158, 160)<br>
+<strong>C_CHARTREUSE</strong> = (127, 255, 0)<br>
+<strong>C_CHOCOLATE</strong> = (210, 105, 30)<br>
+<strong>C_CORAL</strong> = (255, 127, 80)<br>
+<strong>C_CORNFLOWERBLUE</strong> = (100, 149, 237)<br>
+<strong>C_CORNSILK</strong> = (255, 248, 220)<br>
+<strong>C_CRIMSON</strong> = (220, 20, 60)<br>
+<strong>C_CYAN</strong> = (0, 255, 255)<br>
+<strong>C_DARKBLUE</strong> = (0, 0, 139)<br>
+<strong>C_DARKCYAN</strong> = (0, 139, 139)<br>
+<strong>C_DARKGOLDENROD</strong> = (184, 134, 11)<br>
+<strong>C_DARKGRAY</strong> = (169, 169, 169)<br>
+<strong>C_DARKGREEN</strong> = (0, 100, 0)<br>
+<strong>C_DARKKHAKI</strong> = (189, 183, 107)<br>
+<strong>C_DARKMAGENTA</strong> = (139, 0, 139)<br>
+<strong>C_DARKOLIVEGREEN</strong> = (85, 107, 47)<br>
+<strong>C_DARKORANGE</strong> = (255, 140, 0)<br>
+<strong>C_DARKORCHID</strong> = (153, 50, 204)<br>
+<strong>C_DARKRED</strong> = (139, 0, 0)<br>
+<strong>C_DARKSALMON</strong> = (233, 150, 122)<br>
+<strong>C_DARKSEAGREEN</strong> = (143, 188, 143)<br>
+<strong>C_DARKSLATEBLUE</strong> = (72, 61, 139)<br>
+<strong>C_DARKSLATEGRAY</strong> = (47, 79, 79)<br>
+<strong>C_DARKTURQUOISE</strong> = (0, 206, 209)<br>
+<strong>C_DARKVIOLET</strong> = (148, 0, 211)<br>
+<strong>C_DEEPPINK</strong> = (255, 20, 147)<br>
+<strong>C_DEEPSKYBLUE</strong> = (0, 191, 255)<br>
+<strong>C_DIMGRAY</strong> = (105, 105, 105)<br>
+<strong>C_DODGERBLUE</strong> = (30, 144, 255)<br>
+<strong>C_FIREBRICK</strong> = (178, 34, 34)<br>
+<strong>C_FLORALWHITE</strong> = (255, 250, 240)<br>
+<strong>C_FORESTGREEN</strong> = (34, 139, 34)<br>
+<strong>C_FUCHSIA</strong> = (255, 0, 255)<br>
+<strong>C_GAINSBORO</strong> = (220, 220, 220)<br>
+<strong>C_GHOSTWHITE</strong> = (248, 248, 255)<br>
+<strong>C_GOLD</strong> = (255, 215, 0)<br>
+<strong>C_GOLDENROD</strong> = (218, 165, 32)<br>
+<strong>C_GRAY</strong> = (128, 128, 128)<br>
+<strong>C_GREEN</strong> = (0, 128, 0)<br>
+<strong>C_GREENYELLOW</strong> = (173, 255, 47)<br>
+<strong>C_HONEYDEW</strong> = (240, 255, 240)<br>
+<strong>C_HOTPINK</strong> = (255, 105, 180)<br>
+<strong>C_INDIANRED</strong> = (205, 92, 92)<br>
+<strong>C_INDIGO</strong> = (75, 0, 130)<br>
+<strong>C_IVORY</strong> = (255, 255, 240)<br>
+<strong>C_KHAKI</strong> = (240, 230, 140)<br>
+<strong>C_LAVENDER</strong> = (230, 230, 250)<br>
+<strong>C_LAVENDERBLUSH</strong> = (255, 240, 245)<br>
+<strong>C_LAWNGREEN</strong> = (124, 252, 0)<br>
+<strong>C_LEMONCHIFFON</strong> = (255, 250, 205)<br>
+<strong>C_LIGHTBLUE</strong> = (173, 216, 230)<br>
+<strong>C_LIGHTCORAL</strong> = (240, 128, 128)<br>
+<strong>C_LIGHTCYAN</strong> = (224, 255, 255)<br>
+<strong>C_LIGHTGOLDENRODYELLOW</strong> = (250, 250, 210)<br>
+<strong>C_LIGHTGREEN</strong> = (144, 238, 144)<br>
+<strong>C_LIGHTGREY</strong> = (211, 211, 211)<br>
+<strong>C_LIGHTPINK</strong> = (255, 182, 193)<br>
+<strong>C_LIGHTSALMON</strong> = (255, 160, 122)<br>
+<strong>C_LIGHTSEAGREEN</strong> = (32, 178, 170)<br>
+<strong>C_LIGHTSKYBLUE</strong> = (135, 206, 250)<br>
+<strong>C_LIGHTSLATEGRAY</strong> = (119, 136, 153)<br>
+<strong>C_LIGHTSTEELBLUE</strong> = (176, 196, 222)<br>
+<strong>C_LIGHTYELLOW</strong> = (255, 255, 224)<br>
+<strong>C_LIME</strong> = (0, 255, 0)<br>
+<strong>C_LIMEGREEN</strong> = (50, 205, 50)<br>
+<strong>C_LINEN</strong> = (250, 240, 230)<br>
+<strong>C_MAGENTA</strong> = (255, 0, 255)<br>
+<strong>C_MAROON</strong> = (128, 0, 0)<br>
+<strong>C_MEDIUMAQUAMARINE</strong> = (102, 205, 170)<br>
+<strong>C_MEDIUMBLUE</strong> = (0, 0, 205)<br>
+<strong>C_MEDIUMORCHID</strong> = (186, 85, 211)<br>
+<strong>C_MEDIUMPURPLE</strong> = (147, 112, 219)<br>
+<strong>C_MEDIUMSEAGREEN</strong> = (60, 179, 113)<br>
+<strong>C_MEDIUMSLATEBLUE</strong> = (123, 104, 238)<br>
+<strong>C_MEDIUMSPRINGGREEN</strong> = (0, 250, 154)<br>
+<strong>C_MEDIUMTURQUOISE</strong> = (72, 209, 204)<br>
+<strong>C_MEDIUMVIOLETRED</strong> = (199, 21, 133)<br>
+<strong>C_MIDNIGHTBLUE</strong> = (25, 25, 112)<br>
+<strong>C_MINTCREAM</strong> = (245, 255, 250)<br>
+<strong>C_MISTYROSE</strong> = (255, 228, 225)<br>
+<strong>C_MOCCASIN</strong> = (255, 228, 181)<br>
+<strong>C_NAVAJOWHITE</strong> = (255, 222, 173)<br>
+<strong>C_NAVY</strong> = (0, 0, 128)<br>
+<strong>C_OLDLACE</strong> = (253, 245, 230)<br>
+<strong>C_OLIVE</strong> = (128, 128, 0)<br>
+<strong>C_OLIVEDRAB</strong> = (107, 142, 35)<br>
+<strong>C_ORANGE</strong> = (255, 165, 0)<br>
+<strong>C_ORANGERED</strong> = (255, 69, 0)<br>
+<strong>C_ORCHID</strong> = (218, 112, 214)<br>
+<strong>C_PALEGOLDENROD</strong> = (238, 232, 170)<br>
+<strong>C_PALEGREEN</strong> = (152, 251, 152)<br>
+<strong>C_PALETURQUOISE</strong> = (175, 238, 238)<br>
+<strong>C_PALEVIOLETRED</strong> = (219, 112, 147)<br>
+<strong>C_PAPAYAWHIP</strong> = (255, 239, 213)<br>
+<strong>C_PEACHPUFF</strong> = (255, 218, 185)<br>
+<strong>C_PERU</strong> = (205, 133, 63)<br>
+<strong>C_PINK</strong> = (255, 192, 203)<br>
+<strong>C_PLUM</strong> = (221, 160, 221)<br>
+<strong>C_POWDERBLUE</strong> = (176, 224, 230)<br>
+<strong>C_PURPLE</strong> = (128, 0, 128)<br>
+<strong>C_RED</strong> = (255, 0, 0)<br>
+<strong>C_ROSYBROWN</strong> = (188, 143, 143)<br>
+<strong>C_ROYALBLUE</strong> = (65, 105, 225)<br>
+<strong>C_SADDLEBROWN</strong> = (139, 69, 19)<br>
+<strong>C_SALMON</strong> = (250, 128, 114)<br>
+<strong>C_SANDYBROWN</strong> = (244, 164, 96)<br>
+<strong>C_SEAGREEN</strong> = (46, 139, 87)<br>
+<strong>C_SEASHELL</strong> = (255, 245, 238)<br>
+<strong>C_SIENNA</strong> = (160, 82, 45)<br>
+<strong>C_SILVER</strong> = (192, 192, 192)<br>
+<strong>C_SKYBLUE</strong> = (135, 206, 235)<br>
+<strong>C_SLATEBLUE</strong> = (106, 90, 205)<br>
+<strong>C_SLATEGRAY</strong> = (112, 128, 144)<br>
+<strong>C_SNOW</strong> = (255, 250, 250)<br>
+<strong>C_SPRINGGREEN</strong> = (0, 255, 127)<br>
+<strong>C_STEELBLUE</strong> = (70, 130, 180)<br>
+<strong>C_TAN</strong> = (210, 180, 140)<br>
+<strong>C_TEAL</strong> = (0, 128, 128)<br>
+<strong>C_THISTLE</strong> = (216, 191, 216)<br>
+<strong>C_TOMATO</strong> = (255, 99, 71)<br>
+<strong>C_TURQUOISE</strong> = (64, 224, 208)<br>
+<strong>C_VIOLET</strong> = (238, 130, 238)<br>
+<strong>C_WHEAT</strong> = (245, 222, 179)<br>
+<strong>C_WHITE</strong> = (255, 255, 255)<br>
+<strong>C_WHITESMOKE</strong> = (245, 245, 245)<br>
+<strong>C_YELLOW</strong> = (255, 255, 0)<br>
+<strong>C_YELLOWGREEN</strong> = (154, 205, 50)<br>
+<strong>FONT_LAYOUT_ASCII_INCOL</strong> = 1<br>
+<strong>FONT_LAYOUT_ASCII_INROW</strong> = 2<br>
+<strong>FONT_LAYOUT_TCOD</strong> = 8<br>
+<strong>FONT_TYPE_GREYSCALE</strong> = 4<br>
+<strong>KEYDOWN</strong> = 'KEYDOWN'<br>
+<strong>KEYUP</strong> = 'KEYUP'<br>
+<strong>K_0</strong> = 24<br>
+<strong>K_1</strong> = 25<br>
+<strong>K_2</strong> = 26<br>
+<strong>K_3</strong> = 27<br>
+<strong>K_4</strong> = 28<br>
+<strong>K_5</strong> = 29<br>
+<strong>K_6</strong> = 30<br>
+<strong>K_7</strong> = 31<br>
+<strong>K_8</strong> = 32<br>
+<strong>K_9</strong> = 33<br>
+<strong>K_ALT</strong> = 7<br>
+<strong>K_APPS</strong> = 23<br>
+<strong>K_BACKSPACE</strong> = 2<br>
+<strong>K_CAPSLOCK</strong> = 9<br>
+<strong>K_CHAR</strong> = 65<br>
+<strong>K_CONTROL</strong> = 6<br>
+<strong>K_DELETE</strong> = 20<br>
+<strong>K_DOWN</strong> = 17<br>
+<strong>K_END</strong> = 12<br>
+<strong>K_ENTER</strong> = 4<br>
+<strong>K_ESCAPE</strong> = 1<br>
+<strong>K_F1</strong> = 50<br>
+<strong>K_F10</strong> = 59<br>
+<strong>K_F11</strong> = 60<br>
+<strong>K_F12</strong> = 61<br>
+<strong>K_F2</strong> = 51<br>
+<strong>K_F3</strong> = 52<br>
+<strong>K_F4</strong> = 53<br>
+<strong>K_F5</strong> = 54<br>
+<strong>K_F6</strong> = 55<br>
+<strong>K_F7</strong> = 56<br>
+<strong>K_F8</strong> = 57<br>
+<strong>K_F9</strong> = 58<br>
+<strong>K_HOME</strong> = 13<br>
+<strong>K_INSERT</strong> = 19<br>
+<strong>K_KP0</strong> = 34<br>
+<strong>K_KP1</strong> = 35<br>
+<strong>K_KP2</strong> = 36<br>
+<strong>K_KP3</strong> = 37<br>
+<strong>K_KP4</strong> = 38<br>
+<strong>K_KP5</strong> = 39<br>
+<strong>K_KP6</strong> = 40<br>
+<strong>K_KP7</strong> = 41<br>
+<strong>K_KP8</strong> = 42<br>
+<strong>K_KP9</strong> = 43<br>
+<strong>K_KPADD</strong> = 44<br>
+<strong>K_KPDEC</strong> = 48<br>
+<strong>K_KPDIV</strong> = 46<br>
+<strong>K_KPENTER</strong> = 49<br>
+<strong>K_KPMUL</strong> = 47<br>
+<strong>K_KPSUB</strong> = 45<br>
+<strong>K_LEFT</strong> = 15<br>
+<strong>K_LWIN</strong> = 21<br>
+<strong>K_NONE</strong> = 0<br>
+<strong>K_NUMLOCK</strong> = 62<br>
+<strong>K_PAGEDOWN</strong> = 11<br>
+<strong>K_PAGEUP</strong> = 10<br>
+<strong>K_PAUSE</strong> = 8<br>
+<strong>K_PRINTSCREEN</strong> = 18<br>
+<strong>K_RIGHT</strong> = 16<br>
+<strong>K_RWIN</strong> = 22<br>
+<strong>K_SCROLLLOCK</strong> = 63<br>
+<strong>K_SHIFT</strong> = 5<br>
+<strong>K_SPACE</strong> = 64<br>
+<strong>K_TAB</strong> = 3<br>
+<strong>K_UP</strong> = 14<br>
+<strong>MOUSEBUTTONLEFT</strong> = 1<br>
+<strong>MOUSEBUTTONMIDDLE</strong> = 2<br>
+<strong>MOUSEBUTTONRIGHT</strong> = 3<br>
+<strong>MOUSEDOWN</strong> = 'MOUSEDOWN'<br>
+<strong>MOUSEMOTION</strong> = 'MOUSEMOTION'<br>
+<strong>MOUSEUP</strong> = 'MOUSEUP'<br>
+<strong>QUIT</strong> = 'QUIT'<br>
+<strong>__all__</strong> = ['K_F1', 'K_F2', 'K_PAUSE', 'K_F4', 'K_F5', 'K_F6', 'K_F7', 'K_F8', 'K_F9', 'C_DARKTURQUOISE', 'C_MIDNIGHTBLUE', 'C_DARKGRAY', 'C_GREENYELLOW', 'K_F3', 'CHAR_DTEEN', 'CHAR_DNE', 'CHAR_DNW', 'C_ORCHID', 'C_GRAY', 'K_3', ...]</td></tr></table>
+</body></html>

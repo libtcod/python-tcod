@@ -1,0 +1,14 @@
+include *.txt
+include *.bat
+include tdl/*.bmp
+include tdl/*.png
+include tdl/*.txt
+include tdl/*.so
+include tdl/*.dll
+include tdl/*.dylib
+include tdl/*.framework.tar
+include examples/*.py
+include documentation/*.html
+include ez_setup.py
+exclude build/*
+exclude dist/*
