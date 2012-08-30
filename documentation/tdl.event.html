@@ -1,0 +1,410 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module tdl.event</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="tdl.html"><font color="#ffffff">tdl</font></a>.event</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:///C:/python32/lib/site-packages/tdl/event.py">c:\python32\lib\site-packages\tdl\event.py</a></font></td></tr></table>
+    <p><tt>This&nbsp;module&nbsp;handles&nbsp;user&nbsp;input.<br>
+&nbsp;<br>
+Here's&nbsp;a&nbsp;quick&nbsp;reference&nbsp;to&nbsp;<a href="#Event">Event</a>&nbsp;types&nbsp;and&nbsp;their&nbsp;attributes:<br>
+QUIT<br>
+KEYDOWN:&nbsp;key&nbsp;char&nbsp;alt&nbsp;ctrl&nbsp;shift&nbsp;lalt&nbsp;lctrl&nbsp;ralt&nbsp;rctrl<br>
+KEYUP:&nbsp;key&nbsp;char&nbsp;alt&nbsp;ctrl&nbsp;shift&nbsp;lalt&nbsp;lctrl&nbsp;ralt&nbsp;rctrl<br>
+MOUSEDOWN:&nbsp;button&nbsp;pos&nbsp;cell<br>
+MOUSEUP:&nbsp;button&nbsp;pos&nbsp;cell<br>
+MOUSEMOTION:&nbsp;pos&nbsp;cell&nbsp;motion&nbsp;cellmotion<br>
+&nbsp;<br>
+You&nbsp;will&nbsp;likely&nbsp;want&nbsp;to&nbsp;use&nbsp;the&nbsp;tdl.event.get&nbsp;function&nbsp;but&nbsp;you&nbsp;can&nbsp;still&nbsp;use&nbsp;the&nbsp;keywait&nbsp;and&nbsp;window_closed&nbsp;functions&nbsp;if&nbsp;you&nbsp;want.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="ctypes.html">ctypes</a><br>
+</td><td width="25%" valign=top><a href="tdl.local.html">tdl.local</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="tdl.event.html#Event">Event</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="tdl.event.html#KeyEvent">KeyEvent</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="tdl.event.html#KeyDown">KeyDown</a>
+</font></dt><dt><font face="helvetica, arial"><a href="tdl.event.html#KeyUp">KeyUp</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="tdl.event.html#MouseButtonEvent">MouseButtonEvent</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="tdl.event.html#MouseDown">MouseDown</a>
+</font></dt><dt><font face="helvetica, arial"><a href="tdl.event.html#MouseUp">MouseUp</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="tdl.event.html#MouseMotion">MouseMotion</a>
+</font></dt><dt><font face="helvetica, arial"><a href="tdl.event.html#Quit">Quit</a>
+</font></dt></dl>
+</dd>
+</dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Event">class <strong>Event</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Event-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>type</strong> = None</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="KeyDown">class <strong>KeyDown</strong></a>(<a href="tdl.event.html#KeyEvent">KeyEvent</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="tdl.event.html#KeyDown">KeyDown</a></dd>
+<dd><a href="tdl.event.html#KeyEvent">KeyEvent</a></dd>
+<dd><a href="tdl.event.html#Event">Event</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>type</strong> = 'KEYDOWN'</dl>
+
+<hr>
+Methods inherited from <a href="tdl.event.html#KeyEvent">KeyEvent</a>:<br>
+<dl><dt><a name="KeyDown-__init__"><strong>__init__</strong></a>(self, key, char, lalt, lctrl, ralt, rctrl, shift)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="tdl.event.html#KeyEvent">KeyEvent</a>:<br>
+<dl><dt><strong>alt</strong></dt>
+</dl>
+<dl><dt><strong>char</strong></dt>
+</dl>
+<dl><dt><strong>ctrl</strong></dt>
+</dl>
+<dl><dt><strong>key</strong></dt>
+</dl>
+<dl><dt><strong>lalt</strong></dt>
+</dl>
+<dl><dt><strong>lctrl</strong></dt>
+</dl>
+<dl><dt><strong>ralt</strong></dt>
+</dl>
+<dl><dt><strong>rctrl</strong></dt>
+</dl>
+<dl><dt><strong>shift</strong></dt>
+</dl>
+<hr>
+Methods inherited from <a href="tdl.event.html#Event">Event</a>:<br>
+<dl><dt><a name="KeyDown-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="KeyEvent">class <strong>KeyEvent</strong></a>(<a href="tdl.event.html#Event">Event</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="tdl.event.html#KeyEvent">KeyEvent</a></dd>
+<dd><a href="tdl.event.html#Event">Event</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="KeyEvent-__init__"><strong>__init__</strong></a>(self, key, char, lalt, lctrl, ralt, rctrl, shift)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>alt</strong></dt>
+</dl>
+<dl><dt><strong>char</strong></dt>
+</dl>
+<dl><dt><strong>ctrl</strong></dt>
+</dl>
+<dl><dt><strong>key</strong></dt>
+</dl>
+<dl><dt><strong>lalt</strong></dt>
+</dl>
+<dl><dt><strong>lctrl</strong></dt>
+</dl>
+<dl><dt><strong>ralt</strong></dt>
+</dl>
+<dl><dt><strong>rctrl</strong></dt>
+</dl>
+<dl><dt><strong>shift</strong></dt>
+</dl>
+<hr>
+Methods inherited from <a href="tdl.event.html#Event">Event</a>:<br>
+<dl><dt><a name="KeyEvent-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="tdl.event.html#Event">Event</a>:<br>
+<dl><dt><strong>type</strong> = None</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="KeyUp">class <strong>KeyUp</strong></a>(<a href="tdl.event.html#KeyEvent">KeyEvent</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="tdl.event.html#KeyUp">KeyUp</a></dd>
+<dd><a href="tdl.event.html#KeyEvent">KeyEvent</a></dd>
+<dd><a href="tdl.event.html#Event">Event</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>type</strong> = 'KEYUP'</dl>
+
+<hr>
+Methods inherited from <a href="tdl.event.html#KeyEvent">KeyEvent</a>:<br>
+<dl><dt><a name="KeyUp-__init__"><strong>__init__</strong></a>(self, key, char, lalt, lctrl, ralt, rctrl, shift)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="tdl.event.html#KeyEvent">KeyEvent</a>:<br>
+<dl><dt><strong>alt</strong></dt>
+</dl>
+<dl><dt><strong>char</strong></dt>
+</dl>
+<dl><dt><strong>ctrl</strong></dt>
+</dl>
+<dl><dt><strong>key</strong></dt>
+</dl>
+<dl><dt><strong>lalt</strong></dt>
+</dl>
+<dl><dt><strong>lctrl</strong></dt>
+</dl>
+<dl><dt><strong>ralt</strong></dt>
+</dl>
+<dl><dt><strong>rctrl</strong></dt>
+</dl>
+<dl><dt><strong>shift</strong></dt>
+</dl>
+<hr>
+Methods inherited from <a href="tdl.event.html#Event">Event</a>:<br>
+<dl><dt><a name="KeyUp-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="MouseButtonEvent">class <strong>MouseButtonEvent</strong></a>(<a href="tdl.event.html#Event">Event</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="tdl.event.html#MouseButtonEvent">MouseButtonEvent</a></dd>
+<dd><a href="tdl.event.html#Event">Event</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="MouseButtonEvent-__init__"><strong>__init__</strong></a>(self, button, pos, cell)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>button</strong></dt>
+</dl>
+<dl><dt><strong>cell</strong></dt>
+</dl>
+<dl><dt><strong>pos</strong></dt>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>type</strong> = 'MOUSEDOWN'</dl>
+
+<hr>
+Methods inherited from <a href="tdl.event.html#Event">Event</a>:<br>
+<dl><dt><a name="MouseButtonEvent-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="MouseDown">class <strong>MouseDown</strong></a>(<a href="tdl.event.html#MouseButtonEvent">MouseButtonEvent</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="tdl.event.html#MouseDown">MouseDown</a></dd>
+<dd><a href="tdl.event.html#MouseButtonEvent">MouseButtonEvent</a></dd>
+<dd><a href="tdl.event.html#Event">Event</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>type</strong> = 'MOUSEDOWN'</dl>
+
+<hr>
+Methods inherited from <a href="tdl.event.html#MouseButtonEvent">MouseButtonEvent</a>:<br>
+<dl><dt><a name="MouseDown-__init__"><strong>__init__</strong></a>(self, button, pos, cell)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="tdl.event.html#MouseButtonEvent">MouseButtonEvent</a>:<br>
+<dl><dt><strong>button</strong></dt>
+</dl>
+<dl><dt><strong>cell</strong></dt>
+</dl>
+<dl><dt><strong>pos</strong></dt>
+</dl>
+<hr>
+Methods inherited from <a href="tdl.event.html#Event">Event</a>:<br>
+<dl><dt><a name="MouseDown-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="MouseMotion">class <strong>MouseMotion</strong></a>(<a href="tdl.event.html#Event">Event</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="tdl.event.html#MouseMotion">MouseMotion</a></dd>
+<dd><a href="tdl.event.html#Event">Event</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="MouseMotion-__init__"><strong>__init__</strong></a>(self, pos, cell, relpos, relcell)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>cell</strong></dt>
+</dl>
+<dl><dt><strong>cellmotion</strong></dt>
+</dl>
+<dl><dt><strong>motion</strong></dt>
+</dl>
+<dl><dt><strong>pos</strong></dt>
+</dl>
+<dl><dt><strong>relcell</strong></dt>
+</dl>
+<dl><dt><strong>relpos</strong></dt>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>type</strong> = 'MOUSEMOTION'</dl>
+
+<hr>
+Methods inherited from <a href="tdl.event.html#Event">Event</a>:<br>
+<dl><dt><a name="MouseMotion-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="MouseUp">class <strong>MouseUp</strong></a>(<a href="tdl.event.html#MouseButtonEvent">MouseButtonEvent</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="tdl.event.html#MouseUp">MouseUp</a></dd>
+<dd><a href="tdl.event.html#MouseButtonEvent">MouseButtonEvent</a></dd>
+<dd><a href="tdl.event.html#Event">Event</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>type</strong> = 'MOUSEUP'</dl>
+
+<hr>
+Methods inherited from <a href="tdl.event.html#MouseButtonEvent">MouseButtonEvent</a>:<br>
+<dl><dt><a name="MouseUp-__init__"><strong>__init__</strong></a>(self, button, pos, cell)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="tdl.event.html#MouseButtonEvent">MouseButtonEvent</a>:<br>
+<dl><dt><strong>button</strong></dt>
+</dl>
+<dl><dt><strong>cell</strong></dt>
+</dl>
+<dl><dt><strong>pos</strong></dt>
+</dl>
+<hr>
+Methods inherited from <a href="tdl.event.html#Event">Event</a>:<br>
+<dl><dt><a name="MouseUp-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Quit">class <strong>Quit</strong></a>(<a href="tdl.event.html#Event">Event</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="tdl.event.html#Quit">Quit</a></dd>
+<dd><a href="tdl.event.html#Event">Event</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>type</strong> = 'QUIT'</dl>
+
+<hr>
+Methods inherited from <a href="tdl.event.html#Event">Event</a>:<br>
+<dl><dt><a name="Quit-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-get"><strong>get</strong></a>()</dt><dd><tt>Flushes&nbsp;the&nbsp;event&nbsp;queue&nbsp;and&nbsp;returns&nbsp;the&nbsp;list&nbsp;of&nbsp;events.<br>
+&nbsp;<br>
+This&nbsp;function&nbsp;returns&nbsp;<a href="#Event">Event</a>&nbsp;objects&nbsp;that&nbsp;can&nbsp;be&nbsp;ID'd&nbsp;and&nbsp;sorted&nbsp;with&nbsp;their&nbsp;type&nbsp;attribute:<br>
+for&nbsp;event&nbsp;in&nbsp;tdl.event.<a href="#-get">get</a>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;event.type&nbsp;==&nbsp;tdl.QUIT:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;raise&nbsp;SystemExit()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;elif&nbsp;event.type&nbsp;==&nbsp;tdl.MOUSEDOWN:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print('Mouse&nbsp;button&nbsp;%i&nbsp;clicked&nbsp;at&nbsp;%i,&nbsp;%i'&nbsp;%&nbsp;(event.button,&nbsp;event.pos[0],&nbsp;event.pos[1]))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;elif&nbsp;event.type&nbsp;==&nbsp;tdl.KEYDOWN:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print('Key&nbsp;#%i&nbsp;"%s"&nbsp;pressed'&nbsp;%&nbsp;(event.key,&nbsp;event.char))<br>
+&nbsp;<br>
+Here&nbsp;is&nbsp;a&nbsp;list&nbsp;of&nbsp;events&nbsp;and&nbsp;their&nbsp;attributes:<br>
+QUIT<br>
+KEYDOWN:&nbsp;key&nbsp;char&nbsp;alt&nbsp;ctrl&nbsp;shift&nbsp;lalt&nbsp;lctrl&nbsp;ralt&nbsp;rctrl<br>
+KEYUP:&nbsp;key&nbsp;char&nbsp;alt&nbsp;ctrl&nbsp;shift&nbsp;lalt&nbsp;lctrl&nbsp;ralt&nbsp;rctrl<br>
+MOUSEDOWN:&nbsp;button&nbsp;pos&nbsp;cell<br>
+MOUSEUP:&nbsp;button&nbsp;pos&nbsp;cell<br>
+MOUSEMOTION:&nbsp;pos&nbsp;motion&nbsp;cell&nbsp;cellmotion</tt></dd></dl>
+ <dl><dt><a name="-keypressed"><strong>keypressed</strong></a>(key)</dt><dd><tt>Returns&nbsp;True&nbsp;when&nbsp;key&nbsp;is&nbsp;currently&nbsp;pressed.<br>
+&nbsp;<br>
+key&nbsp;can&nbsp;be&nbsp;a&nbsp;number&nbsp;or&nbsp;single&nbsp;length&nbsp;string</tt></dd></dl>
+ <dl><dt><a name="-keywait"><strong>keywait</strong></a>()</dt><dd><tt>Waits&nbsp;until&nbsp;the&nbsp;user&nbsp;presses&nbsp;a&nbsp;key.&nbsp;&nbsp;Returns&nbsp;<a href="#KeyDown">KeyDown</a>&nbsp;events.</tt></dd></dl>
+ <dl><dt><a name="-window_closed"><strong>window_closed</strong></a>()</dt><dd><tt>Returns&nbsp;True&nbsp;if&nbsp;the&nbsp;exit&nbsp;button&nbsp;on&nbsp;the&nbsp;window&nbsp;has&nbsp;been&nbsp;clicked&nbsp;and<br>
+stays&nbsp;True&nbsp;afterwards.</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>__all__</strong> = ['Quit', 'MouseUp', 'KeyDown', 'keypressed', 'MouseMotion', 'MouseButtonEvent', 'local', 'get', 'MouseDown', 'window_closed', 'KeyEvent', 'KeyUp', 'keywait', 'ctypes', 'Event']</td></tr></table>
+</body></html>
