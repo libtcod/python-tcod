@@ -19,7 +19,7 @@ MOUSEDOWN:&nbsp;button&nbsp;pos&nbsp;cell<br>
 MOUSEUP:&nbsp;button&nbsp;pos&nbsp;cell<br>
 MOUSEMOTION:&nbsp;pos&nbsp;cell&nbsp;motion&nbsp;cellmotion<br>
 &nbsp;<br>
-You&nbsp;will&nbsp;likely&nbsp;want&nbsp;to&nbsp;use&nbsp;the&nbsp;tdl.event.get&nbsp;function&nbsp;but&nbsp;you&nbsp;can&nbsp;still&nbsp;use&nbsp;the&nbsp;keywait&nbsp;and&nbsp;window_closed&nbsp;functions&nbsp;if&nbsp;you&nbsp;want.</tt></p>
+You&nbsp;will&nbsp;likely&nbsp;want&nbsp;to&nbsp;use&nbsp;the&nbsp;tdl.event.get&nbsp;function&nbsp;but&nbsp;you&nbsp;can&nbsp;still&nbsp;use&nbsp;the&nbsp;keyWait&nbsp;and&nbsp;isWindowClosed&nbsp;functions&nbsp;if&nbsp;you&nbsp;want.</tt></p>
 <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#aa55cc">
@@ -109,6 +109,8 @@ Data descriptors inherited from <a href="tdl.event.html#KeyEvent">KeyEvent</a>:<
 </dl>
 <dl><dt><strong>key</strong></dt>
 </dl>
+<dl><dt><strong>keyname</strong></dt>
+</dl>
 <dl><dt><strong>lalt</strong></dt>
 </dl>
 <dl><dt><strong>lctrl</strong></dt>
@@ -148,6 +150,8 @@ Data descriptors defined here:<br>
 <dl><dt><strong>ctrl</strong></dt>
 </dl>
 <dl><dt><strong>key</strong></dt>
+</dl>
+<dl><dt><strong>keyname</strong></dt>
 </dl>
 <dl><dt><strong>lalt</strong></dt>
 </dl>
@@ -197,6 +201,8 @@ Data descriptors inherited from <a href="tdl.event.html#KeyEvent">KeyEvent</a>:<
 <dl><dt><strong>ctrl</strong></dt>
 </dl>
 <dl><dt><strong>key</strong></dt>
+</dl>
+<dl><dt><strong>keyname</strong></dt>
 </dl>
 <dl><dt><strong>lalt</strong></dt>
 </dl>
@@ -393,12 +399,12 @@ KEYUP:&nbsp;key&nbsp;char&nbsp;alt&nbsp;ctrl&nbsp;shift&nbsp;lalt&nbsp;lctrl&nbs
 MOUSEDOWN:&nbsp;button&nbsp;pos&nbsp;cell<br>
 MOUSEUP:&nbsp;button&nbsp;pos&nbsp;cell<br>
 MOUSEMOTION:&nbsp;pos&nbsp;motion&nbsp;cell&nbsp;cellmotion</tt></dd></dl>
- <dl><dt><a name="-keypressed"><strong>keypressed</strong></a>(key)</dt><dd><tt>Returns&nbsp;True&nbsp;when&nbsp;key&nbsp;is&nbsp;currently&nbsp;pressed.<br>
+ <dl><dt><a name="-isWindowClosed"><strong>isWindowClosed</strong></a>()</dt><dd><tt>Returns&nbsp;True&nbsp;if&nbsp;the&nbsp;exit&nbsp;button&nbsp;on&nbsp;the&nbsp;window&nbsp;has&nbsp;been&nbsp;clicked&nbsp;and<br>
+stays&nbsp;True&nbsp;afterwards.</tt></dd></dl>
+ <dl><dt><a name="-keyPressed"><strong>keyPressed</strong></a>(key)</dt><dd><tt>Returns&nbsp;True&nbsp;when&nbsp;key&nbsp;is&nbsp;currently&nbsp;pressed.<br>
 &nbsp;<br>
 key&nbsp;can&nbsp;be&nbsp;a&nbsp;number&nbsp;or&nbsp;single&nbsp;length&nbsp;string</tt></dd></dl>
- <dl><dt><a name="-keywait"><strong>keywait</strong></a>()</dt><dd><tt>Waits&nbsp;until&nbsp;the&nbsp;user&nbsp;presses&nbsp;a&nbsp;key.&nbsp;&nbsp;Returns&nbsp;<a href="#KeyDown">KeyDown</a>&nbsp;events.</tt></dd></dl>
- <dl><dt><a name="-window_closed"><strong>window_closed</strong></a>()</dt><dd><tt>Returns&nbsp;True&nbsp;if&nbsp;the&nbsp;exit&nbsp;button&nbsp;on&nbsp;the&nbsp;window&nbsp;has&nbsp;been&nbsp;clicked&nbsp;and<br>
-stays&nbsp;True&nbsp;afterwards.</tt></dd></dl>
+ <dl><dt><a name="-keyWait"><strong>keyWait</strong></a>()</dt><dd><tt>Waits&nbsp;until&nbsp;the&nbsp;user&nbsp;presses&nbsp;a&nbsp;key.&nbsp;&nbsp;Returns&nbsp;<a href="#KeyDown">KeyDown</a>&nbsp;events.</tt></dd></dl>
 </td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#55aa55">
@@ -406,5 +412,5 @@ stays&nbsp;True&nbsp;afterwards.</tt></dd></dl>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>__all__</strong> = ['Quit', 'MouseUp', 'KeyDown', 'keypressed', 'MouseMotion', 'MouseButtonEvent', 'local', 'get', 'MouseDown', 'window_closed', 'KeyEvent', 'KeyUp', 'keywait', 'ctypes', 'Event']</td></tr></table>
+<td width="100%"><strong>__all__</strong> = ['Quit', 'MouseUp', 'KeyDown', 'keyWait', 'MouseMotion', 'keyPressed', 'MouseButtonEvent', 'local', 'isWindowClosed', 'get', 'ctypes', 'KeyEvent', 'KeyUp', 'MouseDown', 'Event']</td></tr></table>
 </body></html>
