@@ -3,10 +3,12 @@ include *.bat
 include tdl/*.bmp
 include tdl/*.png
 include tdl/*.txt
-include tdl/*.so
-include tdl/*.dll
+include tdl/lib/*.txt
+include tdl/linux*/*.so
+include tdl/win32/*.dll
 include tdl/*.dylib
-include tdl/*.framework.tar
+include tdl/lib/darwin/*
+include Frameworks/*.framework.tar
 include examples/*.py
 include documentation/*.html
 include ez_setup.py

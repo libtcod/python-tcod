@@ -18,35 +18,29 @@ except ImportError:
 
 def _unpackFramework(framework, path):
     # get framework.tar file, remove ".tar" and add path
-    return os.path.join(_unpackfile(framework)[:-4], path)
-        
+    return os.path.abspath(os.path.join(_unpackfile(framework)[:-4], path))
+
+def _loadDLL(dll):
+    # shorter version of file unpacking and linking
+    return cdll.LoadLibrary(_unpackfile(dll))
+    
+    
 def _get_library_crossplatform():
     bits, linkage = platform.architecture()
     libpath = None
     if 'win32' in sys.platform:
-        cdll.LoadLibrary(os.path.abspath(_unpackfile('SDL.dll')))
-        cdll.LoadLibrary(os.path.abspath(_unpackfile('zlib1.dll')))
-        libpath = _unpackfile('libtcod-VS.dll')
-        #libpath = _unpackfile('libtcod-mingw.dll')
+        _loadDLL('lib/win32/SDL.dll')
+        _loadDLL('lib/win32/zlib1.dll')
+        return _loadDLL('lib/win32/libtcod-VS.dll')
     elif 'linux' in sys.platform:
         if bits == '32bit':
-            libpath = _unpackfile('libtcod.so')
+            return _loadDLL('lib/linux32/libtcod.so')
         elif bits == '64bit':
-            libpath = _unpackfile('libtcod64.so')
+            return _loadDLL('lib/linux64/libtcod.so')
     elif 'darwin' in sys.platform:
-        # todo: figure out what I'm actually doing here
-        # this area is still a bit wrong but I'll need to set up an OSX enviroment to test
-        cdll.LoadLibrary(_unpackFramework('SDL_image.framework.tar', 'Versions/A/SDL_image'))
-        cdll.LoadLibrary(_unpackFramework('libpng14.framework.tar', 'Versions/1.4.8/libpng'))
-        cdll.LoadLibrary(_unpackFramework('SDL.framework.tar', 'Versions/A/SDL'))
-        libpath = _unpackFramework('libtcod.framework.tar', 'Versions/A/libtcod')
+        return _loadDLL('lib/darwin/libtcod')
     else:
         raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
-
-    libpath = os.path.abspath(libpath)
-    if not os.path.exists(libpath):
-        raise Exception('Operating system supported, but the library is missing: %s' % libpath)
-    return cdll.LoadLibrary(libpath)
 
 _lib = _get_library_crossplatform()
 
