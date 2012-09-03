@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-REVISION = int(open('./.bzr/branch/last-revision', 'r').read().split(' ')[0])
+REVISION = int(''.join(c for c in "$Revision$" if c.isdigit()))
 VERSION = '1.0r%i' % REVISION
 
 try:
@@ -23,7 +23,7 @@ The library is used for displaying tilesets (ascii or graphical) in true color.
       download_url='https://launchpad.net/rlu/+download',
       packages=['tdl'],
       #package_dir={'tdl': 'tdl'},
-      package_data={'tdl': ['*.txt', '*.bmp', '*.png', '*.so', '*.dll', '*.framework.tar']},
+      package_data={'tdl': ['lib/*.txt', '*.bmp', '*.png', 'lib/linux*/*.so', 'lib/win32/*.dll', 'lib/darwin/*']},
       include_package_data=True,
       install_requires=['setuptools'],
       classifiers=['Development Status :: 4 - Beta',
