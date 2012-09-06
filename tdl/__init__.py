@@ -22,12 +22,11 @@ def _formatChar(char):
     "Prepares a single character for passing to ctypes calls"
     if char is None:
         return None
-    elif isinstance(char, (str, bytes))and len(char) == 1:
+    if isinstance(char, (str, bytes)) and len(char) == 1:
         return ord(char)
-    elif isinstance(char, (int)):
+    if isinstance(char, int) or not _IS_PYTHON3 and isinstance(char, long):
         return char
-    else:
-        raise TypeError('Expected char parameter to be a single character string, number, or None, got %s' % repr(char))
+    raise TypeError('Expected char parameter to be a single character string, number, or None, got: %s' % repr(char))
 
 _fontinitialized = False
 _rootinitialized = False
@@ -41,7 +40,7 @@ def _verify_colors(*colors):
     "raise an error if the parameters can not be converted into colors"
     for color in colors:
         if not _iscolor(color):
-            raise TypeError('a color must be a 3 item tuple or None, recived %s' % repr())
+            raise TypeError('a color must be a 3 item tuple or None, received %s' % repr())
 
 def _iscolor(color):
     """Used internally
@@ -51,9 +50,10 @@ def _iscolor(color):
     # this is called often and must be optimized
     if color is None:
         return True
-    if isinstance(color, (tuple, list, _Color)) and len(color) == 3:
-        return True
-    if isinstance(color, int) and 0x000000 <= color <= 0xffffff:
+    if isinstance(color, (tuple, list, _Color)):
+    #if color.__class__ in (tuple, list, _Color):
+        return len(color) == 3
+    if color.__class__ is int and 0x000000 <= color <= 0xffffff:
         return True
     return False
 
@@ -62,24 +62,27 @@ def _formatColor(color):
     """
     if color is None:
         return None
-    if isinstance(color, _Color):
+    # avoid isinstance, checking __class__ gives a small speed increase
+    if color.__class__ is _Color:
         return color
-    if isinstance(color, int):
+    if color.__class__ is int:
         # format a web style color with the format 0xRRGGBB
         return _Color(color >> 16 & 0xff, color >> 8 & 0xff, color & 0xff)
     return _Color(*color)
 
 class TDLError(Exception):
-    pass
+    """
+    The catch all for most TDL specific errors.
+    """
 
-class TDLDrawError(TDLError):
-    pass
+#class TDLDrawError(TDLError):
+#    pass
 
 #class TDLBlitError(TDLError):
 #    pass
 
-class TDLIndexError(TDLError):
-    pass
+#class TDLIndexError(TDLError):
+#    pass
 
 class Console(object):
     """The Console is the main class of the tdl library.
@@ -177,13 +180,17 @@ class Console(object):
             width = height = 0
         return x, y, width, height
     
-    def blit(self, source, x=0, y=0, width=None, height=None, srcx=0, srcy=0, fgalpha=1.0, bgalpha=1.0):
+    def blit(self, source, x=0, y=0, width=None, height=None, srcx=0, srcy=0):
         """Blit another console or Window onto the current console.
 
         By default it blits the entire source to the topleft corner.
         
-        If nothing is blited then TDLBlitError is raised
+        If nothing is blited then TDLError is raised
         """
+        # hardcode alpha settings for now
+        fgalpha=1.0
+        bgalpha=1.0
+        
         assert isinstance(source, (Console, Window)), "source muse be a Window or Console instance"
         
         # if None is used, get the cursor position
@@ -228,7 +235,6 @@ class Console(object):
     def _cursor_advance(self, rate=1):
         "Move the virtual cursor forward, one step by default"
         self.cursorX += rate
-        self._cursor_normalize()
     
     def _cursor_newline(self):
         "Move the cursor down and set x=0"
@@ -238,6 +244,8 @@ class Console(object):
     
     def _cursor_get(self, x=None, y=None):
         "Fill in blanks with the cursor position"
+        if x is None or y is None:
+            self._cursor_normalize() # make sure cursor is valid first
         if x is None:
             x = self.cursorX
         if y is None:
@@ -267,7 +275,7 @@ class Console(object):
         
         if (x is None or 0 <= x < self.width) and (y is None or 0 <= y < self.height):
             return
-        raise TDLIndexError('(%i, %i) is an invalid postition.  %s size is (%i, %i)' %
+        raise TDLError('(%i, %i) is an invalid postition.  %s size is (%i, %i)' %
                             (x, y, self.__class__.__name__, self.width, self.height))
 
     def _translate(self, x, y):
@@ -279,8 +287,8 @@ class Console(object):
         """
         #assert _iscolor(fillcolor), 'fillcolor must be a 3 item list'
         #assert fillcolor is not None, 'fillcolor can not be None'
-        _lib.TCOD_console_set_foreground_color(self, _Color(*fgcolor))
-        _lib.TCOD_console_set_background_color(self, _Color(*bgcolor))
+        _lib.TCOD_console_set_foreground_color(self, _formatColor(fgcolor))
+        _lib.TCOD_console_set_background_color(self, _formatColor(bgcolor))
         _lib.TCOD_console_clear(self)
     
     def _setChar(self, char, x, y, fgcolor=None, bgcolor=None, bgblend=BND_SET):
@@ -293,34 +301,33 @@ class Console(object):
         if bgcolor is not None:
             _setback(self, x, y, _formatColor(bgcolor), bgblend)
     
-    def drawChar(self, char, x=None, y=None, fgcolor=None, bgcolor=None, bgblend=BND_SET):
+    def drawChar(self, char, x=None, y=None, fgcolor=None, bgcolor=None):
         """Draws a single character.
 
         char should be an integer, single character string, or None
         you can set the char parameter as None if you only want to change
         the colors of the tile.
 
-        For fgcolor and bgcolor you use a 3 item list or a Color instance. None
-        will keep the color unchanged.
+        For fgcolor and bgcolor you use a 3 item list or None
+        None will keep the color unchanged.
 
-        bgblend is used to tell how the bgcolor blends into the background. The
-        default is BND_SET.
-
-        Having the x or y values outside of the console will raise a
-        tdl.BadIndex error.
+        Having the x or y values outside of the console will raise a TDLError.
         """
-        if isinstance(char, (str, bytes)):
-            assert len(char) == 1, 'strings must only have one character'
-            char = ord(char)
-        assert isinstance(char, int) or char is None, \
-               'char must be an integer, single character string, or None'
+        # hardcode alpha settings for now
+        bgblend=BND_SET
+        #if isinstance(char, (str, bytes)):
+        #    assert len(char) == 1, 'strings must only have one character'
+        #    char = ord(char)
+        #assert isinstance(char, int) or char is None, \
+        #       'char must be an integer, single character string, or None'
+        char = _formatChar(char)
         _verify_colors(fgcolor, bgcolor)
         x, y = self._cursor_move(x, y)
         
         self._setChar(char, x, y, _formatColor(fgcolor), _formatColor(bgcolor), bgblend)
         self._cursor_advance()
 
-    def drawStr(self, string, x=None, y=None, fgcolor=None, bgcolor=None, bgblend=BND_SET):
+    def drawStr(self, string, x=None, y=None, fgcolor=None, bgcolor=None):
         """Draws a string starting at x and y.
 
         A string that goes past the end will wrap around.  No warning will be
@@ -332,6 +339,9 @@ class Console(object):
 
         If a large enough tileset is loaded you can use a unicode string.
         """
+        # hardcode alpha settings for now
+        bgblend=BND_SET
+        
         x, y = self._cursor_move(x, y)
         _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
@@ -340,28 +350,35 @@ class Console(object):
             self._setChar(char, self.cursorX, self.cursorY, fgcolor, bgcolor, bgblend)
             self._cursor_advance()
     
-    def drawRect(self, char, x=0, y=0, width=None, height=None, fgcolor=None, bgcolor=None, bgblend=BND_SET):
+    def drawRect(self, char, x=0, y=0, width=None, height=None, fgcolor=None, bgcolor=None):
         """Draws a rectangle starting from x and y and extending to width and
         height.  If width or height are None then it will extend to the edge
         of the console.  The rest are the same as drawChar.
         """
+        # hardcode alpha settings for now
+        bgblend=BND_SET
+        
         # replace None with cursor position
         x, y = self._cursor_get(x, y)
         # clamp rect to bounds
         x, y, width, height = self._clampRect(x, y, width, height)
         if (width, height) == (0, 0):
-            raise TDLDrawError('Rectange is entirely out of bounds')
+            raise TDLError('Rectange is out of bounds at (%i, %i), bounds are (%i, %i)' % ((x, y) + self.getSize()))
         _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
         for cellY in range(y, y + height):
             for cellX in range(x, x + width):
                 self._setChar(char, cellX, cellY, fgcolor, bgcolor, bgblend)
         
-    def drawFrame(self, char, x=0, y=0, width=None, height=None, fgcolor=None, bgcolor=None, bgblend=BND_SET):
+    def drawFrame(self, char, x=0, y=0, width=None, height=None, fgcolor=None, bgcolor=None):
+        "Similar to drawRect but only draws the outline of the rectangle"
+        # hardcode alpha settings for now
+        bgblend=BND_SET
+        
         x, y = self._cursor_get(x, y)
         x, y, width, height = self._clampRect(x, y, width, height)
         if (width, height) == (0, 0):
-            raise TDLDrawError('Rectange is entirely out of bounds')
+            raise TDLError('Rectange is out of bounds at (%i, %i), bounds are (%i, %i)' % ((x, y) + self.getSize()))
         _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
         #self.draw_rect(fgcolor, bgcolor, char, x, y, width, height, False, bgblend)
@@ -382,8 +399,6 @@ class Console(object):
         """
         self._drawable(x, y)
         char = _lib.TCOD_console_get_char(self, x, y)
-        #if _IS_PYTHON3:
-        #    char = char.decode()
         fgcolor = tuple(_lib.TCOD_console_get_fore(self, x, y))
         bgcolor = tuple(_lib.TCOD_console_get_back(self, x, y))
         return char, fgcolor, bgcolor
@@ -407,7 +422,7 @@ class Window(object):
 
     def __init__(self, console, x=0, y=0, width=None, height=None):
         if not isinstance(console, (Console, Window)):
-            raise TypeError('console must be a Console or Window instance')
+            raise TypeError('console parameter must be a Console or Window instance')
         assert isinstance(x, int)
         assert isinstance(y, int)
         assert isinstance(width, int) or width is None
@@ -505,7 +520,7 @@ def flush():
     """Make all changes visible and update the screen.
     """
     if not _rootinitialized:
-        raise TDLError('Cannot flush without first initializing')
+        raise TDLError('Cannot flush without first initializing with tdl.init')
     if event._autoflush and not event._eventsflushed:
         event.get()
     else: # do not flush events after the user starts using them
@@ -536,17 +551,17 @@ def getFullscreen():
     """Returns if the window is fullscreen
 
     The user can't make the window fullscreen so you must use the
-    set_fullscreen function
+    setFullscreen function
     """
     if not _rootinitialized:
-        raise TDLError('Initialize first')
+        raise TDLError('Initialize first with tdl.init')
     return _lib.TCOD_console_is_fullscreen()
 
 def setFullscreen(fullscreen):
     """Sets the fullscreen state to the boolen value
     """
     if not _rootinitialized:
-        raise TDLError('Initialize first')
+        raise TDLError('Initialize first with tdl.init')
     _lib.TCOD_console_set_fullscreen(fullscreen)
 
 def setTitle(title):
@@ -556,26 +571,6 @@ def setTitle(title):
         raise TDLError('Not initilized.  Set title with tdl.init')
     _lib.TCOD_console_set_window_title(_format_string(title))
 
-def setFade(color, fade):
-    """Have the screen fade out into a color.
-
-    color is a 3 item tuple or list.
-    fade is a number between 0 and 255 with 0 making the screen one solid color
-    and 255 turning the fade effect off.
-    """
-    if not _rootinitialized:
-        raise TDLError('Initialize first')
-    _lib.TCOD_console_set_fade(fade, _Color(*color))
-
-def getFade():
-    """Return the current fade of the screen as (color, fade)
-    """
-    if not _rootinitialized:
-        raise TDLError('Initialize first')
-    fade = _lib.TCOD_console_get_fade()
-    fadecolor = tuple(_lib.TCOD_console_get_fading_color())
-    return fadecolor, fade
-
 def screenshot(fileobj=None):
     """Capture the screen and place it in fileobj.
 
@@ -584,7 +579,7 @@ def screenshot(fileobj=None):
     screenshotNNNN.png
     """
     if not _rootinitialized:
-        raise TDLError('Initialize first')
+        raise TDLError('Initialize first with tdl.init')
     if isinstance(fileobj, str):
         _lib.TCOD_sys_save_screenshot(_format_string(fileobj))
     elif isinstance(fileobj, file):
@@ -622,20 +617,6 @@ def forceResolution(width, height):
     """Change the fullscreen resoulution
     """
     _lib.TCOD_sys_force_fullscreen_resolution(width, height)
-
-def bresenham(startx, starty, endx, endy):
-    """Returns a list of points between and including the start and end points.
-    The points create a bresenham line.
-    """
-    _lib.TCOD_line_init(startx, starty, endx, endy)
-    finished = False
-    pointlist = []
-    x = ctypes.c_int()
-    y = ctypes.c_int()
-    while not finished:
-        finished = _lib.TCOD_line_step(x, y)
-        pointlist.append((x.value, y.value))
-    return pointlist
 
 __all__ = [var for var in locals().keys() if not '_' in var[0]]
 
