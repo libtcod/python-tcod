@@ -57,6 +57,7 @@ def main():
         with randomTimer:
             # getrandbits is around 5x faster than using randint
             bgcolors = [(random.getrandbits(6), random.getrandbits(6), random.getrandbits(6)) for _ in range(TOTAL)]
+            #bgcolors = [(random.getrandbits(24)) for _ in range(TOTAL)]
             char = [random.getrandbits(8) for _ in range(TOTAL)]
         with drawTimer:
             for (x,y), bgcolor, char in zip(CELLS, bgcolors, char):
