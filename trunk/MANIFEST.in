@@ -3,6 +3,7 @@ include *.bat
 include tdl/*.bmp
 include tdl/*.png
 include tdl/*.txt
+include tdl/VERSION
 include tdl/lib/*.txt
 include tdl/linux*/*.so
 include tdl/win32/*.dll

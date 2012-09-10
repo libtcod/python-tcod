@@ -1,13 +1,29 @@
 #!/usr/bin/env python
 
-REVISION = int(''.join(c for c in "$Rev$" if c.isdigit()))
-VERSION = '1.0r%i' % REVISION
+import subprocess
+from distutils.core import setup
 
-try:
-    from setuptools import setup
-except ImportError:
-    print('This module will use setuptools if available.')
-    from distutils.core import setup
+def getVersion():
+    """getting the latest revision number from svn is a pain
+    when setup.py is run this function is called and sets up the tdl/VERSION file
+    when run from an sdist build the svn isn't found and uses the stored version instead
+    """
+    svnversion = subprocess.Popen('svnversion -n', shell=True, stdout=subprocess.PIPE)
+    REVISION = svnversion.communicate()[0] # get stdout
+    if REVISION == 'Unversioned directory' or REVISION is None:
+        # a real user install, get version from file
+        VERSION = open('tdl/VERSION', 'r').read()
+        return VERSION
+    # building on the svn, save version in a file for user installs
+    if ':' in REVISION:
+        REVISION = REVISION.split(':')[-1] # take "latest" revision, I think
+    REVISION = ''.join((c for c in REVISION if c.isdigit())) # remove letters
+    VERSION = '1.0r%s' % REVISION
+    open('tdl/VERSION', 'w').write(VERSION)
+    return VERSION
+
+VERSION = getVersion()
+print('TDL version is %s' % VERSION)
 
 setup(name='tdl',
       version=VERSION,
@@ -22,10 +38,7 @@ The library is used for displaying tilesets (ascii or graphical) in true color.
       url='http://4b796c65.googlepages.com/tdl',
       download_url='https://launchpad.net/rlu/+download',
       packages=['tdl'],
-      #package_dir={'tdl': 'tdl'},
       package_data={'tdl': ['lib/*.txt', '*.bmp', '*.png', 'lib/linux*/*.so', 'lib/win32/*.dll', 'lib/darwin/*']},
-      include_package_data=True,
-      install_requires=['setuptools'],
       classifiers=['Development Status :: 4 - Beta',
                    'Programming Language :: Python',
                    'Environment :: Win32 (MS Windows)',
@@ -48,5 +61,4 @@ The library is used for displaying tilesets (ascii or graphical) in true color.
                    'Programming Language :: Python :: 3.1',
                    ],
       keywords = 'roguelike roguelikes console text curses doryen ascii',
-      zip_safe=True,
       )
