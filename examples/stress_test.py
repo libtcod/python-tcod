@@ -61,10 +61,10 @@ def main():
             char = [random.getrandbits(8) for _ in range(TOTAL)]
         with drawTimer:
             for (x,y), bgcolor, char in zip(CELLS, bgcolors, char):
-                console.drawChar(char=char,  x=x, y=y, fgcolor=(255, 255, 255), bgcolor=bgcolor)
-        console.drawStr('Random%7.2fms ' % (randomTimer.getMeanTime() * 1000), 0, 0, tdl.C_WHITE, tdl.C_BLACK)
-        console.drawStr('DrawCh%7.2fms ' % (drawTimer.getMeanTime() * 1000), 0, 1, tdl.C_WHITE, tdl.C_BLACK)
-        console.drawStr('Flush %7.2fms ' % (flushTimer.getMeanTime() * 1000), 0, 2, tdl.C_WHITE, tdl.C_BLACK)
+                console.drawChar(x=x, y=y, char=char, fgcolor=(255, 255, 255), bgcolor=bgcolor)
+        console.drawStr(0, 0, 'Random%7.2fms ' % (randomTimer.getMeanTime() * 1000), tdl.C_WHITE, tdl.C_BLACK)
+        console.drawStr(0, 1, 'DrawCh%7.2fms ' % (drawTimer.getMeanTime() * 1000), tdl.C_WHITE, tdl.C_BLACK)
+        console.drawStr(0, 2, 'Flush %7.2fms ' % (flushTimer.getMeanTime() * 1000), tdl.C_WHITE, tdl.C_BLACK)
         with flushTimer:
             tdl.flush()
         tdl.setTitle('%i FPS' % tdl.getFPS())

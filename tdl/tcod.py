@@ -55,7 +55,7 @@ class _Color(Structure):
     _fields_ = [('r', c_uint8), ('g', c_uint8), ('b', c_uint8)]
 
     def __iter__(self):
-        'to make this class more tuple-like
+        'to make this class more tuple-like'
         return iter((self.r, self.g, self.b))
         
     def __len__(self):
