@@ -301,7 +301,7 @@ class Console(object):
         if bgcolor is not None:
             _setback(self, x, y, _formatColor(bgcolor), bgblend)
     
-    def drawChar(self, char, x=None, y=None, fgcolor=None, bgcolor=None):
+    def drawChar(self, x=None, y=None, char=None, fgcolor=C_WHITE, bgcolor=C_BLACK):
         """Draws a single character.
 
         char should be an integer, single character string, or None
@@ -315,11 +315,7 @@ class Console(object):
         """
         # hardcode alpha settings for now
         bgblend=BND_SET
-        #if isinstance(char, (str, bytes)):
-        #    assert len(char) == 1, 'strings must only have one character'
-        #    char = ord(char)
-        #assert isinstance(char, int) or char is None, \
-        #       'char must be an integer, single character string, or None'
+        
         char = _formatChar(char)
         _verify_colors(fgcolor, bgcolor)
         x, y = self._cursor_move(x, y)
@@ -327,7 +323,7 @@ class Console(object):
         self._setChar(char, x, y, _formatColor(fgcolor), _formatColor(bgcolor), bgblend)
         self._cursor_advance()
 
-    def drawStr(self, string, x=None, y=None, fgcolor=None, bgcolor=None):
+    def drawStr(self, x=None, y=None, string='', fgcolor=C_WHITE, bgcolor=C_BLACK):
         """Draws a string starting at x and y.
 
         A string that goes past the end will wrap around.  No warning will be
@@ -347,10 +343,10 @@ class Console(object):
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
         
         for char in string:
-            self._setChar(char, self.cursorX, self.cursorY, fgcolor, bgcolor, bgblend)
+            self._setChar(x=self.cursorX, y=self.cursorY, char=char, fgcolor=fgcolor, bgcolor=bgcolor)
             self._cursor_advance()
     
-    def drawRect(self, char, x=0, y=0, width=None, height=None, fgcolor=None, bgcolor=None):
+    def drawRect(self, x=0, y=0, width=None, height=None, char=None, fgcolor=C_WHITE, bgcolor=C_BLACK):
         """Draws a rectangle starting from x and y and extending to width and
         height.  If width or height are None then it will extend to the edge
         of the console.  The rest are the same as drawChar.
@@ -370,7 +366,7 @@ class Console(object):
             for cellX in range(x, x + width):
                 self._setChar(char, cellX, cellY, fgcolor, bgcolor, bgblend)
         
-    def drawFrame(self, char, x=0, y=0, width=None, height=None, fgcolor=None, bgcolor=None):
+    def drawFrame(self, x=0, y=0, width=None, height=None, char=None, fgcolor=C_WHITE, bgcolor=C_BLACK):
         "Similar to drawRect but only draws the outline of the rectangle"
         # hardcode alpha settings for now
         bgblend=BND_SET
@@ -425,8 +421,8 @@ class Window(object):
             raise TypeError('console parameter must be a Console or Window instance')
         assert isinstance(x, int)
         assert isinstance(y, int)
-        assert isinstance(width, int) or width is None
-        assert isinstance(height, int) or height is None
+        assert (isinstance(width, int) or width is None)
+        assert (isinstance(height, int) or height is None)
         if not console._rectInBounds(x, y, width, height):
             raise TDLError('New Window is not within bounds of it\'s parent')
         self.parent = console
@@ -481,8 +477,6 @@ class Window(object):
                                                           self.height)
 
 
-
-
 def init(width, height, title='TDL', fullscreen=False):
     """Start the main console with the given width and height and return the
     root console.
@@ -521,10 +515,14 @@ def flush():
     """
     if not _rootinitialized:
         raise TDLError('Cannot flush without first initializing with tdl.init')
+    
+    # old hack to prevent locking up on old libtcod
+    # you can probably delete all autoflush releated stuff
     if event._autoflush and not event._eventsflushed:
         event.get()
     else: # do not flush events after the user starts using them
         event._autoflush = False
+    
     event._eventsflushed = False
     _lib.TCOD_console_flush()
 
@@ -582,15 +580,16 @@ def screenshot(fileobj=None):
         raise TDLError('Initialize first with tdl.init')
     if isinstance(fileobj, str):
         _lib.TCOD_sys_save_screenshot(_format_string(fileobj))
-    elif isinstance(fileobj, file):
-        filename = os.tempnam()
-        _lib.TCOD_sys_save_screenshot(_format_string(filename))
-        fileobj.write(file(filename, 'r').read())
-        os.remove(filename)
-    elif fileobj is None:
+    elif isinstance(fileobj, file): # save to temp file and copy to file-like obj
+        tmpname = os.tempnam()
+        _lib.TCOD_sys_save_screenshot(_format_string(tmpname))
+        with tmpname as tmpfile:
+            fileobj.write(tmpfile.read())
+        os.remove(tmpname)
+    elif fileobj is None: # save to screenshot001.png, screenshot002.png, ...
         filelist = os.listdir('.')
-        n = 0
-        filename = 'screenshot%.4i.png' % n
+        n = 1
+        filename = 'screenshot%.3i.png' % n
         while filename in filelist:
             n += 1
             filename = 'screenshot%.4i.png' % n
