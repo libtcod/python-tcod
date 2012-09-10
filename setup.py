@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-REVISION = int(''.join(c for c in "$Revision$" if c.isdigit()))
+REVISION = int(''.join(c for c in "$Rev$" if c.isdigit()))
 VERSION = '1.0r%i' % REVISION
 
 try:
