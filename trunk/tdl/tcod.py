@@ -54,11 +54,16 @@ except NameError:
 class _Color(Structure):
     _fields_ = [('r', c_uint8), ('g', c_uint8), ('b', c_uint8)]
 
-    def __iter__(self): # to make this more tuple-like
+    def __iter__(self):
+        'to make this class more tuple-like
         return iter((self.r, self.g, self.b))
         
     def __len__(self):
         return 3
+        
+    def __int__(self):
+        "useful to convert back into web format: 0xRRGGBB"
+        return (self.r << 16 | self.g << 8 | self.b)
 
 _lib.TCOD_color_equals.restype = c_bool
 _lib.TCOD_color_equals.argtypes = (_Color, _Color)
