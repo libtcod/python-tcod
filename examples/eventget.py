@@ -21,7 +21,7 @@ tdl.setFPS(24) # slow down the program so that the user can clearly see the moti
 
 while 1:
     for event in tdl.event.get():
-        if event.type == tdl.QUIT:
+        if event.type == 'QUIT':
             raise SystemExit()
         elif event.type == 'KEYDOWN':
             print_line_append('KEYDOWN event - key=%.2i char=%s keyname=%s alt=%i ctrl=%i shift=%i' % (event.key, repr(event.char), repr(event.keyname), event.alt, event.ctrl, event.shift))

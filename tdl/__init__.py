@@ -33,14 +33,14 @@ _rootinitialized = False
 _rootconsole = None
 # remove dots from common functions
 _setchar = _lib.TCOD_console_set_char
-_setfore = _lib.TCOD_console_set_fore
-_setback = _lib.TCOD_console_set_back
-
+_setfore = _lib.TCOD_console_set_char_foreground
+_setback = _lib.TCOD_console_set_char_background
+_setcharEX = _lib.TCOD_console_put_char_ex
 def _verify_colors(*colors):
     "raise an error if the parameters can not be converted into colors"
     for color in colors:
-        if not _iscolor(color):
-            raise TypeError('a color must be a 3 item tuple or None, received %s' % repr())
+        assert _iscolor(color), TypeError('a color must be a 3 item tuple, web format, or None, received %s' % repr())
+    return True
 
 def _iscolor(color):
     """Used internally
@@ -268,13 +268,13 @@ class Console(object):
         Checks if a cell is part of the console.
         Raises an exception if it can not be used.
         """
-        if x is not None and not isinstance(x, int):
-            raise TypeError('x must be an integer, got %s' % repr(x))
-        if y is not None and not isinstance(y, int):
-            raise TypeError('y must be an integer, got %s' % repr(y))
+        #if x is not None and not isinstance(x, int):
+        #    raise TypeError('x must be an integer, got %s' % repr(x))
+        #if y is not None and not isinstance(y, int):
+        #    raise TypeError('y must be an integer, got %s' % repr(y))
         
-        if (x is None or 0 <= x < self.width) and (y is None or 0 <= y < self.height):
-            return
+        if (0 <= x < self.width) and (0 <= y < self.height):
+            return True
         raise TDLError('(%i, %i) is an invalid postition.  %s size is (%i, %i)' %
                             (x, y, self.__class__.__name__, self.width, self.height))
 
@@ -282,18 +282,20 @@ class Console(object):
         "Convertion x and y to their position on the root Console for this Window"
         return x, y # Because this is a Console we return the paramaters untouched
         
-    def clear(self, fgcolor=C_WHITE, bgcolor=C_BLACK):
+    def clear(self, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Clears the entire console.
         """
         #assert _iscolor(fillcolor), 'fillcolor must be a 3 item list'
         #assert fillcolor is not None, 'fillcolor can not be None'
-        _lib.TCOD_console_set_foreground_color(self, _formatColor(fgcolor))
-        _lib.TCOD_console_set_background_color(self, _formatColor(bgcolor))
+        _lib.TCOD_console_set_default_background(self, _formatColor(bgcolor))
+        _lib.TCOD_console_set_default_foreground(self, _formatColor(fgcolor))
         _lib.TCOD_console_clear(self)
     
     def _setChar(self, char, x, y, fgcolor=None, bgcolor=None, bgblend=BND_SET):
         """Sets a character without moving the virtual cursor, this is called often
         and is designed to be as fast as possible"""
+        if char is not None and fgcolor is not None and bgcolor is not None:
+            return _setcharEX(self, x, y, _formatChar(char), _formatColor(fgcolor), _formatColor(bgcolor))
         if char is not None:
             _setchar(self, x, y, _formatChar(char))
         if fgcolor is not None:
@@ -301,7 +303,7 @@ class Console(object):
         if bgcolor is not None:
             _setback(self, x, y, _formatColor(bgcolor), bgblend)
     
-    def drawChar(self, x=None, y=None, char=None, fgcolor=C_WHITE, bgcolor=C_BLACK):
+    def drawChar(self, x, y, char=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a single character.
 
         char should be an integer, single character string, or None
@@ -314,16 +316,15 @@ class Console(object):
         Having the x or y values outside of the console will raise a TDLError.
         """
         # hardcode alpha settings for now
-        bgblend=BND_SET
+        #bgblend=BND_SET
         
-        char = _formatChar(char)
-        _verify_colors(fgcolor, bgcolor)
+        assert _verify_colors(fgcolor, bgcolor)
         x, y = self._cursor_move(x, y)
         
-        self._setChar(char, x, y, _formatColor(fgcolor), _formatColor(bgcolor), bgblend)
-        self._cursor_advance()
+        self._setChar(char, x, y, fgcolor, bgcolor)
+        #self._cursor_advance()
 
-    def drawStr(self, x=None, y=None, string='', fgcolor=C_WHITE, bgcolor=C_BLACK):
+    def drawStr(self, x, y, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a string starting at x and y.
 
         A string that goes past the end will wrap around.  No warning will be
@@ -346,7 +347,7 @@ class Console(object):
             self._setChar(x=self.cursorX, y=self.cursorY, char=char, fgcolor=fgcolor, bgcolor=bgcolor)
             self._cursor_advance()
     
-    def drawRect(self, x=0, y=0, width=None, height=None, char=None, fgcolor=C_WHITE, bgcolor=C_BLACK):
+    def drawRect(self, x, y, width, height, char=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a rectangle starting from x and y and extending to width and
         height.  If width or height are None then it will extend to the edge
         of the console.  The rest are the same as drawChar.
@@ -366,7 +367,7 @@ class Console(object):
             for cellX in range(x, x + width):
                 self._setChar(char, cellX, cellY, fgcolor, bgcolor, bgblend)
         
-    def drawFrame(self, x=0, y=0, width=None, height=None, char=None, fgcolor=C_WHITE, bgcolor=C_BLACK):
+    def drawFrame(self, x, y, width, height, char=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         "Similar to drawRect but only draws the outline of the rectangle"
         # hardcode alpha settings for now
         bgblend=BND_SET
@@ -395,9 +396,9 @@ class Console(object):
         """
         self._drawable(x, y)
         char = _lib.TCOD_console_get_char(self, x, y)
-        fgcolor = tuple(_lib.TCOD_console_get_fore(self, x, y))
-        bgcolor = tuple(_lib.TCOD_console_get_back(self, x, y))
-        return char, fgcolor, bgcolor
+        bgcolor = _lib.TCOD_console_get_char_background_wrapper(self, x, y)
+        fgcolor = _lib.TCOD_console_get_char_foreground_wrapper(self, x, y)
+        return char, tuple(fgcolor), tuple(bgcolor)
 
     def __repr__(self):
         return "<Console (Width=%i Height=%i)>" % (self.width, self.height)
@@ -447,7 +448,7 @@ class Window(object):
     
     blit = Console.blit
 
-    def clear(self, fgcolor=C_WHITE, bgcolor=C_BLACK):
+    def clear(self, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Clears the entire Window.
         """
         self.draw_rect(-1, 0, 0, None, None, fgcolor, bgcolor)
@@ -477,7 +478,7 @@ class Window(object):
                                                           self.height)
 
 
-def init(width, height, title='TDL', fullscreen=False):
+def init(width, height, title='TDL', fullscreen=False, renderer=RENDERER_SDL):
     """Start the main console with the given width and height and return the
     root console.
 
@@ -487,7 +488,7 @@ def init(width, height, title='TDL', fullscreen=False):
     """
     global _rootinitialized, _rootconsole
     if not _fontinitialized: # set the default font to the one that comes with tdl
-        setFont(_unpackfile('terminal8x8_aa_as.png'),
+        setFont(_unpackfile('terminal.png'),
                  16, 16, FONT_LAYOUT_ASCII_INCOL)
 
     # If a console already exists then make a clone to replace it
@@ -498,9 +499,11 @@ def init(width, height, title='TDL', fullscreen=False):
         oldroot._replace(rootreplacement)
         del rootreplacement
 
-    _lib.TCOD_console_init_root(width, height, _format_string(title), fullscreen)
+    if renderer>RENDERER_SDL:
+        raise TDLError('Render type out of range: "%i"' % renderer)
+    _lib.TCOD_console_init_root(width, height, _format_string(title), fullscreen, renderer)
 
-    event.get() # flush the libtcod event queue to fix some issues
+    #event.get() # flush the libtcod event queue to fix some issues
     # issues may be fixed already
 
     event._eventsflushed = False
@@ -518,12 +521,12 @@ def flush():
     
     # old hack to prevent locking up on old libtcod
     # you can probably delete all autoflush releated stuff
-    if event._autoflush and not event._eventsflushed:
-        event.get()
-    else: # do not flush events after the user starts using them
-        event._autoflush = False
+    #if event._autoflush and not event._eventsflushed:
+    #    event.get()
+    #else: # do not flush events after the user starts using them
+    #    event._autoflush = False
     
-    event._eventsflushed = False
+    #event._eventsflushed = False
     _lib.TCOD_console_flush()
 
 def setFont(path, width, height, flags):

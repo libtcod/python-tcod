@@ -32,13 +32,14 @@ def _get_library_crossplatform():
         _loadDLL('lib/win32/SDL.dll')
         _loadDLL('lib/win32/zlib1.dll')
         return _loadDLL('lib/win32/libtcod-VS.dll')
+        #return _loadDLL('lib/win32/libtcod-mingw.dll')
     elif 'linux' in sys.platform:
         if bits == '32bit':
             return _loadDLL('lib/linux32/libtcod.so')
         elif bits == '64bit':
             return _loadDLL('lib/linux64/libtcod.so')
     elif 'darwin' in sys.platform:
-        return _loadDLL('lib/darwin/libtcod')
+        return _loadDLL('lib/darwin/libtcod.dylib')
     else:
         raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
 
@@ -64,19 +65,23 @@ class _Color(Structure):
     def __int__(self):
         "useful to convert back into web format: 0xRRGGBB"
         return (self.r << 16 | self.g << 8 | self.b)
+    
+    def __repr__(self):
+        return '<TCODColor r=%i, g=%i, b=%i>' % tuple(self)
 
-_lib.TCOD_color_equals.restype = c_bool
-_lib.TCOD_color_equals.argtypes = (_Color, _Color)
-_lib.TCOD_color_multiply.restype = _Color
-_lib.TCOD_color_multiply.argtypes = (_Color, _Color)
-_lib.TCOD_color_multiply_scalar.restype = _Color
-_lib.TCOD_color_multiply_scalar.argtypes = (_Color , c_float)
-_lib.TCOD_color_lerp.restype = _Color
-_lib.TCOD_color_lerp.argtypes = (_Color, _Color, c_float)
-_lib.TCOD_color_set_HSV.restype = None
-_lib.TCOD_color_set_HSV.argtypes = (POINTER(_Color), c_float, c_float, c_float)
-_lib.TCOD_color_get_HSV.restype = None
-_lib.TCOD_color_get_HSV.argtypes = (_Color, POINTER(c_float), POINTER(c_float), POINTER(c_float))
+# not needed
+#_lib.TCOD_color_equals.restype = c_bool
+#_lib.TCOD_color_equals.argtypes = (_Color, _Color)
+#_lib.TCOD_color_multiply.restype = _Color
+#_lib.TCOD_color_multiply.argtypes = (_Color, _Color)
+#_lib.TCOD_color_multiply_scalar.restype = _Color
+#_lib.TCOD_color_multiply_scalar.argtypes = (_Color , c_float)
+#_lib.TCOD_color_lerp.restype = _Color
+#_lib.TCOD_color_lerp.argtypes = (_Color, _Color, c_float)
+#_lib.TCOD_color_set_HSV.restype = None
+#_lib.TCOD_color_set_HSV.argtypes = (POINTER(_Color), c_float, c_float, c_float)
+#_lib.TCOD_color_get_HSV.restype = None
+#_lib.TCOD_color_get_HSV.argtypes = (_Color, POINTER(c_float), POINTER(c_float), POINTER(c_float))
 
 # CONSOLE
 
@@ -232,6 +237,7 @@ BKGND_ALPH = 12
 # these are already in tdl
 
 TCOD_bkgnd_flag_t = c_int
+TCOD_renderer_t = c_int
 
 KEY_PRESSED = 1
 KEY_RELEASED = 2
@@ -239,7 +245,7 @@ KEY_RELEASED = 2
 TCOD_console_t = c_void_p
 
 _lib.TCOD_console_init_root.restype = None
-_lib.TCOD_console_init_root.argtypes = (c_int, c_int, c_char_p, c_bool)
+_lib.TCOD_console_init_root.argtypes = (c_int, c_int, c_char_p, c_bool, TCOD_renderer_t)
 _lib.TCOD_console_set_custom_font.restype = None
 _lib.TCOD_console_set_custom_font.argtypes = (c_char_p, c_int, c_int, c_int)
 _lib.TCOD_console_set_window_title.restype = None
@@ -250,54 +256,42 @@ _lib.TCOD_console_is_fullscreen.restype = c_bool
 _lib.TCOD_console_is_fullscreen.argtypes = None
 _lib.TCOD_console_is_window_closed.restype = c_bool
 _lib.TCOD_console_is_window_closed.argtypes = None
-#_lib.TCOD_console_set_window_closed.restype = None
-#_lib.TCOD_console_set_window_closed.argtypes = None
 
-_lib.TCOD_console_set_background_color.restype = None
-_lib.TCOD_console_set_background_color.argtypes = (TCOD_console_t, _Color)
-_lib.TCOD_console_set_foreground_color.restype = None
-_lib.TCOD_console_set_foreground_color.argtypes = (TCOD_console_t, _Color)
+_lib.TCOD_console_set_default_background.restype = None
+_lib.TCOD_console_set_default_background.argtypes = (TCOD_console_t, _Color)
+_lib.TCOD_console_set_default_foreground.restype = None
+_lib.TCOD_console_set_default_foreground.argtypes = (TCOD_console_t, _Color)
 _lib.TCOD_console_clear.restype = None
 _lib.TCOD_console_clear.argtypes = (TCOD_console_t,)
-_lib.TCOD_console_set_back.restype = None
-_lib.TCOD_console_set_back.argtypes = (TCOD_console_t, c_int, c_int, _Color, TCOD_bkgnd_flag_t)
-_lib.TCOD_console_set_fore.restype = None
-_lib.TCOD_console_set_fore.argtypes = (TCOD_console_t, c_int, c_int, _Color)
+_lib.TCOD_console_set_char_background.restype = None
+_lib.TCOD_console_set_char_background.argtypes = (TCOD_console_t, c_int, c_int, _Color, TCOD_bkgnd_flag_t)
+_lib.TCOD_console_set_char_foreground.restype = None
+_lib.TCOD_console_set_char_foreground.argtypes = (TCOD_console_t, c_int, c_int, _Color)
 _lib.TCOD_console_set_char.restype = None
 _lib.TCOD_console_set_char.argtypes = (TCOD_console_t, c_int, c_int, c_int)
 _lib.TCOD_console_put_char.restype = None
 _lib.TCOD_console_put_char.argtypes = (TCOD_console_t, c_int, c_int, c_int, TCOD_bkgnd_flag_t)
+_lib.TCOD_console_put_char_ex.restype = None
+_lib.TCOD_console_put_char_ex.argtypes = (TCOD_console_t, c_int, c_int, c_int, _Color, _Color)
 
-_lib.TCOD_console_print_left.restype = None
-_lib.TCOD_console_print_left.argtypes = (TCOD_console_t, c_int, c_int, TCOD_bkgnd_flag_t, c_char_p)#,...?
-_lib.TCOD_console_print_right.restype = None
-_lib.TCOD_console_print_right.argtypes = (TCOD_console_t, c_int, c_int, TCOD_bkgnd_flag_t, c_char_p)
-_lib.TCOD_console_print_center.restype = None
-_lib.TCOD_console_print_center.argtypes = (TCOD_console_t, c_int, c_int, TCOD_bkgnd_flag_t, c_char_p)
-_lib.TCOD_console_print_left_rect.restype = c_int
-_lib.TCOD_console_print_left_rect.argtypes = (TCOD_console_t, c_int, c_int, c_int, c_int, TCOD_bkgnd_flag_t, c_char_p)
-_lib.TCOD_console_print_right_rect.restype = c_int
-_lib.TCOD_console_print_right_rect.argtypes = (TCOD_console_t, c_int, c_int, c_int, c_int, TCOD_bkgnd_flag_t, c_char_p)
-_lib.TCOD_console_print_center_rect.restype = c_int
-_lib.TCOD_console_print_center_rect.argtypes = (TCOD_console_t, c_int, c_int, c_int, c_int, TCOD_bkgnd_flag_t, c_char_p)
+## uncomment if needed later
+#_lib.TCOD_console_rect.restype = None
+#_lib.TCOD_console_rect.argtypes = (TCOD_console_t, c_int, c_int, c_int, c_int, c_bool, TCOD_bkgnd_flag_t)
+#_lib.TCOD_console_hline.restype = None
+#_lib.TCOD_console_hline.argtypes = (TCOD_console_t, c_int, c_int, c_int, TCOD_bkgnd_flag_t)
+#_lib.TCOD_console_vline.restype = None
+#_lib.TCOD_console_vline.argtypes = (TCOD_console_t, c_int, c_int, c_int, TCOD_bkgnd_flag_t)
+#_lib.TCOD_console_print_frame.restype = None
+#_lib.TCOD_console_print_frame.argtypes = (TCOD_console_t, c_int, c_int, c_int, c_int, c_bool, c_char_p)#...?
 
-_lib.TCOD_console_rect.restype = None
-_lib.TCOD_console_rect.argtypes = (TCOD_console_t, c_int, c_int, c_int, c_int, c_bool, TCOD_bkgnd_flag_t)
-_lib.TCOD_console_hline.restype = None
-_lib.TCOD_console_hline.argtypes = (TCOD_console_t, c_int, c_int, c_int, TCOD_bkgnd_flag_t)
-_lib.TCOD_console_vline.restype = None
-_lib.TCOD_console_vline.argtypes = (TCOD_console_t, c_int, c_int, c_int, TCOD_bkgnd_flag_t)
-_lib.TCOD_console_print_frame.restype = None
-_lib.TCOD_console_print_frame.argtypes = (TCOD_console_t, c_int, c_int, c_int, c_int, c_bool, c_char_p)#...?
-
-_lib.TCOD_console_get_background_color.restype = _Color
-_lib.TCOD_console_get_background_color.argtypes = (TCOD_console_t,)
-_lib.TCOD_console_get_foreground_color.restype = _Color
-_lib.TCOD_console_get_foreground_color.argtypes = (TCOD_console_t,)
-_lib.TCOD_console_get_back.restype = _Color
-_lib.TCOD_console_get_back.argtypes = (TCOD_console_t, c_int, c_int)
-_lib.TCOD_console_get_fore.restype = _Color
-_lib.TCOD_console_get_fore.argtypes = (TCOD_console_t, c_int, c_int)
+#_lib.TCOD_console_get_background_color.restype = _Color
+#_lib.TCOD_console_get_background_color.argtypes = (TCOD_console_t,)
+#_lib.TCOD_console_get_foreground_color.restype = _Color
+#_lib.TCOD_console_get_foreground_color.argtypes = (TCOD_console_t,)
+_lib.TCOD_console_get_char_background_wrapper.restype = _Color
+_lib.TCOD_console_get_char_background_wrapper.argtypes = (TCOD_console_t, c_int, c_int)
+_lib.TCOD_console_get_char_foreground_wrapper.restype = _Color
+_lib.TCOD_console_get_char_foreground_wrapper.argtypes = (TCOD_console_t, c_int, c_int)
 _lib.TCOD_console_get_char.restype = c_int
 _lib.TCOD_console_get_char.argtypes = (TCOD_console_t, c_int, c_int)
 
@@ -358,120 +352,38 @@ _lib.TCOD_sys_get_last_frame_length.argtypes = ()
 _lib.TCOD_sys_get_current_resolution.restype = None
 _lib.TCOD_sys_get_current_resolution.argtypes = (POINTER(c_int), POINTER(c_int))
 
-# MERSENNE
-
-TCOD_random_t = c_void_p
-
-#_lib.TCOD_random_get_instance.restype = TCOD_random_t
-#_lib.TCOD_random_get_instance.argtypes = ()
-#_lib.TCOD_random_new.restype = TCOD_random_t
-#_lib.TCOD_random_new.argtypes = ()
-#_lib.TCOD_random_new_from_seed.restype = TCOD_random_t
-#_lib.TCOD_random_new_from_seed.argtypes = (c_uint32,)
-#_lib.TCOD_random_get_int.restype = c_int
-#_lib.TCOD_random_get_int.argtypes = (TCOD_random_t, c_int, c_int)
-#_lib.TCOD_random_get_float.restype = c_float
-#_lib.TCOD_random_get_float.argtypes = (TCOD_random_t, c_int, c_int)
-#_lib.TCOD_random_get_int_from_byte_array.restype = c_int
-#_lib.TCOD_random_get_int_from_byte_array.argtypes = (c_int, c_int, c_void_p, c_int)
-#_lib.TCOD_random_delete.restype = None
-#_lib.TCOD_random_delete.argtypes = (TCOD_random_t,)
-
-
-# BRESENHAM
-
-_lib.TCOD_line_init.restype = None
-_lib.TCOD_line_init.argtypes = (c_int, c_int, c_int, c_int)
-_lib.TCOD_line_step.restype = c_bool
-_lib.TCOD_line_step.argtypes = (POINTER(c_int), POINTER(c_int))
-
-
-# PERLIN
-
-TCOD_noise_t = c_void_p
-
-TCOD_NOISE_MAX_OCTAVES = 128
-TCOD_NOISE_MAX_DIMENSIONS = 4
-TCOD_NOISE_DEFAULT_HURST = 0.5
-TCOD_NOISE_DEFAULT_LACUNARITY = 2.0
-
-#TODO: Update libtcod64 first
-
-_lib.TCOD_noise_new.restype = TCOD_noise_t
-_lib.TCOD_noise_new.argtypes = (c_int, c_float, c_float, TCOD_random_t)
-_lib.TCOD_noise_perlin.restype = c_float
-_lib.TCOD_noise_perlin.argtypes = (TCOD_noise_t, POINTER(c_float))
-_lib.TCOD_noise_fbm_perlin.restype = c_float
-_lib.TCOD_noise_fbm_perlin.argtypes = (TCOD_noise_t, POINTER(c_float), c_float)
-_lib.TCOD_noise_turbulence_perlin.restype = c_float
-_lib.TCOD_noise_turbulence_perlin.argtypes = (TCOD_noise_t, POINTER(c_float), c_float)
-_lib.TCOD_noise_simplex.restype = c_float
-_lib.TCOD_noise_simplex.argtypes = (TCOD_noise_t, POINTER(c_float))
-_lib.TCOD_noise_fbm_simplex.restype = c_float
-_lib.TCOD_noise_fbm_simplex.argtypes = (TCOD_noise_t, POINTER(c_float), c_float)
-_lib.TCOD_noise_turbulence_simplex.restype = c_float
-_lib.TCOD_noise_turbulence_simplex.argtypes = (TCOD_noise_t, POINTER(c_float), c_float)
-_lib.TCOD_noise_wavelet.restype = c_float
-_lib.TCOD_noise_wavelet.argtypes = (TCOD_noise_t, POINTER(c_float))
-_lib.TCOD_noise_fbm_wavelet.restype = c_float
-_lib.TCOD_noise_fbm_wavelet.argtypes = (TCOD_noise_t, POINTER(c_float), c_float)
-_lib.TCOD_noise_turbulence_wavelet.restype = c_float
-_lib.TCOD_noise_turbulence_wavelet.argtypes = (TCOD_noise_t, POINTER(c_float), c_float)
-
-_lib.TCOD_noise_delete.restype = None
-_lib.TCOD_noise_delete.argtypes = (TCOD_noise_t,)
-
-
-# FOV
-
-#TCOD_map_t = c_void_p
-
-#_lib.TCOD_map_new.restype = TCOD_map_t
-#_lib.TCOD_map_new.argtypes = (c_int, c_int)
-#_lib.TCOD_map_clear.restype = None
-#_lib.TCOD_map_clear.argtypes = (TCOD_map_t,)
-#_lib.TCOD_map_set_properties.restype = None
-#_lib.TCOD_map_set_properties.argtypes = (TCOD_map_t, c_int, c_int, c_bool, c_bool)
-#_lib.TCOD_map_delete.restype = None
-#_lib.TCOD_map_delete.argtypes = (TCOD_map_t,)
-#_lib.TCOD_map_compute_fov.restype = None
-#_lib.TCOD_map_compute_fov.argtypes = (TCOD_map_t, c_int, c_int)
-#_lib.TCOD_map_is_in_fov.restype = c_bool
-#_lib.TCOD_map_is_in_fov.argtypes = (TCOD_map_t, c_int, c_int)
-
-
 # IMAGE
 
-TCOD_image_t = c_void_p
+# TCOD_image_t = c_void_p
 
-_lib.TCOD_image_new.restype = TCOD_image_t
-_lib.TCOD_image_new.argtypes = (c_int, c_int)
-_lib.TCOD_image_from_console.restype = TCOD_image_t
-_lib.TCOD_image_from_console.argtypes = (TCOD_console_t,)
-_lib.TCOD_image_load.restype = TCOD_image_t
-_lib.TCOD_image_load.argtypes = (c_char_p,)
-_lib.TCOD_image_clear.restype = None
-_lib.TCOD_image_clear.argtypes = (TCOD_image_t, _Color)
-_lib.TCOD_image_save.restype = None
-_lib.TCOD_image_save.argtypes = (TCOD_image_t, c_char_p)
-_lib.TCOD_image_get_size.restype = None
-_lib.TCOD_image_get_size.argtypes = (TCOD_image_t, POINTER(c_int), POINTER(c_int))
-_lib.TCOD_image_get_pixel.restype = _Color
-_lib.TCOD_image_get_pixel.argtypes = (TCOD_image_t, c_int, c_int)
-_lib.TCOD_image_get_mipmap_pixel.restype = _Color
-_lib.TCOD_image_get_mipmap_pixel.argtypes = (TCOD_image_t, c_float, c_float, c_float, c_float)
-_lib.TCOD_image_put_pixel.restype = None
-_lib.TCOD_image_put_pixel.argtypes = (TCOD_image_t, c_int, c_int, _Color)
-_lib.TCOD_image_blit.restype = None
-_lib.TCOD_image_blit.argtypes = (TCOD_image_t, TCOD_console_t, c_float, c_float, TCOD_bkgnd_flag_t, c_float, c_float, c_float)
-_lib.TCOD_image_blit_rect.restype = None
-_lib.TCOD_image_blit_rect.argtypes = (TCOD_image_t, TCOD_console_t, c_int, c_int, c_int, c_int, TCOD_bkgnd_flag_t)
-_lib.TCOD_image_delete.restype = None
-_lib.TCOD_image_delete.argtypes = (TCOD_image_t,)
-_lib.TCOD_image_set_key_color.restype = None
-_lib.TCOD_image_set_key_color.argtypes = (TCOD_image_t, _Color)
-_lib.TCOD_image_is_pixel_transparent.restype = c_bool
-_lib.TCOD_image_is_pixel_transparent.argtypes = (TCOD_image_t, c_int, c_int)
+# _lib.TCOD_image_new.restype = TCOD_image_t
+# _lib.TCOD_image_new.argtypes = (c_int, c_int)
+# _lib.TCOD_image_from_console.restype = TCOD_image_t
+# _lib.TCOD_image_from_console.argtypes = (TCOD_console_t,)
+# _lib.TCOD_image_load.restype = TCOD_image_t
+# _lib.TCOD_image_load.argtypes = (c_char_p,)
+# _lib.TCOD_image_clear.restype = None
+# _lib.TCOD_image_clear.argtypes = (TCOD_image_t, _Color)
+# _lib.TCOD_image_save.restype = None
+# _lib.TCOD_image_save.argtypes = (TCOD_image_t, c_char_p)
+# _lib.TCOD_image_get_size.restype = None
+# _lib.TCOD_image_get_size.argtypes = (TCOD_image_t, POINTER(c_int), POINTER(c_int))
+# _lib.TCOD_image_get_pixel.restype = _Color
+# _lib.TCOD_image_get_pixel.argtypes = (TCOD_image_t, c_int, c_int)
+# _lib.TCOD_image_get_mipmap_pixel.restype = _Color
+# _lib.TCOD_image_get_mipmap_pixel.argtypes = (TCOD_image_t, c_float, c_float, c_float, c_float)
+# _lib.TCOD_image_put_pixel.restype = None
+# _lib.TCOD_image_put_pixel.argtypes = (TCOD_image_t, c_int, c_int, _Color)
+# _lib.TCOD_image_blit.restype = None
+# _lib.TCOD_image_blit.argtypes = (TCOD_image_t, TCOD_console_t, c_float, c_float, TCOD_bkgnd_flag_t, c_float, c_float, c_float)
+# _lib.TCOD_image_blit_rect.restype = None
+# _lib.TCOD_image_blit_rect.argtypes = (TCOD_image_t, TCOD_console_t, c_int, c_int, c_int, c_int, TCOD_bkgnd_flag_t)
+# _lib.TCOD_image_delete.restype = None
+# _lib.TCOD_image_delete.argtypes = (TCOD_image_t,)
+# _lib.TCOD_image_set_key_color.restype = None
+# _lib.TCOD_image_set_key_color.argtypes = (TCOD_image_t, _Color)
+# _lib.TCOD_image_is_pixel_transparent.restype = c_bool
+# _lib.TCOD_image_is_pixel_transparent.argtypes = (TCOD_image_t, c_int, c_int)
 
 # MOUSE
 
@@ -505,9 +417,12 @@ class _Mouse(Structure):
     @property
     def button_pressed(self):
         return self.lbutton_pressed, self.mbutton_pressed, self.rbutton_pressed
+    
+    def __repr__(self):
+        return '<TCOD_Mouse %s>' % str(self.motion + self.button)
 
-_lib.TCOD_mouse_get_status.restype = None
-_lib.TCOD_mouse_get_status.argtypes = (POINTER(_Mouse),)
+_lib.TCOD_mouse_get_status_wrapper.restype = None
+_lib.TCOD_mouse_get_status_wrapper.argtypes = (POINTER(_Mouse),)
 _lib.TCOD_mouse_show_cursor.restype = None
 _lib.TCOD_mouse_show_cursor.argtypes = (c_bool,)
 _lib.TCOD_mouse_is_cursor_visible.restype = c_bool
@@ -515,3 +430,16 @@ _lib.TCOD_mouse_is_cursor_visible.argtypes = ()
 _lib.TCOD_mouse_move.restype = None
 _lib.TCOD_mouse_move.argtypes = (c_int, c_int)
 
+TCOD_EVENT_KEY_PRESS=1
+TCOD_EVENT_KEY_RELEASE=2
+TCOD_EVENT_KEY=TCOD_EVENT_KEY_PRESS|TCOD_EVENT_KEY_RELEASE
+TCOD_EVENT_MOUSE_MOVE=4
+TCOD_EVENT_MOUSE_PRESS=8
+TCOD_EVENT_MOUSE_RELEASE=16
+TCOD_EVENT_MOUSE=TCOD_EVENT_MOUSE_MOVE|TCOD_EVENT_MOUSE_PRESS|TCOD_EVENT_MOUSE_RELEASE
+TCOD_EVENT_ANY=TCOD_EVENT_KEY|TCOD_EVENT_MOUSE
+
+_lib.TCOD_sys_wait_for_event.restype = c_int
+_lib.TCOD_sys_wait_for_event.argtypes = (c_int, POINTER(_Key), POINTER(_Mouse))
+_lib.TCOD_sys_check_for_event.restype = c_int
+_lib.TCOD_sys_check_for_event.argtypes = (c_int, POINTER(_Key), POINTER(_Mouse))

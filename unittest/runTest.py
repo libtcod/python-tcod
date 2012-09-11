@@ -13,6 +13,7 @@ class SimpleConsoleTest(unittest.TestCase):
 
     def setUp(self):
         self.console = tdl.init(30, 20, 'TDL UnitTest')
+        self.console2 = tdl.Console(30, 20)
 
     def tearDown(self):
         del self.console
@@ -20,11 +21,12 @@ class SimpleConsoleTest(unittest.TestCase):
 class DrawCharTest(SimpleConsoleTest):
 
     def test_dcTuples(self):
-        self.console.clear()
+        self.console2.clear()
         ch = (1, (255, 255, 255), (0, 0, 0))
         self.console.drawChar(0, 0, *ch)
         tdl.flush()
         # a critcal error with getChar prevents testing, I'll need to update libtcod
+        # getChar crashes with the root console and returns garbage on any other console
         self.assertEqual(ch, self.console.getChar(0, 0), 'err?')
         
 def suite():

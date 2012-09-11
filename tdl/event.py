@@ -14,7 +14,8 @@
 
 import ctypes
 
-from .tcod import _lib, _Mouse
+from .tcod import _lib, _Mouse, _Key
+from . import tcod as _tcod
 from . import local
 
 # make sure that the program does not lock up from missing event flushes
@@ -50,7 +51,7 @@ class Event(object):
 
 class Quit(Event):
     __slots__ = ()
-    type = local.QUIT
+    type = 'QUIT'
 
 class KeyEvent(Event):
     __slots__ = ('key', 'keyname', 'char', 'lalt', 'lctrl', 'ralt', 'rctrl',
@@ -71,15 +72,15 @@ class KeyEvent(Event):
 
 class KeyDown(KeyEvent):
     __slots__ = ()
-    type = local.KEYDOWN
+    type = 'KEYDOWN'
 
 class KeyUp(KeyEvent):
     __slots__ = ()
-    type = local.KEYUP
+    type = 'KEYUP'
 
 class MouseButtonEvent(Event):
     __slots__ = ('button', 'pos', 'cell')
-    type = local.MOUSEDOWN
+    type = 'MOUSEDOWN'
 
     def __init__(self, button, pos, cell):
         self.button = button
@@ -88,15 +89,15 @@ class MouseButtonEvent(Event):
 
 class MouseDown(MouseButtonEvent):
     __slots__ = ()
-    type = local.MOUSEDOWN
+    type = 'MOUSEDOWN'
 
 class MouseUp(MouseButtonEvent):
     __slots__ = ()
-    type = local.MOUSEUP
+    type = 'MOUSEUP'
 
 class MouseMotion(Event):
     __slots__ = ('pos',  'motion', 'cell', 'cellmotion', 'relpos', 'relcell')
-    type = local.MOUSEMOTION
+    type = 'MOUSEMOTION'
 
     def __init__(self, pos, cell, relpos, relcell):
         self.pos = pos
@@ -109,11 +110,11 @@ def get():
     
     This function returns Event objects that can be ID'd and sorted with their type attribute:
     for event in tdl.event.get():
-        if event.type == tdl.QUIT:
+        if event.type == 'QUIT':
             raise SystemExit()
-        elif event.type == tdl.MOUSEDOWN:
+        elif event.type == 'MOUSEDOWN':
             print('Mouse button %i clicked at %i, %i' % (event.button, event.pos[0], event.pos[1]))
-        elif event.type == tdl.KEYDOWN:
+        elif event.type == 'KEYDOWN':
             print('Key #%i "%s" pressed' % (event.key, event.char))
     
     Here is a list of events and their attributes:
@@ -127,8 +128,40 @@ def get():
     global _mousel, _mousem, _mouser, _eventsflushed
     _eventsflushed = True
     events = []
-    while 1:
-        libkey = _lib.TCOD_console_check_for_keypress(3)
+    
+    mouse = _Mouse()
+    libkey = _Key()
+    while _lib.TCOD_sys_check_for_event(_tcod.TCOD_EVENT_ANY, libkey, mouse):
+    #print(_lib.TCOD_sys_check_for_event(_tcod.TCOD_EVENT_MOUSE, None, mouse))
+    #_lib.TCOD_mouse_get_status_wrapper(mouse)
+    #print(mouse)
+        if mouse.dx or mouse.dy:
+            events.append(MouseMotion(*mouse.motion))
+
+        mousepos = ((mouse.x, mouse.y), (mouse.cx, mouse.cy))
+
+        for oldstate, newstate, released, button in zip((_mousel, _mousem, _mouser),
+                                    mouse.button, mouse.button_pressed, (1, 2, 3)):
+            if released:
+                if not oldstate:
+                    events.append(MouseDown(button, *mousepos))
+                events.append(MouseUp(button, *mousepos))
+                if newstate:
+                    events.append(MouseDown(button, *mousepos))
+            elif newstate and not oldstate:
+                events.append(MouseDown(button, *mousepos))
+        
+        if mouse.wheel_up:
+            events.append(MouseDown(4, *mousepos))
+        if mouse.wheel_down:
+            events.append(MouseDown(5, *mousepos))
+            
+        _mousel = mouse.lbutton
+        _mousem = mouse.mbutton
+        _mouser = mouse.rbutton
+
+    #while _lib.TCOD_sys_check_for_event(_tcod.TCOD_EVENT_KEY, libkey, None):
+#    while 1:
         if libkey.vk == local.K_NONE:
             break
         if libkey.pressed:
@@ -136,29 +169,8 @@ def get():
         else:
             keyevent = KeyUp
         events.append(keyevent(*tuple(libkey)))
-
-    mouse = _Mouse()
-    _lib.TCOD_mouse_get_status(mouse)
-    if mouse.dx or mouse.dy:
-        events.append(MouseMotion(*mouse.motion))
-
-    mousepos = ((mouse.x, mouse.y), (mouse.cx, mouse.cy))
-
-    for oldstate, newstate, released, button in zip((_mousel, _mousem, _mouser),
-                                mouse.button, mouse.button_pressed, (1, 2, 3)):
-        if released:
-            if not oldstate:
-                events.append(MouseDown(button, *mousepos))
-            events.append(MouseUp(button, *mousepos))
-            if newstate:
-                events.append(MouseDown(button, *mousepos))
-        elif newstate and not oldstate:
-            events.append(MouseDown(button, *mousepos))
-
-    _mousel = mouse.lbutton
-    _mousem = mouse.mbutton
-    _mouser = mouse.rbutton
-
+        #break
+    
     if _lib.TCOD_console_is_window_closed():
         events.append(Quit())
 

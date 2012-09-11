@@ -7,9 +7,11 @@ include tdl/VERSION
 include tdl/lib/*.txt
 include tdl/linux*/*.so
 include tdl/win32/*.dll
-include tdl/*.dylib
 include tdl/lib/darwin/*
+include fonts/*.png
+include fonts/*.txt
 include Frameworks/*.framework.tar
+include Frameworks/*.dmg
 include examples/*.py
 include documentation/*.html
 include ez_setup.py
