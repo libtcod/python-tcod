@@ -7,6 +7,11 @@ Mac users will need to install the files found in the Frameworks directory
 * Python 2.6+ or 3.x
 * 32 bit Windows, 32/64 bit Linux, or Mac OS/X (32 bit architecture)
 
+Additonal Mac requirements (included in Frameworks directory):
+* SDL Framework: http://www.libsdl.org/release/SDL-1.2.14.dmg
+* libpng Framework: http://ethan.tira-thompson.org/Mac_OS_X_Ports_files/libpng%20%28universal%29.dmg
+Mount the .dmg's and copy the framework to /Libraries/Frameworks (you might need to run finder as root. If so, in terminal "paste sudo /System/Library/CoreServices/Finder.app/Contents/MacOS/Finder")
+
 === About ===
 TDL is a port of the C library libtcod in an attempt to make it more "Pythonic"
 You can find more about libtcod at: http://doryen.eptalys.net/libtcod/

@@ -45,14 +45,14 @@ def main():
     # a list containing all x,y pairs
     CELLS = list(itertools.product(range(WIDTH), range(HEIGHT)))
     
-    console = tdl.init(WIDTH, HEIGHT)
+    console = tdl.init(WIDTH, HEIGHT, renderer=tdl.RENDERER_GLSL)
     fullTimer = StopWatch()
     randomTimer = StopWatch()
     drawTimer = StopWatch()
     flushTimer = StopWatch()
     while 1:
         for event in tdl.event.get():
-            if event.type == tdl.QUIT:
+            if event.type == 'QUIT':
                 raise SystemExit()
         with randomTimer:
             # getrandbits is around 5x faster than using randint
@@ -62,9 +62,9 @@ def main():
         with drawTimer:
             for (x,y), bgcolor, char in zip(CELLS, bgcolors, char):
                 console.drawChar(x=x, y=y, char=char, fgcolor=(255, 255, 255), bgcolor=bgcolor)
-        console.drawStr(0, 0, 'Random%7.2fms ' % (randomTimer.getMeanTime() * 1000), tdl.C_WHITE, tdl.C_BLACK)
-        console.drawStr(0, 1, 'DrawCh%7.2fms ' % (drawTimer.getMeanTime() * 1000), tdl.C_WHITE, tdl.C_BLACK)
-        console.drawStr(0, 2, 'Flush %7.2fms ' % (flushTimer.getMeanTime() * 1000), tdl.C_WHITE, tdl.C_BLACK)
+        console.drawStr(0, 0, 'Random%7.2fms ' % (randomTimer.getMeanTime() * 1000))
+        console.drawStr(0, 1, 'DrawCh%7.2fms ' % (drawTimer.getMeanTime() * 1000))
+        console.drawStr(0, 2, 'Flush %7.2fms ' % (flushTimer.getMeanTime() * 1000))
         with flushTimer:
             tdl.flush()
         tdl.setTitle('%i FPS' % tdl.getFPS())
