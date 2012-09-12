@@ -8,7 +8,7 @@
 <td valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="tdl.html"><font color="#ffffff">tdl</font></a>.event</strong></big></big></font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:///C:/python32/lib/site-packages/tdl/event.py">c:\python32\lib\site-packages\tdl\event.py</a></font></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:///C:/users/kyle/dropbox/python/python-tdl/tdl/event.py">c:\users\kyle\dropbox\python\python-tdl\tdl\event.py</a></font></td></tr></table>
     <p><tt>This&nbsp;module&nbsp;handles&nbsp;user&nbsp;input.<br>
 &nbsp;<br>
 Here's&nbsp;a&nbsp;quick&nbsp;reference&nbsp;to&nbsp;<a href="#Event">Event</a>&nbsp;types&nbsp;and&nbsp;their&nbsp;attributes:<br>
@@ -27,9 +27,10 @@ You&nbsp;will&nbsp;likely&nbsp;want&nbsp;to&nbsp;use&nbsp;the&nbsp;tdl.event.get
 <font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="ctypes.html">ctypes</a><br>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="tdl.tcod.html">tdl.tcod</a><br>
+</td><td width="25%" valign=top><a href="ctypes.html">ctypes</a><br>
 </td><td width="25%" valign=top><a href="tdl.local.html">tdl.local</a><br>
-</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -385,11 +386,11 @@ Methods inherited from <a href="tdl.event.html#Event">Event</a>:<br>
 &nbsp;<br>
 This&nbsp;function&nbsp;returns&nbsp;<a href="#Event">Event</a>&nbsp;objects&nbsp;that&nbsp;can&nbsp;be&nbsp;ID'd&nbsp;and&nbsp;sorted&nbsp;with&nbsp;their&nbsp;type&nbsp;attribute:<br>
 for&nbsp;event&nbsp;in&nbsp;tdl.event.<a href="#-get">get</a>():<br>
-&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;event.type&nbsp;==&nbsp;tdl.QUIT:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;event.type&nbsp;==&nbsp;'QUIT':<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;raise&nbsp;SystemExit()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;elif&nbsp;event.type&nbsp;==&nbsp;tdl.MOUSEDOWN:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;elif&nbsp;event.type&nbsp;==&nbsp;'MOUSEDOWN':<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print('Mouse&nbsp;button&nbsp;%i&nbsp;clicked&nbsp;at&nbsp;%i,&nbsp;%i'&nbsp;%&nbsp;(event.button,&nbsp;event.pos[0],&nbsp;event.pos[1]))<br>
-&nbsp;&nbsp;&nbsp;&nbsp;elif&nbsp;event.type&nbsp;==&nbsp;tdl.KEYDOWN:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;elif&nbsp;event.type&nbsp;==&nbsp;'KEYDOWN':<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print('Key&nbsp;#%i&nbsp;"%s"&nbsp;pressed'&nbsp;%&nbsp;(event.key,&nbsp;event.char))<br>
 &nbsp;<br>
 Here&nbsp;is&nbsp;a&nbsp;list&nbsp;of&nbsp;events&nbsp;and&nbsp;their&nbsp;attributes:<br>
