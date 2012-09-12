@@ -66,8 +66,23 @@ class _Color(Structure):
         "useful to convert back into web format: 0xRRGGBB"
         return (self.r << 16 | self.g << 8 | self.b)
     
+    def __getitem__(self, key):
+        if key == 0:
+            return self.r
+        if key == 1:
+            return self.g
+        if key == 2:
+            return self.b
+        raise IndexError()
+    
+    def __eq__(self, other):
+        return (self.r, self.g, self.b) == other
+        
+    def __hash__(self):
+        return hash((self.r, self.g, self.b))
+    
     def __repr__(self):
-        return '<TCODColor r=%i, g=%i, b=%i>' % tuple(self)
+        return '<TCODColor %s>' % repr(tuple(self))
 
 # not needed
 #_lib.TCOD_color_equals.restype = c_bool

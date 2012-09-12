@@ -8,17 +8,18 @@ def getVersion():
     when setup.py is run this function is called and sets up the tdl/VERSION file
     when run from an sdist build the svn isn't found and uses the stored version instead
     """
-    svnversion = subprocess.Popen('svnversion -n', shell=True, stdout=subprocess.PIPE)
+    svnversion = subprocess.Popen('svnversion -n', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     REVISION = svnversion.communicate()[0] # get stdout
-    if REVISION == 'Unversioned directory' or REVISION is None:
-        # a real user install, get version from file
+    if not REVISION or not any([c.isdigit() for c in REVISION]):
+        # no numbers so assume an error
+        # likely a real user install, get version from file
         VERSION = open('tdl/VERSION', 'r').read()
         return VERSION
     # building on the svn, save version in a file for user installs
-    if ':' in REVISION:
-        REVISION = REVISION.split(':')[-1] # take "latest" revision, I think
-    REVISION = ''.join((c for c in REVISION if c.isdigit())) # remove letters
-    VERSION = '1.0r%s' % REVISION
+    if b':' in REVISION:
+        REVISION = REVISION.split(b':')[-1] # take "latest" revision, I think
+    REVISION = b''.join((c for c in REVISION if c.isdigit())) # remove letters
+    VERSION = '1.1r%s' % REVISION
     open('tdl/VERSION', 'w').write(VERSION)
     return VERSION
 
@@ -60,5 +61,7 @@ The library is used for displaying tilesets (ascii or graphical) in true color.
                    'Programming Language :: Python :: 3.0',
                    'Programming Language :: Python :: 3.1',
                    ],
-      keywords = 'roguelike roguelikes console text curses doryen ascii',
+      keywords = 'roguelike roguelikes console text curses doryen ascii libtcod',
+      platforms = ['Windows', 'Mac OS X', 'Linux']
+      license = 'New BSD License'
       )

@@ -6,6 +6,7 @@ import sys
 import os
 import ctypes
 import weakref
+import array
 
 from . import event
 from .tcod import _lib, _Color, _unpackfile
@@ -19,7 +20,12 @@ def _format_string(string):
     return string
 
 def _formatChar(char):
-    "Prepares a single character for passing to ctypes calls"
+    """Prepares a single character for passing to ctypes calls, needs to return
+    an integer but can also pass None which will keep the current character
+    instead of overrwriting it.
+    
+    This is called often and needs to be optimized whenever possible.
+    """
     if char is None:
         return None
     if isinstance(char, (str, bytes)) and len(char) == 1:
@@ -37,23 +43,27 @@ _setfore = _lib.TCOD_console_set_char_foreground
 _setback = _lib.TCOD_console_set_char_background
 _setcharEX = _lib.TCOD_console_put_char_ex
 def _verify_colors(*colors):
-    "raise an error if the parameters can not be converted into colors"
+    """Used internally.
+    Raise an assertion error if the parameters can not be converted into colors.
+    """
     for color in colors:
-        assert _iscolor(color), TypeError('a color must be a 3 item tuple, web format, or None, received %s' % repr())
+        assert _iscolor(color), 'a color must be a 3 item tuple, web format, or None, received %s' % repr()
     return True
 
 def _iscolor(color):
-    """Used internally
+    """Used internally.
     A debug function to see if an object can be used as a TCOD color struct.
-    None counts as a parameter to not change colors.
+    None counts as a parameter to keep the current colors instead.
+    
+    This function is often part of an inner-loop and can slow a program down.
+    It has been made to work with assert and can be skipped with the -O flag.
+    Still it's called often and must be optimized.
     """
-    # this is called often and must be optimized
     if color is None:
         return True
     if isinstance(color, (tuple, list, _Color)):
-    #if color.__class__ in (tuple, list, _Color):
         return len(color) == 3
-    if color.__class__ is int and 0x000000 <= color <= 0xffffff:
+    if color.__class__ is int:
         return True
     return False
 
@@ -94,7 +104,7 @@ class Console(object):
     to the root console to be visisble.
     """
 
-    __slots__ = ('_as_parameter_', 'width', 'height', 'cursorX', 'cursorY', '__weakref__')
+    __slots__ = ('_as_parameter_', 'width', 'height', '__weakref__', '__dict__')
 
     def __init__(self, width, height):
         self._as_parameter_ = _lib.TCOD_console_new(width, height)
@@ -105,7 +115,7 @@ class Console(object):
 
     @classmethod
     def _newConsole(cls, console):
-        "Make a Console instance, from a console ctype"
+        """Make a Console instance, from a console ctype"""
         self = cls.__new__(cls)
         self._as_parameter_ = console
         self.width = _lib.TCOD_console_get_width(self)
@@ -129,10 +139,13 @@ class Console(object):
             pass
 
     def _replace(self, console):
-        """Used internally"""
-        # Used to replace this Console object with the root console
-        # If another Console object is used then they are swapped
+        """Used internally
         
+        Mostly used just to replace this Console object with the root console
+        If another Console object is used then they are swapped
+        
+        Soon to be removed and replaced by the _newConsole method
+        """
         if isinstance(console, Console):
             self._as_parameter_, console._as_parameter_ = \
               console._as_parameter_, self._as_parameter_ # swap tcod consoles
@@ -279,19 +292,22 @@ class Console(object):
                             (x, y, self.__class__.__name__, self.width, self.height))
 
     def _translate(self, x, y):
-        "Convertion x and y to their position on the root Console for this Window"
-        return x, y # Because this is a Console we return the paramaters untouched
+        """Convertion x and y to their position on the root Console for this Window
+        
+        Because this is a Console instead of a Window we return the paramaters
+        untouched"""
+        return x, y
         
     def clear(self, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Clears the entire console.
         """
-        #assert _iscolor(fillcolor), 'fillcolor must be a 3 item list'
-        #assert fillcolor is not None, 'fillcolor can not be None'
+        assert _verify_colors(fgcolor, bgcolor)
         _lib.TCOD_console_set_default_background(self, _formatColor(bgcolor))
         _lib.TCOD_console_set_default_foreground(self, _formatColor(fgcolor))
         _lib.TCOD_console_clear(self)
     
-    def _setChar(self, char, x, y, fgcolor=None, bgcolor=None, bgblend=BND_SET):
+    
+    def _setChar(self, x, y, char, fgcolor=None, bgcolor=None, bgblend=BND_SET):
         """Sets a character without moving the virtual cursor, this is called often
         and is designed to be as fast as possible"""
         if char is not None and fgcolor is not None and bgcolor is not None:
@@ -321,7 +337,7 @@ class Console(object):
         assert _verify_colors(fgcolor, bgcolor)
         x, y = self._cursor_move(x, y)
         
-        self._setChar(char, x, y, fgcolor, bgcolor)
+        self._setChar(x, y, char, fgcolor, bgcolor)
         #self._cursor_advance()
 
     def drawStr(self, x, y, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
@@ -339,15 +355,20 @@ class Console(object):
         # hardcode alpha settings for now
         bgblend=BND_SET
         
-        x, y = self._cursor_move(x, y)
-        _verify_colors(fgcolor, bgcolor)
+        #x, y = self._cursor_move(x, y)
+        assert _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
-        
+        width, height = self.getSize()
         for char in string:
-            self._setChar(x=self.cursorX, y=self.cursorY, char=char, fgcolor=fgcolor, bgcolor=bgcolor)
-            self._cursor_advance()
+            self._setChar(x, y, char, fgcolor, bgcolor)
+            x += 1 # advance cursor
+            if x == width: # line break
+                x = 0
+                y += 1
+                if y == height:
+                    return # just clip the rest of the string and exit
     
-    def drawRect(self, x, y, width, height, char=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def drawRect(self, x, y, width, height, string=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a rectangle starting from x and y and extending to width and
         height.  If width or height are None then it will extend to the edge
         of the console.  The rest are the same as drawChar.
@@ -355,38 +376,45 @@ class Console(object):
         # hardcode alpha settings for now
         bgblend=BND_SET
         
-        # replace None with cursor position
-        x, y = self._cursor_get(x, y)
-        # clamp rect to bounds
-        x, y, width, height = self._clampRect(x, y, width, height)
-        if (width, height) == (0, 0):
-            raise TDLError('Rectange is out of bounds at (%i, %i), bounds are (%i, %i)' % ((x, y) + self.getSize()))
+        ## replace None with cursor position
+        #x, y = self._cursor_get(x, y)
+        ## clamp rect to bounds
+        #if (width, height) == (0, 0):
+        #    raise TDLError('Rectange is out of bounds at (%i, %i), bounds are (%i, %i)' % ((x, y) + self.getSize()))
+        if not self._rectInBounds(x, y, width, height):
+            raise TDLError('Rectange is out of bounds at (x=%i, y=%i, width=%s, height=%s), bounds are (%i, %i)' %
+                           ((x, y, width, height) + self.getSize()))
+        x, y, width, height = self._clampRect(x, y, width, height) # fill in width height
         _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
         for cellY in range(y, y + height):
             for cellX in range(x, x + width):
-                self._setChar(char, cellX, cellY, fgcolor, bgcolor, bgblend)
+                self._setChar(cellX, cellY, string, fgcolor, bgcolor, bgblend)
         
-    def drawFrame(self, x, y, width, height, char=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def drawFrame(self, x, y, width, height, string=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         "Similar to drawRect but only draws the outline of the rectangle"
         # hardcode alpha settings for now
         bgblend=BND_SET
         
-        x, y = self._cursor_get(x, y)
-        x, y, width, height = self._clampRect(x, y, width, height)
-        if (width, height) == (0, 0):
-            raise TDLError('Rectange is out of bounds at (%i, %i), bounds are (%i, %i)' % ((x, y) + self.getSize()))
+        #x, y = self._cursor_get(x, y)
+        #x, y, width, height = self._clampRect(x, y, width, height)
+        #if (width, height) == (0, 0):
+        #    raise TDLError('Rectange is out of bounds at (%i, %i), bounds are (%i, %i)' % ((x, y) + self.getSize()))
+        if not self._rectInBounds(x, y, width, height):
+            raise TDLError('Frame is out of bounds at (x=%i, y=%i, width=%i, height=%i), bounds are (width=%i, height=%i)' %
+                           ((x, y, width, height) + self.getSize()))
+        
+        x, y, width, height = self._clampRect(x, y, width, height) # fill in width height
         _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
-        #self.draw_rect(fgcolor, bgcolor, char, x, y, width, height, False, bgblend)
-        if width == 1 or height == 1:
-            self.drawRect(char, x, y, width, height, fgcolor, bgcolor, bgblend)
+        if width == 1 or height == 1: # it's just a single width line here
+            self.drawRect(x, y, width, height, string, fgcolor, bgcolor, bgblend)
             return
         # draw frame with drawRect
-        self.drawRect(char, x, y, 1, height, fgcolor, bgcolor, bgblend)
-        self.drawRect(char, x, y, width, 1, fgcolor, bgcolor, bgblend)
-        self.drawRect(char, x + width - 1, y, 1, height, fgcolor, bgcolor, bgblend)
-        self.drawRect(char, x, y + height - 1, width, 1, fgcolor, bgcolor, bgblend)
+        self.drawRect(x, y, 1, height, string, fgcolor, bgcolor)
+        self.drawRect(x, y, width, 1, string, fgcolor, bgcolor)
+        self.drawRect(x + width - 1, y, 1, height, string, fgcolor, bgcolor)
+        self.drawRect(x, y + height - 1, width, 1, string, fgcolor, bgcolor)
 
     def getChar(self, x, y):
         """Return the character and colors of a cell as (ch, fg, bg)
@@ -415,19 +443,20 @@ class Window(object):
     You can't blit Window instances but drawing works as expected.
     """
 
-    __slots__ = ('console', 'parent', 'x', 'y', 'width', 'height', 'cursorX', 'cursorY')
+    __slots__ = ('console', 'parent', 'x', 'y', 'width', 'height', '__weakref__', '__dict__')
 
-    def __init__(self, console, x=0, y=0, width=None, height=None):
+    def __init__(self, console, x, y, width, height):
         if not isinstance(console, (Console, Window)):
-            raise TypeError('console parameter must be a Console or Window instance')
-        assert isinstance(x, int)
-        assert isinstance(y, int)
-        assert (isinstance(width, int) or width is None)
-        assert (isinstance(height, int) or height is None)
+            raise TypeError('console parameter must be a Console or Window instance, got %s' % repr(console))
+        assert isinstance(x, int), 'expeted integer got: %s' % repr(x)
+        assert isinstance(y, int), 'expeted integer got: %s' % repr(y)
+        assert (isinstance(width, int) or width is None), 'expeted integer or None got: %s' % repr(width)
+        assert (isinstance(height, int) or height is None), 'expeted integer or None got: %s' % repr(height)
         if not console._rectInBounds(x, y, width, height):
-            raise TDLError('New Window is not within bounds of it\'s parent')
+            raise TDLError("New Window is not within bounds of its parent, Window is (x=%i y=%i width=%i height=%i), Parent is (width=%i, height=%i)" %
+                           ((x, y, width, height) + console.getSize()))
         self.parent = console
-        self.x, self.y, self.width, self.height = console._clampRect(x, y, width, height)
+        self.x, self.y, self.width, self.height = console._clampRect(x, y, width, height) # fill width height params
         self.cursorX = self.cursorY = 0
         if isinstance(console, Console):
             self.console = console
@@ -442,7 +471,7 @@ class Window(object):
     _clampRect = Console._clampRect
     
     def _translate(self, x, y):
-        "Convertion x and y to their position on the root Console for this Window"
+        """Convertion x and y to their position on the root Console"""
         # we add our position relative to our parent and then call then next parent up
         return self.parent._translate((x + self.x), (y + self.y))
     
@@ -451,11 +480,11 @@ class Window(object):
     def clear(self, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Clears the entire Window.
         """
-        self.draw_rect(-1, 0, 0, None, None, fgcolor, bgcolor)
+        assert _verify_colors(fgcolor, bgcolor)
+        self.draw_rect(0, 0, None, None, 0x20, fgcolor, bgcolor)
 
-    def _setChar(self, char, x=None, y=None, fgcolor=None, bgcolor=None, bgblend=BND_SET):
-        x, y = self._translate(x, y)
-        parent._setChar(char, x, y, fgcolor, bgcolor, bgblend)
+    def _setChar(self, x, y, char=None, fgcolor=None, bgcolor=None, bgblend=BND_SET):
+        parent._setChar((x + self.x), (y + self.y), char, fgcolor, bgcolor, bgblend)
         
     drawChar = Console.drawChar
     drawStr = Console.drawStr
@@ -466,9 +495,8 @@ class Window(object):
     def getChar(self, x, y):
         """Return the character and colors of a cell as (ch, fg, bg)
         """
-        x, y = self._cursor_get(x, y)
         self._drawable(x, y)
-        return self.console.getChar(x + self.x, y + self.y)
+        return self.console.getChar(self._translate(x, y))
 
     getSize = Console.getSize
 
@@ -482,15 +510,19 @@ def init(width, height, title='TDL', fullscreen=False, renderer=RENDERER_SDL):
     """Start the main console with the given width and height and return the
     root console.
 
-    Remember to use flush() to make what's drawn visible on all consoles.
+    Remember to use tdl.flush() to make what's drawn visible on the console.
 
-    After the root console is garbage collected the window will close.
+    After the root console is garbage collected the window made by this function
+    will close.
     """
     global _rootinitialized, _rootconsole
     if not _fontinitialized: # set the default font to the one that comes with tdl
         setFont(_unpackfile('terminal.png'),
                  16, 16, FONT_LAYOUT_ASCII_INCOL)
 
+    if renderer>RENDERER_SDL:
+        raise TDLError('Render type out of range: "%i"' % renderer)
+    
     # If a console already exists then make a clone to replace it
     if _rootconsole is not None:
         oldroot = _rootconsole()
@@ -499,8 +531,6 @@ def init(width, height, title='TDL', fullscreen=False, renderer=RENDERER_SDL):
         oldroot._replace(rootreplacement)
         del rootreplacement
 
-    if renderer>RENDERER_SDL:
-        raise TDLError('Render type out of range: "%i"' % renderer)
     _lib.TCOD_console_init_root(width, height, _format_string(title), fullscreen, renderer)
 
     #event.get() # flush the libtcod event queue to fix some issues
@@ -535,7 +565,7 @@ def setFont(path, width, height, flags):
 
     path must be a string for where a bitmap file is found.
 
-    width and height should be of an individual tile.
+    width and height should be the size of an individual tile.
 
     flags are used to define the characters layout in the bitmap and the font type :
     FONT_LAYOUT_ASCII_INCOL : characters in ASCII order, code 0-15 in the first column
@@ -572,12 +602,12 @@ def setTitle(title):
         raise TDLError('Not initilized.  Set title with tdl.init')
     _lib.TCOD_console_set_window_title(_format_string(title))
 
-def screenshot(fileobj=None):
-    """Capture the screen and place it in fileobj.
+def screenshot(file=None):
+    """Capture the screen and place it in file.
 
-    fileobj can be a filelike object or a filepath to save the screenshot
-    if fileobj is none the file will be placed in the current folder with named
-    screenshotNNNN.png
+    file can be a file-like object or a filepath to save the screenshot
+    if file is none then file will be placed in the current folder with
+    the names: screenshot001.png, screenshot002.png, ...
     """
     if not _rootinitialized:
         raise TDLError('Initialize first with tdl.init')
@@ -603,15 +633,15 @@ def screenshot(fileobj=None):
 def setFPS(fps):
     """Set the frames per second.
 
-    You can set no limit by using None or 0.
+    You can set this to have no limit by using 0.
     """
     if fps is None:
         fps = 0
-    assert isinstance(fps, int), 'fps must be an integer or None'
+    assert isinstance(fps, int), 'fps must be an integer or None, got: %s' % repr(fps)
     _lib.TCOD_sys_set_fps(fps)
 
 def getFPS():
-    """Return the frames per second.
+    """Return the current frames per second of the running program.
     """
     return _lib.TCOD_sys_get_fps()
 
