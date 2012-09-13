@@ -8,16 +8,21 @@ import ctypes
 import weakref
 import array
 
-from . import event
+from . import event, ansi
 from .tcod import _lib, _Color, _unpackfile
-from .local import *
 
 _IS_PYTHON3 = (sys.version_info[0] == 3)
-def _format_string(string):
+#_encoding = 'cp437'
+
+def _format_string(string): # still used for filepaths, and that's about it
     "changes string into bytes if running in python 3, for sending to ctypes"
     if _IS_PYTHON3 and isinstance(string, str):
         return string.encode()
     return string
+
+#def _encodeString(string):
+#    pass
+
 
 def _formatChar(char):
     """Prepares a single character for passing to ctypes calls, needs to return
@@ -28,10 +33,10 @@ def _formatChar(char):
     """
     if char is None:
         return None
+    if isinstance(char, int):
+        return char
     if isinstance(char, (str, bytes)) and len(char) == 1:
         return ord(char)
-    if isinstance(char, int) or not _IS_PYTHON3 and isinstance(char, long):
-        return char
     raise TypeError('Expected char parameter to be a single character string, number, or None, got: %s' % repr(char))
 
 _fontinitialized = False
@@ -47,7 +52,7 @@ def _verify_colors(*colors):
     Raise an assertion error if the parameters can not be converted into colors.
     """
     for color in colors:
-        assert _iscolor(color), 'a color must be a 3 item tuple, web format, or None, received %s' % repr()
+        assert _iscolor(color), 'a color must be a 3 item tuple, web format, or None, received %s' % repr(color)
     return True
 
 def _iscolor(color):
@@ -85,14 +90,6 @@ class TDLError(Exception):
     The catch all for most TDL specific errors.
     """
 
-#class TDLDrawError(TDLError):
-#    pass
-
-#class TDLBlitError(TDLError):
-#    pass
-
-#class TDLIndexError(TDLError):
-#    pass
 
 class Console(object):
     """The Console is the main class of the tdl library.
@@ -110,7 +107,7 @@ class Console(object):
         self._as_parameter_ = _lib.TCOD_console_new(width, height)
         self.width = width
         self.height = height
-        self.cursorX = self.cursorY = 0
+        #self.cursorX = self.cursorY = 0
         self.clear()
 
     @classmethod
@@ -155,16 +152,38 @@ class Console(object):
         self.height = _lib.TCOD_console_get_height(self)
         return self
     
+    def _normalizeRect(self, x, y, width, height):
+        """Check if the rectangle is in bounds and make minor adjustments.
+        raise AssertionError's for any problems
+        """
+        old = x, y, width, height
+        assert self._drawable(x, y)
+        if width == None: # if width or height are None then extend them to the edge
+            width = self.width - x
+        if height == None:
+            height = self.height - y
+        assert isinstance(width, int), 'width must be an integer or None, got %s' % repr(width)
+        assert isinstance(height, int), 'height must be an integer or None, got %s' % repr(height)
+        if width < 0: # if width or height are backwards then flip them
+            x += width
+            width = abs(width)
+        if height < 0:
+            y += height
+            height = abs(height)
+        assert x >= 0 and y >= 0 and x + width <= self.width and y + height <= self.height, \
+        'Rect is out of bounds at (x=%i y=%i width=%i height=%i), Console bounds are (width=%i, height=%i)' % old + self.getSize()
+        return x, y, width, height
+    
     def _rectInBounds(self, x, y, width, height):
         "check the rect so see if it's within the bounds of this console"
         if width is None:
             width = 0
         if height is None:
             height = 0
-        if x < 0 or y < 0:
+        if (x < 0 or y < 0 or
+            x + width > self.width or y + height > self.height):
             return False
-        if x + width > self.width or y + height > self.height:
-            return False
+            
         return True
     
     def _clampRect(self, x=0, y=0, width=None, height=None):
@@ -206,90 +225,125 @@ class Console(object):
         
         assert isinstance(source, (Console, Window)), "source muse be a Window or Console instance"
         
-        # if None is used, get the cursor position
-        x, y = self._cursor_get(x, y)
-        srcx, srcy = source._cursor_get(srcx, srcy)
-
-        assert width is None or isinstance(width, (int)), "width must be a number or None"
-        assert height is None or isinstance(height, (int)), "height must be a number or None"
+        assert width is None or isinstance(width, (int)), "width must be a number or None, got %s" % repr(width)
+        assert height is None or isinstance(height, (int)), "height must be a number or None, got %s" % repr(height)
         
-        if not self._rectInBounds(srcx, srcy, width, height):
-            raise TDLError('Source is out of bounds')
-        if not self._rectInBounds(x, y, width, height):
-            raise TDLError('Destination is out of bounds')
+        # fill in width, height
+        if width == None:
+            width = min(self.width - x, source.width - srcx)
+        if height == None:
+            height = min(self.height - y, source.height - srcy)
         
-        x, y, width, height = self._clampRect(x, y, width, height)
-        srcx, srcy, width, height = source._clampRect(srcx, srcy, width, height)
+        # _normalizeRect will break negative values in this case, so enforce
+        # an assert on positive numbers in this one case
+        assert width >= 0 and height >= 0, 'width and height cannot be negaitve'
+        x, y, width, height = self._normalizeRect(x, y, width, height)
+        srcx, srcy, width, height = source._normalizeRect(srcx, srcy, width, height)
         
-
         # translate source and self if any of them are Window instances
         if isinstance(source, Window):
-            source._translate(srcx, srcy)
+            srcx, srcy = source._translate(srcx, srcy)
             source = source.console
         
         if isinstance(self, Window):
-            self._translate(x, y)
+            x, y = self._translate(x, y)
             self = self.console
         
-        _lib.TCOD_console_blit(source, srcx, srcy, width, height, self, x, y, fgalpha, bgalpha)
+        if self == source:
+            # if we are the same console then we need a third console to hold
+            # onto the data, otherwise it tries to copy into itself and
+            # starts destroying everything
+            tmp = Console(width, height)
+            _lib.TCOD_console_blit(source, srcx, srcy, width, height, tmp, 0, 0, fgalpha, bgalpha)
+            _lib.TCOD_console_blit(tmp, 0, 0, width, height, self, x, y, fgalpha, bgalpha)
+        else:
+            _lib.TCOD_console_blit(source, srcx, srcy, width, height, self, x, y, fgalpha, bgalpha)
 
     def getSize(self):
         """Return the size of the console as (width, height)
         """
         return self.width, self.height
-
-    def _cursor_normalize(self):
-        if self.cursorX >= self.width:
-            self.cursorX = 0
-            self.cursorY += 1
-            if self.cursorY >= self.height:
-                self.cursorY = 0
         
-    def _cursor_advance(self, rate=1):
-        "Move the virtual cursor forward, one step by default"
-        self.cursorX += rate
-    
-    def _cursor_newline(self):
-        "Move the cursor down and set x=0"
-        self.cursorX = 0
-        self.cursorY += 1
-        self._cursor_normalize()
-    
-    def _cursor_get(self, x=None, y=None):
-        "Fill in blanks with the cursor position"
-        if x is None or y is None:
-            self._cursor_normalize() # make sure cursor is valid first
-        if x is None:
-            x = self.cursorX
-        if y is None:
-            y = self.cursorY
-        return x, y
-    
-    def _cursor_move(self, x=None, y=None):
-        "Changes the cursor position, checks if the position is valid, and returns the new position"
-        x, y = self._cursor_get(x, y)
-        # replace None with cursor position
-        # check if position is valid, raise an error if not
-        self._drawable(x, y)
-        # change cursor position
-        self.cursorX, self.cursorY = x, y
-        # return new position
-        return x, y
+    def scroll(self, x, y):
+        """Scroll the contents of the console in the direction of x,y.
+        
+        Uncovered areas will be cleared.
+        """
+        # seems simple right?  Get ready for one of the most complex
+        # functions in this library.
+        assert isinstance(x, int), "x must be an integer, got %s" % repr(x)
+        assert isinstance(y, int), "y must be an integer, got %s" % repr(x)
+        def getSlide(x, length):
+            """get the parameters needed to scroll the console in the given
+            direction with x
+            returns (x, length, srcx)
+            """
+            if x > 0:
+                srcx = 0
+                length -= x
+            elif x < 0:
+                srcx = abs(x)
+                x = 0
+                length -= srcx
+            else:
+                srcx = 0
+            return x, length, srcx
+        def getCover(x, length):
+            """return the (x, width) ranges of what is covered and uncovered"""
+            cover = (0, length) # everything covered
+            uncover = None  # nothing uncovered
+            if x > 0: # left side uncovered
+                cover = (x, length - x) 
+                uncover = (0, x)
+            elif x < 0: # right side uncovered
+                x = abs(x)
+                cover = (0, length - x)
+                uncover = (length - x, x)
+            return cover, uncover
+        
+        width, height = self.getSize()
+        if abs(x) >= width or abs(y) >= height:
+            return self.clear() # just clear the console normally
+            
+        # get the ranges of the areas that will be uncovered
+        coverX, uncoverX = getCover(x, width)
+        coverY, uncoverY = getCover(y, height)
+        # so at this point we know that coverX and coverY makes a rect that
+        # encases the area that we end up blitting to.  uncoverX/Y makes a
+        # rect in the corner of the uncovered area.  So we need to combine
+        # the uncoverX/Y with coverY/X to make what's left of the uncovered
+        # area.  Explaining it makes it mush easier to do now.
+        
+        # But first we need to blit so we have an area to clear.
+        x, width, srcx = getSlide(x, width)
+        y, height, srcy = getSlide(y, height)
+        self.blit(self, x, y, width, height, srcx, srcy)
+        
+        # let's do this
+        if uncoverX: # clear sides (0x20 is space)
+            self.drawRect(uncoverX[0], coverY[0], uncoverX[1], coverY[1], 0x20)
+        if uncoverY: # clear top/bottom
+            self.drawRect(coverX[0], uncoverY[0], coverX[1], uncoverY[1], 0x20)
+        if uncoverX and uncoverY: # clear corner
+            self.drawRect(uncoverX[0], uncoverY[0], uncoverX[1], uncoverY[1], 0x20)
+        
+        # you know, now that I think about it.  I could of just copied it
+        # into another console instance and cleared the whole thing.
+        # not only would that have been a better idea.  It would of been
+        # faster too. (but only faster for Console's)
         
     def _drawable(self, x, y):
         """Used internally
         Checks if a cell is part of the console.
-        Raises an exception if it can not be used.
+        Raises an AssertionError if it can not be used.
         """
-        #if x is not None and not isinstance(x, int):
-        #    raise TypeError('x must be an integer, got %s' % repr(x))
-        #if y is not None and not isinstance(y, int):
-        #    raise TypeError('y must be an integer, got %s' % repr(y))
+        assert isinstance(x, int), 'x must be an integer, got %s' % repr(x)
+        assert isinstance(y, int), 'y must be an integer, got %s' % repr(y)
         
-        if (0 <= x < self.width) and (0 <= y < self.height):
-            return True
-        raise TDLError('(%i, %i) is an invalid postition.  %s size is (%i, %i)' %
-                            (x, y, self.__class__.__name__, self.width, self.height))
+        assert (0 <= x < self.width) and (0 <= y < self.height), \
+                ('(%i, %i) is an invalid postition.  %s size is (%i, %i)' %
+                 (x, y, self.__class__.__name__, self.width, self.height))
+        return True
 
     def _translate(self, x, y):
         """Convertion x and y to their position on the root Console for this Window
@@ -307,17 +361,22 @@ class Console(object):
         _lib.TCOD_console_clear(self)
     
     
-    def _setChar(self, x, y, char, fgcolor=None, bgcolor=None, bgblend=BND_SET):
-        """Sets a character without moving the virtual cursor, this is called often
-        and is designed to be as fast as possible"""
+    def _setChar(self, x, y, char, fgcolor=None, bgcolor=None, bgblend=1):
+        """
+        Sets a character without moving the virtual cursor, this is called
+        often and is designed to be as fast as possible.
+        
+        Because of the need for speed this function will do NO TYPE CHECKING
+        AT ALL, it's up to the drawing functions to use the functions:
+        _formatChar and _formatColor before passing to this."""
         if char is not None and fgcolor is not None and bgcolor is not None:
-            return _setcharEX(self, x, y, _formatChar(char), _formatColor(fgcolor), _formatColor(bgcolor))
+            return _setcharEX(self, x, y, char, fgcolor, bgcolor)
         if char is not None:
-            _setchar(self, x, y, _formatChar(char))
+            _setchar(self, x, y, char)
         if fgcolor is not None:
-            _setfore(self, x, y, _formatColor(fgcolor))
+            _setfore(self, x, y, fgcolor)
         if bgcolor is not None:
-            _setback(self, x, y, _formatColor(bgcolor), bgblend)
+            _setback(self, x, y, bgcolor, bgblend)
     
     def drawChar(self, x, y, char=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a single character.
@@ -326,95 +385,86 @@ class Console(object):
         you can set the char parameter as None if you only want to change
         the colors of the tile.
 
-        For fgcolor and bgcolor you use a 3 item list or None
-        None will keep the color unchanged.
+        For fgcolor and bgcolor you use a 3 item list or None.  None will
+        keep the current color at this position unchanged.
+        
 
-        Having the x or y values outside of the console will raise a TDLError.
+        Having the x or y values outside of the console will raise an
+        AssertionError.
         """
-        # hardcode alpha settings for now
-        #bgblend=BND_SET
         
         assert _verify_colors(fgcolor, bgcolor)
-        x, y = self._cursor_move(x, y)
+        assert self._drawable(x, y)
         
-        self._setChar(x, y, char, fgcolor, bgcolor)
-        #self._cursor_advance()
+        self._setChar(x, y, _formatChar(char),
+                      _formatColor(fgcolor), _formatColor(bgcolor))
 
     def drawStr(self, x, y, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
-        """Draws a string starting at x and y.
+        """Draws a string starting at x and y.  Optinally colored.
 
-        A string that goes past the end will wrap around.  No warning will be
-        made if it reaches the end of the console.
+        A string that goes past the right side will wrap around.  A string
+        wraping to below the console will raise a TDLError but will still be
+        written.  This means you can safely ignore the errors with a
+        try... except block if you're fine with partily written strings.
 
-        \\r and \\n are drawn on the console as normal character tiles.
+        \\r and \\n are drawn on the console as normal character tiles.  No
+        special encoding is done and any string will translate to the character
+        table as is.
 
-        For fgcolor and bgcolor, None will keep the color unchanged.
-
-        If a large enough tileset is loaded you can use a unicode string.
+        fgcolor and bgcolor can be set to None to keep the colors unchanged.
         """
-        # hardcode alpha settings for now
-        bgblend=BND_SET
         
-        #x, y = self._cursor_move(x, y)
+        assert self._drawable(x, y)
         assert _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
         width, height = self.getSize()
         for char in string:
-            self._setChar(x, y, char, fgcolor, bgcolor)
+            if y == height:
+                raise TDLError('End of console reached.')
+            self._setChar(x, y, _formatChar(char), fgcolor, bgcolor)
             x += 1 # advance cursor
             if x == width: # line break
                 x = 0
                 y += 1
-                if y == height:
-                    return # just clip the rest of the string and exit
     
     def drawRect(self, x, y, width, height, string=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a rectangle starting from x and y and extending to width and
         height.  If width or height are None then it will extend to the edge
         of the console.  The rest are the same as drawChar.
         """
-        # hardcode alpha settings for now
-        bgblend=BND_SET
-        
-        ## replace None with cursor position
-        #x, y = self._cursor_get(x, y)
-        ## clamp rect to bounds
-        #if (width, height) == (0, 0):
-        #    raise TDLError('Rectange is out of bounds at (%i, %i), bounds are (%i, %i)' % ((x, y) + self.getSize()))
+        assert self._drawable(x, y)
         if not self._rectInBounds(x, y, width, height):
             raise TDLError('Rectange is out of bounds at (x=%i, y=%i, width=%s, height=%s), bounds are (%i, %i)' %
                            ((x, y, width, height) + self.getSize()))
         x, y, width, height = self._clampRect(x, y, width, height) # fill in width height
-        _verify_colors(fgcolor, bgcolor)
+        assert _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
+        char = _formatChar(string)
         for cellY in range(y, y + height):
             for cellX in range(x, x + width):
-                self._setChar(cellX, cellY, string, fgcolor, bgcolor, bgblend)
+                self._setChar(cellX, cellY, char, fgcolor, bgcolor)
         
     def drawFrame(self, x, y, width, height, string=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         "Similar to drawRect but only draws the outline of the rectangle"
         # hardcode alpha settings for now
-        bgblend=BND_SET
+        #bgblend=1
         
-        #x, y = self._cursor_get(x, y)
-        #x, y, width, height = self._clampRect(x, y, width, height)
-        #if (width, height) == (0, 0):
-        #    raise TDLError('Rectange is out of bounds at (%i, %i), bounds are (%i, %i)' % ((x, y) + self.getSize()))
         if not self._rectInBounds(x, y, width, height):
             raise TDLError('Frame is out of bounds at (x=%i, y=%i, width=%i, height=%i), bounds are (width=%i, height=%i)' %
                            ((x, y, width, height) + self.getSize()))
         
         x, y, width, height = self._clampRect(x, y, width, height) # fill in width height
-        _verify_colors(fgcolor, bgcolor)
+        assert _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
+        char = _formatChar(string)
         if width == 1 or height == 1: # it's just a single width line here
-            self.drawRect(x, y, width, height, string, fgcolor, bgcolor, bgblend)
-            return
-        # draw frame with drawRect
-        self.drawRect(x, y, 1, height, string, fgcolor, bgcolor)
-        self.drawRect(x, y, width, 1, string, fgcolor, bgcolor)
-        self.drawRect(x + width - 1, y, 1, height, string, fgcolor, bgcolor)
-        self.drawRect(x, y + height - 1, width, 1, string, fgcolor, bgcolor)
+            return self.drawRect(x, y, width, height, char, fgcolor, bgcolor)
+        
+        # draw sides of frame with drawRect
+        self.drawRect(x, y, 1, height, char, fgcolor, bgcolor)
+        self.drawRect(x, y, width, 1, char, fgcolor, bgcolor)
+        self.drawRect(x + width - 1, y, 1, height, char, fgcolor, bgcolor)
+        self.drawRect(x, y + height - 1, width, 1, char, fgcolor, bgcolor)
 
     def getChar(self, x, y):
         """Return the character and colors of a cell as (ch, fg, bg)
@@ -463,9 +513,9 @@ class Window(object):
         else:
             self.console = self.parent.console
         
-    _cursor_normalize = Console._cursor_normalize
-    _cursor_advance = Console._cursor_advance
-    _cursor_newline = Console._cursor_newline
+    #_cursor_normalize = Console._cursor_normalize
+    #_cursor_advance = Console._cursor_advance
+    #_cursor_newline = Console._cursor_newline
     _drawable = Console._drawable
     _rectInBounds = Console._rectInBounds
     _clampRect = Console._clampRect
@@ -476,6 +526,7 @@ class Window(object):
         return self.parent._translate((x + self.x), (y + self.y))
     
     blit = Console.blit
+    scroll = Console.scroll
 
     def clear(self, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Clears the entire Window.
@@ -483,7 +534,7 @@ class Window(object):
         assert _verify_colors(fgcolor, bgcolor)
         self.draw_rect(0, 0, None, None, 0x20, fgcolor, bgcolor)
 
-    def _setChar(self, x, y, char=None, fgcolor=None, bgcolor=None, bgblend=BND_SET):
+    def _setChar(self, x, y, char=None, fgcolor=None, bgcolor=None, bgblend=1):
         parent._setChar((x + self.x), (y + self.y), char, fgcolor, bgcolor, bgblend)
         
     drawChar = Console.drawChar
@@ -506,22 +557,26 @@ class Window(object):
                                                           self.height)
 
 
-def init(width, height, title='TDL', fullscreen=False, renderer=RENDERER_SDL):
+def init(width, height, title='TDL', fullscreen=False, renderer='SDL'):
     """Start the main console with the given width and height and return the
     root console.
 
     Remember to use tdl.flush() to make what's drawn visible on the console.
 
-    After the root console is garbage collected the window made by this function
-    will close.
+    After the root console is garbage collected, the window made by this
+    function will close.
+    
+    renderer can be one of 'GLSL', 'OPENGL', or 'SDL'
     """
+    RENDERERS = {'GLSL': 0, 'OPENGL': 1, 'SDL': 2}
     global _rootinitialized, _rootconsole
     if not _fontinitialized: # set the default font to the one that comes with tdl
         setFont(_unpackfile('terminal.png'),
-                 16, 16, FONT_LAYOUT_ASCII_INCOL)
+                 width=16, height=16, colomn=True)
 
-    if renderer>RENDERER_SDL:
-        raise TDLError('Render type out of range: "%i"' % renderer)
+    if renderer.upper() not in RENDERERS:
+        raise TDLError('No such render type "%s", expected one of "%s"' % (renderer, '", "'.join(RENDERERS)))
+    renderer = RENDERERS[renderer.upper()]
     
     # If a console already exists then make a clone to replace it
     if _rootconsole is not None:
@@ -559,23 +614,45 @@ def flush():
     #event._eventsflushed = False
     _lib.TCOD_console_flush()
 
-def setFont(path, width, height, flags):
+def setFont(path, width, height, colomn=False, greyscale=False, altLayout=False):
     """Changes the font to be used for this session
     This should be called before tdl.init
 
-    path must be a string for where a bitmap file is found.
+    path - must be a string for where a bitmap file is found.
 
-    width and height should be the size of an individual tile.
+    width, height - is the size of an individual tile.
 
-    flags are used to define the characters layout in the bitmap and the font type :
-    FONT_LAYOUT_ASCII_INCOL : characters in ASCII order, code 0-15 in the first column
-    FONT_LAYOUT_ASCII_INROW : characters in ASCII order, code 0-15 in the first row
-    FONT_LAYOUT_TCOD : simplified layout, see libtcod documents
-    FONT_TYPE_GREYSCALE : create an anti-aliased font from a greyscale bitmap
+    colomn - defines if the characer order goes along the rows or colomns.  It
+    should be True if the codes are 0-15 in the first column.  And should be
+    False if the codes are 0-15 in the first row.
+    
+    greyscale - creates an anti-aliased font from a greyscale bitmap.
+    Unnecessary when a font has an alpha channel for anti-aliasing.
+    
+    altLayout - a alternative layout with space in the upper left corner.  The
+    colomn parameter is ignored if this is True, find examples of this layout
+    in the font/ directory included with the TDL source.
     """
+    # put up some constants that are only used here
+    FONT_LAYOUT_ASCII_INCOL = 1
+    FONT_LAYOUT_ASCII_INROW = 2
+    FONT_TYPE_GREYSCALE = 4
+    FONT_LAYOUT_TCOD = 8
     global _fontinitialized
     _fontinitialized = True
-    assert os.path.exists(path), 'no file exists at "%s"' % path
+    flags = 0
+    if altLayout:
+        flags |= FONT_LAYOUT_TCOD
+    elif colomn:
+        flags |= FONT_LAYOUT_ASCII_INCOL
+    else:
+        flags |= FONT_LAYOUT_ASCII_INROW
+    if greyscale:
+        flags |= FONT_TYPE_GREYSCALE
+    #if isinstance(path, file):
+    #    path = path.name # if given a file just grab the path from the obj
+    if not os.path.exists(path):
+        raise TDLError('no file exists at: "%s"' % path)
     _lib.TCOD_console_set_custom_font(_format_string(path), flags, width, height)
 
 def getFullscreen():

@@ -39,13 +39,13 @@ class StopWatch:
 
 def main():
 
-    WIDTH = 80
-    HEIGHT = 60
+    WIDTH = 60
+    HEIGHT = 40
     TOTAL = WIDTH * HEIGHT
     # a list containing all x,y pairs
     CELLS = list(itertools.product(range(WIDTH), range(HEIGHT)))
     
-    console = tdl.init(WIDTH, HEIGHT, renderer=tdl.RENDERER_GLSL)
+    console = tdl.init(WIDTH, HEIGHT, renderer='GLSL')
     fullTimer = StopWatch()
     randomTimer = StopWatch()
     drawTimer = StopWatch()

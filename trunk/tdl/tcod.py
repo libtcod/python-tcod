@@ -14,7 +14,7 @@ try: # decide how files are unpacked depending on if we have the pkg_resources m
 except ImportError:
     from tdl import __path__
     def _unpackfile(filename):
-        return os.path.join(__path__[0], filename)
+        return os.path.abspath(os.path.join(__path__[0], filename))
 
 def _unpackFramework(framework, path):
     # get framework.tar file, remove ".tar" and add path

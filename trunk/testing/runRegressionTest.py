@@ -14,8 +14,11 @@ class TDLTemplate(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.console = tdl.init(30, 20, 'TDL UnitTest', False, renderer=tdl.RENDERER_SDL)
+        cls.console = tdl.init(30, 20, 'TDL UnitTest', False, renderer='SDL')
 
+    def setUp(self):
+        self.console.clear()
+        
     @classmethod
     def tearDownClass(cls):
         del cls.console
@@ -78,6 +81,9 @@ class BasicTests(TDLTemplate):
         for x,y in self.getDrawables():
             self.assertEqual((ch, fg, bg), self.console.getChar(x, y), 'clear should default to white on black')
         
+    #def test_changeFonts(self):
+    #    "Fonts are changable on the fly"
+        
         
 class DrawingTests(TDLTemplate):
 
@@ -108,16 +114,62 @@ class DrawingTests(TDLTemplate):
         
     def test_drawCharErrors(self):
         "test out of bounds assertion errors"
-        #if not __debug__:
-        #    self.skipTest('python run with optimized flag, skipping an AssertionError test')
+        if not __debug__:
+            self.skipTest('python run with optimized flag, skipping an AssertionError test')
         for x,y in self.getUndrawables():
-            with self.assertRaisesRegexp(tdl.TDLError, r"\(%i, %i\)" % (x, y)):
+            with self.assertRaisesRegexp(AssertionError, r"\(%i, %i\)" % (x, y)):
                 self.console.drawChar(x, y, *(self.getRandomCharacter()))
         
     def test_drawStrArray(self):
+        """strings will raise errors if they pass over the end of the console.
+        The data will still be written however."""
+        width, height = self.console.getSize()
         for x,y in self.getDrawables():
-            string = (random.getrandbits(8) for _ in range(random.randint(1, 100)))
-            self.console.drawStr(x, y, string, self.getRandomColor(), self.getRandomColor())
+            string = [random.getrandbits(8) for _ in range(random.randint(2, 10))]
+            fg, bg = self.getRandomColor(), self.getRandomColor()
+            if len(string) > ((height - y) * width - x): # compare length of string to remaining space on the console
+                with self.assertRaises(tdl.TDLError): # expect end of console error
+                    self.console.drawStr(x, y, string, fg, bg)
+            else:
+                self.console.drawStr(x, y, string, fg, bg)
+            for ch in string: # inspect console for changes
+                self.assertEqual(self.console.getChar(x, y), (ch, fg, bg), 'console data should be overwritten')
+                x += 1
+                if x == width:
+                    x = 0
+                    y += 1
+                    if y == height:
+                        break # end of console
+    
+    def test_drawStrErrors(self):
+        "test out of bounds assertion errors"
+        if not __debug__:
+            self.skipTest('python run with optimized flag, skipping an AssertionError test')
+        for x,y in self.getUndrawables():
+            with self.assertRaisesRegexp(AssertionError, r"\(%i, %i\)" % (x, y)):
+                self.console.drawStr(x, y, 'foo', self.getRandomColor(), self.getRandomColor())
+                
+    def test_scrolling(self):
+        """marks a spot and then scrolls the console, checks to make sure no
+        other spots are marked, test also knows if it's out of bounds.
+        
+        This test is a bit slow, it could be made more efficent by marking
+        several areas and not clearing the console every loop.
+        """
+        for sx, sy in itertools.product(range(-30, 30, 5), range(-20, 20, 5)):
+            self.console.clear()
+            char = self.getRandomCharacter()
+            dx, dy = random.choice(list(self.getDrawables()))
+            self.console.drawChar(dx, dy, *char)
+            self.console.scroll(sx, sy)
+            dx += sx # if these go out of bounds then the check will make sure everything is cleared
+            dy += sy
+            for x, y in self.getDrawables():
+                if x == dx and y == dy:
+                    self.assertEqual(self.console.getChar(x, y), char, 'marked position should have scrolled here')
+                else:
+                    self.assertEqual(self.console.getChar(x, y), (0x20, (255, 255, 255), (0, 0, 0)), 'every other place should be clear')
+        
         
 def suite():
     loader = unittest.TestLoader()
