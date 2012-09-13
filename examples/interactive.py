@@ -26,11 +26,13 @@ class TDLPrint(io.TextIOBase):
             for string in textwrap.wrap(strings, 80):
                 scroll()
                 console.drawStr(0, HEIGHT-1, string, *self.colors)
+                tdl.flush()
 
 sys.stdout = TDLPrint()
 olderr = sys.stderr
 newerr = TDLPrint((255, 255, 255), (127, 0, 0))
 interpeter = code.InteractiveConsole({'tdl':tdl, 'console':console})
+print('Python %s' % sys.version)
 print('Press ESC to quit')
 if __name__ == '__main__':
     buffer = ''
@@ -66,7 +68,8 @@ if __name__ == '__main__':
                         sys.excepthook(*sys.exc_info())
                         banner = sys.ps1
                     sys.stderr = olderr
-                    commands.append(buffer)
+                    if buffer not in commands:
+                        commands.append(buffer)
                     buffer = ''
                 elif event.ctrl:
                     pass
@@ -96,7 +99,7 @@ if __name__ == '__main__':
                     buffer = commands.pop(0)
                     cursor = len(buffer)
                 elif event.char == '\t':
-                    buffer += '    '
+                    buffer = buffer[:cursor] + '    ' + buffer[cursor:]
                     cursor += 4
                 elif event.keyname == 'ESCAPE':
                     raise SystemExit()

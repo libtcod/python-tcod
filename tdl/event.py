@@ -16,24 +16,26 @@ import ctypes
 
 from .tcod import _lib, _Mouse, _Key
 from . import tcod as _tcod
-from . import local
-
-# make sure that the program does not lock up from missing event flushes
-_eventsflushed = False # not that it works to well to fix that problem
-
-_autoflush = True
 
 _mousel = 0
 _mousem = 0
 _mouser = 0
 
 # this interpets the constants from local and makes a key to keyname dictionary
-_keynames = {}
-for attr in dir(local):
-    if attr[:2] == 'K_':
-        _keynames[getattr(local, attr)] = attr[2:]
-del attr
+def _parse_keynames(module):
+    """returns a dictionary mapping of human readable key names to their keycodes
+    this parses constants with the names of K_* and makes code=name pairs
+    this is for KeyEvent.keyname variable and that enables things like:
+    if (event.keyname == 'PAGEUP'):
+    """
+    _keynames = {}
+    for attr in dir(module): # from the modules variables
+        if attr[:2] == 'K_': # get the K_* constants
+            _keynames[getattr(_tcod, attr)] = attr[2:] # and make CODE=NAME pairs
+    return _keynames
 
+_keynames = _parse_keynames(_tcod)
+    
 class Event(object):
     __slots__ = ()
     type = None
@@ -80,7 +82,6 @@ class KeyUp(KeyEvent):
 
 class MouseButtonEvent(Event):
     __slots__ = ('button', 'pos', 'cell')
-    type = 'MOUSEDOWN'
 
     def __init__(self, button, pos, cell):
         self.button = button
@@ -96,14 +97,14 @@ class MouseUp(MouseButtonEvent):
     type = 'MOUSEUP'
 
 class MouseMotion(Event):
-    __slots__ = ('pos',  'motion', 'cell', 'cellmotion', 'relpos', 'relcell')
+    __slots__ = ('pos',  'motion', 'cell', 'cellmotion')
     type = 'MOUSEMOTION'
 
-    def __init__(self, pos, cell, relpos, relcell):
+    def __init__(self, pos, cell, motion, cellmotion):
         self.pos = pos
         self.cell = cell
-        self.relpos = self.motion = relpos
-        self.relcell = self.cellmotion = relcell
+        self.motion = motion
+        self.cellmotion = cellmotion
 
 def get():
     """Flushes the event queue and returns the list of events.
@@ -119,8 +120,8 @@ def get():
     
     Here is a list of events and their attributes:
     QUIT
-    KEYDOWN: key char alt ctrl shift lalt lctrl ralt rctrl
-    KEYUP: key char alt ctrl shift lalt lctrl ralt rctrl
+    KEYDOWN: key char keyname alt ctrl shift lalt lctrl ralt rctrl
+    KEYUP: key char keyname alt ctrl shift lalt lctrl ralt rctrl
     MOUSEDOWN: button pos cell
     MOUSEUP: button pos cell
     MOUSEMOTION: pos motion cell cellmotion
@@ -132,9 +133,6 @@ def get():
     mouse = _Mouse()
     libkey = _Key()
     while _lib.TCOD_sys_check_for_event(_tcod.TCOD_EVENT_ANY, libkey, mouse):
-    #print(_lib.TCOD_sys_check_for_event(_tcod.TCOD_EVENT_MOUSE, None, mouse))
-    #_lib.TCOD_mouse_get_status_wrapper(mouse)
-    #print(mouse)
         if mouse.dx or mouse.dy:
             events.append(MouseMotion(*mouse.motion))
 
@@ -160,16 +158,13 @@ def get():
         _mousem = mouse.mbutton
         _mouser = mouse.rbutton
 
-    #while _lib.TCOD_sys_check_for_event(_tcod.TCOD_EVENT_KEY, libkey, None):
-#    while 1:
-        if libkey.vk == local.K_NONE:
+        if libkey.vk == _tcod.K_NONE:
             break
         if libkey.pressed:
             keyevent = KeyDown
         else:
             keyevent = KeyUp
         events.append(keyevent(*tuple(libkey)))
-        #break
     
     if _lib.TCOD_console_is_window_closed():
         events.append(Quit())
@@ -177,7 +172,7 @@ def get():
     return events
 
 def keyWait():
-    """Waits until the user presses a key.  Returns KeyDown events.
+    """Waits until the user presses a key.  Then returns a KeyDown event.
     """
     global _eventsflushed
     _eventsflushed = True
@@ -185,16 +180,17 @@ def keyWait():
     libkey = _lib.TCOD_console_wait_for_keypress(flush)
     return KeyDown(*libkey)
 
-def keyPressed(key):
-    """Returns True when key is currently pressed.
-
-    key can be a number or single length string
-    """
-    assert isinstance(key, (str, int)), "key must be a string or int"
-    if not isinstance(key, int):
-        assert len(key) == 1, "key can not be a multi character string"
-        key = ord(key)
-    return _lib.TCOD_console_check_for_keypress(key)
+# tested this function recently, it did not work
+#def keyPressed(key):
+#    """Returns True when key is currently pressed.
+#
+#    key can be a number or single length string
+#    """
+#    assert isinstance(key, (str, int)), "key must be a single character string or int"
+#    if not isinstance(key, int):
+#        assert len(key) == 1, "key can not be a multi character string"
+#        key = ord(key)
+#    return _lib.TCOD_console_check_for_keypress(key).pressed # returns key object?
 
 def isWindowClosed():
     """Returns True if the exit button on the window has been clicked and
