@@ -33,7 +33,7 @@ def _formatChar(char):
     """
     if char is None:
         return None
-    if isinstance(char, int):
+    if isinstance(char, int) or not _IS_PYTHON3 and isinstance(char, long):
         return char
     if isinstance(char, (str, bytes)) and len(char) == 1:
         return ord(char)
@@ -68,7 +68,7 @@ def _iscolor(color):
         return True
     if isinstance(color, (tuple, list, _Color)):
         return len(color) == 3
-    if color.__class__ is int:
+    if color.__class__ is int or not _IS_PYTHON3 and color.__class__ is long:
         return True
     return False
 
@@ -80,7 +80,7 @@ def _formatColor(color):
     # avoid isinstance, checking __class__ gives a small speed increase
     if color.__class__ is _Color:
         return color
-    if color.__class__ is int:
+    if color.__class__ is int or not _IS_PYTHON3 and color.__class__ is long:
         # format a web style color with the format 0xRRGGBB
         return _Color(color >> 16 & 0xff, color >> 8 & 0xff, color & 0xff)
     return _Color(*color)
@@ -157,7 +157,8 @@ class Console(object):
         raise AssertionError's for any problems
         """
         old = x, y, width, height
-        assert self._drawable(x, y)
+        assert isinstance(x, int), 'x must be an integer, got %s' % repr(x)
+        assert isinstance(y, int), 'y must be an integer, got %s' % repr(y)
         if width == None: # if width or height are None then extend them to the edge
             width = self.width - x
         if height == None:
@@ -236,7 +237,7 @@ class Console(object):
         
         # _normalizeRect will break negative values in this case, so enforce
         # an assert on positive numbers in this one case
-        assert width >= 0 and height >= 0, 'width and height cannot be negaitve'
+        assert width >= 0 and height >= 0, 'width and height cannot be negative'
         x, y, width, height = self._normalizeRect(x, y, width, height)
         srcx, srcy, width, height = source._normalizeRect(srcx, srcy, width, height)
         
