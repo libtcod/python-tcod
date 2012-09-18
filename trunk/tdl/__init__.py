@@ -165,14 +165,12 @@ class Console(object):
             height = self.height - y
         assert isinstance(width, int), 'width must be an integer or None, got %s' % repr(width)
         assert isinstance(height, int), 'height must be an integer or None, got %s' % repr(height)
-        if width < 0: # if width or height are backwards then flip them
-            x += width
-            width = abs(width)
-        if height < 0:
-            y += height
-            height = abs(height)
+        
+        assert width >= 0 and height >= 0, 'width and height cannot be negative'
+        # later idea, negative numbers work like Python list indexing
+        
         assert x >= 0 and y >= 0 and x + width <= self.width and y + height <= self.height, \
-        'Rect is out of bounds at (x=%i y=%i width=%i height=%i), Console bounds are (width=%i, height=%i)' % old + self.getSize()
+        'Rect is out of bounds at (x=%i y=%i width=%i height=%i), Console bounds are (width=%i, height=%i)' % (old + self.getSize())
         return x, y, width, height
     
     def _rectInBounds(self, x, y, width, height):
@@ -235,9 +233,6 @@ class Console(object):
         if height == None:
             height = min(self.height - y, source.height - srcy)
         
-        # _normalizeRect will break negative values in this case, so enforce
-        # an assert on positive numbers in this one case
-        assert width >= 0 and height >= 0, 'width and height cannot be negative'
         x, y, width, height = self._normalizeRect(x, y, width, height)
         srcx, srcy, width, height = source._normalizeRect(srcx, srcy, width, height)
         
@@ -433,11 +428,12 @@ class Console(object):
         height.  If width or height are None then it will extend to the edge
         of the console.  The rest are the same as drawChar.
         """
-        assert self._drawable(x, y)
-        if not self._rectInBounds(x, y, width, height):
-            raise TDLError('Rectange is out of bounds at (x=%i, y=%i, width=%s, height=%s), bounds are (%i, %i)' %
-                           ((x, y, width, height) + self.getSize()))
-        x, y, width, height = self._clampRect(x, y, width, height) # fill in width height
+        #assert self._drawable(x, y)
+        #if not self._rectInBounds(x, y, width, height):
+        #    raise TDLError('Rectange is out of bounds at (x=%i, y=%i, width=%s, height=%s), bounds are (%i, %i)' %
+        #                   ((x, y, width, height) + self.getSize()))
+        #x, y, width, height = self._clampRect(x, y, width, height) # fill in width height
+        x, y, width, height = self._normalizeRect(x, y, width, height)
         assert _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
         char = _formatChar(string)
@@ -450,11 +446,12 @@ class Console(object):
         # hardcode alpha settings for now
         #bgblend=1
         
-        if not self._rectInBounds(x, y, width, height):
-            raise TDLError('Frame is out of bounds at (x=%i, y=%i, width=%i, height=%i), bounds are (width=%i, height=%i)' %
-                           ((x, y, width, height) + self.getSize()))
+        #if not self._rectInBounds(x, y, width, height):
+        #    raise TDLError('Frame is out of bounds at (x=%i, y=%i, width=%i, height=%i), bounds are (width=%i, height=%i)' %
+        #                   ((x, y, width, height) + self.getSize()))
         
-        x, y, width, height = self._clampRect(x, y, width, height) # fill in width height
+        #x, y, width, height = self._clampRect(x, y, width, height) # fill in width height
+        x, y, width, height = self._normalizeRect(x, y, width, height)
         assert _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
         char = _formatChar(string)
@@ -572,8 +569,7 @@ def init(width, height, title='TDL', fullscreen=False, renderer='SDL'):
     RENDERERS = {'GLSL': 0, 'OPENGL': 1, 'SDL': 2}
     global _rootinitialized, _rootconsole
     if not _fontinitialized: # set the default font to the one that comes with tdl
-        setFont(_unpackfile('terminal.png'),
-                 width=16, height=16, colomn=True)
+        setFont(_unpackfile('terminal.png'), 16, 16, colomn=True)
 
     if renderer.upper() not in RENDERERS:
         raise TDLError('No such render type "%s", expected one of "%s"' % (renderer, '", "'.join(RENDERERS)))
@@ -615,13 +611,13 @@ def flush():
     #event._eventsflushed = False
     _lib.TCOD_console_flush()
 
-def setFont(path, width, height, colomn=False, greyscale=False, altLayout=False):
+def setFont(path, tileWidth, tileHeight, colomn=False, greyscale=False, altLayout=False):
     """Changes the font to be used for this session
     This should be called before tdl.init
 
     path - must be a string for where a bitmap file is found.
 
-    width, height - is the size of an individual tile.
+    tileWidth, tileHeight - is the size of an individual tile.
 
     colomn - defines if the characer order goes along the rows or colomns.  It
     should be True if the codes are 0-15 in the first column.  And should be
@@ -654,7 +650,7 @@ def setFont(path, width, height, colomn=False, greyscale=False, altLayout=False)
     #    path = path.name # if given a file just grab the path from the obj
     if not os.path.exists(path):
         raise TDLError('no file exists at: "%s"' % path)
-    _lib.TCOD_console_set_custom_font(_format_string(path), flags, width, height)
+    _lib.TCOD_console_set_custom_font(_format_string(path), flags, tileWidth, tileHeight)
 
 def getFullscreen():
     """Returns if the window is fullscreen
@@ -708,15 +704,15 @@ def screenshot(file=None):
     else:
         raise TypeError('fileobj is an invalid type: %s' % type(fileobj))
 
-def setFPS(fps):
-    """Set the frames per second.
+def setFPS(frameRate):
+    """Set the frame rate.
 
     You can set this to have no limit by using 0.
     """
-    if fps is None:
-        fps = 0
-    assert isinstance(fps, int), 'fps must be an integer or None, got: %s' % repr(fps)
-    _lib.TCOD_sys_set_fps(fps)
+    if frameRate is None:
+        frameRate = 0
+    assert isinstance(frameRate, int), 'frameRate must be an integer or None, got: %s' % repr(frameRate)
+    _lib.TCOD_sys_set_fps(frameRate)
 
 def getFPS():
     """Return the current frames per second of the running program.

@@ -9,6 +9,8 @@ import gc
 sys.path.insert(0, '..')
 import tdl
 
+ERROR_RANGE = 100 # a number to test out of bound errors
+
 class TDLTemplate(unittest.TestCase):
     "Nearly all tests need tdl.init to be called"
 
@@ -47,7 +49,7 @@ class TDLTemplate(unittest.TestCase):
         if console is None:
             console = self.console
         w, h = console.getSize()
-        RANGE = 1000 # distance from bounds to test, just needs to be some moderate number
+        RANGE = ERROR_RANGE # distance from bounds to test, just needs to be some moderate number
         results = []
         for _ in range(8):
             for x, y in [(-1, 0), (1, 0), (0, -1), (0, 1), # every side
@@ -112,10 +114,9 @@ class DrawingTests(TDLTemplate):
         for (x,y), data in record.items():
             self.assertEqual(data, self.console.getChar(x, y), 'drawChar should not overwrite any other tiles')
         
+    @unittest.skipIf(not __debug__, 'python run with optimized flag, skipping an AssertionError test')
     def test_drawCharErrors(self):
         "test out of bounds assertion errors"
-        if not __debug__:
-            self.skipTest('python run with optimized flag, skipping an AssertionError test')
         for x,y in self.getUndrawables():
             with self.assertRaisesRegexp(AssertionError, r"\(%i, %i\)" % (x, y)):
                 self.console.drawChar(x, y, *(self.getRandomCharacter()))
@@ -141,14 +142,54 @@ class DrawingTests(TDLTemplate):
                     if y == height:
                         break # end of console
     
+    @unittest.skipIf(not __debug__, 'python run with optimized flag, skipping an AssertionError test')
     def test_drawStrErrors(self):
         "test out of bounds assertion errors"
-        if not __debug__:
-            self.skipTest('python run with optimized flag, skipping an AssertionError test')
         for x,y in self.getUndrawables():
             with self.assertRaisesRegexp(AssertionError, r"\(%i, %i\)" % (x, y)):
                 self.console.drawStr(x, y, 'foo', self.getRandomColor(), self.getRandomColor())
-                
+    
+    def test_drawRect(self):
+        consoleCopy = tdl.Console(*(self.console.getSize()))
+        for x,y in self.getDrawables():
+            consoleCopy.blit(self.console) # copy the console to compare untouched areas
+            ch, fg, bg = self.getRandomCharacter()
+            width, height = self.console.getSize()
+            width, height = random.randint(1, width - x), random.randint(1, height - y)
+            self.console.drawRect(x, y, width, height, ch, fg, bg)
+            for testX,testY in self.getDrawables():
+                if x <= testX < x + width and y <= testY < y + height:
+                    self.assertEqual(self.console.getChar(testX, testY), (ch, fg, bg), 'rectangle are should be overwritten')
+                else:
+                    self.assertEqual(self.console.getChar(testX, testY), consoleCopy.getChar(testX, testY), 'this area should remain untouched')
+                    
+    def test_drawFrame(self):
+        consoleCopy = tdl.Console(*(self.console.getSize()))
+        for x,y in self.getDrawables():
+            consoleCopy.blit(self.console) # copy the console to compare untouched areas
+            ch, fg, bg = self.getRandomCharacter()
+            width, height = self.console.getSize()
+            width, height = random.randint(1, width - x), random.randint(1, height - y)
+            self.console.drawFrame(x, y, width, height, ch, fg, bg)
+            for testX,testY in self.getDrawables():
+                if x + 1 <= testX < x + width - 1 and y + 1 <= testY < y + height - 1:
+                    self.assertEqual(self.console.getChar(testX, testY), consoleCopy.getChar(testX, testY), 'inner frame should remain untouched')
+                elif x <= testX < x + width and y <= testY < y + height:
+                    self.assertEqual(self.console.getChar(testX, testY), (ch, fg, bg), 'frame area should be overwritten')
+                else:
+                    self.assertEqual(self.console.getChar(testX, testY), consoleCopy.getChar(testX, testY), 'outer frame should remain untouched')
+    
+    @unittest.skipIf(not __debug__, 'python run with optimized flag, skipping an AssertionError test')
+    def test_drawRectFrameErrors(self):
+        for x,y in self.getDrawables():
+            ch, fg, bg = self.getRandomCharacter()
+            width, height = self.console.getSize()
+            width, height = random.randint(x + width, x + width + ERROR_RANGE), random.randint(y + height, y + height + ERROR_RANGE)
+            with self.assertRaises(AssertionError):
+                self.console.drawRect(x, y, width, height, ch, fg, bg)
+            with self.assertRaises(AssertionError):
+                self.console.drawFrame(x, y, width, height, ch, fg, bg)
+    
     def test_scrolling(self):
         """marks a spot and then scrolls the console, checks to make sure no
         other spots are marked, test also knows if it's out of bounds.
