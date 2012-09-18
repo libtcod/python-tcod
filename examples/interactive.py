@@ -74,6 +74,8 @@ if __name__ == '__main__':
                 elif event.ctrl:
                     pass
                 elif event.char == '\b':
+                    if cursor == 0:
+                        continue
                     if buffer[:cursor][-4:] == '    ':
                         buffer = buffer[:cursor-4] + buffer[cursor:]
                         cursor -= 4
