@@ -36,14 +36,16 @@ setup(name='tdl',
       author_email='4B796C65+tdl@gmail.com',
       description='Graphical and utility library for making a roguelike or other tile-based video games',
       long_description="""
-tdl is a ctypes port of The Doryen Library.
+tdl is a ctypes port of "libtcod".
 
 The library is used for displaying tilesets (ascii or graphical) in true color.
 """,
       url='http://4b796c65.googlepages.com/tdl',
       download_url='https://launchpad.net/rlu/+download',
       packages=['tdl'],
-      package_data={'tdl': ['lib/*.txt', '*.bmp', '*.png', 'lib/win32/*', 'lib/darwin/*.dylib', 'lib/darwin/SDL.framework/Versions/A/SDL', 'lib/linux*/*']},
+      package_data={'tdl': ['lib/*.txt', '*.bmp', '*.png', 'lib/win32/*',
+                            'lib/darwin/*.dylib', 'lib/linux*/*',
+                            'lib/darwin/SDL.framework/Versions/A/SDL']},
       classifiers=['Development Status :: 4 - Beta',
                    'Programming Language :: Python',
                    'Environment :: Win32 (MS Windows)',

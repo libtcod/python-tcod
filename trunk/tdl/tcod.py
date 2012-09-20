@@ -1,5 +1,6 @@
 """
-    This is an internal module and should not be accessed directly
+    This module is used internally to access libtcod functions from ctypes.
+    It should never be accessed directly.
 """
 import sys
 import os

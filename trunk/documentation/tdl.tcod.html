@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head><title>Python: package tdl.tcod</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head><body bgcolor="#f0f0f8">
 
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
@@ -9,7 +9,8 @@
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="tdl.html"><font color="#ffffff">tdl</font></a>.tcod</strong></big></big></font></td
 ><td align=right valign=bottom
 ><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:///C:/users/kyle/dropbox/python/python-tdl/tdl/tcod.py">c:\users\kyle\dropbox\python\python-tdl\tdl\tcod.py</a></font></td></tr></table>
-    <p><tt>This&nbsp;is&nbsp;an&nbsp;internal&nbsp;module&nbsp;and&nbsp;should&nbsp;not&nbsp;be&nbsp;accessed&nbsp;directly</tt></p>
+    <p><tt>This&nbsp;module&nbsp;is&nbsp;used&nbsp;internally&nbsp;to&nbsp;access&nbsp;libtcod&nbsp;functions&nbsp;from&nbsp;ctypes.<br>
+It&nbsp;should&nbsp;never&nbsp;be&nbsp;accessed&nbsp;directly.</tt></p>
 <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#aa55cc">
@@ -18,9 +19,8 @@
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="tdl.tcod.event.html">event</a><br>
-</td><td width="25%" valign=top><a href="tdl.tcod.local.html">local</a><br>
 </td><td width="25%" valign=top><a href="tdl.tcod.tcod.html">tcod</a><br>
-</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#eeaa77">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -44,6 +44,10 @@ as&nbsp;function&nbsp;argument</tt></dd></dl>
  <dl><dt><a name="-get_last_error"><strong>get_last_error</strong></a>(...)</dt></dl>
  <dl><dt><a name="-pointer"><strong>pointer</strong></a>(...)</dt></dl>
  <dl><dt><a name="-resize"><strong>resize</strong></a>(...)</dt><dd><tt>Resize&nbsp;the&nbsp;memory&nbsp;buffer&nbsp;of&nbsp;a&nbsp;ctypes&nbsp;instance</tt></dd></dl>
+ <dl><dt><a name="-set_conversion_mode"><strong>set_conversion_mode</strong></a>(...)</dt><dd><tt><a href="#-set_conversion_mode">set_conversion_mode</a>(encoding,&nbsp;errors)&nbsp;-&gt;&nbsp;(previous-encoding,&nbsp;previous-errors)<br>
+&nbsp;<br>
+Set&nbsp;the&nbsp;encoding&nbsp;and&nbsp;error&nbsp;handling&nbsp;ctypes&nbsp;uses&nbsp;when&nbsp;converting<br>
+between&nbsp;unicode&nbsp;and&nbsp;strings.&nbsp;&nbsp;Returns&nbsp;the&nbsp;previous&nbsp;values.</tt></dd></dl>
  <dl><dt><a name="-set_errno"><strong>set_errno</strong></a>(...)</dt></dl>
  <dl><dt><a name="-set_last_error"><strong>set_last_error</strong></a>(...)</dt></dl>
  <dl><dt><a name="-sizeof"><strong>sizeof</strong></a>(...)</dt><dd><tt><a href="#-sizeof">sizeof</a>(C&nbsp;type)&nbsp;-&gt;&nbsp;integer<br>
@@ -199,6 +203,6 @@ Return&nbsp;the&nbsp;size&nbsp;in&nbsp;bytes&nbsp;of&nbsp;a&nbsp;C&nbsp;instance
 <strong>memset</strong> = &lt;CFunctionType object&gt;<br>
 <strong>oledll</strong> = &lt;ctypes.LibraryLoader object&gt;<br>
 <strong>pydll</strong> = &lt;ctypes.LibraryLoader object&gt;<br>
-<strong>pythonapi</strong> = &lt;PyDLL 'python dll', handle 1e000000 at 2fa3ff0&gt;<br>
+<strong>pythonapi</strong> = &lt;PyDLL 'python dll', handle 1e000000 at 254af30&gt;<br>
 <strong>windll</strong> = &lt;ctypes.LibraryLoader object&gt;</td></tr></table>
 </body></html>
