@@ -218,5 +218,6 @@ def suite():
     return unittest.TestSuite([load(BasicTests), load(DrawingTests)])
 
 if __name__ == '__main__':
-    unittest.TextTestRunner().run(suite())
+    suite = suite()
+    unittest.TextTestRunner().run(suite)
 

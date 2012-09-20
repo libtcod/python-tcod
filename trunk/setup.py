@@ -43,7 +43,7 @@ The library is used for displaying tilesets (ascii or graphical) in true color.
       url='http://4b796c65.googlepages.com/tdl',
       download_url='https://launchpad.net/rlu/+download',
       packages=['tdl'],
-      package_data={'tdl': ['lib/*.txt', '*.bmp', '*.png', 'lib/linux*/*.so', 'lib/win32/*.dll', 'lib/darwin/*']},
+      package_data={'tdl': ['lib/*.txt', '*.bmp', '*.png', 'lib/win32/*', 'lib/darwin/*.dylib', 'lib/darwin/SDL.framework/Versions/A/SDL', 'lib/linux*/*']},
       classifiers=['Development Status :: 4 - Beta',
                    'Programming Language :: Python',
                    'Environment :: Win32 (MS Windows)',
@@ -66,6 +66,6 @@ The library is used for displaying tilesets (ascii or graphical) in true color.
                    'Programming Language :: Python :: 3.1',
                    ],
       keywords = 'roguelike roguelikes console text curses doryen ascii libtcod',
-      platforms = ['Windows', 'Mac OS X', 'Linux']
+      platforms = ['Windows', 'Mac OS X', 'Linux'],
       license = 'New BSD License'
       )

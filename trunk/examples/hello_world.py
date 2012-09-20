@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
     Example showing some of the most basic functions needed to say "Hello World"
 """

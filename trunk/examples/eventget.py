@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
     An interactive example of what events are available
 """
