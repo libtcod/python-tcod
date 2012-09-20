@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+    Not much commentary in this example.  It's more of a demo.
+"""
 import sys
 import code
 import textwrap

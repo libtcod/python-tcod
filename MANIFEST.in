@@ -1,5 +1,4 @@
 include *.txt
-include *.bat
 include tdl/*.bmp
 include tdl/*.png
 include tdl/*.txt

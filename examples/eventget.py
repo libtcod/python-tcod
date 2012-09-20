@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-    An interactive example of what events are available
+    An interactive example of what events are available.
 """
 
 import sys
@@ -8,31 +8,29 @@ sys.path.insert(0, '../')
 
 import tdl
 
-console = tdl.init(80, 60)
+WIDTH, HEIGHT = 80, 60
 
-def print_line_append(string):
-    # move everything on the console up a line with blit
-    console.blit(console, 0, 0, 80, 57, 0, 1)
-    # clear the bottom line with drawRect
-    console.drawRect(0, 57, None, 1, ' ')
-    # print the string
-    console.drawStr(0, 57, string)
+console = tdl.init(WIDTH, HEIGHT)
 
-tdl.setFPS(24) # slow down the program so that the user can clearly see the motion events
+# the scrolling text window
+textWindow = tdl.Window(console, 0, 0, WIDTH, HEIGHT-2)
+
+# slow down the program so that the user can more clearly see the motion events
+tdl.setFPS(24)
 
 while 1:
     for event in tdl.event.get():
         if event.type == 'QUIT':
             raise SystemExit()
-        elif event.type == 'KEYDOWN':
-            print_line_append('KEYDOWN event - key=%.2i char=%s keyname=%s alt=%i ctrl=%i shift=%i' % (event.key, repr(event.char), repr(event.keyname), event.alt, event.ctrl, event.shift))
-        elif event.type == 'KEYUP':
-            print_line_append('KEYUP   event - key=%.2i char=%s keyname=%s alt=%i ctrl=%i shift=%i' % (event.key, repr(event.char), repr(event.keyname), event.alt, event.ctrl, event.shift))
         elif event.type == 'MOUSEMOTION':
-            console.drawRect(0, 59, None, None, ' ')
-            console.drawStr(0, 59, 'MOUSEMOTION event - pos=%i,%i cell=%i,%i motion=%i,%i cellmotion=%i,%i' % (event.pos + event.cell + event.motion + event.cellmotion))
-        elif event.type == 'MOUSEDOWN':
-            print_line_append('MOUSEDOWN event - pos=%i,%i cell=%i,%i button=%i' % (event.pos + event.cell + (event.button,)))
-        elif event.type == 'MOUSEUP':
-            print_line_append('MOUSEUP   event - pos=%i,%i cell=%i,%i button=%i' % (event.pos + event.cell + (event.button,)))
+            # clear and print to the bottom of the console
+            console.drawRect(0, HEIGHT - 1, None, None, ' ')
+            console.drawStr(0, HEIGHT - 1, 'MOUSEMOTION event - pos=%i,%i cell=%i,%i motion=%i,%i cellmotion=%i,%i' % (event.pos + event.cell + event.motion + event.cellmotion))
+            continue # prevent scrolling
+        
+        textWindow.scroll(0, -1)
+        if event.type == 'KEYDOWN' or event.type == 'KEYUP':
+            textWindow.drawStr(0, HEIGHT-3, '%s event - key=%.2i char=%s keyname=%s alt=%i ctrl=%i shift=%i' % (event.type.ljust(7), event.key, repr(event.char), repr(event.keyname), event.alt, event.ctrl, event.shift))
+        elif event.type == 'MOUSEDOWN' or event.type == 'MOUSEUP':
+            textWindow.drawStr(0, HEIGHT-3, '%s event - pos=%i,%i cell=%i,%i button=%i' % ((event.type.ljust(9),) + event.pos + event.cell + (event.button,)))
     tdl.flush()

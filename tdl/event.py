@@ -3,12 +3,12 @@
 
     Here's a quick reference to Event types and their attributes:
     QUIT
-    KEYDOWN: key char alt ctrl shift lalt lctrl ralt rctrl
-    KEYUP: key char alt ctrl shift lalt lctrl ralt rctrl
+    KEYDOWN: keyname key char alt ctrl shift lalt lctrl ralt rctrl
+    KEYUP: keyname key char alt ctrl shift lalt lctrl ralt rctrl
     MOUSEDOWN: button pos cell
     MOUSEUP: button pos cell
     MOUSEMOTION: pos cell motion cellmotion
-
+    
     You will likely want to use the tdl.event.get function but you can still
     use keyWait and isWindowClosed to control your entire program.
 """
@@ -22,7 +22,7 @@ _mousel = 0
 _mousem = 0
 _mouser = 0
 
-# this interpets the constants from local and makes a key to keyname dictionary
+# this interpets the constants from libtcod and makes a key -> keyname dictionary
 def _parse_keynames(module):
     """returns a dictionary mapping of human readable key names to their keycodes
     this parses constants with the names of K_* and makes code=name pairs

@@ -1,5 +1,5 @@
 """
-    tdl is a ctypes port of The Doryen Library.
+    
 """
 
 import sys
@@ -90,67 +90,89 @@ class TDLError(Exception):
     The catch all for most TDL specific errors.
     """
 
-
-class Console(object):
-    """The Console is the main class of the tdl library.
-
-    The console created by the init function is the root console and is the
-    consle that is rendered to the screen with flush.
-
-    Any console made from Console is an off screen console that must be blited
-    to the root console to be visisble.
+class _MetaConsole(object):
     """
+    Contains methods shared by both the Console and Window classes.
+    """
+    __slots__ = ('width', 'height', '__weakref__', '__dict__')
+    
+    def drawChar(self, x, y, char=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+        """Draws a single character.
 
-    __slots__ = ('_as_parameter_', 'width', 'height', '__weakref__', '__dict__')
+        char should be an integer, single character string, or None
+        you can set the char parameter as None if you only want to change
+        the colors of the tile.
 
-    def __init__(self, width, height):
-        self._as_parameter_ = _lib.TCOD_console_new(width, height)
-        self.width = width
-        self.height = height
-        #self.cursorX = self.cursorY = 0
-        self.clear()
-
-    @classmethod
-    def _newConsole(cls, console):
-        """Make a Console instance, from a console ctype"""
-        self = cls.__new__(cls)
-        self._as_parameter_ = console
-        self.width = _lib.TCOD_console_get_width(self)
-        self.height = _lib.TCOD_console_get_height(self)
-        self.cursorX = self.cursorY = 0
-        self.clear()
-        return self
+        For fgcolor and bgcolor you use a 3 item list or None.  None will
+        keep the current color at this position unchanged.
         
-    def __del__(self):
-        """
-        If the main console is garbage collected then the window will be closed as well
-        """
-        # If this is the root console the window will close when collected
-        try:
-            if isinstance(self._as_parameter_, ctypes.c_void_p):
-                global _rootinitialized, _rootconsole
-                _rootinitialized = False
-                _rootconsole = None
-            _lib.TCOD_console_delete(self)
-        except StandardError:
-            pass
 
-    def _replace(self, console):
-        """Used internally
-        
-        Mostly used just to replace this Console object with the root console
-        If another Console object is used then they are swapped
-        
-        Soon to be removed and replaced by the _newConsole method
+        Having the x or y values outside of the console will raise an
+        AssertionError.
         """
-        if isinstance(console, Console):
-            self._as_parameter_, console._as_parameter_ = \
-              console._as_parameter_, self._as_parameter_ # swap tcod consoles
-        else:
-            self._as_parameter_ = console
-        self.width = _lib.TCOD_console_get_width(self)
-        self.height = _lib.TCOD_console_get_height(self)
-        return self
+        
+        assert _verify_colors(fgcolor, bgcolor)
+        assert self._drawable(x, y)
+        
+        self._setChar(x, y, _formatChar(char),
+                      _formatColor(fgcolor), _formatColor(bgcolor))
+
+    def drawStr(self, x, y, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+        """Draws a string starting at x and y.  Optinally colored.
+
+        A string that goes past the right side will wrap around.  A string
+        wraping to below the console will raise a TDLError but will still be
+        written out.  This means you can safely ignore the errors with a
+        try... except block if you're fine with partily written strings.
+
+        \\r and \\n are drawn on the console as normal character tiles.  No
+        special encoding is done and any string will translate to the character
+        table as is.
+
+        fgcolor and bgcolor can be set to None to keep the colors unchanged.
+        """
+        
+        assert self._drawable(x, y)
+        assert _verify_colors(fgcolor, bgcolor)
+        fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
+        width, height = self.getSize()
+        for char in string:
+            if y == height:
+                raise TDLError('End of console reached.')
+            self._setChar(x, y, _formatChar(char), fgcolor, bgcolor)
+            x += 1 # advance cursor
+            if x == width: # line break
+                x = 0
+                y += 1
+    
+    def drawRect(self, x, y, width, height, string=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+        """Draws a rectangle starting from x and y and extending to width and
+        height.  If width or height are None then it will extend to the edge
+        of the console.  The rest are the same as drawChar.
+        """
+        x, y, width, height = self._normalizeRect(x, y, width, height)
+        assert _verify_colors(fgcolor, bgcolor)
+        fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
+        char = _formatChar(string)
+        for cellY in range(y, y + height):
+            for cellX in range(x, x + width):
+                self._setChar(cellX, cellY, char, fgcolor, bgcolor)
+        
+    def drawFrame(self, x, y, width, height, string=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+        "Similar to drawRect but only draws the outline of the rectangle"
+        x, y, width, height = self._normalizeRect(x, y, width, height)
+        assert _verify_colors(fgcolor, bgcolor)
+        fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
+        char = _formatChar(string)
+        if width == 1 or height == 1: # it's just a single width line here
+            return self.drawRect(x, y, width, height, char, fgcolor, bgcolor)
+        
+        # draw sides of frame with drawRect
+        self.drawRect(x, y, 1, height, char, fgcolor, bgcolor)
+        self.drawRect(x, y, width, 1, char, fgcolor, bgcolor)
+        self.drawRect(x + width - 1, y, 1, height, char, fgcolor, bgcolor)
+        self.drawRect(x, y + height - 1, width, 1, char, fgcolor, bgcolor)
+    
     
     def _normalizeRect(self, x, y, width, height):
         """Check if the rectangle is in bounds and make minor adjustments.
@@ -339,6 +361,66 @@ class Console(object):
                  (x, y, self.__class__.__name__, self.width, self.height))
         return True
 
+class Console(_MetaConsole):
+    """The Console is the main class of the tdl library.
+
+    The console created by the init function is the root console and is the
+    consle that is rendered to the screen with flush.
+
+    Any console made from Console is an off-screen console that can be drawn
+    on and then blited to the root console.
+    """
+
+    __slots__ = ('_as_parameter_',)
+
+    def __init__(self, width, height):
+        self._as_parameter_ = _lib.TCOD_console_new(width, height)
+        self.width = width
+        self.height = height
+        self.clear()
+
+    @classmethod
+    def _newConsole(cls, console):
+        """Make a Console instance, from a console ctype"""
+        self = cls.__new__(cls)
+        self._as_parameter_ = console
+        self.width = _lib.TCOD_console_get_width(self)
+        self.height = _lib.TCOD_console_get_height(self)
+        self.cursorX = self.cursorY = 0
+        self.clear()
+        return self
+        
+    def __del__(self):
+        """
+        If the main console is garbage collected then the window will be closed as well
+        """
+        # If this is the root console the window will close when collected
+        try:
+            if isinstance(self._as_parameter_, ctypes.c_void_p):
+                global _rootinitialized, _rootconsole
+                _rootinitialized = False
+                _rootconsole = None
+            _lib.TCOD_console_delete(self)
+        except StandardError:
+            pass
+
+    def _replace(self, console):
+        """Used internally
+        
+        Mostly used just to replace this Console object with the root console
+        If another Console object is used then they are swapped
+        
+        Soon to be removed and replaced by the _newConsole method
+        """
+        if isinstance(console, Console):
+            self._as_parameter_, console._as_parameter_ = \
+              console._as_parameter_, self._as_parameter_ # swap tcod consoles
+        else:
+            self._as_parameter_ = console
+        self.width = _lib.TCOD_console_get_width(self)
+        self.height = _lib.TCOD_console_get_height(self)
+        return self
+    
     def _translate(self, x, y):
         """Convertion x and y to their position on the root Console for this Window
         
@@ -353,7 +435,6 @@ class Console(object):
         _lib.TCOD_console_set_default_background(self, _formatColor(bgcolor))
         _lib.TCOD_console_set_default_foreground(self, _formatColor(fgcolor))
         _lib.TCOD_console_clear(self)
-    
     
     def _setChar(self, x, y, char, fgcolor=None, bgcolor=None, bgblend=1):
         """
@@ -371,96 +452,6 @@ class Console(object):
             _setfore(self, x, y, fgcolor)
         if bgcolor is not None:
             _setback(self, x, y, bgcolor, bgblend)
-    
-    def drawChar(self, x, y, char=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
-        """Draws a single character.
-
-        char should be an integer, single character string, or None
-        you can set the char parameter as None if you only want to change
-        the colors of the tile.
-
-        For fgcolor and bgcolor you use a 3 item list or None.  None will
-        keep the current color at this position unchanged.
-        
-
-        Having the x or y values outside of the console will raise an
-        AssertionError.
-        """
-        
-        assert _verify_colors(fgcolor, bgcolor)
-        assert self._drawable(x, y)
-        
-        self._setChar(x, y, _formatChar(char),
-                      _formatColor(fgcolor), _formatColor(bgcolor))
-
-    def drawStr(self, x, y, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
-        """Draws a string starting at x and y.  Optinally colored.
-
-        A string that goes past the right side will wrap around.  A string
-        wraping to below the console will raise a TDLError but will still be
-        written.  This means you can safely ignore the errors with a
-        try... except block if you're fine with partily written strings.
-
-        \\r and \\n are drawn on the console as normal character tiles.  No
-        special encoding is done and any string will translate to the character
-        table as is.
-
-        fgcolor and bgcolor can be set to None to keep the colors unchanged.
-        """
-        
-        assert self._drawable(x, y)
-        assert _verify_colors(fgcolor, bgcolor)
-        fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
-        width, height = self.getSize()
-        for char in string:
-            if y == height:
-                raise TDLError('End of console reached.')
-            self._setChar(x, y, _formatChar(char), fgcolor, bgcolor)
-            x += 1 # advance cursor
-            if x == width: # line break
-                x = 0
-                y += 1
-    
-    def drawRect(self, x, y, width, height, string=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
-        """Draws a rectangle starting from x and y and extending to width and
-        height.  If width or height are None then it will extend to the edge
-        of the console.  The rest are the same as drawChar.
-        """
-        #assert self._drawable(x, y)
-        #if not self._rectInBounds(x, y, width, height):
-        #    raise TDLError('Rectange is out of bounds at (x=%i, y=%i, width=%s, height=%s), bounds are (%i, %i)' %
-        #                   ((x, y, width, height) + self.getSize()))
-        #x, y, width, height = self._clampRect(x, y, width, height) # fill in width height
-        x, y, width, height = self._normalizeRect(x, y, width, height)
-        assert _verify_colors(fgcolor, bgcolor)
-        fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
-        char = _formatChar(string)
-        for cellY in range(y, y + height):
-            for cellX in range(x, x + width):
-                self._setChar(cellX, cellY, char, fgcolor, bgcolor)
-        
-    def drawFrame(self, x, y, width, height, string=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
-        "Similar to drawRect but only draws the outline of the rectangle"
-        # hardcode alpha settings for now
-        #bgblend=1
-        
-        #if not self._rectInBounds(x, y, width, height):
-        #    raise TDLError('Frame is out of bounds at (x=%i, y=%i, width=%i, height=%i), bounds are (width=%i, height=%i)' %
-        #                   ((x, y, width, height) + self.getSize()))
-        
-        #x, y, width, height = self._clampRect(x, y, width, height) # fill in width height
-        x, y, width, height = self._normalizeRect(x, y, width, height)
-        assert _verify_colors(fgcolor, bgcolor)
-        fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
-        char = _formatChar(string)
-        if width == 1 or height == 1: # it's just a single width line here
-            return self.drawRect(x, y, width, height, char, fgcolor, bgcolor)
-        
-        # draw sides of frame with drawRect
-        self.drawRect(x, y, 1, height, char, fgcolor, bgcolor)
-        self.drawRect(x, y, width, 1, char, fgcolor, bgcolor)
-        self.drawRect(x + width - 1, y, 1, height, char, fgcolor, bgcolor)
-        self.drawRect(x, y + height - 1, width, 1, char, fgcolor, bgcolor)
 
     def getChar(self, x, y):
         """Return the character and colors of a cell as (ch, fg, bg)
@@ -478,51 +469,30 @@ class Console(object):
         return "<Console (Width=%i Height=%i)>" % (self.width, self.height)
 
 
-class Window(object):
+class Window(_MetaConsole):
     """A Window contains a small isolated part of a Console.
 
-    Drawing on the Window draws on the Console.  This works both ways.
+    Drawing on the Window draws on the Console.
 
-    If you make a Window without setting its size (or set the width and height
-    as None) it will extend to the edge of the console.
-
-    You can't blit Window instances but drawing works as expected.
+    Making a Window and setting its width or height to None will extend it to
+    the edge of the console.
     """
 
-    __slots__ = ('console', 'parent', 'x', 'y', 'width', 'height', '__weakref__', '__dict__')
+    __slots__ = ('console', 'parent', 'x', 'y')
 
     def __init__(self, console, x, y, width, height):
-        if not isinstance(console, (Console, Window)):
-            raise TypeError('console parameter must be a Console or Window instance, got %s' % repr(console))
-        assert isinstance(x, int), 'expeted integer got: %s' % repr(x)
-        assert isinstance(y, int), 'expeted integer got: %s' % repr(y)
-        assert (isinstance(width, int) or width is None), 'expeted integer or None got: %s' % repr(width)
-        assert (isinstance(height, int) or height is None), 'expeted integer or None got: %s' % repr(height)
-        if not console._rectInBounds(x, y, width, height):
-            raise TDLError("New Window is not within bounds of its parent, Window is (x=%i y=%i width=%i height=%i), Parent is (width=%i, height=%i)" %
-                           ((x, y, width, height) + console.getSize()))
+        assert isinstance(console, (Console, Window)), 'console parameter must be a Console or Window instance, got %s' % repr(console)
         self.parent = console
-        self.x, self.y, self.width, self.height = console._clampRect(x, y, width, height) # fill width height params
-        self.cursorX = self.cursorY = 0
+        self.x, self.y, self.width, self.height = console._normalizeRect(x, y, width, height)
         if isinstance(console, Console):
             self.console = console
         else:
             self.console = self.parent.console
-        
-    #_cursor_normalize = Console._cursor_normalize
-    #_cursor_advance = Console._cursor_advance
-    #_cursor_newline = Console._cursor_newline
-    _drawable = Console._drawable
-    _rectInBounds = Console._rectInBounds
-    _clampRect = Console._clampRect
     
     def _translate(self, x, y):
         """Convertion x and y to their position on the root Console"""
         # we add our position relative to our parent and then call then next parent up
         return self.parent._translate((x + self.x), (y + self.y))
-    
-    blit = Console.blit
-    scroll = Console.scroll
 
     def clear(self, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Clears the entire Window.
@@ -531,21 +501,13 @@ class Window(object):
         self.draw_rect(0, 0, None, None, 0x20, fgcolor, bgcolor)
 
     def _setChar(self, x, y, char=None, fgcolor=None, bgcolor=None, bgblend=1):
-        parent._setChar((x + self.x), (y + self.y), char, fgcolor, bgcolor, bgblend)
-        
-    drawChar = Console.drawChar
-    drawStr = Console.drawStr
-    drawRect = Console.drawRect
-    drawFrame = Console.drawFrame
+        self.parent._setChar((x + self.x), (y + self.y), char, fgcolor, bgcolor, bgblend)
     
-
     def getChar(self, x, y):
         """Return the character and colors of a cell as (ch, fg, bg)
         """
         self._drawable(x, y)
         return self.console.getChar(self._translate(x, y))
-
-    getSize = Console.getSize
 
     def __repr__(self):
         return "<Window(X=%i Y=%i Width=%i Height=%i)>" % (self.x, self.y,
@@ -644,8 +606,6 @@ def setFont(path, tileWidth, tileHeight, colomn=False, greyscale=False, altLayou
         flags |= FONT_LAYOUT_ASCII_INROW
     if greyscale:
         flags |= FONT_TYPE_GREYSCALE
-    #if isinstance(path, file):
-    #    path = path.name # if given a file just grab the path from the obj
     if not os.path.exists(path):
         raise TDLError('no file exists at: "%s"' % path)
     _lib.TCOD_console_set_custom_font(_format_string(path), flags, tileWidth, tileHeight)
