@@ -9,7 +9,8 @@
     MOUSEUP: button pos cell
     MOUSEMOTION: pos cell motion cellmotion
 
-    You will likely want to use the tdl.event.get function but you can still use the keyWait and isWindowClosed functions if you want.
+    You will likely want to use the tdl.event.get function but you can still
+    use keyWait and isWindowClosed to control your entire program.
 """
 
 import ctypes
@@ -132,7 +133,10 @@ def get():
     
     mouse = _Mouse()
     libkey = _Key()
-    while _lib.TCOD_sys_check_for_event(_tcod.TCOD_EVENT_ANY, libkey, mouse):
+    while 1:
+        if not _lib.TCOD_sys_check_for_event(_tcod.TCOD_EVENT_ANY, libkey, mouse):
+            break
+            
         if mouse.dx or mouse.dy:
             events.append(MouseMotion(*mouse.motion))
 
@@ -177,7 +181,8 @@ def keyWait():
     global _eventsflushed
     _eventsflushed = True
     flush = False
-    libkey = _lib.TCOD_console_wait_for_keypress(flush)
+    libkey = _Key()
+    _lib.TCOD_console_wait_for_keypress_wrapper(libkey, flush)
     return KeyDown(*libkey)
 
 # tested this function recently, it did not work

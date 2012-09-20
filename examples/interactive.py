@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 import sys
 import code
 import textwrap
@@ -53,7 +53,7 @@ if __name__ == '__main__':
             if event.type == 'QUIT':
                 raise SystemExit()
             if event.type == 'KEYDOWN':
-                if event.char == '\r':
+                if event.keyname == 'ENTER':
                     sys.stderr = newerr
                     try:
                         console.drawRect(0, HEIGHT-1, None, 1, None, (255, 255, 255), (0, 0, 0))
@@ -73,7 +73,7 @@ if __name__ == '__main__':
                     buffer = ''
                 elif event.ctrl:
                     pass
-                elif event.char == '\b':
+                elif event.keyname == 'BACKSPACE':
                     if cursor == 0:
                         continue
                     if buffer[:cursor][-4:] == '    ':
@@ -100,7 +100,7 @@ if __name__ == '__main__':
                     commands.append(buffer)
                     buffer = commands.pop(0)
                     cursor = len(buffer)
-                elif event.char == '\t':
+                elif event.keyname == 'TAB':
                     buffer = buffer[:cursor] + '    ' + buffer[cursor:]
                     cursor += 4
                 elif event.keyname == 'ESCAPE':

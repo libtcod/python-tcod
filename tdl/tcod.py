@@ -39,7 +39,10 @@ def _get_library_crossplatform():
         elif bits == '64bit':
             return _loadDLL('lib/linux64/libtcod.so')
     elif 'darwin' in sys.platform:
+        #sys.path.insert(0, _unpackfile('lib/darwin/Frameworks/'))
+        #_loadDLL('lib/darwin/libpng14')
         return _loadDLL('lib/darwin/libtcod.dylib')
+        
     else:
         raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
 
@@ -327,6 +330,8 @@ _lib.TCOD_console_check_for_keypress.restype = _Key
 _lib.TCOD_console_check_for_keypress.argtypes = (c_int,)
 _lib.TCOD_console_wait_for_keypress.restype = _Key
 _lib.TCOD_console_wait_for_keypress.argtypes = (c_bool,)
+_lib.TCOD_console_wait_for_keypress_wrapper.restype = None
+_lib.TCOD_console_wait_for_keypress_wrapper.argtypes = (POINTER(_Key), c_bool)
 _lib.TCOD_console_set_keyboard_repeat.restype = None
 _lib.TCOD_console_set_keyboard_repeat.argtypes = (c_int, c_int)
 _lib.TCOD_console_disable_keyboard_repeat.restype = None

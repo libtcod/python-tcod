@@ -8,7 +8,7 @@ import ctypes
 import weakref
 import array
 
-from . import event, ansi
+from . import event
 from .tcod import _lib, _Color, _unpackfile
 
 _IS_PYTHON3 = (sys.version_info[0] == 3)
@@ -265,8 +265,6 @@ class Console(object):
         
         Uncovered areas will be cleared.
         """
-        # seems simple right?  Get ready for one of the most complex
-        # functions in this library.
         assert isinstance(x, int), "x must be an integer, got %s" % repr(x)
         assert isinstance(y, int), "y must be an integer, got %s" % repr(x)
         def getSlide(x, length):
@@ -555,7 +553,7 @@ class Window(object):
                                                           self.height)
 
 
-def init(width, height, title='TDL', fullscreen=False, renderer='SDL'):
+def init(width, height, title='TDL', fullscreen=False, renderer='OPENGL'):
     """Start the main console with the given width and height and return the
     root console.
 

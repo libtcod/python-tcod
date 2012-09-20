@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
     Stress test designed to test tdl under harsh conditions
     
