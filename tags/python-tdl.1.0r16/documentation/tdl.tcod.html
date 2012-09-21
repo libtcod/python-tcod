@@ -1,0 +1,208 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: package tdl.tcod</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="tdl.html"><font color="#ffffff">tdl</font></a>.tcod</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:///C:/users/kyle/dropbox/python/python-tdl/tdl/tcod.py">c:\users\kyle\dropbox\python\python-tdl\tdl\tcod.py</a></font></td></tr></table>
+    <p><tt>This&nbsp;module&nbsp;is&nbsp;used&nbsp;internally&nbsp;to&nbsp;access&nbsp;libtcod&nbsp;functions&nbsp;from&nbsp;ctypes.<br>
+It&nbsp;should&nbsp;never&nbsp;be&nbsp;accessed&nbsp;directly.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Package Contents</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="tdl.tcod.event.html">event</a><br>
+</td><td width="25%" valign=top><a href="tdl.tcod.tcod.html">tcod</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-FormatError"><strong>FormatError</strong></a>(...)</dt><dd><tt><a href="#-FormatError">FormatError</a>([integer])&nbsp;-&gt;&nbsp;string<br>
+&nbsp;<br>
+Convert&nbsp;a&nbsp;win32&nbsp;error&nbsp;code&nbsp;into&nbsp;a&nbsp;string.&nbsp;If&nbsp;the&nbsp;error&nbsp;code&nbsp;is&nbsp;not<br>
+given,&nbsp;the&nbsp;return&nbsp;value&nbsp;of&nbsp;a&nbsp;call&nbsp;to&nbsp;GetLastError()&nbsp;is&nbsp;used.</tt></dd></dl>
+ <dl><dt><a name="-POINTER"><strong>POINTER</strong></a>(...)</dt></dl>
+ <dl><dt><a name="-addressof"><strong>addressof</strong></a>(...)</dt><dd><tt><a href="#-addressof">addressof</a>(C&nbsp;instance)&nbsp;-&gt;&nbsp;integer<br>
+Return&nbsp;the&nbsp;address&nbsp;of&nbsp;the&nbsp;C&nbsp;instance&nbsp;internal&nbsp;buffer</tt></dd></dl>
+ <dl><dt><a name="-alignment"><strong>alignment</strong></a>(...)</dt><dd><tt><a href="#-alignment">alignment</a>(C&nbsp;type)&nbsp;-&gt;&nbsp;integer<br>
+<a href="#-alignment">alignment</a>(C&nbsp;instance)&nbsp;-&gt;&nbsp;integer<br>
+Return&nbsp;the&nbsp;alignment&nbsp;requirements&nbsp;of&nbsp;a&nbsp;C&nbsp;instance</tt></dd></dl>
+ <dl><dt><a name="-byref"><strong>byref</strong></a>(...)</dt><dd><tt><a href="#-byref">byref</a>(C&nbsp;instance[,&nbsp;offset=0])&nbsp;-&gt;&nbsp;byref-object<br>
+Return&nbsp;a&nbsp;pointer&nbsp;lookalike&nbsp;to&nbsp;a&nbsp;C&nbsp;instance,&nbsp;only&nbsp;usable<br>
+as&nbsp;function&nbsp;argument</tt></dd></dl>
+ <dl><dt><a name="-get_errno"><strong>get_errno</strong></a>(...)</dt></dl>
+ <dl><dt><a name="-get_last_error"><strong>get_last_error</strong></a>(...)</dt></dl>
+ <dl><dt><a name="-pointer"><strong>pointer</strong></a>(...)</dt></dl>
+ <dl><dt><a name="-resize"><strong>resize</strong></a>(...)</dt><dd><tt>Resize&nbsp;the&nbsp;memory&nbsp;buffer&nbsp;of&nbsp;a&nbsp;ctypes&nbsp;instance</tt></dd></dl>
+ <dl><dt><a name="-set_conversion_mode"><strong>set_conversion_mode</strong></a>(...)</dt><dd><tt><a href="#-set_conversion_mode">set_conversion_mode</a>(encoding,&nbsp;errors)&nbsp;-&gt;&nbsp;(previous-encoding,&nbsp;previous-errors)<br>
+&nbsp;<br>
+Set&nbsp;the&nbsp;encoding&nbsp;and&nbsp;error&nbsp;handling&nbsp;ctypes&nbsp;uses&nbsp;when&nbsp;converting<br>
+between&nbsp;unicode&nbsp;and&nbsp;strings.&nbsp;&nbsp;Returns&nbsp;the&nbsp;previous&nbsp;values.</tt></dd></dl>
+ <dl><dt><a name="-set_errno"><strong>set_errno</strong></a>(...)</dt></dl>
+ <dl><dt><a name="-set_last_error"><strong>set_last_error</strong></a>(...)</dt></dl>
+ <dl><dt><a name="-sizeof"><strong>sizeof</strong></a>(...)</dt><dd><tt><a href="#-sizeof">sizeof</a>(C&nbsp;type)&nbsp;-&gt;&nbsp;integer<br>
+<a href="#-sizeof">sizeof</a>(C&nbsp;instance)&nbsp;-&gt;&nbsp;integer<br>
+Return&nbsp;the&nbsp;size&nbsp;in&nbsp;bytes&nbsp;of&nbsp;a&nbsp;C&nbsp;instance</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>BKGND_ADD</strong> = 8<br>
+<strong>BKGND_ADDA</strong> = 9<br>
+<strong>BKGND_ALPH</strong> = 12<br>
+<strong>BKGND_BURN</strong> = 10<br>
+<strong>BKGND_COLOR_BURN</strong> = 7<br>
+<strong>BKGND_COLOR_DODGE</strong> = 6<br>
+<strong>BKGND_DARKEN</strong> = 4<br>
+<strong>BKGND_LIGHTEN</strong> = 3<br>
+<strong>BKGND_MULTIPLY</strong> = 2<br>
+<strong>BKGND_NONE</strong> = 0<br>
+<strong>BKGND_OVERLAY</strong> = 11<br>
+<strong>BKGND_SCREEN</strong> = 5<br>
+<strong>BKGND_SET</strong> = 1<br>
+<strong>CHAR_ARROW_E</strong> = 26<br>
+<strong>CHAR_ARROW_N</strong> = 24<br>
+<strong>CHAR_ARROW_S</strong> = 25<br>
+<strong>CHAR_ARROW_W</strong> = 27<br>
+<strong>CHAR_BLOCK</strong> = 219<br>
+<strong>CHAR_BLOCK1</strong> = 178<br>
+<strong>CHAR_BLOCK2</strong> = 177<br>
+<strong>CHAR_BLOCK3</strong> = 176<br>
+<strong>CHAR_BLOCK_B</strong> = 220<br>
+<strong>CHAR_BLOCK_T</strong> = 223<br>
+<strong>CHAR_CHECKER</strong> = 178<br>
+<strong>CHAR_CROSS</strong> = 197<br>
+<strong>CHAR_DHLINE</strong> = 205<br>
+<strong>CHAR_DNE</strong> = 187<br>
+<strong>CHAR_DNW</strong> = 201<br>
+<strong>CHAR_DSE</strong> = 188<br>
+<strong>CHAR_DSW</strong> = 200<br>
+<strong>CHAR_DS_CROSSH</strong> = 216<br>
+<strong>CHAR_DS_CROSSV</strong> = 215<br>
+<strong>CHAR_DTEEE</strong> = 198<br>
+<strong>CHAR_DTEEN</strong> = 208<br>
+<strong>CHAR_DTEES</strong> = 210<br>
+<strong>CHAR_DTEEW</strong> = 181<br>
+<strong>CHAR_DVLINE</strong> = 186<br>
+<strong>CHAR_HLINE</strong> = 196<br>
+<strong>CHAR_LIGHT</strong> = 15<br>
+<strong>CHAR_NE</strong> = 191<br>
+<strong>CHAR_NW</strong> = 218<br>
+<strong>CHAR_SE</strong> = 217<br>
+<strong>CHAR_SW</strong> = 192<br>
+<strong>CHAR_TEEE</strong> = 195<br>
+<strong>CHAR_TEEN</strong> = 193<br>
+<strong>CHAR_TEES</strong> = 194<br>
+<strong>CHAR_TEEW</strong> = 180<br>
+<strong>CHAR_TREE</strong> = 5<br>
+<strong>CHAR_VLINE</strong> = 179<br>
+<strong>COLCTRL_1</strong> = 1<br>
+<strong>COLCTRL_2</strong> = 2<br>
+<strong>COLCTRL_3</strong> = 3<br>
+<strong>COLCTRL_4</strong> = 4<br>
+<strong>COLCTRL_5</strong> = 5<br>
+<strong>COLCTRL_BACK_RGB</strong> = 7<br>
+<strong>COLCTRL_FORE_RGB</strong> = 6<br>
+<strong>COLCTRL_NUMBER</strong> = 5<br>
+<strong>COLCTRL_STOP</strong> = 8<br>
+<strong>DEFAULT_MODE</strong> = 0<br>
+<strong>GetLastError</strong> = &lt;_FuncPtr object&gt;<br>
+<strong>KEY_PRESSED</strong> = 1<br>
+<strong>KEY_RELEASED</strong> = 2<br>
+<strong>K_0</strong> = 24<br>
+<strong>K_1</strong> = 25<br>
+<strong>K_2</strong> = 26<br>
+<strong>K_3</strong> = 27<br>
+<strong>K_4</strong> = 28<br>
+<strong>K_5</strong> = 29<br>
+<strong>K_6</strong> = 30<br>
+<strong>K_7</strong> = 31<br>
+<strong>K_8</strong> = 32<br>
+<strong>K_9</strong> = 33<br>
+<strong>K_ALT</strong> = 7<br>
+<strong>K_APPS</strong> = 23<br>
+<strong>K_BACKSPACE</strong> = 2<br>
+<strong>K_CAPSLOCK</strong> = 9<br>
+<strong>K_CHAR</strong> = 65<br>
+<strong>K_CONTROL</strong> = 6<br>
+<strong>K_DELETE</strong> = 20<br>
+<strong>K_DOWN</strong> = 17<br>
+<strong>K_END</strong> = 12<br>
+<strong>K_ENTER</strong> = 4<br>
+<strong>K_ESCAPE</strong> = 1<br>
+<strong>K_F1</strong> = 50<br>
+<strong>K_F10</strong> = 59<br>
+<strong>K_F11</strong> = 60<br>
+<strong>K_F12</strong> = 61<br>
+<strong>K_F2</strong> = 51<br>
+<strong>K_F3</strong> = 52<br>
+<strong>K_F4</strong> = 53<br>
+<strong>K_F5</strong> = 54<br>
+<strong>K_F6</strong> = 55<br>
+<strong>K_F7</strong> = 56<br>
+<strong>K_F8</strong> = 57<br>
+<strong>K_F9</strong> = 58<br>
+<strong>K_HOME</strong> = 13<br>
+<strong>K_INSERT</strong> = 19<br>
+<strong>K_KP0</strong> = 34<br>
+<strong>K_KP1</strong> = 35<br>
+<strong>K_KP2</strong> = 36<br>
+<strong>K_KP3</strong> = 37<br>
+<strong>K_KP4</strong> = 38<br>
+<strong>K_KP5</strong> = 39<br>
+<strong>K_KP6</strong> = 40<br>
+<strong>K_KP7</strong> = 41<br>
+<strong>K_KP8</strong> = 42<br>
+<strong>K_KP9</strong> = 43<br>
+<strong>K_KPADD</strong> = 44<br>
+<strong>K_KPDEC</strong> = 48<br>
+<strong>K_KPDIV</strong> = 46<br>
+<strong>K_KPENTER</strong> = 49<br>
+<strong>K_KPMUL</strong> = 47<br>
+<strong>K_KPSUB</strong> = 45<br>
+<strong>K_LEFT</strong> = 15<br>
+<strong>K_LWIN</strong> = 21<br>
+<strong>K_NONE</strong> = 0<br>
+<strong>K_NUMLOCK</strong> = 62<br>
+<strong>K_PAGEDOWN</strong> = 11<br>
+<strong>K_PAGEUP</strong> = 10<br>
+<strong>K_PAUSE</strong> = 8<br>
+<strong>K_PRINTSCREEN</strong> = 18<br>
+<strong>K_RIGHT</strong> = 16<br>
+<strong>K_RWIN</strong> = 22<br>
+<strong>K_SCROLLLOCK</strong> = 63<br>
+<strong>K_SHIFT</strong> = 5<br>
+<strong>K_SPACE</strong> = 64<br>
+<strong>K_TAB</strong> = 3<br>
+<strong>K_UP</strong> = 14<br>
+<strong>RTLD_GLOBAL</strong> = 0<br>
+<strong>RTLD_LOCAL</strong> = 0<br>
+<strong>TCOD_EVENT_ANY</strong> = 31<br>
+<strong>TCOD_EVENT_KEY</strong> = 3<br>
+<strong>TCOD_EVENT_KEY_PRESS</strong> = 1<br>
+<strong>TCOD_EVENT_KEY_RELEASE</strong> = 2<br>
+<strong>TCOD_EVENT_MOUSE</strong> = 28<br>
+<strong>TCOD_EVENT_MOUSE_MOVE</strong> = 4<br>
+<strong>TCOD_EVENT_MOUSE_PRESS</strong> = 8<br>
+<strong>TCOD_EVENT_MOUSE_RELEASE</strong> = 16<br>
+<strong>cdll</strong> = &lt;ctypes.LibraryLoader object&gt;<br>
+<strong>memmove</strong> = &lt;CFunctionType object&gt;<br>
+<strong>memset</strong> = &lt;CFunctionType object&gt;<br>
+<strong>oledll</strong> = &lt;ctypes.LibraryLoader object&gt;<br>
+<strong>pydll</strong> = &lt;ctypes.LibraryLoader object&gt;<br>
+<strong>pythonapi</strong> = &lt;PyDLL 'python dll', handle 1e000000 at 254af30&gt;<br>
+<strong>windll</strong> = &lt;ctypes.LibraryLoader object&gt;</td></tr></table>
+</body></html>
