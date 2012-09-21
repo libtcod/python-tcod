@@ -46,7 +46,7 @@ The library is used for displaying tilesets (ascii or graphical) in true color.
       package_data={'tdl': ['lib/*.txt', '*.bmp', '*.png', 'lib/win32/*',
                             'lib/darwin/*.dylib', 'lib/linux*/*',
                             'lib/darwin/SDL.framework/Versions/A/SDL']},
-      classifiers=['Development Status :: 4 - Beta',
+      classifiers=['Development Status :: 5 - Production/Stable',
                    'Programming Language :: Python',
                    'Environment :: Win32 (MS Windows)',
                    'Environment :: MacOS X',
