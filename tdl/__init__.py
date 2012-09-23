@@ -348,6 +348,14 @@ class _MetaConsole(object):
         # not only would that have been a better idea.  It would of been
         # faster too. (but only faster for Console's)
         
+    def __contains__(self, key):
+        """
+        It's likely that you'll want to know if a point on the console can be
+        drawn on.  You can use ((x, y) in console) to check.
+        """
+        x, y = key
+        return (0 <= x < self.width) and (0 <= y < self.height)
+        
     def _drawable(self, x, y):
         """Used internally
         Checks if a cell is part of the console.
