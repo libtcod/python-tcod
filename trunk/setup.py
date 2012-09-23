@@ -13,7 +13,6 @@ def getVersion():
     if os.path.exists('.svn'): # if .svn/ doesn't even exist, don't bother running svnversion
         svnversion = subprocess.Popen('svnversion -n', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         REVISION = svnversion.communicate()[0].decode() # get stdout
-    print(REVISION)
     if not REVISION or not any([c.isdigit() for c in REVISION]):
         # no numbers so assume an error
         # but likely a real user install, so get version from file
@@ -28,7 +27,7 @@ def getVersion():
     return VERSION
 
 VERSION = getVersion()
-print('TDL version is %s' % VERSION)
+# print('TDL version is %s' % VERSION)
 
 setup(name='tdl',
       version=VERSION,
