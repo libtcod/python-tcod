@@ -13,10 +13,12 @@
     use keyWait and isWindowClosed to control your entire program.
 """
 
+import time
 import ctypes
 
 from .tcod import _lib, _Mouse, _Key
 from . import tcod as _tcod
+import tdl as _tdl
 
 _mousel = 0
 _mousem = 0
@@ -107,6 +109,48 @@ class MouseMotion(Event):
         self.motion = motion
         self.cellmotion = cellmotion
 
+class App(object):
+    __slots__ = ()
+    
+    def ev_QUIT(self, event):
+        raise SystemExit()
+    
+    def ev_KEYDOWN(self, event):
+        pass
+    
+    def ev_KEYUP(self, event):
+        pass
+    
+    def ev_MOUSEDOWN(self, event):
+        pass
+    
+    def ev_MOUSEUP(self, event):
+        pass
+    
+    def ev_MOUSEMOTION(self, event):
+        pass
+    
+    def update(self, dt):
+        pass
+        
+    def run(self):
+        prevTime = time.clock()
+        while 1:
+            for event in get():
+                if event.type: # exclude custom events with a blank type variable
+                    # call the ev_* methods
+                    method = 'ev_%s' % event.type # ev_TYPE
+                    getattr(self, method)(event)
+                if event.type == 'KEYDOWN':
+                    # call the key_* methods
+                    method = 'key_%s' % event.keyname # key_KEYNAME
+                    if hasattr(self, method): # silently exclude undefined methods
+                        getattr(self, method)(event)
+            newTime = time.clock()
+            self.update(newTime - prevTime)
+            prevTime = newTime
+            _tdl.flush()
+        
 def get():
     """Flushes the event queue and returns the list of events.
     
