@@ -13,7 +13,7 @@ include fonts/*.txt
 include Frameworks/*.framework.tar
 include Frameworks/*.dmg
 include examples/*.py
-include documentation/*.html
+include documentation/*
 include ez_setup.py
 exclude build/*
 exclude dist/*
