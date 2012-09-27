@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>tdl.Window</title>
+  <title>tdl._MetaConsole</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -43,7 +43,7 @@
     <td width="100%">
       <span class="breadcrumbs">
         <a href="tdl-module.html">Package&nbsp;tdl</a> ::
-        Class&nbsp;Window
+        Class&nbsp;_MetaConsole
       </span>
     </td>
     <td>
@@ -53,27 +53,28 @@
     onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="tdl.Window-class.html"
+            >]&nbsp;|&nbsp;<a href="tdl._MetaConsole-class.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class Window</h1><p class="nomargin-top"><span class="codelink"><a href="tdl-pysrc.html#Window">source&nbsp;code</a></span></p>
+<h1 class="epydoc">Class _MetaConsole</h1><p class="nomargin-top"><span class="codelink"><a href="tdl-pysrc.html#_MetaConsole">source&nbsp;code</a></span></p>
 <pre class="base-tree">
-  object --+    
-           |    
-<a href="tdl._MetaConsole-class.html" onclick="show_private();">_MetaConsole</a> --+
-               |
-              <strong class="uidshort">Window</strong>
+object --+
+         |
+        <strong class="uidshort">_MetaConsole</strong>
 </pre>
 
+<dl><dt>Known Subclasses:</dt>
+<dd>
+      <ul class="subclass-list">
+<li><a href="tdl.Console-class.html">Console</a></li><li>, <a href="tdl.Window-class.html">Window</a></li>  </ul>
+</dd></dl>
+
 <hr />
-<p>A Window contains a small isolated part of a Console.</p>
-  <p>Drawing on the Window draws on the Console.</p>
-  <p>Making a Window and setting its width or height to None will extend it
-  to the edge of the console.</p>
+<p>Contains methods shared by both the Console and Window classes.</p>
 
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
@@ -92,144 +93,6 @@
     </table>
   </td>
 </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="tdl.Window-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">console</span>,
-        <span class="summary-sig-arg">x</span>,
-        <span class="summary-sig-arg">y</span>,
-        <span class="summary-sig-arg">width</span>,
-        <span class="summary-sig-arg">height</span>)</span><br />
-      x.__init__(...) initializes x; see help(type(x)) for signature</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="tdl-pysrc.html#Window.__init__">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="tdl.Window-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      repr(x)</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="tdl-pysrc.html#Window.__repr__">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="_setChar"></a><span class="summary-sig-name">_setChar</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">x</span>,
-        <span class="summary-sig-arg">y</span>,
-        <span class="summary-sig-arg">char</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">fgcolor</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">bgcolor</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">bgblend</span>=<span class="summary-sig-default">1</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="tdl-pysrc.html#Window._setChar">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="_translate"></a><span class="summary-sig-name">_translate</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">x</span>,
-        <span class="summary-sig-arg">y</span>)</span><br />
-      Convertion x and y to their position on the root Console</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="tdl-pysrc.html#Window._translate">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="clear"></a><span class="summary-sig-name">clear</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">fgcolor</span>=<span class="summary-sig-default"><code class="variable-group">(</code>255<code class="variable-op">, </code>255<code class="variable-op">, </code>255<code class="variable-group">)</code></span>,
-        <span class="summary-sig-arg">bgcolor</span>=<span class="summary-sig-default"><code class="variable-group">(</code>0<code class="variable-op">, </code>0<code class="variable-op">, </code>0<code class="variable-group">)</code></span>)</span><br />
-      Clears the entire Window.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="tdl-pysrc.html#Window.clear">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="getChar"></a><span class="summary-sig-name">getChar</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">x</span>,
-        <span class="summary-sig-arg">y</span>)</span><br />
-      Return the character and colors of a cell as (ch, fg, bg)</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="tdl-pysrc.html#Window.getChar">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
-      <code>__delattr__</code>,
-      <code>__format__</code>,
-      <code>__getattribute__</code>,
-      <code>__hash__</code>,
-      <code>__new__</code>,
-      <code>__reduce__</code>,
-      <code>__reduce_ex__</code>,
-      <code>__setattr__</code>,
-      <code>__sizeof__</code>,
-      <code>__str__</code>,
-      <code>__subclasshook__</code>
-      </p>
-    </td>
-  </tr>
-<tr bgcolor="#e8f0f8" >
-  <th colspan="2" class="group-header"
-    >&nbsp;&nbsp;&nbsp;&nbsp;Inherited from <a href="tdl._MetaConsole-class.html" onclick="show_private();">_MetaConsole</a></th></tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -484,6 +347,25 @@
       
     </td>
   </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__init__</code>,
+      <code>__new__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
 </table>
 <!-- ==================== PROPERTIES ==================== -->
 <a name="section-Properties"></a>
@@ -506,44 +388,6 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="console"></a><span class="summary-name">console</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="parent"></a><span class="summary-name">parent</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="x"></a><span class="summary-name">x</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="y"></a><span class="summary-name">y</span>
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
-      <code>__class__</code>
-      </p>
-    </td>
-  </tr>
-<tr bgcolor="#e8f0f8" >
-  <th colspan="2" class="group-header"
-    >&nbsp;&nbsp;&nbsp;&nbsp;Inherited from <a href="tdl._MetaConsole-class.html" onclick="show_private();">_MetaConsole</a></th></tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
         <a name="height"></a><span class="summary-name">height</span>
     </td>
   </tr>
@@ -552,6 +396,13 @@
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="width"></a><span class="summary-name">width</span>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
     </td>
   </tr>
 </table>
@@ -573,56 +424,238 @@
   </td>
 </tr>
 </table>
-<a name="__init__"></a>
+<a name="__contains__"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">console</span>,
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__contains__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">key</span>)</span>
+    <br /><em class="fname">(In operator)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.__contains__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>It's likely that you'll want to know if a point on the console can be 
+  drawn on.  You can use ((x, y) in console) to check.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="_clampRect"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_clampRect</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">x</span>=<span class="sig-default">0</span>,
+        <span class="sig-arg">y</span>=<span class="sig-default">0</span>,
+        <span class="sig-arg">width</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">height</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#_MetaConsole._clampRect">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Alter a rectange to fit inside of this console</p>
+  <p>width and hight of None will extend to the edge and an area out of 
+  bounds will end with a width and height of 0</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="_drawable"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_drawable</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">x</span>,
+        <span class="sig-arg">y</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#_MetaConsole._drawable">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Used internally Checks if a cell is part of the console. Raises an 
+  AssertionError if it can not be used.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="_normalizeRect"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_normalizeRect</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">x</span>,
         <span class="sig-arg">y</span>,
         <span class="sig-arg">width</span>,
         <span class="sig-arg">height</span>)</span>
-    <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="tdl-pysrc.html#Window.__init__">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="tdl-pysrc.html#_MetaConsole._normalizeRect">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
-  <p>x.__init__(...) initializes x; see help(type(x)) for signature</p>
+  <p>Check if the rectangle is in bounds and make minor adjustments. raise 
+  AssertionError's for any problems</p>
   <dl class="fields">
-    <dt>Overrides:
-        object.__init__
-        <dd><em class="note">(inherited documentation)</em></dd>
-    </dt>
   </dl>
 </td></tr></table>
 </div>
-<a name="__repr__"></a>
+<a name="blit"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__repr__</span>(<span class="sig-arg">self</span>)</span>
-    <br /><em class="fname">(Representation operator)</em>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">blit</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">source</span>,
+        <span class="sig-arg">x</span>=<span class="sig-default">0</span>,
+        <span class="sig-arg">y</span>=<span class="sig-default">0</span>,
+        <span class="sig-arg">width</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">height</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">srcx</span>=<span class="sig-default">0</span>,
+        <span class="sig-arg">srcy</span>=<span class="sig-default">0</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="tdl-pysrc.html#Window.__repr__">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.blit">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
-  <p>repr(x)</p>
+  <p>Blit another console or Window onto the current console.</p>
+  <p>By default it blits the entire source to the topleft corner.</p>
+  <p>If nothing is blited then TDLError is raised</p>
   <dl class="fields">
-    <dt>Overrides:
-        object.__repr__
-        <dd><em class="note">(inherited documentation)</em></dd>
-    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="drawChar"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">drawChar</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">x</span>,
+        <span class="sig-arg">y</span>,
+        <span class="sig-arg">char</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">fgcolor</span>=<span class="sig-default"><code class="variable-group">(</code>255<code class="variable-op">, </code>255<code class="variable-op">, </code>255<code class="variable-group">)</code></span>,
+        <span class="sig-arg">bgcolor</span>=<span class="sig-default"><code class="variable-group">(</code>0<code class="variable-op">, </code>0<code class="variable-op">, </code>0<code class="variable-group">)</code></span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.drawChar">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Draws a single character.</p>
+  <p>char should be an integer, single character string, or None you can 
+  set the char parameter as None if you only want to change the colors of 
+  the tile.</p>
+  <p>For fgcolor and bgcolor you use a 3 item list or None.  None will keep
+  the current color at this position unchanged.</p>
+  <p>Having the x or y values outside of the console will raise an 
+  AssertionError.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="drawRect"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">drawRect</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">x</span>,
+        <span class="sig-arg">y</span>,
+        <span class="sig-arg">width</span>,
+        <span class="sig-arg">height</span>,
+        <span class="sig-arg">string</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">fgcolor</span>=<span class="sig-default"><code class="variable-group">(</code>255<code class="variable-op">, </code>255<code class="variable-op">, </code>255<code class="variable-group">)</code></span>,
+        <span class="sig-arg">bgcolor</span>=<span class="sig-default"><code class="variable-group">(</code>0<code class="variable-op">, </code>0<code class="variable-op">, </code>0<code class="variable-group">)</code></span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.drawRect">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Draws a rectangle starting from x and y and extending to width and 
+  height.  If width or height are None then it will extend to the edge of 
+  the console.  The rest are the same as drawChar.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="drawStr"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">drawStr</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">x</span>,
+        <span class="sig-arg">y</span>,
+        <span class="sig-arg">string</span>,
+        <span class="sig-arg">fgcolor</span>=<span class="sig-default"><code class="variable-group">(</code>255<code class="variable-op">, </code>255<code class="variable-op">, </code>255<code class="variable-group">)</code></span>,
+        <span class="sig-arg">bgcolor</span>=<span class="sig-default"><code class="variable-group">(</code>0<code class="variable-op">, </code>0<code class="variable-op">, </code>0<code class="variable-group">)</code></span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.drawStr">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Draws a string starting at x and y.  Optinally colored.</p>
+  <p>A string that goes past the right side will wrap around.  A string 
+  wraping to below the console will raise a TDLError but will still be 
+  written out.  This means you can safely ignore the errors with a try... 
+  except block if you're fine with partily written strings.</p>
+  <p>\r and \n are drawn on the console as normal character tiles.  No 
+  special encoding is done and any string will translate to the character 
+  table as is.</p>
+  <p>fgcolor and bgcolor can be set to None to keep the colors 
+  unchanged.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="scroll"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">scroll</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">x</span>,
+        <span class="sig-arg">y</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.scroll">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Scroll the contents of the console in the direction of x,y.</p>
+  <p>Uncovered areas will be cleared.</p>
+  <dl class="fields">
   </dl>
 </td></tr></table>
 </div>

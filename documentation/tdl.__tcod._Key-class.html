@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>tdl.event.KeyEvent</title>
+  <title>tdl.__tcod._Key</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -43,8 +43,8 @@
     <td width="100%">
       <span class="breadcrumbs">
         <a href="tdl-module.html">Package&nbsp;tdl</a> ::
-        <a href="tdl.event-module.html">Module&nbsp;event</a> ::
-        Class&nbsp;KeyEvent
+        <a href="tdl.__tcod-module.html" onclick="show_private();">Module&nbsp;__tcod</a> ::
+        Class&nbsp;_Key
       </span>
     </td>
     <td>
@@ -54,27 +54,23 @@
     onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="tdl.event.KeyEvent-class.html"
+            >]&nbsp;|&nbsp;<a href="tdl.__tcod._Key-class.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class KeyEvent</h1><p class="nomargin-top"><span class="codelink"><a href="tdl.event-pysrc.html#KeyEvent">source&nbsp;code</a></span></p>
+<h1 class="epydoc">Class _Key</h1><p class="nomargin-top"><span class="codelink"><a href="tdl.__tcod-pysrc.html#_Key">source&nbsp;code</a></span></p>
 <pre class="base-tree">
-object --+    
-         |    
-     <a href="tdl.event.Event-class.html">Event</a> --+
-             |
-            <strong class="uidshort">KeyEvent</strong>
+   object --+        
+            |        
+    ??._CData --+    
+                |    
+_ctypes.Structure --+
+                    |
+                   <strong class="uidshort">_Key</strong>
 </pre>
-
-<dl><dt>Known Subclasses:</dt>
-<dd>
-      <ul class="subclass-list">
-<li><a href="tdl.event.KeyDown-class.html">KeyDown</a></li><li>, <a href="tdl.event.KeyUp-class.html">KeyUp</a></li>  </ul>
-</dd></dl>
 
 <hr />
 <!-- ==================== INSTANCE METHODS ==================== -->
@@ -100,17 +96,9 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="tdl.event.KeyEvent-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">key</span>,
-        <span class="summary-sig-arg">char</span>,
-        <span class="summary-sig-arg">lalt</span>,
-        <span class="summary-sig-arg">lctrl</span>,
-        <span class="summary-sig-arg">ralt</span>,
-        <span class="summary-sig-arg">rctrl</span>,
-        <span class="summary-sig-arg">shift</span>)</span><br />
-      x.__init__(...) initializes x; see help(type(x)) for signature</td>
+          <td><span class="summary-sig"><a name="__iter__"></a><span class="summary-sig-name">__iter__</span>(<span class="summary-sig-arg">self</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="tdl.event-pysrc.html#KeyEvent.__init__">source&nbsp;code</a></span>
+            <span class="codelink"><a href="tdl.__tcod-pysrc.html#_Key.__iter__">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -120,39 +108,27 @@ object --+
   </tr>
   <tr>
     <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>_ctypes.Structure</code></b>:
+      <code>__init__</code>,
+      <code>__new__</code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><i>unreachable</i>._CData</code></b>:
+      <code>__ctypes_from_outparam__</code>,
+      <code>__hash__</code>,
+      <code>__reduce__</code>,
+      <code>__setstate__</code>
+      </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
       <code>__format__</code>,
       <code>__getattribute__</code>,
-      <code>__hash__</code>,
-      <code>__new__</code>,
-      <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
       <code>__setattr__</code>,
       <code>__sizeof__</code>,
       <code>__str__</code>,
       <code>__subclasshook__</code>
       </p>
-    </td>
-  </tr>
-<tr bgcolor="#e8f0f8" >
-  <th colspan="2" class="group-header"
-    >&nbsp;&nbsp;&nbsp;&nbsp;Inherited from <a href="tdl.event.Event-class.html">Event</a></th></tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="tdl.event.Event-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      repr(x)</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="tdl.event-pysrc.html#Event.__repr__">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
     </td>
   </tr>
 </table>
@@ -173,14 +149,74 @@ object --+
     </table>
   </td>
 </tr>
-<tr bgcolor="#e8f0f8" >
-  <th colspan="2" class="group-header"
-    >&nbsp;&nbsp;&nbsp;&nbsp;Inherited from <a href="tdl.event.Event-class.html">Event</a></th></tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="type"></a><span class="summary-name">type</span> = <code title="None">None</code>
+        <a href="tdl.__tcod._Key-class.html#_fields_" class="summary-name">_fields_</a> = <code title="[('vk', &lt;class 'ctypes.c_long'&gt;),
+ ('c', &lt;class 'ctypes.c_char'&gt;),
+ ('pressed', &lt;class 'ctypes.c_bool'&gt;),
+ ('lalt', &lt;class 'ctypes.c_bool'&gt;),
+ ('lctrl', &lt;class 'ctypes.c_bool'&gt;),
+ ('ralt', &lt;class 'ctypes.c_bool'&gt;),
+ ('rctrl', &lt;class 'ctypes.c_bool'&gt;),
+ ('shift', &lt;class 'ctypes.c_bool'&gt;)]"><code class="variable-group">[</code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">vk</code><code class="variable-quote">'</code><code class="variable-op">, </code>&lt;class 'ctypes.c_long'&gt;<code class="variable-group">)</code><code class="variable-op">, </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">c</code><code class="variable-quote">'</code><code class="variable-op">, </code>&lt;class 'cty<code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="c"></a><span class="summary-name">c</span> = <code title="&lt;Field type=c_char, ofs=4, size=1&gt;">&lt;Field type=c_char, ofs=4, size=1&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="lalt"></a><span class="summary-name">lalt</span> = <code title="&lt;Field type=c_bool, ofs=6, size=1&gt;">&lt;Field type=c_bool, ofs=6, size=1&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="lctrl"></a><span class="summary-name">lctrl</span> = <code title="&lt;Field type=c_bool, ofs=7, size=1&gt;">&lt;Field type=c_bool, ofs=7, size=1&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="pressed"></a><span class="summary-name">pressed</span> = <code title="&lt;Field type=c_bool, ofs=5, size=1&gt;">&lt;Field type=c_bool, ofs=5, size=1&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="ralt"></a><span class="summary-name">ralt</span> = <code title="&lt;Field type=c_bool, ofs=8, size=1&gt;">&lt;Field type=c_bool, ofs=8, size=1&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="rctrl"></a><span class="summary-name">rctrl</span> = <code title="&lt;Field type=c_bool, ofs=9, size=1&gt;">&lt;Field type=c_bool, ofs=9, size=1&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="shift"></a><span class="summary-name">shift</span> = <code title="&lt;Field type=c_bool, ofs=10, size=1&gt;">&lt;Field type=c_bool, ofs=10, size=1&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="vk"></a><span class="summary-name">vk</span> = <code title="&lt;Field type=c_long, ofs=0, size=4&gt;">&lt;Field type=c_long, ofs=0, size=4&gt;</code>
     </td>
   </tr>
 </table>
@@ -201,95 +237,32 @@ object --+
     </table>
   </td>
 </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="alt"></a><span class="summary-name">alt</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="char"></a><span class="summary-name">char</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="ctrl"></a><span class="summary-name">ctrl</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="key"></a><span class="summary-name">key</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="keyname"></a><span class="summary-name">keyname</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="lalt"></a><span class="summary-name">lalt</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="lctrl"></a><span class="summary-name">lctrl</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="ralt"></a><span class="summary-name">ralt</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="rctrl"></a><span class="summary-name">rctrl</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="shift"></a><span class="summary-name">shift</span>
-    </td>
-  </tr>
   <tr>
     <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><i>unreachable</i>._CData</code></b>:
+      <code>_b_base_</code>,
+      <code>_b_needsfree_</code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><i>unreachable</i>._CData</code></b> (private):
+      <code>_objects</code>
+      </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__class__</code>
       </p>
     </td>
   </tr>
 </table>
-<!-- ==================== METHOD DETAILS ==================== -->
-<a name="section-MethodDetails"></a>
+<!-- ==================== CLASS VARIABLE DETAILS ==================== -->
+<a name="section-ClassVariableDetails"></a>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr bgcolor="#70b0f0" class="table-header">
   <td colspan="2" class="table-header">
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
       <tr valign="top">
-        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="left"><span class="table-header">Class Variable Details</span></td>
         <td align="right" valign="top"
-         ><span class="options">[<a href="#section-MethodDetails"
+         ><span class="options">[<a href="#section-ClassVariableDetails"
          class="privatelink" onclick="toggle_private();"
          >hide private</a>]</span></td>
       </tr>
@@ -297,34 +270,28 @@ object --+
   </td>
 </tr>
 </table>
-<a name="__init__"></a>
+<a name="_fields_"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">key</span>,
-        <span class="sig-arg">char</span>,
-        <span class="sig-arg">lalt</span>,
-        <span class="sig-arg">lctrl</span>,
-        <span class="sig-arg">ralt</span>,
-        <span class="sig-arg">rctrl</span>,
-        <span class="sig-arg">shift</span>)</span>
-    <br /><em class="fname">(Constructor)</em>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="tdl.event-pysrc.html#KeyEvent.__init__">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
+  <h3 class="epydoc">_fields_</h3>
   
-  <p>x.__init__(...) initializes x; see help(type(x)) for signature</p>
   <dl class="fields">
-    <dt>Overrides:
-        object.__init__
-        <dd><em class="note">(inherited documentation)</em></dd>
-    </dt>
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">[</code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">vk</code><code class="variable-quote">'</code><code class="variable-op">, </code>&lt;class 'ctypes.c_long'&gt;<code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">c</code><code class="variable-quote">'</code><code class="variable-op">, </code>&lt;class 'ctypes.c_char'&gt;<code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">pressed</code><code class="variable-quote">'</code><code class="variable-op">, </code>&lt;class 'ctypes.c_bool'&gt;<code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">lalt</code><code class="variable-quote">'</code><code class="variable-op">, </code>&lt;class 'ctypes.c_bool'&gt;<code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">lctrl</code><code class="variable-quote">'</code><code class="variable-op">, </code>&lt;class 'ctypes.c_bool'&gt;<code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">ralt</code><code class="variable-quote">'</code><code class="variable-op">, </code>&lt;class 'ctypes.c_bool'&gt;<code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">rctrl</code><code class="variable-quote">'</code><code class="variable-op">, </code>&lt;class 'ctypes.c_bool'&gt;<code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">shift</code><code class="variable-quote">'</code><code class="variable-op">, </code>&lt;class 'ctypes.c_bool'&gt;<code class="variable-group">)</code><code class="variable-group">]</code>
+</pre></td></tr></table>
+</dd>
   </dl>
 </td></tr></table>
 </div>
