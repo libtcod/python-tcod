@@ -464,3 +464,5 @@ _lib.TCOD_sys_wait_for_event.restype = c_int
 _lib.TCOD_sys_wait_for_event.argtypes = (c_int, POINTER(_Key), POINTER(_Mouse))
 _lib.TCOD_sys_check_for_event.restype = c_int
 _lib.TCOD_sys_check_for_event.argtypes = (c_int, POINTER(_Key), POINTER(_Mouse))
+
+__all__ = ()

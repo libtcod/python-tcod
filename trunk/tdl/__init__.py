@@ -9,7 +9,7 @@ import weakref
 import array
 
 from . import event
-from .tcod import _lib, _Color, _unpackfile
+from .__tcod import _lib, _Color, _unpackfile
 
 _IS_PYTHON3 = (sys.version_info[0] == 3)
 #_encoding = 'cp437'
@@ -690,5 +690,5 @@ def forceResolution(width, height):
     """
     _lib.TCOD_sys_force_fullscreen_resolution(width, height)
 
-__all__ = [var for var in locals().keys() if not '_' in var[0]]
+__all__ = [var for var in locals().keys() if var[0] != '_' and var not in ['sys', 'os', 'ctypes', 'array', 'weakref']]
 
