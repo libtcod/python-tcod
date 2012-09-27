@@ -690,5 +690,5 @@ def forceResolution(width, height):
     """
     _lib.TCOD_sys_force_fullscreen_resolution(width, height)
 
-__all__ = [var for var in locals().keys() if var[0] != '_' and var not in ['sys', 'os', 'ctypes', 'array', 'weakref']]
-
+__all__ = [_var for _var in locals().keys() if _var[0] != '_' and _var not in ['sys', 'os', 'ctypes', 'array', 'weakref']]
+__all__ += ['_MetaConsole'] # keep this object public to show the documentation in epydoc

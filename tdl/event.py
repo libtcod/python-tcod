@@ -247,4 +247,4 @@ def isWindowClosed():
     """
     return _lib.TCOD_console_is_window_closed()
 
-__all__ = [var for var in locals().keys() if var[0] != '_' and var not in ['time', 'ctypes']]
+__all__ = [_var for _var in locals().keys() if _var[0] != '_' and _var not in ['time', 'ctypes']]
