@@ -16,8 +16,8 @@
 import time
 import ctypes
 
-from .tcod import _lib, _Mouse, _Key
-from . import tcod as _tcod
+from .__tcod import _lib, _Mouse, _Key
+from . import __tcod as _tcod
 import tdl as _tdl
 
 _mousel = 0
@@ -247,4 +247,4 @@ def isWindowClosed():
     """
     return _lib.TCOD_console_is_window_closed()
 
-__all__ = [var for var in locals().keys() if not '_' in var[0]]
+__all__ = [var for var in locals().keys() if var[0] != '_' and var not in ['time', 'ctypes']]
