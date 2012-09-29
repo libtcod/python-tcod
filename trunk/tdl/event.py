@@ -20,6 +20,8 @@ from .__tcod import _lib, _Mouse, _Key
 from . import __tcod as _tcod
 import tdl as _tdl
 
+_eventQueue = []
+
 _mousel = 0
 _mousem = 0
 _mouser = 0
@@ -44,9 +46,11 @@ class Event(object):
     type = None
 
     def __repr__(self):
+        """List an events public attributes in print calls
+        """
         attrdict = {}
         for varname in dir(self):
-            if '_' in varname:
+            if '_' == varname[0]:
                 continue
             attrdict[varname] = self.__getattribute__(varname)
         return '%s Event %s' % (self.__class__.__name__, repr(attrdict))
@@ -59,18 +63,18 @@ class Quit(Event):
     type = 'QUIT'
 
 class KeyEvent(Event):
-    __slots__ = ('key', 'keyname', 'char', 'lalt', 'lctrl', 'ralt', 'rctrl',
-                 'shift', 'alt', 'ctrl')
+    __slots__ = ('key', 'keyname', 'char', 'shift', 'alt', 'ctrl',
+                 'leftAlt', 'leftCtrl', 'rightAlt', 'rightCtrl')
 
     def __init__(self, key, char, lalt, lctrl, ralt, rctrl, shift):
         self.key = key
         self.keyname = _keynames[key]
         char = char if isinstance(char, str) else char.decode()
         self.char = char.replace('\x00', '') # change null to empty string
-        self.lalt = bool(lalt)
-        self.ralt = bool(ralt)
-        self.lctrl = bool(lctrl)
-        self.rctrl = bool(rctrl)
+        self.leftAlt = bool(lalt)
+        self.rightAlt = bool(ralt)
+        self.leftCtrl = bool(lctrl)
+        self.rightCtrl = bool(rctrl)
         self.shift = bool(shift)
         self.alt = bool(lalt or ralt)
         self.ctrl = bool(lctrl or rctrl)
@@ -110,7 +114,7 @@ class MouseMotion(Event):
         self.cellmotion = cellmotion
 
 class App(object):
-    __slots__ = ()
+    __slots__ = ('__running')
     
     def ev_QUIT(self, event):
         raise SystemExit()
@@ -133,9 +137,13 @@ class App(object):
     def update(self, dt):
         pass
         
+    def suspend(self):
+        self._running = False
+        
     def run(self):
+        self.__running = True
         prevTime = time.clock()
-        while 1:
+        while self._running:
             for event in get():
                 if event.type: # exclude custom events with a blank type variable
                     # call the ev_* methods
@@ -146,31 +154,15 @@ class App(object):
                     method = 'key_%s' % event.keyname # key_KEYNAME
                     if hasattr(self, method): # silently exclude undefined methods
                         getattr(self, method)(event)
+                if not __running:
+                    break # interupt event handing after suspend()
             newTime = time.clock()
             self.update(newTime - prevTime)
             prevTime = newTime
             _tdl.flush()
-        
-def get():
-    """Flushes the event queue and returns the list of events.
-    
-    This function returns Event objects that can be ID'd and sorted with their type attribute:
-    for event in tdl.event.get():
-        if event.type == 'QUIT':
-            raise SystemExit()
-        elif event.type == 'MOUSEDOWN':
-            print('Mouse button %i clicked at %i, %i' % (event.button, event.pos[0], event.pos[1]))
-        elif event.type == 'KEYDOWN':
-            print('Key #%i "%s" pressed' % (event.key, event.char))
-    
-    Here is a list of events and their attributes:
-    QUIT
-    KEYDOWN: key char keyname alt ctrl shift lalt lctrl ralt rctrl
-    KEYUP: key char keyname alt ctrl shift lalt lctrl ralt rctrl
-    MOUSEDOWN: button pos cell
-    MOUSEUP: button pos cell
-    MOUSEMOTION: pos motion cell cellmotion
-    """
+
+def _processEvents():
+    """Flushes the event queue from libtcod into the global list _eventQueue"""
     global _mousel, _mousem, _mouser, _eventsflushed
     _eventsflushed = True
     events = []
@@ -178,10 +170,12 @@ def get():
     mouse = _Mouse()
     libkey = _Key()
     while 1:
-        if not _lib.TCOD_sys_check_for_event(_tcod.TCOD_EVENT_ANY, libkey, mouse):
+        libevent = _lib.TCOD_sys_check_for_event(_tcod.TCOD_EVENT_ANY, libkey, mouse)
+        if not libevent: # no more events from libtcod
             break
             
-        if mouse.dx or mouse.dy:
+        #if mouse.dx or mouse.dy:
+        if libevent & _tcod.TCOD_EVENT_MOUSE_MOVE:
             events.append(MouseMotion(*mouse.motion))
 
         mousepos = ((mouse.x, mouse.y), (mouse.cx, mouse.cy))
@@ -217,7 +211,32 @@ def get():
     if _lib.TCOD_console_is_window_closed():
         events.append(Quit())
 
-    return events
+    _eventQueue.extend(events)
+    
+def get():
+    """Flushes the event queue and returns the list of events.
+    
+    This function returns Event objects that can be ID'd and sorted with their type attribute:
+    for event in tdl.event.get():
+        if event.type == 'QUIT':
+            raise SystemExit()
+        elif event.type == 'MOUSEDOWN':
+            print('Mouse button %i clicked at %i, %i' % (event.button, event.pos[0], event.pos[1]))
+        elif event.type == 'KEYDOWN':
+            print('Key #%i "%s" pressed' % (event.key, event.char))
+    
+    Here is a list of events and their attributes:
+    QUIT
+    KEYDOWN: key char keyname alt ctrl shift lalt lctrl ralt rctrl
+    KEYUP: key char keyname alt ctrl shift lalt lctrl ralt rctrl
+    MOUSEDOWN: button pos cell
+    MOUSEUP: button pos cell
+    MOUSEMOTION: pos motion cell cellmotion
+    """
+    _processEvents()
+    while _eventQueue:
+        yield(_eventQueue.pop(0))
+    raise StopIteration()
 
 def keyWait():
     """Waits until the user presses a key.  Then returns a KeyDown event.
@@ -228,18 +247,6 @@ def keyWait():
     libkey = _Key()
     _lib.TCOD_console_wait_for_keypress_wrapper(libkey, flush)
     return KeyDown(*libkey)
-
-# tested this function recently, it did not work
-#def keyPressed(key):
-#    """Returns True when key is currently pressed.
-#
-#    key can be a number or single length string
-#    """
-#    assert isinstance(key, (str, int)), "key must be a single character string or int"
-#    if not isinstance(key, int):
-#        assert len(key) == 1, "key can not be a multi character string"
-#        key = ord(key)
-#    return _lib.TCOD_console_check_for_keypress(key).pressed # returns key object?
 
 def isWindowClosed():
     """Returns True if the exit button on the window has been clicked and
