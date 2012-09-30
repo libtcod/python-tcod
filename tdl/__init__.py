@@ -121,7 +121,7 @@ class _MetaConsole(object):
         """Draws a string starting at x and y.  Optinally colored.
 
         A string that goes past the right side will wrap around.  A string
-        wraping to below the console will raise a TDLError but will still be
+        wraping to below the console will raise a L{TDLError} but will still be
         written out.  This means you can safely ignore the errors with a
         try... except block if you're fine with partily written strings.
 
@@ -417,8 +417,6 @@ class Console(_MetaConsole):
         
         Mostly used just to replace this Console object with the root console
         If another Console object is used then they are swapped
-        
-        Soon to be removed and replaced by the _newConsole method
         """
         if isinstance(console, Console):
             self._as_parameter_, console._as_parameter_ = \
@@ -527,12 +525,33 @@ def init(width, height, title='TDL', fullscreen=False, renderer='OPENGL'):
     """Start the main console with the given width and height and return the
     root console.
 
-    Remember to use tdl.flush() to make what's drawn visible on the console.
+    Call the consoles drawing functions.  Then remember to use L{tdl.flush} to
+    make what's drawn visible on the console.
 
-    After the root console is garbage collected, the window made by this
-    function will close.
+    @type width: int
+    @type height: int
     
-    renderer can be one of 'GLSL', 'OPENGL', or 'SDL'
+    @type title: string
+    
+    @type fullscreen: boolean
+    @param fullscreen: Can be set to True to start in fullscreen mode.
+    
+    @type renderer: string
+    @param renderer: Can be one of 'GLSL', 'OPENGL', or 'SDL'.
+                     
+                     Due to way Python works you're unlikely to see much of an
+                     improvement by using 'GLSL' or 'OPENGL' as most of the
+                     time Python is slow interacting with the console and the
+                     rendering itself is pretty fast even on 'SDL'.
+                     
+                     This should be left at default or switched to 'SDL' for
+                     better reliability and an instantaneous start up time.
+    
+    @rtype: L{Console}
+    @return: The root console.  Only what is drawn on the root console is
+             what's visible after a call to L{tdl.flush}.
+             After the root console is garbage collected, the window made by
+             this function will close.
     """
     RENDERERS = {'GLSL': 0, 'OPENGL': 1, 'SDL': 2}
     global _rootinitialized, _rootconsole
@@ -565,6 +584,11 @@ def init(width, height, title='TDL', fullscreen=False, renderer='OPENGL'):
 
 def flush():
     """Make all changes visible and update the screen.
+    
+    Remember to call this function after drawing operations.
+    Calls to flush will enfore the frame rate limit set by L{tdl.setFPS}.
+    
+    This function can only be called after L{tdl.init}
     """
     if not _rootinitialized:
         raise TDLError('Cannot flush without first initializing with tdl.init')
@@ -579,24 +603,39 @@ def flush():
     #event._eventsflushed = False
     _lib.TCOD_console_flush()
 
-def setFont(path, tileWidth, tileHeight, colomn=False, greyscale=False, altLayout=False):
-    """Changes the font to be used for this session
-    This should be called before tdl.init
-
-    path - must be a string for where a bitmap file is found.
-
-    tileWidth, tileHeight - is the size of an individual tile.
-
-    colomn - defines if the characer order goes along the rows or colomns.  It
-    should be True if the codes are 0-15 in the first column.  And should be
-    False if the codes are 0-15 in the first row.
+def setFont(path, tileWidth, tileHeight, colomn=False,
+            greyscale=False, altLayout=False):
+    """Changes the font to be used for this session.
+    This should be called before L{tdl.init}
     
-    greyscale - creates an anti-aliased font from a greyscale bitmap.
-    Unnecessary when a font has an alpha channel for anti-aliasing.
+    While it's possible you can change the font mid program it can sometimes
+    break in rare circumstances.  So use caution when doing this.
+
+    @type path: string
+    @param path: Must be a string filepath where a bmp or png file is found.
+
+    @type tileWidth: int
+    @param tileWidth: The width of an individual tile.
     
-    altLayout - a alternative layout with space in the upper left corner.  The
-    colomn parameter is ignored if this is True, find examples of this layout
-    in the font/ directory included with the TDL source.
+    @type tileHeight: int
+    @param tileHeight: The height of an individual tile.
+    
+    @type colomn: boolean
+    @param colomn: Defines if the characer order goes along the rows or
+                   colomns.
+                   It should be True if the charater codes 0-15 are in the
+                   first column.  And should be False if the characters 0-15
+                   are in the first row.
+    
+    @type greyscale: boolean
+    @param greyscale: Creates an anti-aliased font from a greyscale bitmap.
+                      Otherwise it uses the alpha channel for anti-aliasing.
+    
+    @type altLayout: boolean
+    @param altLayout: An alternative layout with space in the upper left
+                      corner.  The colomn parameter is ignored if this is
+                      True, find examples of this layout in the font/
+                      directory included with the python-tdl source.
     """
     # put up some constants that are only used here
     FONT_LAYOUT_ASCII_INCOL = 1
@@ -619,17 +658,18 @@ def setFont(path, tileWidth, tileHeight, colomn=False, greyscale=False, altLayou
     _lib.TCOD_console_set_custom_font(_format_string(path), flags, tileWidth, tileHeight)
 
 def getFullscreen():
-    """Returns if the window is fullscreen
-
-    The user can't make the window fullscreen so you must use the
-    setFullscreen function
+    """Returns True if program is fullscreen.
+    
+    @rtype: boolean
+    @return: Returns True if the window is in fullscreen mode.
+             Otherwise returns False.
     """
     if not _rootinitialized:
         raise TDLError('Initialize first with tdl.init')
     return _lib.TCOD_console_is_fullscreen()
 
 def setFullscreen(fullscreen):
-    """Sets the fullscreen state to the boolen value
+    """Sets the fullscreen state to the boolean value.
     """
     if not _rootinitialized:
         raise TDLError('Initialize first with tdl.init')
@@ -671,9 +711,14 @@ def screenshot(file=None):
         raise TypeError('fileobj is an invalid type: %s' % type(fileobj))
 
 def setFPS(frameRate):
-    """Set the frame rate.
-
-    You can set this to have no limit by using 0.
+    """Set the maximum frame rate.
+    
+    @type frameRate: int
+    @param frameRate: Further calls to L{tdl.flush} will limit the speed of
+                      the program to run at <frameRate> frames per second. Can
+                      also be set to 0 to run without a limit.
+                      
+                      Defaults to None.
     """
     if frameRate is None:
         frameRate = 0
@@ -681,7 +726,12 @@ def setFPS(frameRate):
     _lib.TCOD_sys_set_fps(frameRate)
 
 def getFPS():
-    """Return the current frames per second of the running program.
+    """Return the current frames per second of the running program set by
+    L{setFPS}
+    
+    @rtype: int
+    @return: Returns the frameRate set by setFPS.
+             If set to no limit, this will return 0.
     """
     return _lib.TCOD_sys_get_fps()
 
