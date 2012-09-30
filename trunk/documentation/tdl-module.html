@@ -128,7 +128,7 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="flush"></a><span class="summary-sig-name">flush</span>()</span><br />
+          <td><span class="summary-sig"><a href="tdl-module.html#flush" class="summary-sig-name">flush</a>()</span><br />
       Make all changes visible and update the screen.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#flush">source&nbsp;code</a></span>
@@ -159,12 +159,13 @@
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">int</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="getFPS"></a><span class="summary-sig-name">getFPS</span>()</span><br />
-      Return the current frames per second of the running program.</td>
+          <td><span class="summary-sig"><a href="tdl-module.html#getFPS" class="summary-sig-name">getFPS</a>()</span><br />
+      Return the current frames per second of the running program set by <a
+      href="tdl-module.html#setFPS" class="link">setFPS</a></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#getFPS">source&nbsp;code</a></span>
             
@@ -176,12 +177,12 @@
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">boolean</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="tdl-module.html#getFullscreen" class="summary-sig-name">getFullscreen</a>()</span><br />
-      Returns if the window is fullscreen</td>
+      Returns True if program is fullscreen.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#getFullscreen">source&nbsp;code</a></span>
             
@@ -193,7 +194,7 @@
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type"><a href="tdl.Console-class.html" class="link">Console</a></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -237,7 +238,7 @@
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="tdl-module.html#setFPS" class="summary-sig-name">setFPS</a>(<span class="summary-sig-arg">frameRate</span>)</span><br />
-      Set the frame rate.</td>
+      Set the maximum frame rate.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#setFPS">source&nbsp;code</a></span>
             
@@ -259,8 +260,7 @@
         <span class="summary-sig-arg">colomn</span>=<span class="summary-sig-default">False</span>,
         <span class="summary-sig-arg">greyscale</span>=<span class="summary-sig-default">False</span>,
         <span class="summary-sig-arg">altLayout</span>=<span class="summary-sig-default">False</span>)</span><br />
-      Changes the font to be used for this session This should be called 
-      before tdl.init</td>
+      Changes the font to be used for this session.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#setFont">source&nbsp;code</a></span>
             
@@ -277,7 +277,7 @@
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="setFullscreen"></a><span class="summary-sig-name">setFullscreen</span>(<span class="summary-sig-arg">fullscreen</span>)</span><br />
-      Sets the fullscreen state to the boolen value</td>
+      Sets the fullscreen state to the boolean value.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#setFullscreen">source&nbsp;code</a></span>
             
@@ -314,6 +314,53 @@
     <span class="table-header">Function Details</span></td>
 </tr>
 </table>
+<a name="flush"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">flush</span>()</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#flush">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Make all changes visible and update the screen.</p>
+  <p>Remember to call this function after drawing operations. Calls to 
+  flush will enfore the frame rate limit set by <a 
+  href="tdl-module.html#setFPS" class="link">tdl.setFPS</a>.</p>
+  <p>This function can only be called after <a href="tdl-module.html#init" 
+  class="link">tdl.init</a></p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="getFPS"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getFPS</span>()</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#getFPS">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Return the current frames per second of the running program set by <a 
+  href="tdl-module.html#setFPS" class="link">setFPS</a></p>
+  <dl class="fields">
+    <dt>Returns: int</dt>
+        <dd>Returns the frameRate set by setFPS. If set to no limit, this 
+          will return 0.</dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="getFullscreen"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -328,10 +375,11 @@
     </td>
   </tr></table>
   
-  <p>Returns if the window is fullscreen</p>
-  <p>The user can't make the window fullscreen so you must use the 
-  setFullscreen function</p>
+  <p>Returns True if program is fullscreen.</p>
   <dl class="fields">
+    <dt>Returns: boolean</dt>
+        <dd>Returns True if the window is in fullscreen mode. Otherwise 
+          returns False.</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -355,12 +403,29 @@
   
   <p>Start the main console with the given width and height and return the 
   root console.</p>
-  <p>Remember to use tdl.flush() to make what's drawn visible on the 
-  console.</p>
-  <p>After the root console is garbage collected, the window made by this 
-  function will close.</p>
-  <p>renderer can be one of 'GLSL', 'OPENGL', or 'SDL'</p>
+  <p>Call the consoles drawing functions.  Then remember to use <a 
+  href="tdl-module.html#flush" class="link">tdl.flush</a> to make what's 
+  drawn visible on the console.</p>
   <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>fullscreen</code></strong> (boolean) - Can be set to True to start in fullscreen mode.</li>
+        <li><strong class="pname"><code>renderer</code></strong> (string) - Can be one of 'GLSL', 'OPENGL', or 'SDL'.
+          <p>Due to way Python works you're unlikely to see much of an 
+          improvement by using 'GLSL' or 'OPENGL' as most of the time 
+          Python is slow interacting with the console and the rendering 
+          itself is pretty fast even on 'SDL'.</p>
+          <p>This should be left at default or switched to 'SDL' for better
+          reliability and an instantaneous start up time.</p></li>
+        <li><strong class="pname"><code>width</code></strong> (int)</li>
+        <li><strong class="pname"><code>title</code></strong> (string)</li>
+        <li><strong class="pname"><code>height</code></strong> (int)</li>
+    </ul></dd>
+    <dt>Returns: <a href="tdl.Console-class.html" class="link">Console</a></dt>
+        <dd>The root console.  Only what is drawn on the root console is 
+          what's visible after a call to <a href="tdl-module.html#flush" 
+          class="link">tdl.flush</a>. After the root console is garbage 
+          collected, the window made by this function will close.</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -400,9 +465,16 @@
     </td>
   </tr></table>
   
-  <p>Set the frame rate.</p>
-  <p>You can set this to have no limit by using 0.</p>
+  <p>Set the maximum frame rate.</p>
   <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>frameRate</code></strong> (int) - Further calls to <a href="tdl-module.html#flush" 
+          class="link">tdl.flush</a> will limit the speed of the program to
+          run at &lt;frameRate&gt; frames per second. Can also be set to 0 
+          to run without a limit.
+          <p>Defaults to None.</p></li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -425,19 +497,28 @@
     </td>
   </tr></table>
   
-  <p>Changes the font to be used for this session This should be called 
-  before tdl.init</p>
-  <p>path - must be a string for where a bitmap file is found.</p>
-  <p>tileWidth, tileHeight - is the size of an individual tile.</p>
-  <p>colomn - defines if the characer order goes along the rows or colomns.
-  It should be True if the codes are 0-15 in the first column.  And should 
-  be False if the codes are 0-15 in the first row.</p>
-  <p>greyscale - creates an anti-aliased font from a greyscale bitmap. 
-  Unnecessary when a font has an alpha channel for anti-aliasing.</p>
-  <p>altLayout - a alternative layout with space in the upper left corner.
-  The colomn parameter is ignored if this is True, find examples of this 
-  layout in the font/ directory included with the TDL source.</p>
+  <p>Changes the font to be used for this session. This should be called 
+  before <a href="tdl-module.html#init" class="link">tdl.init</a></p>
+  <p>While it's possible you can change the font mid program it can 
+  sometimes break in rare circumstances.  So use caution when doing 
+  this.</p>
   <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>path</code></strong> (string) - Must be a string filepath where a bmp or png file is found.</li>
+        <li><strong class="pname"><code>tileWidth</code></strong> (int) - The width of an individual tile.</li>
+        <li><strong class="pname"><code>tileHeight</code></strong> (int) - The height of an individual tile.</li>
+        <li><strong class="pname"><code>colomn</code></strong> (boolean) - Defines if the characer order goes along the rows or colomns. It 
+          should be True if the charater codes 0-15 are in the first 
+          column.  And should be False if the characters 0-15 are in the 
+          first row.</li>
+        <li><strong class="pname"><code>greyscale</code></strong> (boolean) - Creates an anti-aliased font from a greyscale bitmap. Otherwise 
+          it uses the alpha channel for anti-aliasing.</li>
+        <li><strong class="pname"><code>altLayout</code></strong> (boolean) - An alternative layout with space in the upper left corner.  The 
+          colomn parameter is ignored if this is True, find examples of 
+          this layout in the font/ directory included with the python-tdl 
+          source.</li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -474,7 +555,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Thu Sep 27 13:02:21 2012</a>
+    3.0.1 on Sun Sep 30 01:30:49 2012</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

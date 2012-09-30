@@ -133,7 +133,7 @@ object --+
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="tdl.event.Event-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      repr(x)</td>
+      List an events public attributes in print calls</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl.event-pysrc.html#Event.__repr__">source&nbsp;code</a></span>
             
@@ -156,7 +156,60 @@ object --+
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="type"></a><span class="summary-name">type</span> = <code title="'KEYUP'"><code class="variable-quote">'</code><code class="variable-string">KEYUP</code><code class="variable-quote">'</code></code>
+        <a name="type"></a><span class="summary-name">type</span> = <code title="'KEYUP'"><code class="variable-quote">'</code><code class="variable-string">KEYUP</code><code class="variable-quote">'</code></code><br />
+      String constant representing the type of event.
+    </td>
+  </tr>
+</table>
+<!-- ==================== INSTANCE VARIABLES ==================== -->
+<a name="section-InstanceVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Instance Variables</span></td>
+</tr>
+<tr bgcolor="#e8f0f8" >
+  <th colspan="2" class="group-header"
+    >&nbsp;&nbsp;&nbsp;&nbsp;Inherited from <a href="tdl.event.KeyEvent-class.html">KeyEvent</a></th></tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="alt"></a><span class="summary-name">alt</span><br />
+      True if alt was held down during this event.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.event.KeyEvent-class.html#char" class="summary-name">char</a><br />
+      A single character string of the letter or symbol pressed.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="ctrl"></a><span class="summary-name">ctrl</span><br />
+      True if control was held down during this event.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="keyname"></a><span class="summary-name">keyname</span><br />
+      A human readable version of key
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="shift"></a><span class="summary-name">shift</span><br />
+      True if shift was held down during this event.
     </td>
   </tr>
 </table>
@@ -182,27 +235,6 @@ object --+
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="alt"></a><span class="summary-name">alt</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="char"></a><span class="summary-name">char</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="ctrl"></a><span class="summary-name">ctrl</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
         <a name="key"></a><span class="summary-name">key</span>
     </td>
   </tr>
@@ -210,42 +242,28 @@ object --+
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="keyname"></a><span class="summary-name">keyname</span>
+        <a name="leftAlt"></a><span class="summary-name">leftAlt</span>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="lalt"></a><span class="summary-name">lalt</span>
+        <a name="leftCtrl"></a><span class="summary-name">leftCtrl</span>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="lctrl"></a><span class="summary-name">lctrl</span>
+        <a name="rightAlt"></a><span class="summary-name">rightAlt</span>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="ralt"></a><span class="summary-name">ralt</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="rctrl"></a><span class="summary-name">rctrl</span>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="shift"></a><span class="summary-name">shift</span>
+        <a name="rightCtrl"></a><span class="summary-name">rightCtrl</span>
     </td>
   </tr>
 </table>
@@ -281,7 +299,7 @@ object --+
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Thu Sep 27 13:02:21 2012</a>
+    3.0.1 on Sun Sep 30 01:30:49 2012</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

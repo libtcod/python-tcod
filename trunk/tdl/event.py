@@ -2,15 +2,15 @@
     This module handles user input.
 
     Here's a quick reference to Event types and their attributes:
-    QUIT
-    KEYDOWN: keyname key char alt ctrl shift lalt lctrl ralt rctrl
-    KEYUP: keyname key char alt ctrl shift lalt lctrl ralt rctrl
-    MOUSEDOWN: button pos cell
-    MOUSEUP: button pos cell
-    MOUSEMOTION: pos cell motion cellmotion
+     - QUIT
+     - KEYDOWN: keyname key char alt ctrl shift lalt lctrl ralt rctrl
+     - KEYUP: keyname key char alt ctrl shift lalt lctrl ralt rctrl
+     - MOUSEDOWN: button pos cell
+     - MOUSEUP: button pos cell
+     - MOUSEMOTION: pos cell motion cellmotion
     
-    You will likely want to use the tdl.event.get function but you can still
-    use keyWait and isWindowClosed to control your entire program.
+    You will likely want to use the L{tdl.event.get} function but you can still
+    use L{keyWait} and L{isWindowClosed} to control your entire program.
 """
 
 import time
@@ -44,6 +44,10 @@ _keynames = _parse_keynames(_tcod)
 class Event(object):
     __slots__ = ()
     type = None
+    """String constant representing the type of event.
+    
+    Can be: 'QUIT', 'KEYDOWN', 'KEYUP', 'MOUSEDOWN', 'MOUSEUP', or 'MOUSEMOTION.'
+    """
 
     def __repr__(self):
         """List an events public attributes in print calls
@@ -69,15 +73,21 @@ class KeyEvent(Event):
     def __init__(self, key, char, lalt, lctrl, ralt, rctrl, shift):
         self.key = key
         self.keyname = _keynames[key]
+        """A human readable version of key"""
         char = char if isinstance(char, str) else char.decode()
         self.char = char.replace('\x00', '') # change null to empty string
+        """A single character string of the letter or symbol pressed.
+        Special characters like delete and return are not cross platform."""
         self.leftAlt = bool(lalt)
         self.rightAlt = bool(ralt)
         self.leftCtrl = bool(lctrl)
         self.rightCtrl = bool(rctrl)
         self.shift = bool(shift)
+        "True if shift was held down during this event."
         self.alt = bool(lalt or ralt)
+        "True if alt was held down during this event."
         self.ctrl = bool(lctrl or rctrl)
+        "True if control was held down during this event."
 
 class KeyDown(KeyEvent):
     __slots__ = ()
@@ -216,22 +226,24 @@ def _processEvents():
 def get():
     """Flushes the event queue and returns the list of events.
     
-    This function returns Event objects that can be ID'd and sorted with their type attribute:
-    for event in tdl.event.get():
-        if event.type == 'QUIT':
-            raise SystemExit()
-        elif event.type == 'MOUSEDOWN':
-            print('Mouse button %i clicked at %i, %i' % (event.button, event.pos[0], event.pos[1]))
-        elif event.type == 'KEYDOWN':
-            print('Key #%i "%s" pressed' % (event.key, event.char))
+    This function returns Event objects that can be ID'd and sorted with their type attribute::
+        for event in tdl.event.get():
+            if event.type == 'QUIT':
+                raise SystemExit()
+            elif event.type == 'MOUSEDOWN':
+                print('Mouse button %i clicked at %i, %i' % (event.button, event.pos[0], event.pos[1]))
+            elif event.type == 'KEYDOWN':
+                print('Key #%i "%s" pressed' % (event.key, event.char))
     
     Here is a list of events and their attributes:
-    QUIT
-    KEYDOWN: key char keyname alt ctrl shift lalt lctrl ralt rctrl
-    KEYUP: key char keyname alt ctrl shift lalt lctrl ralt rctrl
-    MOUSEDOWN: button pos cell
-    MOUSEUP: button pos cell
-    MOUSEMOTION: pos motion cell cellmotion
+     - QUIT
+     - KEYDOWN: key char keyname alt ctrl shift lalt lctrl ralt rctrl
+     - KEYUP: key char keyname alt ctrl shift lalt lctrl ralt rctrl
+     - MOUSEDOWN: button pos cell
+     - MOUSEUP: button pos cell
+     - MOUSEMOTION: pos motion cell cellmotion
+    
+    @rtype: iterator
     """
     _processEvents()
     while _eventQueue:
@@ -239,7 +251,9 @@ def get():
     raise StopIteration()
 
 def keyWait():
-    """Waits until the user presses a key.  Then returns a KeyDown event.
+    """Waits until the user presses a key.  Then returns a L{KeyDown} event.
+    
+    @rtype: L{KeyDown}
     """
     global _eventsflushed
     _eventsflushed = True
@@ -251,6 +265,8 @@ def keyWait():
 def isWindowClosed():
     """Returns True if the exit button on the window has been clicked and
     stays True afterwards.
+    
+    @rtype: boolean
     """
     return _lib.TCOD_console_is_window_closed()
 

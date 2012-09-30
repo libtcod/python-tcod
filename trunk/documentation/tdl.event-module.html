@@ -60,13 +60,32 @@
 <!-- ==================== MODULE DESCRIPTION ==================== -->
 <h1 class="epydoc">Module event</h1><p class="nomargin-top"><span class="codelink"><a href="tdl.event-pysrc.html">source&nbsp;code</a></span></p>
 <p>This module handles user input.</p>
-  <p>Here's a quick reference to Event types and their attributes: QUIT 
-  KEYDOWN: keyname key char alt ctrl shift lalt lctrl ralt rctrl KEYUP: 
-  keyname key char alt ctrl shift lalt lctrl ralt rctrl MOUSEDOWN: button 
-  pos cell MOUSEUP: button pos cell MOUSEMOTION: pos cell motion 
-  cellmotion</p>
-  <p>You will likely want to use the tdl.event.get function but you can 
-  still use keyWait and isWindowClosed to control your entire program.</p>
+  <p>Here's a quick reference to Event types and their attributes:</p>
+  <ul>
+    <li>
+      QUIT
+    </li>
+    <li>
+      KEYDOWN: keyname key char alt ctrl shift lalt lctrl ralt rctrl
+    </li>
+    <li>
+      KEYUP: keyname key char alt ctrl shift lalt lctrl ralt rctrl
+    </li>
+    <li>
+      MOUSEDOWN: button pos cell
+    </li>
+    <li>
+      MOUSEUP: button pos cell
+    </li>
+    <li>
+      MOUSEMOTION: pos cell motion cellmotion
+    </li>
+  </ul>
+  <p>You will likely want to use the <a href="tdl.event-module.html#get" 
+  class="link">tdl.event.get</a> function but you can still use <a 
+  href="tdl.event-module.html#keyWait" class="link">keyWait</a> and <a 
+  href="tdl.event-module.html#isWindowClosed" 
+  class="link">isWindowClosed</a> to control your entire program.</p>
 
 <!-- ==================== CLASSES ==================== -->
 <a name="section-Classes"></a>
@@ -157,7 +176,7 @@
 </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">iterator</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -174,7 +193,7 @@
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type"><a href="tdl.event.KeyDown-class.html" class="link">KeyDown</a></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -191,7 +210,7 @@
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">boolean</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -231,28 +250,41 @@
     </td>
   </tr></table>
   
-  <pre class="literalblock">
-Flushes the event queue and returns the list of events.
-
-This function returns Event objects that can be ID'd and sorted with their type attribute:
-for event in tdl.event.get():
-    if event.type == 'QUIT':
-        raise SystemExit()
-    elif event.type == 'MOUSEDOWN':
-        print('Mouse button %i clicked at %i, %i' % (event.button, event.pos[0], event.pos[1]))
-    elif event.type == 'KEYDOWN':
-        print('Key #%i &quot;%s&quot; pressed' % (event.key, event.char))
-
-Here is a list of events and their attributes:
-QUIT
-KEYDOWN: key char keyname alt ctrl shift lalt lctrl ralt rctrl
-KEYUP: key char keyname alt ctrl shift lalt lctrl ralt rctrl
-MOUSEDOWN: button pos cell
-MOUSEUP: button pos cell
-MOUSEMOTION: pos motion cell cellmotion
-
+  <p>Flushes the event queue and returns the list of events.</p>
+  <p>This function returns Event objects that can be ID'd and sorted with 
+  their type attribute:</p>
+<pre class="literalblock">
+   for event in tdl.event.get():
+       if event.type == 'QUIT':
+           raise SystemExit()
+       elif event.type == 'MOUSEDOWN':
+           print('Mouse button %i clicked at %i, %i' % (event.button, event.pos[0], event.pos[1]))
+       elif event.type == 'KEYDOWN':
+           print('Key #%i &quot;%s&quot; pressed' % (event.key, event.char))
 </pre>
+  <p>Here is a list of events and their attributes:</p>
+  <ul>
+    <li>
+      QUIT
+    </li>
+    <li>
+      KEYDOWN: key char keyname alt ctrl shift lalt lctrl ralt rctrl
+    </li>
+    <li>
+      KEYUP: key char keyname alt ctrl shift lalt lctrl ralt rctrl
+    </li>
+    <li>
+      MOUSEDOWN: button pos cell
+    </li>
+    <li>
+      MOUSEUP: button pos cell
+    </li>
+    <li>
+      MOUSEMOTION: pos motion cell cellmotion
+    </li>
+  </ul>
   <dl class="fields">
+    <dt>Returns: iterator</dt>
   </dl>
 </td></tr></table>
 </div>
@@ -270,8 +302,10 @@ MOUSEMOTION: pos motion cell cellmotion
     </td>
   </tr></table>
   
-  <p>Waits until the user presses a key.  Then returns a KeyDown event.</p>
+  <p>Waits until the user presses a key.  Then returns a <a 
+  href="tdl.event.KeyDown-class.html" class="link">KeyDown</a> event.</p>
   <dl class="fields">
+    <dt>Returns: <a href="tdl.event.KeyDown-class.html" class="link">KeyDown</a></dt>
   </dl>
 </td></tr></table>
 </div>
@@ -308,7 +342,7 @@ MOUSEMOTION: pos motion cell cellmotion
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Thu Sep 27 13:02:21 2012</a>
+    3.0.1 on Sun Sep 30 01:30:49 2012</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

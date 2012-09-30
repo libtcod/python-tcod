@@ -20,6 +20,7 @@ tdl.setFPS(24)
 
 while 1:
     for event in tdl.event.get():
+        print(event)
         if event.type == 'QUIT':
             raise SystemExit()
         elif event.type == 'MOUSEMOTION':
