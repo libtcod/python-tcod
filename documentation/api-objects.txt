@@ -120,7 +120,7 @@ tdl.event.Event	tdl.event.Event-class.html
 tdl.event.Event.__repr__	tdl.event.Event-class.html#__repr__
 tdl.event.Event.type	tdl.event.Event-class.html#type
 tdl.event.KeyDown	tdl.event.KeyDown-class.html
-tdl.event.KeyEvent.ctrl	tdl.event.KeyEvent-class.html#ctrl
+tdl.event.KeyEvent.control	tdl.event.KeyEvent-class.html#control
 tdl.event.KeyEvent.rightCtrl	tdl.event.KeyEvent-class.html#rightCtrl
 tdl.event.KeyEvent.alt	tdl.event.KeyEvent-class.html#alt
 tdl.event.KeyEvent.__init__	tdl.event.KeyEvent-class.html#__init__
@@ -134,7 +134,7 @@ tdl.event.KeyEvent.shift	tdl.event.KeyEvent-class.html#shift
 tdl.event.KeyEvent.keyname	tdl.event.KeyEvent-class.html#keyname
 tdl.event.Event.__repr__	tdl.event.Event-class.html#__repr__
 tdl.event.KeyEvent	tdl.event.KeyEvent-class.html
-tdl.event.KeyEvent.ctrl	tdl.event.KeyEvent-class.html#ctrl
+tdl.event.KeyEvent.control	tdl.event.KeyEvent-class.html#control
 tdl.event.KeyEvent.char	tdl.event.KeyEvent-class.html#char
 tdl.event.KeyEvent.alt	tdl.event.KeyEvent-class.html#alt
 tdl.event.KeyEvent.__init__	tdl.event.KeyEvent-class.html#__init__
@@ -148,7 +148,7 @@ tdl.event.KeyEvent.shift	tdl.event.KeyEvent-class.html#shift
 tdl.event.KeyEvent.keyname	tdl.event.KeyEvent-class.html#keyname
 tdl.event.Event.__repr__	tdl.event.Event-class.html#__repr__
 tdl.event.KeyUp	tdl.event.KeyUp-class.html
-tdl.event.KeyEvent.ctrl	tdl.event.KeyEvent-class.html#ctrl
+tdl.event.KeyEvent.control	tdl.event.KeyEvent-class.html#control
 tdl.event.KeyEvent.rightCtrl	tdl.event.KeyEvent-class.html#rightCtrl
 tdl.event.KeyEvent.alt	tdl.event.KeyEvent-class.html#alt
 tdl.event.KeyEvent.__init__	tdl.event.KeyEvent-class.html#__init__

@@ -22,7 +22,7 @@ def getVersion():
     if ':' in REVISION:
         REVISION = REVISION.split(':')[-1] # take "latest" revision, I think
     REVISION = ''.join((c for c in REVISION if c.isdigit())) # remove letters
-    VERSION = '1.0r%s' % REVISION
+    VERSION = '1.1r%s' % REVISION
     open('tdl/VERSION', 'w').write(VERSION)
     return VERSION
 

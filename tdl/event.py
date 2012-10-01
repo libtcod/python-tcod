@@ -9,8 +9,9 @@
      - MOUSEUP: button pos cell
      - MOUSEMOTION: pos cell motion cellmotion
     
-    You will likely want to use the L{tdl.event.get} function but you can still
-    use L{keyWait} and L{isWindowClosed} to control your entire program.
+    You will likely want to use the L{event.get} function or L{event.App}
+    class but you can still use L{keyWait} and L{isWindowClosed} to control
+    your entire program.
 """
 
 import time
@@ -63,17 +64,22 @@ class Event(object):
     #    return tuple((getattr(self, attr) for attr in self.__slots__))
 
 class Quit(Event):
+    """For when the window is closed by the user.
+    """
     __slots__ = ()
     type = 'QUIT'
 
 class KeyEvent(Event):
-    __slots__ = ('key', 'keyname', 'char', 'shift', 'alt', 'ctrl',
+    __slots__ = ('key', 'keyname', 'char', 'shift', 'alt', 'control',
                  'leftAlt', 'leftCtrl', 'rightAlt', 'rightCtrl')
 
     def __init__(self, key, char, lalt, lctrl, ralt, rctrl, shift):
         self.key = key
+        """Look up the use of L{keyname} instead."""
         self.keyname = _keynames[key]
-        """A human readable version of key"""
+        """A human readable version of key
+        
+        Can be one of 'NONE', 'ESCAPE', 'BACKSPACE', 'TAB', 'ENTER', 'SHIFT', 'CONTROL', 'ALT', 'PAUSE', 'CAPSLOCK', 'PAGEUP', 'PAGEDOWN', 'END', 'HOME', 'UP', 'LEFT', 'RIGHT', 'DOWN', 'PRINTSCREEN', 'INSERT', 'DELETE', 'LWIN', 'RWIN', 'APPS', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'KP0', 'KP1', 'KP2', 'KP3', 'KP4', 'KP5', 'KP6', 'KP7', 'KP8', 'KP9', 'KPADD', 'KPSUB', 'KPDIV', 'KPMUL', 'KPDEC', 'KPENTER', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'NUMLOCK', 'SCROLLLOCK', 'SPACE', 'CHAR'"""
         char = char if isinstance(char, str) else char.decode()
         self.char = char.replace('\x00', '') # change null to empty string
         """A single character string of the letter or symbol pressed.
@@ -86,14 +92,18 @@ class KeyEvent(Event):
         "True if shift was held down during this event."
         self.alt = bool(lalt or ralt)
         "True if alt was held down during this event."
-        self.ctrl = bool(lctrl or rctrl)
+        self.control = bool(lctrl or rctrl)
         "True if control was held down during this event."
 
 class KeyDown(KeyEvent):
+    """For when the user presses a key on the keyboard or a key repeats.
+    """
     __slots__ = ()
     type = 'KEYDOWN'
 
 class KeyUp(KeyEvent):
+    """For when the user releases a key on the keyboard.
+    """
     __slots__ = ()
     type = 'KEYUP'
 
@@ -102,55 +112,101 @@ class MouseButtonEvent(Event):
 
     def __init__(self, button, pos, cell):
         self.button = button
+        "1=left, 2=middle, 3=right, 4=scrollUp, 5=scrollDown"
         self.pos = pos
+        "(x, y) position of the mouse on the screen"
         self.cell = cell
+        "(x, y) position of the mouse snapped to a cell on the root console"
 
 class MouseDown(MouseButtonEvent):
+    """For when a button is pressed."""
     __slots__ = ()
     type = 'MOUSEDOWN'
 
 class MouseUp(MouseButtonEvent):
+    """For when a button is released."""
     __slots__ = ()
     type = 'MOUSEUP'
 
 class MouseMotion(Event):
+    """For when the mouse is moved."""
     __slots__ = ('pos',  'motion', 'cell', 'cellmotion')
     type = 'MOUSEMOTION'
 
     def __init__(self, pos, cell, motion, cellmotion):
         self.pos = pos
+        "(x, y) position of the mouse on the screen"
         self.cell = cell
+        "(x, y) position of the mouse snapped to a cell on the root console"
         self.motion = motion
+        "(x, y) motion of the mouse on the screen"
         self.cellmotion = cellmotion
+        "(x, y) mostion of the mouse moving over cells on the root console"
 
 class App(object):
+    """
+    
+     - ev_*: Events are passed to methods based on their L{Event.type} attribute.  If an event
+       type is 'KEYDOWN' for example the event will be sent to the ev_KEYDOWN method
+       with the event as a parameter.
+    
+     - key_*: When a key is pressed another method will be called based on the
+       keyname attribute.  For example the 'ENTER' keyname will call key_ENTER
+       with the associated L{KeyDown} event as its parameter.
+    
+    """
     __slots__ = ('__running')
     
     def ev_QUIT(self, event):
+        """Unless overridden this method raises a SystemExit exception closing
+        the program."""
         raise SystemExit()
     
     def ev_KEYDOWN(self, event):
-        pass
+        "Override this method to handle this event."
     
     def ev_KEYUP(self, event):
-        pass
+        "Override this method to handle this event."
     
     def ev_MOUSEDOWN(self, event):
-        pass
+        "Override this method to handle this event."
     
     def ev_MOUSEUP(self, event):
-        pass
+        "Override this method to handle this event."
     
     def ev_MOUSEMOTION(self, event):
-        pass
+        "Override this method to handle this event."
     
-    def update(self, dt):
+    def update(self, deltaTime):
+        """Override this method to handle per frame logic and drawing.
+        
+        @type deltaTime: float
+        @param deltaTime: This parameter tells the amount of time passed since
+                          the last call measured in seconds as a floating point
+                          number.
+        """
         pass
         
     def suspend(self):
+        """When called the App will begin to return control to where
+        L{App.run} was called.
+        
+        No further events are processed and the L{App.update} method will be
+        called one last time before exiting
+        (unless suspended during a call to L{App.update}.)
+        """
         self._running = False
         
     def run(self):
+        """Delegate control over to this App instance.  This function will
+        process all events and send them to the special methods ev_* and key_*.
+        
+        A call to L{App.suspend} will return the control flow back to where
+        this function is called.  And then the App can be run again.
+        But a single App instance can not be run multiple times simultaneously.
+        """
+        if self.__running:
+            raise _tdl.TDLError('An App can not be run multiple times simultaneously')
         self.__running = True
         prevTime = time.clock()
         while self._running:
@@ -226,22 +282,8 @@ def _processEvents():
 def get():
     """Flushes the event queue and returns the list of events.
     
-    This function returns Event objects that can be ID'd and sorted with their type attribute::
-        for event in tdl.event.get():
-            if event.type == 'QUIT':
-                raise SystemExit()
-            elif event.type == 'MOUSEDOWN':
-                print('Mouse button %i clicked at %i, %i' % (event.button, event.pos[0], event.pos[1]))
-            elif event.type == 'KEYDOWN':
-                print('Key #%i "%s" pressed' % (event.key, event.char))
-    
-    Here is a list of events and their attributes:
-     - QUIT
-     - KEYDOWN: key char keyname alt ctrl shift lalt lctrl ralt rctrl
-     - KEYUP: key char keyname alt ctrl shift lalt lctrl ralt rctrl
-     - MOUSEDOWN: button pos cell
-     - MOUSEUP: button pos cell
-     - MOUSEMOTION: pos motion cell cellmotion
+    This function returns L{Event} objects that can be indentified by their
+    type attribute or their class.
     
     @rtype: iterator
     """
