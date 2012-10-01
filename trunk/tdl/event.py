@@ -1,17 +1,12 @@
 """
     This module handles user input.
-
-    Here's a quick reference to Event types and their attributes:
-     - QUIT
-     - KEYDOWN: keyname key char alt ctrl shift lalt lctrl ralt rctrl
-     - KEYUP: keyname key char alt ctrl shift lalt lctrl ralt rctrl
-     - MOUSEDOWN: button pos cell
-     - MOUSEUP: button pos cell
-     - MOUSEMOTION: pos cell motion cellmotion
+    
+    String constants can be found in the variable details of L{KeyEvent.key},
+    L{MouseButtonEvent.button}, and L{Event.type}.
     
     You will likely want to use the L{event.get} function or L{event.App}
-    class but you can still use L{keyWait} and L{isWindowClosed} to control
-    your entire program.
+    class but you can still use L{event.keyWait} and L{event.isWindowClosed}
+    to control your entire program.
 """
 
 import time
@@ -28,19 +23,20 @@ _mousem = 0
 _mouser = 0
 
 # this interpets the constants from libtcod and makes a key -> keyname dictionary
-def _parse_keynames(module):
-    """returns a dictionary mapping of human readable key names to their keycodes
+def _parseKeyNames(module):
+    """
+    returns a dictionary mapping of human readable key names to their keycodes
     this parses constants with the names of K_* and makes code=name pairs
     this is for KeyEvent.keyname variable and that enables things like:
     if (event.keyname == 'PAGEUP'):
     """
-    _keynames = {}
+    _keyNames = {}
     for attr in dir(module): # from the modules variables
         if attr[:2] == 'K_': # get the K_* constants
-            _keynames[getattr(_tcod, attr)] = attr[2:] # and make CODE=NAME pairs
-    return _keynames
+            _keyNames[getattr(_tcod, attr)] = attr[2:] # and make CODE=NAME pairs
+    return _keyNames
 
-_keynames = _parse_keynames(_tcod)
+_keyNames = _parseKeyNames(_tcod)
     
 class Event(object):
     __slots__ = ()
@@ -51,7 +47,7 @@ class Event(object):
     """
 
     def __repr__(self):
-        """List an events public attributes in print calls
+        """List an events public attributes in print calls.
         """
         attrdict = {}
         for varname in dir(self):
@@ -59,12 +55,9 @@ class Event(object):
                 continue
             attrdict[varname] = self.__getattribute__(varname)
         return '%s Event %s' % (self.__class__.__name__, repr(attrdict))
-    
-    #def __tuple__(self):
-    #    return tuple((getattr(self, attr) for attr in self.__slots__))
 
 class Quit(Event):
-    """For when the window is closed by the user.
+    """Fired when the window is closed by the user.
     """
     __slots__ = ()
     type = 'QUIT'
@@ -74,62 +67,78 @@ class KeyEvent(Event):
                  'leftAlt', 'leftCtrl', 'rightAlt', 'rightCtrl')
 
     def __init__(self, key, char, lalt, lctrl, ralt, rctrl, shift):
-        self.key = key
-        """Look up the use of L{keyname} instead."""
-        self.keyname = _keynames[key]
-        """A human readable version of key
+        self.key = _keyNames[key]
+        """Human readable name of the key pressed.
         
-        Can be one of 'NONE', 'ESCAPE', 'BACKSPACE', 'TAB', 'ENTER', 'SHIFT', 'CONTROL', 'ALT', 'PAUSE', 'CAPSLOCK', 'PAGEUP', 'PAGEDOWN', 'END', 'HOME', 'UP', 'LEFT', 'RIGHT', 'DOWN', 'PRINTSCREEN', 'INSERT', 'DELETE', 'LWIN', 'RWIN', 'APPS', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'KP0', 'KP1', 'KP2', 'KP3', 'KP4', 'KP5', 'KP6', 'KP7', 'KP8', 'KP9', 'KPADD', 'KPSUB', 'KPDIV', 'KPMUL', 'KPDEC', 'KPENTER', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'NUMLOCK', 'SCROLLLOCK', 'SPACE', 'CHAR'"""
+        Can be one of
+        'NONE', 'ESCAPE', 'BACKSPACE', 'TAB', 'ENTER', 'SHIFT', 'CONTROL',
+        'ALT', 'PAUSE', 'CAPSLOCK', 'PAGEUP', 'PAGEDOWN', 'END', 'HOME', 'UP',
+        'LEFT', 'RIGHT', 'DOWN', 'PRINTSCREEN', 'INSERT', 'DELETE', 'LWIN',
+        'RWIN', 'APPS', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        'KP0', 'KP1', 'KP2', 'KP3', 'KP4', 'KP5', 'KP6', 'KP7', 'KP8', 'KP9',
+        'KPADD', 'KPSUB', 'KPDIV', 'KPMUL', 'KPDEC', 'KPENTER', 'F1', 'F2',
+        'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12',
+        'NUMLOCK', 'SCROLLLOCK', 'SPACE', 'CHAR'
+        @type: string"""
         char = char if isinstance(char, str) else char.decode()
         self.char = char.replace('\x00', '') # change null to empty string
         """A single character string of the letter or symbol pressed.
-        Special characters like delete and return are not cross platform."""
+        Special characters like delete and return are not cross platform.
+        @type: string"""
         self.leftAlt = bool(lalt)
         self.rightAlt = bool(ralt)
         self.leftCtrl = bool(lctrl)
         self.rightCtrl = bool(rctrl)
         self.shift = bool(shift)
-        "True if shift was held down during this event."
+        """True if shift was held down during this event.
+        @type: boolean"""
         self.alt = bool(lalt or ralt)
-        "True if alt was held down during this event."
+        """True if alt was held down during this event.
+        @type: boolean"""
         self.control = bool(lctrl or rctrl)
-        "True if control was held down during this event."
+        """True if control was held down during this event.
+        @type: boolean"""
 
 class KeyDown(KeyEvent):
-    """For when the user presses a key on the keyboard or a key repeats.
+    """Fired when the user presses a key on the keyboard or a key repeats.
     """
     __slots__ = ()
     type = 'KEYDOWN'
 
 class KeyUp(KeyEvent):
-    """For when the user releases a key on the keyboard.
+    """Fired when the user releases a key on the keyboard.
     """
     __slots__ = ()
     type = 'KEYUP'
 
+_mouseNames = {1: 'LEFT', 2: 'MIDDLE', 3: 'RIGHT', 4: 'SCROLLUP', 5: 'SCROLLDOWN'}
 class MouseButtonEvent(Event):
     __slots__ = ('button', 'pos', 'cell')
 
     def __init__(self, button, pos, cell):
-        self.button = button
-        "1=left, 2=middle, 3=right, 4=scrollUp, 5=scrollDown"
+        self.button = _mouseNames[button]
+        """Can be one of
+        'LEFT', 'MIDDLE', 'RIGHT', 'SCROLLUP', 'SCROLLDOWN'
+        @type: string"""
         self.pos = pos
-        "(x, y) position of the mouse on the screen"
+        """(x, y) position of the mouse on the screen
+        @type: (int, int)"""
         self.cell = cell
-        "(x, y) position of the mouse snapped to a cell on the root console"
+        """(x, y) position of the mouse snapped to a cell on the root console
+        @type: (int, int)"""
 
 class MouseDown(MouseButtonEvent):
-    """For when a button is pressed."""
+    """Fired when a button is pressed."""
     __slots__ = ()
     type = 'MOUSEDOWN'
 
 class MouseUp(MouseButtonEvent):
-    """For when a button is released."""
+    """Fired when a button is released."""
     __slots__ = ()
     type = 'MOUSEUP'
 
 class MouseMotion(Event):
-    """For when the mouse is moved."""
+    """Fired when the mouse is moved."""
     __slots__ = ('pos',  'motion', 'cell', 'cellmotion')
     type = 'MOUSEMOTION'
 
