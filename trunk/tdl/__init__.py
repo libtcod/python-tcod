@@ -96,7 +96,7 @@ class _MetaConsole(object):
     """
     __slots__ = ('width', 'height', '__weakref__', '__dict__')
     
-    def drawChar(self, x, y, char=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def drawChar(self, x, y, char, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a single character.
 
         char should be an integer, single character string, or None
@@ -145,7 +145,7 @@ class _MetaConsole(object):
                 x = 0
                 y += 1
     
-    def drawRect(self, x, y, width, height, string=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def drawRect(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a rectangle starting from x and y and extending to width and
         height.  If width or height are None then it will extend to the edge
         of the console.  The rest are the same as drawChar.
@@ -158,7 +158,7 @@ class _MetaConsole(object):
             for cellX in range(x, x + width):
                 self._setChar(cellX, cellY, char, fgcolor, bgcolor)
         
-    def drawFrame(self, x, y, width, height, string=None, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def drawFrame(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         "Similar to drawRect but only draws the outline of the rectangle"
         x, y, width, height = self._normalizeRect(x, y, width, height)
         assert _verify_colors(fgcolor, bgcolor)
@@ -330,12 +330,11 @@ class _MetaConsole(object):
         # the uncoverX/Y with coverY/X to make what's left of the uncovered
         # area.  Explaining it makes it mush easier to do now.
         
-        # But first we need to blit so we have an area to clear.
+        # But first we need to blit.
         x, width, srcx = getSlide(x, width)
         y, height, srcy = getSlide(y, height)
         self.blit(self, x, y, width, height, srcx, srcy)
         
-        # let's do this
         if uncoverX: # clear sides (0x20 is space)
             self.drawRect(uncoverX[0], coverY[0], uncoverX[1], coverY[1], 0x20)
         if uncoverY: # clear top/bottom
@@ -343,17 +342,13 @@ class _MetaConsole(object):
         if uncoverX and uncoverY: # clear corner
             self.drawRect(uncoverX[0], uncoverY[0], uncoverX[1], uncoverY[1], 0x20)
         
-        # you know, now that I think about it.  I could of just copied it
-        # into another console instance and cleared the whole thing.
-        # not only would that have been a better idea.  It would of been
-        # faster too. (but only faster for Console's)
+    def __contains__(self, position):
+        """Checks if a position is drawable on this console.
         
-    def __contains__(self, key):
-        """
         It's likely that you'll want to know if a point on the console can be
         drawn on.  You can use ((x, y) in console) to check.
         """
-        x, y = key
+        x, y = position
         return (0 <= x < self.width) and (0 <= y < self.height)
         
     def _drawable(self, x, y):
@@ -410,7 +405,7 @@ class Console(_MetaConsole):
                 _rootconsole = None
             _lib.TCOD_console_delete(self)
         except StandardError:
-            pass
+            pass # I forget why I put this here but I'm to afraid to delete it
 
     def _replace(self, console):
         """Used internally
@@ -460,10 +455,13 @@ class Console(_MetaConsole):
             _setback(self, x, y, bgcolor, bgblend)
 
     def getChar(self, x, y):
-        """Return the character and colors of a cell as (ch, fg, bg)
+        """Return the character and colors of a cell as
+        (char, fgcolor, bgcolor)
 
         The charecter is returned as a number.
         each color is returned as a tuple
+        
+        @rtype: (int, tuple, tuple)
         """
         self._drawable(x, y)
         char = _lib.TCOD_console_get_char(self, x, y)
@@ -682,12 +680,15 @@ def setTitle(title):
         raise TDLError('Not initilized.  Set title with tdl.init')
     _lib.TCOD_console_set_window_title(_format_string(title))
 
-def screenshot(file=None):
-    """Capture the screen and place it in file.
+def screenshot(path):
+    """Capture the screen and save it as a png file
 
-    file can be a file-like object or a filepath to save the screenshot
-    if file is none then file will be placed in the current folder with
-    the names: screenshot001.png, screenshot002.png, ...
+    @type path: string
+    @param path: The filepath to save the screenshot.
+    
+                 If path is None then the image will be placed in the current
+                 folder with the names:
+                 screenshot001.png, screenshot002.png, ...
     """
     if not _rootinitialized:
         raise TDLError('Initialize first with tdl.init')

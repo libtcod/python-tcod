@@ -107,6 +107,24 @@ object --+
       
     </td>
   </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="tdl.event.Event-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      List an events public attributes in print calls
+      <em>(Inherited from <a href="tdl.event.Event-class.html">tdl.event.Event</a>)</em></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl.event-pysrc.html#Event.__repr__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
   <tr>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
@@ -124,26 +142,6 @@ object --+
       </p>
     </td>
   </tr>
-<tr bgcolor="#e8f0f8" >
-  <th colspan="2" class="group-header"
-    >&nbsp;&nbsp;&nbsp;&nbsp;Inherited from <a href="tdl.event.Event-class.html">Event</a></th></tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="tdl.event.Event-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      List an events public attributes in print calls</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="tdl.event-pysrc.html#Event.__repr__">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
 </table>
 <!-- ==================== CLASS VARIABLES ==================== -->
 <a name="section-ClassVariables"></a>
@@ -153,15 +151,13 @@ object --+
   <td align="left" colspan="2" class="table-header">
     <span class="table-header">Class Variables</span></td>
 </tr>
-<tr bgcolor="#e8f0f8" >
-  <th colspan="2" class="group-header"
-    >&nbsp;&nbsp;&nbsp;&nbsp;Inherited from <a href="tdl.event.Event-class.html">Event</a></th></tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="tdl.event.Event-class.html#type" class="summary-name">type</a> = <code title="None">None</code><br />
       String constant representing the type of event.
+      <em>(Inherited from <a href="tdl.event.Event-class.html">tdl.event.Event</a>)</em>
     </td>
   </tr>
 </table>
@@ -177,7 +173,16 @@ object --+
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="keyname"></a><span class="summary-name">keyname</span><br />
+        <a name="key"></a><span class="summary-name">key</span><br />
+      Look up the use of <a href="tdl.event.KeyEvent-class.html#keyname" 
+      class="link">keyname</a> instead.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.event.KeyEvent-class.html#keyname" class="summary-name">keyname</a><br />
       A human readable version of key
     </td>
   </tr>
@@ -209,7 +214,7 @@ object --+
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="ctrl"></a><span class="summary-name">ctrl</span><br />
+        <a name="control"></a><span class="summary-name">control</span><br />
       True if control was held down during this event.
     </td>
   </tr>
@@ -222,13 +227,6 @@ object --+
   <td align="left" colspan="2" class="table-header">
     <span class="table-header">Properties</span></td>
 </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="key"></a><span class="summary-name">key</span>
-    </td>
-  </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -315,6 +313,25 @@ object --+
     <span class="table-header">Instance Variable Details</span></td>
 </tr>
 </table>
+<a name="keyname"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">keyname</h3>
+  <p>A human readable version of key</p>
+  <p>Can be one of 'NONE', 'ESCAPE', 'BACKSPACE', 'TAB', 'ENTER', 'SHIFT', 
+  'CONTROL', 'ALT', 'PAUSE', 'CAPSLOCK', 'PAGEUP', 'PAGEDOWN', 'END', 
+  'HOME', 'UP', 'LEFT', 'RIGHT', 'DOWN', 'PRINTSCREEN', 'INSERT', 'DELETE',
+  'LWIN', 'RWIN', 'APPS', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+  'KP0', 'KP1', 'KP2', 'KP3', 'KP4', 'KP5', 'KP6', 'KP7', 'KP8', 'KP9', 
+  'KPADD', 'KPSUB', 'KPDIV', 'KPMUL', 'KPDEC', 'KPENTER', 'F1', 'F2', 'F3',
+  'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'NUMLOCK', 
+  'SCROLLLOCK', 'SPACE', 'CHAR'</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
 <a name="char"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -360,7 +377,7 @@ object --+
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Sep 30 01:30:49 2012</a>
+    3.0.1 on Sun Sep 30 17:28:55 2012</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
