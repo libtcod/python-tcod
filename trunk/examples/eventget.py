@@ -31,7 +31,7 @@ while 1:
         
         textWindow.scroll(0, -1)
         if event.type == 'KEYDOWN' or event.type == 'KEYUP':
-            textWindow.drawStr(0, HEIGHT-3, '%s event - key=%.2i char=%s keyname=%s alt=%i ctrl=%i shift=%i' % (event.type.ljust(7), event.key, repr(event.char), repr(event.keyname), event.alt, event.ctrl, event.shift))
+            textWindow.drawStr(0, HEIGHT-3, '%s event - char=%s key=%s alt=%i control=%i shift=%i' % (event.type.ljust(7), repr(event.char), repr(event.key), event.alt, event.control, event.shift))
         elif event.type == 'MOUSEDOWN' or event.type == 'MOUSEUP':
-            textWindow.drawStr(0, HEIGHT-3, '%s event - pos=%i,%i cell=%i,%i button=%i' % ((event.type.ljust(9),) + event.pos + event.cell + (event.button,)))
+            textWindow.drawStr(0, HEIGHT-3, '%s event - pos=%i,%i cell=%i,%i button=%s' % ((event.type.ljust(9),) + event.pos + event.cell + (repr(event.button),)))
     tdl.flush()

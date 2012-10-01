@@ -56,7 +56,7 @@ if __name__ == '__main__':
             if event.type == 'QUIT':
                 raise SystemExit()
             if event.type == 'KEYDOWN':
-                if event.keyname == 'ENTER':
+                if event.key == 'ENTER':
                     sys.stderr = newerr
                     try:
                         console.drawRect(0, HEIGHT-1, None, 1, None, (255, 255, 255), (0, 0, 0))
@@ -74,9 +74,7 @@ if __name__ == '__main__':
                     if buffer not in commands:
                         commands.append(buffer)
                     buffer = ''
-                elif event.ctrl:
-                    pass
-                elif event.keyname == 'BACKSPACE':
+                elif event.key == 'BACKSPACE':
                     if cursor == 0:
                         continue
                     if buffer[:cursor][-4:] == '    ':
@@ -85,28 +83,28 @@ if __name__ == '__main__':
                     elif buffer:
                         buffer = buffer[:cursor-1] + buffer[cursor:]
                         cursor -= 1
-                elif event.keyname == 'DELETE':
+                elif event.key == 'DELETE':
                     buffer = buffer[:cursor] + buffer[cursor+1:]
-                elif event.keyname == 'LEFT':
+                elif event.key == 'LEFT':
                     cursor -= 1
-                elif event.keyname == 'RIGHT':
+                elif event.key == 'RIGHT':
                     cursor += 1
-                elif event.keyname == 'HOME':
+                elif event.key == 'HOME':
                     cursor = 0
-                elif event.keyname == 'END':
+                elif event.key == 'END':
                     cursor = len(buffer)
-                elif event.keyname == 'UP':
+                elif event.key == 'UP':
                     commands.insert(0, buffer)
                     buffer = commands.pop()
                     cursor = len(buffer)
-                elif event.keyname == 'DOWN':
+                elif event.key == 'DOWN':
                     commands.append(buffer)
                     buffer = commands.pop(0)
                     cursor = len(buffer)
-                elif event.keyname == 'TAB':
+                elif event.key == 'TAB':
                     buffer = buffer[:cursor] + '    ' + buffer[cursor:]
                     cursor += 4
-                elif event.keyname == 'ESCAPE':
+                elif event.key == 'ESCAPE':
                     raise SystemExit()
                 elif event.char:
                     buffer = buffer[:cursor] + event.char + buffer[cursor:]
