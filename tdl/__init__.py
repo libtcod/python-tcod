@@ -7,12 +7,13 @@ import os
 import ctypes
 import weakref
 import array
+import itertools
 
 from . import event
 from .__tcod import _lib, _Color, _unpackfile
 
 _IS_PYTHON3 = (sys.version_info[0] == 3)
-#_encoding = 'cp437'
+_USE_FILL = False 'Set to True to use the libtcod fill optimization.  This is actually slower than the normal mode.'
 
 def _format_string(string): # still used for filepaths, and that's about it
     "changes string into bytes if running in python 3, for sending to ctypes"
@@ -22,7 +23,6 @@ def _format_string(string): # still used for filepaths, and that's about it
 
 #def _encodeString(string):
 #    pass
-
 
 def _formatChar(char):
     """Prepares a single character for passing to ctypes calls, needs to return
@@ -380,8 +380,9 @@ class Console(_MetaConsole):
         self._as_parameter_ = _lib.TCOD_console_new(width, height)
         self.width = width
         self.height = height
+        self._initArrays()
         self.clear()
-
+        
     @classmethod
     def _newConsole(cls, console):
         """Make a Console instance, from a console ctype"""
@@ -389,9 +390,22 @@ class Console(_MetaConsole):
         self._as_parameter_ = console
         self.width = _lib.TCOD_console_get_width(self)
         self.height = _lib.TCOD_console_get_height(self)
-        self.cursorX = self.cursorY = 0
+        self._initArrays()
         self.clear()
         return self
+        
+    def _initArrays(self):
+        if not _USE_FILL:
+            return
+        # used for the libtcod fill optimization
+        IntArray = ctypes.c_int * (self.width * self.height)
+        self.chArray = IntArray()
+        self.fgArrays = (IntArray(),
+                         IntArray(),
+                         IntArray())
+        self.bgArrays = (IntArray(),
+                         IntArray(),
+                         IntArray())
         
     def __del__(self):
         """
@@ -437,10 +451,18 @@ class Console(_MetaConsole):
         _lib.TCOD_console_set_default_foreground(self, _formatColor(fgcolor))
         _lib.TCOD_console_clear(self)
     
-    def _setChar(self, x, y, char, fgcolor=None, bgcolor=None, bgblend=1):
+    def _setCharFill(self, x, y, char, fgcolor=None, bgcolor=None):
+        """An optimized version using the fill wrappers that didn't work out to be any faster"""
+        index = x + y * self.width
+        self.chArray[index] = char
+        for channel, color in zip(itertools.chain(self.fgArrays, self.bgArrays),
+                                  itertools.chain(fgcolor, bgcolor)):
+            channel[index] = color
+
+    def _setCharCall(self, x, y, char, fgcolor=None, bgcolor=None, bgblend=1):
         """
-        Sets a character without moving the virtual cursor, this is called
-        often and is designed to be as fast as possible.
+        Sets a character.
+        This is called often and is designed to be as fast as possible.
         
         Because of the need for speed this function will do NO TYPE CHECKING
         AT ALL, it's up to the drawing functions to use the functions:
@@ -453,6 +475,11 @@ class Console(_MetaConsole):
             _setfore(self, x, y, fgcolor)
         if bgcolor is not None:
             _setback(self, x, y, bgcolor, bgblend)
+            
+    if _USE_FILL:
+        _setChar = _setCharFill
+    else:
+        _setChar = _setCharCall
 
     def getChar(self, x, y):
         """Return the character and colors of a cell as
@@ -590,15 +617,13 @@ def flush():
     """
     if not _rootinitialized:
         raise TDLError('Cannot flush without first initializing with tdl.init')
-    
-    # old hack to prevent locking up on old libtcod
-    # you can probably delete all autoflush releated stuff
-    #if event._autoflush and not event._eventsflushed:
-    #    event.get()
-    #else: # do not flush events after the user starts using them
-    #    event._autoflush = False
-    
-    #event._eventsflushed = False
+        
+    if _USE_FILL:
+        console = _rootconsole()
+        _lib.TCOD_console_fill_background(console, *console.bgArrays)
+        _lib.TCOD_console_fill_foreground(console, *console.fgArrays)
+        _lib.TCOD_console_fill_char(console, console.chArray)
+        
     _lib.TCOD_console_flush()
 
 def setFont(path, tileWidth, tileHeight, colomn=False,
@@ -741,5 +766,5 @@ def forceResolution(width, height):
     """
     _lib.TCOD_sys_force_fullscreen_resolution(width, height)
 
-__all__ = [_var for _var in locals().keys() if _var[0] != '_' and _var not in ['sys', 'os', 'ctypes', 'array', 'weakref']]
+__all__ = [_var for _var in locals().keys() if _var[0] != '_' and _var not in ['sys', 'os', 'ctypes', 'array', 'weakref', 'itertools']]
 __all__ += ['_MetaConsole'] # keep this object public to show the documentation in epydoc

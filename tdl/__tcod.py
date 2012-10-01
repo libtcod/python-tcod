@@ -465,4 +465,12 @@ _lib.TCOD_sys_wait_for_event.argtypes = (c_int, POINTER(_Key), POINTER(_Mouse))
 _lib.TCOD_sys_check_for_event.restype = c_int
 _lib.TCOD_sys_check_for_event.argtypes = (c_int, POINTER(_Key), POINTER(_Mouse))
 
+# these functions should perform ultra fast once I set them up
+_lib.TCOD_console_fill_background.restype = None
+_lib.TCOD_console_fill_background.argtypes = (TCOD_console_t, POINTER(c_int), POINTER(c_int), POINTER(c_int))
+_lib.TCOD_console_fill_foreground.restype = None
+_lib.TCOD_console_fill_foreground.argtypes = (TCOD_console_t, POINTER(c_int), POINTER(c_int), POINTER(c_int))
+_lib.TCOD_console_fill_char.restype = None
+_lib.TCOD_console_fill_char.argtypes = (TCOD_console_t, POINTER(c_int));
+
 __all__ = ()

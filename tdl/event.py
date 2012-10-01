@@ -128,12 +128,12 @@ class MouseButtonEvent(Event):
         @type: (int, int)"""
 
 class MouseDown(MouseButtonEvent):
-    """Fired when a button is pressed."""
+    """Fired when a mouse button is pressed."""
     __slots__ = ()
     type = 'MOUSEDOWN'
 
 class MouseUp(MouseButtonEvent):
-    """Fired when a button is released."""
+    """Fired when a mouse button is released."""
     __slots__ = ()
     type = 'MOUSEUP'
 
