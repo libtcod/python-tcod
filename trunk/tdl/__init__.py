@@ -1,5 +1,26 @@
 """
+    The documentation for python-tdl.  A Pythonic port of
+    U{libtcod<http://doryen.eptalys.net/libtcod/>}.
     
+    Getting Started
+    ===============
+      Once the library is imported you can load the font you want to use with
+      L{tdl.setFont}.  This is optional and can be skipped to get a decent
+      default font.  After that you call L{tdl.init} to set the size of the
+      window and get the root console in return.  This console is the canvas
+      to what will appear on the screen.
+    
+    Drawing
+    =======
+      Once you have the root console from L{tdl.init} you can start drawing on
+      it using a method such as L{Console.drawChar}.  When using this method
+      you can have the char parameter be an intiger or a single character
+      string.  The fgcolor and bgcolor parameters expect a three item list
+      [red, green, blue] with integers in the 0-255 range with [0, 0, 0] being
+      black and [255, 255, 255] being white.  Or instead you can use None for
+      any of the three parameters to tell the library to keep what is at that
+      spot instead of overwriting it.  After the drawing functions are called
+      a call to L{tdl.flush} will update the screen.
 """
 
 import sys
@@ -13,7 +34,8 @@ from . import event
 from .__tcod import _lib, _Color, _unpackfile
 
 _IS_PYTHON3 = (sys.version_info[0] == 3)
-_USE_FILL = False 'Set to True to use the libtcod fill optimization.  This is actually slower than the normal mode.'
+_USE_FILL = False
+'Set to True to use the libtcod fill optimization.  This is actually slower than the normal mode.'
 
 def _format_string(string): # still used for filepaths, and that's about it
     "changes string into bytes if running in python 3, for sending to ctypes"
@@ -68,7 +90,7 @@ def _iscolor(color):
         return True
     if isinstance(color, (tuple, list, _Color)):
         return len(color) == 3
-    if color.__class__ is int or not _IS_PYTHON3 and color.__class__ is long:
+    if isinstance(color, int) or not _IS_PYTHON3 and isinstance(color, long):
         return True
     return False
 
@@ -80,11 +102,11 @@ def _formatColor(color):
     # avoid isinstance, checking __class__ gives a small speed increase
     if color.__class__ is _Color:
         return color
-    if color.__class__ is int or not _IS_PYTHON3 and color.__class__ is long:
+    if isinstance(color, int) or not _IS_PYTHON3 and isinstance(color, long):
         # format a web style color with the format 0xRRGGBB
         return _Color(color >> 16 & 0xff, color >> 8 & 0xff, color & 0xff)
     return _Color(*color)
-
+    
 class TDLError(Exception):
     """
     The catch all for most TDL specific errors.
@@ -92,23 +114,30 @@ class TDLError(Exception):
 
 class _MetaConsole(object):
     """
-    Contains methods shared by both the Console and Window classes.
+    Contains methods shared by both the L{Console} and L{Window} classes.
     """
     __slots__ = ('width', 'height', '__weakref__', '__dict__')
     
     def drawChar(self, x, y, char, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a single character.
 
-        char should be an integer, single character string, or None
-        you can set the char parameter as None if you only want to change
-        the colors of the tile.
-
-        For fgcolor and bgcolor you use a 3 item list or None.  None will
-        keep the current color at this position unchanged.
+        @type x: int
+        @type y: int
+        @type char: int, string, or None
+        @type fgcolor: 3-item list or None
+        @type bgcolor: 3-item list or None
+        @param char: Should be an integer, single character string, or None.
         
+                     You can set the char parameter as None if you only want to change
+                     the colors of the tile.
 
-        Having the x or y values outside of the console will raise an
-        AssertionError.
+        @param fgcolor: For fgcolor and bgcolor you use a 3 item list with integers ranging 0 - 255 or None.
+                        None will keep the current color at this position unchanged.
+        
+        
+        @raise AssertionError: Having the x or y values outside of the console will raise an
+                               AssertionError.  You can use ((x, y) in console)
+                               to check if a cell is drawable.
         """
         
         assert _verify_colors(fgcolor, bgcolor)
@@ -130,6 +159,13 @@ class _MetaConsole(object):
         table as is.
 
         fgcolor and bgcolor can be set to None to keep the colors unchanged.
+        
+        @type x: int
+        @type y: int
+        @type string: string or iterable
+        @type fgcolor: 3-item list or None
+        @type bgcolor: 3-item list or None
+        
         """
         
         assert self._drawable(x, y)
@@ -149,6 +185,14 @@ class _MetaConsole(object):
         """Draws a rectangle starting from x and y and extending to width and
         height.  If width or height are None then it will extend to the edge
         of the console.  The rest are the same as drawChar.
+        
+        @type x: int
+        @type y: int
+        @type width: int or None
+        @type height: int or None
+        @type string: int, string, or None
+        @type fgcolor: 3-item list or None
+        @type bgcolor: 3-item list or None
         """
         x, y, width, height = self._normalizeRect(x, y, width, height)
         assert _verify_colors(fgcolor, bgcolor)
@@ -159,7 +203,16 @@ class _MetaConsole(object):
                 self._setChar(cellX, cellY, char, fgcolor, bgcolor)
         
     def drawFrame(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
-        "Similar to drawRect but only draws the outline of the rectangle"
+        """Similar to drawRect but only draws the outline of the rectangle.
+        
+        @type x: int
+        @type y: int
+        @type width: int or None
+        @type height: int or None
+        @type string: int, string, or None
+        @type fgcolor: 3-item list or None
+        @type bgcolor: 3-item list or None
+        """
         x, y, width, height = self._normalizeRect(x, y, width, height)
         assert _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
@@ -233,12 +286,18 @@ class _MetaConsole(object):
             width = height = 0
         return x, y, width, height
     
-    def blit(self, source, x=0, y=0, width=None, height=None, srcx=0, srcy=0):
+    def blit(self, source, x=0, y=0, width=None, height=None, srcX=0, srcY=0):
         """Blit another console or Window onto the current console.
 
         By default it blits the entire source to the topleft corner.
         
-        If nothing is blited then TDLError is raised
+        @type source: Console or Window
+        @type x: int
+        @type y: int
+        @type width: int or None
+        @type height: int or None
+        @type srcX: int
+        @type srcY: int
         """
         # hardcode alpha settings for now
         fgalpha=1.0
@@ -251,16 +310,16 @@ class _MetaConsole(object):
         
         # fill in width, height
         if width == None:
-            width = min(self.width - x, source.width - srcx)
+            width = min(self.width - x, source.width - srcX)
         if height == None:
-            height = min(self.height - y, source.height - srcy)
+            height = min(self.height - y, source.height - srcY)
         
         x, y, width, height = self._normalizeRect(x, y, width, height)
-        srcx, srcy, width, height = source._normalizeRect(srcx, srcy, width, height)
+        srcX, srcY, width, height = source._normalizeRect(srcX, srcY, width, height)
         
         # translate source and self if any of them are Window instances
         if isinstance(source, Window):
-            srcx, srcy = source._translate(srcx, srcy)
+            srcX, srcY = source._translate(srcX, srcY)
             source = source.console
         
         if isinstance(self, Window):
@@ -272,13 +331,15 @@ class _MetaConsole(object):
             # onto the data, otherwise it tries to copy into itself and
             # starts destroying everything
             tmp = Console(width, height)
-            _lib.TCOD_console_blit(source, srcx, srcy, width, height, tmp, 0, 0, fgalpha, bgalpha)
+            _lib.TCOD_console_blit(source, srcX, srcY, width, height, tmp, 0, 0, fgalpha, bgalpha)
             _lib.TCOD_console_blit(tmp, 0, 0, width, height, self, x, y, fgalpha, bgalpha)
         else:
-            _lib.TCOD_console_blit(source, srcx, srcy, width, height, self, x, y, fgalpha, bgalpha)
+            _lib.TCOD_console_blit(source, srcX, srcY, width, height, self, x, y, fgalpha, bgalpha)
 
     def getSize(self):
         """Return the size of the console as (width, height)
+        
+        @rtype: (int, int)
         """
         return self.width, self.height
         
@@ -286,6 +347,8 @@ class _MetaConsole(object):
         """Scroll the contents of the console in the direction of x,y.
         
         Uncovered areas will be cleared.
+        @type x: int
+        @type y: int
         """
         assert isinstance(x, int), "x must be an integer, got %s" % repr(x)
         assert isinstance(y, int), "y must be an integer, got %s" % repr(x)
@@ -343,10 +406,7 @@ class _MetaConsole(object):
             self.drawRect(uncoverX[0], uncoverY[0], uncoverX[1], uncoverY[1], 0x20)
         
     def __contains__(self, position):
-        """Checks if a position is drawable on this console.
-        
-        It's likely that you'll want to know if a point on the console can be
-        drawn on.  You can use ((x, y) in console) to check.
+        """Use ((x, y) in console) to check if a position is drawable on this console.
         """
         x, y = position
         return (0 <= x < self.width) and (0 <= y < self.height)
@@ -367,21 +427,23 @@ class _MetaConsole(object):
 class Console(_MetaConsole):
     """The Console is the main class of the tdl library.
 
-    The console created by the init function is the root console and is the
+    The console created by the L{tdl.init} function is the root console and is the
     consle that is rendered to the screen with flush.
 
     Any console made from Console is an off-screen console that can be drawn
-    on and then blited to the root console.
+    on and then L{blit} to the root console.
     """
 
     __slots__ = ('_as_parameter_',)
 
     def __init__(self, width, height):
+        """Create a new offscreen console
+        """
         self._as_parameter_ = _lib.TCOD_console_new(width, height)
         self.width = width
         self.height = height
         self._initArrays()
-        self.clear()
+        #self.clear()
         
     @classmethod
     def _newConsole(cls, console):
@@ -391,7 +453,7 @@ class Console(_MetaConsole):
         self.width = _lib.TCOD_console_get_width(self)
         self.height = _lib.TCOD_console_get_height(self)
         self._initArrays()
-        self.clear()
+        #self.clear()
         return self
         
     def _initArrays(self):
@@ -445,8 +507,12 @@ class Console(_MetaConsole):
         
     def clear(self, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Clears the entire console.
+        
+        @type fgcolor: 3-item list
+        @type bgcolor: 3-item list
         """
         assert _verify_colors(fgcolor, bgcolor)
+        assert fgcolor and bgcolor, 'Can not use None with clear'
         _lib.TCOD_console_set_default_background(self, _formatColor(bgcolor))
         _lib.TCOD_console_set_default_foreground(self, _formatColor(fgcolor))
         _lib.TCOD_console_clear(self)
@@ -486,9 +552,9 @@ class Console(_MetaConsole):
         (char, fgcolor, bgcolor)
 
         The charecter is returned as a number.
-        each color is returned as a tuple
+        Each color is returned as a tuple.
         
-        @rtype: (int, tuple, tuple)
+        @rtype: (int, 3-item tuple, 3-item tuple)
         """
         self._drawable(x, y)
         char = _lib.TCOD_console_get_char(self, x, y)
@@ -527,8 +593,12 @@ class Window(_MetaConsole):
 
     def clear(self, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Clears the entire Window.
+        
+        @type fgcolor: 3-item list
+        @type bgcolor: 3-item list
         """
         assert _verify_colors(fgcolor, bgcolor)
+        assert fgcolor and bgcolor, 'Can not use None with clear'
         self.draw_rect(0, 0, None, None, 0x20, fgcolor, bgcolor)
 
     def _setChar(self, x, y, char=None, fgcolor=None, bgcolor=None, bgblend=1):
@@ -536,6 +606,8 @@ class Window(_MetaConsole):
     
     def getChar(self, x, y):
         """Return the character and colors of a cell as (ch, fg, bg)
+        
+        @rtype: (int, 3-item tuple, 3-item tuple)
         """
         self._drawable(x, y)
         return self.console.getChar(self._translate(x, y))
@@ -546,7 +618,7 @@ class Window(_MetaConsole):
                                                           self.height)
 
 
-def init(width, height, title='TDL', fullscreen=False, renderer='OPENGL'):
+def init(width, height, title='python-tdl', fullscreen=False, renderer='OPENGL'):
     """Start the main console with the given width and height and return the
     root console.
 
@@ -659,6 +731,13 @@ def setFont(path, tileWidth, tileHeight, colomn=False,
                       corner.  The colomn parameter is ignored if this is
                       True, find examples of this layout in the font/
                       directory included with the python-tdl source.
+    
+    @raise TDLError: Will be raised if no file is found at path.
+    
+    @note: A png file that's been optimized can fail to load correctly on
+           MAC OS X creating a garbled mess when rendering.
+           Don't use a program like optipng or just use bmp files instead if
+           you want your program to work on macs.
     """
     # put up some constants that are only used here
     FONT_LAYOUT_ASCII_INCOL = 1
@@ -692,7 +771,9 @@ def getFullscreen():
     return _lib.TCOD_console_is_fullscreen()
 
 def setFullscreen(fullscreen):
-    """Sets the fullscreen state to the boolean value.
+    """Changes the fullscreen state.
+    
+    @type fullscreen: boolean
     """
     if not _rootinitialized:
         raise TDLError('Initialize first with tdl.init')
@@ -700,12 +781,14 @@ def setFullscreen(fullscreen):
 
 def setTitle(title):
     """Change the window title.
+    
+    @type title: string
     """
     if not _rootinitialized:
         raise TDLError('Not initilized.  Set title with tdl.init')
     _lib.TCOD_console_set_window_title(_format_string(title))
 
-def screenshot(path):
+def screenshot(path=None):
     """Capture the screen and save it as a png file
 
     @type path: string
@@ -763,6 +846,9 @@ def getFPS():
 
 def forceResolution(width, height):
     """Change the fullscreen resoulution
+    
+    @type width: int
+    @type height: int
     """
     _lib.TCOD_sys_force_fullscreen_resolution(width, height)
 

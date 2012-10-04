@@ -1,12 +1,33 @@
 """
     This module handles user input.
     
-    String constants can be found in the variable details of L{KeyEvent.key},
-    L{MouseButtonEvent.button}, and L{Event.type}.
+    To handle user input you will likely want to use the L{event.get} function
+    or create a subclass of L{event.App}.
+     - L{event.get} iterates over recent events.
+     - L{event.App} passes events to the overridable methods: ev_* and key_*.
     
-    You will likely want to use the L{event.get} function or L{event.App}
-    class but you can still use L{event.keyWait} and L{event.isWindowClosed}
-    to control your entire program.
+    But there are other options such as L{event.keyWait} and L{event.isWindowClosed}.
+    
+    A few event attributes are actually string constants.
+    Here's a reference for those:
+     - L{Event.type}
+     
+       'QUIT', 'KEYDOWN', 'KEYUP', 'MOUSEDOWN', 'MOUSEUP', or 'MOUSEMOTION.'
+       
+     - L{MouseButtonEvent.button} (found in L{MouseDown} and L{MouseUp} events)
+     
+       'LEFT', 'MIDDLE', 'RIGHT', 'SCROLLUP', 'SCROLLDOWN'
+       
+     - L{KeyEvent.key} (found in L{KeyDown} and L{KeyUp} events)
+     
+       'NONE', 'ESCAPE', 'BACKSPACE', 'TAB', 'ENTER', 'SHIFT', 'CONTROL',
+       'ALT', 'PAUSE', 'CAPSLOCK', 'PAGEUP', 'PAGEDOWN', 'END', 'HOME', 'UP',
+       'LEFT', 'RIGHT', 'DOWN', 'PRINTSCREEN', 'INSERT', 'DELETE', 'LWIN',
+       'RWIN', 'APPS', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+       'KP0', 'KP1', 'KP2', 'KP3', 'KP4', 'KP5', 'KP6', 'KP7', 'KP8', 'KP9',
+       'KPADD', 'KPSUB', 'KPDIV', 'KPMUL', 'KPDEC', 'KPENTER', 'F1', 'F2',
+       'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12',
+       'NUMLOCK', 'SCROLLLOCK', 'SPACE', 'CHAR'
 """
 
 import time
@@ -17,6 +38,7 @@ from . import __tcod as _tcod
 import tdl as _tdl
 
 _eventQueue = []
+_pushedEvents = []
 
 _mousel = 0
 _mousem = 0
@@ -63,7 +85,7 @@ class Quit(Event):
     type = 'QUIT'
 
 class KeyEvent(Event):
-    __slots__ = ('key', 'keyname', 'char', 'shift', 'alt', 'control',
+    __slots__ = ('key', 'char', 'shift', 'alt', 'control',
                  'leftAlt', 'leftCtrl', 'rightAlt', 'rightCtrl')
 
     def __init__(self, key, char, lalt, lctrl, ralt, rctrl, shift):
@@ -83,12 +105,18 @@ class KeyEvent(Event):
         char = char if isinstance(char, str) else char.decode()
         self.char = char.replace('\x00', '') # change null to empty string
         """A single character string of the letter or symbol pressed.
-        Special characters like delete and return are not cross platform.
+        
+        Special characters like delete and return are not cross-platform.
+        L{key} should be used instead for special keys.
         @type: string"""
         self.leftAlt = bool(lalt)
+        """@type: boolean"""
         self.rightAlt = bool(ralt)
+        """@type: boolean"""
         self.leftCtrl = bool(lctrl)
+        """@type: boolean"""
         self.rightCtrl = bool(rctrl)
+        """@type: boolean"""
         self.shift = bool(shift)
         """True if shift was held down during this event.
         @type: boolean"""
@@ -144,27 +172,36 @@ class MouseMotion(Event):
 
     def __init__(self, pos, cell, motion, cellmotion):
         self.pos = pos
-        "(x, y) position of the mouse on the screen"
+        """(x, y) position of the mouse on the screen.
+        type: (int, int)"""
         self.cell = cell
-        "(x, y) position of the mouse snapped to a cell on the root console"
+        """(x, y) position of the mouse snapped to a cell on the root console.
+        type: (int, int)"""
         self.motion = motion
-        "(x, y) motion of the mouse on the screen"
+        """(x, y) motion of the mouse on the screen.
+        type: (int, int)"""
         self.cellmotion = cellmotion
-        "(x, y) mostion of the mouse moving over cells on the root console"
+        """(x, y) mostion of the mouse moving over cells on the root console.
+        type: (int, int)"""
 
 class App(object):
     """
+    Application framework.
     
-     - ev_*: Events are passed to methods based on their L{Event.type} attribute.  If an event
-       type is 'KEYDOWN' for example the event will be sent to the ev_KEYDOWN method
-       with the event as a parameter.
+     - ev_*: Events are passed to methods based on their L{Event.type} attribute.
+       If an event type is 'KEYDOWN' the ev_KEYDOWN method will be called
+       with the event instance as a parameter.
     
      - key_*: When a key is pressed another method will be called based on the
        keyname attribute.  For example the 'ENTER' keyname will call key_ENTER
        with the associated L{KeyDown} event as its parameter.
-    
+       
+     - L{update}: This method is called every loop before making a call to
+       L{tdl.flush}.  It is passed a single parameter detailing the time in
+       seconds since the last update (often known as deltaTime.)
     """
     __slots__ = ('__running')
+    __running = False
     
     def ev_QUIT(self, event):
         """Unless overridden this method raises a SystemExit exception closing
@@ -193,6 +230,9 @@ class App(object):
         @param deltaTime: This parameter tells the amount of time passed since
                           the last call measured in seconds as a floating point
                           number.
+                          
+                          You can use this variable to make your program
+                          frame rate independent.
         """
         pass
         
@@ -204,7 +244,7 @@ class App(object):
         called one last time before exiting
         (unless suspended during a call to L{App.update}.)
         """
-        self._running = False
+        self.__running = False
         
     def run(self):
         """Delegate control over to this App instance.  This function will
@@ -218,7 +258,7 @@ class App(object):
             raise _tdl.TDLError('An App can not be run multiple times simultaneously')
         self.__running = True
         prevTime = time.clock()
-        while self._running:
+        while self.__running:
             for event in get():
                 if event.type: # exclude custom events with a blank type variable
                     # call the ev_* methods
@@ -226,10 +266,10 @@ class App(object):
                     getattr(self, method)(event)
                 if event.type == 'KEYDOWN':
                     # call the key_* methods
-                    method = 'key_%s' % event.keyname # key_KEYNAME
+                    method = 'key_%s' % event.key # key_KEYNAME
                     if hasattr(self, method): # silently exclude undefined methods
                         getattr(self, method)(event)
-                if not __running:
+                if not self.__running:
                     break # interupt event handing after suspend()
             newTime = time.clock()
             self.update(newTime - prevTime)
@@ -238,9 +278,10 @@ class App(object):
 
 def _processEvents():
     """Flushes the event queue from libtcod into the global list _eventQueue"""
-    global _mousel, _mousem, _mouser, _eventsflushed
+    global _mousel, _mousem, _mouser, _eventsflushed, _pushedEvents
     _eventsflushed = True
-    events = []
+    events = _pushedEvents # get events from event.push
+    _pushedEvents = [] # then clear the pushed events queue
     
     mouse = _Mouse()
     libkey = _Key()
@@ -298,9 +339,22 @@ def get():
     """
     _processEvents()
     while _eventQueue:
+        # if there is an interruption the rest of the events stay untouched
+        # this means you can break out of a event.get loop without losing
+        # the leftover events
         yield(_eventQueue.pop(0))
     raise StopIteration()
 
+def push(event):
+    """Push an event into the event buffer.
+    
+    @type event: L{Event}-like object
+    @param event: The event will be available on the next call to L{event.get}.  An event
+                  pushed in the middle of a get will not show until the next time it's called.
+                  This prevents infinite loops.
+    """
+    _pushedEvents.append(event)
+    
 def keyWait():
     """Waits until the user presses a key.  Then returns a L{KeyDown} event.
     

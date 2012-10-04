@@ -71,7 +71,8 @@ object --+
 </pre>
 
 <hr />
-<p>For when the user presses a key on the keyboard or a key repeats.</p>
+<p>Fired when the user presses a key on the keyboard or a key 
+  repeats.</p>
 
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
@@ -113,7 +114,7 @@ object --+
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="tdl.event.Event-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      List an events public attributes in print calls
+      List an events public attributes in print calls.
       <em>(Inherited from <a href="tdl.event.Event-class.html">tdl.event.Event</a>)</em></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl.event-pysrc.html#Event.__repr__">source&nbsp;code</a></span>
@@ -169,7 +170,7 @@ object --+
 </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">boolean</span>
     </td><td class="summary">
         <a name="alt"></a><span class="summary-name">alt</span><br />
       True if alt was held down during this event.
@@ -178,7 +179,7 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">string</span>
     </td><td class="summary">
         <a href="tdl.event.KeyEvent-class.html#char" class="summary-name">char</a><br />
       A single character string of the letter or symbol pressed.
@@ -187,7 +188,7 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">boolean</span>
     </td><td class="summary">
         <a name="control"></a><span class="summary-name">control</span><br />
       True if control was held down during this event.
@@ -196,26 +197,48 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">string</span>
     </td><td class="summary">
-        <a name="key"></a><span class="summary-name">key</span><br />
-      Look up the use of <a href="tdl.event.KeyEvent-class.html#keyname" 
-      class="link">keyname</a> instead.
+        <a href="tdl.event.KeyEvent-class.html#key" class="summary-name">key</a><br />
+      Human readable name of the key pressed.
       <em>(Inherited from <a href="tdl.event.KeyEvent-class.html">tdl.event.KeyEvent</a>)</em>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">boolean</span>
     </td><td class="summary">
-        <a href="tdl.event.KeyEvent-class.html#keyname" class="summary-name">keyname</a><br />
-      A human readable version of key
+        <a name="leftAlt"></a><span class="summary-name">leftAlt</span>
       <em>(Inherited from <a href="tdl.event.KeyEvent-class.html">tdl.event.KeyEvent</a>)</em>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">boolean</span>
+    </td><td class="summary">
+        <a name="leftCtrl"></a><span class="summary-name">leftCtrl</span>
+      <em>(Inherited from <a href="tdl.event.KeyEvent-class.html">tdl.event.KeyEvent</a>)</em>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">boolean</span>
+    </td><td class="summary">
+        <a name="rightAlt"></a><span class="summary-name">rightAlt</span>
+      <em>(Inherited from <a href="tdl.event.KeyEvent-class.html">tdl.event.KeyEvent</a>)</em>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">boolean</span>
+    </td><td class="summary">
+        <a name="rightCtrl"></a><span class="summary-name">rightCtrl</span>
+      <em>(Inherited from <a href="tdl.event.KeyEvent-class.html">tdl.event.KeyEvent</a>)</em>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">boolean</span>
     </td><td class="summary">
         <a name="shift"></a><span class="summary-name">shift</span><br />
       True if shift was held down during this event.
@@ -231,38 +254,6 @@ object --+
   <td align="left" colspan="2" class="table-header">
     <span class="table-header">Properties</span></td>
 </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="leftAlt"></a><span class="summary-name">leftAlt</span>
-      <em>(Inherited from <a href="tdl.event.KeyEvent-class.html">tdl.event.KeyEvent</a>)</em>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="leftCtrl"></a><span class="summary-name">leftCtrl</span>
-      <em>(Inherited from <a href="tdl.event.KeyEvent-class.html">tdl.event.KeyEvent</a>)</em>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="rightAlt"></a><span class="summary-name">rightAlt</span>
-      <em>(Inherited from <a href="tdl.event.KeyEvent-class.html">tdl.event.KeyEvent</a>)</em>
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="rightCtrl"></a><span class="summary-name">rightCtrl</span>
-      <em>(Inherited from <a href="tdl.event.KeyEvent-class.html">tdl.event.KeyEvent</a>)</em>
-    </td>
-  </tr>
   <tr>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
@@ -303,7 +294,7 @@ object --+
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Sep 30 17:28:55 2012</a>
+    3.0.1 on Thu Oct 04 00:52:16 2012</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
