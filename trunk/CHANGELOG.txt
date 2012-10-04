@@ -1,5 +1,5 @@
 
-1.1
+1.1.0
  * KeyEvent.keyname is now KeyEvent.key
  * MouseButtonEvent.button now behaves like KeyEvent.keyname does
  * event.App class added
