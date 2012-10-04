@@ -4,33 +4,8 @@ import os.path
 import subprocess
 from distutils.core import setup
 
-def getVersion():
-    """getting the latest revision number from svn is a pain
-    when setup.py is run this function is called and sets up the tdl/VERSION file
-    when run from an sdist build the svn data isn't found and uses the stored version instead
-    """
-    REVISION = None
-    if os.path.exists('.svn'): # if .svn/ doesn't even exist, don't bother running svnversion
-        svnversion = subprocess.Popen('svnversion -n', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        REVISION = svnversion.communicate()[0].decode() # get stdout
-    if not REVISION or not any([c.isdigit() for c in REVISION]):
-        # no numbers so assume an error
-        # but likely a real user install, so get version from file
-        VERSION = open('tdl/VERSION', 'r').read()
-        return VERSION
-    # building on the svn, save version in a file for user installs
-    if ':' in REVISION:
-        REVISION = REVISION.split(':')[-1] # take "latest" revision, I think
-    REVISION = ''.join((c for c in REVISION if c.isdigit())) # remove letters
-    VERSION = '1.1r%s' % REVISION
-    open('tdl/VERSION', 'w').write(VERSION)
-    return VERSION
-
-VERSION = getVersion()
-# print('TDL version is %s' % VERSION)
-
 setup(name='tdl',
-      version=VERSION,
+      version='1.1.0',
       author='Kyle Stewart',
       author_email='4B796C65+pythonTDL@gmail.com',
       description='Simple graphical library for making a roguelike or other tile-based video game.',
