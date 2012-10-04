@@ -58,6 +58,30 @@
 </table>
 <!-- ==================== PACKAGE DESCRIPTION ==================== -->
 <h1 class="epydoc">Package tdl</h1><p class="nomargin-top"><span class="codelink"><a href="tdl-pysrc.html">source&nbsp;code</a></span></p>
+<p>The documentation for python-tdl.  A Pythonic port of <a 
+  href="http://doryen.eptalys.net/libtcod/" target="_top">libtcod</a>.</p>
+  <h1 class="heading">Getting Started</h1>
+    <p>Once the library is imported you can load the font you want to use 
+    with <a href="tdl-module.html#setFont" class="link">tdl.setFont</a>.  
+    This is optional and can be skipped to get a decent default font.  
+    After that you call <a href="tdl-module.html#init" 
+    class="link">tdl.init</a> to set the size of the window and get the 
+    root console in return.  This console is the canvas to what will appear
+    on the screen.</p>
+  <h1 class="heading">Drawing</h1>
+    <p>Once you have the root console from <a href="tdl-module.html#init" 
+    class="link">tdl.init</a> you can start drawing on it using a method 
+    such as <a href="tdl._MetaConsole-class.html#drawChar" 
+    class="link">Console.drawChar</a>.  When using this method you can have
+    the char parameter be an intiger or a single character string.  The 
+    fgcolor and bgcolor parameters expect a three item list [red, green, 
+    blue] with integers in the 0-255 range with [0, 0, 0] being black and 
+    [255, 255, 255] being white.  Or instead you can use None for any of 
+    the three parameters to tell the library to keep what is at that spot 
+    instead of overwriting it.  After the drawing functions are called a 
+    call to <a href="tdl-module.html#flush" class="link">tdl.flush</a> will
+    update the screen.</p>
+
 <!-- ==================== SUBMODULES ==================== -->
 <a name="section-Submodules"></a>
 <table class="summary" border="1" cellpadding="3"
@@ -110,7 +134,9 @@
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="tdl._MetaConsole-class.html" class="summary-name">_MetaConsole</a><br />
-      Contains methods shared by both the Console and Window classes.
+      Contains methods shared by both the <a 
+        href="tdl.Console-class.html" class="link">Console</a> and <a 
+        href="tdl.Window-class.html" class="link">Window</a> classes.
     </td>
   </tr>
 </table>
@@ -145,7 +171,7 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="forceResolution"></a><span class="summary-sig-name">forceResolution</span>(<span class="summary-sig-arg">width</span>,
+          <td><span class="summary-sig"><a href="tdl-module.html#forceResolution" class="summary-sig-name">forceResolution</a>(<span class="summary-sig-arg">width</span>,
         <span class="summary-sig-arg">height</span>)</span><br />
       Change the fullscreen resoulution</td>
           <td align="right" valign="top">
@@ -200,7 +226,7 @@
         <tr>
           <td><span class="summary-sig"><a href="tdl-module.html#init" class="summary-sig-name">init</a>(<span class="summary-sig-arg">width</span>,
         <span class="summary-sig-arg">height</span>,
-        <span class="summary-sig-arg">title</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">TDL</code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">title</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">python-tdl</code><code class="variable-quote">'</code></span>,
         <span class="summary-sig-arg">fullscreen</span>=<span class="summary-sig-default">False</span>,
         <span class="summary-sig-arg">renderer</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">OPENGL</code><code class="variable-quote">'</code></span>)</span><br />
       Start the main console with the given width and height and return the
@@ -220,7 +246,7 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="tdl-module.html#screenshot" class="summary-sig-name">screenshot</a>(<span class="summary-sig-arg">path</span>)</span><br />
+          <td><span class="summary-sig"><a href="tdl-module.html#screenshot" class="summary-sig-name">screenshot</a>(<span class="summary-sig-arg">path</span>=<span class="summary-sig-default">None</span>)</span><br />
       Capture the screen and save it as a png file</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#screenshot">source&nbsp;code</a></span>
@@ -276,8 +302,8 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="setFullscreen"></a><span class="summary-sig-name">setFullscreen</span>(<span class="summary-sig-arg">fullscreen</span>)</span><br />
-      Sets the fullscreen state to the boolean value.</td>
+          <td><span class="summary-sig"><a href="tdl-module.html#setFullscreen" class="summary-sig-name">setFullscreen</a>(<span class="summary-sig-arg">fullscreen</span>)</span><br />
+      Changes the fullscreen state.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#setFullscreen">source&nbsp;code</a></span>
             
@@ -293,7 +319,7 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="setTitle"></a><span class="summary-sig-name">setTitle</span>(<span class="summary-sig-arg">title</span>)</span><br />
+          <td><span class="summary-sig"><a href="tdl-module.html#setTitle" class="summary-sig-name">setTitle</a>(<span class="summary-sig-arg">title</span>)</span><br />
       Change the window title.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#setTitle">source&nbsp;code</a></span>
@@ -335,6 +361,31 @@
   <p>This function can only be called after <a href="tdl-module.html#init" 
   class="link">tdl.init</a></p>
   <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="forceResolution"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">forceResolution</span>(<span class="sig-arg">width</span>,
+        <span class="sig-arg">height</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#forceResolution">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Change the fullscreen resoulution</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>width</code></strong> (int)</li>
+        <li><strong class="pname"><code>height</code></strong> (int)</li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -392,7 +443,7 @@
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">init</span>(<span class="sig-arg">width</span>,
         <span class="sig-arg">height</span>,
-        <span class="sig-arg">title</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">TDL</code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">title</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">python-tdl</code><code class="variable-quote">'</code></span>,
         <span class="sig-arg">fullscreen</span>=<span class="sig-default">False</span>,
         <span class="sig-arg">renderer</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">OPENGL</code><code class="variable-quote">'</code></span>)</span>
   </h3>
@@ -436,7 +487,7 @@
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">screenshot</span>(<span class="sig-arg">path</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">screenshot</span>(<span class="sig-arg">path</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="tdl-pysrc.html#screenshot">source&nbsp;code</a></span>&nbsp;
@@ -523,6 +574,62 @@
           this layout in the font/ directory included with the python-tdl 
           source.</li>
     </ul></dd>
+    <dt>Raises:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code><strong class='fraise'><a href="tdl.TDLError-class.html">TDLError</a></strong></code> - Will be raised if no file is found at path.</li>
+    </ul></dd>
+  </dl>
+<div class="fields">      <p><strong>Note:</strong>
+        A png file that's been optimized can fail to load correctly on MAC 
+        OS X creating a garbled mess when rendering. Don't use a program 
+        like optipng or just use bmp files instead if you want your program
+        to work on macs.
+      </p>
+</div></td></tr></table>
+</div>
+<a name="setFullscreen"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">setFullscreen</span>(<span class="sig-arg">fullscreen</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#setFullscreen">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Changes the fullscreen state.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>fullscreen</code></strong> (boolean)</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="setTitle"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">setTitle</span>(<span class="sig-arg">title</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#setTitle">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Change the window title.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>title</code></strong> (string)</li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -559,7 +666,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Sep 30 17:28:55 2012</a>
+    3.0.1 on Thu Oct 04 00:52:15 2012</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

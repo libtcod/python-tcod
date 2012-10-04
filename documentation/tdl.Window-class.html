@@ -87,9 +87,10 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="tdl._MetaConsole-class.html#__contains__" class="summary-sig-name">__contains__</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a name="__contains__"></a><span class="summary-sig-name">__contains__</span>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">position</span>)</span><br />
-      Checks if a position is drawable on this console.
+      Use ((x, y) in console) to check if a position is drawable on this 
+      console.
       <em>(Inherited from <a href="tdl._MetaConsole-class.html">tdl._MetaConsole</a>)</em></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.__contains__">source&nbsp;code</a></span>
@@ -151,8 +152,8 @@
         <span class="summary-sig-arg">y</span>=<span class="summary-sig-default">0</span>,
         <span class="summary-sig-arg">width</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">height</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">srcx</span>=<span class="summary-sig-default">0</span>,
-        <span class="summary-sig-arg">srcy</span>=<span class="summary-sig-default">0</span>)</span><br />
+        <span class="summary-sig-arg">srcX</span>=<span class="summary-sig-default">0</span>,
+        <span class="summary-sig-arg">srcY</span>=<span class="summary-sig-default">0</span>)</span><br />
       Blit another console or Window onto the current console.
       <em>(Inherited from <a href="tdl._MetaConsole-class.html">tdl._MetaConsole</a>)</em></td>
           <td align="right" valign="top">
@@ -170,7 +171,7 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="clear"></a><span class="summary-sig-name">clear</span>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="tdl.Window-class.html#clear" class="summary-sig-name">clear</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">fgcolor</span>=<span class="summary-sig-default"><code class="variable-group">(</code>255<code class="variable-op">, </code>255<code class="variable-op">, </code>255<code class="variable-group">)</code></span>,
         <span class="summary-sig-arg">bgcolor</span>=<span class="summary-sig-default"><code class="variable-group">(</code>0<code class="variable-op">, </code>0<code class="variable-op">, </code>0<code class="variable-group">)</code></span>)</span><br />
       Clears the entire Window.</td>
@@ -212,7 +213,7 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="drawFrame"></a><span class="summary-sig-name">drawFrame</span>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="tdl._MetaConsole-class.html#drawFrame" class="summary-sig-name">drawFrame</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">x</span>,
         <span class="summary-sig-arg">y</span>,
         <span class="summary-sig-arg">width</span>,
@@ -220,7 +221,7 @@
         <span class="summary-sig-arg">string</span>,
         <span class="summary-sig-arg">fgcolor</span>=<span class="summary-sig-default"><code class="variable-group">(</code>255<code class="variable-op">, </code>255<code class="variable-op">, </code>255<code class="variable-group">)</code></span>,
         <span class="summary-sig-arg">bgcolor</span>=<span class="summary-sig-default"><code class="variable-group">(</code>0<code class="variable-op">, </code>0<code class="variable-op">, </code>0<code class="variable-group">)</code></span>)</span><br />
-      Similar to drawRect but only draws the outline of the rectangle
+      Similar to drawRect but only draws the outline of the rectangle.
       <em>(Inherited from <a href="tdl._MetaConsole-class.html">tdl._MetaConsole</a>)</em></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.drawFrame">source&nbsp;code</a></span>
@@ -282,7 +283,7 @@
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">(int, 3-item tuple, 3-item tuple)</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -301,7 +302,7 @@
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">(int, int)</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -477,6 +478,32 @@
   </dl>
 </td></tr></table>
 </div>
+<a name="clear"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">clear</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">fgcolor</span>=<span class="sig-default"><code class="variable-group">(</code>255<code class="variable-op">, </code>255<code class="variable-op">, </code>255<code class="variable-group">)</code></span>,
+        <span class="sig-arg">bgcolor</span>=<span class="sig-default"><code class="variable-group">(</code>0<code class="variable-op">, </code>0<code class="variable-op">, </code>0<code class="variable-group">)</code></span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#Window.clear">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Clears the entire Window.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>bgcolor</code></strong> (3-item list)</li>
+        <li><strong class="pname"><code>fgcolor</code></strong> (3-item list)</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
 <br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
@@ -510,7 +537,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Sep 30 17:28:55 2012</a>
+    3.0.1 on Thu Oct 04 00:52:16 2012</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

@@ -38,37 +38,64 @@ class StopWatch:
         return sum(self.snapshots) / len(self.snapshots)
         
 
-def main():
-
-    WIDTH = 60
-    HEIGHT = 40
-    TOTAL = WIDTH * HEIGHT
-    # a list containing all x,y pairs
-    CELLS = list(itertools.product(range(WIDTH), range(HEIGHT)))
+class TestApp(tdl.event.App):
     
-    console = tdl.init(WIDTH, HEIGHT, renderer='GLSL')
-    fullTimer = StopWatch()
-    randomTimer = StopWatch()
-    drawTimer = StopWatch()
-    flushTimer = StopWatch()
-    while 1:
-        for event in tdl.event.get():
-            if event.type == 'QUIT':
-                raise SystemExit()
-        with randomTimer:
-            # getrandbits is around 5x faster than using randint
-            bgcolors = [(random.getrandbits(6), random.getrandbits(6), random.getrandbits(6)) for _ in range(TOTAL)]
-            #bgcolors = [(random.getrandbits(24)) for _ in range(TOTAL)]
-            char = [random.getrandbits(8) for _ in range(TOTAL)]
-        with drawTimer:
-            for (x,y), bgcolor, char in zip(CELLS, bgcolors, char):
-                console.drawChar(x=x, y=y, char=char, fgcolor=(255, 255, 255), bgcolor=bgcolor)
-        console.drawStr(0, 0, 'Random%7.2fms ' % (randomTimer.getMeanTime() * 1000))
-        console.drawStr(0, 1, 'DrawCh%7.2fms ' % (drawTimer.getMeanTime() * 1000))
-        console.drawStr(0, 2, 'Flush %7.2fms ' % (flushTimer.getMeanTime() * 1000))
-        with flushTimer:
-            tdl.flush()
-        tdl.setTitle('%i FPS' % tdl.getFPS())
+    def __init__(self, console):
+        self.console = console
+        self.width, self.height = self.console.getSize()
+        self.total = self.width * self.height
+        self.cells = list(itertools.product(range(self.width), range(self.height)))
+        
+    def ev_MOUSEDOWN(self, event):
+        self.suspend()
+        
+    def update(self, deltaTime):
+        self.updateTest(deltaTime)
+        tdl.setTitle('%s: %i FPS' % (self.__class__.__name__, tdl.getFPS()))
+        
+class FullDrawCharTest(TestApp):    
+    
+    def updateTest(self, deltaTime):
+        # getrandbits is around 5x faster than using randint
+        bgcolors = [(random.getrandbits(6), random.getrandbits(6), random.getrandbits(6)) for _ in range(self.total)]
+        char = [random.getrandbits(8) for _ in range(self.total)]
+        for (x,y), bgcolor, char in zip(self.cells, bgcolors, char):
+            self.console.drawChar(x, y, char, (255, 255, 255), bgcolor)
+        
+
+class CharOnlyTest(TestApp):
+
+    def updateTest(self, deltaTime):
+        char = [random.getrandbits(8) for _ in range(self.total)]
+        for (x,y), char in zip(self.cells, char):
+            self.console.drawChar(x, y, char, None, None)
+
+class ColorOnlyTest(TestApp):    
+    
+    def updateTest(self, deltaTime):
+        # getrandbits is around 5x faster than using randint
+        bgcolors = [(random.getrandbits(6), random.getrandbits(6), random.getrandbits(6)) for _ in range(self.total)]
+        for (x,y), bgcolor in zip(self.cells, bgcolors):
+            self.console.drawChar(x, y, None, None, bgcolor)
+
+class GetCharTest(TestApp):    
+    
+    def updateTest(self, deltaTime):
+        for (x,y) in self.cells:
+            self.console.getChar(x, y)
+
+class SingleRectTest(TestApp):
+
+    def updateTest(self, deltaTime):
+        bgcolor = (random.getrandbits(6), random.getrandbits(6), random.getrandbits(6))
+        self.console.drawRect(0, 0, None, None, ' ', (255, 255, 255), bgcolor)
+    
+            
+def main():
+    console = tdl.init(60, 40)
+    for Test in [FullDrawCharTest, CharOnlyTest, ColorOnlyTest, GetCharTest, SingleRectTest]:
+        Test(console).run()
+        console.clear()
 
 if __name__ == '__main__':
     main()

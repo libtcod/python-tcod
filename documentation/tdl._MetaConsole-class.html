@@ -72,7 +72,9 @@ object --+
 </dd></dl>
 
 <hr />
-<p>Contains methods shared by both the Console and Window classes.</p>
+<p>Contains methods shared by both the <a href="tdl.Console-class.html" 
+  class="link">Console</a> and <a href="tdl.Window-class.html" 
+  class="link">Window</a> classes.</p>
 
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
@@ -88,9 +90,10 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="tdl._MetaConsole-class.html#__contains__" class="summary-sig-name">__contains__</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a name="__contains__"></a><span class="summary-sig-name">__contains__</span>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">position</span>)</span><br />
-      Checks if a position is drawable on this console.</td>
+      Use ((x, y) in console) to check if a position is drawable on this 
+      console.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.__contains__">source&nbsp;code</a></span>
             
@@ -112,8 +115,8 @@ object --+
         <span class="summary-sig-arg">y</span>=<span class="summary-sig-default">0</span>,
         <span class="summary-sig-arg">width</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">height</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">srcx</span>=<span class="summary-sig-default">0</span>,
-        <span class="summary-sig-arg">srcy</span>=<span class="summary-sig-default">0</span>)</span><br />
+        <span class="summary-sig-arg">srcX</span>=<span class="summary-sig-default">0</span>,
+        <span class="summary-sig-arg">srcY</span>=<span class="summary-sig-default">0</span>)</span><br />
       Blit another console or Window onto the current console.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.blit">source&nbsp;code</a></span>
@@ -152,7 +155,7 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="drawFrame"></a><span class="summary-sig-name">drawFrame</span>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="tdl._MetaConsole-class.html#drawFrame" class="summary-sig-name">drawFrame</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">x</span>,
         <span class="summary-sig-arg">y</span>,
         <span class="summary-sig-arg">width</span>,
@@ -160,7 +163,7 @@ object --+
         <span class="summary-sig-arg">string</span>,
         <span class="summary-sig-arg">fgcolor</span>=<span class="summary-sig-default"><code class="variable-group">(</code>255<code class="variable-op">, </code>255<code class="variable-op">, </code>255<code class="variable-group">)</code></span>,
         <span class="summary-sig-arg">bgcolor</span>=<span class="summary-sig-default"><code class="variable-group">(</code>0<code class="variable-op">, </code>0<code class="variable-op">, </code>0<code class="variable-group">)</code></span>)</span><br />
-      Similar to drawRect but only draws the outline of the rectangle</td>
+      Similar to drawRect but only draws the outline of the rectangle.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.drawFrame">source&nbsp;code</a></span>
             
@@ -219,7 +222,7 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">(int, int)</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -312,29 +315,6 @@ object --+
     <span class="table-header">Method Details</span></td>
 </tr>
 </table>
-<a name="__contains__"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__contains__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">position</span>)</span>
-    <br /><em class="fname">(In operator)</em>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.__contains__">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Checks if a position is drawable on this console.</p>
-  <p>It's likely that you'll want to know if a point on the console can be 
-  drawn on.  You can use ((x, y) in console) to check.</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
 <a name="blit"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -348,8 +328,8 @@ object --+
         <span class="sig-arg">y</span>=<span class="sig-default">0</span>,
         <span class="sig-arg">width</span>=<span class="sig-default">None</span>,
         <span class="sig-arg">height</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">srcx</span>=<span class="sig-default">0</span>,
-        <span class="sig-arg">srcy</span>=<span class="sig-default">0</span>)</span>
+        <span class="sig-arg">srcX</span>=<span class="sig-default">0</span>,
+        <span class="sig-arg">srcY</span>=<span class="sig-default">0</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.blit">source&nbsp;code</a></span>&nbsp;
@@ -358,8 +338,17 @@ object --+
   
   <p>Blit another console or Window onto the current console.</p>
   <p>By default it blits the entire source to the topleft corner.</p>
-  <p>If nothing is blited then TDLError is raised</p>
   <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>width</code></strong> (int or None)</li>
+        <li><strong class="pname"><code>height</code></strong> (int or None)</li>
+        <li><strong class="pname"><code>source</code></strong> (Console or Window)</li>
+        <li><strong class="pname"><code>y</code></strong> (int)</li>
+        <li><strong class="pname"><code>x</code></strong> (int)</li>
+        <li><strong class="pname"><code>srcX</code></strong> (int)</li>
+        <li><strong class="pname"><code>srcY</code></strong> (int)</li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -383,14 +372,61 @@ object --+
   </tr></table>
   
   <p>Draws a single character.</p>
-  <p>char should be an integer, single character string, or None you can 
-  set the char parameter as None if you only want to change the colors of 
-  the tile.</p>
-  <p>For fgcolor and bgcolor you use a 3 item list or None.  None will keep
-  the current color at this position unchanged.</p>
-  <p>Having the x or y values outside of the console will raise an 
-  AssertionError.</p>
   <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>char</code></strong> (int, string, or None) - Should be an integer, single character string, or None.
+          <p>You can set the char parameter as None if you only want to 
+          change the colors of the tile.</p></li>
+        <li><strong class="pname"><code>fgcolor</code></strong> (3-item list or None) - For fgcolor and bgcolor you use a 3 item list with integers 
+          ranging 0 - 255 or None. None will keep the current color at this
+          position unchanged.</li>
+        <li><strong class="pname"><code>y</code></strong> (int)</li>
+        <li><strong class="pname"><code>x</code></strong> (int)</li>
+        <li><strong class="pname"><code>bgcolor</code></strong> (3-item list or None)</li>
+    </ul></dd>
+    <dt>Raises:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code><strong class='fraise'>AssertionError</strong></code> - Having the x or y values outside of the console will raise an 
+        AssertionError.  You can use ((x, y) in console) to check if a cell
+        is drawable.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="drawFrame"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">drawFrame</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">x</span>,
+        <span class="sig-arg">y</span>,
+        <span class="sig-arg">width</span>,
+        <span class="sig-arg">height</span>,
+        <span class="sig-arg">string</span>,
+        <span class="sig-arg">fgcolor</span>=<span class="sig-default"><code class="variable-group">(</code>255<code class="variable-op">, </code>255<code class="variable-op">, </code>255<code class="variable-group">)</code></span>,
+        <span class="sig-arg">bgcolor</span>=<span class="sig-default"><code class="variable-group">(</code>0<code class="variable-op">, </code>0<code class="variable-op">, </code>0<code class="variable-group">)</code></span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.drawFrame">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Similar to drawRect but only draws the outline of the rectangle.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>string</code></strong> (int, string, or None)</li>
+        <li><strong class="pname"><code>bgcolor</code></strong> (3-item list or None)</li>
+        <li><strong class="pname"><code>height</code></strong> (int or None)</li>
+        <li><strong class="pname"><code>width</code></strong> (int or None)</li>
+        <li><strong class="pname"><code>y</code></strong> (int)</li>
+        <li><strong class="pname"><code>x</code></strong> (int)</li>
+        <li><strong class="pname"><code>fgcolor</code></strong> (3-item list or None)</li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -419,6 +455,16 @@ object --+
   height.  If width or height are None then it will extend to the edge of 
   the console.  The rest are the same as drawChar.</p>
   <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>string</code></strong> (int, string, or None)</li>
+        <li><strong class="pname"><code>bgcolor</code></strong> (3-item list or None)</li>
+        <li><strong class="pname"><code>height</code></strong> (int or None)</li>
+        <li><strong class="pname"><code>width</code></strong> (int or None)</li>
+        <li><strong class="pname"><code>y</code></strong> (int)</li>
+        <li><strong class="pname"><code>x</code></strong> (int)</li>
+        <li><strong class="pname"><code>fgcolor</code></strong> (3-item list or None)</li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -453,6 +499,14 @@ object --+
   <p>fgcolor and bgcolor can be set to None to keep the colors 
   unchanged.</p>
   <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>y</code></strong> (int)</li>
+        <li><strong class="pname"><code>x</code></strong> (int)</li>
+        <li><strong class="pname"><code>string</code></strong> (string or iterable)</li>
+        <li><strong class="pname"><code>bgcolor</code></strong> (3-item list or None)</li>
+        <li><strong class="pname"><code>fgcolor</code></strong> (3-item list or None)</li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -475,6 +529,11 @@ object --+
   <p>Scroll the contents of the console in the direction of x,y.</p>
   <p>Uncovered areas will be cleared.</p>
   <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>y</code></strong> (int)</li>
+        <li><strong class="pname"><code>x</code></strong> (int)</li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -511,7 +570,7 @@ object --+
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Sep 30 17:28:55 2012</a>
+    3.0.1 on Thu Oct 04 00:52:16 2012</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

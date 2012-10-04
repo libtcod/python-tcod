@@ -2,8 +2,8 @@
 """
     Example showing some of the most basic functions needed to say "Hello World"
 """
-# you can skip past this part and onto the next.
-# what this does is allow tdl to be used without installing it first.
+# you can skip past this part and go onto the next.
+# what this does is allow tdl to be imported without installing it first.
 import sys
 sys.path.insert(0, '../')
 
