@@ -200,7 +200,7 @@ class App(object):
        L{tdl.flush}.  It is passed a single parameter detailing the time in
        seconds since the last update (often known as deltaTime.)
     """
-    __slots__ = ('__running')
+    __slots__ = ('__running', '__prevTime')
     __running = False
     
     def ev_QUIT(self, event):
@@ -240,7 +240,7 @@ class App(object):
         """When called the App will begin to return control to where
         L{App.run} was called.
         
-        No further events are processed and the L{App.update} method will be
+        Some further events are processed and the L{App.update} method will be
         called one last time before exiting
         (unless suspended during a call to L{App.update}.)
         """
@@ -257,24 +257,31 @@ class App(object):
         if self.__running:
             raise _tdl.TDLError('An App can not be run multiple times simultaneously')
         self.__running = True
-        prevTime = time.clock()
         while self.__running:
-            for event in get():
-                if event.type: # exclude custom events with a blank type variable
-                    # call the ev_* methods
-                    method = 'ev_%s' % event.type # ev_TYPE
+            self.runOnce()
+    
+    def runOnce(self):
+        """Pump events to this App instance and then return.
+        
+        This works in the way described in L{App.run} except it immediately
+        returns after the first L{update} call.
+        """
+        if not hasattr(self, '__prevTime'):
+            self.__prevTime = time.clock() # initiate __prevTime
+        for event in get():
+            if event.type: # exclude custom events with a blank type variable
+                # call the ev_* methods
+                method = 'ev_%s' % event.type # ev_TYPE
+                getattr(self, method)(event)
+            if event.type == 'KEYDOWN':
+                # call the key_* methods
+                method = 'key_%s' % event.key # key_KEYNAME
+                if hasattr(self, method): # silently exclude undefined methods
                     getattr(self, method)(event)
-                if event.type == 'KEYDOWN':
-                    # call the key_* methods
-                    method = 'key_%s' % event.key # key_KEYNAME
-                    if hasattr(self, method): # silently exclude undefined methods
-                        getattr(self, method)(event)
-                if not self.__running:
-                    break # interupt event handing after suspend()
-            newTime = time.clock()
-            self.update(newTime - prevTime)
-            prevTime = newTime
-            _tdl.flush()
+        newTime = time.clock()
+        self.update(newTime - self.__prevTime)
+        self.__prevTime = newTime
+        _tdl.flush()
 
 def _processEvents():
     """Flushes the event queue from libtcod into the global list _eventQueue"""

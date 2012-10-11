@@ -117,9 +117,11 @@ tdl.event.App.suspend	tdl.event.App-class.html#suspend
 tdl.event.App.ev_MOUSEUP	tdl.event.App-class.html#ev_MOUSEUP
 tdl.event.App.ev_MOUSEDOWN	tdl.event.App-class.html#ev_MOUSEDOWN
 tdl.event.App.run	tdl.event.App-class.html#run
+tdl.event.App.__prevTime	tdl.event.App-class.html#__prevTime
 tdl.event.App.update	tdl.event.App-class.html#update
 tdl.event.App.__running	tdl.event.App-class.html#__running
 tdl.event.App.ev_KEYUP	tdl.event.App-class.html#ev_KEYUP
+tdl.event.App.runOnce	tdl.event.App-class.html#runOnce
 tdl.event.App.ev_QUIT	tdl.event.App-class.html#ev_QUIT
 tdl.event.App.ev_KEYDOWN	tdl.event.App-class.html#ev_KEYDOWN
 tdl.event.App.ev_MOUSEMOTION	tdl.event.App-class.html#ev_MOUSEMOTION

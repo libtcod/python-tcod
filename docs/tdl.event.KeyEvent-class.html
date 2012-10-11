@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>tdl.event.MouseMotion</title>
+  <title>tdl.event.KeyEvent</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -44,7 +44,7 @@
       <span class="breadcrumbs">
         <a href="tdl-module.html">Package&nbsp;tdl</a> ::
         <a href="tdl.event-module.html">Module&nbsp;event</a> ::
-        Class&nbsp;MouseMotion
+        Class&nbsp;KeyEvent
       </span>
     </td>
     <td>
@@ -52,25 +52,29 @@
         <!-- hide/show private -->
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="tdl.event.MouseMotion-class.html"
+            >]&nbsp;|&nbsp;<a href="tdl.event.KeyEvent-class.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class MouseMotion</h1><p class="nomargin-top"><span class="codelink"><a href="tdl.event-pysrc.html#MouseMotion">source&nbsp;code</a></span></p>
+<h1 class="epydoc">Class KeyEvent</h1><p class="nomargin-top"><span class="codelink"><a href="tdl.event-pysrc.html#KeyEvent">source&nbsp;code</a></span></p>
 <pre class="base-tree">
 object --+    
          |    
      <a href="tdl.event.Event-class.html">Event</a> --+
              |
-            <strong class="uidshort">MouseMotion</strong>
+            <strong class="uidshort">KeyEvent</strong>
 </pre>
 
-<hr />
-<p>Fired when the mouse is moved.</p>
+<dl><dt>Known Subclasses:</dt>
+<dd>
+      <ul class="subclass-list">
+<li><a href="tdl.event.KeyDown-class.html">KeyDown</a></li><li>, <a href="tdl.event.KeyUp-class.html">KeyUp</a></li>  </ul>
+</dd></dl>
 
+<hr />
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
 <table class="summary" border="1" cellpadding="3"
@@ -85,14 +89,17 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="tdl.event.MouseMotion-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">pos</span>,
-        <span class="summary-sig-arg">cell</span>,
-        <span class="summary-sig-arg">motion</span>,
-        <span class="summary-sig-arg">cellmotion</span>)</span><br />
+          <td><span class="summary-sig"><a href="tdl.event.KeyEvent-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">key</span>,
+        <span class="summary-sig-arg">char</span>,
+        <span class="summary-sig-arg">lalt</span>,
+        <span class="summary-sig-arg">lctrl</span>,
+        <span class="summary-sig-arg">ralt</span>,
+        <span class="summary-sig-arg">rctrl</span>,
+        <span class="summary-sig-arg">shift</span>)</span><br />
       x.__init__(...) initializes x; see help(type(x)) for signature</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="tdl.event-pysrc.html#MouseMotion.__init__">source&nbsp;code</a></span>
+            <span class="codelink"><a href="tdl.event-pysrc.html#KeyEvent.__init__">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -148,8 +155,9 @@ object --+
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="type"></a><span class="summary-name">type</span> = <code title="'MOUSEMOTION'"><code class="variable-quote">'</code><code class="variable-string">MOUSEMOTION</code><code class="variable-quote">'</code></code><br />
+        <a href="tdl.event.Event-class.html#type" class="summary-name">type</a> = <code title="None">None</code><br />
       String constant representing the type of event.
+      <em>(Inherited from <a href="tdl.event.Event-class.html">tdl.event.Event</a>)</em>
     </td>
   </tr>
 </table>
@@ -163,34 +171,70 @@ object --+
 </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">string</span>
     </td><td class="summary">
-        <a href="tdl.event.MouseMotion-class.html#pos" class="summary-name">pos</a><br />
-      (x, y) position of the mouse on the screen.
+        <a href="tdl.event.KeyEvent-class.html#key" class="summary-name">key</a><br />
+      Human readable name of the key pressed.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">string</span>
     </td><td class="summary">
-        <a href="tdl.event.MouseMotion-class.html#cell" class="summary-name">cell</a><br />
-      (x, y) position of the mouse snapped to a cell on the root console.
+        <a href="tdl.event.KeyEvent-class.html#char" class="summary-name">char</a><br />
+      A single character string of the letter or symbol pressed.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">boolean</span>
     </td><td class="summary">
-        <a href="tdl.event.MouseMotion-class.html#motion" class="summary-name">motion</a><br />
-      (x, y) motion of the mouse on the screen.
+        <a name="leftAlt"></a><span class="summary-name">leftAlt</span>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">boolean</span>
     </td><td class="summary">
-        <a href="tdl.event.MouseMotion-class.html#cellmotion" class="summary-name">cellmotion</a><br />
-      (x, y) mostion of the mouse moving over cells on the root console.
+        <a name="rightAlt"></a><span class="summary-name">rightAlt</span>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">boolean</span>
+    </td><td class="summary">
+        <a name="leftCtrl"></a><span class="summary-name">leftCtrl</span>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">boolean</span>
+    </td><td class="summary">
+        <a name="rightCtrl"></a><span class="summary-name">rightCtrl</span>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">boolean</span>
+    </td><td class="summary">
+        <a name="shift"></a><span class="summary-name">shift</span><br />
+      True if shift was held down during this event.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">boolean</span>
+    </td><td class="summary">
+        <a name="alt"></a><span class="summary-name">alt</span><br />
+      True if alt was held down during this event.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">boolean</span>
+    </td><td class="summary">
+        <a name="control"></a><span class="summary-name">control</span><br />
+      True if control was held down during this event.
     </td>
   </tr>
 </table>
@@ -227,14 +271,17 @@ object --+
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">pos</span>,
-        <span class="sig-arg">cell</span>,
-        <span class="sig-arg">motion</span>,
-        <span class="sig-arg">cellmotion</span>)</span>
+        <span class="sig-arg">key</span>,
+        <span class="sig-arg">char</span>,
+        <span class="sig-arg">lalt</span>,
+        <span class="sig-arg">lctrl</span>,
+        <span class="sig-arg">ralt</span>,
+        <span class="sig-arg">rctrl</span>,
+        <span class="sig-arg">shift</span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="tdl.event-pysrc.html#MouseMotion.__init__">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="tdl.event-pysrc.html#KeyEvent.__init__">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -257,48 +304,35 @@ object --+
     <span class="table-header">Instance Variable Details</span></td>
 </tr>
 </table>
-<a name="pos"></a>
+<a name="key"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
-  <h3 class="epydoc">pos</h3>
-  <p>(x, y) position of the mouse on the screen. type: (int, int)</p>
+  <h3 class="epydoc">key</h3>
+  <p>Human readable name of the key pressed.</p>
+  <p>Can be one of 'NONE', 'ESCAPE', 'BACKSPACE', 'TAB', 'ENTER', 'SHIFT', 
+  'CONTROL', 'ALT', 'PAUSE', 'CAPSLOCK', 'PAGEUP', 'PAGEDOWN', 'END', 
+  'HOME', 'UP', 'LEFT', 'RIGHT', 'DOWN', 'PRINTSCREEN', 'INSERT', 'DELETE',
+  'LWIN', 'RWIN', 'APPS', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+  'KP0', 'KP1', 'KP2', 'KP3', 'KP4', 'KP5', 'KP6', 'KP7', 'KP8', 'KP9', 
+  'KPADD', 'KPSUB', 'KPDIV', 'KPMUL', 'KPDEC', 'KPENTER', 'F1', 'F2', 'F3',
+  'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'NUMLOCK', 
+  'SCROLLLOCK', 'SPACE', 'CHAR'</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
 </div>
-<a name="cell"></a>
+<a name="char"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
-  <h3 class="epydoc">cell</h3>
-  <p>(x, y) position of the mouse snapped to a cell on the root console. 
-  type: (int, int)</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="motion"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">motion</h3>
-  <p>(x, y) motion of the mouse on the screen. type: (int, int)</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="cellmotion"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">cellmotion</h3>
-  <p>(x, y) mostion of the mouse moving over cells on the root console. 
-  type: (int, int)</p>
+  <h3 class="epydoc">char</h3>
+  <p>A single character string of the letter or symbol pressed.</p>
+  <p>Special characters like delete and return are not cross-platform. <a 
+  href="tdl.event.KeyEvent-class.html#key" class="link">key</a> should be 
+  used instead for special keys.</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -336,7 +370,7 @@ object --+
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Thu Oct 04 00:52:16 2012</a>
+    3.0.1 on Wed Oct 10 22:45:26 2012</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
