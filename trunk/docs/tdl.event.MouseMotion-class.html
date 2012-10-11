@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>tdl.event.Quit</title>
+  <title>tdl.event.MouseMotion</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -44,7 +44,7 @@
       <span class="breadcrumbs">
         <a href="tdl-module.html">Package&nbsp;tdl</a> ::
         <a href="tdl.event-module.html">Module&nbsp;event</a> ::
-        Class&nbsp;Quit
+        Class&nbsp;MouseMotion
       </span>
     </td>
     <td>
@@ -52,24 +52,24 @@
         <!-- hide/show private -->
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="tdl.event.Quit-class.html"
+            >]&nbsp;|&nbsp;<a href="tdl.event.MouseMotion-class.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class Quit</h1><p class="nomargin-top"><span class="codelink"><a href="tdl.event-pysrc.html#Quit">source&nbsp;code</a></span></p>
+<h1 class="epydoc">Class MouseMotion</h1><p class="nomargin-top"><span class="codelink"><a href="tdl.event-pysrc.html#MouseMotion">source&nbsp;code</a></span></p>
 <pre class="base-tree">
 object --+    
          |    
      <a href="tdl.event.Event-class.html">Event</a> --+
              |
-            <strong class="uidshort">Quit</strong>
+            <strong class="uidshort">MouseMotion</strong>
 </pre>
 
 <hr />
-<p>Fired when the window is closed by the user.</p>
+<p>Fired when the mouse is moved.</p>
 
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
@@ -79,6 +79,27 @@ object --+
   <td align="left" colspan="2" class="table-header">
     <span class="table-header">Instance Methods</span></td>
 </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="tdl.event.MouseMotion-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">pos</span>,
+        <span class="summary-sig-arg">cell</span>,
+        <span class="summary-sig-arg">motion</span>,
+        <span class="summary-sig-arg">cellmotion</span>)</span><br />
+      x.__init__(...) initializes x; see help(type(x)) for signature</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl.event-pysrc.html#MouseMotion.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -104,7 +125,6 @@ object --+
       <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
-      <code>__init__</code>,
       <code>__new__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
@@ -128,8 +148,49 @@ object --+
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="type"></a><span class="summary-name">type</span> = <code title="'QUIT'"><code class="variable-quote">'</code><code class="variable-string">QUIT</code><code class="variable-quote">'</code></code><br />
+        <a name="type"></a><span class="summary-name">type</span> = <code title="'MOUSEMOTION'"><code class="variable-quote">'</code><code class="variable-string">MOUSEMOTION</code><code class="variable-quote">'</code></code><br />
       String constant representing the type of event.
+    </td>
+  </tr>
+</table>
+<!-- ==================== INSTANCE VARIABLES ==================== -->
+<a name="section-InstanceVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Instance Variables</span></td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.event.MouseMotion-class.html#pos" class="summary-name">pos</a><br />
+      (x, y) position of the mouse on the screen.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.event.MouseMotion-class.html#cell" class="summary-name">cell</a><br />
+      (x, y) position of the mouse snapped to a cell on the root console.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.event.MouseMotion-class.html#motion" class="summary-name">motion</a><br />
+      (x, y) motion of the mouse on the screen.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.event.MouseMotion-class.html#cellmotion" class="summary-name">cellmotion</a><br />
+      (x, y) mostion of the mouse moving over cells on the root console.
     </td>
   </tr>
 </table>
@@ -149,6 +210,100 @@ object --+
     </td>
   </tr>
 </table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Method Details</span></td>
+</tr>
+</table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">pos</span>,
+        <span class="sig-arg">cell</span>,
+        <span class="sig-arg">motion</span>,
+        <span class="sig-arg">cellmotion</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl.event-pysrc.html#MouseMotion.__init__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>x.__init__(...) initializes x; see help(type(x)) for signature</p>
+  <dl class="fields">
+    <dt>Overrides:
+        object.__init__
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== INSTANCE VARIABLE DETAILS ==================== -->
+<a name="section-InstanceVariableDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Instance Variable Details</span></td>
+</tr>
+</table>
+<a name="pos"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">pos</h3>
+  <p>(x, y) position of the mouse on the screen. type: (int, int)</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="cell"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">cell</h3>
+  <p>(x, y) position of the mouse snapped to a cell on the root console. 
+  type: (int, int)</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="motion"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">motion</h3>
+  <p>(x, y) motion of the mouse on the screen. type: (int, int)</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="cellmotion"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">cellmotion</h3>
+  <p>(x, y) mostion of the mouse moving over cells on the root console. 
+  type: (int, int)</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
        bgcolor="#a0c0ff" cellspacing="0">
@@ -181,7 +336,7 @@ object --+
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Thu Oct 04 00:52:16 2012</a>
+    3.0.1 on Wed Oct 10 22:45:26 2012</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
