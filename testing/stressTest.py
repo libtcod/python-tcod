@@ -90,10 +90,19 @@ class SingleRectTest(TestApp):
         bgcolor = (random.getrandbits(6), random.getrandbits(6), random.getrandbits(6))
         self.console.drawRect(0, 0, None, None, ' ', (255, 255, 255), bgcolor)
     
+class DrawStrTest(TestApp):
+
+    def updateTest(self, deltaTime):
+        for y in range(self.height):
+            bgcolor = (random.getrandbits(6), random.getrandbits(6), random.getrandbits(6))
+            string = [random.getrandbits(8) for x in range(self.width)]
+            self.console.drawStr(0, y, string, (255, 255, 255), bgcolor)
+    
             
 def main():
     console = tdl.init(60, 40)
-    for Test in [FullDrawCharTest, CharOnlyTest, ColorOnlyTest, GetCharTest, SingleRectTest]:
+    for Test in [FullDrawCharTest, CharOnlyTest, ColorOnlyTest, GetCharTest,
+                 SingleRectTest, DrawStrTest]:
         Test(console).run()
         console.clear()
 

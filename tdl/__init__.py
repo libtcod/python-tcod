@@ -34,16 +34,14 @@ from . import event
 from .__tcod import _lib, _Color, _unpackfile
 
 _IS_PYTHON3 = (sys.version_info[0] == 3)
-_USE_FILL = False
-'Set to True to use the libtcod fill optimization.  This is actually slower than the normal mode.'
 
-def _format_string(string): # still used for filepaths, and that's about it
+def _encodeString(string): # still used for filepaths, and that's about it
     "changes string into bytes if running in python 3, for sending to ctypes"
     if _IS_PYTHON3 and isinstance(string, str):
         return string.encode()
     return string
 
-#def _encodeString(string):
+#def _formatString(string):
 #    pass
 
 def _formatChar(char):
@@ -93,14 +91,13 @@ def _iscolor(color):
     if isinstance(color, int) or not _IS_PYTHON3 and isinstance(color, long):
         return True
     return False
-
+    
 def _formatColor(color):
     """Format the color to ctypes
     """
     if color is None:
         return None
-    # avoid isinstance, checking __class__ gives a small speed increase
-    if color.__class__ is _Color:
+    if isinstance(color, _Color):
         return color
     if isinstance(color, int) or not _IS_PYTHON3 and isinstance(color, long):
         # format a web style color with the format 0xRRGGBB
@@ -172,14 +169,23 @@ class _MetaConsole(object):
         assert _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
         width, height = self.getSize()
-        for char in string:
-            if y == height:
-                raise TDLError('End of console reached.')
-            self._setChar(x, y, _formatChar(char), fgcolor, bgcolor)
-            x += 1 # advance cursor
-            if x == width: # line break
-                x = 0
-                y += 1
+        batch = [] # prepare a batch operation
+        def _drawStrGen(x=x, y=y, string=string, width=width, height=height):
+            """Generator for drawStr
+            
+            Iterates over ((x, y), ch) data for _setCharBatch, raising an
+            error if the end of the console is reached.
+            """
+            for char in string:
+                if y == height:
+                    raise TDLError('End of console reached.')
+                #batch.append(((x, y), _formatChar(char))) # ((x, y), ch)
+                yield((x, y), _formatChar(char))
+                x += 1 # advance cursor
+                if x == width: # line break
+                    x = 0
+                    y += 1
+        self._setCharBatch(_drawStrGen(), fgcolor, bgcolor)
     
     def drawRect(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a rectangle starting from x and y and extending to width and
@@ -198,9 +204,13 @@ class _MetaConsole(object):
         assert _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
         char = _formatChar(string)
-        for cellY in range(y, y + height):
-            for cellX in range(x, x + width):
-                self._setChar(cellX, cellY, char, fgcolor, bgcolor)
+        # use itertools to make an x,y grid
+        # using ctypes here reduces type converstions later
+        grid = itertools.product((ctypes.c_int(x) for x in range(x, x + width)),
+                                 (ctypes.c_int(y) for y in range(y, y + height)))
+        # zip the single character in a batch variable
+        batch = zip(grid, itertools.repeat(char, width * height))
+        self._setCharBatch(batch, fgcolor, bgcolor)
         
     def drawFrame(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Similar to drawRect but only draws the outline of the rectangle.
@@ -442,7 +452,6 @@ class Console(_MetaConsole):
         self._as_parameter_ = _lib.TCOD_console_new(width, height)
         self.width = width
         self.height = height
-        self._initArrays()
         #self.clear()
         
     @classmethod
@@ -452,22 +461,8 @@ class Console(_MetaConsole):
         self._as_parameter_ = console
         self.width = _lib.TCOD_console_get_width(self)
         self.height = _lib.TCOD_console_get_height(self)
-        self._initArrays()
         #self.clear()
         return self
-        
-    def _initArrays(self):
-        if not _USE_FILL:
-            return
-        # used for the libtcod fill optimization
-        IntArray = ctypes.c_int * (self.width * self.height)
-        self.chArray = IntArray()
-        self.fgArrays = (IntArray(),
-                         IntArray(),
-                         IntArray())
-        self.bgArrays = (IntArray(),
-                         IntArray(),
-                         IntArray())
         
     def __del__(self):
         """
@@ -517,15 +512,7 @@ class Console(_MetaConsole):
         _lib.TCOD_console_set_default_foreground(self, _formatColor(fgcolor))
         _lib.TCOD_console_clear(self)
     
-    def _setCharFill(self, x, y, char, fgcolor=None, bgcolor=None):
-        """An optimized version using the fill wrappers that didn't work out to be any faster"""
-        index = x + y * self.width
-        self.chArray[index] = char
-        for channel, color in zip(itertools.chain(self.fgArrays, self.bgArrays),
-                                  itertools.chain(fgcolor, bgcolor)):
-            channel[index] = color
-
-    def _setCharCall(self, x, y, char, fgcolor=None, bgcolor=None, bgblend=1):
+    def _setChar(self, x, y, char, fgcolor=None, bgcolor=None, bgblend=1):
         """
         Sets a character.
         This is called often and is designed to be as fast as possible.
@@ -533,19 +520,42 @@ class Console(_MetaConsole):
         Because of the need for speed this function will do NO TYPE CHECKING
         AT ALL, it's up to the drawing functions to use the functions:
         _formatChar and _formatColor before passing to this."""
+        # buffer values as ctypes objects
+        console = self._as_parameter_
+        x = ctypes.c_int(x)
+        y = ctypes.c_int(y)
+        
         if char is not None and fgcolor is not None and bgcolor is not None:
-            return _setcharEX(self, x, y, char, fgcolor, bgcolor)
+            _setcharEX(console, x, y, char, fgcolor, bgcolor)
+            return
         if char is not None:
-            _setchar(self, x, y, char)
+            _setchar(console, x, y, char)
         if fgcolor is not None:
-            _setfore(self, x, y, fgcolor)
+            _setfore(console, x, y, fgcolor)
         if bgcolor is not None:
-            _setback(self, x, y, bgcolor, bgblend)
+            _setback(console, x, y, bgcolor, bgblend)
             
-    if _USE_FILL:
-        _setChar = _setCharFill
-    else:
-        _setChar = _setCharCall
+    def _setCharBatch(self, batch, fgcolor, bgcolor, bgblend=1):
+        """
+        Try to perform a batch operation otherwise fall back to _setChar.
+        If fgcolor and bgcolor are defined then this is faster but not by very
+        much.
+        
+        batch is a iterable of [(x, y), ch] items
+        """
+        if fgcolor and bgcolor:
+            # buffer values as ctypes objects
+            console = self._as_parameter_
+            bgblend = ctypes.c_int(bgblend)
+            
+            _lib.TCOD_console_set_default_background(console, bgcolor)
+            _lib.TCOD_console_set_default_foreground(console, fgcolor)
+            _putChar = _lib.TCOD_console_put_char # remove dots
+            for (x, y), char in batch:
+                _putChar(console, x, y, char, bgblend)
+        else:
+            for (x, y), char in batch:
+                self._setChar(x, y, char, fgcolor, bgcolor, bgblend)
 
     def getChar(self, x, y):
         """Return the character and colors of a cell as
@@ -556,7 +566,7 @@ class Console(_MetaConsole):
         
         @rtype: (int, 3-item tuple, 3-item tuple)
         """
-        self._drawable(x, y)
+        assert self._drawable(x, y)
         char = _lib.TCOD_console_get_char(self, x, y)
         bgcolor = _lib.TCOD_console_get_char_background_wrapper(self, x, y)
         fgcolor = _lib.TCOD_console_get_char_foreground_wrapper(self, x, y)
@@ -603,6 +613,12 @@ class Window(_MetaConsole):
 
     def _setChar(self, x, y, char=None, fgcolor=None, bgcolor=None, bgblend=1):
         self.parent._setChar((x + self.x), (y + self.y), char, fgcolor, bgcolor, bgblend)
+    
+    def _setCharBatch(self, batch, fgcolor, bgcolor, bgblend=1):
+        myX = self.x # remove dots for speed up
+        myY = self.y
+        self.parent._setCharBatch((((x + myX, y + myY), ch) for ((x, y), ch) in batch),
+                                  fgcolor, bgcolor, bgblend)
     
     def getChar(self, x, y):
         """Return the character and colors of a cell as (ch, fg, bg)
@@ -667,7 +683,7 @@ def init(width, height, title='python-tdl', fullscreen=False, renderer='OPENGL')
         oldroot._replace(rootreplacement)
         del rootreplacement
 
-    _lib.TCOD_console_init_root(width, height, _format_string(title), fullscreen, renderer)
+    _lib.TCOD_console_init_root(width, height, _encodeString(title), fullscreen, renderer)
 
     #event.get() # flush the libtcod event queue to fix some issues
     # issues may be fixed already
@@ -689,12 +705,6 @@ def flush():
     """
     if not _rootinitialized:
         raise TDLError('Cannot flush without first initializing with tdl.init')
-        
-    if _USE_FILL:
-        console = _rootconsole()
-        _lib.TCOD_console_fill_background(console, *console.bgArrays)
-        _lib.TCOD_console_fill_foreground(console, *console.fgArrays)
-        _lib.TCOD_console_fill_char(console, console.chArray)
         
     _lib.TCOD_console_flush()
 
@@ -757,7 +767,7 @@ def setFont(path, tileWidth, tileHeight, colomn=False,
         flags |= FONT_TYPE_GREYSCALE
     if not os.path.exists(path):
         raise TDLError('no file exists at: "%s"' % path)
-    _lib.TCOD_console_set_custom_font(_format_string(path), flags, tileWidth, tileHeight)
+    _lib.TCOD_console_set_custom_font(_encodeString(path), flags, tileWidth, tileHeight)
 
 def getFullscreen():
     """Returns True if program is fullscreen.
@@ -786,7 +796,7 @@ def setTitle(title):
     """
     if not _rootinitialized:
         raise TDLError('Not initilized.  Set title with tdl.init')
-    _lib.TCOD_console_set_window_title(_format_string(title))
+    _lib.TCOD_console_set_window_title(_encodeString(title))
 
 def screenshot(path=None):
     """Capture the screen and save it as a png file
@@ -801,10 +811,10 @@ def screenshot(path=None):
     if not _rootinitialized:
         raise TDLError('Initialize first with tdl.init')
     if isinstance(fileobj, str):
-        _lib.TCOD_sys_save_screenshot(_format_string(fileobj))
+        _lib.TCOD_sys_save_screenshot(_encodeString(fileobj))
     elif isinstance(fileobj, file): # save to temp file and copy to file-like obj
         tmpname = os.tempnam()
-        _lib.TCOD_sys_save_screenshot(_format_string(tmpname))
+        _lib.TCOD_sys_save_screenshot(_encodeString(tmpname))
         with tmpname as tmpfile:
             fileobj.write(tmpfile.read())
         os.remove(tmpname)
@@ -815,7 +825,7 @@ def screenshot(path=None):
         while filename in filelist:
             n += 1
             filename = 'screenshot%.4i.png' % n
-        _lib.TCOD_sys_save_screenshot(_format_string(filename))
+        _lib.TCOD_sys_save_screenshot(_encodeString(filename))
     else:
         raise TypeError('fileobj is an invalid type: %s' % type(fileobj))
 
