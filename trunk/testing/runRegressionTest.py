@@ -134,7 +134,7 @@ class DrawingTests(TDLTemplate):
             else:
                 self.console.drawStr(x, y, string, fg, bg)
             for ch in string: # inspect console for changes
-                self.assertEqual(self.console.getChar(x, y), (ch, fg, bg), 'console data should be overwritten')
+                self.assertEqual(self.console.getChar(x, y), (ch, fg, bg), 'console data should be overwritten, even after an error')
                 x += 1
                 if x == width:
                     x = 0
