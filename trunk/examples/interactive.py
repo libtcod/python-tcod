@@ -6,6 +6,7 @@ import sys
 import code
 import textwrap
 import io
+import traceback
 
 sys.path.insert(0, '../')
 import tdl
@@ -15,10 +16,6 @@ sys.ps2 = '... '
 
 WIDTH, HEIGHT = 80, 50
 console = tdl.init(WIDTH, HEIGHT, 'Python Interpeter in TDL')
-
-def scroll():
-    console.blit(console, 0, 0, None, HEIGHT-1 , 0, 1)
-    console.drawRect(0, HEIGHT-1, None, 1, ' ', (255, 255, 255), (0, 0, 0))
 
 class TDLPrint(io.TextIOBase):
     def __init__(self, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
@@ -31,10 +28,13 @@ class TDLPrint(io.TextIOBase):
                 console.drawStr(0, HEIGHT-1, string, *self.colors)
                 tdl.flush()
 
-sys.stdout = TDLPrint()
+#sys.stdout = TDLPrint()
+sys.stdout = tdl.Typewriter(console)
+sys.stdout.move(0, HEIGHT-1)
 olderr = sys.stderr
 newerr = TDLPrint((255, 255, 255), (127, 0, 0))
 interpeter = code.InteractiveConsole({'tdl':tdl, 'console':console})
+print()
 print('Python %s' % sys.version)
 print('Press ESC to quit')
 if __name__ == '__main__':
@@ -42,7 +42,6 @@ if __name__ == '__main__':
     commands = ['']
     banner = sys.ps1
     cursor = 0
-    scroll()
     while 1:
         console.drawRect(0, HEIGHT-1, None, 1, ' ', (255, 255, 255), (0, 0, 0))
         console.drawStr(0, HEIGHT-1, banner + buffer)
@@ -60,11 +59,11 @@ if __name__ == '__main__':
                     sys.stderr = newerr
                     try:
                         console.drawRect(0, HEIGHT-1, None, 1, None, (255, 255, 255), (0, 0, 0))
+                        console.scroll(0, -1)
                         if interpeter.push(buffer):
                             banner = sys.ps2
                         else:
                             banner = sys.ps1
-                        scroll()
                     except SystemExit:
                         raise
                     except:

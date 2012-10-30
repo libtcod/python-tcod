@@ -1,7 +1,7 @@
 """
     The documentation for python-tdl.  A Pythonic port of
     U{libtcod<http://doryen.eptalys.net/libtcod/>}.
-    
+
     Getting Started
     ===============
       Once the library is imported you can load the font you want to use with
@@ -9,7 +9,7 @@
       default font.  After that you call L{tdl.init} to set the size of the
       window and get the root console in return.  This console is the canvas
       to what will appear on the screen.
-    
+
     Drawing
     =======
       Once you have the root console from L{tdl.init} you can start drawing on
@@ -29,8 +29,9 @@ import ctypes
 import weakref
 import array
 import itertools
+import textwrap
 
-from . import event
+from . import event, path
 from .__tcod import _lib, _Color, _unpackfile
 
 _IS_PYTHON3 = (sys.version_info[0] == 3)
@@ -48,7 +49,7 @@ def _formatChar(char):
     """Prepares a single character for passing to ctypes calls, needs to return
     an integer but can also pass None which will keep the current character
     instead of overrwriting it.
-    
+
     This is called often and needs to be optimized whenever possible.
     """
     if char is None:
@@ -79,7 +80,7 @@ def _iscolor(color):
     """Used internally.
     A debug function to see if an object can be used as a TCOD color struct.
     None counts as a parameter to keep the current colors instead.
-    
+
     This function is often part of an inner-loop and can slow a program down.
     It has been made to work with assert and can be skipped with the -O flag.
     Still it's called often and must be optimized.
@@ -91,7 +92,7 @@ def _iscolor(color):
     if isinstance(color, int) or not _IS_PYTHON3 and isinstance(color, long):
         return True
     return False
-    
+
 def _formatColor(color):
     """Format the color to ctypes
     """
@@ -103,7 +104,7 @@ def _formatColor(color):
         # format a web style color with the format 0xRRGGBB
         return _Color(color >> 16 & 0xff, color >> 8 & 0xff, color & 0xff)
     return _Color(*color)
-    
+
 class TDLError(Exception):
     """
     The catch all for most TDL specific errors.
@@ -114,7 +115,7 @@ class _MetaConsole(object):
     Contains methods shared by both the L{Console} and L{Window} classes.
     """
     __slots__ = ('width', 'height', '__weakref__', '__dict__')
-    
+
     def drawChar(self, x, y, char, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a single character.
 
@@ -124,23 +125,23 @@ class _MetaConsole(object):
         @type fgcolor: 3-item list or None
         @type bgcolor: 3-item list or None
         @param char: Should be an integer, single character string, or None.
-        
+
                      You can set the char parameter as None if you only want to change
                      the colors of the tile.
 
         @param fgcolor: For fgcolor and bgcolor you use a 3 item list with integers ranging 0 - 255 or None.
                         None will keep the current color at this position unchanged.
-        
-        
+
+
         @raise AssertionError: Having the x or y values outside of the console will raise an
                                AssertionError.  You can use ((x, y) in console)
                                to check if a cell is drawable.
         """
-        
+
         assert _verify_colors(fgcolor, bgcolor)
         assert self._drawable(x, y)
-        
-        self._setChar(x, y, _formatChar(char),
+
+        self._setChar(ctypes.c_int(x), ctypes.c_int(y), _formatChar(char),
                       _formatColor(fgcolor), _formatColor(bgcolor))
 
     def drawStr(self, x, y, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
@@ -156,15 +157,15 @@ class _MetaConsole(object):
         table as is.
 
         fgcolor and bgcolor can be set to None to keep the colors unchanged.
-        
+
         @type x: int
         @type y: int
         @type string: string or iterable
         @type fgcolor: 3-item list or None
         @type bgcolor: 3-item list or None
-        
+
         """
-        
+
         assert self._drawable(x, y)
         assert _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
@@ -172,7 +173,7 @@ class _MetaConsole(object):
         batch = [] # prepare a batch operation
         def _drawStrGen(x=x, y=y, string=string, width=width, height=height):
             """Generator for drawStr
-            
+
             Iterates over ((x, y), ch) data for _setCharBatch, raising an
             error if the end of the console is reached.
             """
@@ -186,12 +187,12 @@ class _MetaConsole(object):
                     x = 0
                     y += 1
         self._setCharBatch(_drawStrGen(), fgcolor, bgcolor)
-    
+
     def drawRect(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a rectangle starting from x and y and extending to width and
         height.  If width or height are None then it will extend to the edge
         of the console.  The rest are the same as drawChar.
-        
+
         @type x: int
         @type y: int
         @type width: int or None
@@ -210,11 +211,11 @@ class _MetaConsole(object):
                                  (ctypes.c_int(y) for y in range(y, y + height)))
         # zip the single character in a batch variable
         batch = zip(grid, itertools.repeat(char, width * height))
-        self._setCharBatch(batch, fgcolor, bgcolor)
-        
+        self._setCharBatch(batch, fgcolor, bgcolor, nullChar=(char is None))
+
     def drawFrame(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Similar to drawRect but only draws the outline of the rectangle.
-        
+
         @type x: int
         @type y: int
         @type width: int or None
@@ -229,14 +230,14 @@ class _MetaConsole(object):
         char = _formatChar(string)
         if width == 1 or height == 1: # it's just a single width line here
             return self.drawRect(x, y, width, height, char, fgcolor, bgcolor)
-        
+
         # draw sides of frame with drawRect
         self.drawRect(x, y, 1, height, char, fgcolor, bgcolor)
         self.drawRect(x, y, width, 1, char, fgcolor, bgcolor)
         self.drawRect(x + width - 1, y, 1, height, char, fgcolor, bgcolor)
         self.drawRect(x, y + height - 1, width, 1, char, fgcolor, bgcolor)
-    
-    
+
+
     def _normalizeRect(self, x, y, width, height):
         """Check if the rectangle is in bounds and make minor adjustments.
         raise AssertionError's for any problems
@@ -250,14 +251,14 @@ class _MetaConsole(object):
             height = self.height - y
         assert isinstance(width, int), 'width must be an integer or None, got %s' % repr(width)
         assert isinstance(height, int), 'height must be an integer or None, got %s' % repr(height)
-        
+
         assert width >= 0 and height >= 0, 'width and height cannot be negative'
         # later idea, negative numbers work like Python list indexing
-        
+
         assert x >= 0 and y >= 0 and x + width <= self.width and y + height <= self.height, \
         'Rect is out of bounds at (x=%i y=%i width=%i height=%i), Console bounds are (width=%i, height=%i)' % (old + self.getSize())
         return x, y, width, height
-    
+
     def _rectInBounds(self, x, y, width, height):
         "check the rect so see if it's within the bounds of this console"
         if width is None:
@@ -267,12 +268,12 @@ class _MetaConsole(object):
         if (x < 0 or y < 0 or
             x + width > self.width or y + height > self.height):
             return False
-            
+
         return True
-    
+
     def _clampRect(self, x=0, y=0, width=None, height=None):
         """Alter a rectange to fit inside of this console
-        
+
         width and hight of None will extend to the edge and
         an area out of bounds will end with a width and height of 0
         """
@@ -295,12 +296,12 @@ class _MetaConsole(object):
         if width <= 0 or height <= 0:
             width = height = 0
         return x, y, width, height
-    
+
     def blit(self, source, x=0, y=0, width=None, height=None, srcX=0, srcY=0):
         """Blit another console or Window onto the current console.
 
         By default it blits the entire source to the topleft corner.
-        
+
         @type source: Console or Window
         @type x: int
         @type y: int
@@ -312,30 +313,30 @@ class _MetaConsole(object):
         # hardcode alpha settings for now
         fgalpha=1.0
         bgalpha=1.0
-        
+
         assert isinstance(source, (Console, Window)), "source muse be a Window or Console instance"
-        
+
         assert width is None or isinstance(width, (int)), "width must be a number or None, got %s" % repr(width)
         assert height is None or isinstance(height, (int)), "height must be a number or None, got %s" % repr(height)
-        
+
         # fill in width, height
         if width == None:
             width = min(self.width - x, source.width - srcX)
         if height == None:
             height = min(self.height - y, source.height - srcY)
-        
+
         x, y, width, height = self._normalizeRect(x, y, width, height)
         srcX, srcY, width, height = source._normalizeRect(srcX, srcY, width, height)
-        
+
         # translate source and self if any of them are Window instances
         if isinstance(source, Window):
             srcX, srcY = source._translate(srcX, srcY)
             source = source.console
-        
+
         if isinstance(self, Window):
             x, y = self._translate(x, y)
             self = self.console
-        
+
         if self == source:
             # if we are the same console then we need a third console to hold
             # onto the data, otherwise it tries to copy into itself and
@@ -348,14 +349,14 @@ class _MetaConsole(object):
 
     def getSize(self):
         """Return the size of the console as (width, height)
-        
+
         @rtype: (int, int)
         """
         return self.width, self.height
-        
+
     def scroll(self, x, y):
         """Scroll the contents of the console in the direction of x,y.
-        
+
         Uncovered areas will be cleared.
         @type x: int
         @type y: int
@@ -382,18 +383,18 @@ class _MetaConsole(object):
             cover = (0, length) # everything covered
             uncover = None  # nothing uncovered
             if x > 0: # left side uncovered
-                cover = (x, length - x) 
+                cover = (x, length - x)
                 uncover = (0, x)
             elif x < 0: # right side uncovered
                 x = abs(x)
                 cover = (0, length - x)
                 uncover = (length - x, x)
             return cover, uncover
-        
+
         width, height = self.getSize()
         if abs(x) >= width or abs(y) >= height:
             return self.clear() # just clear the console normally
-            
+
         # get the ranges of the areas that will be uncovered
         coverX, uncoverX = getCover(x, width)
         coverY, uncoverY = getCover(y, height)
@@ -402,25 +403,25 @@ class _MetaConsole(object):
         # rect in the corner of the uncovered area.  So we need to combine
         # the uncoverX/Y with coverY/X to make what's left of the uncovered
         # area.  Explaining it makes it mush easier to do now.
-        
+
         # But first we need to blit.
         x, width, srcx = getSlide(x, width)
         y, height, srcy = getSlide(y, height)
         self.blit(self, x, y, width, height, srcx, srcy)
-        
+
         if uncoverX: # clear sides (0x20 is space)
             self.drawRect(uncoverX[0], coverY[0], uncoverX[1], coverY[1], 0x20)
         if uncoverY: # clear top/bottom
             self.drawRect(coverX[0], uncoverY[0], coverX[1], uncoverY[1], 0x20)
         if uncoverX and uncoverY: # clear corner
             self.drawRect(uncoverX[0], uncoverY[0], uncoverX[1], uncoverY[1], 0x20)
-        
+
     def __contains__(self, position):
         """Use ((x, y) in console) to check if a position is drawable on this console.
         """
         x, y = position
         return (0 <= x < self.width) and (0 <= y < self.height)
-        
+
     def _drawable(self, x, y):
         """Used internally
         Checks if a cell is part of the console.
@@ -428,7 +429,7 @@ class _MetaConsole(object):
         """
         assert isinstance(x, int), 'x must be an integer, got %s' % repr(x)
         assert isinstance(y, int), 'y must be an integer, got %s' % repr(y)
-        
+
         assert (0 <= x < self.width) and (0 <= y < self.height), \
                 ('(%i, %i) is an invalid postition.  %s size is (%i, %i)' %
                  (x, y, self.__class__.__name__, self.width, self.height))
@@ -444,7 +445,7 @@ class Console(_MetaConsole):
     on and then L{blit} to the root console.
     """
 
-    __slots__ = ('_as_parameter_',)
+    __slots__ = ('_as_parameter_', '_typewriter')
 
     def __init__(self, width, height):
         """Create a new offscreen console
@@ -452,8 +453,9 @@ class Console(_MetaConsole):
         self._as_parameter_ = _lib.TCOD_console_new(width, height)
         self.width = width
         self.height = height
+        self._typewriter = None # "typewriter" lock
         #self.clear()
-        
+
     @classmethod
     def _newConsole(cls, console):
         """Make a Console instance, from a console ctype"""
@@ -463,7 +465,7 @@ class Console(_MetaConsole):
         self.height = _lib.TCOD_console_get_height(self)
         #self.clear()
         return self
-        
+
     def __del__(self):
         """
         If the main console is garbage collected then the window will be closed as well
@@ -480,7 +482,7 @@ class Console(_MetaConsole):
 
     def _replace(self, console):
         """Used internally
-        
+
         Mostly used just to replace this Console object with the root console
         If another Console object is used then they are swapped
         """
@@ -492,39 +494,38 @@ class Console(_MetaConsole):
         self.width = _lib.TCOD_console_get_width(self)
         self.height = _lib.TCOD_console_get_height(self)
         return self
-    
+
     def _translate(self, x, y):
         """Convertion x and y to their position on the root Console for this Window
-        
+
         Because this is a Console instead of a Window we return the paramaters
         untouched"""
         return x, y
-        
+
     def clear(self, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Clears the entire console.
-        
+
         @type fgcolor: 3-item list
         @type bgcolor: 3-item list
         """
         assert _verify_colors(fgcolor, bgcolor)
         assert fgcolor and bgcolor, 'Can not use None with clear'
+        self._typewriter = None
         _lib.TCOD_console_set_default_background(self, _formatColor(bgcolor))
         _lib.TCOD_console_set_default_foreground(self, _formatColor(fgcolor))
         _lib.TCOD_console_clear(self)
-    
+
     def _setChar(self, x, y, char, fgcolor=None, bgcolor=None, bgblend=1):
         """
         Sets a character.
         This is called often and is designed to be as fast as possible.
-        
+
         Because of the need for speed this function will do NO TYPE CHECKING
         AT ALL, it's up to the drawing functions to use the functions:
         _formatChar and _formatColor before passing to this."""
         # buffer values as ctypes objects
         console = self._as_parameter_
-        x = ctypes.c_int(x)
-        y = ctypes.c_int(y)
-        
+
         if char is not None and fgcolor is not None and bgcolor is not None:
             _setcharEX(console, x, y, char, fgcolor, bgcolor)
             return
@@ -534,20 +535,21 @@ class Console(_MetaConsole):
             _setfore(console, x, y, fgcolor)
         if bgcolor is not None:
             _setback(console, x, y, bgcolor, bgblend)
-            
-    def _setCharBatch(self, batch, fgcolor, bgcolor, bgblend=1):
+
+    def _setCharBatch(self, batch, fgcolor, bgcolor, bgblend=1, nullChar=False):
         """
         Try to perform a batch operation otherwise fall back to _setChar.
         If fgcolor and bgcolor are defined then this is faster but not by very
         much.
-        
+
         batch is a iterable of [(x, y), ch] items
         """
-        if fgcolor and bgcolor:
+        if fgcolor and bgcolor and not nullChar:
             # buffer values as ctypes objects
+            self._typewriter = None
             console = self._as_parameter_
             bgblend = ctypes.c_int(bgblend)
-            
+
             _lib.TCOD_console_set_default_background(console, bgcolor)
             _lib.TCOD_console_set_default_foreground(console, fgcolor)
             _putChar = _lib.TCOD_console_put_char # remove dots
@@ -563,7 +565,7 @@ class Console(_MetaConsole):
 
         The charecter is returned as a number.
         Each color is returned as a tuple.
-        
+
         @rtype: (int, 3-item tuple, 3-item tuple)
         """
         assert self._drawable(x, y)
@@ -595,7 +597,7 @@ class Window(_MetaConsole):
             self.console = console
         else:
             self.console = self.parent.console
-    
+
     def _translate(self, x, y):
         """Convertion x and y to their position on the root Console"""
         # we add our position relative to our parent and then call then next parent up
@@ -603,7 +605,7 @@ class Window(_MetaConsole):
 
     def clear(self, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Clears the entire Window.
-        
+
         @type fgcolor: 3-item list
         @type bgcolor: 3-item list
         """
@@ -613,16 +615,29 @@ class Window(_MetaConsole):
 
     def _setChar(self, x, y, char=None, fgcolor=None, bgcolor=None, bgblend=1):
         self.parent._setChar((x + self.x), (y + self.y), char, fgcolor, bgcolor, bgblend)
-    
+
     def _setCharBatch(self, batch, fgcolor, bgcolor, bgblend=1):
         myX = self.x # remove dots for speed up
         myY = self.y
         self.parent._setCharBatch((((x + myX, y + myY), ch) for ((x, y), ch) in batch),
                                   fgcolor, bgcolor, bgblend)
     
+    
+    def drawChar(self, x, y, char, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+        assert self._drawable(x, y)
+        self.parent.drawChar(x + self.x, y + self.y, char, fgcolor, bgcolor)
+    
+    def drawRect(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+        x, y, width, height = self._normalizeRect(x, y, width, height)
+        self.parent.drawRect(x + self.x, y + self.y, width, height, string, fgcolor, bgcolor)
+        
+    def drawFrame(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+        x, y, width, height = self._normalizeRect(x, y, width, height)
+        self.parent.drawFrame(x + self.x, y + self.y, width, height, string, fgcolor, bgcolor)
+
     def getChar(self, x, y):
         """Return the character and colors of a cell as (ch, fg, bg)
-        
+
         @rtype: (int, 3-item tuple, 3-item tuple)
         """
         self._drawable(x, y)
@@ -634,6 +649,108 @@ class Window(_MetaConsole):
                                                           self.height)
 
 
+class Typewriter(object):
+
+    def __init__(self, console):
+        assert isinstance(console, (Console, Window)), 'console parameter must be a Console or Window instance, got %s' % repr(console)
+        self.parent = console
+        if isinstance(self.parent, Console):
+            self.console = self.parent
+        else:
+            self.console = self.parent.console
+        self.cursor = (0, 0) # cursor position
+        self.scrollMode = 'scroll'
+        self.fgcolor = (255, 255, 255)
+        self.bgcolor = (0, 0, 0)
+
+    def _normalize(self, x, y):
+        """return the normalized the cursor position."""
+        width, height = self.parent.getSize()
+        while x >= width:
+            x -= width
+            y += 1
+        while y >= height:
+            if self.scrollMode == 'scroll':
+                y -= 1
+                self.parent.scroll(0, -1)
+            elif self.scrollMode == 'error':
+                # reset the cursor on error
+                self.cursor = (0, 0)
+                raise TDLError('Typewriter cursor has reached the end of the console')
+        return (x, y)
+
+    def getCursor(self):
+        """Return the virtual cursor position"""
+        x, y = self.cursor
+        width, height = self.parent.getSize()
+        while x >= width:
+            x -= width
+            y += 1
+        if y >= height:
+            y = height - 1
+        return x, y
+
+    def move(self, x, y):
+        assert self.parent._drawable(x, y)
+        self.cursor = (x, y)
+        
+    def setFG(self, color):
+        self.fgcolor = _formatColor(color)
+        if self.console._typewriter is self:
+            _lib.TCOD_console_set_default_foreground(self.console, self.fgcolor)
+        
+    def setBG(self, color):
+        self.bgcolor = _formatColor(color)
+        if self.console._typewriter is self:
+            _lib.TCOD_console_set_default_background(self.console, self.bgcolor)
+        
+    def _updateConsole(self):
+        if self.console._typewriter is not self:
+            self.console._typewriter = self
+            
+            _lib.TCOD_console_set_default_background(self.console, self.bgcolor)
+            _lib.TCOD_console_set_default_foreground(self.console, self.fgcolor)
+        
+
+    def addChar(self, char):
+        x, y = self._normalize(*self.cursor)
+        self.parent.drawChar(x, y, char, self.fgcolor, self.bgcolor)
+        self.cursor = (x + 1, y)
+
+    def addStr(self, string, lineBreak='\n'):
+        x, y = self.cursor
+        for char in string:
+            if char == lineBreak:
+                x = 0
+                y += 1
+            else:
+                x, y = self._normalize(x, y)
+                self.parent.drawChar(x, y, char, self.fgcolor, self.bgcolor)
+                x += 1
+        self.cursor = (x, y)
+
+    def write(self, string):
+        x, y = self._normalize(*self.cursor)
+        width, height = self.parent.getSize()
+        wrapper = textwrap.TextWrapper(initial_indent=(' '*x), width=width)
+        writeLines = []
+        for line in string.split('\n'):
+            if line:
+                writeLines += wrapper.wrap(line)
+                wrapper.initial_indent = ''
+            else:
+                writeLines.append([])
+
+        for line in writeLines:
+            x, y = self._normalize(x, y)
+            self.parent.drawStr(x, y, line[x:], self.fgcolor, self.bgcolor)
+            y += 1
+            x = 0
+        y -= 1
+        self.cursor = (x, y)
+
+
+
 def init(width, height, title='python-tdl', fullscreen=False, renderer='OPENGL'):
     """Start the main console with the given width and height and return the
     root console.
@@ -643,23 +760,23 @@ def init(width, height, title='python-tdl', fullscreen=False, renderer='OPENGL')
 
     @type width: int
     @type height: int
-    
+
     @type title: string
-    
+
     @type fullscreen: boolean
     @param fullscreen: Can be set to True to start in fullscreen mode.
-    
+
     @type renderer: string
     @param renderer: Can be one of 'GLSL', 'OPENGL', or 'SDL'.
-                     
+
                      Due to way Python works you're unlikely to see much of an
                      improvement by using 'GLSL' or 'OPENGL' as most of the
                      time Python is slow interacting with the console and the
                      rendering itself is pretty fast even on 'SDL'.
-                     
+
                      This should be left at default or switched to 'SDL' for
                      better reliability and an instantaneous start up time.
-    
+
     @rtype: L{Console}
     @return: The root console.  Only what is drawn on the root console is
              what's visible after a call to L{tdl.flush}.
@@ -674,7 +791,7 @@ def init(width, height, title='python-tdl', fullscreen=False, renderer='OPENGL')
     if renderer.upper() not in RENDERERS:
         raise TDLError('No such render type "%s", expected one of "%s"' % (renderer, '", "'.join(RENDERERS)))
     renderer = RENDERERS[renderer.upper()]
-    
+
     # If a console already exists then make a clone to replace it
     if _rootconsole is not None:
         oldroot = _rootconsole()
@@ -697,22 +814,22 @@ def init(width, height, title='python-tdl', fullscreen=False, renderer='OPENGL')
 
 def flush():
     """Make all changes visible and update the screen.
-    
+
     Remember to call this function after drawing operations.
     Calls to flush will enfore the frame rate limit set by L{tdl.setFPS}.
-    
+
     This function can only be called after L{tdl.init}
     """
     if not _rootinitialized:
         raise TDLError('Cannot flush without first initializing with tdl.init')
-        
+
     _lib.TCOD_console_flush()
 
 def setFont(path, tileWidth, tileHeight, colomn=False,
             greyscale=False, altLayout=False):
     """Changes the font to be used for this session.
     This should be called before L{tdl.init}
-    
+
     While it's possible you can change the font mid program it can sometimes
     break in rare circumstances.  So use caution when doing this.
 
@@ -721,29 +838,29 @@ def setFont(path, tileWidth, tileHeight, colomn=False,
 
     @type tileWidth: int
     @param tileWidth: The width of an individual tile.
-    
+
     @type tileHeight: int
     @param tileHeight: The height of an individual tile.
-    
+
     @type colomn: boolean
     @param colomn: Defines if the characer order goes along the rows or
                    colomns.
                    It should be True if the charater codes 0-15 are in the
                    first column.  And should be False if the characters 0-15
                    are in the first row.
-    
+
     @type greyscale: boolean
     @param greyscale: Creates an anti-aliased font from a greyscale bitmap.
                       Otherwise it uses the alpha channel for anti-aliasing.
-    
+
     @type altLayout: boolean
     @param altLayout: An alternative layout with space in the upper left
                       corner.  The colomn parameter is ignored if this is
                       True, find examples of this layout in the font/
                       directory included with the python-tdl source.
-    
+
     @raise TDLError: Will be raised if no file is found at path.
-    
+
     @note: A png file that's been optimized can fail to load correctly on
            MAC OS X creating a garbled mess when rendering.
            Don't use a program like optipng or just use bmp files instead if
@@ -771,7 +888,7 @@ def setFont(path, tileWidth, tileHeight, colomn=False,
 
 def getFullscreen():
     """Returns True if program is fullscreen.
-    
+
     @rtype: boolean
     @return: Returns True if the window is in fullscreen mode.
              Otherwise returns False.
@@ -782,7 +899,7 @@ def getFullscreen():
 
 def setFullscreen(fullscreen):
     """Changes the fullscreen state.
-    
+
     @type fullscreen: boolean
     """
     if not _rootinitialized:
@@ -791,7 +908,7 @@ def setFullscreen(fullscreen):
 
 def setTitle(title):
     """Change the window title.
-    
+
     @type title: string
     """
     if not _rootinitialized:
@@ -803,7 +920,7 @@ def screenshot(path=None):
 
     @type path: string
     @param path: The filepath to save the screenshot.
-    
+
                  If path is None then the image will be placed in the current
                  folder with the names:
                  screenshot001.png, screenshot002.png, ...
@@ -831,12 +948,12 @@ def screenshot(path=None):
 
 def setFPS(frameRate):
     """Set the maximum frame rate.
-    
+
     @type frameRate: int
     @param frameRate: Further calls to L{tdl.flush} will limit the speed of
                       the program to run at <frameRate> frames per second. Can
                       also be set to 0 to run without a limit.
-                      
+
                       Defaults to None.
     """
     if frameRate is None:
@@ -847,7 +964,7 @@ def setFPS(frameRate):
 def getFPS():
     """Return the current frames per second of the running program set by
     L{setFPS}
-    
+
     @rtype: int
     @return: Returns the frameRate set by setFPS.
              If set to no limit, this will return 0.
@@ -856,11 +973,11 @@ def getFPS():
 
 def forceResolution(width, height):
     """Change the fullscreen resoulution
-    
+
     @type width: int
     @type height: int
     """
     _lib.TCOD_sys_force_fullscreen_resolution(width, height)
 
-__all__ = [_var for _var in locals().keys() if _var[0] != '_' and _var not in ['sys', 'os', 'ctypes', 'array', 'weakref', 'itertools']]
+__all__ = [_var for _var in locals().keys() if _var[0] != '_' and _var not in ['sys', 'os', 'ctypes', 'array', 'weakref', 'itertools', 'textwrap']]
 __all__ += ['_MetaConsole'] # keep this object public to show the documentation in epydoc
