@@ -98,11 +98,19 @@ class DrawStrTest(TestApp):
             string = [random.getrandbits(8) for x in range(self.width)]
             self.console.drawStr(0, y, string, (255, 255, 255), bgcolor)
     
+class BlitScrollTest(TestApp):
+    def updateTest(self, deltaTime):
+        self.console.scroll(0, 1)
+        for x in range(self.width):
+            bgcolor = (random.getrandbits(6), random.getrandbits(6), random.getrandbits(6))
+            ch = random.getrandbits(8)
+            self.console.drawChar(x, 0, ch, bgcolor=bgcolor)
+    
             
 def main():
     console = tdl.init(60, 40)
     for Test in [FullDrawCharTest, CharOnlyTest, ColorOnlyTest, GetCharTest,
-                 SingleRectTest, DrawStrTest]:
+                 SingleRectTest, DrawStrTest, BlitScrollTest]:
         Test(console).run()
         console.clear()
 
