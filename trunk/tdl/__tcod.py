@@ -465,7 +465,69 @@ _lib.TCOD_sys_wait_for_event.argtypes = (c_int, POINTER(_Key), POINTER(_Mouse))
 _lib.TCOD_sys_check_for_event.restype = c_int
 _lib.TCOD_sys_check_for_event.argtypes = (c_int, POINTER(_Key), POINTER(_Mouse))
 
+# FOV
+
+TCOD_map_t = c_void_p
+
+_lib.TCOD_map_new.restype = TCOD_map_t
+_lib.TCOD_map_new.argtypes = (c_int, c_int)
+_lib.TCOD_map_delete.restype = None
+_lib.TCOD_map_delete.argtypes = (TCOD_map_t,)
+_lib.TCOD_map_set_properties.restype = None
+_lib.TCOD_map_set_properties.argtypes = (TCOD_map_t, c_int, c_int, c_bool, c_bool)
+
+_lib.TCOD_map_compute_fov.restype = None
+_lib.TCOD_map_compute_fov.argtypes = (TCOD_map_t, c_int, c_int, c_int, c_bool, c_int)
+_lib.TCOD_map_is_in_fov.restype = c_bool
+_lib.TCOD_map_is_in_fov.argtypes = (TCOD_map_t, c_int, c_int)
+
+# PATH
+
+TCOD_path_t = c_void_p
+PATHCALL = CFUNCTYPE(c_float, (c_int, c_int, c_int, c_int, c_void_p))
+
+_lib.TCOD_path_new_using_map.restype = TCOD_path_t
+_lib.TCOD_path_new_using_map.argtypes = (TCOD_map_t, c_float)
+_lib.TCOD_path_new_using_function.restype = TCOD_path_t
+_lib.TCOD_path_new_using_function.argtypes = (c_int, c_int, PATHCALL, c_void_p, c_float)
+_lib.TCOD_path_compute.restype = c_bool
+_lib.TCOD_path_compute.argtypes = (TCOD_path_t, c_int, c_int, c_int, c_int)
+_lib.TCOD_path_walk.restype = c_bool
+_lib.TCOD_path_walk.argtypes = (TCOD_path_t, POINTER(c_int), POINTER(c_int), c_bool)
+_lib.TCOD_path_size.restype = c_int
+_lib.TCOD_path_size.argtypes = (TCOD_path_t,)
+_lib.TCOD_path_delete.restype = None
+_lib.TCOD_path_delete.argtypes = (TCOD_path_t,)
+
+# Dijkstra
+
+TCOD_dijkstra_t = c_void_p
+
+_lib.TCOD_dijkstra_new.restype = TCOD_dijkstra_t
+_lib.TCOD_dijkstra_new.argtypes = (TCOD_map_t, c_float)
+_lib.TCOD_dijkstra_new_using_function.restype = TCOD_dijkstra_t
+_lib.TCOD_dijkstra_new_using_function.argtypes = (c_int, c_int, PATHCALL, c_void_p, c_float)
+_lib.TCOD_dijkstra_compute.restype = None
+_lib.TCOD_dijkstra_compute.argtypes = (TCOD_dijkstra_t, c_int, c_int)
+_lib.TCOD_dijkstra_get_distance.restype = c_float
+_lib.TCOD_dijkstra_get_distance.argtypes = (TCOD_dijkstra_t, c_int, c_int)
+_lib.TCOD_dijkstra_path_set.restype = c_bool
+_lib.TCOD_dijkstra_path_set.argtypes = (TCOD_dijkstra_t, c_int, c_int)
+_lib.TCOD_dijkstra_size.restype = c_int
+_lib.TCOD_dijkstra_size.argtypes = (TCOD_dijkstra_t,)
+_lib.TCOD_dijkstra_reverse.restype = None
+_lib.TCOD_dijkstra_reverse.argtypes = (TCOD_dijkstra_t,)
+_lib.TCOD_dijkstra_path_walk.restype = None
+_lib.TCOD_dijkstra_path_walk.argtypes = (TCOD_path_t, POINTER(c_int), POINTER(c_int))
+_lib.TCOD_dijkstra_delete.restype = None
+_lib.TCOD_dijkstra_delete.argtypes = (TCOD_dijkstra_t,)
+
+#_lib..restype = None
+#_lib..argtypes = 
+
 # these functions should perform ultra fast once I set them up
+# after testing it seems that converting python types to ctypes is slow no
+# matter how they are passed to C
 _lib.TCOD_console_fill_background.restype = None
 _lib.TCOD_console_fill_background.argtypes = (TCOD_console_t, POINTER(c_int), POINTER(c_int), POINTER(c_int))
 _lib.TCOD_console_fill_foreground.restype = None
