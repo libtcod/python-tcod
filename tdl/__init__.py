@@ -31,7 +31,7 @@ import array
 import itertools
 import textwrap
 
-from . import event, path
+from . import event, path, fov
 from .__tcod import _lib, _Color, _unpackfile
 
 _IS_PYTHON3 = (sys.version_info[0] == 3)
@@ -978,6 +978,6 @@ def forceResolution(width, height):
     @type height: int
     """
     _lib.TCOD_sys_force_fullscreen_resolution(width, height)
-
+        
 __all__ = [_var for _var in locals().keys() if _var[0] != '_' and _var not in ['sys', 'os', 'ctypes', 'array', 'weakref', 'itertools', 'textwrap']]
 __all__ += ['_MetaConsole'] # keep this object public to show the documentation in epydoc
