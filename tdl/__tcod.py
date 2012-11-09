@@ -484,7 +484,7 @@ _lib.TCOD_map_is_in_fov.argtypes = (TCOD_map_t, c_int, c_int)
 # PATH
 
 TCOD_path_t = c_void_p
-PATHCALL = CFUNCTYPE(c_float, (c_int, c_int, c_int, c_int, c_void_p))
+PATHCALL = CFUNCTYPE(c_float, c_int, c_int, c_int, c_int, c_void_p)
 
 _lib.TCOD_path_new_using_map.restype = TCOD_path_t
 _lib.TCOD_path_new_using_map.argtypes = (TCOD_map_t, c_float)
