@@ -42,6 +42,7 @@ class TestApp(tdl.event.App):
     
     def __init__(self, console):
         self.console = console
+        self.writer = tdl.Typewriter(console)
         self.width, self.height = self.console.getSize()
         self.total = self.width * self.height
         self.cells = list(itertools.product(range(self.width), range(self.height)))
@@ -70,6 +71,15 @@ class CharOnlyTest(TestApp):
         for (x,y), char in zip(self.cells, char):
             self.console.drawChar(x, y, char, None, None)
 
+class TypewriterCharOnlyTest(TestApp):
+
+    def updateTest(self, deltaTime):
+        self.writer.move(0, 0)
+        char = [random.getrandbits(8) for _ in range(self.total)]
+        for (x,y), char in zip(self.cells, char):
+            self.writer.move(x, y)
+            self.writer.addChar(char)
+            
 class ColorOnlyTest(TestApp):    
     
     def updateTest(self, deltaTime):
@@ -109,7 +119,7 @@ class BlitScrollTest(TestApp):
             
 def main():
     console = tdl.init(60, 40)
-    for Test in [FullDrawCharTest, CharOnlyTest, ColorOnlyTest, GetCharTest,
+    for Test in [FullDrawCharTest, CharOnlyTest, TypewriterCharOnlyTest, ColorOnlyTest, GetCharTest,
                  SingleRectTest, DrawStrTest, BlitScrollTest]:
         Test(console).run()
         console.clear()
