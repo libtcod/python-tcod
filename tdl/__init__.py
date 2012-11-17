@@ -453,7 +453,7 @@ class Console(_MetaConsole):
         self._as_parameter_ = _lib.TCOD_console_new(width, height)
         self.width = width
         self.height = height
-        self._typewriter = None # "typewriter" lock
+        self._typewriter = None # "typewriter" lock, makes sure the colors are set to the typewriter
         #self.clear()
 
     @classmethod
@@ -463,6 +463,7 @@ class Console(_MetaConsole):
         self._as_parameter_ = console
         self.width = _lib.TCOD_console_get_width(self)
         self.height = _lib.TCOD_console_get_height(self)
+        self._typewriter = None
         #self.clear()
         return self
 
@@ -660,8 +661,9 @@ class Typewriter(object):
             self.console = self.parent.console
         self.cursor = (0, 0) # cursor position
         self.scrollMode = 'scroll'
-        self.fgcolor = (255, 255, 255)
-        self.bgcolor = (0, 0, 0)
+        self.fgcolor = _formatColor((255, 255, 255))
+        self.bgcolor = _formatColor((0, 0, 0))
+        self._bgblend = 1 # SET
 
     def _normalize(self, x, y):
         """return the normalized the cursor position."""
@@ -695,11 +697,13 @@ class Typewriter(object):
         self.cursor = (x, y)
         
     def setFG(self, color):
+        assert _iscolor(color)
         self.fgcolor = _formatColor(color)
         if self.console._typewriter is self:
             _lib.TCOD_console_set_default_foreground(self.console, self.fgcolor)
         
     def setBG(self, color):
+        assert _iscolor(color)
         self.bgcolor = _formatColor(color)
         if self.console._typewriter is self:
             _lib.TCOD_console_set_default_background(self.console, self.bgcolor)
@@ -714,8 +718,11 @@ class Typewriter(object):
 
     def addChar(self, char):
         x, y = self._normalize(*self.cursor)
-        self.parent.drawChar(x, y, char, self.fgcolor, self.bgcolor)
-        self.cursor = (x + 1, y)
+        self.cursor = [x + 1, y] # advance cursor on next draw
+        self._updateConsole()
+        x, y = self.parent._translate(x, y)
+        _lib.TCOD_console_put_char(self.console._as_parameter_, x, y, _formatChar(char), self._bgblend)
+        
 
     def addStr(self, string, lineBreak='\n'):
         x, y = self.cursor
