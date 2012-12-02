@@ -7,7 +7,7 @@ from .__tcod import _lib
 
 class Map(object):
     
-    def __init__(self, width, height, callback):
+    def __init__(self, width, height, callback=None):
         self._width = int(width)
         self._height = int(height)
         self._size = self._width * self._height
@@ -49,6 +49,8 @@ class Map(object):
                                      x, y, walkable, transparent)
         
     def _updateMap(self, x, y, radius):
+        if not self._callback:
+            return
         c_bool = ctypes.c_bool
         for (x, cX),(y, cY) in self._pointsInRadiusC(x, y, radius):
             #if (x, y) not in self._clean:

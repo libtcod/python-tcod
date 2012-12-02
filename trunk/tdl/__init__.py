@@ -450,6 +450,8 @@ class Console(_MetaConsole):
     def __init__(self, width, height):
         """Create a new offscreen console
         """
+        if not _rootinitialized:
+            raise TDLError('Can not create Console\'s before tdl.init')
         self._as_parameter_ = _lib.TCOD_console_new(width, height)
         self.width = width
         self.height = height
