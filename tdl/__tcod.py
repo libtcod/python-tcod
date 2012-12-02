@@ -484,12 +484,12 @@ _lib.TCOD_map_is_in_fov.argtypes = (TCOD_map_t, c_int, c_int)
 # PATH
 
 TCOD_path_t = c_void_p
-PATHCALL = CFUNCTYPE(c_float, c_int, c_int, c_int, c_int, c_void_p)
+_PATHCALL = CFUNCTYPE(c_float, c_int, c_int, c_int, c_int, py_object)
 
 _lib.TCOD_path_new_using_map.restype = TCOD_path_t
 _lib.TCOD_path_new_using_map.argtypes = (TCOD_map_t, c_float)
 _lib.TCOD_path_new_using_function.restype = TCOD_path_t
-_lib.TCOD_path_new_using_function.argtypes = (c_int, c_int, PATHCALL, c_void_p, c_float)
+_lib.TCOD_path_new_using_function.argtypes = (c_int, c_int, _PATHCALL, py_object, c_float)
 _lib.TCOD_path_compute.restype = c_bool
 _lib.TCOD_path_compute.argtypes = (TCOD_path_t, c_int, c_int, c_int, c_int)
 _lib.TCOD_path_walk.restype = c_bool
@@ -506,7 +506,7 @@ TCOD_dijkstra_t = c_void_p
 _lib.TCOD_dijkstra_new.restype = TCOD_dijkstra_t
 _lib.TCOD_dijkstra_new.argtypes = (TCOD_map_t, c_float)
 _lib.TCOD_dijkstra_new_using_function.restype = TCOD_dijkstra_t
-_lib.TCOD_dijkstra_new_using_function.argtypes = (c_int, c_int, PATHCALL, c_void_p, c_float)
+_lib.TCOD_dijkstra_new_using_function.argtypes = (c_int, c_int, POINTER(_PATHCALL), py_object, c_float)
 _lib.TCOD_dijkstra_compute.restype = None
 _lib.TCOD_dijkstra_compute.argtypes = (TCOD_dijkstra_t, c_int, c_int)
 _lib.TCOD_dijkstra_get_distance.restype = c_float

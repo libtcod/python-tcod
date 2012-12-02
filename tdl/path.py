@@ -2,33 +2,43 @@
 import math
 import ctypes
 
-from .__tcod import _lib
+from .__tcod import _lib, _PATHCALL
 
 class AStar(object):
 
     def __init__(self, width, height, callback, diagnalCost=math.sqrt(2)):
         def newCallback(fromX, fromY, toX, toY, null):
             pathCost = callback(toX, toY) # expecting a float or 0
-            return pathCost
-        self.callback = newCallback
+            if pathCost:
+                return pathCost
+            return 0.0
+        self.callback = _PATHCALL(newCallback)
         self._as_parameter_ = _lib.TCOD_path_new_using_function(width, height,
-                                                newCallback, None, diagnalCost)
+                                     self.callback, None, diagnalCost)
 
+    @classmethod
+    def newFromMap(cls, map, diagnalCost=math.sqrt(2)):
+        self = cls.__new__(cls)
+        self.callback = None
+        self._as_parameter_ = _lib.TCOD_path_new_using_map(map, diagnalCost)
+        return self
+                                     
+    def __del__(self):
+        _lib.TCOD_path_delete(self)
+        
     def getPath(self, origX, origY, destX, destY):
         found = _lib.TCOD_path_compute(self, origX, origY, destX, destY)
         if not found:
-            pass # path not found, not sure what to do
+            return [] # path not found
         x, y = ctypes.c_int(), ctypes.c_int()
         xRef, yRef = ctypes.byref(x), ctypes.byref(y)
         recalculate = ctypes.c_bool(False)
         path = []
         while _lib.TCOD_path_walk(self, xRef, yRef, recalculate):
-            path.append(x.value, y.value)
+            path.append((x.value, y.value))
         return path
         
                                                 
-    def __del__(self):
-        _lib.TCOD_path_delete(self)
     
 class Dijkstra(object):
 
@@ -38,8 +48,15 @@ class Dijkstra(object):
             return pathCost
         self.callback = newCallback
         self._as_parameter_ = _lib.TCOD_dijkstra_new_using_function(width, height,
-                                                newCallback, None, diagnalCost)
+                                     _PATHCALL(newCallback), None, diagnalCost)
         # add code to compute here with x,y
+        
+    def __del__(self):
+        _lib.TCOD_dijkstra_delete(self)
+        
+    def setPos(self, x, y):
+        self.x, self.y = x, y
+        _lib.TCOD_dijkstra_compute(self, x, y)
         
     def getPathFrom(self, startX, startY):
         pass
