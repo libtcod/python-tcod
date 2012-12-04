@@ -17,7 +17,7 @@ class AStar(object):
                                      self.callback, None, diagnalCost)
 
     @classmethod
-    def newFromMap(cls, map, diagnalCost=math.sqrt(2)):
+    def FromMap(cls, map, diagnalCost=math.sqrt(2)):
         self = cls.__new__(cls)
         self.callback = None
         self._as_parameter_ = _lib.TCOD_path_new_using_map(map, diagnalCost)
@@ -46,15 +46,22 @@ class Dijkstra(object):
         def newCallback(fromX, fromY, toX, toY, null):
             pathCost = callback(toX, toY) # expecting a float or 0
             return pathCost
-        self.callback = newCallback
+        self.callback = _PATHCALL(newCallback)
         self._as_parameter_ = _lib.TCOD_dijkstra_new_using_function(width, height,
-                                     _PATHCALL(newCallback), None, diagnalCost)
+                                     self.callback, None, diagnalCost)
         # add code to compute here with x,y
+    
+    @classmethod
+    def FromMap(cls, map, diagnalCost=math.sqrt(2)):
+        self = cls.__new__(cls)
+        self.callback = None
+        self._as_parameter_ = _lib.TCOD_dijkstra_new_using_map(map, diagnalCost)
+        return self
         
     def __del__(self):
         _lib.TCOD_dijkstra_delete(self)
         
-    def setPos(self, x, y):
+    def setPole(self, x, y):
         self.x, self.y = x, y
         _lib.TCOD_dijkstra_compute(self, x, y)
         
