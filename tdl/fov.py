@@ -69,7 +69,7 @@ class Map(object):
         elif fov[:10] == 'PERMISSIVE' and fov[10].isdigit():
             fov = 4 + int(fov[10])
         else:
-            raise TDLError('No such fov as %s' % oldFOV)
+            raise TDLError('No such fov option as %s' % oldFOV)
             
         self._updateMap(x, y, radius)
         _lib.TCOD_map_compute_fov(self, x, y, radius, lightWalls, fov)

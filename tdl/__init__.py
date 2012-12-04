@@ -36,6 +36,15 @@ from .__tcod import _lib, _Color, _unpackfile
 
 _IS_PYTHON3 = (sys.version_info[0] == 3)
 
+if _IS_PYTHON3: # some type lists to use with isinstance
+    _INTTYPES = (int,)
+    _NUMTYPES = (int, float)
+    _STRTYPES = (str, bytes)
+else:
+    _INTTYPES = (int, long)
+    _NUMTYPES = (int, long, float)
+    _STRTYPES = (str,)
+
 def _encodeString(string): # still used for filepaths, and that's about it
     "changes string into bytes if running in python 3, for sending to ctypes"
     if _IS_PYTHON3 and isinstance(string, str):
@@ -54,9 +63,9 @@ def _formatChar(char):
     """
     if char is None:
         return None
-    if isinstance(char, int) or not _IS_PYTHON3 and isinstance(char, long):
+    if isinstance(char, _INTTYPES):
         return char
-    if isinstance(char, (str, bytes)) and len(char) == 1:
+    if isinstance(char, _STRTYPES) and len(char) == 1:
         return ord(char)
     raise TypeError('Expected char parameter to be a single character string, number, or None, got: %s' % repr(char))
 
@@ -89,7 +98,7 @@ def _iscolor(color):
         return True
     if isinstance(color, (tuple, list, _Color)):
         return len(color) == 3
-    if isinstance(color, int) or not _IS_PYTHON3 and isinstance(color, long):
+    if isinstance(color, _INTTYPES):
         return True
     return False
 
@@ -100,7 +109,7 @@ def _formatColor(color):
         return None
     if isinstance(color, _Color):
         return color
-    if isinstance(color, int) or not _IS_PYTHON3 and isinstance(color, long):
+    if isinstance(color, _INTTYPES):
         # format a web style color with the format 0xRRGGBB
         return _Color(color >> 16 & 0xff, color >> 8 & 0xff, color & 0xff)
     return _Color(*color)
@@ -139,7 +148,7 @@ class _MetaConsole(object):
         """
 
         assert _verify_colors(fgcolor, bgcolor)
-        assert self._drawable(x, y)
+        x, y = self._normalizePoint(x, y)
 
         self._setChar(ctypes.c_int(x), ctypes.c_int(y), _formatChar(char),
                       _formatColor(fgcolor), _formatColor(bgcolor))
@@ -166,7 +175,7 @@ class _MetaConsole(object):
 
         """
 
-        assert self._drawable(x, y)
+        x, y = self._normalizePoint(x, y)
         assert _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
         width, height = self.getSize()
@@ -237,64 +246,50 @@ class _MetaConsole(object):
         self.drawRect(x + width - 1, y, 1, height, char, fgcolor, bgcolor)
         self.drawRect(x, y + height - 1, width, 1, char, fgcolor, bgcolor)
 
+    def _normalizePoint(self, x, y):
+        """Check if a point is in bounds and make minor adjustments.
+        
+        Respects Pythons negative indexes.  -1 starts at the bottom right.
+        Replaces the _drawable function
+        """
+        assert isinstance(x, _INTTYPES), 'x must be an integer, got %s' % repr(x)
+        assert isinstance(y, _INTTYPES), 'y must be an integer, got %s' % repr(y)
+
+        assert (-self.width <= x < self.width) and (-self.height <= y < self.height), \
+                ('(%i, %i) is an invalid postition on %s' % (x, y, self))
+                 
+        # handle negative indexes
+        if x < 0:
+            x += self.width
+        if y < 0:
+            y += self.height
+        return (x, y)
 
     def _normalizeRect(self, x, y, width, height):
         """Check if the rectangle is in bounds and make minor adjustments.
         raise AssertionError's for any problems
         """
-        old = x, y, width, height
-        assert isinstance(x, int), 'x must be an integer, got %s' % repr(x)
-        assert isinstance(y, int), 'y must be an integer, got %s' % repr(y)
-        if width == None: # if width or height are None then extend them to the edge
-            width = self.width - x
-        if height == None:
-            height = self.height - y
-        assert isinstance(width, int), 'width must be an integer or None, got %s' % repr(width)
-        assert isinstance(height, int), 'height must be an integer or None, got %s' % repr(height)
-
-        assert width >= 0 and height >= 0, 'width and height cannot be negative'
-        # later idea, negative numbers work like Python list indexing
-
-        assert x >= 0 and y >= 0 and x + width <= self.width and y + height <= self.height, \
-        'Rect is out of bounds at (x=%i y=%i width=%i height=%i), Console bounds are (width=%i, height=%i)' % (old + self.getSize())
-        return x, y, width, height
-
-    def _rectInBounds(self, x, y, width, height):
-        "check the rect so see if it's within the bounds of this console"
-        if width is None:
-            width = 0
-        if height is None:
-            height = 0
-        if (x < 0 or y < 0 or
-            x + width > self.width or y + height > self.height):
-            return False
-
-        return True
-
-    def _clampRect(self, x=0, y=0, width=None, height=None):
-        """Alter a rectange to fit inside of this console
-
-        width and hight of None will extend to the edge and
-        an area out of bounds will end with a width and height of 0
-        """
-        # extend any width and height of None to the end of the console
+        x, y = self._normalizePoint(x, y) # inherit _normalizePoint logic
+        
+        assert width is None or isinstance(width, _INTTYPES), 'width must be an integer or None, got %s' % repr(width)
+        assert height is None or isinstance(height, _INTTYPES), 'height must be an integer or None, got %s' % repr(height)
+        
+        # if width or height are None then extend them to the edge
         if width is None:
             width = self.width - x
+        elif width < 0: # handle negative numbers
+            width += self.width
+            width = max(0, width) # a 'too big' negative is clamped zero
         if height is None:
             height = self.height - y
-        # move x and y within bounds, shrinking the width and height to match
-        if x < 0:
-            width += x
-            x = 0
-        if y < 0:
-            height += y
-            y = 0
-        # move width and height within bounds
+            height = max(0, height)
+        elif height < 0:
+            height += self.height
+
+        # reduce rect size to bounds
         width = min(width, self.width - x)
         height = min(height, self.height - y)
-        # a rect that was out of bounds will have a 0 or negative width or height at this point
-        if width <= 0 or height <= 0:
-            width = height = 0
+        
         return x, y, width, height
 
     def blit(self, source, x=0, y=0, width=None, height=None, srcX=0, srcY=0):
@@ -316,26 +311,17 @@ class _MetaConsole(object):
 
         assert isinstance(source, (Console, Window)), "source muse be a Window or Console instance"
 
-        assert width is None or isinstance(width, (int)), "width must be a number or None, got %s" % repr(width)
-        assert height is None or isinstance(height, (int)), "height must be a number or None, got %s" % repr(height)
-
-        # fill in width, height
-        if width == None:
-            width = min(self.width - x, source.width - srcX)
-        if height == None:
-            height = min(self.height - y, source.height - srcY)
-
+        # handle negative indexes and rects
+        # negative width and height will be set realtive to the destination
+        # and will also be clamped to the smallest Console
         x, y, width, height = self._normalizeRect(x, y, width, height)
         srcX, srcY, width, height = source._normalizeRect(srcX, srcY, width, height)
 
         # translate source and self if any of them are Window instances
-        if isinstance(source, Window):
-            srcX, srcY = source._translate(srcX, srcY)
-            source = source.console
-
-        if isinstance(self, Window):
-            x, y = self._translate(x, y)
-            self = self.console
+        srcX, srcY = source._translate(srcX, srcY)
+        source = source.console
+        x, y = self._translate(x, y)
+        self = self.console
 
         if self == source:
             # if we are the same console then we need a third console to hold
@@ -361,8 +347,8 @@ class _MetaConsole(object):
         @type x: int
         @type y: int
         """
-        assert isinstance(x, int), "x must be an integer, got %s" % repr(x)
-        assert isinstance(y, int), "y must be an integer, got %s" % repr(x)
+        assert isinstance(x, _INTTYPES), "x must be an integer, got %s" % repr(x)
+        assert isinstance(y, _INTTYPES), "y must be an integer, got %s" % repr(x)
         def getSlide(x, length):
             """get the parameters needed to scroll the console in the given
             direction with x
@@ -422,19 +408,6 @@ class _MetaConsole(object):
         x, y = position
         return (0 <= x < self.width) and (0 <= y < self.height)
 
-    def _drawable(self, x, y):
-        """Used internally
-        Checks if a cell is part of the console.
-        Raises an AssertionError if it can not be used.
-        """
-        assert isinstance(x, int), 'x must be an integer, got %s' % repr(x)
-        assert isinstance(y, int), 'y must be an integer, got %s' % repr(y)
-
-        assert (0 <= x < self.width) and (0 <= y < self.height), \
-                ('(%i, %i) is an invalid postition.  %s size is (%i, %i)' %
-                 (x, y, self.__class__.__name__, self.width, self.height))
-        return True
-
 class Console(_MetaConsole):
     """The Console is the main class of the tdl library.
 
@@ -453,9 +426,10 @@ class Console(_MetaConsole):
         if not _rootinitialized:
             raise TDLError('Can not create Console\'s before tdl.init')
         self._as_parameter_ = _lib.TCOD_console_new(width, height)
+        self.console = self
         self.width = width
         self.height = height
-        self._typewriter = None # "typewriter" lock, makes sure the colors are set to the typewriter
+        self._typewriter = None # "typewriter lock", makes sure the colors are set to the typewriter
         #self.clear()
 
     @classmethod
@@ -463,6 +437,7 @@ class Console(_MetaConsole):
         """Make a Console instance, from a console ctype"""
         self = cls.__new__(cls)
         self._as_parameter_ = console
+        self.console = self
         self.width = _lib.TCOD_console_get_width(self)
         self.height = _lib.TCOD_console_get_height(self)
         self._typewriter = None
@@ -549,13 +524,13 @@ class Console(_MetaConsole):
         """
         if fgcolor and bgcolor and not nullChar:
             # buffer values as ctypes objects
-            self._typewriter = None
+            self._typewriter = None # clear the typewriter as colors will be set
             console = self._as_parameter_
             bgblend = ctypes.c_int(bgblend)
 
             _lib.TCOD_console_set_default_background(console, bgcolor)
             _lib.TCOD_console_set_default_foreground(console, fgcolor)
-            _putChar = _lib.TCOD_console_put_char # remove dots
+            _putChar = _lib.TCOD_console_put_char # remove dots and make local
             for (x, y), char in batch:
                 _putChar(console, x, y, char, bgblend)
         else:
@@ -571,7 +546,8 @@ class Console(_MetaConsole):
 
         @rtype: (int, 3-item tuple, 3-item tuple)
         """
-        assert self._drawable(x, y)
+        #assert self._drawable(x, y)
+        x, y = self._normalizePoint(x, y)
         char = _lib.TCOD_console_get_char(self, x, y)
         bgcolor = _lib.TCOD_console_get_char_background_wrapper(self, x, y)
         fgcolor = _lib.TCOD_console_get_char_foreground_wrapper(self, x, y)
@@ -627,7 +603,7 @@ class Window(_MetaConsole):
     
     
     def drawChar(self, x, y, char, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
-        assert self._drawable(x, y)
+        x, y = self._normalizePoint(x, y)
         self.parent.drawChar(x + self.x, y + self.y, char, fgcolor, bgcolor)
     
     def drawRect(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
@@ -643,7 +619,7 @@ class Window(_MetaConsole):
 
         @rtype: (int, 3-item tuple, 3-item tuple)
         """
-        self._drawable(x, y)
+        x, y = self._normalizePoint(x, y)
         return self.console.getChar(self._translate(x, y))
 
     def __repr__(self):
@@ -695,8 +671,7 @@ class Typewriter(object):
         return x, y
 
     def move(self, x, y):
-        assert self.parent._drawable(x, y)
-        self.cursor = (x, y)
+        self.cursor = self.parent._normalizePoint(x, y)
         
     def setFG(self, color):
         assert _iscolor(color)
@@ -711,6 +686,7 @@ class Typewriter(object):
             _lib.TCOD_console_set_default_background(self.console, self.bgcolor)
         
     def _updateConsole(self):
+        """Make sure the colors on a console match the Typewriter instance"""
         if self.console._typewriter is not self:
             self.console._typewriter = self
             
@@ -726,8 +702,9 @@ class Typewriter(object):
         _lib.TCOD_console_put_char(self.console._as_parameter_, x, y, _formatChar(char), self._bgblend)
         
 
-    def addStr(self, string, lineBreak='\n'):
+    def addStr(self, string):
         x, y = self.cursor
+        lineBreak = '\n'
         for char in string:
             if char == lineBreak:
                 x = 0
@@ -967,7 +944,7 @@ def setFPS(frameRate):
     """
     if frameRate is None:
         frameRate = 0
-    assert isinstance(frameRate, int), 'frameRate must be an integer or None, got: %s' % repr(frameRate)
+    assert isinstance(frameRate, _INTTYPES), 'frameRate must be an integer or None, got: %s' % repr(frameRate)
     _lib.TCOD_sys_set_fps(frameRate)
 
 def getFPS():
