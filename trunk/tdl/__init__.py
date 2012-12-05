@@ -31,7 +31,7 @@ import array
 import itertools
 import textwrap
 
-from . import event, path, fov
+from . import event, map
 from .__tcod import _lib, _Color, _unpackfile
 
 _IS_PYTHON3 = (sys.version_info[0] == 3)
@@ -638,7 +638,7 @@ class Typewriter(object):
         else:
             self.console = self.parent.console
         self.cursor = (0, 0) # cursor position
-        self.scrollMode = 'scroll'
+        self.scrollMode = 'scroll' #can be 'scroll', 'error'
         self.fgcolor = _formatColor((255, 255, 255))
         self.bgcolor = _formatColor((0, 0, 0))
         self._bgblend = 1 # SET
@@ -671,15 +671,18 @@ class Typewriter(object):
         return x, y
 
     def move(self, x, y):
+        """Move the virtual cursor"""
         self.cursor = self.parent._normalizePoint(x, y)
         
     def setFG(self, color):
+        """Change the foreground color"""
         assert _iscolor(color)
         self.fgcolor = _formatColor(color)
         if self.console._typewriter is self:
             _lib.TCOD_console_set_default_foreground(self.console, self.fgcolor)
         
     def setBG(self, color):
+        """Change the background color"""
         assert _iscolor(color)
         self.bgcolor = _formatColor(color)
         if self.console._typewriter is self:
@@ -695,6 +698,7 @@ class Typewriter(object):
         
 
     def addChar(self, char):
+        """Draw a single character at the cursor."""
         x, y = self._normalize(*self.cursor)
         self.cursor = [x + 1, y] # advance cursor on next draw
         self._updateConsole()
@@ -703,6 +707,7 @@ class Typewriter(object):
         
 
     def addStr(self, string):
+        """Write a string at the cursor"""
         x, y = self.cursor
         lineBreak = '\n'
         for char in string:
@@ -716,6 +721,12 @@ class Typewriter(object):
         self.cursor = (x, y)
 
     def write(self, string):
+        """To behave like a file-like object. (for sys.stdout, sys.stderr)
+        
+        """
+        # some 'basic' line buffer stuff.
+        # there must be an easier way to do this.  The textwrap module didn't
+        # help much.
         x, y = self._normalize(*self.cursor)
         width, height = self.parent.getSize()
         wrapper = textwrap.TextWrapper(initial_indent=(' '*x), width=width)
@@ -734,8 +745,7 @@ class Typewriter(object):
             x = 0
         y -= 1
         self.cursor = (x, y)
-
-
+        
 
 def init(width, height, title='python-tdl', fullscreen=False, renderer='OPENGL'):
     """Start the main console with the given width and height and return the

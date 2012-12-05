@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>tdl.event.Event</title>
+  <title>tdl.map</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -43,8 +43,7 @@
     <td width="100%">
       <span class="breadcrumbs">
         <a href="tdl-module.html">Package&nbsp;tdl</a> ::
-        <a href="tdl.event-module.html">Module&nbsp;event</a> ::
-        Class&nbsp;Event
+        Module&nbsp;map
       </span>
     </td>
     <td>
@@ -52,45 +51,64 @@
         <!-- hide/show private -->
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="tdl.event.Event-class.html"
+            >]&nbsp;|&nbsp;<a href="tdl.map-module.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
-<!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class Event</h1><p class="nomargin-top"><span class="codelink"><a href="tdl.event-pysrc.html#Event">source&nbsp;code</a></span></p>
-<pre class="base-tree">
-object --+
-         |
-        <strong class="uidshort">Event</strong>
-</pre>
+<!-- ==================== MODULE DESCRIPTION ==================== -->
+<h1 class="epydoc">Module map</h1><p class="nomargin-top"><span class="codelink"><a href="tdl.map-pysrc.html">source&nbsp;code</a></span></p>
+<p>Rogue-like map utilitys such as line-of-sight, field-of-view, and 
+  path-finding.</p>
 
-<dl><dt>Known Subclasses:</dt>
-<dd>
-      <ul class="subclass-list">
-<li><a href="tdl.event.KeyEvent-class.html">KeyEvent</a></li><li>, <a href="tdl.event.MouseButtonEvent-class.html">MouseButtonEvent</a></li><li>, <a href="tdl.event.MouseMotion-class.html">MouseMotion</a></li><li>, <a href="tdl.event.Quit-class.html">Quit</a></li>  </ul>
-</dd></dl>
-
-<hr />
-<!-- ==================== INSTANCE METHODS ==================== -->
-<a name="section-InstanceMethods"></a>
+<!-- ==================== CLASSES ==================== -->
+<a name="section-Classes"></a>
 <table class="summary" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr bgcolor="#70b0f0" class="table-header">
   <td align="left" colspan="2" class="table-header">
-    <span class="table-header">Instance Methods</span></td>
+    <span class="table-header">Classes</span></td>
 </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a href="tdl.map.AStar-class.html" class="summary-name">AStar</a>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.map.Dijkstra-class.html" class="summary-name">Dijkstra</a>
+    </td>
+  </tr>
+</table>
+<!-- ==================== FUNCTIONS ==================== -->
+<a name="section-Functions"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Functions</span></td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">iterator</span>
+    </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="tdl.event.Event-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      List an events public attributes in print calls.</td>
+          <td><span class="summary-sig"><a href="tdl.map-module.html#quickFOV" class="summary-sig-name">quickFOV</a>(<span class="summary-sig-arg">x</span>,
+        <span class="summary-sig-arg">y</span>,
+        <span class="summary-sig-arg">callback</span>,
+        <span class="summary-sig-arg">fov</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">PERMISSIVE</code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">radius</span>=<span class="summary-sig-default">7.5</span>,
+        <span class="summary-sig-arg">lightWalls</span>=<span class="summary-sig-default">True</span>,
+        <span class="summary-sig-arg">sphere</span>=<span class="summary-sig-default">True</span>)</span><br />
+      All field-of-view functionality in one call.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="tdl.event-pysrc.html#Event.__repr__">source&nbsp;code</a></span>
+            <span class="codelink"><a href="tdl.map-pysrc.html#quickFOV">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -98,117 +116,59 @@ object --+
       
     </td>
   </tr>
-  <tr>
-    <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
-      <code>__delattr__</code>,
-      <code>__format__</code>,
-      <code>__getattribute__</code>,
-      <code>__hash__</code>,
-      <code>__init__</code>,
-      <code>__new__</code>,
-      <code>__reduce__</code>,
-      <code>__reduce_ex__</code>,
-      <code>__setattr__</code>,
-      <code>__sizeof__</code>,
-      <code>__str__</code>,
-      <code>__subclasshook__</code>
-      </p>
-    </td>
-  </tr>
 </table>
-<!-- ==================== CLASS VARIABLES ==================== -->
-<a name="section-ClassVariables"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td align="left" colspan="2" class="table-header">
-    <span class="table-header">Class Variables</span></td>
-</tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="tdl.event.Event-class.html#type" class="summary-name">type</a> = <code title="None">None</code><br />
-      String constant representing the type of event.
-    </td>
-  </tr>
-</table>
-<!-- ==================== PROPERTIES ==================== -->
-<a name="section-Properties"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td align="left" colspan="2" class="table-header">
-    <span class="table-header">Properties</span></td>
-</tr>
-  <tr>
-    <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
-      <code>__class__</code>
-      </p>
-    </td>
-  </tr>
-</table>
-<!-- ==================== METHOD DETAILS ==================== -->
-<a name="section-MethodDetails"></a>
+<!-- ==================== FUNCTION DETAILS ==================== -->
+<a name="section-FunctionDetails"></a>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr bgcolor="#70b0f0" class="table-header">
   <td align="left" colspan="2" class="table-header">
-    <span class="table-header">Method Details</span></td>
+    <span class="table-header">Function Details</span></td>
 </tr>
 </table>
-<a name="__repr__"></a>
+<a name="quickFOV"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__repr__</span>(<span class="sig-arg">self</span>)</span>
-    <br /><em class="fname">(Representation operator)</em>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">quickFOV</span>(<span class="sig-arg">x</span>,
+        <span class="sig-arg">y</span>,
+        <span class="sig-arg">callback</span>,
+        <span class="sig-arg">fov</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">PERMISSIVE</code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">radius</span>=<span class="sig-default">7.5</span>,
+        <span class="sig-arg">lightWalls</span>=<span class="sig-default">True</span>,
+        <span class="sig-arg">sphere</span>=<span class="sig-default">True</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="tdl.event-pysrc.html#Event.__repr__">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="tdl.map-pysrc.html#quickFOV">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
-  <p>List an events public attributes in print calls.</p>
+  <p>All field-of-view functionality in one call.</p>
   <dl class="fields">
-    <dt>Overrides:
-        object.__repr__
-    </dt>
-  </dl>
-</td></tr></table>
-</div>
-<br />
-<!-- ==================== CLASS VARIABLE DETAILS ==================== -->
-<a name="section-ClassVariableDetails"></a>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td align="left" colspan="2" class="table-header">
-    <span class="table-header">Class Variable Details</span></td>
-</tr>
-</table>
-<a name="type"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">type</h3>
-  <p>String constant representing the type of event.</p>
-  <p>Can be: 'QUIT', 'KEYDOWN', 'KEYUP', 'MOUSEDOWN', 'MOUSEUP', or 
-  'MOUSEMOTION.'</p>
-  <dl class="fields">
-  </dl>
-  <dl class="fields">
-    <dt>Value:</dt>
-      <dd><table><tr><td><pre class="variable">
-None
-</pre></td></tr></table>
-</dd>
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>x</code></strong> (int) - x origin of the field-of-view</li>
+        <li><strong class="pname"><code>y</code></strong> (int) - y origin of the field-of-view</li>
+        <li><strong class="pname"><code>callback</code></strong> (function) - This should be a function that takes two positional arguments x,y
+          and returns True if the tile at that position is transparent or 
+          False if the tile blocks light or is out of bounds.</li>
+        <li><strong class="pname"><code>fov</code></strong> (string) - The type of field-of-view to be used.  Available types are:
+          <p>'BASIC', 'DIAMOND', 'SHADOW', 'RESTRICTIVE', 'PERMISSIVE', 
+          'PERMISSIVE0', 'PERMISSIVE1', ..., 'PERMISSIVE8'</p></li>
+        <li><strong class="pname"><code>radius</code></strong> (float) - Raduis of the field-of-view.
+          <p>When sphere is True a floating point can be used to fine-tune 
+          the range.  Otherwise the radius is just rounded up.</p>
+          <p>Be careful as a large radius has an exponential effect on how 
+          long this function takes.</p></li>
+        <li><strong class="pname"><code>lightWalls</code></strong> (boolean) - Include or exclude wall tiles in the field-of-view.</li>
+        <li><strong class="pname"><code>sphere</code></strong> (boolean) - True for a spherical field-of-view.  False for a square one.</li>
+    </ul></dd>
+    <dt>Returns: iterator</dt>
+        <dd>Returns an iterator of (x, y) points that are within the 
+          field-of-view</dd>
   </dl>
 </td></tr></table>
 </div>
