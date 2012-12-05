@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>tdl.event.MouseMotion</title>
+  <title>tdl.Typewriter</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -43,8 +43,7 @@
     <td width="100%">
       <span class="breadcrumbs">
         <a href="tdl-module.html">Package&nbsp;tdl</a> ::
-        <a href="tdl.event-module.html">Module&nbsp;event</a> ::
-        Class&nbsp;MouseMotion
+        Class&nbsp;Typewriter
       </span>
     </td>
     <td>
@@ -52,25 +51,21 @@
         <!-- hide/show private -->
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="tdl.event.MouseMotion-class.html"
+            >]&nbsp;|&nbsp;<a href="tdl.Typewriter-class.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class MouseMotion</h1><p class="nomargin-top"><span class="codelink"><a href="tdl.event-pysrc.html#MouseMotion">source&nbsp;code</a></span></p>
+<h1 class="epydoc">Class Typewriter</h1><p class="nomargin-top"><span class="codelink"><a href="tdl-pysrc.html#Typewriter">source&nbsp;code</a></span></p>
 <pre class="base-tree">
-object --+    
-         |    
-     <a href="tdl.event.Event-class.html">Event</a> --+
-             |
-            <strong class="uidshort">MouseMotion</strong>
+object --+
+         |
+        <strong class="uidshort">Typewriter</strong>
 </pre>
 
 <hr />
-<p>Fired when the mouse is moved.</p>
-
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
 <table class="summary" border="1" cellpadding="3"
@@ -85,14 +80,11 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="tdl.event.MouseMotion-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">pos</span>,
-        <span class="summary-sig-arg">cell</span>,
-        <span class="summary-sig-arg">motion</span>,
-        <span class="summary-sig-arg">cellmotion</span>)</span><br />
+          <td><span class="summary-sig"><a href="tdl.Typewriter-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">console</span>)</span><br />
       x.__init__(...) initializes x; see help(type(x)) for signature</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="tdl.event-pysrc.html#MouseMotion.__init__">source&nbsp;code</a></span>
+            <span class="codelink"><a href="tdl-pysrc.html#Typewriter.__init__">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -106,11 +98,119 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="tdl.event.Event-class.html#__repr__" class="summary-sig-name">__repr__</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      List an events public attributes in print calls.
-      <em>(Inherited from <a href="tdl.event.Event-class.html">tdl.event.Event</a>)</em></td>
+          <td><span class="summary-sig"><a name="addChar"></a><span class="summary-sig-name">addChar</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">char</span>)</span><br />
+      Draw a single character at the cursor.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="tdl.event-pysrc.html#Event.__repr__">source&nbsp;code</a></span>
+            <span class="codelink"><a href="tdl-pysrc.html#Typewriter.addChar">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="addStr"></a><span class="summary-sig-name">addStr</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">string</span>)</span><br />
+      Write a string at the cursor</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl-pysrc.html#Typewriter.addStr">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="getCursor"></a><span class="summary-sig-name">getCursor</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Return the virtual cursor position</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl-pysrc.html#Typewriter.getCursor">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="move"></a><span class="summary-sig-name">move</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">x</span>,
+        <span class="summary-sig-arg">y</span>)</span><br />
+      Move the virtual cursor</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl-pysrc.html#Typewriter.move">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="setBG"></a><span class="summary-sig-name">setBG</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">color</span>)</span><br />
+      Change the background color</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl-pysrc.html#Typewriter.setBG">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="setFG"></a><span class="summary-sig-name">setFG</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">color</span>)</span><br />
+      Change the foreground color</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl-pysrc.html#Typewriter.setFG">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="tdl.Typewriter-class.html#write" class="summary-sig-name">write</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">string</span>)</span><br />
+      To behave like a file-like object.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl-pysrc.html#Typewriter.write">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -128,69 +228,12 @@ object --+
       <code>__new__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
       <code>__setattr__</code>,
       <code>__sizeof__</code>,
       <code>__str__</code>,
       <code>__subclasshook__</code>
       </p>
-    </td>
-  </tr>
-</table>
-<!-- ==================== CLASS VARIABLES ==================== -->
-<a name="section-ClassVariables"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td align="left" colspan="2" class="table-header">
-    <span class="table-header">Class Variables</span></td>
-</tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="type"></a><span class="summary-name">type</span> = <code title="'MOUSEMOTION'"><code class="variable-quote">'</code><code class="variable-string">MOUSEMOTION</code><code class="variable-quote">'</code></code><br />
-      String constant representing the type of event.
-    </td>
-  </tr>
-</table>
-<!-- ==================== INSTANCE VARIABLES ==================== -->
-<a name="section-InstanceVariables"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td align="left" colspan="2" class="table-header">
-    <span class="table-header">Instance Variables</span></td>
-</tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="tdl.event.MouseMotion-class.html#pos" class="summary-name">pos</a><br />
-      (x, y) position of the mouse on the screen.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="tdl.event.MouseMotion-class.html#cell" class="summary-name">cell</a><br />
-      (x, y) position of the mouse snapped to a cell on the root console.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="tdl.event.MouseMotion-class.html#motion" class="summary-name">motion</a><br />
-      (x, y) motion of the mouse on the screen.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="tdl.event.MouseMotion-class.html#cellmotion" class="summary-name">cellmotion</a><br />
-      (x, y) mostion of the mouse moving over cells on the root console.
     </td>
   </tr>
 </table>
@@ -227,14 +270,11 @@ object --+
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">pos</span>,
-        <span class="sig-arg">cell</span>,
-        <span class="sig-arg">motion</span>,
-        <span class="sig-arg">cellmotion</span>)</span>
+        <span class="sig-arg">console</span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="tdl.event-pysrc.html#MouseMotion.__init__">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="tdl-pysrc.html#Typewriter.__init__">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -247,58 +287,22 @@ object --+
   </dl>
 </td></tr></table>
 </div>
-<br />
-<!-- ==================== INSTANCE VARIABLE DETAILS ==================== -->
-<a name="section-InstanceVariableDetails"></a>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td align="left" colspan="2" class="table-header">
-    <span class="table-header">Instance Variable Details</span></td>
-</tr>
-</table>
-<a name="pos"></a>
+<a name="write"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
-  <h3 class="epydoc">pos</h3>
-  <p>(x, y) position of the mouse on the screen. type: (int, int)</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="cell"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">cell</h3>
-  <p>(x, y) position of the mouse snapped to a cell on the root console. 
-  type: (int, int)</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="motion"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">motion</h3>
-  <p>(x, y) motion of the mouse on the screen. type: (int, int)</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="cellmotion"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">cellmotion</h3>
-  <p>(x, y) mostion of the mouse moving over cells on the root console. 
-  type: (int, int)</p>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">write</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">string</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#Typewriter.write">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>To behave like a file-like object. (for sys.stdout, sys.stderr)</p>
   <dl class="fields">
   </dl>
 </td></tr></table>
