@@ -163,7 +163,9 @@ object --+
         <span class="summary-sig-arg">string</span>,
         <span class="summary-sig-arg">fgcolor</span>=<span class="summary-sig-default"><code class="variable-group">(</code>255<code class="variable-op">, </code>255<code class="variable-op">, </code>255<code class="variable-group">)</code></span>,
         <span class="summary-sig-arg">bgcolor</span>=<span class="summary-sig-default"><code class="variable-group">(</code>0<code class="variable-op">, </code>0<code class="variable-op">, </code>0<code class="variable-group">)</code></span>)</span><br />
-      Similar to drawRect but only draws the outline of the rectangle.</td>
+      Similar to <a href="tdl._MetaConsole-class.html#drawRect" 
+      class="link">drawRect</a> but only draws the outline of the 
+      rectangle.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.drawFrame">source&nbsp;code</a></span>
             
@@ -213,6 +215,25 @@ object --+
       Draws a string starting at x and y.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.drawStr">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">(int, (r, g, b), (r, g, b))</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="tdl._MetaConsole-class.html#getChar" class="summary-sig-name">getChar</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">x</span>,
+        <span class="summary-sig-arg">y</span>)</span><br />
+      Return the character and colors of a tile as (ch, fg, bg)</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.getChar">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -288,6 +309,13 @@ object --+
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a name="console"></a><span class="summary-name">console</span>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a name="height"></a><span class="summary-name">height</span>
     </td>
   </tr>
@@ -341,13 +369,20 @@ object --+
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>width</code></strong> (int or None)</li>
-        <li><strong class="pname"><code>height</code></strong> (int or None)</li>
-        <li><strong class="pname"><code>source</code></strong> (Console or Window)</li>
-        <li><strong class="pname"><code>y</code></strong> (int)</li>
-        <li><strong class="pname"><code>x</code></strong> (int)</li>
-        <li><strong class="pname"><code>srcX</code></strong> (int)</li>
-        <li><strong class="pname"><code>srcY</code></strong> (int)</li>
+        <li><strong class="pname"><code>source</code></strong> (<a href="tdl.Console-class.html" class="link">Console</a> or <a 
+          href="tdl.Window-class.html" class="link">Window</a>) - Source window can be a <a href="tdl.Console-class.html" 
+          class="link">Console</a> or <a href="tdl.Window-class.html" 
+          class="link">Window</a> instance. It can even blit to itself 
+          without any problems.</li>
+        <li><strong class="pname"><code>x</code></strong> (int) - X coordinate to blit to.</li>
+        <li><strong class="pname"><code>y</code></strong> (int) - Y coordinate to blit to.</li>
+        <li><strong class="pname"><code>width</code></strong> (int or None) - Width of the rectangle.
+          <p>Can be None to extend as far as possible to the bottom right 
+          corner of the blit area or can be a negative number to be sized 
+          reltive to the total size of the <b>destination</b> console.</p></li>
+        <li><strong class="pname"><code>height</code></strong> (int or None) - Height of the rectangle.  See width.</li>
+        <li><strong class="pname"><code>srcX</code></strong> (int) - The source consoles x coordinate to blit from.</li>
+        <li><strong class="pname"><code>srcY</code></strong> (int) - The source consoles y coordinate to blit from.</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -375,21 +410,22 @@ object --+
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>x</code></strong> (int) - X coordinate to draw at.</li>
+        <li><strong class="pname"><code>y</code></strong> (int) - Y coordinate to draw at.</li>
         <li><strong class="pname"><code>char</code></strong> (int, string, or None) - Should be an integer, single character string, or None.
           <p>You can set the char parameter as None if you only want to 
           change the colors of the tile.</p></li>
-        <li><strong class="pname"><code>fgcolor</code></strong> (3-item list or None) - For fgcolor and bgcolor you use a 3 item list with integers 
-          ranging 0 - 255 or None. None will keep the current color at this
-          position unchanged.</li>
-        <li><strong class="pname"><code>y</code></strong> (int)</li>
-        <li><strong class="pname"><code>x</code></strong> (int)</li>
-        <li><strong class="pname"><code>bgcolor</code></strong> (3-item list or None)</li>
+        <li><strong class="pname"><code>fgcolor</code></strong> ((r, g, b) or None) - For fgcolor and bgcolor you use a 3 item list with integers 
+          ranging 0-255 or None.
+          <p>None will keep the current color at this position 
+          unchanged.</p></li>
+        <li><strong class="pname"><code>bgcolor</code></strong> ((r, g, b) or None) - Background color.  See fgcolor</li>
     </ul></dd>
     <dt>Raises:</dt>
     <dd><ul class="nomargin-top">
-        <li><code><strong class='fraise'>AssertionError</strong></code> - Having the x or y values outside of the console will raise an 
-        AssertionError.  You can use ((x, y) in console) to check if a cell
-        is drawable.</li>
+        <li><code><strong class='fraise'>AssertionError</strong></code> - Having x or y values that can't be placed inside of the console 
+        will raise an AssertionError. You can use always use ((x, y) in 
+        console) to check if a tile is drawable.</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -415,17 +451,34 @@ object --+
     </td>
   </tr></table>
   
-  <p>Similar to drawRect but only draws the outline of the rectangle.</p>
+  <p>Similar to <a href="tdl.Window-class.html#drawRect" 
+  class="link">drawRect</a> but only draws the outline of the 
+  rectangle.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>string</code></strong> (int, string, or None)</li>
-        <li><strong class="pname"><code>bgcolor</code></strong> (3-item list or None)</li>
-        <li><strong class="pname"><code>height</code></strong> (int or None)</li>
-        <li><strong class="pname"><code>width</code></strong> (int or None)</li>
-        <li><strong class="pname"><code>y</code></strong> (int)</li>
-        <li><strong class="pname"><code>x</code></strong> (int)</li>
-        <li><strong class="pname"><code>fgcolor</code></strong> (3-item list or None)</li>
+        <li><strong class="pname"><code>x</code></strong> (int) - x coordinate to draw at.</li>
+        <li><strong class="pname"><code>y</code></strong> (int) - y coordinate to draw at.</li>
+        <li><strong class="pname"><code>width</code></strong> (int or None) - Width of the rectangle.
+          <p>Can be None to extend to the bottom right of the console or 
+          can be a negative number to be sized reltive to the total size of
+          the console.</p></li>
+        <li><strong class="pname"><code>height</code></strong> (int or None) - Height of the rectangle.  See width.</li>
+        <li><strong class="pname"><code>string</code></strong> (int, string, or None) - Should be an integer, single character string, or None.
+          <p>You can set the char parameter as None if you only want to 
+          change the colors of an area.</p></li>
+        <li><strong class="pname"><code>fgcolor</code></strong> ((r, g, b) or None) - For fgcolor and bgcolor you use a 3 item list with integers 
+          ranging 0-255 or None.
+          <p>None will keep the current color at this position 
+          unchanged.</p></li>
+        <li><strong class="pname"><code>bgcolor</code></strong> ((r, g, b) or None) - Background color.  See fgcolor</li>
+    </ul></dd>
+    <dt>Raises:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code><strong class='fraise'>AssertionError</strong></code> - Having x or y values that can't be placed inside of the console 
+        will raise an AssertionError.
+        <p>You can use always use ((x, y) in console) to check if a tile is
+        drawable.</p></li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -452,18 +505,34 @@ object --+
   </tr></table>
   
   <p>Draws a rectangle starting from x and y and extending to width and 
-  height.  If width or height are None then it will extend to the edge of 
-  the console.  The rest are the same as drawChar.</p>
+  height.</p>
+  <p>If width or height are None then it will extend to the edge of the 
+  console.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>string</code></strong> (int, string, or None)</li>
-        <li><strong class="pname"><code>bgcolor</code></strong> (3-item list or None)</li>
-        <li><strong class="pname"><code>height</code></strong> (int or None)</li>
-        <li><strong class="pname"><code>width</code></strong> (int or None)</li>
-        <li><strong class="pname"><code>y</code></strong> (int)</li>
-        <li><strong class="pname"><code>x</code></strong> (int)</li>
-        <li><strong class="pname"><code>fgcolor</code></strong> (3-item list or None)</li>
+        <li><strong class="pname"><code>x</code></strong> (int) - x coordinate to draw at.</li>
+        <li><strong class="pname"><code>y</code></strong> (int) - y coordinate to draw at.</li>
+        <li><strong class="pname"><code>width</code></strong> (int or None) - Width of the rectangle.
+          <p>Can be None to extend to the bottom right of the console or 
+          can be a negative number to be sized reltive to the total size of
+          the console.</p></li>
+        <li><strong class="pname"><code>height</code></strong> (int or None) - Height of the rectangle.  See width.</li>
+        <li><strong class="pname"><code>string</code></strong> (int, string, or None) - Should be an integer, single character string, or None.
+          <p>You can set the char parameter as None if you only want to 
+          change the colors of an area.</p></li>
+        <li><strong class="pname"><code>fgcolor</code></strong> ((r, g, b) or None) - For fgcolor and bgcolor you use a 3 item list with integers 
+          ranging 0-255 or None.
+          <p>None will keep the current color at this position 
+          unchanged.</p></li>
+        <li><strong class="pname"><code>bgcolor</code></strong> ((r, g, b) or None) - Background color.  See fgcolor</li>
+    </ul></dd>
+    <dt>Raises:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code><strong class='fraise'>AssertionError</strong></code> - Having x or y values that can't be placed inside of the console 
+        will raise an AssertionError.
+        <p>You can use always use ((x, y) in console) to check if a tile is
+        drawable.</p></li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -496,17 +565,57 @@ object --+
   <p>\r and \n are drawn on the console as normal character tiles.  No 
   special encoding is done and any string will translate to the character 
   table as is.</p>
-  <p>fgcolor and bgcolor can be set to None to keep the colors 
-  unchanged.</p>
+  <p>For a string drawing operation that respects special characters see 
+  the <a href="tdl.Typewriter-class.html" class="link">Typewriter</a> 
+  class.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>y</code></strong> (int)</li>
-        <li><strong class="pname"><code>x</code></strong> (int)</li>
-        <li><strong class="pname"><code>string</code></strong> (string or iterable)</li>
-        <li><strong class="pname"><code>bgcolor</code></strong> (3-item list or None)</li>
-        <li><strong class="pname"><code>fgcolor</code></strong> (3-item list or None)</li>
+        <li><strong class="pname"><code>x</code></strong> (int) - X coordinate to draw at.</li>
+        <li><strong class="pname"><code>y</code></strong> (int) - Y coordinate to draw at.</li>
+        <li><strong class="pname"><code>string</code></strong> (string or iterable) - Can be a string or an iterable of numbers.
+          <p>Special characters are ignored and rendered as any other 
+          character.</p></li>
+        <li><strong class="pname"><code>fgcolor</code></strong> ((r, g, b) or None) - For fgcolor and bgcolor you use a 3 item list with integers 
+          ranging 0-255 or None.
+          <p>None will keep the current color at this position 
+          unchanged.</p></li>
+        <li><strong class="pname"><code>bgcolor</code></strong> ((r, g, b) or None) - Background color.  See fgcolor</li>
     </ul></dd>
+    <dt>Raises:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code><strong class='fraise'>AssertionError</strong></code> - Having x or y values that can't be placed inside of the console 
+        will raise an AssertionError.
+        <p>You can use always use ((x, y) in console) to check if a tile is
+        drawable.</p></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="getChar"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getChar</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">x</span>,
+        <span class="sig-arg">y</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.getChar">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Return the character and colors of a tile as (ch, fg, bg)</p>
+  <p>This method runs very slowly as is not recommended to be called 
+  frequently.</p>
+  <dl class="fields">
+    <dt>Returns: (int, (r, g, b), (r, g, b))</dt>
+        <dd>Returns a 3-item tuple.  The first item is an integer of the 
+          character at the position (x, y) the second and third are the 
+          foreground and background colors respectfully.</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -531,8 +640,8 @@ object --+
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>y</code></strong> (int)</li>
-        <li><strong class="pname"><code>x</code></strong> (int)</li>
+        <li><strong class="pname"><code>x</code></strong> (int) - Distance to scroll along x-axis</li>
+        <li><strong class="pname"><code>y</code></strong> (int) - Distance to scroll along y-axis</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -570,7 +679,7 @@ object --+
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Tue Dec 04 19:10:26 2012</a>
+    3.0.1 on Wed Dec 05 20:07:32 2012</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

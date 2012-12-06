@@ -49,7 +49,9 @@ tdl.map	tdl.map-module.html
 tdl.map.quickFOV	tdl.map-module.html#quickFOV
 tdl.map.__package__	tdl.map-module.html#__package__
 tdl.map._getFOVType	tdl.map-module.html#_getFOVType
+tdl.map._FOVTYPES	tdl.map-module.html#_FOVTYPES
 tdl.Console	tdl.Console-class.html
+tdl._MetaConsole._normalizeRect	tdl._MetaConsole-class.html#_normalizeRect
 tdl.Console._setChar	tdl.Console-class.html#_setChar
 tdl._MetaConsole.height	tdl._MetaConsole-class.html#height
 tdl._MetaConsole.getSize	tdl._MetaConsole-class.html#getSize
@@ -58,13 +60,13 @@ tdl._MetaConsole.width	tdl._MetaConsole-class.html#width
 tdl._MetaConsole.blit	tdl._MetaConsole-class.html#blit
 tdl.Console.__init__	tdl.Console-class.html#__init__
 tdl.Console._newConsole	tdl.Console-class.html#_newConsole
+tdl._MetaConsole.console	tdl._MetaConsole-class.html#console
 tdl._MetaConsole.__contains__	tdl._MetaConsole-class.html#__contains__
 tdl._MetaConsole.drawChar	tdl._MetaConsole-class.html#drawChar
-tdl._MetaConsole.drawFrame	tdl._MetaConsole-class.html#drawFrame
+tdl.Console.__del__	tdl.Console-class.html#__del__
 tdl.Console.__repr__	tdl.Console-class.html#__repr__
 tdl.Console._translate	tdl.Console-class.html#_translate
-tdl._MetaConsole._normalizeRect	tdl._MetaConsole-class.html#_normalizeRect
-tdl.Console.__del__	tdl.Console-class.html#__del__
+tdl._MetaConsole.drawFrame	tdl._MetaConsole-class.html#drawFrame
 tdl.Console._replace	tdl.Console-class.html#_replace
 tdl.Console._as_parameter_	tdl.Console-class.html#_as_parameter_
 tdl.Console._setCharBatch	tdl.Console-class.html#_setCharBatch
@@ -93,7 +95,7 @@ tdl._MetaConsole.drawStr	tdl._MetaConsole-class.html#drawStr
 tdl._MetaConsole.width	tdl._MetaConsole-class.html#width
 tdl._MetaConsole.blit	tdl._MetaConsole-class.html#blit
 tdl.Window.__init__	tdl.Window-class.html#__init__
-tdl.Window.console	tdl.Window-class.html#console
+tdl._MetaConsole.console	tdl._MetaConsole-class.html#console
 tdl._MetaConsole.__contains__	tdl._MetaConsole-class.html#__contains__
 tdl.Window.drawChar	tdl.Window-class.html#drawChar
 tdl._MetaConsole._normalizeRect	tdl._MetaConsole-class.html#_normalizeRect
@@ -115,6 +117,7 @@ tdl._MetaConsole.height	tdl._MetaConsole-class.html#height
 tdl._MetaConsole.getSize	tdl._MetaConsole-class.html#getSize
 tdl._MetaConsole.width	tdl._MetaConsole-class.html#width
 tdl._MetaConsole.blit	tdl._MetaConsole-class.html#blit
+tdl._MetaConsole.console	tdl._MetaConsole-class.html#console
 tdl._MetaConsole.__contains__	tdl._MetaConsole-class.html#__contains__
 tdl._MetaConsole.drawChar	tdl._MetaConsole-class.html#drawChar
 tdl._MetaConsole.drawFrame	tdl._MetaConsole-class.html#drawFrame
@@ -123,6 +126,7 @@ tdl._MetaConsole._normalizePoint	tdl._MetaConsole-class.html#_normalizePoint
 tdl._MetaConsole.drawRect	tdl._MetaConsole-class.html#drawRect
 tdl._MetaConsole.drawStr	tdl._MetaConsole-class.html#drawStr
 tdl._MetaConsole.scroll	tdl._MetaConsole-class.html#scroll
+tdl._MetaConsole.getChar	tdl._MetaConsole-class.html#getChar
 tdl.event.App	tdl.event.App-class.html
 tdl.event.App.suspend	tdl.event.App-class.html#suspend
 tdl.event.App.ev_MOUSEUP	tdl.event.App-class.html#ev_MOUSEUP
@@ -211,12 +215,8 @@ tdl.event.Quit	tdl.event.Quit-class.html
 tdl.event.Event.__repr__	tdl.event.Event-class.html#__repr__
 tdl.event.Quit.type	tdl.event.Quit-class.html#type
 tdl.map.AStar	tdl.map.AStar-class.html
+tdl.map.AStar._callback	tdl.map.AStar-class.html#_callback
 tdl.map.AStar.__del__	tdl.map.AStar-class.html#__del__
 tdl.map.AStar.getPath	tdl.map.AStar-class.html#getPath
+tdl.map.AStar._as_parameter_	tdl.map.AStar-class.html#_as_parameter_
 tdl.map.AStar.__init__	tdl.map.AStar-class.html#__init__
-tdl.map.Dijkstra	tdl.map.Dijkstra-class.html
-tdl.map.Dijkstra.getPathFrom	tdl.map.Dijkstra-class.html#getPathFrom
-tdl.map.Dijkstra.__del__	tdl.map.Dijkstra-class.html#__del__
-tdl.map.Dijkstra.getPathTo	tdl.map.Dijkstra-class.html#getPathTo
-tdl.map.Dijkstra.setPole	tdl.map.Dijkstra-class.html#setPole
-tdl.map.Dijkstra.__init__	tdl.map.Dijkstra-class.html#__init__

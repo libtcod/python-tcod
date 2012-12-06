@@ -1,3 +1,9 @@
+1.1.1
+ * map submodule added with AStar class and quickFOV function
+ * new Typewriter class
+ * most console functions can use Python-style negative indexes now
+ * new App.runOnce method
+ * rectangle geometry is less strict
 
 1.1.0
  * KeyEvent.keyname is now KeyEvent.key

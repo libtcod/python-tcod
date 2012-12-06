@@ -9,122 +9,85 @@ import math
 
 from .__tcod import _lib, _PATHCALL
 
+_FOVTYPES = {'BASIC' : 0, 'DIAMOND': 1, 'SHADOW': 2, 'RESTRICTIVE': 12, 'PERMISSIVE': 11}
+
 def _getFOVType(fov):
     "Return a FOV from a string"
     oldFOV = fov
     fov = str(fov).upper()
-    FOVTYPES = {'BASIC' : 0, 'DIAMOND': 1, 'SHADOW': 2, 'RESTRICTIVE': 12,
-                'PERMISSIVE': 11}
-    if fov in FOVTYPES:
-        fov = FOVTYPES[fov]
-    elif fov[:10] == 'PERMISSIVE' and fov[10].isdigit() and fov[10] != '9':
-        fov = 4 + int(fov[10])
-    else:
-        raise TDLError('No such fov option as %s' % oldFOV)
-    return fov
-
-# class Map(object):
-    
-    # def __init__(self, width, height, callback=None):
-        # self._width = int(width)
-        # self._height = int(height)
-        # self._size = self._width * self._height
-        # self._tcodMap = _lib.TCOD_map_new(width, height)
-        # self._as_parameter_ = self._tcodMap
-        # self._callback = callback
-        # #self._clean = set()
-        # #self._walkable = array.array('b', [0] * self._size)
-        # #self._transparent = array.array('b', [0] * self._size)
-        
-    # def __del__(self):
-        # _lib.TCOD_map_delete(self)
-        
-    # def _pointsInRadius(self, x, y, radius):
-        # 'returns a list of (x, y) items'
-        # x = range(max(0, x - radius), min(x + radius + 1, self._width))
-        # y = range(max(0, y - radius), min(y + radius + 1, self._height))
-        # return itertools.product(x, y)
-    
-    # def _pointsInRadiusC(self, x, y, radius):
-        # 'returns a list of ((x, ctypeX), (y, ctypeY)) items'
-        # c_int = ctypes.c_int
-        # x = ((i, c_int(i)) for i in
-             # range(max(0, x - radius), min(x + radius + 1, self._width)))
-        # y = ((i, c_int(i)) for i in
-             # range(max(0, y - radius), min(y + radius + 1, self._height)))
-        # return itertools.product(x, y)
-        
-    # def setFromCallbacks(self, walkableCall, transparentCall):
-        # for x, y in itertools.product(range(self._width), range(self._height)):
-            # _lib.TCOD_map_set_properties(self._tcodMap, x, y,
-                                         # transparentCall(x, y),
-                                         # walkableCall(x, y))
-        
-    # def set(self, x, y, walkable, transparent):
-        # #walkable = bool(walkable)
-        # #transparent = bool(transparent)
-        # _lib.TCOD_map_set_properties(self._as_parameter_,
-                                     # x, y, walkable, transparent)
-        
-    # def _updateMap(self, x, y, radius):
-        # if not self._callback:
-            # return
-        # c_bool = ctypes.c_bool
-        # for (x, cX),(y, cY) in self._pointsInRadiusC(x, y, radius):
-            # #if (x, y) not in self._clean:
-            # #    self._clean.add((x,y))
-                # transparent = c_bool(self._callback(x, y))
-                # _lib.TCOD_map_set_properties(self._as_parameter_,
-                                         # cX, cY, transparent, transparent)
-        
-    # def computeFOV(self, x, y, fov='PERMISSIVE', radius=8, lightWalls=True):
-        # """
-        
-        # @type x: int
-        # @param x:
-        # @type y: int
-        # @param y:
-        # @type fov: string
-        # @type radius: int
-        # @type lightWalls: boolean
-        
-        # @rtype: list
-        # @return: Returns a list of (x, y) coordinates that are within the field-of-view
-        # """
-        # fov = _getFOVType(fov)
-            
-        # self._updateMap(x, y, radius)
-        # _lib.TCOD_map_compute_fov(self, x, y, radius, lightWalls, fov)
-        # return self._listFOV(x, y, radius)
-            
-    # def _iterFOV(self, x, y, radius):
-        # inFOV = _lib.TCOD_map_is_in_fov
-        # map = self._as_parameter_
-        # for (x, cX),(y, cY) in self._pointsInRadiusC(x, y, radius):
-            # if inFOV(map, cX, cY):
-                # yield(x, y)
-                
-    # def _listFOV(self, x, y, radius):
-        # return list(self._iterFOV(x, y, radius))
+    if fov in _FOVTYPES:
+        return _FOVTYPES[fov]
+    if fov[:10] == 'PERMISSIVE' and fov[10].isdigit() and fov[10] != '9':
+        return 4 + int(fov[10])
+    raise TDLError('No such fov option as %s' % oldFOV)
 
 class AStar(object):
+    """A* pathfinder
+    
+    Using this class requires a callback detailed in L{AStar.__init__}
+    """
+    
+    __slots__ = ('_as_parameter_', '_callback', '__weakref__')
 
-    def __init__(self, width, height, callback, diagnalCost=math.sqrt(2)):
-        def newCallback(fromX, fromY, toX, toY, null):
-            pathCost = callback(toX, toY) # expecting a float or 0
-            if pathCost:
-                return pathCost
-            return 0.0
-        self.callback = _PATHCALL(newCallback)
+    def __init__(self, width, height, callback,
+                 diagnalCost=math.sqrt(2), advanced=False):
+        """Create an A* pathfinder using a callback.
+        
+        Before crating this instance you should make one of two types of
+        callbacks:
+         - A function that returns the cost to move to (x, y)
+        or
+         - A function that returns the cost to move between
+           (destX, destY, sourceX, sourceY)
+        If path is blocked the function should return zero or None.
+        When using the second type of callback be sure to set advanced=True
+        
+        @type width: int
+        @param width: width of the pathfinding area in tiles
+        @type height: int
+        @param height: height of the pathfinding area in tiles
+        
+        @type callback: function
+        @param callback: A callback taking parameters depending on the setting
+                         of 'advanced' and returning the cost of
+                         movement for an open tile or zero for a
+                         blocked tile.
+        
+        @type diagnalCost: float
+        @param diagnalCost: Multiplier for diagonal movement.
+        
+                            Can be set to zero to disable diagonal movement
+                            entirely.
+        
+        @type advanced: boolean
+        @param advanced: A simple callback with 2 positional parameters may not
+                         provide enough information.  Setting this to True will
+                         call the callback with 2 additional parameters giving
+                         you both the destination and the source of movement.
+                         
+                         When True the callback will need to accept
+                         (destX, destY, sourceX, sourceY) as parameters.
+                         Instead of just (destX, destY).
+                         
+        """
+        if not diagnalCost: # set None or False to zero
+            diagnalCost = 0.0
+        if advanced:
+            def newCallback(sourceX, sourceY, destX, destY, null):
+                pathCost = callback(destX, destY, sourceX, sourceY)
+                if pathCost:
+                    return pathCost
+                return 0.0
+        else:
+            def newCallback(sourceX, sourceY, destX, destY, null):
+                pathCost = callback(destX, destY) # expecting a float or 0
+                if pathCost:
+                    return pathCost
+                return 0.0
+        self._callback = _PATHCALL(newCallback)
+        """A CFUNCTYPE callback to be kept in memory."""
         self._as_parameter_ = _lib.TCOD_path_new_using_function(width, height,
-                                     self.callback, None, diagnalCost)
-
-    #@classmethod
-    #def FromMap(cls, map, diagnalCost=math.sqrt(2)):
-    #    self = cls.__new__(cls)
-    #    self.callback = None
-    #    self._as_parameter_ = _lib.TCOD_path_new_using_map(map, diagnalCost)
-    #    return self
+                                     self._callback, None, diagnalCost)
                                      
     def __del__(self):
         _lib.TCOD_path_delete(self)
@@ -135,52 +98,28 @@ class AStar(object):
             return [] # path not found
         x, y = ctypes.c_int(), ctypes.c_int()
         xRef, yRef = ctypes.byref(x), ctypes.byref(y)
-        recalculate = ctypes.c_bool(False)
+        recalculate = ctypes.c_bool(True)
         path = []
         while _lib.TCOD_path_walk(self, xRef, yRef, recalculate):
             path.append((x.value, y.value))
         return path
-        
-                                                
-    
-class Dijkstra(object):
-
-    def __init__(self, width, height, callback, diagnalCost=math.sqrt(2)):
-        def newCallback(fromX, fromY, toX, toY, null):
-            pathCost = callback(toX, toY) # expecting a float or 0
-            return pathCost
-        self.callback = _PATHCALL(newCallback)
-        self._as_parameter_ = _lib.TCOD_dijkstra_new_using_function(width, height,
-                                     self.callback, None, diagnalCost)
-        # add code to compute here with x,y
-    
-    #@classmethod
-    #def FromMap(cls, map, diagnalCost=math.sqrt(2)):
-    #    self = cls.__new__(cls)
-    #    self.callback = None
-    #    self._as_parameter_ = _lib.TCOD_dijkstra_new_using_map(map, diagnalCost)
-    #    return self
-        
-    def __del__(self):
-        _lib.TCOD_dijkstra_delete(self)
-        
-    def setPole(self, x, y):
-        self.x, self.y = x, y
-        _lib.TCOD_dijkstra_compute(self, x, y)
-        
-    def getPathFrom(self, startX, startY):
-        pass
-        
-    def getPathTo(self, destX, destY):
-        pass
     
 def quickFOV(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sphere=True):
     """All field-of-view functionality in one call.
     
+    Before using this call be sure to make a function, lambda, or method that takes 2
+    positional parameters and returns True if light can pass the tile or False
+    for light-blocking tiles and for positions that are out of bounds of the
+    dungeon.
+    
+    This function is 'quick' as in no hassle but can quickly become a very slow
+    function call if a large radius is used or the callback provided itself
+    isn't optimized.
+    
     @type x: int
-    @param x: x origin of the field-of-view
+    @param x: x center of the field-of-view
     @type y: int
-    @param y: y origin of the field-of-view
+    @param y: y center of the field-of-view
     @type callback: function
     @param callback: This should be a function that takes two positional arguments x,y
                      and returns True if the tile at that position is transparent
@@ -274,4 +213,4 @@ def quickFOV(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sphe
         # points.reverse()
     # return points
     
-__all__ = ['AStar', 'Dijkstra', 'quickFOV']
+__all__ = ['AStar', 'quickFOV']

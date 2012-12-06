@@ -61,9 +61,16 @@ def _parseKeyNames(module):
 _keyNames = _parseKeyNames(_tcod)
     
 class Event(object):
-    __slots__ = ()
+    """Base Event class.
+    
+    You can easily subclass this to make your own events.  Be sure to set
+    the class attribute L{Event.type} for it to be passed to a custom L{App}
+    ev_* method."""
+    __slots__ = ('__weakref__',)
     type = None
     """String constant representing the type of event.
+    
+    The L{App} ev_* methods depend on this attribute.
     
     Can be: 'QUIT', 'KEYDOWN', 'KEYUP', 'MOUSEDOWN', 'MOUSEUP', or 'MOUSEMOTION.'
     """
@@ -209,19 +216,19 @@ class App(object):
         raise SystemExit()
     
     def ev_KEYDOWN(self, event):
-        "Override this method to handle this event."
+        """Override this method to handle a L{KeyDown} event."""
     
     def ev_KEYUP(self, event):
-        "Override this method to handle this event."
+        """Override this method to handle a L{KeyUp} event."""
     
     def ev_MOUSEDOWN(self, event):
-        "Override this method to handle this event."
+        """Override this method to handle a L{MouseDown} event."""
     
     def ev_MOUSEUP(self, event):
-        "Override this method to handle this event."
+        """Override this method to handle a L{MouseUp} event."""
     
     def ev_MOUSEMOTION(self, event):
-        "Override this method to handle this event."
+        """Override this method to handle a L{MouseMotion} event."""
     
     def update(self, deltaTime):
         """Override this method to handle per frame logic and drawing.
@@ -232,7 +239,9 @@ class App(object):
                           number.
                           
                           You can use this variable to make your program
-                          frame rate independent.
+                          frame rate independent.  Use this parameter to adjust
+                          the speed of physics, special visual effects,
+                          and other game logic.
         """
         pass
         
@@ -265,6 +274,9 @@ class App(object):
         
         This works in the way described in L{App.run} except it immediately
         returns after the first L{update} call.
+        
+        Having multiple L{App} instances and selectively calling runOnce on
+        them is a decent way to create a state machine.
         """
         if not hasattr(self, '__prevTime'):
             self.__prevTime = time.clock() # initiate __prevTime
@@ -343,6 +355,10 @@ def get():
     type attribute or their class.
     
     @rtype: iterator
+    @return: Returns an iterable of objects derived from L{Event} or anything
+             put in a L{push} call.  If the iterator is deleted or otherwise
+             interrupted before finishing the excess items are preserved for the
+             next call.
     """
     _processEvents()
     while _eventQueue:
@@ -356,9 +372,10 @@ def push(event):
     """Push an event into the event buffer.
     
     @type event: L{Event}-like object
-    @param event: The event will be available on the next call to L{event.get}.  An event
-                  pushed in the middle of a get will not show until the next time it's called.
-                  This prevents infinite loops.
+    @param event: The event will be available on the next call to L{event.get}.
+                  An event pushed in the middle of a L{get} will not show until
+                  the next time L{get} called preventing push related
+                  infinite loops.
     """
     _pushedEvents.append(event)
     

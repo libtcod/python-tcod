@@ -5,22 +5,34 @@
     Getting Started
     ===============
       Once the library is imported you can load the font you want to use with
-      L{tdl.setFont}.  This is optional and can be skipped to get a decent
-      default font.  After that you call L{tdl.init} to set the size of the
-      window and get the root console in return.  This console is the canvas
-      to what will appear on the screen.
+      L{tdl.setFont}.
+      This is optional and when skipped will use a decent default font.
+      
+      After that you call L{tdl.init} to set the size of the window and get the
+      root console in return.
+      This console is the canvas to what will appear on the screen.
 
+    Indexing Consoles
+    =================
+      For most methods taking a position you can use Python-style negative
+      indexes to refer to the opposite side of a console with (-1, -1)
+      starting at the bottom right.
+      You can also check if a point is part of a console using containment
+      logic i.e. ((x, y) in console).
+      
     Drawing
     =======
       Once you have the root console from L{tdl.init} you can start drawing on
-      it using a method such as L{Console.drawChar}.  When using this method
-      you can have the char parameter be an intiger or a single character
-      string.  The fgcolor and bgcolor parameters expect a three item list
+      it using a method such as L{Console.drawChar}.
+      When using this method you can have the char parameter be an integer or a
+      single character string.
+      The fgcolor and bgcolor parameters expect a three item list
       [red, green, blue] with integers in the 0-255 range with [0, 0, 0] being
-      black and [255, 255, 255] being white.  Or instead you can use None for
-      any of the three parameters to tell the library to keep what is at that
-      spot instead of overwriting it.  After the drawing functions are called
-      a call to L{tdl.flush} will update the screen.
+      black and [255, 255, 255] being white.
+      Or instead you can use None for any of the three parameters to tell the
+      library to keep what is at that spot instead of overwriting it.
+      After the drawing functions are called a call to L{tdl.flush} will update
+      the screen.
 """
 
 import sys
@@ -57,7 +69,7 @@ def _encodeString(string): # still used for filepaths, and that's about it
 def _formatChar(char):
     """Prepares a single character for passing to ctypes calls, needs to return
     an integer but can also pass None which will keep the current character
-    instead of overrwriting it.
+    instead of overwriting it.
 
     This is called often and needs to be optimized whenever possible.
     """
@@ -123,28 +135,34 @@ class _MetaConsole(object):
     """
     Contains methods shared by both the L{Console} and L{Window} classes.
     """
-    __slots__ = ('width', 'height', '__weakref__', '__dict__')
+    __slots__ = ('width', 'height', 'console', '__weakref__', '__dict__')
 
     def drawChar(self, x, y, char, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a single character.
 
         @type x: int
+        @param x: X coordinate to draw at.
         @type y: int
+        @param y: Y coordinate to draw at.
+        
         @type char: int, string, or None
-        @type fgcolor: 3-item list or None
-        @type bgcolor: 3-item list or None
         @param char: Should be an integer, single character string, or None.
 
                      You can set the char parameter as None if you only want to change
                      the colors of the tile.
 
-        @param fgcolor: For fgcolor and bgcolor you use a 3 item list with integers ranging 0 - 255 or None.
+        @type fgcolor: (r, g, b) or None
+        @param fgcolor: For fgcolor and bgcolor you use a 3 item list with
+                        integers ranging 0-255 or None.
+                        
                         None will keep the current color at this position unchanged.
+        @type bgcolor: (r, g, b) or None
+        @param bgcolor: Background color.  See fgcolor
 
-
-        @raise AssertionError: Having the x or y values outside of the console will raise an
-                               AssertionError.  You can use ((x, y) in console)
-                               to check if a cell is drawable.
+        @raise AssertionError: Having x or y values that can't be placed inside
+                               of the console will raise an AssertionError.
+                               You can use always use ((x, y) in console) to
+                               check if a tile is drawable.
         """
 
         assert _verify_colors(fgcolor, bgcolor)
@@ -164,15 +182,34 @@ class _MetaConsole(object):
         \\r and \\n are drawn on the console as normal character tiles.  No
         special encoding is done and any string will translate to the character
         table as is.
-
-        fgcolor and bgcolor can be set to None to keep the colors unchanged.
+        
+        For a string drawing operation that respects special characters see the
+        L{Typewriter} class.
 
         @type x: int
+        @param x: X coordinate to draw at.
         @type y: int
+        @param y: Y coordinate to draw at.
+        
         @type string: string or iterable
-        @type fgcolor: 3-item list or None
-        @type bgcolor: 3-item list or None
-
+        @param string: Can be a string or an iterable of numbers.
+                       
+                       Special characters are ignored and rendered as any other
+                       character.
+        
+        @type fgcolor: (r, g, b) or None
+        @param fgcolor: For fgcolor and bgcolor you use a 3 item list with
+                        integers ranging 0-255 or None.
+                        
+                        None will keep the current color at this position unchanged.
+        @type bgcolor: (r, g, b) or None
+        @param bgcolor: Background color.  See fgcolor
+        
+        @raise AssertionError: Having x or y values that can't be placed inside
+                               of the console will raise an AssertionError.
+                               
+                               You can use always use ((x, y) in console) to
+                               check if a tile is drawable.
         """
 
         x, y = self._normalizePoint(x, y)
@@ -198,17 +235,43 @@ class _MetaConsole(object):
         self._setCharBatch(_drawStrGen(), fgcolor, bgcolor)
 
     def drawRect(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
-        """Draws a rectangle starting from x and y and extending to width and
-        height.  If width or height are None then it will extend to the edge
-        of the console.  The rest are the same as drawChar.
+        """Draws a rectangle starting from x and y and extending to width and height.
+        
+        If width or height are None then it will extend to the edge of the console.
 
         @type x: int
+        @param x: x coordinate to draw at.
         @type y: int
+        @param y: y coordinate to draw at.
+        
         @type width: int or None
+        @param width: Width of the rectangle.
+                      
+                      Can be None to extend to the bottom right of the
+                      console or can be a negative number to be sized reltive
+                      to the total size of the console.
         @type height: int or None
+        @param height: Height of the rectangle.  See width.
+        
         @type string: int, string, or None
-        @type fgcolor: 3-item list or None
-        @type bgcolor: 3-item list or None
+        @param string: Should be an integer, single character string, or None.
+
+                       You can set the char parameter as None if you only want
+                       to change the colors of an area.
+        
+        @type fgcolor: (r, g, b) or None
+        @param fgcolor: For fgcolor and bgcolor you use a 3 item list with
+                        integers ranging 0-255 or None.
+                        
+                        None will keep the current color at this position unchanged.
+        @type bgcolor: (r, g, b) or None
+        @param bgcolor: Background color.  See fgcolor
+        
+        @raise AssertionError: Having x or y values that can't be placed inside
+                               of the console will raise an AssertionError.
+                               
+                               You can use always use ((x, y) in console) to
+                               check if a tile is drawable.
         """
         x, y, width, height = self._normalizeRect(x, y, width, height)
         assert _verify_colors(fgcolor, bgcolor)
@@ -223,15 +286,41 @@ class _MetaConsole(object):
         self._setCharBatch(batch, fgcolor, bgcolor, nullChar=(char is None))
 
     def drawFrame(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
-        """Similar to drawRect but only draws the outline of the rectangle.
+        """Similar to L{drawRect} but only draws the outline of the rectangle.
 
         @type x: int
+        @param x: x coordinate to draw at.
         @type y: int
+        @param y: y coordinate to draw at.
+        
         @type width: int or None
+        @param width: Width of the rectangle.
+                      
+                      Can be None to extend to the bottom right of the
+                      console or can be a negative number to be sized reltive
+                      to the total size of the console.
         @type height: int or None
+        @param height: Height of the rectangle.  See width.
+        
         @type string: int, string, or None
-        @type fgcolor: 3-item list or None
-        @type bgcolor: 3-item list or None
+        @param string: Should be an integer, single character string, or None.
+
+                       You can set the char parameter as None if you only want
+                       to change the colors of an area.
+        
+        @type fgcolor: (r, g, b) or None
+        @param fgcolor: For fgcolor and bgcolor you use a 3 item list with
+                        integers ranging 0-255 or None.
+                        
+                        None will keep the current color at this position unchanged.
+        @type bgcolor: (r, g, b) or None
+        @param bgcolor: Background color.  See fgcolor
+        
+        @raise AssertionError: Having x or y values that can't be placed inside
+                               of the console will raise an AssertionError.
+                               
+                               You can use always use ((x, y) in console) to
+                               check if a tile is drawable.
         """
         x, y, width, height = self._normalizeRect(x, y, width, height)
         assert _verify_colors(fgcolor, bgcolor)
@@ -297,13 +386,29 @@ class _MetaConsole(object):
 
         By default it blits the entire source to the topleft corner.
 
-        @type source: Console or Window
+        @type source: L{Console} or L{Window}
+        @param source: Source window can be a L{Console} or L{Window} instance.
+                       It can even blit to itself without any problems.
+        
         @type x: int
+        @param x: X coordinate to blit to.
         @type y: int
+        @param y: Y coordinate to blit to.
+        
         @type width: int or None
+        @param width: Width of the rectangle.
+                      
+                      Can be None to extend as far as possible to the
+                      bottom right corner of the blit area or can be a negative
+                      number to be sized reltive to the total size of the
+                      B{destination} console.
         @type height: int or None
+        @param height: Height of the rectangle.  See width.
+        
         @type srcX: int
+        @param srcX: The source consoles x coordinate to blit from.
         @type srcY: int
+        @param srcY: The source consoles y coordinate to blit from.
         """
         # hardcode alpha settings for now
         fgalpha=1.0
@@ -345,7 +450,9 @@ class _MetaConsole(object):
 
         Uncovered areas will be cleared.
         @type x: int
+        @param x: Distance to scroll along x-axis
         @type y: int
+        @param y: Distance to scroll along y-axis
         """
         assert isinstance(x, _INTTYPES), "x must be an integer, got %s" % repr(x)
         assert isinstance(y, _INTTYPES), "y must be an integer, got %s" % repr(x)
@@ -402,6 +509,19 @@ class _MetaConsole(object):
         if uncoverX and uncoverY: # clear corner
             self.drawRect(uncoverX[0], uncoverY[0], uncoverX[1], uncoverY[1], 0x20)
 
+    def getChar(self, x, y):
+        """Return the character and colors of a tile as (ch, fg, bg)
+        
+        This method runs very slowly as is not recommended to be called
+        frequently.
+
+        @rtype: (int, (r, g, b), (r, g, b))
+        @returns: Returns a 3-item tuple.  The first item is an integer of the
+                  character at the position (x, y) the second and third are the
+                  foreground and background colors respectfully.
+        """
+        raise NotImplementedError('Method here only exists for the docstring')
+            
     def __contains__(self, position):
         """Use ((x, y) in console) to check if a position is drawable on this console.
         """
@@ -409,19 +529,24 @@ class _MetaConsole(object):
         return (0 <= x < self.width) and (0 <= y < self.height)
 
 class Console(_MetaConsole):
-    """The Console is the main class of the tdl library.
+    """Contains character and color data and can be drawn to.
 
     The console created by the L{tdl.init} function is the root console and is the
-    consle that is rendered to the screen with flush.
+    console that is rendered to the screen with L{flush}.
 
-    Any console made from Console is an off-screen console that can be drawn
-    on and then L{blit} to the root console.
+    Any console created from the Console class is an off-screen console that
+    can be drawn on before being L{blit} to the root console.
     """
 
     __slots__ = ('_as_parameter_', '_typewriter')
 
     def __init__(self, width, height):
-        """Create a new offscreen console
+        """Create a new offscreen console.
+        
+        @type width: int
+        @param width: Width of the console in tiles
+        @type height: int
+        @param height: Height of the console in tiles
         """
         if not _rootinitialized:
             raise TDLError('Can not create Console\'s before tdl.init')
@@ -481,10 +606,16 @@ class Console(_MetaConsole):
         return x, y
 
     def clear(self, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
-        """Clears the entire console.
+        """Clears the entire Console.
 
-        @type fgcolor: 3-item list
-        @type bgcolor: 3-item list
+        @type fgcolor: (r, g, b)
+        @param fgcolor: Foreground color.
+        
+                        Must be a 3-item list with integers that range 0-255.
+                        
+                        Unlike most other operations you can not use None here.
+        @type bgcolor: (r, g, b)
+        @param bgcolor: Background color.  See fgcolor.
         """
         assert _verify_colors(fgcolor, bgcolor)
         assert fgcolor and bgcolor, 'Can not use None with clear'
@@ -538,15 +669,7 @@ class Console(_MetaConsole):
                 self._setChar(x, y, char, fgcolor, bgcolor, bgblend)
 
     def getChar(self, x, y):
-        """Return the character and colors of a cell as
-        (char, fgcolor, bgcolor)
-
-        The charecter is returned as a number.
-        Each color is returned as a tuple.
-
-        @rtype: (int, 3-item tuple, 3-item tuple)
-        """
-        #assert self._drawable(x, y)
+        # inherit docstring
         x, y = self._normalizePoint(x, y)
         char = _lib.TCOD_console_get_char(self, x, y)
         bgcolor = _lib.TCOD_console_get_char_background_wrapper(self, x, y)
@@ -566,9 +689,38 @@ class Window(_MetaConsole):
     the edge of the console.
     """
 
-    __slots__ = ('console', 'parent', 'x', 'y')
+    __slots__ = ('parent', 'x', 'y')
 
     def __init__(self, console, x, y, width, height):
+        """Isolate part of a L{Console} or L{Window} instance.
+        
+        @type console: L{Console} or L{Window}
+        @param console: The parent object which can be a L{Console} or another
+                        L{Window} instance.
+        
+        @type x: int
+        @param x: X coordinate to place the Window.
+                  
+                  This follows the normal rules for indexing so you can use a
+                  negative integer to place the Window relative to the bottom
+                  right of the parent Console instance.
+        @type y: int
+        @param y: Y coordinate to place the Window.
+        
+                  See x.
+        
+        @type width: int or None
+        @param width: Width of the Window.
+                      
+                      Can be None to extend as far as possible to the
+                      bottom right corner of the parent Console or can be a
+                      negative number to be sized reltive to the Consoles total
+                      size.
+        @type height: int or None
+        @param height: Height of the Window.
+        
+                       See width.
+        """
         assert isinstance(console, (Console, Window)), 'console parameter must be a Console or Window instance, got %s' % repr(console)
         self.parent = console
         self.x, self.y, self.width, self.height = console._normalizeRect(x, y, width, height)
@@ -585,8 +737,14 @@ class Window(_MetaConsole):
     def clear(self, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Clears the entire Window.
 
-        @type fgcolor: 3-item list
-        @type bgcolor: 3-item list
+        @type fgcolor: (r, g, b)
+        @param fgcolor: Foreground color.
+        
+                        Must be a 3-item list with integers that range 0-255.
+                        
+                        Unlike most other operations you can not use None here.
+        @type bgcolor: (r, g, b)
+        @param bgcolor: Background color.  See fgcolor.
         """
         assert _verify_colors(fgcolor, bgcolor)
         assert fgcolor and bgcolor, 'Can not use None with clear'
@@ -603,22 +761,22 @@ class Window(_MetaConsole):
     
     
     def drawChar(self, x, y, char, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+        # inherit docstring
         x, y = self._normalizePoint(x, y)
         self.parent.drawChar(x + self.x, y + self.y, char, fgcolor, bgcolor)
     
     def drawRect(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+        # inherit docstring
         x, y, width, height = self._normalizeRect(x, y, width, height)
         self.parent.drawRect(x + self.x, y + self.y, width, height, string, fgcolor, bgcolor)
         
     def drawFrame(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+        # inherit docstring
         x, y, width, height = self._normalizeRect(x, y, width, height)
         self.parent.drawFrame(x + self.x, y + self.y, width, height, string, fgcolor, bgcolor)
 
     def getChar(self, x, y):
-        """Return the character and colors of a cell as (ch, fg, bg)
-
-        @rtype: (int, 3-item tuple, 3-item tuple)
-        """
+        # inherit docstring
         x, y = self._normalizePoint(x, y)
         return self.console.getChar(self._translate(x, y))
 
@@ -629,8 +787,19 @@ class Window(_MetaConsole):
 
 
 class Typewriter(object):
+    """Converts a console into a scrolling text log that respects special
+    characters.
+    
+    This class works best on a L{Window} or off-screen L{Console} instance.
+    In a L{Window} for example the scrolling text is limited to the L{Window}'s
+    isolated area.
+    """
 
     def __init__(self, console):
+        """Add a virtual cursor to a L{Console} or L{Window} instance.
+        
+        @type console: L{Console} or L{Window}
+        """
         assert isinstance(console, (Console, Window)), 'console parameter must be a Console or Window instance, got %s' % repr(console)
         self.parent = console
         if isinstance(self.parent, Console):
@@ -660,18 +829,30 @@ class Typewriter(object):
         return (x, y)
 
     def getCursor(self):
-        """Return the virtual cursor position"""
+        """Return the virtual cursor position.
+        
+        @rtype: (int, int)
+        @return: Returns (x, y) a 2-integer tuple containing where the next
+                 L{addChar} or L{addStr} will start at.
+                 
+                 This can be changed with the L{move} method."""
         x, y = self.cursor
         width, height = self.parent.getSize()
         while x >= width:
             x -= width
             y += 1
-        if y >= height:
+        if y >= height and self.scrollMode == 'scroll':
             y = height - 1
         return x, y
 
     def move(self, x, y):
-        """Move the virtual cursor"""
+        """Move the virtual cursor.
+        
+        @type x: int
+        @param x: X position to place the cursor.
+        @type y: int
+        @param y: Y position to place the cursor.
+        """
         self.cursor = self.parent._normalizePoint(x, y)
         
     def setFG(self, color):
@@ -699,6 +880,13 @@ class Typewriter(object):
 
     def addChar(self, char):
         """Draw a single character at the cursor."""
+        if char == '\n': # line break
+            x = 0
+            y += 1
+            return
+        if char == '\r': # return
+            x = 0
+            return
         x, y = self._normalize(*self.cursor)
         self.cursor = [x + 1, y] # advance cursor on next draw
         self._updateConsole()
@@ -707,22 +895,32 @@ class Typewriter(object):
         
 
     def addStr(self, string):
-        """Write a string at the cursor"""
+        """Write a string at the cursor.  Handles special characters such as newlines.
+        
+        @type string: string
+        @param string: 
+        """
         x, y = self.cursor
-        lineBreak = '\n'
         for char in string:
-            if char == lineBreak:
+            if char == '\n': # line break
                 x = 0
                 y += 1
-            else:
-                x, y = self._normalize(x, y)
-                self.parent.drawChar(x, y, char, self.fgcolor, self.bgcolor)
-                x += 1
+                continue
+            if char == '\r': # return
+                x = 0
+                continue
+            x, y = self._normalize(x, y)
+            self.parent.drawChar(x, y, char, self.fgcolor, self.bgcolor)
+            x += 1
         self.cursor = (x, y)
 
     def write(self, string):
-        """To behave like a file-like object. (for sys.stdout, sys.stderr)
+        """This method mimics basic file-like behaviour.
         
+        Because of this method you can replace sys.stdout or sys.stderr with
+        a L{Typewriter} instance.
+        
+        @type string: string
         """
         # some 'basic' line buffer stuff.
         # there must be an easier way to do this.  The textwrap module didn't
@@ -755,10 +953,14 @@ def init(width, height, title='python-tdl', fullscreen=False, renderer='OPENGL')
     make what's drawn visible on the console.
 
     @type width: int
+    @param width: width of the root console (in tiles)
+    
     @type height: int
-
+    @param height: height of the root console (in tiles)
+    
     @type title: string
-
+    @param title: Text to display as the window title.
+    
     @type fullscreen: boolean
     @param fullscreen: Can be set to True to start in fullscreen mode.
 

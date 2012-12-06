@@ -66,6 +66,15 @@ object --+
 </pre>
 
 <hr />
+<p>Converts a console into a scrolling text log that respects special 
+  characters.</p>
+  <p>This class works best on a <a href="tdl.Window-class.html" 
+  class="link">Window</a> or off-screen <a href="tdl.Console-class.html" 
+  class="link">Console</a> instance. In a <a href="tdl.Window-class.html" 
+  class="link">Window</a> for example the scrolling text is limited to the 
+  <a href="tdl.Window-class.html" class="link">Window</a>'s isolated 
+  area.</p>
+
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
 <table class="summary" border="1" cellpadding="3"
@@ -82,7 +91,9 @@ object --+
         <tr>
           <td><span class="summary-sig"><a href="tdl.Typewriter-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">console</span>)</span><br />
-      x.__init__(...) initializes x; see help(type(x)) for signature</td>
+      Add a virtual cursor to a <a href="tdl.Console-class.html" 
+      class="link">Console</a> or <a href="tdl.Window-class.html" 
+      class="link">Window</a> instance.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#Typewriter.__init__">source&nbsp;code</a></span>
             
@@ -116,9 +127,9 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="addStr"></a><span class="summary-sig-name">addStr</span>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="tdl.Typewriter-class.html#addStr" class="summary-sig-name">addStr</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">string</span>)</span><br />
-      Write a string at the cursor</td>
+      Write a string at the cursor.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#Typewriter.addStr">source&nbsp;code</a></span>
             
@@ -130,12 +141,12 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">(int, int)</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="getCursor"></a><span class="summary-sig-name">getCursor</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Return the virtual cursor position</td>
+          <td><span class="summary-sig"><a href="tdl.Typewriter-class.html#getCursor" class="summary-sig-name">getCursor</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Return the virtual cursor position.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#Typewriter.getCursor">source&nbsp;code</a></span>
             
@@ -151,10 +162,10 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="move"></a><span class="summary-sig-name">move</span>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="tdl.Typewriter-class.html#move" class="summary-sig-name">move</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">x</span>,
         <span class="summary-sig-arg">y</span>)</span><br />
-      Move the virtual cursor</td>
+      Move the virtual cursor.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#Typewriter.move">source&nbsp;code</a></span>
             
@@ -208,7 +219,7 @@ object --+
         <tr>
           <td><span class="summary-sig"><a href="tdl.Typewriter-class.html#write" class="summary-sig-name">write</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">string</span>)</span><br />
-      To behave like a file-like object.</td>
+      This method mimics basic file-like behaviour.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#Typewriter.write">source&nbsp;code</a></span>
             
@@ -278,12 +289,96 @@ object --+
     </td>
   </tr></table>
   
-  <p>x.__init__(...) initializes x; see help(type(x)) for signature</p>
+  <p>Add a virtual cursor to a <a href="tdl.Console-class.html" 
+  class="link">Console</a> or <a href="tdl.Window-class.html" 
+  class="link">Window</a> instance.</p>
   <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>console</code></strong> (<a href="tdl.Console-class.html" class="link">Console</a> or <a 
+          href="tdl.Window-class.html" class="link">Window</a>)</li>
+    </ul></dd>
     <dt>Overrides:
         object.__init__
-        <dd><em class="note">(inherited documentation)</em></dd>
     </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="addStr"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">addStr</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">string</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#Typewriter.addStr">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Write a string at the cursor.  Handles special characters such as 
+  newlines.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>string</code></strong> (string)</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="getCursor"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getCursor</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#Typewriter.getCursor">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Return the virtual cursor position.</p>
+  <dl class="fields">
+    <dt>Returns: (int, int)</dt>
+        <dd>Returns (x, y) a 2-integer tuple containing where the next <a 
+          href="tdl.Typewriter-class.html#addChar" class="link">addChar</a>
+          or <a href="tdl.Typewriter-class.html#addStr" 
+          class="link">addStr</a> will start at.
+          <p>This can be changed with the <a 
+          href="tdl.Typewriter-class.html#move" class="link">move</a> 
+          method.</p></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="move"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">move</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">x</span>,
+        <span class="sig-arg">y</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#Typewriter.move">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Move the virtual cursor.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>x</code></strong> (int) - X position to place the cursor.</li>
+        <li><strong class="pname"><code>y</code></strong> (int) - Y position to place the cursor.</li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -302,8 +397,15 @@ object --+
     </td>
   </tr></table>
   
-  <p>To behave like a file-like object. (for sys.stdout, sys.stderr)</p>
+  <p>This method mimics basic file-like behaviour.</p>
+  <p>Because of this method you can replace sys.stdout or sys.stderr with a
+  <a href="tdl.Typewriter-class.html" class="link">Typewriter</a> 
+  instance.</p>
   <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>string</code></strong> (string)</li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -340,7 +442,7 @@ object --+
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Tue Dec 04 19:10:26 2012</a>
+    3.0.1 on Wed Dec 05 20:07:32 2012</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
