@@ -113,7 +113,9 @@
         <span class="summary-sig-arg">y</span>,
         <span class="summary-sig-arg">width</span>,
         <span class="summary-sig-arg">height</span>)</span><br />
-      x.__init__(...) initializes x; see help(type(x)) for signature</td>
+      Isolate part of a <a href="tdl.Console-class.html" 
+      class="link">Console</a> or <a href="tdl.Window-class.html" 
+      class="link">Window</a> instance.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#Window.__init__">source&nbsp;code</a></span>
             
@@ -220,7 +222,9 @@
         <span class="summary-sig-arg">string</span>,
         <span class="summary-sig-arg">fgcolor</span>=<span class="summary-sig-default"><code class="variable-group">(</code>255<code class="variable-op">, </code>255<code class="variable-op">, </code>255<code class="variable-group">)</code></span>,
         <span class="summary-sig-arg">bgcolor</span>=<span class="summary-sig-default"><code class="variable-group">(</code>0<code class="variable-op">, </code>0<code class="variable-op">, </code>0<code class="variable-group">)</code></span>)</span><br />
-      Similar to drawRect but only draws the outline of the rectangle.</td>
+      Similar to <a href="tdl._MetaConsole-class.html#drawRect" 
+      class="link">drawRect</a> but only draws the outline of the 
+      rectangle.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#Window.drawFrame">source&nbsp;code</a></span>
             
@@ -280,14 +284,14 @@
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">(int, 3-item tuple, 3-item tuple)</span>
+      <span class="summary-type">(int, (r, g, b), (r, g, b))</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="getChar"></a><span class="summary-sig-name">getChar</span>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="tdl.Window-class.html#getChar" class="summary-sig-name">getChar</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">x</span>,
         <span class="summary-sig-arg">y</span>)</span><br />
-      Return the character and colors of a cell as (ch, fg, bg)</td>
+      Return the character and colors of a tile as (ch, fg, bg)</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#Window.getChar">source&nbsp;code</a></span>
             
@@ -366,6 +370,7 @@
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="console"></a><span class="summary-name">console</span>
+      <em>(Inherited from <a href="tdl._MetaConsole-class.html">tdl._MetaConsole</a>)</em>
     </td>
   </tr>
 <tr>
@@ -442,11 +447,31 @@
     </td>
   </tr></table>
   
-  <p>x.__init__(...) initializes x; see help(type(x)) for signature</p>
+  <p>Isolate part of a <a href="tdl.Console-class.html" 
+  class="link">Console</a> or <a href="tdl.Window-class.html" 
+  class="link">Window</a> instance.</p>
   <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>console</code></strong> (<a href="tdl.Console-class.html" class="link">Console</a> or <a 
+          href="tdl.Window-class.html" class="link">Window</a>) - The parent object which can be a <a href="tdl.Console-class.html"
+          class="link">Console</a> or another <a 
+          href="tdl.Window-class.html" class="link">Window</a> instance.</li>
+        <li><strong class="pname"><code>x</code></strong> (int) - X coordinate to place the Window.
+          <p>This follows the normal rules for indexing so you can use a 
+          negative integer to place the Window relative to the bottom right
+          of the parent Console instance.</p></li>
+        <li><strong class="pname"><code>y</code></strong> (int) - Y coordinate to place the Window.
+          <p>See x.</p></li>
+        <li><strong class="pname"><code>width</code></strong> (int or None) - Width of the Window.
+          <p>Can be None to extend as far as possible to the bottom right 
+          corner of the parent Console or can be a negative number to be 
+          sized reltive to the Consoles total size.</p></li>
+        <li><strong class="pname"><code>height</code></strong> (int or None) - Height of the Window.
+          <p>See width.</p></li>
+    </ul></dd>
     <dt>Overrides:
         object.__init__
-        <dd><em class="note">(inherited documentation)</em></dd>
     </dt>
   </dl>
 </td></tr></table>
@@ -495,8 +520,10 @@
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>bgcolor</code></strong> (3-item list)</li>
-        <li><strong class="pname"><code>fgcolor</code></strong> (3-item list)</li>
+        <li><strong class="pname"><code>fgcolor</code></strong> ((r, g, b)) - Foreground color.
+          <p>Must be a 3-item list with integers that range 0-255.</p>
+          <p>Unlike most other operations you can not use None here.</p></li>
+        <li><strong class="pname"><code>bgcolor</code></strong> ((r, g, b)) - Background color.  See fgcolor.</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -524,18 +551,22 @@
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>x</code></strong> - X coordinate to draw at.</li>
+        <li><strong class="pname"><code>y</code></strong> - Y coordinate to draw at.</li>
         <li><strong class="pname"><code>char</code></strong> - Should be an integer, single character string, or None.
           <p>You can set the char parameter as None if you only want to 
           change the colors of the tile.</p></li>
         <li><strong class="pname"><code>fgcolor</code></strong> - For fgcolor and bgcolor you use a 3 item list with integers 
-          ranging 0 - 255 or None. None will keep the current color at this
-          position unchanged.</li>
+          ranging 0-255 or None.
+          <p>None will keep the current color at this position 
+          unchanged.</p></li>
+        <li><strong class="pname"><code>bgcolor</code></strong> - Background color.  See fgcolor</li>
     </ul></dd>
     <dt>Raises:</dt>
     <dd><ul class="nomargin-top">
-        <li><code><strong class='fraise'>AssertionError</strong></code> - Having the x or y values outside of the console will raise an 
-        AssertionError.  You can use ((x, y) in console) to check if a cell
-        is drawable.</li>
+        <li><code><strong class='fraise'>AssertionError</strong></code> - Having x or y values that can't be placed inside of the console 
+        will raise an AssertionError. You can use always use ((x, y) in 
+        console) to check if a tile is drawable.</li>
     </ul></dd>
     <dt>Overrides:
         <a href="tdl._MetaConsole-class.html#drawChar">_MetaConsole.drawChar</a>
@@ -565,8 +596,35 @@
     </td>
   </tr></table>
   
-  <p>Similar to drawRect but only draws the outline of the rectangle.</p>
+  <p>Similar to <a href="tdl.Window-class.html#drawRect" 
+  class="link">drawRect</a> but only draws the outline of the 
+  rectangle.</p>
   <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>x</code></strong> - x coordinate to draw at.</li>
+        <li><strong class="pname"><code>y</code></strong> - y coordinate to draw at.</li>
+        <li><strong class="pname"><code>width</code></strong> - Width of the rectangle.
+          <p>Can be None to extend to the bottom right of the console or 
+          can be a negative number to be sized reltive to the total size of
+          the console.</p></li>
+        <li><strong class="pname"><code>height</code></strong> - Height of the rectangle.  See width.</li>
+        <li><strong class="pname"><code>string</code></strong> - Should be an integer, single character string, or None.
+          <p>You can set the char parameter as None if you only want to 
+          change the colors of an area.</p></li>
+        <li><strong class="pname"><code>fgcolor</code></strong> - For fgcolor and bgcolor you use a 3 item list with integers 
+          ranging 0-255 or None.
+          <p>None will keep the current color at this position 
+          unchanged.</p></li>
+        <li><strong class="pname"><code>bgcolor</code></strong> - Background color.  See fgcolor</li>
+    </ul></dd>
+    <dt>Raises:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code><strong class='fraise'>AssertionError</strong></code> - Having x or y values that can't be placed inside of the console 
+        will raise an AssertionError.
+        <p>You can use always use ((x, y) in console) to check if a tile is
+        drawable.</p></li>
+    </ul></dd>
     <dt>Overrides:
         <a href="tdl._MetaConsole-class.html#drawFrame">_MetaConsole.drawFrame</a>
         <dd><em class="note">(inherited documentation)</em></dd>
@@ -596,11 +654,68 @@
   </tr></table>
   
   <p>Draws a rectangle starting from x and y and extending to width and 
-  height.  If width or height are None then it will extend to the edge of 
-  the console.  The rest are the same as drawChar.</p>
+  height.</p>
+  <p>If width or height are None then it will extend to the edge of the 
+  console.</p>
   <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>x</code></strong> - x coordinate to draw at.</li>
+        <li><strong class="pname"><code>y</code></strong> - y coordinate to draw at.</li>
+        <li><strong class="pname"><code>width</code></strong> - Width of the rectangle.
+          <p>Can be None to extend to the bottom right of the console or 
+          can be a negative number to be sized reltive to the total size of
+          the console.</p></li>
+        <li><strong class="pname"><code>height</code></strong> - Height of the rectangle.  See width.</li>
+        <li><strong class="pname"><code>string</code></strong> - Should be an integer, single character string, or None.
+          <p>You can set the char parameter as None if you only want to 
+          change the colors of an area.</p></li>
+        <li><strong class="pname"><code>fgcolor</code></strong> - For fgcolor and bgcolor you use a 3 item list with integers 
+          ranging 0-255 or None.
+          <p>None will keep the current color at this position 
+          unchanged.</p></li>
+        <li><strong class="pname"><code>bgcolor</code></strong> - Background color.  See fgcolor</li>
+    </ul></dd>
+    <dt>Raises:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code><strong class='fraise'>AssertionError</strong></code> - Having x or y values that can't be placed inside of the console 
+        will raise an AssertionError.
+        <p>You can use always use ((x, y) in console) to check if a tile is
+        drawable.</p></li>
+    </ul></dd>
     <dt>Overrides:
         <a href="tdl._MetaConsole-class.html#drawRect">_MetaConsole.drawRect</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="getChar"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getChar</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">x</span>,
+        <span class="sig-arg">y</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#Window.getChar">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Return the character and colors of a tile as (ch, fg, bg)</p>
+  <p>This method runs very slowly as is not recommended to be called 
+  frequently.</p>
+  <dl class="fields">
+    <dt>Returns: (int, (r, g, b), (r, g, b))</dt>
+        <dd>Returns a 3-item tuple.  The first item is an integer of the 
+          character at the position (x, y) the second and third are the 
+          foreground and background colors respectfully.</dd>
+    <dt>Overrides:
+        <a href="tdl._MetaConsole-class.html#getChar">_MetaConsole.getChar</a>
         <dd><em class="note">(inherited documentation)</em></dd>
     </dt>
   </dl>
@@ -639,7 +754,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Tue Dec 04 19:10:26 2012</a>
+    3.0.1 on Wed Dec 05 20:07:32 2012</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

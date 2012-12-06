@@ -68,13 +68,15 @@
 </pre>
 
 <hr />
-<p>The Console is the main class of the tdl library.</p>
+<p>Contains character and color data and can be drawn to.</p>
   <p>The console created by the <a href="tdl-module.html#init" 
-  class="link">tdl.init</a> function is the root console and is the consle 
-  that is rendered to the screen with flush.</p>
-  <p>Any console made from Console is an off-screen console that can be 
-  drawn on and then <a href="tdl._MetaConsole-class.html#blit" 
-  class="link">blit</a> to the root console.</p>
+  class="link">tdl.init</a> function is the root console and is the console
+  that is rendered to the screen with <a href="tdl-module.html#flush" 
+  class="link">flush</a>.</p>
+  <p>Any console created from the Console class is an off-screen console 
+  that can be drawn on before being <a 
+  href="tdl._MetaConsole-class.html#blit" class="link">blit</a> to the root
+  console.</p>
 
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
@@ -131,7 +133,7 @@
           <td><span class="summary-sig"><a href="tdl.Console-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">width</span>,
         <span class="summary-sig-arg">height</span>)</span><br />
-      Create a new offscreen console</td>
+      Create a new offscreen console.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#Console.__init__">source&nbsp;code</a></span>
             
@@ -192,7 +194,7 @@
           <td><span class="summary-sig"><a href="tdl.Console-class.html#clear" class="summary-sig-name">clear</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">fgcolor</span>=<span class="summary-sig-default"><code class="variable-group">(</code>255<code class="variable-op">, </code>255<code class="variable-op">, </code>255<code class="variable-group">)</code></span>,
         <span class="summary-sig-arg">bgcolor</span>=<span class="summary-sig-default"><code class="variable-group">(</code>0<code class="variable-op">, </code>0<code class="variable-op">, </code>0<code class="variable-group">)</code></span>)</span><br />
-      Clears the entire console.</td>
+      Clears the entire Console.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#Console.clear">source&nbsp;code</a></span>
             
@@ -239,7 +241,9 @@
         <span class="summary-sig-arg">string</span>,
         <span class="summary-sig-arg">fgcolor</span>=<span class="summary-sig-default"><code class="variable-group">(</code>255<code class="variable-op">, </code>255<code class="variable-op">, </code>255<code class="variable-group">)</code></span>,
         <span class="summary-sig-arg">bgcolor</span>=<span class="summary-sig-default"><code class="variable-group">(</code>0<code class="variable-op">, </code>0<code class="variable-op">, </code>0<code class="variable-group">)</code></span>)</span><br />
-      Similar to drawRect but only draws the outline of the rectangle.
+      Similar to <a href="tdl._MetaConsole-class.html#drawRect" 
+      class="link">drawRect</a> but only draws the outline of the 
+      rectangle.
       <em>(Inherited from <a href="tdl._MetaConsole-class.html">tdl._MetaConsole</a>)</em></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.drawFrame">source&nbsp;code</a></span>
@@ -301,14 +305,14 @@
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">(int, 3-item tuple, 3-item tuple)</span>
+      <span class="summary-type">(int, (r, g, b), (r, g, b))</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="tdl.Console-class.html#getChar" class="summary-sig-name">getChar</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">x</span>,
         <span class="summary-sig-arg">y</span>)</span><br />
-      Return the character and colors of a cell as (char, fgcolor, bgcolor)</td>
+      Return the character and colors of a tile as (ch, fg, bg)</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#Console.getChar">source&nbsp;code</a></span>
             
@@ -393,6 +397,14 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a name="console"></a><span class="summary-name">console</span>
+      <em>(Inherited from <a href="tdl._MetaConsole-class.html">tdl._MetaConsole</a>)</em>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a name="height"></a><span class="summary-name">height</span>
       <em>(Inherited from <a href="tdl._MetaConsole-class.html">tdl._MetaConsole</a>)</em>
     </td>
@@ -439,8 +451,13 @@
     </td>
   </tr></table>
   
-  <p>Create a new offscreen console</p>
+  <p>Create a new offscreen console.</p>
   <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>width</code></strong> (int) - Width of the console in tiles</li>
+        <li><strong class="pname"><code>height</code></strong> (int) - Height of the console in tiles</li>
+    </ul></dd>
     <dt>Overrides:
         object.__init__
     </dt>
@@ -487,12 +504,14 @@
     </td>
   </tr></table>
   
-  <p>Clears the entire console.</p>
+  <p>Clears the entire Console.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>bgcolor</code></strong> (3-item list)</li>
-        <li><strong class="pname"><code>fgcolor</code></strong> (3-item list)</li>
+        <li><strong class="pname"><code>fgcolor</code></strong> ((r, g, b)) - Foreground color.
+          <p>Must be a 3-item list with integers that range 0-255.</p>
+          <p>Unlike most other operations you can not use None here.</p></li>
+        <li><strong class="pname"><code>bgcolor</code></strong> ((r, g, b)) - Background color.  See fgcolor.</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -513,12 +532,18 @@
     </td>
   </tr></table>
   
-  <p>Return the character and colors of a cell as (char, fgcolor, 
-  bgcolor)</p>
-  <p>The charecter is returned as a number. Each color is returned as a 
-  tuple.</p>
+  <p>Return the character and colors of a tile as (ch, fg, bg)</p>
+  <p>This method runs very slowly as is not recommended to be called 
+  frequently.</p>
   <dl class="fields">
-    <dt>Returns: (int, 3-item tuple, 3-item tuple)</dt>
+    <dt>Returns: (int, (r, g, b), (r, g, b))</dt>
+        <dd>Returns a 3-item tuple.  The first item is an integer of the 
+          character at the position (x, y) the second and third are the 
+          foreground and background colors respectfully.</dd>
+    <dt>Overrides:
+        <a href="tdl._MetaConsole-class.html#getChar">_MetaConsole.getChar</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
   </dl>
 </td></tr></table>
 </div>
@@ -555,7 +580,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Tue Dec 04 19:10:26 2012</a>
+    3.0.1 on Wed Dec 05 20:07:32 2012</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
