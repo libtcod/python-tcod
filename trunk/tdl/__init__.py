@@ -1,6 +1,9 @@
 """
     The documentation for python-tdl.  A Pythonic port of
     U{libtcod<http://doryen.eptalys.net/libtcod/>}.
+    
+    You can find the project page on Google Code
+    U{here<http://code.google.com/p/python-tdl/>}.
 
     Getting Started
     ===============
@@ -43,7 +46,7 @@ import array
 import itertools
 import textwrap
 
-from . import event, map
+from . import event, map, noise
 from .__tcod import _lib, _Color, _unpackfile
 
 _IS_PYTHON3 = (sys.version_info[0] == 3)
@@ -83,7 +86,7 @@ def _formatChar(char):
 
 _fontinitialized = False
 _rootinitialized = False
-_rootconsole = None
+_rootConsoleRef = None
 # remove dots from common functions
 _setchar = _lib.TCOD_console_set_char
 _setfore = _lib.TCOD_console_set_char_foreground
@@ -114,6 +117,21 @@ def _iscolor(color):
         return True
     return False
 
+## not using this for now
+#class Color(object):
+#    
+#    def __init__(self, r, g, b):
+#        self._color = (r, g, b)
+#        self._ctype = None
+#        
+#    def _getCType(self):
+#        if not self._ctype:
+#            self._ctype = _Color(*self._color)
+#        return self._ctype
+#        
+#    def __len__(self):
+#        return 3
+    
 def _formatColor(color):
     """Format the color to ctypes
     """
@@ -121,6 +139,8 @@ def _formatColor(color):
         return None
     if isinstance(color, _Color):
         return color
+    #if isinstance(color, Color):
+    #    return color._getCType()
     if isinstance(color, _INTTYPES):
         # format a web style color with the format 0xRRGGBB
         return _Color(color >> 16 & 0xff, color >> 8 & 0xff, color & 0xff)
@@ -167,8 +187,8 @@ class _MetaConsole(object):
 
         assert _verify_colors(fgcolor, bgcolor)
         x, y = self._normalizePoint(x, y)
-
-        self._setChar(ctypes.c_int(x), ctypes.c_int(y), _formatChar(char),
+        x, y = ctypes.c_int(x), ctypes.c_int(y)
+        self._setChar(x, y, _formatChar(char),
                       _formatColor(fgcolor), _formatColor(bgcolor))
 
     def drawStr(self, x, y, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
@@ -555,7 +575,6 @@ class Console(_MetaConsole):
         self.width = width
         self.height = height
         self._typewriter = None # "typewriter lock", makes sure the colors are set to the typewriter
-        #self.clear()
 
     @classmethod
     def _newConsole(cls, console):
@@ -566,7 +585,6 @@ class Console(_MetaConsole):
         self.width = _lib.TCOD_console_get_width(self)
         self.height = _lib.TCOD_console_get_height(self)
         self._typewriter = None
-        #self.clear()
         return self
 
     def __del__(self):
@@ -576,9 +594,9 @@ class Console(_MetaConsole):
         # If this is the root console the window will close when collected
         try:
             if isinstance(self._as_parameter_, ctypes.c_void_p):
-                global _rootinitialized, _rootconsole
+                global _rootinitialized, _rootConsoleRef
                 _rootinitialized = False
-                _rootconsole = None
+                _rootConsoleRef = None
             _lib.TCOD_console_delete(self)
         except StandardError:
             pass # I forget why I put this here but I'm to afraid to delete it
@@ -605,7 +623,7 @@ class Console(_MetaConsole):
         untouched"""
         return x, y
 
-    def clear(self, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def clear(self, fgcolor=(0, 0, 0), bgcolor=(0, 0, 0)):
         """Clears the entire Console.
 
         @type fgcolor: (r, g, b)
@@ -653,10 +671,12 @@ class Console(_MetaConsole):
 
         batch is a iterable of [(x, y), ch] items
         """
-        if fgcolor and bgcolor and not nullChar:
+        if fgcolor and not nullChar:
             # buffer values as ctypes objects
             self._typewriter = None # clear the typewriter as colors will be set
             console = self._as_parameter_
+            if not bgcolor:
+                bgblend = 0
             bgblend = ctypes.c_int(bgblend)
 
             _lib.TCOD_console_set_default_background(console, bgcolor)
@@ -734,7 +754,7 @@ class Window(_MetaConsole):
         # we add our position relative to our parent and then call then next parent up
         return self.parent._translate((x + self.x), (y + self.y))
 
-    def clear(self, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def clear(self, fgcolor=(0, 0, 0), bgcolor=(0, 0, 0)):
         """Clears the entire Window.
 
         @type fgcolor: (r, g, b)
@@ -858,6 +878,7 @@ class Typewriter(object):
     def setFG(self, color):
         """Change the foreground color"""
         assert _iscolor(color)
+        assert color is not None
         self.fgcolor = _formatColor(color)
         if self.console._typewriter is self:
             _lib.TCOD_console_set_default_foreground(self.console, self.fgcolor)
@@ -865,6 +886,7 @@ class Typewriter(object):
     def setBG(self, color):
         """Change the background color"""
         assert _iscolor(color)
+        assert color is not None
         self.bgcolor = _formatColor(color)
         if self.console._typewriter is self:
             _lib.TCOD_console_set_default_background(self.console, self.bgcolor)
@@ -945,7 +967,7 @@ class Typewriter(object):
         self.cursor = (x, y)
         
 
-def init(width, height, title='python-tdl', fullscreen=False, renderer='OPENGL'):
+def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
     """Start the main console with the given width and height and return the
     root console.
 
@@ -960,6 +982,8 @@ def init(width, height, title='python-tdl', fullscreen=False, renderer='OPENGL')
     
     @type title: string
     @param title: Text to display as the window title.
+                  
+                  If left None it defaults to the running scripts filename.
     
     @type fullscreen: boolean
     @param fullscreen: Can be set to True to start in fullscreen mode.
@@ -982,7 +1006,7 @@ def init(width, height, title='python-tdl', fullscreen=False, renderer='OPENGL')
              this function will close.
     """
     RENDERERS = {'GLSL': 0, 'OPENGL': 1, 'SDL': 2}
-    global _rootinitialized, _rootconsole
+    global _rootinitialized, _rootConsoleRef
     if not _fontinitialized: # set the default font to the one that comes with tdl
         setFont(_unpackfile('terminal.png'), 16, 16, colomn=True)
 
@@ -991,12 +1015,19 @@ def init(width, height, title='python-tdl', fullscreen=False, renderer='OPENGL')
     renderer = RENDERERS[renderer.upper()]
 
     # If a console already exists then make a clone to replace it
-    if _rootconsole is not None:
-        oldroot = _rootconsole()
+    if _rootConsoleRef and _rootConsoleRef():
+        oldroot = _rootConsoleRef()
         rootreplacement = Console(oldroot.width, oldroot.height)
         rootreplacement.blit(oldroot)
         oldroot._replace(rootreplacement)
         del rootreplacement
+        
+    if title is None: # use a default title
+        if sys.argv:
+            # Use the script filename as the title.
+            title = os.path.basename(sys.argv[0])
+        else:
+            title = 'python-tdl'
 
     _lib.TCOD_console_init_root(width, height, _encodeString(title), fullscreen, renderer)
 
@@ -1006,7 +1037,7 @@ def init(width, height, title='python-tdl', fullscreen=False, renderer='OPENGL')
     event._eventsflushed = False
     _rootinitialized = True
     rootconsole = Console._newConsole(ctypes.c_void_p())
-    _rootconsole = weakref.ref(rootconsole)
+    _rootConsoleRef = weakref.ref(rootconsole)
 
     return rootconsole
 

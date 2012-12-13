@@ -522,8 +522,53 @@ _lib.TCOD_dijkstra_path_walk.argtypes = (TCOD_path_t, POINTER(c_int), POINTER(c_
 _lib.TCOD_dijkstra_delete.restype = None
 _lib.TCOD_dijkstra_delete.argtypes = (TCOD_dijkstra_t,)
 
+# RANDOM
+
+
+RNG_MT = 1 # Mersenne twister
+RNG_CMWC = 2 # Multiply-with-carry
+
+TCOD_random_t = c_void_p
+
+#TCODLIB_API TCOD_random_t TCOD_random_new_from_seed(TCOD_random_algo_t algo, uint32 seed);
+_lib.TCOD_random_new_from_seed.restype = TCOD_random_t
+_lib.TCOD_random_new_from_seed.argtypes = (c_int, c_uint32)
+#TCODLIB_API void TCOD_random_delete(TCOD_random_t mersenne);
+_lib.TCOD_random_delete.restype = None
+_lib.TCOD_random_delete.argtypes = (TCOD_random_t,)
+
+
+# NOISE
+
+NOISE_PERLIN = 1
+NOISE_SIMPLEX = 2
+NOISE_WAVELET = 4
+
+TCOD_noise_t = c_void_p
+
+#TCODLIB_API TCOD_noise_t TCOD_noise_new(int dimensions, float hurst, float lacunarity, TCOD_random_t random);
+_lib.TCOD_noise_new.restype = TCOD_noise_t
+_lib.TCOD_noise_new.argtypes = (c_int, c_float, c_float)
+
+#TCODLIB_API void TCOD_noise_set_type (TCOD_noise_t noise, TCOD_noise_type_t type);
+_lib.TCOD_noise_set_type.restype = None
+_lib.TCOD_noise_set_type.argtypes = (TCOD_noise_t, c_int)
+#TCODLIB_API float TCOD_noise_get (TCOD_noise_t noise, float *f);
+_lib.TCOD_noise_get.restype = c_float
+_lib.TCOD_noise_get.argtypes = (TCOD_noise_t, POINTER(c_float))
+#TCODLIB_API float TCOD_noise_get_fbm (TCOD_noise_t noise, float *f, float octaves);
+_lib.TCOD_noise_get_fbm.restype = c_float
+_lib.TCOD_noise_get_fbm.argtypes = (TCOD_noise_t, POINTER(c_float), c_float)
+#TCODLIB_API float TCOD_noise_get_turbulence (TCOD_noise_t noise, float *f, float octaves);
+_lib.TCOD_noise_get_turbulence.restype = c_float
+_lib.TCOD_noise_get_turbulence.argtypes = (TCOD_noise_t, POINTER(c_float), c_float)
+#TCODLIB_API void TCOD_noise_delete(TCOD_noise_t noise);
+_lib.TCOD_noise_delete.restype = None
+_lib.TCOD_noise_delete.argtypes = (TCOD_noise_t,)
+
+
 #_lib..restype = None
-#_lib..argtypes = 
+#_lib..argtypes = ()
 
 # these functions should perform ultra fast once I set them up
 # after testing it seems that converting python types to ctypes is slow no

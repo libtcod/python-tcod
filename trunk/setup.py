@@ -5,10 +5,10 @@ import subprocess
 from distutils.core import setup
 
 setup(name='tdl',
-      version='1.1.1',
+      version='1.1.2',
       author='Kyle Stewart',
       author_email='4B796C65+pythonTDL@gmail.com',
-      description='Simple graphical library for making a roguelike or other tile-based video game.',
+      description='Simple graphical library for making a rogue-like or other tile-based video game.',
       long_description="""python-tdl is a ctypes port of "libtcod".
 
       The library is used for displaying tilesets (ascii or graphical) in true color.
@@ -36,7 +36,7 @@ setup(name='tdl',
                    'Topic :: Multimedia :: Graphics',
                    'Topic :: Software Development :: Libraries :: Python Modules',
                    ],
-      keywords = 'roguelike roguelikes console text ctypes doryen ascii libtcod',
+      keywords = 'portable rogue-like rogue-likes text ctypes ASCII ANSI Unicode libtcod',
       platforms = ['Windows', 'Mac OS X', 'Linux'],
       license = 'New BSD License'
       )

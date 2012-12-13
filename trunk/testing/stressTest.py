@@ -53,6 +53,7 @@ class TestApp(tdl.event.App):
     def update(self, deltaTime):
         self.updateTest(deltaTime)
         tdl.setTitle('%s: %i FPS' % (self.__class__.__name__, tdl.getFPS()))
+        tdl.flush()
         
 class FullDrawCharTest(TestApp):    
     
@@ -60,8 +61,9 @@ class FullDrawCharTest(TestApp):
         # getrandbits is around 5x faster than using randint
         bgcolors = [(random.getrandbits(6), random.getrandbits(6), random.getrandbits(6)) for _ in range(self.total)]
         char = [random.getrandbits(8) for _ in range(self.total)]
+        fgcolor = (255, 255, 255)
         for (x,y), bgcolor, char in zip(self.cells, bgcolors, char):
-            self.console.drawChar(x, y, char, (255, 255, 255), bgcolor)
+            self.console.drawChar(x, y, char, fgcolor, bgcolor)
         
 
 class CharOnlyTest(TestApp):
@@ -116,9 +118,11 @@ class BlitScrollTest(TestApp):
             ch = random.getrandbits(8)
             self.console.drawChar(x, 0, ch, bgcolor=bgcolor)
     
-            
+# match libtcod sample screen
+WIDTH = 46
+HEIGHT = 20
 def main():
-    console = tdl.init(60, 40)
+    console = tdl.init(46, 20)
     for Test in [FullDrawCharTest, CharOnlyTest, TypewriterCharOnlyTest, ColorOnlyTest, GetCharTest,
                  SingleRectTest, DrawStrTest, BlitScrollTest]:
         Test(console).run()

@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>tdl.map.AStar</title>
+  <title>tdl.noise.Noise</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -43,8 +43,8 @@
     <td width="100%">
       <span class="breadcrumbs">
         <a href="tdl-module.html">Package&nbsp;tdl</a> ::
-        <a href="tdl.map-module.html">Module&nbsp;map</a> ::
-        Class&nbsp;AStar
+        <a href="tdl.noise-module.html">Module&nbsp;noise</a> ::
+        Class&nbsp;Noise
       </span>
     </td>
     <td>
@@ -52,25 +52,22 @@
         <!-- hide/show private -->
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="tdl.map.AStar-class.html"
+            >]&nbsp;|&nbsp;<a href="tdl.noise.Noise-class.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class AStar</h1><p class="nomargin-top"><span class="codelink"><a href="tdl.map-pysrc.html#AStar">source&nbsp;code</a></span></p>
+<h1 class="epydoc">Class Noise</h1><p class="nomargin-top"><span class="codelink"><a href="tdl.noise-pysrc.html#Noise">source&nbsp;code</a></span></p>
 <pre class="base-tree">
 object --+
          |
-        <strong class="uidshort">AStar</strong>
+        <strong class="uidshort">Noise</strong>
 </pre>
 
 <hr />
-<p>A* pathfinder</p>
-  <p>Using this class requires a callback detailed in <a 
-  href="tdl.map.AStar-class.html#__init__" 
-  class="link">AStar.__init__</a></p>
+<p>An advanced noise generator.</p>
 
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
@@ -86,15 +83,35 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="tdl.map.AStar-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">width</span>,
-        <span class="summary-sig-arg">height</span>,
-        <span class="summary-sig-arg">callback</span>,
-        <span class="summary-sig-arg">diagnalCost</span>=<span class="summary-sig-default">1.41421356237</span>,
-        <span class="summary-sig-arg">advanced</span>=<span class="summary-sig-default">False</span>)</span><br />
-      Create an A* pathfinder using a callback.</td>
+          <td><span class="summary-sig"><a href="tdl.noise.Noise-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">algorithm</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">PERLIN</code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">mode</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">FLAT</code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">hurst</span>=<span class="summary-sig-default">0.5</span>,
+        <span class="summary-sig-arg">lacunarity</span>=<span class="summary-sig-default">2.0</span>,
+        <span class="summary-sig-arg">octaves</span>=<span class="summary-sig-default">4.0</span>,
+        <span class="summary-sig-arg">seed</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Create a new noise generator specifying a noise algorithm and how 
+      it's used.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="tdl.map-pysrc.html#AStar.__init__">source&nbsp;code</a></span>
+            <span class="codelink"><a href="tdl.noise-pysrc.html#Noise.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">float</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="tdl.noise.Noise-class.html#getPoint" class="summary-sig-name">getPoint</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">*position</span>)</span><br />
+      Return the noise value of a specific position.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl.noise-pysrc.html#Noise.getPoint">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -110,27 +127,7 @@ object --+
         <tr>
           <td><span class="summary-sig"><a name="__del__"></a><span class="summary-sig-name">__del__</span>(<span class="summary-sig-arg">self</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="tdl.map-pysrc.html#AStar.__del__">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="getPath"></a><span class="summary-sig-name">getPath</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">origX</span>,
-        <span class="summary-sig-arg">origY</span>,
-        <span class="summary-sig-arg">destX</span>,
-        <span class="summary-sig-arg">destY</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="tdl.map-pysrc.html#AStar.getPath">source&nbsp;code</a></span>
+            <span class="codelink"><a href="tdl.noise-pysrc.html#Noise.__del__">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -165,13 +162,6 @@ object --+
   <td align="left" colspan="2" class="table-header">
     <span class="table-header">Properties</span></td>
 </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_as_parameter_"></a><span class="summary-name">_as_parameter_</span>
-    </td>
-  </tr>
   <tr>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
@@ -197,56 +187,102 @@ object --+
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">width</span>,
-        <span class="sig-arg">height</span>,
-        <span class="sig-arg">callback</span>,
-        <span class="sig-arg">diagnalCost</span>=<span class="sig-default">1.41421356237</span>,
-        <span class="sig-arg">advanced</span>=<span class="sig-default">False</span>)</span>
+        <span class="sig-arg">algorithm</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">PERLIN</code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">mode</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">FLAT</code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">hurst</span>=<span class="sig-default">0.5</span>,
+        <span class="sig-arg">lacunarity</span>=<span class="sig-default">2.0</span>,
+        <span class="sig-arg">octaves</span>=<span class="sig-default">4.0</span>,
+        <span class="sig-arg">seed</span>=<span class="sig-default">None</span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="tdl.map-pysrc.html#AStar.__init__">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="tdl.noise-pysrc.html#Noise.__init__">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
-  <p>Create an A* pathfinder using a callback.</p>
-  <p>Before crating this instance you should make one of two types of 
-  callbacks:</p>
-  <ul>
-    <li>
-      A function that returns the cost to move to (x, y)
-    </li>
-  </ul>
-  <p>or</p>
-  <ul>
-    <li>
-      A function that returns the cost to move between (destX, destY, 
-      sourceX, sourceY)
-    </li>
-  </ul>
-  <p>If path is blocked the function should return zero or None. When using
-  the second type of callback be sure to set advanced=True</p>
+  <p>Create a new noise generator specifying a noise algorithm and how it's
+  used.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>width</code></strong> (int) - width of the pathfinding area in tiles</li>
-        <li><strong class="pname"><code>height</code></strong> (int) - height of the pathfinding area in tiles</li>
-        <li><strong class="pname"><code>callback</code></strong> (function) - A callback taking parameters depending on the setting of 
-          'advanced' and returning the cost of movement for an open tile or
-          zero for a blocked tile.</li>
-        <li><strong class="pname"><code>diagnalCost</code></strong> (float) - Multiplier for diagonal movement.
-          <p>Can be set to zero to disable diagonal movement entirely.</p></li>
-        <li><strong class="pname"><code>advanced</code></strong> (boolean) - A simple callback with 2 positional parameters may not provide 
-          enough information.  Setting this to True will call the callback 
-          with 2 additional parameters giving you both the destination and 
-          the source of movement.
-          <p>When True the callback will need to accept (destX, destY, 
-          sourceX, sourceY) as parameters. Instead of just (destX, 
-          destY).</p></li>
+        <li><strong class="pname"><code>algorithm</code></strong> (string) - The primary noise algorithm to be used.
+          <p>Can be one of 'PERLIN', 'SIMPLEX', 'WAVELET'</p>
+          <ul>
+            <li>
+              'PERLIN' - A popular noise generator.
+            </li>
+            <li>
+              'SIMPLEX' - A slightly faster generator that unlike perlin 
+              has no noticeable directional artifacts.
+            </li>
+            <li>
+              'WAVELET' A noise generator designed to reduce aliasing and 
+              not lose detail when summed into a fractal (as with the 'FBM'
+              and 'TURBULENCE' modes.)
+            </li>
+          </ul></li>
+        <li><strong class="pname"><code>mode</code></strong> (string) - A secondary parameter to determine how noise is generated.
+          <p>Can be one of 'FLAT', 'FBM', 'TURBULENCE'</p>
+          <ul>
+            <li>
+              'FLAT' - Generates the simplest form of noise. This mode does
+              not use the hurst, lacunarity, and octaves parameters.
+            </li>
+            <li>
+              'FBM' - Generates fractal brownian motion.
+            </li>
+            <li>
+              'TURBULENCE' - Generates detailed noise with smoother and 
+              more natural transitions.
+            </li>
+          </ul></li>
+        <li><strong class="pname"><code>hurst</code></strong> (float) - The hurst exponent describes the raggedness of the resultant 
+          noise, with a higher value leading to a smoother noise. It should
+          be in the 0.0-1.0 range.
+          <p>This is only used in 'FBM' and 'TURBULENCE' modes.</p></li>
+        <li><strong class="pname"><code>lacunarity</code></strong> (float) - A multiplier that determines how quickly the frequency increases 
+          for each successive octave.
+          <p>The frequency of each successive octave is equal to the 
+          product of the previous octave's frequency and the lacunarity 
+          value.</p>
+          <p>This is only used in 'FBM' and 'TURBULENCE' modes.</p></li>
+        <li><strong class="pname"><code>octaves</code></strong> (float) - Controls the amount of detail in the noise.
+          <p>This is only used in 'FBM' and 'TURBULENCE' modes.</p></li>
+        <li><strong class="pname"><code>seed</code></strong> (object) - You can use any hashable object to be a seed for the noise 
+          generator.
+          <p>If None is used then a random seed will be generated.</p></li>
     </ul></dd>
     <dt>Overrides:
         object.__init__
     </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="getPoint"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getPoint</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">*position</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl.noise-pysrc.html#Noise.getPoint">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Return the noise value of a specific position.</p>
+  <p>Example usage: value = noise.getPoint(x, y, z)</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>position</code></strong> (floats)</li>
+    </ul></dd>
+    <dt>Returns: float</dt>
+        <dd>Returns the noise value at position. This will be a floating 
+          point in the 0.0-1.0 range.</dd>
   </dl>
 </td></tr></table>
 </div>
