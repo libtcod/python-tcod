@@ -1,3 +1,10 @@
+1.1.2
+ * Window title now defaults to the running scripts filename
+ * Fixed incorrect deltaTime for App.update
+ * App will no longer call tdl.flush on its own, you'll need to call this yourself
+ * tdl.noise module added
+ * clear method now defaults to black on black
+
 1.1.1
  * map submodule added with AStar class and quickFOV function
  * new Typewriter class

@@ -7,6 +7,7 @@ import ctypes
 import itertools
 import math
 
+import tdl
 from .__tcod import _lib, _PATHCALL
 
 _FOVTYPES = {'BASIC' : 0, 'DIAMOND': 1, 'SHADOW': 2, 'RESTRICTIVE': 12, 'PERMISSIVE': 11}
@@ -19,7 +20,7 @@ def _getFOVType(fov):
         return _FOVTYPES[fov]
     if fov[:10] == 'PERMISSIVE' and fov[10].isdigit() and fov[10] != '9':
         return 4 + int(fov[10])
-    raise TDLError('No such fov option as %s' % oldFOV)
+    raise tdl.TDLError('No such fov option as %s' % oldFOV)
 
 class AStar(object):
     """A* pathfinder

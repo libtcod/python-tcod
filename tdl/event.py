@@ -49,8 +49,8 @@ def _parseKeyNames(module):
     """
     returns a dictionary mapping of human readable key names to their keycodes
     this parses constants with the names of K_* and makes code=name pairs
-    this is for KeyEvent.keyname variable and that enables things like:
-    if (event.keyname == 'PAGEUP'):
+    this is for KeyEvent.key variable and that enables things like:
+    if (event.key == 'PAGEUP'):
     """
     _keyNames = {}
     for attr in dir(module): # from the modules variables
@@ -200,15 +200,19 @@ class App(object):
        with the event instance as a parameter.
     
      - key_*: When a key is pressed another method will be called based on the
-       keyname attribute.  For example the 'ENTER' keyname will call key_ENTER
+       L{KeyEvent.key} attribute.  For example the 'ENTER' key will call key_ENTER
        with the associated L{KeyDown} event as its parameter.
        
-     - L{update}: This method is called every loop before making a call to
-       L{tdl.flush}.  It is passed a single parameter detailing the time in
-       seconds since the last update (often known as deltaTime.)
+     - L{update}: This method is called every loop.  It is passed a single
+       parameter detailing the time in seconds since the last update
+       (often known as deltaTime.)
+       
+       You may want to call drawing routines in this method followed by
+       L{tdl.flush}.
     """
     __slots__ = ('__running', '__prevTime')
     __running = False
+    __prevTime = None
     
     def ev_QUIT(self, event):
         """Unless overridden this method raises a SystemExit exception closing
@@ -239,9 +243,9 @@ class App(object):
                           number.
                           
                           You can use this variable to make your program
-                          frame rate independent.  Use this parameter to adjust
-                          the speed of physics, special visual effects,
-                          and other game logic.
+                          frame rate independent.
+                          Use this parameter to adjust the speed of motion,
+                          timers, and other game logic.
         """
         pass
         
@@ -278,7 +282,7 @@ class App(object):
         Having multiple L{App} instances and selectively calling runOnce on
         them is a decent way to create a state machine.
         """
-        if not hasattr(self, '__prevTime'):
+        if self.__prevTime is None:
             self.__prevTime = time.clock() # initiate __prevTime
         for event in get():
             if event.type: # exclude custom events with a blank type variable
@@ -293,7 +297,7 @@ class App(object):
         newTime = time.clock()
         self.update(newTime - self.__prevTime)
         self.__prevTime = newTime
-        _tdl.flush()
+        #_tdl.flush()
 
 def _processEvents():
     """Flushes the event queue from libtcod into the global list _eventQueue"""
