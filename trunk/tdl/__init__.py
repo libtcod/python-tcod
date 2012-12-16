@@ -967,7 +967,7 @@ class Typewriter(object):
         self.cursor = (x, y)
         
 
-def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
+def init(width, height, title=None, fullscreen=False, renderer='SDL'):
     """Start the main console with the given width and height and return the
     root console.
 
@@ -996,9 +996,6 @@ def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
                      time Python is slow interacting with the console and the
                      rendering itself is pretty fast even on 'SDL'.
 
-                     This should be left at default or switched to 'SDL' for
-                     better reliability and an instantaneous start up time.
-
     @rtype: L{Console}
     @return: The root console.  Only what is drawn on the root console is
              what's visible after a call to L{tdl.flush}.
@@ -1008,7 +1005,7 @@ def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
     RENDERERS = {'GLSL': 0, 'OPENGL': 1, 'SDL': 2}
     global _rootinitialized, _rootConsoleRef
     if not _fontinitialized: # set the default font to the one that comes with tdl
-        setFont(_unpackfile('terminal.png'), 16, 16, colomn=True)
+        setFont(_unpackfile('terminal.png'), 16, 16, True, True)
 
     if renderer.upper() not in RENDERERS:
         raise TDLError('No such render type "%s", expected one of "%s"' % (renderer, '", "'.join(RENDERERS)))
@@ -1054,7 +1051,7 @@ def flush():
 
     _lib.TCOD_console_flush()
 
-def setFont(path, tileWidth, tileHeight, colomn=False,
+def setFont(path, columns, rows, columnFirst=False,
             greyscale=False, altLayout=False):
     """Changes the font to be used for this session.
     This should be called before L{tdl.init}
@@ -1065,22 +1062,27 @@ def setFont(path, tileWidth, tileHeight, colomn=False,
     @type path: string
     @param path: Must be a string filepath where a bmp or png file is found.
 
-    @type tileWidth: int
-    @param tileWidth: The width of an individual tile.
+    @type columns: int
+    @param columns: Number of columns in the tileset.
 
-    @type tileHeight: int
-    @param tileHeight: The height of an individual tile.
+    @type rows: int
+    @param rows: Number of rows in the tileset.
 
-    @type colomn: boolean
-    @param colomn: Defines if the characer order goes along the rows or
-                   colomns.
-                   It should be True if the charater codes 0-15 are in the
-                   first column.  And should be False if the characters 0-15
-                   are in the first row.
+    @type columnFirst: boolean
+    @param columnFirst: Defines if the characer order goes along the rows or
+                        colomns.
+                        It should be True if the charater codes 0-15 are in the
+                        first column.
+                        And should be False if the characters 0-15
+                        are in the first row.
 
     @type greyscale: boolean
     @param greyscale: Creates an anti-aliased font from a greyscale bitmap.
                       Otherwise it uses the alpha channel for anti-aliasing.
+                      
+                      Unless you actually need anti-aliasing from a font you
+                      know uses a smooth greyscale channel you should leave
+                      this on False.
 
     @type altLayout: boolean
     @param altLayout: An alternative layout with space in the upper left
@@ -1105,7 +1107,7 @@ def setFont(path, tileWidth, tileHeight, colomn=False,
     flags = 0
     if altLayout:
         flags |= FONT_LAYOUT_TCOD
-    elif colomn:
+    elif columnFirst:
         flags |= FONT_LAYOUT_ASCII_INCOL
     else:
         flags |= FONT_LAYOUT_ASCII_INROW
@@ -1113,7 +1115,8 @@ def setFont(path, tileWidth, tileHeight, colomn=False,
         flags |= FONT_TYPE_GREYSCALE
     if not os.path.exists(path):
         raise TDLError('no file exists at: "%s"' % path)
-    _lib.TCOD_console_set_custom_font(_encodeString(path), flags, tileWidth, tileHeight)
+    path = os.path.abspath(path)
+    _lib.TCOD_console_set_custom_font(_encodeString(path), flags, columns, rows)
 
 def getFullscreen():
     """Returns True if program is fullscreen.

@@ -1,0 +1,23 @@
+# Target repertoire for bold/italic fixed character sets
+# (CP1252, MES-1, ISO 8859-1,2,3,4,5,7,8,9,10,14,15, etc.)
+
+# Plane 00
+# Rows	Positions (Cells)
+
+  00	20-7E A0-FF
+  01	00-7F 8F 92
+  02	18-1B 59 C6-C7 D8-DD
+  03	74-75 7A 7E 84-8A 8C 8E-A1 A3-CE
+  04	01-0C 0E-4F 51-5C 5E-5F 90-91
+  05	D0-EA
+  1E	02-03 0A-0B 1E-1F 40-41 56-57 60-61 6A-6B 80-85 F2-F3
+  20	10-22 26 30 39-3A AC AF
+  21	16 22 26 5B-5E 90-93
+  22	60 64-65
+  23	BA-BD
+  24	09-0D 24
+  25	00 02 0C 10 14 18 1C 24 2C 34 3C 92 C6
+  26	6A
+  FF	FD
+
+# Number of characters in above table: 617
