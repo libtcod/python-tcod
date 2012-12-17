@@ -5,13 +5,13 @@ import subprocess
 from distutils.core import setup
 
 setup(name='tdl',
-      version='1.1.2',
+      version='1.1.3',
       author='Kyle Stewart',
       author_email='4B796C65+pythonTDL@gmail.com',
       description='Simple graphical library for making a rogue-like or other tile-based video game.',
       long_description="""python-tdl is a ctypes port of "libtcod".
 
-      The library is used for displaying tilesets (ascii or graphical) in true color.
+      The library is used for displaying tilesets (ansi, unicode, or graphical) in true color.
       """,
       url='http://code.google.com/p/python-tdl/',
       download_url='http://code.google.com/p/python-tdl/downloads/list',

@@ -40,11 +40,15 @@
 
 import sys
 import os
+
 import ctypes
 import weakref
 import array
 import itertools
 import textwrap
+import struct
+import re
+import warnings
 
 from . import event, map, noise
 from .__tcod import _lib, _Color, _unpackfile
@@ -145,6 +149,26 @@ def _formatColor(color):
         # format a web style color with the format 0xRRGGBB
         return _Color(color >> 16 & 0xff, color >> 8 & 0xff, color & 0xff)
     return _Color(*color)
+
+def _getImageSize(filename):
+    """Try to get the width and height of a bmp of png image file"""
+    file = open(filename, 'rb')
+    if file.read(8) == b'\x89PNG\r\n\x1a\n': # PNG
+        while 1:
+            length, = struct.unpack('>i', file.read(4))
+            chunkID = file.read(4)
+            if chunkID == '': # EOF
+                return None
+            if chunkID == b'IHDR':
+                # return width, height
+                return struct.unpack('>ii', file.read(8))
+            file.seek(4 + length, 1)
+    file.seek(0)
+    if file.read(8) == b'BM': # Bitmap
+        file.seek(18, 0) # skip to size data
+        # return width, height
+        return struct.unpack('<ii', file.read(8))
+    # return None on error, unknown file
 
 class TDLError(Exception):
     """
@@ -967,7 +991,7 @@ class Typewriter(object):
         self.cursor = (x, y)
         
 
-def init(width, height, title=None, fullscreen=False, renderer='SDL'):
+def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
     """Start the main console with the given width and height and return the
     root console.
 
@@ -1005,7 +1029,7 @@ def init(width, height, title=None, fullscreen=False, renderer='SDL'):
     RENDERERS = {'GLSL': 0, 'OPENGL': 1, 'SDL': 2}
     global _rootinitialized, _rootConsoleRef
     if not _fontinitialized: # set the default font to the one that comes with tdl
-        setFont(_unpackfile('terminal.png'), 16, 16, True, True)
+        setFont(_unpackfile('terminal8x8.png'), None, None, True, True)
 
     if renderer.upper() not in RENDERERS:
         raise TDLError('No such render type "%s", expected one of "%s"' % (renderer, '", "'.join(RENDERERS)))
@@ -1051,10 +1075,14 @@ def flush():
 
     _lib.TCOD_console_flush()
 
-def setFont(path, columns, rows, columnFirst=False,
+def setFont(path, columns=None, rows=None, columnFirst=False,
             greyscale=False, altLayout=False):
     """Changes the font to be used for this session.
     This should be called before L{tdl.init}
+    
+    If the font specifies its size in its filename (i.e. font_NxN.png) then this
+    function can auto-detect the tileset formatting and the parameters columns
+    and rows can be left None.
 
     While it's possible you can change the font mid program it can sometimes
     break in rare circumstances.  So use caution when doing this.
@@ -1064,9 +1092,13 @@ def setFont(path, columns, rows, columnFirst=False,
 
     @type columns: int
     @param columns: Number of columns in the tileset.
+                    
+                    Can be left None for auto-detection.
 
     @type rows: int
     @param rows: Number of rows in the tileset.
+                 
+                 Can be left None for auto-detection.
 
     @type columnFirst: boolean
     @param columnFirst: Defines if the characer order goes along the rows or
@@ -1086,11 +1118,13 @@ def setFont(path, columns, rows, columnFirst=False,
 
     @type altLayout: boolean
     @param altLayout: An alternative layout with space in the upper left
-                      corner.  The colomn parameter is ignored if this is
-                      True, find examples of this layout in the font/
+                      corner.
+                      The colomn parameter is ignored if this is True,
+                      find examples of this layout in the font/libtcod/
                       directory included with the python-tdl source.
 
-    @raise TDLError: Will be raised if no file is found at path.
+    @raise TDLError: Will be raised if no file is found at path or if auto-
+                     detection fails.
 
     @note: A png file that's been optimized can fail to load correctly on
            MAC OS X creating a garbled mess when rendering.
@@ -1116,6 +1150,40 @@ def setFont(path, columns, rows, columnFirst=False,
     if not os.path.exists(path):
         raise TDLError('no file exists at: "%s"' % path)
     path = os.path.abspath(path)
+    
+    # and the rest is the auto-detect script
+    imgSize = _getImageSize(path) # try to find image size
+    if imgSize:
+        imgWidth, imgHeight = imgSize
+        # try to get font size from filename
+        match = re.match('.*([0-9]+)[xX]([0-9]+)', os.path.basename(path))
+        if match:
+            fontWidth, fontHeight = match.groups()
+            fontWidth, fontHeight = int(fontWidth), int(fontHeight)
+            
+            # estimate correct tileset size
+            estColumns, remC = divmod(imgWidth, fontWidth)
+            estRows, remR = divmod(imgHeight, fontHeight)
+            if remC or remR:
+                warnings.warn("Font may be incorrectly formatted.")
+            
+            if not columns:
+                columns = estColumns
+            if not rows:
+                rows = estRows
+        else:
+            if not (columns and rows):
+                # no matched font size and no tileset is given
+                raise TDLError('%s has no font size in filename' % os.path.basename(path))
+            
+        if columns and rows:
+            # confirm user set options
+            if (fontWidth * columns != imgWidth or
+                fontHeight * rows != imgHeight):
+                warnings.warn("setFont parameters are set as if the image size is (%d, %d) when the detected size is actually (%i, %i)"
+                             % (fontWidth * columns, fontHeight * rows,
+                                imgWidth, imgHeight))
+            
     _lib.TCOD_console_set_custom_font(_encodeString(path), flags, columns, rows)
 
 def getFullscreen():
@@ -1211,5 +1279,5 @@ def forceResolution(width, height):
     """
     _lib.TCOD_sys_force_fullscreen_resolution(width, height)
         
-__all__ = [_var for _var in locals().keys() if _var[0] != '_' and _var not in ['sys', 'os', 'ctypes', 'array', 'weakref', 'itertools', 'textwrap']]
+__all__ = [_var for _var in locals().keys() if _var[0] != '_' and _var not in ['sys', 'os', 'ctypes', 'array', 'weakref', 'itertools', 'textwrap', 'struct', 're', 'warnings']]
 __all__ += ['_MetaConsole'] # keep this object public to show the documentation in epydoc

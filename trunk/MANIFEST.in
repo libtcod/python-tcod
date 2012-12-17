@@ -8,11 +8,10 @@ include tdl/lib/linux*/*.so
 include tdl/lib/win32/*.dll
 include tdl/lib/darwin/*
 include tdl/lib/darwin/SDL.framework/Versions/A/SDL
+include fonts/*.png
 include fonts/*.txt
-include fonts/libtcod/*.png
-include fonts/libtcod/*.txt
-include fonts/X11/*.png
-include fonts/X11/*.txt
+include fonts/*/*.png
+include fonts/*/*.txt
 include Frameworks/*.framework.tar
 include Frameworks/*.dmg
 include examples/*.py
