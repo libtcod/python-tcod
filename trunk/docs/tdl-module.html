@@ -300,9 +300,9 @@
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="tdl-module.html#setFont" class="summary-sig-name">setFont</a>(<span class="summary-sig-arg">path</span>,
-        <span class="summary-sig-arg">tileWidth</span>,
-        <span class="summary-sig-arg">tileHeight</span>,
-        <span class="summary-sig-arg">colomn</span>=<span class="summary-sig-default">False</span>,
+        <span class="summary-sig-arg">columns</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">rows</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">columnFirst</span>=<span class="summary-sig-default">False</span>,
         <span class="summary-sig-arg">greyscale</span>=<span class="summary-sig-default">False</span>,
         <span class="summary-sig-arg">altLayout</span>=<span class="summary-sig-default">False</span>)</span><br />
       Changes the font to be used for this session.</td>
@@ -488,9 +488,7 @@
           <p>Due to way Python works you're unlikely to see much of an 
           improvement by using 'GLSL' or 'OPENGL' as most of the time 
           Python is slow interacting with the console and the rendering 
-          itself is pretty fast even on 'SDL'.</p>
-          <p>This should be left at default or switched to 'SDL' for better
-          reliability and an instantaneous start up time.</p></li>
+          itself is pretty fast even on 'SDL'.</p></li>
     </ul></dd>
     <dt>Returns: <a href="tdl.Console-class.html" class="link">Console</a></dt>
         <dd>The root console.  Only what is drawn on the root console is 
@@ -561,9 +559,9 @@
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">setFont</span>(<span class="sig-arg">path</span>,
-        <span class="sig-arg">tileWidth</span>,
-        <span class="sig-arg">tileHeight</span>,
-        <span class="sig-arg">colomn</span>=<span class="sig-default">False</span>,
+        <span class="sig-arg">columns</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">rows</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">columnFirst</span>=<span class="sig-default">False</span>,
         <span class="sig-arg">greyscale</span>=<span class="sig-default">False</span>,
         <span class="sig-arg">altLayout</span>=<span class="sig-default">False</span>)</span>
   </h3>
@@ -574,6 +572,9 @@
   
   <p>Changes the font to be used for this session. This should be called 
   before <a href="tdl-module.html#init" class="link">tdl.init</a></p>
+  <p>If the font specifies its size in its filename (i.e. font_NxN.png) 
+  then this function can auto-detect the tileset formatting and the 
+  parameters columns and rows can be left None.</p>
   <p>While it's possible you can change the font mid program it can 
   sometimes break in rare circumstances.  So use caution when doing 
   this.</p>
@@ -581,22 +582,28 @@
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>path</code></strong> (string) - Must be a string filepath where a bmp or png file is found.</li>
-        <li><strong class="pname"><code>tileWidth</code></strong> (int) - The width of an individual tile.</li>
-        <li><strong class="pname"><code>tileHeight</code></strong> (int) - The height of an individual tile.</li>
-        <li><strong class="pname"><code>colomn</code></strong> (boolean) - Defines if the characer order goes along the rows or colomns. It 
+        <li><strong class="pname"><code>columns</code></strong> (int) - Number of columns in the tileset.
+          <p>Can be left None for auto-detection.</p></li>
+        <li><strong class="pname"><code>rows</code></strong> (int) - Number of rows in the tileset.
+          <p>Can be left None for auto-detection.</p></li>
+        <li><strong class="pname"><code>columnFirst</code></strong> (boolean) - Defines if the characer order goes along the rows or colomns. It 
           should be True if the charater codes 0-15 are in the first 
-          column.  And should be False if the characters 0-15 are in the 
+          column. And should be False if the characters 0-15 are in the 
           first row.</li>
         <li><strong class="pname"><code>greyscale</code></strong> (boolean) - Creates an anti-aliased font from a greyscale bitmap. Otherwise 
-          it uses the alpha channel for anti-aliasing.</li>
-        <li><strong class="pname"><code>altLayout</code></strong> (boolean) - An alternative layout with space in the upper left corner.  The 
+          it uses the alpha channel for anti-aliasing.
+          <p>Unless you actually need anti-aliasing from a font you know 
+          uses a smooth greyscale channel you should leave this on 
+          False.</p></li>
+        <li><strong class="pname"><code>altLayout</code></strong> (boolean) - An alternative layout with space in the upper left corner. The 
           colomn parameter is ignored if this is True, find examples of 
-          this layout in the font/ directory included with the python-tdl 
-          source.</li>
+          this layout in the font/libtcod/ directory included with the 
+          python-tdl source.</li>
     </ul></dd>
     <dt>Raises:</dt>
     <dd><ul class="nomargin-top">
-        <li><code><strong class='fraise'><a href="tdl.TDLError-class.html">TDLError</a></strong></code> - Will be raised if no file is found at path.</li>
+        <li><code><strong class='fraise'><a href="tdl.TDLError-class.html">TDLError</a></strong></code> - Will be raised if no file is found at path or if auto- detection 
+        fails.</li>
     </ul></dd>
   </dl>
 <div class="fields">      <p><strong>Note:</strong>
@@ -686,7 +693,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Thu Dec 13 12:51:20 2012</a>
+    3.0.1 on Mon Dec 17 00:44:50 2012</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

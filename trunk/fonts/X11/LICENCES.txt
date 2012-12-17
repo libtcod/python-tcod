@@ -1,4 +1,4 @@
-All the fonts here are public domain with the exceptions of clR6x12.png and helvR12.png
+All the fonts here are public domain with the exceptions of clR6x12.png and helvR12_14x15.png
 
 == clR6x12.png ==
  Copyright 1989 Dale Schumacher, dal@syntel.mn.org
@@ -20,7 +20,7 @@ All the fonts here are public domain with the exceptions of clR6x12.png and helv
  Modified by Robert Brady, <rwb197@ecs.soton.ac.uk>
 
 
-== helvR12.png ==
+== helvR12_14x15.png ==
  Copyright 1984-1989, 1994 Adobe Systems Incorporated.
  Copyright 1988, 1994 Digital Equipment Corporation.
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import sys
+import os
+
 import unittest
 import time
 import random
@@ -16,6 +18,7 @@ class TDLTemplate(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        tdl.setFont('../fonts/libtcod/terminal8x8_gs_ro.png')
         cls.console = tdl.init(30, 20, 'TDL UnitTest', False, renderer='SDL')
 
     def setUp(self):
@@ -83,8 +86,19 @@ class BasicTests(TDLTemplate):
         #for x,y in self.getDrawables():
         #    self.assertEqual((ch, fg, bg), self.console.getChar(x, y), 'clear should default to white on black')
         
-    #def test_changeFonts(self):
-    #    "Fonts are changable on the fly"
+    def test_changeFonts(self):
+        "Fonts are changable on the fly... kind of"
+        FONT_DIR = '../fonts/X11'
+        for font in os.listdir(FONT_DIR):
+            if font[-4:] != '.png':
+                continue # skip all those other files
+            font = os.path.join(FONT_DIR, font)
+            tdl.setFont(font)
+            for x,y in self.getDrawables():
+                self.console.drawChar(x, y, *self.getRandomCharacter())
+            tdl.setTitle(font)
+            tdl.flush()
+            time.sleep(.25)
         
         
 class DrawingTests(TDLTemplate):
@@ -190,6 +204,7 @@ class DrawingTests(TDLTemplate):
     #        with self.assertRaises(AssertionError):
     #            self.console.drawFrame(x, y, width, height, ch, fg, bg)
     
+    @unittest.skip("Need this to be faster before unskipping")
     def test_scrolling(self):
         """marks a spot and then scrolls the console, checks to make sure no
         other spots are marked, test also knows if it's out of bounds.

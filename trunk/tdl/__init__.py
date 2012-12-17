@@ -1156,7 +1156,7 @@ def setFont(path, columns=None, rows=None, columnFirst=False,
     if imgSize:
         imgWidth, imgHeight = imgSize
         # try to get font size from filename
-        match = re.match('.*([0-9]+)[xX]([0-9]+)', os.path.basename(path))
+        match = re.match('.*?([0-9]+)[xX]([0-9]+)', os.path.basename(path))
         if match:
             fontWidth, fontHeight = match.groups()
             fontWidth, fontHeight = int(fontWidth), int(fontHeight)
@@ -1172,6 +1172,7 @@ def setFont(path, columns=None, rows=None, columnFirst=False,
             if not rows:
                 rows = estRows
         else:
+            # the font name excluded the fonts size
             if not (columns and rows):
                 # no matched font size and no tileset is given
                 raise TDLError('%s has no font size in filename' % os.path.basename(path))
@@ -1183,6 +1184,12 @@ def setFont(path, columns=None, rows=None, columnFirst=False,
                 warnings.warn("setFont parameters are set as if the image size is (%d, %d) when the detected size is actually (%i, %i)"
                              % (fontWidth * columns, fontHeight * rows,
                                 imgWidth, imgHeight))
+    else:
+        warnings.warn("%s is probably not an image." % os.path.basename(path))
+    
+    if not (columns and rows):
+        # didn't auto-detect
+        raise TDLError('Can not auto-detect the tileset of %s' % os.path.basename(path))
             
     _lib.TCOD_console_set_custom_font(_encodeString(path), flags, columns, rows)
 

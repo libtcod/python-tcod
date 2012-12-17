@@ -24,6 +24,7 @@ tdl.screenshot	tdl-module.html#screenshot
 tdl._iscolor	tdl-module.html#_iscolor
 tdl._fontinitialized	tdl-module.html#_fontinitialized
 tdl.forceResolution	tdl-module.html#forceResolution
+tdl._getImageSize	tdl-module.html#_getImageSize
 tdl.setFPS	tdl-module.html#setFPS
 tdl._setchar	tdl-module.html#_setchar
 tdl._STRTYPES	tdl-module.html#_STRTYPES
