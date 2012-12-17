@@ -77,11 +77,11 @@ class BasicTests(TDLTemplate):
         self.console.clear(fg, bg)
         for x,y in self.getDrawables():
             self.assertEqual((ch, fg, bg), self.console.getChar(x, y), 'color should be changeable with clear')
-        fg = (255, 255, 255)
-        bg = (0, 0, 0)
-        self.console.clear()
-        for x,y in self.getDrawables():
-            self.assertEqual((ch, fg, bg), self.console.getChar(x, y), 'clear should default to white on black')
+        #fg = (255, 255, 255)
+        #bg = (0, 0, 0)
+        #self.console.clear()
+        #for x,y in self.getDrawables():
+        #    self.assertEqual((ch, fg, bg), self.console.getChar(x, y), 'clear should default to white on black')
         
     #def test_changeFonts(self):
     #    "Fonts are changable on the fly"
@@ -114,12 +114,12 @@ class DrawingTests(TDLTemplate):
         for (x,y), data in record.items():
             self.assertEqual(data, self.console.getChar(x, y), 'drawChar should not overwrite any other tiles')
         
-    @unittest.skipIf(not __debug__, 'python run with optimized flag, skipping an AssertionError test')
-    def test_drawCharErrors(self):
-        "test out of bounds assertion errors"
-        for x,y in self.getUndrawables():
-            with self.assertRaisesRegexp(AssertionError, r"\(%i, %i\)" % (x, y)):
-                self.console.drawChar(x, y, *(self.getRandomCharacter()))
+    #@unittest.skipIf(not __debug__, 'python run with optimized flag, skipping an AssertionError test')
+    #def test_drawCharErrors(self):
+    #    "test out of bounds assertion errors"
+    #    for x,y in self.getUndrawables():
+    #        with self.assertRaisesRegexp(AssertionError, r"\(%i, %i\)" % (x, y)):
+    #            self.console.drawChar(x, y, *(self.getRandomCharacter()))
         
     def test_drawStrArray(self):
         """strings will raise errors if they pass over the end of the console.
@@ -142,12 +142,12 @@ class DrawingTests(TDLTemplate):
                     if y == height:
                         break # end of console
     
-    @unittest.skipIf(not __debug__, 'python run with optimized flag, skipping an AssertionError test')
-    def test_drawStrErrors(self):
-        "test out of bounds assertion errors"
-        for x,y in self.getUndrawables():
-            with self.assertRaisesRegexp(AssertionError, r"\(%i, %i\)" % (x, y)):
-                self.console.drawStr(x, y, 'foo', self.getRandomColor(), self.getRandomColor())
+    #@unittest.skipIf(not __debug__, 'python run with optimized flag, skipping an AssertionError test')
+    #def test_drawStrErrors(self):
+    #    "test out of bounds assertion errors"
+    #    for x,y in self.getUndrawables():
+    #        with self.assertRaisesRegexp(AssertionError, r"\(%i, %i\)" % (x, y)):
+    #            self.console.drawStr(x, y, 'foo', self.getRandomColor(), self.getRandomColor())
     
     def test_drawRect(self):
         consoleCopy = tdl.Console(*(self.console.getSize()))
@@ -179,16 +179,16 @@ class DrawingTests(TDLTemplate):
                 else:
                     self.assertEqual(self.console.getChar(testX, testY), consoleCopy.getChar(testX, testY), 'outer frame should remain untouched')
     
-    @unittest.skipIf(not __debug__, 'python run with optimized flag, skipping an AssertionError test')
-    def test_drawRectFrameErrors(self):
-        for x,y in self.getDrawables():
-            ch, fg, bg = self.getRandomCharacter()
-            width, height = self.console.getSize()
-            width, height = random.randint(x + width, x + width + ERROR_RANGE), random.randint(y + height, y + height + ERROR_RANGE)
-            with self.assertRaises(AssertionError):
-                self.console.drawRect(x, y, width, height, ch, fg, bg)
-            with self.assertRaises(AssertionError):
-                self.console.drawFrame(x, y, width, height, ch, fg, bg)
+    #@unittest.skipIf(not __debug__, 'python run with optimized flag, skipping an AssertionError test')
+    #def test_drawRectFrameErrors(self):
+    #    for x,y in self.getDrawables():
+    #        ch, fg, bg = self.getRandomCharacter()
+    #        width, height = self.console.getSize()
+    #        width, height = random.randint(x + width, x + width + ERROR_RANGE), random.randint(y + height, y + height + ERROR_RANGE)
+    #        with self.assertRaises(AssertionError):
+    #            self.console.drawRect(x, y, width, height, ch, fg, bg)
+    #        with self.assertRaises(AssertionError):
+    #            self.console.drawFrame(x, y, width, height, ch, fg, bg)
     
     def test_scrolling(self):
         """marks a spot and then scrolls the console, checks to make sure no

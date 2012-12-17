@@ -53,11 +53,13 @@ class NoiseSample(SampleApp):
     def generateNoise(self):
         self.noise = tdl.noise.Noise(self.noiseType, self.noiseMode, seed=42)
         
-    def key_CHAR(self, event):
+    def ev_KEYDOWN(self, event):
         if event.char in self.NOISE_KEYS:
             self.noiseType = self.NOISE_KEYS[event.char]
+            print('noise set to %s' % self.noiseType)
         if event.char in self.MODE_KEYS:
             self.noiseMode = self.MODE_KEYS[event.char]
+            print('mode set to %s' % self.noiseMode)
         self.generateNoise()
     
     def update(self, deltaTime):
@@ -74,11 +76,14 @@ class NoiseSample(SampleApp):
                 bgcolor = (int(val * 255),) * 2 + (min(255, int(val * 2 * 255)),)
                 samplewin.drawChar(x, y, ' ', (255, 255, 255), bgcolor)
 
-WIDTH, HEIGHT = 80, 50
+WIDTH, HEIGHT = 80, 40
 SAMPLE_WINDOW_RECT = (20, 10, 46, 20)
     
+FONT = '../fonts/X11/8x13.png'
+    
 if __name__ == '__main__':
-    console = tdl.init(WIDTH, HEIGHT)
+    tdl.setFont(FONT)
+    console = tdl.init(WIDTH, HEIGHT, renderer='opengl')
     samplewin = tdl.Window(console, *SAMPLE_WINDOW_RECT)
     
     samples = [cls() for cls in [TrueColorSample, NoiseSample]]

@@ -69,6 +69,7 @@ class FullDrawCharTest(TestApp):
 class CharOnlyTest(TestApp):
 
     def updateTest(self, deltaTime):
+        self.console.clear((255, 255, 255), (0, 0, 0))
         char = [random.getrandbits(8) for _ in range(self.total)]
         for (x,y), char in zip(self.cells, char):
             self.console.drawChar(x, y, char, None, None)
