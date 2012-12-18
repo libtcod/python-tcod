@@ -1,0 +1,25 @@
+1.1.3
+ * Some of the setFont parameters were incorrectly labeled and documented
+ * setFont can auto-detect tilesets if the font sizes are in the filenames
+ * Added some X11 unicode tilesets, including unifont.
+
+1.1.2
+ * Window title now defaults to the running scripts filename
+ * Fixed incorrect deltaTime for App.update
+ * App will no longer call tdl.flush on its own, you'll need to call this yourself
+ * tdl.noise module added
+ * clear method now defaults to black on black
+
+1.1.1
+ * map submodule added with AStar class and quickFOV function
+ * new Typewriter class
+ * most console functions can use Python-style negative indexes now
+ * new App.runOnce method
+ * rectangle geometry is less strict
+
+1.1.0
+ * KeyEvent.keyname is now KeyEvent.key
+ * MouseButtonEvent.button now behaves like KeyEvent.keyname does
+ * event.App class added
+ * drawing methods no longer have a default for the character parameter
+ * KeyEvent.ctrl is now KeyEvent.control

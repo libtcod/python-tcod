@@ -1,0 +1,30 @@
+# Target repertoire for comprehensive fixed character sets
+
+# Plane 00
+# Rows	Positions (Cells)
+
+  00	20-7E A0-FF
+  01	00-FF
+  02	00-FF
+  03	00-77 7A-7E 84-8A 8C 8E-A1 A3-FF
+  04	00-FF
+  05	00-23 31-56 59-5F 61-87 89-8A B0-C7 D0-EA F0-F4
+  10	D0-FC
+  1E	00-FF
+  1F	00-15 18-1D 20-45 48-4D 50-57 59 5B 5D 5F-7D 80-B4 B6-C4 C6-D3
+  1F	D6-DB DD-EF F2-F4 F6-FE
+  20	00-0A 10-27 2F-64 70-71 74-8E 90-94 A0-B5 D0-F0
+  21	00-4F 53-88 90-FF
+  22	00-FF
+  23	00-28 2B-E7
+  24	00-26 40-4A
+  25	00-FF
+  26	00-9D A0-BC C0-C3
+  27	E6-EB F5-FF
+  2A	00-06 1D 3F
+  30	3F
+  FB	00-06 13-17 1D-36 38-3C 3E 40-41 43-44 46-4F
+  FE	20-26
+  FF	61-9F FD
+
+# Number of characters in above table: 3480
