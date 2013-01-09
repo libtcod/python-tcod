@@ -110,10 +110,12 @@ class Noise(object):
             seed = random.getrandbits(32)
         else:
             seed = hash(seed)
+        # convert values into ctypes to localize type errors
+        self._seed = ctypes.c_int(seed)
         self._dimensions = _MAX_DIMENSIONS
         if self._algorithm == 'WAVELET':
             self._dimensions = 3 # Wavelet only goes up to 3
-        self._random = _lib.TCOD_random_new_from_seed(seed, _MERSENNE_TWISTER)
+        self._random = _lib.TCOD_random_new_from_seed(self._seed, _MERSENNE_TWISTER)
         self._hurst = ctypes.c_float(hurst)
         self._lacunarity = ctypes.c_float(lacunarity)
         self._noise = _lib.TCOD_noise_new(self._dimensions, self._hurst,
@@ -123,6 +125,15 @@ class Noise(object):
         self._octaves = ctypes.c_float(octaves)
         self._useOctaves = (self._mode != 'FLAT')
         self._cFloatArray = ctypes.c_float * self._dimensions
+        
+    def __copy__(self):
+        # using the pickle method is a convenient way to clone this object
+        self.__class__(self.__getinitargs__())
+        
+    def __getinitargs__(self):
+        return (self._algorithm, self._mode,
+                self._hurst.value, self._lacunarity.value, self._octaves.value,
+                self.seed.value)
         
     def getPoint(self, *position):
         """Return the noise value of a specific position.
