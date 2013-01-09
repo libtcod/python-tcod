@@ -547,11 +547,11 @@ class _MetaConsole(object):
         self.blit(self, x, y, width, height, srcx, srcy)
 
         if uncoverX: # clear sides (0x20 is space)
-            self.drawRect(uncoverX[0], coverY[0], uncoverX[1], coverY[1], 0x20)
+            self.drawRect(uncoverX[0], coverY[0], uncoverX[1], coverY[1], 0x20, 0x000000, 0x000000)
         if uncoverY: # clear top/bottom
-            self.drawRect(coverX[0], uncoverY[0], coverX[1], uncoverY[1], 0x20)
+            self.drawRect(coverX[0], uncoverY[0], coverX[1], uncoverY[1], 0x20, 0x000000, 0x000000)
         if uncoverX and uncoverY: # clear corner
-            self.drawRect(uncoverX[0], uncoverY[0], uncoverX[1], uncoverY[1], 0x20)
+            self.drawRect(uncoverX[0], uncoverY[0], uncoverX[1], uncoverY[1], 0x20, 0x000000, 0x000000)
 
     def getChar(self, x, y):
         """Return the character and colors of a tile as (ch, fg, bg)
@@ -625,6 +625,26 @@ class Console(_MetaConsole):
         except StandardError:
             pass # I forget why I put this here but I'm to afraid to delete it
 
+    def __copy__(self):
+        # make a new class and blit
+        clone = self.__class__(self.width, self.height)
+        clone.blit(self)
+        return clone
+        
+    def __getstate__(self):
+        # save data from getChar
+        data = [self.getChar(x, y) for x,y in
+                itertools.product(range(self.width), range(self.height))]
+        return self.width, self.height, data
+            
+    def __setstate__(self, state):
+        # make console from __init__ and unpack a getChar array
+        width, height, data = state
+        self.__init__(width, height)
+        for (x, y), graphic in zip(itertools.product(range(width),
+                                                     range(height)), data):
+            self.drawChar(x, y, *graphic)
+            
     def _replace(self, console):
         """Used internally
 
@@ -655,7 +675,7 @@ class Console(_MetaConsole):
         
                         Must be a 3-item list with integers that range 0-255.
                         
-                        Unlike most other operations you can not use None here.
+                        Unlike most other operations you cannot use None here.
         @type bgcolor: (r, g, b)
         @param bgcolor: Background color.  See fgcolor.
         """
@@ -699,11 +719,12 @@ class Console(_MetaConsole):
             # buffer values as ctypes objects
             self._typewriter = None # clear the typewriter as colors will be set
             console = self._as_parameter_
-            if not bgcolor:
-                bgblend = 0
             bgblend = ctypes.c_int(bgblend)
 
-            _lib.TCOD_console_set_default_background(console, bgcolor)
+            if not bgcolor:
+                bgblend = 0
+            else:
+                _lib.TCOD_console_set_default_background(console, bgcolor)
             _lib.TCOD_console_set_default_foreground(console, fgcolor)
             _putChar = _lib.TCOD_console_put_char # remove dots and make local
             for (x, y), char in batch:
@@ -792,7 +813,7 @@ class Window(_MetaConsole):
         """
         assert _verify_colors(fgcolor, bgcolor)
         assert fgcolor and bgcolor, 'Can not use None with clear'
-        self.draw_rect(0, 0, None, None, 0x20, fgcolor, bgcolor)
+        self.drawRect(0, 0, None, None, 0x20, fgcolor, bgcolor)
 
     def _setChar(self, x, y, char=None, fgcolor=None, bgcolor=None, bgblend=1):
         self.parent._setChar((x + self.x), (y + self.y), char, fgcolor, bgcolor, bgblend)
@@ -1234,24 +1255,25 @@ def screenshot(path=None):
     """
     if not _rootinitialized:
         raise TDLError('Initialize first with tdl.init')
-    if isinstance(fileobj, str):
-        _lib.TCOD_sys_save_screenshot(_encodeString(fileobj))
-    elif isinstance(fileobj, file): # save to temp file and copy to file-like obj
-        tmpname = os.tempnam()
-        _lib.TCOD_sys_save_screenshot(_encodeString(tmpname))
-        with tmpname as tmpfile:
-            fileobj.write(tmpfile.read())
-        os.remove(tmpname)
-    elif fileobj is None: # save to screenshot001.png, screenshot002.png, ...
+    if isinstance(path, str):
+        _lib.TCOD_sys_save_screenshot(_encodeString(path))
+    elif path is None: # save to screenshot001.png, screenshot002.png, ...
         filelist = os.listdir('.')
         n = 1
         filename = 'screenshot%.3i.png' % n
         while filename in filelist:
             n += 1
-            filename = 'screenshot%.4i.png' % n
+            filename = 'screenshot%.3i.png' % n
         _lib.TCOD_sys_save_screenshot(_encodeString(filename))
-    else:
-        raise TypeError('fileobj is an invalid type: %s' % type(fileobj))
+    else: # assume file like obj
+        #save to temp file and copy to file-like obj
+        tmpname = os.tempnam()
+        _lib.TCOD_sys_save_screenshot(_encodeString(tmpname))
+        with tmpname as tmpfile:
+            path.write(tmpfile.read())
+        os.remove(tmpname)
+    #else:
+    #    raise TypeError('path is an invalid type: %s' % type(path))
 
 def setFPS(frameRate):
     """Set the maximum frame rate.

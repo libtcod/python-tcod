@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
-import os.path
-import subprocess
-from distutils.core import setup
+try:
+    # use setuptools or distribute if available
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 setup(name='tdl',
       version='1.1.3',

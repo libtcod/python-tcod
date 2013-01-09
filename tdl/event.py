@@ -76,7 +76,7 @@ class Event(object):
     """
 
     def __repr__(self):
-        """List an events public attributes in print calls.
+        """List an events public attributes when printed.
         """
         attrdict = {}
         for varname in dir(self):
@@ -92,12 +92,13 @@ class Quit(Event):
     type = 'QUIT'
 
 class KeyEvent(Event):
-    __slots__ = ('key', 'char', 'shift', 'alt', 'control',
+    __slots__ = ('key', 'char', 'keychar', 'shift', 'alt', 'control',
                  'leftAlt', 'leftCtrl', 'rightAlt', 'rightCtrl')
 
     def __init__(self, key, char, lalt, lctrl, ralt, rctrl, shift):
         self.key = _keyNames[key]
-        """Human readable name of the key pressed.
+        """Human readable names of the key pressed.
+        Non special characters will show up as 'CHAR'.
         
         Can be one of
         'NONE', 'ESCAPE', 'BACKSPACE', 'TAB', 'ENTER', 'SHIFT', 'CONTROL',
@@ -108,14 +109,26 @@ class KeyEvent(Event):
         'KPADD', 'KPSUB', 'KPDIV', 'KPMUL', 'KPDEC', 'KPENTER', 'F1', 'F2',
         'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12',
         'NUMLOCK', 'SCROLLLOCK', 'SPACE', 'CHAR'
+        
+        For the actual character instead of 'CHAR' use L{keychar}.
         @type: string"""
         char = char if isinstance(char, str) else char.decode()
         self.char = char.replace('\x00', '') # change null to empty string
         """A single character string of the letter or symbol pressed.
         
         Special characters like delete and return are not cross-platform.
-        L{key} should be used instead for special keys.
+        L{key} or L{keychar} should be used instead for special keys.
+        Characters are also case sensitive.
         @type: string"""
+        # get the best out of self.key and self.char
+        self.keychar = self.char if self.key == 'CHAR' else self.key
+        """Similar to L{key} but returns a case sensitive letter or symbol
+        instead of 'CHAR'.
+        
+        This variable makes available the widest variety of symbols and should
+        be used for key-mappings or anywhere where a narrower sample of keys
+        isn't needed.
+        """
         self.leftAlt = bool(lalt)
         """@type: boolean"""
         self.rightAlt = bool(ralt)
@@ -364,13 +377,15 @@ def get():
              interrupted before finishing the excess items are preserved for the
              next call.
     """
+    def eventGenerator():
+        while _eventQueue:
+            # if there is an interruption the rest of the events stay untouched
+            # this means you can break out of a event.get loop without losing
+            # the leftover events
+            yield(_eventQueue.pop(0))
+        raise StopIteration()
     _processEvents()
-    while _eventQueue:
-        # if there is an interruption the rest of the events stay untouched
-        # this means you can break out of a event.get loop without losing
-        # the leftover events
-        yield(_eventQueue.pop(0))
-    raise StopIteration()
+    return eventGenerator()
 
 def push(event):
     """Push an event into the event buffer.
