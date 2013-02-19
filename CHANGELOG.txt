@@ -1,4 +1,6 @@
- 
+
+ * Merged the Typewriter and MetaConsole classes,
+   you now have a virtual cursor with Console and Window objects
  * Fixed the clear method on Window class
  * Fixed screenshot function
  * Fixed some drawing operations with unchanging backgrounds

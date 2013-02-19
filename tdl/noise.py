@@ -33,7 +33,7 @@ class Noise(object):
     """
     
     def __init__(self, algorithm='PERLIN', mode='FLAT',
-                 hurst=0.5, lacunarity=2.0, octaves=4.0, seed=None):
+                 hurst=0.5, lacunarity=2.0, octaves=4.0, seed=None, dimensions=4):
         """Create a new noise generator specifying a noise algorithm and how
         it's used.
         
@@ -110,11 +110,11 @@ class Noise(object):
             seed = random.getrandbits(32)
         else:
             seed = hash(seed)
-        # convert values into ctypes to localize type errors
-        self._seed = ctypes.c_int(seed)
-        self._dimensions = _MAX_DIMENSIONS
+        self._seed = seed
+        # convert values into ctypes to speed up later functions
+        self._dimensions = min(_MAX_DIMENSIONS, int(dimensions))
         if self._algorithm == 'WAVELET':
-            self._dimensions = 3 # Wavelet only goes up to 3
+            self._dimensions = min(self._dimensions, 3) # Wavelet only goes up to 3
         self._random = _lib.TCOD_random_new_from_seed(self._seed, _MERSENNE_TWISTER)
         self._hurst = ctypes.c_float(hurst)
         self._lacunarity = ctypes.c_float(lacunarity)
@@ -125,15 +125,19 @@ class Noise(object):
         self._octaves = ctypes.c_float(octaves)
         self._useOctaves = (self._mode != 'FLAT')
         self._cFloatArray = ctypes.c_float * self._dimensions
+        self._array = self._cFloatArray()
         
     def __copy__(self):
         # using the pickle method is a convenient way to clone this object
-        self.__class__(self.__getinitargs__())
+        self.__class__(self.__getstate__())
         
-    def __getinitargs__(self):
+    def __getstate__(self):
         return (self._algorithm, self._mode,
                 self._hurst.value, self._lacunarity.value, self._octaves.value,
-                self.seed.value)
+                self._seed, self._dimensions)
+        
+    def __setstate__(self, state):
+        self.__init__(*state)
         
     def getPoint(self, *position):
         """Return the noise value of a specific position.
@@ -146,6 +150,9 @@ class Noise(object):
         @return: Returns the noise value at position.
                  This will be a floating point in the 0.0-1.0 range.
         """
+        #array = self._array
+        #for d, pos in enumerate(position):
+        #    array[d] = pos
         array = self._cFloatArray(*position)
         if self._useOctaves:
             return (self._noiseFunc(self._noise, array, self._octaves) + 1) * 0.5

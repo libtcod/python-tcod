@@ -97,6 +97,13 @@ class TDLTemplate(unittest.TestCase):
                     y = random.randint(0, h)
                 results.append((x, y))
         return results
+        
+    def compareConsoles(self, consoleA, consoleB, errorMsg='colors should be the same'):
+        "Compare two console assuming they match and failing if they don't"
+        self.assertEqual(consoleA.getSize(), consoleB.getSize(), 'consoles should be the same size')
+        for x, y in self.getDrawables(consoleA):
+            self.assertEqual(self.consoleA.getChar(x, y),
+                             self.consoleB.getChar(x, y), '%s, position: (%i, %i)' % (errorMsg, x, y))
 
 class BasicTests(TDLTemplate):
     
@@ -120,15 +127,13 @@ class BasicTests(TDLTemplate):
     def test_cloneConsole(self):
         noiseData = self.randomizeConsole()
         clone = copy.copy(self.console)
-        for x,y in self.getDrawables():
-            self.assertEqual(self.console.getChar(x, y), clone.getChar(x, y), 'console clone should match root console')
+        self.compareConsoles(self.console, clone, 'console clone should match root console')
     
     def test_pickleConsole(self):
         noiseData = self.randomizeConsole()
         pickled = pickle.dumps(self.console)
         clone = pickle.loads(pickled)
-        for x,y in self.getDrawables():
-            self.assertEqual(self.console.getChar(x, y), clone.getChar(x, y), 'pickled console should match root console')
+        self.compareConsoles(self.console, clone, 'pickled console should match root console')
         
     def test_changeFonts(self):
         "Fonts are changable on the fly... kind of"

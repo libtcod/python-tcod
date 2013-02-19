@@ -139,8 +139,8 @@ def _iscolor(color):
 def _formatColor(color):
     """Format the color to ctypes
     """
-    if color is None:
-        return None
+    if color is None or color is False:
+        return color
     if isinstance(color, _Color):
         return color
     #if isinstance(color, Color):
@@ -179,8 +179,147 @@ class _MetaConsole(object):
     """
     Contains methods shared by both the L{Console} and L{Window} classes.
     """
-    __slots__ = ('width', 'height', 'console', '__weakref__', '__dict__')
+    __slots__ = ('width', 'height', 'console', '_cursor', '_fgcolor',
+                 '_bgcolor', '_bgblend', '_colorLock', '__weakref__', '__dict__')
 
+    def __init__(self):
+        self._cursor = (0, 0)
+        self._scrollMode = 'error'
+        self._fgcolor = _formatColor((255, 255, 255))
+        self._bgcolor = _formatColor((0, 0, 0))
+        self._bgblend = 1 # SET
+        self._colorLock = None # which object sets the ctype color options
+        
+    def _normalizePoint(self, x, y):
+        """Check if a point is in bounds and make minor adjustments.
+        
+        Respects Pythons negative indexes.  -1 starts at the bottom right.
+        Replaces the _drawable function
+        """
+        assert isinstance(x, _INTTYPES), 'x must be an integer, got %s' % repr(x)
+        assert isinstance(y, _INTTYPES), 'y must be an integer, got %s' % repr(y)
+
+        assert (-self.width <= x < self.width) and (-self.height <= y < self.height), \
+                ('(%i, %i) is an invalid postition on %s' % (x, y, self))
+                 
+        # handle negative indexes
+        if x < 0:
+            x += self.width
+        if y < 0:
+            y += self.height
+        return (x, y)
+
+    def _normalizeRect(self, x, y, width, height):
+        """Check if the rectangle is in bounds and make minor adjustments.
+        raise AssertionError's for any problems
+        """
+        x, y = self._normalizePoint(x, y) # inherit _normalizePoint logic
+        
+        assert width is None or isinstance(width, _INTTYPES), 'width must be an integer or None, got %s' % repr(width)
+        assert height is None or isinstance(height, _INTTYPES), 'height must be an integer or None, got %s' % repr(height)
+        
+        # if width or height are None then extend them to the edge
+        if width is None:
+            width = self.width - x
+        elif width < 0: # handle negative numbers
+            width += self.width
+            width = max(0, width) # a 'too big' negative is clamped zero
+        if height is None:
+            height = self.height - y
+            height = max(0, height)
+        elif height < 0:
+            height += self.height
+
+        # reduce rect size to bounds
+        width = min(width, self.width - x)
+        height = min(height, self.height - y)
+        
+        return x, y, width, height
+    
+    def _normalizeCursor(self, x, y):
+        """return the normalized the cursor position."""
+        width, height = self.getSize()
+        while x >= width:
+            x -= width
+            y += 1
+        while y >= height:
+            if self._scrollMode == 'scroll':
+                y -= 1
+                self.scroll(0, -1)
+            elif self._scrollMode == 'error':
+                # reset the cursor on error
+                self._cursor = (0, 0)
+                raise TDLError('Cursor has reached the end of the console')
+        return (x, y)
+        
+    def _lockColors(self, forceUpdate=False):
+        """Make sure the color options on the root console match ths instance"""
+        if self.console._lockColors is not self or forceUpdate:
+            self.console._lockColors = self
+            _lib.TCOD_console_set_default_background(self.console, self.bgcolor)
+            _lib.TCOD_console_set_default_foreground(self.console, self.fgcolor)
+            #
+            
+    def setColors(self, fg=None, bg=None):
+        if self.console._lockColors is self:
+            self.console._lockColors = None
+        if fg is not None:
+            self_fgcolor = _formatColor(fg)
+        if bg is not None:
+            self_fgcolor = _formatColor(fg)
+
+    def printStr(self, string):
+        """Print a string at the cursor.
+        
+        Handles special characters such as '\\n' and '\\r'.
+        
+        @type string: string
+        @param string: 
+        """
+        x, y = self._cursor
+        for char in string:
+            if char == '\n': # line break
+                x = 0
+                y += 1
+                continue
+            if char == '\r': # return
+                x = 0
+                continue
+            x, y = self._normalizeCursor(x, y)
+            self.drawChar(x, y, char, self._fgcolor, self._bgcolor)
+            x += 1
+        self._cursor = (x, y)
+
+    def write(self, string):
+        """This method mimics basic file-like behaviour.
+        
+        Because of this method you can replace sys.stdout or sys.stderr with
+        a L{Typewriter} instance.
+        
+        @type string: string
+        """
+        # some 'basic' line buffer stuff.
+        # there must be an easier way to do this.  The textwrap module didn't
+        # help much.
+        x, y = self._normalize(*self._cursor)
+        width, height = self.parent.getSize()
+        wrapper = textwrap.TextWrapper(initial_indent=(' '*x), width=width)
+        writeLines = []
+        for line in string.split('\n'):
+            if line:
+                writeLines += wrapper.wrap(line)
+                wrapper.initial_indent = ''
+            else:
+                writeLines.append([])
+
+        for line in writeLines:
+            x, y = self._normalize(x, y)
+            self.parent.drawStr(x, y, line[x:], self.fgcolor, self.bgcolor)
+            y += 1
+            x = 0
+        y -= 1
+        self._cursor = (x, y)
+    
     def drawChar(self, x, y, char, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a single character.
 
@@ -379,52 +518,6 @@ class _MetaConsole(object):
         self.drawRect(x + width - 1, y, 1, height, char, fgcolor, bgcolor)
         self.drawRect(x, y + height - 1, width, 1, char, fgcolor, bgcolor)
 
-    def _normalizePoint(self, x, y):
-        """Check if a point is in bounds and make minor adjustments.
-        
-        Respects Pythons negative indexes.  -1 starts at the bottom right.
-        Replaces the _drawable function
-        """
-        assert isinstance(x, _INTTYPES), 'x must be an integer, got %s' % repr(x)
-        assert isinstance(y, _INTTYPES), 'y must be an integer, got %s' % repr(y)
-
-        assert (-self.width <= x < self.width) and (-self.height <= y < self.height), \
-                ('(%i, %i) is an invalid postition on %s' % (x, y, self))
-                 
-        # handle negative indexes
-        if x < 0:
-            x += self.width
-        if y < 0:
-            y += self.height
-        return (x, y)
-
-    def _normalizeRect(self, x, y, width, height):
-        """Check if the rectangle is in bounds and make minor adjustments.
-        raise AssertionError's for any problems
-        """
-        x, y = self._normalizePoint(x, y) # inherit _normalizePoint logic
-        
-        assert width is None or isinstance(width, _INTTYPES), 'width must be an integer or None, got %s' % repr(width)
-        assert height is None or isinstance(height, _INTTYPES), 'height must be an integer or None, got %s' % repr(height)
-        
-        # if width or height are None then extend them to the edge
-        if width is None:
-            width = self.width - x
-        elif width < 0: # handle negative numbers
-            width += self.width
-            width = max(0, width) # a 'too big' negative is clamped zero
-        if height is None:
-            height = self.height - y
-            height = max(0, height)
-        elif height < 0:
-            height += self.height
-
-        # reduce rect size to bounds
-        width = min(width, self.width - x)
-        height = min(height, self.height - y)
-        
-        return x, y, width, height
-
     def blit(self, source, x=0, y=0, width=None, height=None, srcX=0, srcY=0):
         """Blit another console or Window onto the current console.
 
@@ -482,6 +575,23 @@ class _MetaConsole(object):
         else:
             _lib.TCOD_console_blit(source, srcX, srcY, width, height, self, x, y, fgalpha, bgalpha)
 
+    def getCursor(self):
+        """Return the virtual cursor position.
+        
+        @rtype: (int, int)
+        @return: Returns (x, y) a 2-integer tuple containing where the next
+                 L{addChar} or L{addStr} will start at.
+                 
+                 This can be changed with the L{move} method."""
+        x, y = self._cursor
+        width, height = self.parent.getSize()
+        while x >= width:
+            x -= width
+            y += 1
+        if y >= height and self.scrollMode == 'scroll':
+            y = height - 1
+        return x, y
+            
     def getSize(self):
         """Return the size of the console as (width, height)
 
@@ -489,6 +599,16 @@ class _MetaConsole(object):
         """
         return self.width, self.height
 
+    def move(self, x, y):
+        """Move the virtual cursor.
+        
+        @type x: int
+        @param x: X position to place the cursor.
+        @type y: int
+        @param y: Y position to place the cursor.
+        """
+        self._cursor = self._normalizePoint(x, y)
+        
     def scroll(self, x, y):
         """Scroll the contents of the console in the direction of x,y.
 
@@ -592,6 +712,7 @@ class Console(_MetaConsole):
         @type height: int
         @param height: Height of the console in tiles
         """
+        _MetaConsole.__init__(self)
         if not _rootinitialized:
             raise TDLError('Can not create Console\'s before tdl.init')
         self._as_parameter_ = _lib.TCOD_console_new(width, height)
@@ -599,11 +720,13 @@ class Console(_MetaConsole):
         self.width = width
         self.height = height
         self._typewriter = None # "typewriter lock", makes sure the colors are set to the typewriter
+        # will be phased out with the Typewriter class
 
     @classmethod
     def _newConsole(cls, console):
         """Make a Console instance, from a console ctype"""
         self = cls.__new__(cls)
+        _MetaConsole.__init__(self)
         self._as_parameter_ = console
         self.console = self
         self.width = _lib.TCOD_console_get_width(self)
@@ -786,6 +909,7 @@ class Window(_MetaConsole):
         
                        See width.
         """
+        _MetaConsole.__init__(self)
         assert isinstance(console, (Console, Window)), 'console parameter must be a Console or Window instance, got %s' % repr(console)
         self.parent = console
         self.x, self.y, self.width, self.height = console._normalizeRect(x, y, width, height)
@@ -865,13 +989,14 @@ class Typewriter(object):
         
         @type console: L{Console} or L{Window}
         """
+        warnings.warn("Typewriter is no longer needed, use Console or Window objects", DeprecationWarning)
         assert isinstance(console, (Console, Window)), 'console parameter must be a Console or Window instance, got %s' % repr(console)
         self.parent = console
         if isinstance(self.parent, Console):
             self.console = self.parent
         else:
             self.console = self.parent.console
-        self.cursor = (0, 0) # cursor position
+        self._cursor = (0, 0) # cursor position
         self.scrollMode = 'scroll' #can be 'scroll', 'error'
         self.fgcolor = _formatColor((255, 255, 255))
         self.bgcolor = _formatColor((0, 0, 0))
@@ -889,7 +1014,7 @@ class Typewriter(object):
                 self.parent.scroll(0, -1)
             elif self.scrollMode == 'error':
                 # reset the cursor on error
-                self.cursor = (0, 0)
+                self._cursor = (0, 0)
                 raise TDLError('Typewriter cursor has reached the end of the console')
         return (x, y)
 
@@ -901,7 +1026,7 @@ class Typewriter(object):
                  L{addChar} or L{addStr} will start at.
                  
                  This can be changed with the L{move} method."""
-        x, y = self.cursor
+        x, y = self._cursor
         width, height = self.parent.getSize()
         while x >= width:
             x -= width
@@ -918,14 +1043,14 @@ class Typewriter(object):
         @type y: int
         @param y: Y position to place the cursor.
         """
-        self.cursor = self.parent._normalizePoint(x, y)
+        self._cursor = self.parent._normalizePoint(x, y)
         
     def setFG(self, color):
         """Change the foreground color"""
         assert _iscolor(color)
         assert color is not None
         self.fgcolor = _formatColor(color)
-        if self.console._typewriter is self:
+        if self.console._colorLock is self:
             _lib.TCOD_console_set_default_foreground(self.console, self.fgcolor)
         
     def setBG(self, color):
@@ -933,13 +1058,13 @@ class Typewriter(object):
         assert _iscolor(color)
         assert color is not None
         self.bgcolor = _formatColor(color)
-        if self.console._typewriter is self:
+        if self.console._colorLock is self:
             _lib.TCOD_console_set_default_background(self.console, self.bgcolor)
         
     def _updateConsole(self):
         """Make sure the colors on a console match the Typewriter instance"""
-        if self.console._typewriter is not self:
-            self.console._typewriter = self
+        if self.console._colorLock is not self:
+            self.console._colorLock = self
             
             _lib.TCOD_console_set_default_background(self.console, self.bgcolor)
             _lib.TCOD_console_set_default_foreground(self.console, self.fgcolor)
@@ -955,7 +1080,7 @@ class Typewriter(object):
             x = 0
             return
         x, y = self._normalize(*self.cursor)
-        self.cursor = [x + 1, y] # advance cursor on next draw
+        self._cursor = [x + 1, y] # advance cursor on next draw
         self._updateConsole()
         x, y = self.parent._translate(x, y)
         _lib.TCOD_console_put_char(self.console._as_parameter_, x, y, _formatChar(char), self._bgblend)
@@ -967,7 +1092,7 @@ class Typewriter(object):
         @type string: string
         @param string: 
         """
-        x, y = self.cursor
+        x, y = self._cursor
         for char in string:
             if char == '\n': # line break
                 x = 0
@@ -979,7 +1104,7 @@ class Typewriter(object):
             x, y = self._normalize(x, y)
             self.parent.drawChar(x, y, char, self.fgcolor, self.bgcolor)
             x += 1
-        self.cursor = (x, y)
+        self._cursor = (x, y)
 
     def write(self, string):
         """This method mimics basic file-like behaviour.
@@ -992,7 +1117,7 @@ class Typewriter(object):
         # some 'basic' line buffer stuff.
         # there must be an easier way to do this.  The textwrap module didn't
         # help much.
-        x, y = self._normalize(*self.cursor)
+        x, y = self._normalize(*self._cursor)
         width, height = self.parent.getSize()
         wrapper = textwrap.TextWrapper(initial_indent=(' '*x), width=width)
         writeLines = []
@@ -1009,7 +1134,7 @@ class Typewriter(object):
             y += 1
             x = 0
         y -= 1
-        self.cursor = (x, y)
+        self._cursor = (x, y)
         
 
 def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
@@ -1308,5 +1433,12 @@ def forceResolution(width, height):
     """
     _lib.TCOD_sys_force_fullscreen_resolution(width, height)
         
-__all__ = [_var for _var in locals().keys() if _var[0] != '_' and _var not in ['sys', 'os', 'ctypes', 'array', 'weakref', 'itertools', 'textwrap', 'struct', 're', 'warnings']]
+__all__ = [_var for _var in locals().keys() if _var[0] != '_' and _var not in
+           ['sys', 'os', 'ctypes', 'array', 'weakref', 'itertools', 'textwrap',
+            'struct', 're', 'warnings']] # remove modules from __all__
 __all__ += ['_MetaConsole'] # keep this object public to show the documentation in epydoc
+__all__.remove('Typewriter') # Hide the deprecated Typewriter class
+
+__author__ = "Kyle Stewart"
+__license__ = "New BSD License"
+__email__ = "4b796c65+pythonTDL@gmail.com"
