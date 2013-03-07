@@ -4,6 +4,9 @@
     
     You can find the project page on Google Code
     U{here<http://code.google.com/p/python-tdl/>}.
+    
+    Report any bugs or issues to the Google Code issue tracker
+    U{here<https://code.google.com/p/python-tdl/issues/list>}.
 
     Getting Started
     ===============
