@@ -102,8 +102,8 @@ class TDLTemplate(unittest.TestCase):
         "Compare two console assuming they match and failing if they don't"
         self.assertEqual(consoleA.getSize(), consoleB.getSize(), 'consoles should be the same size')
         for x, y in self.getDrawables(consoleA):
-            self.assertEqual(self.consoleA.getChar(x, y),
-                             self.consoleB.getChar(x, y), '%s, position: (%i, %i)' % (errorMsg, x, y))
+            self.assertEqual(consoleA.getChar(x, y),
+                             consoleB.getChar(x, y), '%s, position: (%i, %i)' % (errorMsg, x, y))
 
 class BasicTests(TDLTemplate):
     
@@ -134,20 +134,21 @@ class BasicTests(TDLTemplate):
         pickled = pickle.dumps(self.console)
         clone = pickle.loads(pickled)
         self.compareConsoles(self.console, clone, 'pickled console should match root console')
-        
-    def test_changeFonts(self):
-        "Fonts are changable on the fly... kind of"
-        FONT_DIR = '../fonts/X11'
-        for font in os.listdir(FONT_DIR):
-            if font[-4:] != '.png':
-                continue # skip all those other files
-            font = os.path.join(FONT_DIR, font)
-            tdl.setFont(font)
-            for x,y in self.getDrawables():
-                self.console.drawChar(x, y, *self.getRandomCharacter())
-            tdl.setTitle(font)
-            self.flush()
-            time.sleep(.05)
+     
+    ## This isn't really supported.
+    #def test_changeFonts(self):
+    #    "Fonts are changable on the fly... kind of"
+    #    FONT_DIR = '../fonts/X11'
+    #    for font in os.listdir(FONT_DIR):
+    #        if font[-4:] != '.png':
+    #            continue # skip all those other files
+    #        font = os.path.join(FONT_DIR, font)
+    #        tdl.setFont(font)
+    #        for x,y in self.getDrawables():
+    #            self.console.drawChar(x, y, *self.getRandomCharacter())
+    #        tdl.setTitle(font)
+    #        self.flush()
+    #        time.sleep(.05)
         
         
 class DrawingTests(TDLTemplate):

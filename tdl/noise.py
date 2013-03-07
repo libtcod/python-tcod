@@ -45,13 +45,15 @@ class Noise(object):
                              A popular noise generator.
                              
                            - 'SIMPLEX' -
-                             A slightly faster generator that unlike perlin has
-                             no noticeable directional artifacts.
+                             In theory this is a slightly faster generator with
+                             less noticeable directional artifacts.
                              
                            - 'WAVELET'
                              A noise generator designed to reduce aliasing and
                              not lose detail when summed into a fractal
                              (as with the 'FBM' and 'TURBULENCE' modes.)
+                             
+                             This works faster at higher dimensions.
         
         @type mode: string
         @param mode: A secondary parameter to determine how noise is generated.

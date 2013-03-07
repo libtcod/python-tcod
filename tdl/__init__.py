@@ -33,7 +33,7 @@
       [red, green, blue] with integers in the 0-255 range with [0, 0, 0] being
       black and [255, 255, 255] being white.
       Or instead you can use None for any of the three parameters to tell the
-      library to keep what is at that spot instead of overwriting it.
+      library to not overwrite colors.
       After the drawing functions are called a call to L{tdl.flush} will update
       the screen.
 """
@@ -261,6 +261,10 @@ class _MetaConsole(object):
             #
             
     def setColors(self, fg=None, bg=None):
+        """Sets the colors to be used with the L{printStr} function.
+        
+        Values of None will only leave the current values unchanged.
+        """
         if self.console._lockColors is self:
             self.console._lockColors = None
         if fg is not None:
@@ -269,9 +273,13 @@ class _MetaConsole(object):
             self_fgcolor = _formatColor(fg)
 
     def printStr(self, string):
-        """Print a string at the cursor.
+        """Print a string at the virtual cursor.
         
         Handles special characters such as '\\n' and '\\r'.
+        Printing past the bottom of the console will scroll everying upwards.
+        
+        Colors can be set with L{setColors} and the virtual cursor can be moved
+        with L{move}.
         
         @type string: string
         @param string: 
@@ -295,6 +303,9 @@ class _MetaConsole(object):
         
         Because of this method you can replace sys.stdout or sys.stderr with
         a L{Typewriter} instance.
+        
+        This is a convoluted process and behaviour seen now can be excepted to
+        change on later versions.
         
         @type string: string
         """
@@ -613,6 +624,7 @@ class _MetaConsole(object):
         """Scroll the contents of the console in the direction of x,y.
 
         Uncovered areas will be cleared.
+        Does not move the virutal cursor.
         @type x: int
         @param x: Distance to scroll along x-axis
         @type y: int
@@ -1439,6 +1451,5 @@ __all__ = [_var for _var in locals().keys() if _var[0] != '_' and _var not in
 __all__ += ['_MetaConsole'] # keep this object public to show the documentation in epydoc
 __all__.remove('Typewriter') # Hide the deprecated Typewriter class
 
-__author__ = "Kyle Stewart"
 __license__ = "New BSD License"
 __email__ = "4b796c65+pythonTDL@gmail.com"

@@ -307,11 +307,68 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a href="tdl._MetaConsole-class.html#getCursor" class="summary-sig-name">getCursor</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Return the virtual cursor position.
+      <em>(Inherited from <a href="tdl._MetaConsole-class.html">tdl._MetaConsole</a>)</em></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.getCursor">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">(int, int)</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a name="getSize"></a><span class="summary-sig-name">getSize</span>(<span class="summary-sig-arg">self</span>)</span><br />
       Return the size of the console as (width, height)
       <em>(Inherited from <a href="tdl._MetaConsole-class.html">tdl._MetaConsole</a>)</em></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.getSize">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="tdl._MetaConsole-class.html#move" class="summary-sig-name">move</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">x</span>,
+        <span class="summary-sig-arg">y</span>)</span><br />
+      Move the virtual cursor.
+      <em>(Inherited from <a href="tdl._MetaConsole-class.html">tdl._MetaConsole</a>)</em></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.move">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="tdl._MetaConsole-class.html#printStr" class="summary-sig-name">printStr</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">string</span>)</span><br />
+      Print a string at the virtual cursor.
+      <em>(Inherited from <a href="tdl._MetaConsole-class.html">tdl._MetaConsole</a>)</em></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.printStr">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -332,6 +389,47 @@
       <em>(Inherited from <a href="tdl._MetaConsole-class.html">tdl._MetaConsole</a>)</em></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.scroll">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="tdl._MetaConsole-class.html#setColors" class="summary-sig-name">setColors</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">fg</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">bg</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Sets the colors to be used with the <a 
+      href="tdl._MetaConsole-class.html#printStr" class="link">printStr</a>
+      function.
+      <em>(Inherited from <a href="tdl._MetaConsole-class.html">tdl._MetaConsole</a>)</em></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.setColors">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="tdl._MetaConsole-class.html#write" class="summary-sig-name">write</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">string</span>)</span><br />
+      This method mimics basic file-like behaviour.
+      <em>(Inherited from <a href="tdl._MetaConsole-class.html">tdl._MetaConsole</a>)</em></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.write">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -754,7 +852,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Mon Dec 17 00:44:50 2012</a>
+    3.0.1 on Wed Mar 06 18:21:19 2013</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
