@@ -96,7 +96,8 @@ class KeyEvent(Event):
                  'leftAlt', 'leftCtrl', 'rightAlt', 'rightCtrl')
 
     def __init__(self, key, char, lalt, lctrl, ralt, rctrl, shift):
-        self.key = _keyNames[key]
+        # Convert keycodes into string, but use string if passed
+        self.key = key if isinstance(key, str) else _keyNames[key]
         """Human readable names of the key pressed.
         Non special characters will show up as 'CHAR'.
         
@@ -399,16 +400,23 @@ def push(event):
     _pushedEvents.append(event)
     
 def keyWait():
-    """Waits until the user presses a key.  Then returns a L{KeyDown} event.
+    """Waits until the user presses a key.
+    Then returns a L{KeyDown} event.
+    
+    Key events will repeat if held down.
+    
+    A click to close the window will be converted into an Alt+F4 KeyDown event.
     
     @rtype: L{KeyDown}
     """
-    global _eventsflushed
-    _eventsflushed = True
-    flush = False
-    libkey = _Key()
-    _lib.TCOD_console_wait_for_keypress_wrapper(libkey, flush)
-    return KeyDown(*libkey)
+    while 1:
+        for event in get():
+            if event.type == 'KEYDOWN':
+                return event
+            if event.type == 'QUIT':
+                # convert QUIT into alt+F4
+                return KeyDown('F4', '', True, False, True, False, False)
+        time.sleep(.001)
 
 def isWindowClosed():
     """Returns True if the exit button on the window has been clicked and

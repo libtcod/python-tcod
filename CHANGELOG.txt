@@ -6,6 +6,7 @@
  * Fixed some drawing operations with unchanging backgrounds
  * Instances of Console and Noise can be pickled and copied
  * Added KeyEvent.keychar
+ * Fixed event.keyWait, and now converts window closed events into Alt+F4
 
 1.1.3
  * Some of the setFont parameters were incorrectly labeled and documented

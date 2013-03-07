@@ -7,6 +7,9 @@ TDL is a port of the C library libtcod in an attempt to make it more "Pythonic"
 You can find more about libtcod at: http://doryen.eptalys.net/libtcod/
 And you can find the tdl project here: http://code.google.com/p/python-tdl/
 
+Report any bugs or issues here:
+https://code.google.com/p/python-tdl/issues/list
+
 == License ==
 Copyright (c) 2012, Kyle Stewart
 All rights reserved.
