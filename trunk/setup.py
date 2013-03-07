@@ -7,7 +7,7 @@ except ImportError:
     from distutils.core import setup
 
 setup(name='tdl',
-      version='1.1.3',
+      version='1.1.4',
       author='Kyle Stewart',
       author_email='4B796C65+pythonTDL@gmail.com',
       description='Simple graphical library for making a rogue-like or other tile-based video game.',
