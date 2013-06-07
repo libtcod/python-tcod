@@ -219,7 +219,7 @@ class DrawingTests(TDLTemplate):
     
     def test_drawRect(self):
         consoleCopy = tdl.Console(*(self.console.getSize()))
-        for x,y in self.getDrawables():
+        for x,y in random.sample(list(self.getDrawables()), 100):
             consoleCopy.blit(self.console) # copy the console to compare untouched areas
             ch, fg, bg = self.getRandomCharacter()
             width, height = self.console.getSize()
@@ -234,7 +234,7 @@ class DrawingTests(TDLTemplate):
                     
     def test_drawFrame(self):
         consoleCopy = tdl.Console(*(self.console.getSize()))
-        for x,y in self.getDrawables():
+        for x,y in random.sample(list(self.getDrawables()), 100):
             consoleCopy.blit(self.console) # copy the console to compare untouched areas
             ch, fg, bg = self.getRandomCharacter()
             width, height = self.console.getSize()

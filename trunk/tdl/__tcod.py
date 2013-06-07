@@ -18,11 +18,11 @@ except ImportError:
         return os.path.abspath(os.path.join(__path__[0], filename))
 
 def _unpackFramework(framework, path):
-    # get framework.tar file, remove ".tar" and add path
+    """get framework.tar file, remove ".tar" and add path"""
     return os.path.abspath(os.path.join(_unpackfile(framework)[:-4], path))
 
 def _loadDLL(dll):
-    # shorter version of file unpacking and linking
+    """shorter version of file unpacking and linking"""
     return cdll.LoadLibrary(_unpackfile(dll))
     
     
@@ -30,24 +30,25 @@ def _get_library_crossplatform():
     bits, linkage = platform.architecture()
     libpath = None
     if 'win32' in sys.platform:
-        _loadDLL('lib/win32/SDL.dll')
+        libSDL = _loadDLL('lib/win32/SDL.dll')
         _loadDLL('lib/win32/zlib1.dll')
-        return _loadDLL('lib/win32/libtcod-VS.dll')
-        #return _loadDLL('lib/win32/libtcod-mingw.dll')
+        libTCOD = _loadDLL('lib/win32/libtcod-VS.dll')
     elif 'linux' in sys.platform:
+        libSDL = None
+        #libSDL = cdll.LoadLibrary('SDL.so')
         if bits == '32bit':
-            return _loadDLL('lib/linux32/libtcod.so')
+            libTCOD = _loadDLL('lib/linux32/libtcod.so')
         elif bits == '64bit':
-            return _loadDLL('lib/linux64/libtcod.so')
+            libTCOD = _loadDLL('lib/linux64/libtcod.so')
     elif 'darwin' in sys.platform:
-        #sys.path.insert(0, _unpackfile('lib/darwin/Frameworks/'))
-        #_loadDLL('lib/darwin/libpng14')
-        return _loadDLL('lib/darwin/libtcod.dylib')
+        libSDL = _loadDLL('lib/darwin/SDL.dylib')
+        libTCOD = _loadDLL('lib/darwin/libtcod.dylib')
         
     else:
         raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
+    return libTCOD, libSDL
 
-_lib = _get_library_crossplatform()
+_lib, _libSDL = _get_library_crossplatform()
 
 try:
     c_bool
@@ -58,7 +59,25 @@ except NameError:
 
 class _Color(Structure):
     _fields_ = [('r', c_uint8), ('g', c_uint8), ('b', c_uint8)]
-
+    
+    @staticmethod
+    def new(color):
+        if color is None or color is False:
+            return color
+        if isinstance(color, _Color):
+            return color
+        if isinstance(color, int):
+            # format a web style color with the format 0xRRGGBB
+            return _Color(color >> 16 & 0xff, color >> 8 & 0xff, color & 0xff)
+        return _Color(*color)
+    
+    def set(self, r, g, b):
+        """perform a slightly faster in-place assignment of this object"""
+        self.r = r
+        self.g = g
+        self.b = b
+        return self
+    
     def __iter__(self):
         'to make this class more tuple-like'
         return iter((self.r, self.g, self.b))

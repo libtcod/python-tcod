@@ -85,11 +85,12 @@ def _formatChar(char):
     """
     if char is None:
         return None
-    if isinstance(char, _INTTYPES):
-        return char
+    #if isinstance(char, _INTTYPES):
+    #    return char
     if isinstance(char, _STRTYPES) and len(char) == 1:
         return ord(char)
-    raise TypeError('Expected char parameter to be a single character string, number, or None, got: %s' % repr(char))
+    return int(char) # conversion faster than type check
+    #raise TypeError('Expected char parameter to be a single character string, number, or None, got: %s' % repr(char))
 
 _fontinitialized = False
 _rootinitialized = False
@@ -139,19 +140,8 @@ def _iscolor(color):
 #    def __len__(self):
 #        return 3
     
-def _formatColor(color):
-    """Format the color to ctypes
-    """
-    if color is None or color is False:
-        return color
-    if isinstance(color, _Color):
-        return color
-    #if isinstance(color, Color):
-    #    return color._getCType()
-    if isinstance(color, _INTTYPES):
-        # format a web style color with the format 0xRRGGBB
-        return _Color(color >> 16 & 0xff, color >> 8 & 0xff, color & 0xff)
-    return _Color(*color)
+# Format the color to ctypes, will preserve None and False
+_formatColor = _Color.new
 
 def _getImageSize(filename):
     """Try to get the width and height of a bmp of png image file"""
@@ -199,8 +189,11 @@ class _MetaConsole(object):
         Respects Pythons negative indexes.  -1 starts at the bottom right.
         Replaces the _drawable function
         """
-        assert isinstance(x, _INTTYPES), 'x must be an integer, got %s' % repr(x)
-        assert isinstance(y, _INTTYPES), 'y must be an integer, got %s' % repr(y)
+        #assert isinstance(x, _INTTYPES), 'x must be an integer, got %s' % repr(x)
+        #assert isinstance(y, _INTTYPES), 'y must be an integer, got %s' % repr(y)
+        # force int, always faster than type checking
+        x = int(x)
+        y = int(y)
 
         assert (-self.width <= x < self.width) and (-self.height <= y < self.height), \
                 ('(%i, %i) is an invalid postition on %s' % (x, y, self))
@@ -262,6 +255,32 @@ class _MetaConsole(object):
             _lib.TCOD_console_set_default_background(self.console, self.bgcolor)
             _lib.TCOD_console_set_default_foreground(self.console, self.fgcolor)
             #
+            
+    def setScrollMode(self, mode):
+        """Configure how this console will react to the cursor writing past the
+        end if the console.
+        
+        This is for methods that use the virtual cursor, such as L{printStr}.
+        
+        @type mode: string
+        @param mode: Possible settings are:
+        
+                      - 'error' - A TDLError will be raised once the cursor
+                        reaches the end of the console.  Everything up until
+                        the error will still be drawn.
+                        
+                        This is the default setting.
+                        
+                      - 'scroll' - The console will scroll up as stuff is
+                        written to the end.
+                        
+                        You can restrict the region with L{tdl.Window} when
+                        doing this.
+        """
+        MODES = ['error', 'scroll']
+        if mode.lower() not in MODES:
+            raise TDLError('mode must be one of %s, got %s' % (MODES, repr(mode)))
+        self._scrollMode = mode.lower()
             
     def setColors(self, fg=None, bg=None):
         """Sets the colors to be used with the L{printStr} function.

@@ -42,7 +42,8 @@ class TestApp(tdl.event.App):
     
     def __init__(self, console):
         self.console = console
-        self.writer = tdl.Typewriter(console)
+        self.writer = self.console
+        self.console.setScrollMode('scroll')
         self.width, self.height = self.console.getSize()
         self.total = self.width * self.height
         self.cells = list(itertools.product(range(self.width), range(self.height)))
@@ -59,7 +60,7 @@ class FullDrawCharTest(TestApp):
     
     def updateTest(self, deltaTime):
         # getrandbits is around 5x faster than using randint
-        bgcolors = [(random.getrandbits(6), random.getrandbits(6), random.getrandbits(6)) for _ in range(self.total)]
+        bgcolors = [(random.getrandbits(7), random.getrandbits(7), random.getrandbits(7)) for _ in range(self.total)]
         char = [random.getrandbits(8) for _ in range(self.total)]
         fgcolor = (255, 255, 255)
         for (x,y), bgcolor, char in zip(self.cells, bgcolors, char):
@@ -81,7 +82,7 @@ class TypewriterCharOnlyTest(TestApp):
         char = [random.getrandbits(8) for _ in range(self.total)]
         for (x,y), char in zip(self.cells, char):
             self.writer.move(x, y)
-            self.writer.addChar(char)
+            self.writer.printStr(chr(char))
             
 class ColorOnlyTest(TestApp):    
     
