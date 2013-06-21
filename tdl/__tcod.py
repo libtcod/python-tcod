@@ -55,6 +55,47 @@ try:
 except NameError:
     c_bool = c_byte
 
+# ---------------- SDL ----------------
+
+class SDL_Rect(Structure):
+    _fields_ = [('x', c_int16),
+                ('y', c_int16),
+                ('width', c_uint16),
+                ('height', c_uint16)]
+   
+class SDL_PixelFormat(Structure):
+   _fields_ = [('palette', c_void_p),
+                ('BitsPerPixel', c_uint8),
+                ('BytesPerPixel', c_uint8),
+                ('Rloss', c_uint8),
+                ('Gloss', c_uint8),
+                ('Bloss', c_uint8),
+                ('Aloss', c_uint8),
+                ('Rshift', c_uint8),
+                ('Gshift', c_uint8),
+                ('Bshift', c_uint8),
+                ('Ashift', c_uint8),
+                ('Rmask', c_uint32),
+                ('Gmask', c_uint32),
+                ('Bmask', c_uint32),
+                ('Amask', c_uint32),
+                ('colorkey', c_uint32),
+                ('alpha', c_uint8),
+                ]
+   
+class SDL_Surface(Structure):
+    _fields_ = [('flags', c_uint32),
+                ('PixelFormat', POINTER(SDL_PixelFormat)),
+                ('width', c_int),
+                ('height', c_int),
+                ('pitch', c_uint16),
+                ('pixels', c_void_p), # Read-write
+                ('rect', SDL_Rect),
+                ('refcount', c_int)
+                ]
+
+# ---------------- libtcod ----------------
+    
 # COLOR
 
 class _Color(Structure):
@@ -391,6 +432,15 @@ _lib.TCOD_sys_get_last_frame_length.restype = c_float
 _lib.TCOD_sys_get_last_frame_length.argtypes = ()
 _lib.TCOD_sys_get_current_resolution.restype = None
 _lib.TCOD_sys_get_current_resolution.argtypes = (POINTER(c_int), POINTER(c_int))
+
+_lib.TCOD_sys_clipboard_set.restype = None
+_lib.TCOD_sys_clipboard_set.argtypes = (c_char_p,)
+_lib.TCOD_sys_clipboard_get.restype = c_char_p
+_lib.TCOD_sys_clipboard_get.argtypes = ()
+
+_RENDERCALL = CFUNCTYPE(None, POINTER(SDL_Surface))
+_lib.TCOD_sys_register_SDL_renderer.restype = None
+_lib.TCOD_sys_register_SDL_renderer.argtypes = None
 
 # IMAGE
 
