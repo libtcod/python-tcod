@@ -1,5 +1,7 @@
+ * added a method to iterate over all coordinates in a Console, getMap
  * drawStr can be configured to scroll or raise an error
-
+ * You can now configure or disable key repeating with tdl.event.setKeyRepeat
+ 
 1.1.4
  * Merged the Typewriter and MetaConsole classes,
    You now have a virtual cursor with Console and Window objects

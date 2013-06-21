@@ -418,6 +418,21 @@ def keyWait():
                 return KeyDown('F4', '', True, False, True, False, False)
         time.sleep(.001)
 
+def setKeyRepeat(delay=500, interval=0):
+    """Change or disable key repeat.
+    
+    @type delay: int
+    @param delay: Milliseconds before a held key begins to repeat.
+    
+                  Key repeat can be disabled entirely by setting a delay of zero.
+    
+    @type interval: int
+    @param interval: Milliseconds between key repeats.
+    
+                     An interval of zero will repeat every frame.
+    """
+    _lib.TCOD_console_set_keyboard_repeat(delay, interval)
+        
 def isWindowClosed():
     """Returns True if the exit button on the window has been clicked and
     stays True afterwards.

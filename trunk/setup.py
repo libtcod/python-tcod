@@ -10,10 +10,12 @@ setup(name='tdl',
       version='1.1.4',
       author='Kyle Stewart',
       author_email='4B796C65+pythonTDL@gmail.com',
-      description='Simple graphical library for making a rogue-like or other tile-based video game.',
+      description='Pythonic port of rogue-like library libtcod.',
       long_description="""python-tdl is a ctypes port of "libtcod".
 
-      The library is used for displaying tilesets (ansi, unicode, or graphical) in true color.
+      The library is used for displaying tilesets (ANSI, Unicode, or graphical) in true color.
+      
+      It also provides functionality to compute path-finding and field of view.
       """,
       url='http://code.google.com/p/python-tdl/',
       download_url='http://code.google.com/p/python-tdl/downloads/list',

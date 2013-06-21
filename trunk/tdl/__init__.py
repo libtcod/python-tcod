@@ -632,6 +632,10 @@ class _MetaConsole(object):
         """
         return self.width, self.height
 
+    def getMap(self):
+        """Return an iterator with every possible (x, y) value for this console."""
+        return itertools.product(range(self.width), range(self.height))
+        
     def move(self, x, y):
         """Move the virtual cursor.
         
