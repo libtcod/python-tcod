@@ -235,6 +235,7 @@ class _MetaConsole(object):
     def _normalizeCursor(self, x, y):
         """return the normalized the cursor position."""
         width, height = self.getSize()
+        assert width != 0 and height != 0, 'can not print on a console with a width or height of zero'
         while x >= width:
             x -= width
             y += 1
@@ -256,7 +257,7 @@ class _MetaConsole(object):
             _lib.TCOD_console_set_default_foreground(self.console, self.fgcolor)
             #
             
-    def setScrollMode(self, mode):
+    def setMode(self, mode):
         """Configure how this console will react to the cursor writing past the
         end if the console.
         
@@ -632,8 +633,11 @@ class _MetaConsole(object):
         """
         return self.width, self.height
 
-    def getMap(self):
-        """Return an iterator with every possible (x, y) value for this console."""
+    def map(self):
+        """Return an iterator with every possible (x, y) value for this console.
+        
+        It goes without saying that working on the console this way is a
+        slow process, especially for Python, and should be minimized."""
         return itertools.product(range(self.width), range(self.height))
         
     def move(self, x, y):
