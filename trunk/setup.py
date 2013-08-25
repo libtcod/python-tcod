@@ -16,6 +16,12 @@ setup(name='tdl',
       The library is used for displaying tilesets (ANSI, Unicode, or graphical) in true color.
       
       It also provides functionality to compute path-finding and field of view.
+      
+      python-tdl on GoogleCode: http://code.google.com/p/python-tdl/
+      Online Documentation: http://pythonhosted.org/tdl/
+      Issue Tracker: http://code.google.com/p/python-tdl/issues/list
+      
+      libtcod: http://doryen.eptalys.net/libtcod/
       """,
       url='http://code.google.com/p/python-tdl/',
       download_url='http://code.google.com/p/python-tdl/downloads/list',
@@ -40,7 +46,7 @@ setup(name='tdl',
                    'Topic :: Multimedia :: Graphics',
                    'Topic :: Software Development :: Libraries :: Python Modules',
                    ],
-      keywords = 'portable rogue-like rogue-likes text ctypes ASCII ANSI Unicode libtcod',
+      keywords = 'portable rogue-like rogue-likes text ctypes ASCII ANSI Unicode libtcod fov pathfinsing',
       platforms = ['Windows', 'Mac OS X', 'Linux'],
       license = 'New BSD License'
       )

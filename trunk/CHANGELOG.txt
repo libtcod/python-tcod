@@ -1,4 +1,4 @@
- * added a method to iterate over all coordinates in a Console, getMap
+ * added a method to iterate over all coordinates of a Console
  * drawStr can be configured to scroll or raise an error
  * You can now configure or disable key repeating with tdl.event.setKeyRepeat
  
