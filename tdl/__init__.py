@@ -633,7 +633,7 @@ class _MetaConsole(object):
         """
         return self.width, self.height
 
-    def map(self):
+    def __iter__(self):
         """Return an iterator with every possible (x, y) value for this console.
         
         It goes without saying that working on the console this way is a
