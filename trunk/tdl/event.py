@@ -225,8 +225,6 @@ class App(object):
        L{tdl.flush}.
     """
     __slots__ = ('__running', '__prevTime')
-    __running = False
-    __prevTime = None
     
     def ev_QUIT(self, event):
         """Unless overridden this method raises a SystemExit exception closing
@@ -281,7 +279,7 @@ class App(object):
         this function is called.  And then the App can be run again.
         But a single App instance can not be run multiple times simultaneously.
         """
-        if self.__running:
+        if getattr(self, '_App__running', False):
             raise _tdl.TDLError('An App can not be run multiple times simultaneously')
         self.__running = True
         while self.__running:
@@ -296,7 +294,7 @@ class App(object):
         Having multiple L{App} instances and selectively calling runOnce on
         them is a decent way to create a state machine.
         """
-        if self.__prevTime is None:
+        if not hasattr(self, '_App__prevTime'):
             self.__prevTime = time.clock() # initiate __prevTime
         for event in get():
             if event.type: # exclude custom events with a blank type variable

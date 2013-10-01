@@ -321,6 +321,30 @@ TCOD_renderer_t = c_int
 KEY_PRESSED = 1
 KEY_RELEASED = 2
 
+
+#class char_t(Structure):
+#    _fields_ = [('c', c_int), # character ascii code
+#                ('cf', c_int), # character number in font
+#                ('fore', _Color), ('back', _Color),
+#                ('dirty', c_uint8)]
+                
+                
+#class TCOD_console_t(Structure):
+#    _fields_ = [('buf', POINTER(char_t)), # current console
+#                ('oldbuf', POINTER(char_t)), # console for last frame
+#                ('w', c_int), ('h', c_int), # console width and height (in characters,not pixels)
+#                ]
+                
+#	/* default background operator for print & print_rect functions */
+#	TCOD_bkgnd_flag_t bkgnd_flag;
+#	/* default alignment for print & print_rect functions */
+#	TCOD_alignment_t alignment;
+#	/* foreground (text), background and key colors */
+#	TCOD_color_t fore,back,key;
+#	uint8 fade;
+#	bool haskey; /* a key color has been defined */
+#} TCOD_console_data_t;
+
 TCOD_console_t = c_void_p
 
 _lib.TCOD_console_init_root.restype = None

@@ -43,7 +43,7 @@ class TestApp(tdl.event.App):
     def __init__(self, console):
         self.console = console
         self.writer = self.console
-        self.console.setScrollMode('scroll')
+        self.console.setMode('scroll')
         self.width, self.height = self.console.getSize()
         self.total = self.width * self.height
         self.cells = list(itertools.product(range(self.width), range(self.height)))
