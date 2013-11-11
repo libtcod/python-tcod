@@ -6,6 +6,7 @@ import sys
 import code
 import textwrap
 import io
+import time
 import traceback
 
 sys.path.insert(0, '../')
@@ -16,28 +17,35 @@ sys.ps2 = '... '
 
 WIDTH, HEIGHT = 80, 50
 console = tdl.init(WIDTH, HEIGHT, 'Python Interpeter in TDL')
+console.setMode('scroll')
 
 class TDLPrint(io.TextIOBase):
     def __init__(self, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         self.colors = fgcolor, bgcolor
 
     def write(self, string):
-        for strings in string.split('\n'):
-            for string in textwrap.wrap(strings, 80):
-                scroll()
-                console.drawStr(0, HEIGHT-1, string, *self.colors)
-                tdl.flush()
+        olderr.write(string)
+        console.setColors(*self.colors)
+        console.write(string)
 
 #sys.stdout = TDLPrint()
-sys.stdout = tdl.Typewriter(console)
+sys.stdout = console
 sys.stdout.move(0, HEIGHT-1)
-olderr = sys.stderr
+olderr = newerr = sys.stderr
 newerr = TDLPrint((255, 255, 255), (127, 0, 0))
-interpeter = code.InteractiveConsole({'tdl':tdl, 'console':console})
-print()
-print('Python %s' % sys.version)
-print('Press ESC to quit')
-if __name__ == '__main__':
+
+def exit():
+    raise SystemExit
+
+interpeter = code.InteractiveConsole({'tdl':tdl,
+                                      'console':console,
+                                      'exit':exit})
+
+def main():
+    print()
+    print('Python %s' % sys.version)
+    print('Press ESC to quit')
+    
     buffer = ''
     commands = ['']
     banner = sys.ps1
@@ -55,7 +63,7 @@ if __name__ == '__main__':
             if event.type == 'QUIT':
                 raise SystemExit()
             if event.type == 'KEYDOWN':
-                if event.key == 'ENTER':
+                if event.key == 'ENTER' or event.key == 'KPENTER':
                     sys.stderr = newerr
                     try:
                         console.drawRect(0, HEIGHT-1, None, 1, None, (255, 255, 255), (0, 0, 0))
@@ -69,7 +77,10 @@ if __name__ == '__main__':
                     except:
                         sys.excepthook(*sys.exc_info())
                         banner = sys.ps1
-                    sys.stderr = olderr
+                    finally:
+                        sys.stderr = olderr
+                        sys.stdout = olderr
+                    sys.stdout = console
                     if buffer not in commands:
                         commands.append(buffer)
                     buffer = ''
@@ -109,3 +120,7 @@ if __name__ == '__main__':
                     buffer = buffer[:cursor] + event.char + buffer[cursor:]
                     cursor += 1
                 cursor = max(0, min(cursor, len(buffer)))
+        time.sleep(.01)
+
+if __name__ == '__main__':
+    main()

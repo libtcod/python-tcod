@@ -26,17 +26,24 @@
       You can also check if a point is part of a console using containment
       logic i.e. ((x, y) in console).
       
+      You may also iterate over a console using a for statement.  This returns
+      every x,y coordinate available to draw on but it will be extremely slow
+      to actually operate on every coordinate individualy.
+      Try to minimize draws by using an offscreen L{Console}, only drawing
+      what needs to be updated, and using L{Console.blit}.
+      
     Drawing
     =======
       Once you have the root console from L{tdl.init} you can start drawing on
       it using a method such as L{Console.drawChar}.
       When using this method you can have the char parameter be an integer or a
       single character string.
+      
       The fgcolor and bgcolor parameters expect a three item list
       [red, green, blue] with integers in the 0-255 range with [0, 0, 0] being
       black and [255, 255, 255] being white.
-      Or instead you can use None for any of the three parameters to tell the
-      library to not overwrite colors.
+      Or instead you can use None in the place of any of the three parameters
+      to tell the library to not overwrite colors.
       After the drawing functions are called a call to L{tdl.flush} will update
       the screen.
 """
@@ -291,9 +298,9 @@ class _MetaConsole(object):
         if self.console._lockColors is self:
             self.console._lockColors = None
         if fg is not None:
-            self_fgcolor = _formatColor(fg)
+            self._fgcolor = _formatColor(fg)
         if bg is not None:
-            self_fgcolor = _formatColor(fg)
+            self._bgcolor = _formatColor(bg)
 
     def printStr(self, string):
         """Print a string at the virtual cursor.
@@ -335,8 +342,8 @@ class _MetaConsole(object):
         # some 'basic' line buffer stuff.
         # there must be an easier way to do this.  The textwrap module didn't
         # help much.
-        x, y = self._normalize(*self._cursor)
-        width, height = self.parent.getSize()
+        x, y = self._normalizeCursor(*self._cursor)
+        width, height = self.getSize()
         wrapper = textwrap.TextWrapper(initial_indent=(' '*x), width=width)
         writeLines = []
         for line in string.split('\n'):
@@ -347,8 +354,8 @@ class _MetaConsole(object):
                 writeLines.append([])
 
         for line in writeLines:
-            x, y = self._normalize(x, y)
-            self.parent.drawStr(x, y, line[x:], self.fgcolor, self.bgcolor)
+            x, y = self._normalizeCursor(x, y)
+            self.drawStr(x, y, line[x:], self._fgcolor, self._bgcolor)
             y += 1
             x = 0
         y -= 1
@@ -612,7 +619,7 @@ class _MetaConsole(object):
     def getCursor(self):
         """Return the virtual cursor position.
         
-        @rtype: (int, int)
+        @rtype: (x, y)
         @return: Returns (x, y) a 2-integer tuple containing where the next
                  L{addChar} or L{addStr} will start at.
                  
@@ -629,7 +636,7 @@ class _MetaConsole(object):
     def getSize(self):
         """Return the size of the console as (width, height)
 
-        @rtype: (int, int)
+        @rtype: (width, height)
         """
         return self.width, self.height
 
@@ -637,7 +644,9 @@ class _MetaConsole(object):
         """Return an iterator with every possible (x, y) value for this console.
         
         It goes without saying that working on the console this way is a
-        slow process, especially for Python, and should be minimized."""
+        slow process, especially for Python, and should be minimized.
+        @rtype: iter((x, y), ...)
+        """
         return itertools.product(range(self.width), range(self.height))
         
     def move(self, x, y):
@@ -659,6 +668,8 @@ class _MetaConsole(object):
         @param x: Distance to scroll along x-axis
         @type y: int
         @param y: Distance to scroll along y-axis
+        @rtype: iter((x, y), ...)
+        @return: Iterates over the (x, y) of any tile uncovered after scrolling.
         """
         assert isinstance(x, _INTTYPES), "x must be an integer, got %s" % repr(x)
         assert isinstance(y, _INTTYPES), "y must be an integer, got %s" % repr(x)
@@ -1017,168 +1028,6 @@ class Window(_MetaConsole):
                                                           self.height)
 
 
-class Typewriter(object):
-    """Converts a console into a scrolling text log that respects special
-    characters.
-    
-    This class works best on a L{Window} or off-screen L{Console} instance.
-    In a L{Window} for example the scrolling text is limited to the L{Window}'s
-    isolated area.
-    """
-
-    def __init__(self, console):
-        """Add a virtual cursor to a L{Console} or L{Window} instance.
-        
-        @type console: L{Console} or L{Window}
-        """
-        warnings.warn("Typewriter is no longer needed, use Console or Window objects", DeprecationWarning)
-        assert isinstance(console, (Console, Window)), 'console parameter must be a Console or Window instance, got %s' % repr(console)
-        self.parent = console
-        if isinstance(self.parent, Console):
-            self.console = self.parent
-        else:
-            self.console = self.parent.console
-        self._cursor = (0, 0) # cursor position
-        self.scrollMode = 'scroll' #can be 'scroll', 'error'
-        self.fgcolor = _formatColor((255, 255, 255))
-        self.bgcolor = _formatColor((0, 0, 0))
-        self._bgblend = 1 # SET
-
-    def _normalize(self, x, y):
-        """return the normalized the cursor position."""
-        width, height = self.parent.getSize()
-        while x >= width:
-            x -= width
-            y += 1
-        while y >= height:
-            if self.scrollMode == 'scroll':
-                y -= 1
-                self.parent.scroll(0, -1)
-            elif self.scrollMode == 'error':
-                # reset the cursor on error
-                self._cursor = (0, 0)
-                raise TDLError('Typewriter cursor has reached the end of the console')
-        return (x, y)
-
-    def getCursor(self):
-        """Return the virtual cursor position.
-        
-        @rtype: (int, int)
-        @return: Returns (x, y) a 2-integer tuple containing where the next
-                 L{addChar} or L{addStr} will start at.
-                 
-                 This can be changed with the L{move} method."""
-        x, y = self._cursor
-        width, height = self.parent.getSize()
-        while x >= width:
-            x -= width
-            y += 1
-        if y >= height and self.scrollMode == 'scroll':
-            y = height - 1
-        return x, y
-
-    def move(self, x, y):
-        """Move the virtual cursor.
-        
-        @type x: int
-        @param x: X position to place the cursor.
-        @type y: int
-        @param y: Y position to place the cursor.
-        """
-        self._cursor = self.parent._normalizePoint(x, y)
-        
-    def setFG(self, color):
-        """Change the foreground color"""
-        assert _iscolor(color)
-        assert color is not None
-        self.fgcolor = _formatColor(color)
-        if self.console._colorLock is self:
-            _lib.TCOD_console_set_default_foreground(self.console, self.fgcolor)
-        
-    def setBG(self, color):
-        """Change the background color"""
-        assert _iscolor(color)
-        assert color is not None
-        self.bgcolor = _formatColor(color)
-        if self.console._colorLock is self:
-            _lib.TCOD_console_set_default_background(self.console, self.bgcolor)
-        
-    def _updateConsole(self):
-        """Make sure the colors on a console match the Typewriter instance"""
-        if self.console._colorLock is not self:
-            self.console._colorLock = self
-            
-            _lib.TCOD_console_set_default_background(self.console, self.bgcolor)
-            _lib.TCOD_console_set_default_foreground(self.console, self.fgcolor)
-        
-
-    def addChar(self, char):
-        """Draw a single character at the cursor."""
-        if char == '\n': # line break
-            x = 0
-            y += 1
-            return
-        if char == '\r': # return
-            x = 0
-            return
-        x, y = self._normalize(*self.cursor)
-        self._cursor = [x + 1, y] # advance cursor on next draw
-        self._updateConsole()
-        x, y = self.parent._translate(x, y)
-        _lib.TCOD_console_put_char(self.console._as_parameter_, x, y, _formatChar(char), self._bgblend)
-        
-
-    def addStr(self, string):
-        """Write a string at the cursor.  Handles special characters such as newlines.
-        
-        @type string: string
-        @param string: 
-        """
-        x, y = self._cursor
-        for char in string:
-            if char == '\n': # line break
-                x = 0
-                y += 1
-                continue
-            if char == '\r': # return
-                x = 0
-                continue
-            x, y = self._normalize(x, y)
-            self.parent.drawChar(x, y, char, self.fgcolor, self.bgcolor)
-            x += 1
-        self._cursor = (x, y)
-
-    def write(self, string):
-        """This method mimics basic file-like behaviour.
-        
-        Because of this method you can replace sys.stdout or sys.stderr with
-        a L{Typewriter} instance.
-        
-        @type string: string
-        """
-        # some 'basic' line buffer stuff.
-        # there must be an easier way to do this.  The textwrap module didn't
-        # help much.
-        x, y = self._normalize(*self._cursor)
-        width, height = self.parent.getSize()
-        wrapper = textwrap.TextWrapper(initial_indent=(' '*x), width=width)
-        writeLines = []
-        for line in string.split('\n'):
-            if line:
-                writeLines += wrapper.wrap(line)
-                wrapper.initial_indent = ''
-            else:
-                writeLines.append([])
-
-        for line in writeLines:
-            x, y = self._normalize(x, y)
-            self.parent.drawStr(x, y, line[x:], self.fgcolor, self.bgcolor)
-            y += 1
-            x = 0
-        y -= 1
-        self._cursor = (x, y)
-        
-
 def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
     """Start the main console with the given width and height and return the
     root console.
@@ -1479,7 +1328,6 @@ __all__ = [_var for _var in locals().keys() if _var[0] != '_' and _var not in
            ['sys', 'os', 'ctypes', 'array', 'weakref', 'itertools', 'textwrap',
             'struct', 're', 'warnings']] # remove modules from __all__
 __all__ += ['_MetaConsole'] # keep this object public to show the documentation in epydoc
-__all__.remove('Typewriter') # Hide the deprecated Typewriter class
 
 __license__ = "New BSD License"
 __email__ = "4b796c65+pythonTDL@gmail.com"

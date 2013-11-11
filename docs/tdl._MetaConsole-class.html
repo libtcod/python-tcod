@@ -122,6 +122,23 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">iter((x, y), ...)</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="tdl._MetaConsole-class.html#__iter__" class="summary-sig-name">__iter__</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Return an iterator with every possible (x, y) value for this console.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.__iter__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -260,7 +277,7 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">(int, int)</span>
+      <span class="summary-type">(x, y)</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -277,7 +294,7 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">(int, int)</span>
+      <span class="summary-type">(width, height)</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -331,7 +348,7 @@ object --+
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type">iter((x, y), ...)</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -362,6 +379,25 @@ object --+
       function.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.setColors">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="tdl._MetaConsole-class.html#setMode" class="summary-sig-name">setMode</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">mode</span>)</span><br />
+      Configure how this console will react to the cursor writing past the 
+      end if the console.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.setMode">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -473,6 +509,29 @@ object --+
         object.__init__
         <dd><em class="note">(inherited documentation)</em></dd>
     </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="__iter__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__iter__</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.__iter__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Return an iterator with every possible (x, y) value for this 
+  console.</p>
+  <p>It goes without saying that working on the console this way is a slow 
+  process, especially for Python, and should be minimized.</p>
+  <dl class="fields">
+    <dt>Returns: iter((x, y), ...)</dt>
   </dl>
 </td></tr></table>
 </div>
@@ -699,7 +758,7 @@ object --+
   special encoding is done and any string will translate to the character 
   table as is.</p>
   <p>For a string drawing operation that respects special characters see 
-  the Typewriter class.</p>
+  the <code class="link">Typewriter</code> class.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
@@ -767,7 +826,7 @@ object --+
   
   <p>Return the virtual cursor position.</p>
   <dl class="fields">
-    <dt>Returns: (int, int)</dt>
+    <dt>Returns: (x, y)</dt>
         <dd>Returns (x, y) a 2-integer tuple containing where the next <code 
           class="link">addChar</code> or <code class="link">addStr</code> 
           will start at.
@@ -856,6 +915,8 @@ object --+
         <li><strong class="pname"><code>x</code></strong> (int) - Distance to scroll along x-axis</li>
         <li><strong class="pname"><code>y</code></strong> (int) - Distance to scroll along y-axis</li>
     </ul></dd>
+    <dt>Returns: iter((x, y), ...)</dt>
+        <dd>Iterates over the (x, y) of any tile uncovered after scrolling.</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -883,6 +944,49 @@ object --+
   </dl>
 </td></tr></table>
 </div>
+<a name="setMode"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">setMode</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">mode</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#_MetaConsole.setMode">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Configure how this console will react to the cursor writing past the 
+  end if the console.</p>
+  <p>This is for methods that use the virtual cursor, such as <a 
+  href="tdl._MetaConsole-class.html#printStr" 
+  class="link">printStr</a>.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>mode</code></strong> (string) - Possible settings are:
+          <ul>
+            <li>
+              'error' - A TDLError will be raised once the cursor reaches 
+              the end of the console.  Everything up until the error will 
+              still be drawn.
+              <p>This is the default setting.</p>
+            </li>
+            <li>
+              'scroll' - The console will scroll up as stuff is written to 
+              the end.
+              <p>You can restrict the region with <a 
+              href="tdl.Window-class.html" class="link">tdl.Window</a> when
+              doing this.</p>
+            </li>
+          </ul></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="write"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -900,7 +1004,7 @@ object --+
   
   <p>This method mimics basic file-like behaviour.</p>
   <p>Because of this method you can replace sys.stdout or sys.stderr with a
-  Typewriter instance.</p>
+  <code class="link">Typewriter</code> instance.</p>
   <p>This is a convoluted process and behaviour seen now can be excepted to
   change on later versions.</p>
   <dl class="fields">
@@ -944,7 +1048,7 @@ object --+
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Wed Mar 06 19:00:12 2013</a>
+    3.0.1 on Sun Nov 10 19:20:28 2013</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
