@@ -94,6 +94,15 @@ class AStar(object):
         _lib.TCOD_path_delete(self)
         
     def getPath(self, origX, origY, destX, destY):
+        """
+        Get the shortest path from origXY to destXY.
+        
+        @rtype: [(x, y), ...]
+        @return: Returns a list walking the path from origXY to destXY.
+                 This excludes the starting point and includes the destination.
+                 
+                 If no path is found then an empty list is returned.
+        """
         found = _lib.TCOD_path_compute(self, origX, origY, destX, destY)
         if not found:
             return [] # path not found
@@ -146,8 +155,8 @@ def quickFOV(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sphe
     @type sphere: boolean
     @param sphere: True for a spherical field-of-view.  False for a square one.
     
-    @rtype: iterator
-    @return: Returns an iterator of (x, y) points that are within the field-of-view
+    @rtype: set((x, y), ...)
+    @return: Returns a set of (x, y) points that are within the field-of-view.
     """
     trueRadius = radius
     radius = math.ceil(radius)
@@ -172,13 +181,13 @@ def quickFOV(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sphe
         
         # pass two, compute fov and build a list of points
         _lib.TCOD_map_compute_fov(tcodMap, radius, radius, radius, lightWalls, fov)
-        touched = [] # points touched by field of view
+        touched = set() # points touched by field of view
         for (x_, cX),(y_, cY) in itertools.product(((i, ctypes.c_int(i)) for i in range(mapSize)),
                                                    ((i, ctypes.c_int(i)) for i in range(mapSize))):
             if sphere and math.hypot(x_ - radius, y_ - radius) > trueRadius:
                 continue
             if inFOV(tcodMap, cX, cY):
-                touched.append((x_ + x - radius, y_ + y - radius))
+                touched.add((x_ + x - radius, y_ + y - radius))
     finally:
         _lib.TCOD_map_delete(tcodMap)
     return touched

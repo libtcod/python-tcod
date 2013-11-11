@@ -19,7 +19,6 @@ tdl.init	tdl-module.html#init
 tdl._rootConsoleRef	tdl-module.html#_rootConsoleRef
 tdl._NUMTYPES	tdl-module.html#_NUMTYPES
 tdl.getFPS	tdl-module.html#getFPS
-tdl._formatColor	tdl-module.html#_formatColor
 tdl._iscolor	tdl-module.html#_iscolor
 tdl._fontinitialized	tdl-module.html#_fontinitialized
 tdl.forceResolution	tdl-module.html#forceResolution
@@ -44,6 +43,7 @@ tdl.event.get	tdl.event-module.html#get
 tdl.event._pushedEvents	tdl.event-module.html#_pushedEvents
 tdl.event._eventQueue	tdl.event-module.html#_eventQueue
 tdl.event._mouseNames	tdl.event-module.html#_mouseNames
+tdl.event.setKeyRepeat	tdl.event-module.html#setKeyRepeat
 tdl.event._parseKeyNames	tdl.event-module.html#_parseKeyNames
 tdl.event._processEvents	tdl.event-module.html#_processEvents
 tdl.event.push	tdl.event-module.html#push
@@ -84,8 +84,10 @@ tdl.Console._translate	tdl.Console-class.html#_translate
 tdl.Console.__setstate__	tdl.Console-class.html#__setstate__
 tdl._MetaConsole._normalizeRect	tdl._MetaConsole-class.html#_normalizeRect
 tdl.Console._replace	tdl.Console-class.html#_replace
+tdl._MetaConsole.__iter__	tdl._MetaConsole-class.html#__iter__
 tdl._MetaConsole.getCursor	tdl._MetaConsole-class.html#getCursor
 tdl._MetaConsole._lockColors	tdl._MetaConsole-class.html#_lockColors
+tdl._MetaConsole.setMode	tdl._MetaConsole-class.html#setMode
 tdl._MetaConsole._colorLock	tdl._MetaConsole-class.html#_colorLock
 tdl.Console._as_parameter_	tdl.Console-class.html#_as_parameter_
 tdl.Console._setCharBatch	tdl.Console-class.html#_setCharBatch
@@ -122,8 +124,10 @@ tdl.Window._translate	tdl.Window-class.html#_translate
 tdl.Window.parent	tdl.Window-class.html#parent
 tdl._MetaConsole._normalizeRect	tdl._MetaConsole-class.html#_normalizeRect
 tdl._MetaConsole._normalizePoint	tdl._MetaConsole-class.html#_normalizePoint
+tdl._MetaConsole.__iter__	tdl._MetaConsole-class.html#__iter__
 tdl._MetaConsole.getCursor	tdl._MetaConsole-class.html#getCursor
 tdl._MetaConsole._lockColors	tdl._MetaConsole-class.html#_lockColors
+tdl._MetaConsole.setMode	tdl._MetaConsole-class.html#setMode
 tdl._MetaConsole._colorLock	tdl._MetaConsole-class.html#_colorLock
 tdl.Window.drawRect	tdl.Window-class.html#drawRect
 tdl.Window._setCharBatch	tdl.Window-class.html#_setCharBatch
@@ -156,8 +160,10 @@ tdl._MetaConsole.printStr	tdl._MetaConsole-class.html#printStr
 tdl._MetaConsole._bgcolor	tdl._MetaConsole-class.html#_bgcolor
 tdl._MetaConsole.drawFrame	tdl._MetaConsole-class.html#drawFrame
 tdl._MetaConsole._normalizePoint	tdl._MetaConsole-class.html#_normalizePoint
+tdl._MetaConsole.__iter__	tdl._MetaConsole-class.html#__iter__
 tdl._MetaConsole.getCursor	tdl._MetaConsole-class.html#getCursor
 tdl._MetaConsole._lockColors	tdl._MetaConsole-class.html#_lockColors
+tdl._MetaConsole.setMode	tdl._MetaConsole-class.html#setMode
 tdl._MetaConsole._colorLock	tdl._MetaConsole-class.html#_colorLock
 tdl._MetaConsole.drawRect	tdl._MetaConsole-class.html#drawRect
 tdl._MetaConsole._fgcolor	tdl._MetaConsole-class.html#_fgcolor
