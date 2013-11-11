@@ -1,5 +1,5 @@
 === Requirements ===
-* Python 2.6+ or 3.x (up to 3.3)
+* Python 2.6+ or 3.x
 * 32 bit Windows, 32/64 bit Linux, or Mac OS/X (64 bit architecture)
 
 === About ===
