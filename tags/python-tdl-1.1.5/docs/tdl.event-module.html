@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>tdl.event</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="tdl-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://code.google.com/p/python-tdl/">python-tdl</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="tdl-module.html">Package&nbsp;tdl</a> ::
+        Module&nbsp;event
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="tdl.event-module.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== MODULE DESCRIPTION ==================== -->
+<h1 class="epydoc">Module event</h1><p class="nomargin-top"><span class="codelink"><a href="tdl.event-pysrc.html">source&nbsp;code</a></span></p>
+<p>This module handles user input.</p>
+  <p>To handle user input you will likely want to use the <a 
+  href="tdl.event-module.html#get" class="link">event.get</a> function or 
+  create a subclass of <a href="tdl.event.App-class.html" 
+  class="link">event.App</a>.</p>
+  <ul>
+    <li>
+      <a href="tdl.event-module.html#get" class="link">event.get</a> 
+      iterates over recent events.
+    </li>
+    <li>
+      <a href="tdl.event.App-class.html" class="link">event.App</a> passes 
+      events to the overridable methods: ev_* and key_*.
+    </li>
+  </ul>
+  <p>But there are other options such as <a 
+  href="tdl.event-module.html#keyWait" class="link">event.keyWait</a> and 
+  <a href="tdl.event-module.html#isWindowClosed" 
+  class="link">event.isWindowClosed</a>.</p>
+  <p>A few event attributes are actually string constants. Here's a 
+  reference for those:</p>
+  <ul>
+    <li>
+      <a href="tdl.event.Event-class.html#type" class="link">Event.type</a>
+      <p>'QUIT', 'KEYDOWN', 'KEYUP', 'MOUSEDOWN', 'MOUSEUP', or 
+      'MOUSEMOTION.'</p>
+    </li>
+    <li>
+      <a href="tdl.event.MouseButtonEvent-class.html#button" 
+      class="link">MouseButtonEvent.button</a> (found in <a 
+      href="tdl.event.MouseDown-class.html" class="link">MouseDown</a> and 
+      <a href="tdl.event.MouseUp-class.html" class="link">MouseUp</a> 
+      events)
+      <p>'LEFT', 'MIDDLE', 'RIGHT', 'SCROLLUP', 'SCROLLDOWN'</p>
+    </li>
+    <li>
+      <a href="tdl.event.KeyEvent-class.html#key" 
+      class="link">KeyEvent.key</a> (found in <a 
+      href="tdl.event.KeyDown-class.html" class="link">KeyDown</a> and <a 
+      href="tdl.event.KeyUp-class.html" class="link">KeyUp</a> events)
+      <p>'NONE', 'ESCAPE', 'BACKSPACE', 'TAB', 'ENTER', 'SHIFT', 'CONTROL',
+      'ALT', 'PAUSE', 'CAPSLOCK', 'PAGEUP', 'PAGEDOWN', 'END', 'HOME', 
+      'UP', 'LEFT', 'RIGHT', 'DOWN', 'PRINTSCREEN', 'INSERT', 'DELETE', 
+      'LWIN', 'RWIN', 'APPS', '0', '1', '2', '3', '4', '5', '6', '7', '8', 
+      '9', 'KP0', 'KP1', 'KP2', 'KP3', 'KP4', 'KP5', 'KP6', 'KP7', 'KP8', 
+      'KP9', 'KPADD', 'KPSUB', 'KPDIV', 'KPMUL', 'KPDEC', 'KPENTER', 'F1', 
+      'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 
+      'NUMLOCK', 'SCROLLLOCK', 'SPACE', 'CHAR'</p>
+    </li>
+  </ul>
+
+<!-- ==================== CLASSES ==================== -->
+<a name="section-Classes"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Classes</span></td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.event.Event-class.html" class="summary-name">Event</a><br />
+      Base Event class.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.event.Quit-class.html" class="summary-name">Quit</a><br />
+      Fired when the window is closed by the user.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.event.KeyEvent-class.html" class="summary-name">KeyEvent</a>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.event.KeyDown-class.html" class="summary-name">KeyDown</a><br />
+      Fired when the user presses a key on the keyboard or a key repeats.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.event.KeyUp-class.html" class="summary-name">KeyUp</a><br />
+      Fired when the user releases a key on the keyboard.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.event.MouseButtonEvent-class.html" class="summary-name">MouseButtonEvent</a>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.event.MouseDown-class.html" class="summary-name">MouseDown</a><br />
+      Fired when a mouse button is pressed.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.event.MouseUp-class.html" class="summary-name">MouseUp</a><br />
+      Fired when a mouse button is released.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.event.MouseMotion-class.html" class="summary-name">MouseMotion</a><br />
+      Fired when the mouse is moved.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="tdl.event.App-class.html" class="summary-name">App</a><br />
+      Application framework.
+    </td>
+  </tr>
+</table>
+<!-- ==================== FUNCTIONS ==================== -->
+<a name="section-Functions"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Functions</span></td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">iterator</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="tdl.event-module.html#get" class="summary-sig-name">get</a>()</span><br />
+      Flushes the event queue and returns the list of events.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl.event-pysrc.html#get">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="tdl.event-module.html#push" class="summary-sig-name">push</a>(<span class="summary-sig-arg">event</span>)</span><br />
+      Push an event into the event buffer.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl.event-pysrc.html#push">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><a href="tdl.event.KeyDown-class.html" class="link">KeyDown</a></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="tdl.event-module.html#keyWait" class="summary-sig-name">keyWait</a>()</span><br />
+      Waits until the user presses a key.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl.event-pysrc.html#keyWait">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="tdl.event-module.html#setKeyRepeat" class="summary-sig-name">setKeyRepeat</a>(<span class="summary-sig-arg">delay</span>=<span class="summary-sig-default">500</span>,
+        <span class="summary-sig-arg">interval</span>=<span class="summary-sig-default">0</span>)</span><br />
+      Change or disable key repeat.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl.event-pysrc.html#setKeyRepeat">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">boolean</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="isWindowClosed"></a><span class="summary-sig-name">isWindowClosed</span>()</span><br />
+      Returns True if the exit button on the window has been clicked and 
+      stays True afterwards.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl.event-pysrc.html#isWindowClosed">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
+<!-- ==================== FUNCTION DETAILS ==================== -->
+<a name="section-FunctionDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Function Details</span></td>
+</tr>
+</table>
+<a name="get"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get</span>()</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl.event-pysrc.html#get">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Flushes the event queue and returns the list of events.</p>
+  <p>This function returns <a href="tdl.event.Event-class.html" 
+  class="link">Event</a> objects that can be indentified by their type 
+  attribute or their class.</p>
+  <dl class="fields">
+    <dt>Returns: iterator</dt>
+        <dd>Returns an iterable of objects derived from <a 
+          href="tdl.event.Event-class.html" class="link">Event</a> or 
+          anything put in a <a href="tdl.event-module.html#push" 
+          class="link">push</a> call.  If the iterator is deleted or 
+          otherwise interrupted before finishing the excess items are 
+          preserved for the next call.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="push"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">push</span>(<span class="sig-arg">event</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl.event-pysrc.html#push">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Push an event into the event buffer.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>event</code></strong> (<a href="tdl.event.Event-class.html" class="link">Event</a>-like 
+          object) - The event will be available on the next call to <a 
+          href="tdl.event-module.html#get" class="link">event.get</a>. An 
+          event pushed in the middle of a <a 
+          href="tdl.event-module.html#get" class="link">get</a> will not 
+          show until the next time <a href="tdl.event-module.html#get" 
+          class="link">get</a> called preventing push related infinite 
+          loops.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="keyWait"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">keyWait</span>()</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl.event-pysrc.html#keyWait">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Waits until the user presses a key. Then returns a <a 
+  href="tdl.event.KeyDown-class.html" class="link">KeyDown</a> event.</p>
+  <p>Key events will repeat if held down.</p>
+  <p>A click to close the window will be converted into an Alt+F4 KeyDown 
+  event.</p>
+  <dl class="fields">
+    <dt>Returns: <a href="tdl.event.KeyDown-class.html" class="link">KeyDown</a></dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="setKeyRepeat"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">setKeyRepeat</span>(<span class="sig-arg">delay</span>=<span class="sig-default">500</span>,
+        <span class="sig-arg">interval</span>=<span class="sig-default">0</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl.event-pysrc.html#setKeyRepeat">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Change or disable key repeat.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>delay</code></strong> (int) - Milliseconds before a held key begins to repeat.
+          <p>Key repeat can be disabled entirely by setting a delay of 
+          zero.</p></li>
+        <li><strong class="pname"><code>interval</code></strong> (int) - Milliseconds between key repeats.
+          <p>An interval of zero will repeat every frame.</p></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="tdl-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://code.google.com/p/python-tdl/">python-tdl</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    <a href="epydoc-log.html">Generated by Epydoc
+    3.0.1 on Sun Nov 10 19:20:27 2013</a>
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>
