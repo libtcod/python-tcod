@@ -31,7 +31,7 @@ def _get_library_crossplatform():
     libpath = None
     if 'win32' in sys.platform:
         libSDL = _loadDLL('lib/win32/SDL.dll')
-        _loadDLL('lib/win32/zlib1.dll')
+        libZ = _loadDLL('lib/win32/zlib1.dll')
         libTCOD = _loadDLL('lib/win32/libtcod-VS.dll')
     elif 'linux' in sys.platform:
         libSDL = None
