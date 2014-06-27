@@ -1331,3 +1331,7 @@ __all__ += ['_MetaConsole'] # keep this object public to show the documentation 
 
 __license__ = "New BSD License"
 __email__ = "4b796c65+pythonTDL@gmail.com"
+
+file = open(os.path.join(os.path.dirname(__file__), 'VERSION.txt'), 'r')
+__version__ = file.read()
+file.close()
