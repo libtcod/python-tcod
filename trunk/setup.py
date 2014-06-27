@@ -1,13 +1,40 @@
 #!/usr/bin/env python
 
+import subprocess
+
 try:
     # use setuptools or distribute if available
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
 
+base_version = '1.1.6' # base version
+def get_version():
+    """Probably a much more elegant way to do this.
+    
+    Update tdl/VERSION.txt with the current svn version, then return the result"""
+    try:
+        revision = subprocess.check_output('svnversion', universal_newlines=True)[:-1]
+    except:
+        revision = None
+
+    if revision:
+        if ':' in revision:
+            revision = revision.split(':')[-1]
+        if 'M' in revision:
+            revision = revision[:-1]
+        file = open('tdl/VERSION.txt', 'w')
+        file.write(base_version + 'r' + revision)
+        file.close()
+        print('revision %s' % revision)
+        
+    file = open('tdl/VERSION.txt', 'r')
+    version = file.read()
+    file.close()
+    return version
+    
 setup(name='tdl',
-      version='1.1.6',
+      version=get_version(),
       author='Kyle Stewart',
       author_email='4B796C65+pythonTDL@gmail.com',
       description='Pythonic port of rogue-like library libtcod.',
