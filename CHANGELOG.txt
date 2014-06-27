@@ -1,6 +1,6 @@
 1.1.6
  * Fixed a race condition when importing on some platforms
- * Fixed a type issues with quickFOV on Linux
+ * Fixed a type issue with quickFOV on Linux
  * Added a bresenham function to the tdl.map module
 
 1.1.5
