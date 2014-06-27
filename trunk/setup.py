@@ -7,7 +7,7 @@ except ImportError:
     from distutils.core import setup
 
 setup(name='tdl',
-      version='1.1.5',
+      version='1.1.6',
       author='Kyle Stewart',
       author_email='4B796C65+pythonTDL@gmail.com',
       description='Pythonic port of rogue-like library libtcod.',
