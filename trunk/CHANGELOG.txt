@@ -1,3 +1,8 @@
+1.1.6
+ * Fixed a race condition when importing on some platforms
+ * Fixed a type issues with quickFOV on Linux
+ * Added a bresenham function to the tdl.map module
+
 1.1.5
  * a for loop can iterate over all coordinates of a Console
  * drawStr can be configured to scroll or raise an error
