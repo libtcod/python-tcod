@@ -3,7 +3,7 @@
 
 python-tdl is hosted on pypi, you can get a source disribution or a windows installer at https://pypi.python.org/pypi/tdl
 
-If it's available you can use pip to install with the following command:
+If it's available you should use pip to install using the following console command:
 
 pip install tdl
 
