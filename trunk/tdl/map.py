@@ -159,7 +159,7 @@ def quickFOV(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sphe
     @return: Returns a set of (x, y) points that are within the field-of-view.
     """
     trueRadius = radius
-    radius = math.ceil(radius)
+    radius = int(math.ceil(radius))
     mapSize = radius * 2 + 1
     fov = _getFOVType(fov)
     
@@ -168,8 +168,8 @@ def quickFOV(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sphe
     
     cTrue = ctypes.c_bool(1)
     cFalse = ctypes.c_bool(False)
+    tcodMap = _lib.TCOD_map_new(mapSize, mapSize)
     try:
-        tcodMap = _lib.TCOD_map_new(mapSize, mapSize)
         # pass one, write callback data to the tcodMap
         for (x_, cX), (y_, cY) in itertools.product(((i, ctypes.c_int(i)) for i in range(mapSize)),
                                                     ((i, ctypes.c_int(i)) for i in range(mapSize))):
