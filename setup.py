@@ -22,7 +22,7 @@ def get_version():
         if ':' in revision:
             revision = revision.split(':')[-1]
         if 'M' in revision:
-            revision = revision[:-1]
+            revision = str(int(revision[:-1]) + 1)
         file = open('tdl/VERSION.txt', 'w')
         file.write(base_version + 'r' + revision)
         file.close()
@@ -38,23 +38,13 @@ setup(name='tdl',
       author='Kyle Stewart',
       author_email='4B796C65+pythonTDL@gmail.com',
       description='Pythonic port of rogue-like library libtcod.',
-      long_description="""python-tdl is a ctypes port of "libtcod".
-
-      The library is used for displaying tilesets (ANSI, Unicode, or graphical) in true color.
-      
-      It also provides functionality to compute path-finding and field of view.
-      
-      python-tdl on GoogleCode: http://code.google.com/p/python-tdl/
-      Online Documentation: http://pythonhosted.org/tdl/
-      Issue Tracker: http://code.google.com/p/python-tdl/issues/list
-      
-      libtcod: http://doryen.eptalys.net/libtcod/
-      """,
+      long_description=open('README.txt', 'r').read(),
       url='http://code.google.com/p/python-tdl/',
-      download_url='http://code.google.com/p/python-tdl/downloads/list',
+      download_url='https://pypi.python.org/pypi/tdl',
       packages=['tdl'],
-      package_data={'tdl': ['lib/*.txt', '*.bmp', '*.png', 'lib/win32/*',
+      package_data={'tdl': ['*.txt', 'lib/*.txt', '*.bmp', '*.png', 'lib/win32/*',
                             'lib/darwin/*.dylib', 'lib/linux*/*']},
+      install_requires=['ctypes'],
       classifiers=['Development Status :: 5 - Production/Stable',
                    'Environment :: Win32 (MS Windows)',
                    'Environment :: MacOS X',
@@ -68,12 +58,17 @@ setup(name='tdl',
                    'Programming Language :: Python :: 2.6',
                    'Programming Language :: Python :: 2.7',
                    'Programming Language :: Python :: 3',
+                   'Programming Language :: Python :: 3.0',
+                   'Programming Language :: Python :: 3.1',
+                   'Programming Language :: Python :: 3.2',
+                   'Programming Language :: Python :: 3.3',
+                   'Programming Language :: Python :: Implementation :: CPython',
                    'Programming Language :: Python :: Implementation :: PyPy',
                    'Topic :: Games/Entertainment',
                    'Topic :: Multimedia :: Graphics',
                    'Topic :: Software Development :: Libraries :: Python Modules',
                    ],
-      keywords = 'portable rogue-like rogue-likes text ctypes ASCII ANSI Unicode libtcod fov pathfinsing',
+      keywords = 'portable rogue-like rogue-likes text ctypes ASCII ANSI Unicode libtcod fov',
       platforms = ['Windows', 'Mac OS X', 'Linux'],
       license = 'New BSD License'
       )
