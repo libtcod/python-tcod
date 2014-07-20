@@ -117,7 +117,7 @@ class Noise(object):
         self._dimensions = min(_MAX_DIMENSIONS, int(dimensions))
         if self._algorithm == 'WAVELET':
             self._dimensions = min(self._dimensions, 3) # Wavelet only goes up to 3
-        self._random = _lib.TCOD_random_new_from_seed(self._seed, _MERSENNE_TWISTER)
+        self._random = _lib.TCOD_random_new_from_seed(_MERSENNE_TWISTER, self._seed)
         self._hurst = ctypes.c_float(hurst)
         self._lacunarity = ctypes.c_float(lacunarity)
         self._noise = _lib.TCOD_noise_new(self._dimensions, self._hurst,
