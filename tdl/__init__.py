@@ -1109,7 +1109,8 @@ def flush():
     """
     if not _rootinitialized:
         raise TDLError('Cannot flush without first initializing with tdl.init')
-
+    # flush the OS event queue, preventing lock-ups if not done manually
+    event.get()
     _lib.TCOD_console_flush()
 
 def setFont(path, columns=None, rows=None, columnFirst=False,

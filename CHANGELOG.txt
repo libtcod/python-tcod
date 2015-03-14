@@ -1,3 +1,11 @@
+===========
+ Changelog
+===========
+Current
+ * Noise generator now seeds properly
+ * The OS event queue will now be handled during a call to tdl.flush
+   This will prevent common lock-ups where events are handled infrequently
+
 1.1.6
  * Fixed a race condition when importing on some platforms
  * Fixed a type issue with quickFOV on Linux
