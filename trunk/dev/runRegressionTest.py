@@ -52,7 +52,7 @@ class TDLTemplate(unittest.TestCase):
         
     def flush(self):
         'Pump events and refresh screen so show progress'
-        tdl.event.get()
+        #tdl.event.get() # no longer needed
         tdl.flush()
         
     def getRandomCharacter(self):

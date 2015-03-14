@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import subprocess
 
@@ -38,13 +38,13 @@ setup(name='tdl',
       author='Kyle Stewart',
       author_email='4B796C65+pythonTDL@gmail.com',
       description='Pythonic port of rogue-like library libtcod.',
-      long_description=open('README.txt', 'r').read(),
+      long_description=open('README.txt', 'r').read() + open('CHANGELOG.txt', 'r').read(),
       url='http://code.google.com/p/python-tdl/',
       download_url='https://pypi.python.org/pypi/tdl',
       packages=['tdl'],
       package_data={'tdl': ['*.txt', 'lib/*.txt', '*.bmp', '*.png', 'lib/win32/*',
                             'lib/darwin/*.dylib', 'lib/linux*/*']},
-      install_requires=['ctypes'],
+      #install_requires=['ctypes'], # ctypes requirement causes issues sometimes
       classifiers=['Development Status :: 5 - Production/Stable',
                    'Environment :: Win32 (MS Windows)',
                    'Environment :: MacOS X',
