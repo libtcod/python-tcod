@@ -7,11 +7,11 @@ The library can be used for displaying tilesets (ANSI, Unicode, or graphical) in
 
 It also provides functionality to compute path-finding and field of view.
 
-python-tdl on GoogleCode: http://code.google.com/p/python-tdl/
+python-tdl is hosted on GitHub: https://github.com/HexDecimal/python-tdl
 
 Online Documentation: http://pythonhosted.org/tdl/
 
-Issue Tracker: http://code.google.com/p/python-tdl/issues/list
+Issue Tracker: https://github.com/HexDecimal/python-tdl/issues
 
 python-tdl is a ctypes port of "libtcod".
 You can find more about libtcod at: http://doryen.eptalys.net/libtcod/
