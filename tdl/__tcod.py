@@ -98,6 +98,12 @@ class SDL_Surface(Structure):
     
 # COLOR
 
+# python 2 to 3 workaround
+if sys.version_info[0] == 2:
+    int_types = (int, long)
+else:
+    int_types = int
+
 class _Color(Structure):
     _fields_ = [('r', c_uint8), ('g', c_uint8), ('b', c_uint8)]
     
@@ -107,7 +113,7 @@ class _Color(Structure):
             return color
         if isinstance(color, _Color):
             return color
-        if isinstance(color, int):
+        if isinstance(color, int_types):
             # format a web style color with the format 0xRRGGBB
             return _Color(color >> 16 & 0xff, color >> 8 & 0xff, color & 0xff)
         return _Color(*color)

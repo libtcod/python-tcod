@@ -767,7 +767,7 @@ class Console(_MetaConsole):
         """
         _MetaConsole.__init__(self)
         if not _rootinitialized:
-            raise TDLError('Can not create Console\'s before tdl.init')
+            raise TDLError('Can not create Console instances before a call to tdl.init')
         self._as_parameter_ = _lib.TCOD_console_new(width, height)
         self.console = self
         self.width = width
@@ -791,15 +791,18 @@ class Console(_MetaConsole):
         """
         If the main console is garbage collected then the window will be closed as well
         """
-        # If this is the root console the window will close when collected
-        try:
-            if isinstance(self._as_parameter_, ctypes.c_void_p):
-                global _rootinitialized, _rootConsoleRef
+        global _rootinitialized, _rootConsoleRef
+        # check of see if the pointer is to the special root console
+        if isinstance(self._as_parameter_, ctypes.c_void_p):
+            # do we recognise this root console?
+            if(_rootConsoleRef and _rootConsoleRef is self):
                 _rootinitialized = False
                 _rootConsoleRef = None
+                _lib.TCOD_console_delete(self)
+            # if not then assume the console has already been taken care of
+        else:
+            # this is a normal console pointer and can be safely deleted
             _lib.TCOD_console_delete(self)
-        except StandardError:
-            pass # I forget why I put this here but I'm to afraid to delete it
 
     def __copy__(self):
         # make a new class and blit
