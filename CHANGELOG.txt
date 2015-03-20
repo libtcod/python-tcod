@@ -1,10 +1,12 @@
 ===========
  Changelog
 ===========
-Current
+1.1.7
  * Noise generator now seeds properly
- * The OS event queue will now be handled during a call to tdl.flush
-   This will prevent common lock-ups where events are handled infrequently
+ * The OS event queue will now be handled during a call to tdl.flush. This
+   prevents a common newbie programmer hang where events are handled
+   infrequently during long animations, simulations, or early development
+ * Fixed a major bug that would cause a crash in later versions of Python 3
 
 1.1.6
  * Fixed a race condition when importing on some platforms
