@@ -3,14 +3,15 @@
 ==============
 The latest Windows installer can be found on PyPI: https://pypi.python.org/pypi/tdl
 
-Or if it's available you can use pip instead by running the command: pip install tdl
+If it's available you can use pip instead by running the command:
 
-This module can also be manually installed by going into the "setup.py"
-directory and running the command: python setup.py install
+    pip install tdl
 
-Already compiled libtcod libraries are included as part of the package data.
-They won't need to be compiled as part of the installation, but can be replaced
-with newer versions if necessary.
+This module can also be manually installed by going into the "setup.py" directory and running the command:
+
+    python setup.py install
+
+Already compiled libtcod libraries are included as part of the package data.  They won't need to be compiled as part of the installation, but can be replaced with newer versions if necessary.
 
 =======
  About
@@ -27,8 +28,7 @@ Online Documentation: http://pythonhosted.org/tdl/
 
 Issue Tracker: https://github.com/HexDecimal/python-tdl/issues
 
-python-tdl is a ctypes port of "libtcod".
-You can find more about libtcod at http://doryen.eptalys.net/libtcod/
+python-tdl is a ctypes port of "libtcod".  You can find more about libtcod at http://doryen.eptalys.net/libtcod/
 
 ==============
  Requirements
@@ -39,5 +39,4 @@ You can find more about libtcod at http://doryen.eptalys.net/libtcod/
 =========
  License
 =========
-python-tdl is distributed under the FreeBSD license, same as libtcod.
-Read LICENSE.txt for more details.
+python-tdl is distributed under the FreeBSD license, same as libtcod.  Read LICENSE.txt for more details.
