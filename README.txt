@@ -1,3 +1,20 @@
+==============
+ Installation
+==============
+The latest Windows installer can be found on PyPI:
+    https://pypi.python.org/pypi?name=tdl&:action=display
+
+Or if it's available you can use pip instead by running the command:
+    pip install tdl
+
+This module can also be manually installed by going into the "setup.py"
+directory and running the command:
+    python setup.py install
+
+Already compiled libtcod libraries are included as part of the package data.
+They won't need to be compiled as part of the installation, but can be replaced
+with newer versions if necessary.
+
 =======
  About
 =======
@@ -7,14 +24,17 @@ The library can be used for displaying tilesets (ANSI, Unicode, or graphical) in
 
 It also provides functionality to compute path-finding and field of view.
 
-python-tdl is hosted on GitHub: https://github.com/HexDecimal/python-tdl
+python-tdl is hosted on GitHub:
+    https://github.com/HexDecimal/python-tdl
 
-Online Documentation: http://pythonhosted.org/tdl/
+Online Documentation:
+    http://pythonhosted.org/tdl/
 
-Issue Tracker: https://github.com/HexDecimal/python-tdl/issues
+Issue Tracker:
+    https://github.com/HexDecimal/python-tdl/issues
 
 python-tdl is a ctypes port of "libtcod".
-You can find more about libtcod at: http://doryen.eptalys.net/libtcod/
+You can find more about libtcod at http://doryen.eptalys.net/libtcod/
 
 ==============
  Requirements
