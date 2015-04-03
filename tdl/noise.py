@@ -10,12 +10,12 @@
 """
 
 
-import random
+import random as _random
 import itertools
-import ctypes
+import ctypes as _ctypes
 
-import tdl
-from tdl.__tcod import _lib
+import tdl as _tdl
+from .__tcod import _lib
 
 _MERSENNE_TWISTER = 1
 _CARRY_WITH_MULTIPLY = 2
@@ -101,15 +101,15 @@ class Noise(object):
                      If None is used then a random seed will be generated.
         """
         if algorithm.upper() not in _NOISE_TYPES:
-            raise tdl.TDLError('No such noise algorithm as %s' % algorithm)
+            raise _tdl.TDLError('No such noise algorithm as %s' % algorithm)
         self._algorithm = algorithm.upper()
         
         if mode.upper() not in _NOISE_MODES:
-            raise tdl.TDLError('No such mode as %s' % mode)
+            raise _tdl.TDLError('No such mode as %s' % mode)
         self._mode = mode.upper()
         
         if seed is None:
-            seed = random.getrandbits(32)
+            seed = _random.getrandbits(32)
         else:
             seed = hash(seed)
         self._seed = seed
@@ -118,15 +118,15 @@ class Noise(object):
         if self._algorithm == 'WAVELET':
             self._dimensions = min(self._dimensions, 3) # Wavelet only goes up to 3
         self._random = _lib.TCOD_random_new_from_seed(_MERSENNE_TWISTER, self._seed)
-        self._hurst = ctypes.c_float(hurst)
-        self._lacunarity = ctypes.c_float(lacunarity)
+        self._hurst = _ctypes.c_float(hurst)
+        self._lacunarity = _ctypes.c_float(lacunarity)
         self._noise = _lib.TCOD_noise_new(self._dimensions, self._hurst,
                                           self._lacunarity, self._random)
         _lib.TCOD_noise_set_type(self._noise, _NOISE_TYPES[self._algorithm])
         self._noiseFunc = _NOISE_MODES[self._mode]
-        self._octaves = ctypes.c_float(octaves)
+        self._octaves = _ctypes.c_float(octaves)
         self._useOctaves = (self._mode != 'FLAT')
-        self._cFloatArray = ctypes.c_float * self._dimensions
+        self._cFloatArray = _ctypes.c_float * self._dimensions
         self._array = self._cFloatArray()
         
     def __copy__(self):

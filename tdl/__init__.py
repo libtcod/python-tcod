@@ -48,22 +48,21 @@
       the screen.
 """
 
-import sys
-import os
+import sys as _sys
+import os as _os
 
-import ctypes
-import weakref
-import array
-import itertools
-import textwrap
-import struct
-import re
-import warnings
+import ctypes as _ctypes
+import weakref as _weakref
+import itertools as _itertools
+import textwrap as _textwrap
+import struct as _struct
+import re as _re
+import warnings as _warnings
 
 from . import event, map, noise
 from .__tcod import _lib, _Color, _unpackfile
 
-_IS_PYTHON3 = (sys.version_info[0] == 3)
+_IS_PYTHON3 = (_sys.version_info[0] == 3)
 
 if _IS_PYTHON3: # some type lists to use with isinstance
     _INTTYPES = (int,)
@@ -155,19 +154,19 @@ def _getImageSize(filename):
     file = open(filename, 'rb')
     if file.read(8) == b'\x89PNG\r\n\x1a\n': # PNG
         while 1:
-            length, = struct.unpack('>i', file.read(4))
+            length, = _struct.unpack('>i', file.read(4))
             chunkID = file.read(4)
             if chunkID == '': # EOF
                 return None
             if chunkID == b'IHDR':
                 # return width, height
-                return struct.unpack('>ii', file.read(8))
+                return _struct.unpack('>ii', file.read(8))
             file.seek(4 + length, 1)
     file.seek(0)
     if file.read(8) == b'BM': # Bitmap
         file.seek(18, 0) # skip to size data
         # return width, height
-        return struct.unpack('<ii', file.read(8))
+        return _struct.unpack('<ii', file.read(8))
     # return None on error, unknown file
 
 class TDLError(Exception):
@@ -344,7 +343,7 @@ class _MetaConsole(object):
         # help much.
         x, y = self._normalizeCursor(*self._cursor)
         width, height = self.getSize()
-        wrapper = textwrap.TextWrapper(initial_indent=(' '*x), width=width)
+        wrapper = _textwrap.TextWrapper(initial_indent=(' '*x), width=width)
         writeLines = []
         for line in string.split('\n'):
             if line:
@@ -391,7 +390,7 @@ class _MetaConsole(object):
 
         assert _verify_colors(fgcolor, bgcolor)
         x, y = self._normalizePoint(x, y)
-        x, y = ctypes.c_int(x), ctypes.c_int(y)
+        x, y = _ctypes.c_int(x), _ctypes.c_int(y)
         self._setChar(x, y, _formatChar(char),
                       _formatColor(fgcolor), _formatColor(bgcolor))
 
@@ -503,10 +502,10 @@ class _MetaConsole(object):
         char = _formatChar(string)
         # use itertools to make an x,y grid
         # using ctypes here reduces type converstions later
-        grid = itertools.product((ctypes.c_int(x) for x in range(x, x + width)),
-                                 (ctypes.c_int(y) for y in range(y, y + height)))
+        grid = _itertools.product((_ctypes.c_int(x) for x in range(x, x + width)),
+                                  (_ctypes.c_int(y) for y in range(y, y + height)))
         # zip the single character in a batch variable
-        batch = zip(grid, itertools.repeat(char, width * height))
+        batch = zip(grid, _itertools.repeat(char, width * height))
         self._setCharBatch(batch, fgcolor, bgcolor, nullChar=(char is None))
 
     def drawFrame(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
@@ -647,7 +646,7 @@ class _MetaConsole(object):
         slow process, especially for Python, and should be minimized.
         @rtype: iter((x, y), ...)
         """
-        return itertools.product(range(self.width), range(self.height))
+        return _itertools.product(range(self.width), range(self.height))
         
     def move(self, x, y):
         """Move the virtual cursor.
@@ -793,7 +792,7 @@ class Console(_MetaConsole):
         """
         global _rootinitialized, _rootConsoleRef
         # check of see if the pointer is to the special root console
-        if isinstance(self._as_parameter_, ctypes.c_void_p):
+        if isinstance(self._as_parameter_, _ctypes.c_void_p):
             # do we recognise this root console?
             if(_rootConsoleRef and _rootConsoleRef is self):
                 _rootinitialized = False
@@ -813,15 +812,15 @@ class Console(_MetaConsole):
     def __getstate__(self):
         # save data from getChar
         data = [self.getChar(x, y) for x,y in
-                itertools.product(range(self.width), range(self.height))]
+                _itertools.product(range(self.width), range(self.height))]
         return self.width, self.height, data
             
     def __setstate__(self, state):
         # make console from __init__ and unpack a getChar array
         width, height, data = state
         self.__init__(width, height)
-        for (x, y), graphic in zip(itertools.product(range(width),
-                                                     range(height)), data):
+        for (x, y), graphic in zip(_itertools.product(range(width),
+                                                      range(height)), data):
             self.drawChar(x, y, *graphic)
             
     def _replace(self, console):
@@ -898,7 +897,7 @@ class Console(_MetaConsole):
             # buffer values as ctypes objects
             self._typewriter = None # clear the typewriter as colors will be set
             console = self._as_parameter_
-            bgblend = ctypes.c_int(bgblend)
+            bgblend = _ctypes.c_int(bgblend)
 
             if not bgcolor:
                 bgblend = 0
@@ -1084,9 +1083,9 @@ def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
         del rootreplacement
         
     if title is None: # use a default title
-        if sys.argv:
+        if _sys.argv:
             # Use the script filename as the title.
-            title = os.path.basename(sys.argv[0])
+            title = _os.path.basename(_sys.argv[0])
         else:
             title = 'python-tdl'
 
@@ -1097,8 +1096,8 @@ def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
 
     event._eventsflushed = False
     _rootinitialized = True
-    rootconsole = Console._newConsole(ctypes.c_void_p())
-    _rootConsoleRef = weakref.ref(rootconsole)
+    rootconsole = Console._newConsole(_ctypes.c_void_p())
+    _rootConsoleRef = _weakref.ref(rootconsole)
 
     return rootconsole
 
@@ -1188,16 +1187,16 @@ def setFont(path, columns=None, rows=None, columnFirst=False,
         flags |= FONT_LAYOUT_ASCII_INROW
     if greyscale:
         flags |= FONT_TYPE_GREYSCALE
-    if not os.path.exists(path):
+    if not _os.path.exists(path):
         raise TDLError('no file exists at: "%s"' % path)
-    path = os.path.abspath(path)
+    path = _os.path.abspath(path)
     
     # and the rest is the auto-detect script
     imgSize = _getImageSize(path) # try to find image size
     if imgSize:
         imgWidth, imgHeight = imgSize
         # try to get font size from filename
-        match = re.match('.*?([0-9]+)[xX]([0-9]+)', os.path.basename(path))
+        match = _re.match('.*?([0-9]+)[xX]([0-9]+)', _os.path.basename(path))
         if match:
             fontWidth, fontHeight = match.groups()
             fontWidth, fontHeight = int(fontWidth), int(fontHeight)
@@ -1206,7 +1205,7 @@ def setFont(path, columns=None, rows=None, columnFirst=False,
             estColumns, remC = divmod(imgWidth, fontWidth)
             estRows, remR = divmod(imgHeight, fontHeight)
             if remC or remR:
-                warnings.warn("Font may be incorrectly formatted.")
+                _warnings.warn("Font may be incorrectly formatted.")
             
             if not columns:
                 columns = estColumns
@@ -1216,21 +1215,21 @@ def setFont(path, columns=None, rows=None, columnFirst=False,
             # the font name excluded the fonts size
             if not (columns and rows):
                 # no matched font size and no tileset is given
-                raise TDLError('%s has no font size in filename' % os.path.basename(path))
+                raise TDLError('%s has no font size in filename' % _os.path.basename(path))
             
         if columns and rows:
             # confirm user set options
             if (fontWidth * columns != imgWidth or
                 fontHeight * rows != imgHeight):
-                warnings.warn("setFont parameters are set as if the image size is (%d, %d) when the detected size is actually (%i, %i)"
+                _warnings.warn("setFont parameters are set as if the image size is (%d, %d) when the detected size is actually (%i, %i)"
                              % (fontWidth * columns, fontHeight * rows,
                                 imgWidth, imgHeight))
     else:
-        warnings.warn("%s is probably not an image." % os.path.basename(path))
+        _warnings.warn("%s is probably not an image." % _os.path.basename(path))
     
     if not (columns and rows):
         # didn't auto-detect
-        raise TDLError('Can not auto-detect the tileset of %s' % os.path.basename(path))
+        raise TDLError('Can not auto-detect the tileset of %s' % _os.path.basename(path))
             
     _lib.TCOD_console_set_custom_font(_encodeString(path), flags, columns, rows)
 
@@ -1278,7 +1277,7 @@ def screenshot(path=None):
     if isinstance(path, str):
         _lib.TCOD_sys_save_screenshot(_encodeString(path))
     elif path is None: # save to screenshot001.png, screenshot002.png, ...
-        filelist = os.listdir('.')
+        filelist = _os.listdir('.')
         n = 1
         filename = 'screenshot%.3i.png' % n
         while filename in filelist:
@@ -1287,11 +1286,11 @@ def screenshot(path=None):
         _lib.TCOD_sys_save_screenshot(_encodeString(filename))
     else: # assume file like obj
         #save to temp file and copy to file-like obj
-        tmpname = os.tempnam()
+        tmpname = _os.tempnam()
         _lib.TCOD_sys_save_screenshot(_encodeString(tmpname))
         with tmpname as tmpfile:
             path.write(tmpfile.read())
-        os.remove(tmpname)
+        _os.remove(tmpname)
     #else:
     #    raise TypeError('path is an invalid type: %s' % type(path))
 
@@ -1328,9 +1327,7 @@ def forceResolution(width, height):
     """
     _lib.TCOD_sys_force_fullscreen_resolution(width, height)
         
-__all__ = [_var for _var in locals().keys() if _var[0] != '_' and _var not in
-           ['sys', 'os', 'ctypes', 'array', 'weakref', 'itertools', 'textwrap',
-            'struct', 're', 'warnings']] # remove modules from __all__
+__all__ = [_var for _var in locals().keys() if _var[0] != '_'] # remove modules from __all__
 __all__ += ['_MetaConsole'] # keep this object public to show the documentation in epydoc
 
 __license__ = "New BSD License"

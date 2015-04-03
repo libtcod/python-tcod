@@ -2,12 +2,11 @@
     Rogue-like map utilitys such as line-of-sight, field-of-view, and path-finding.
     
 """
-import array
-import ctypes
-import itertools
-import math
+import ctypes as _ctypes
+import itertools as _itertools
+import math as _math
 
-import tdl
+import tdl as _tdl
 from .__tcod import _lib, _PATHCALL
 
 _FOVTYPES = {'BASIC' : 0, 'DIAMOND': 1, 'SHADOW': 2, 'RESTRICTIVE': 12, 'PERMISSIVE': 11}
@@ -20,7 +19,7 @@ def _getFOVType(fov):
         return _FOVTYPES[fov]
     if fov[:10] == 'PERMISSIVE' and fov[10].isdigit() and fov[10] != '9':
         return 4 + int(fov[10])
-    raise tdl.TDLError('No such fov option as %s' % oldFOV)
+    raise _tdl.TDLError('No such fov option as %s' % oldFOV)
 
 class AStar(object):
     """A* pathfinder
@@ -31,7 +30,7 @@ class AStar(object):
     __slots__ = ('_as_parameter_', '_callback', '__weakref__')
 
     def __init__(self, width, height, callback,
-                 diagnalCost=math.sqrt(2), advanced=False):
+                 diagnalCost=_math.sqrt(2), advanced=False):
         """Create an A* pathfinder using a callback.
         
         Before crating this instance you should make one of two types of
@@ -106,9 +105,9 @@ class AStar(object):
         found = _lib.TCOD_path_compute(self, origX, origY, destX, destY)
         if not found:
             return [] # path not found
-        x, y = ctypes.c_int(), ctypes.c_int()
-        xRef, yRef = ctypes.byref(x), ctypes.byref(y)
-        recalculate = ctypes.c_bool(True)
+        x, y = _ctypes.c_int(), _ctypes.c_int()
+        xRef, yRef = _ctypes.byref(x), _ctypes.byref(y)
+        recalculate = _ctypes.c_bool(True)
         path = []
         while _lib.TCOD_path_walk(self, xRef, yRef, recalculate):
             path.append((x.value, y.value))
@@ -159,20 +158,20 @@ def quickFOV(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sphe
     @return: Returns a set of (x, y) points that are within the field-of-view.
     """
     trueRadius = radius
-    radius = int(math.ceil(radius))
+    radius = int(_math.ceil(radius))
     mapSize = radius * 2 + 1
     fov = _getFOVType(fov)
     
     setProp = _lib.TCOD_map_set_properties # make local
     inFOV = _lib.TCOD_map_is_in_fov
     
-    cTrue = ctypes.c_bool(1)
-    cFalse = ctypes.c_bool(False)
+    cTrue = _ctypes.c_bool(1)
+    cFalse = _ctypes.c_bool(False)
     tcodMap = _lib.TCOD_map_new(mapSize, mapSize)
     try:
         # pass one, write callback data to the tcodMap
-        for (x_, cX), (y_, cY) in itertools.product(((i, ctypes.c_int(i)) for i in range(mapSize)),
-                                                    ((i, ctypes.c_int(i)) for i in range(mapSize))):
+        for (x_, cX), (y_, cY) in _itertools.product(((i, _ctypes.c_int(i)) for i in range(mapSize)),
+                                                    ((i, _ctypes.c_int(i)) for i in range(mapSize))):
             
             pos = (x_ + x - radius, 
                    y_ + y - radius)
@@ -182,9 +181,9 @@ def quickFOV(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sphe
         # pass two, compute fov and build a list of points
         _lib.TCOD_map_compute_fov(tcodMap, radius, radius, radius, lightWalls, fov)
         touched = set() # points touched by field of view
-        for (x_, cX),(y_, cY) in itertools.product(((i, ctypes.c_int(i)) for i in range(mapSize)),
-                                                   ((i, ctypes.c_int(i)) for i in range(mapSize))):
-            if sphere and math.hypot(x_ - radius, y_ - radius) > trueRadius:
+        for (x_, cX),(y_, cY) in _itertools.product(((i, _ctypes.c_int(i)) for i in range(mapSize)),
+                                                   ((i, _ctypes.c_int(i)) for i in range(mapSize))):
+            if sphere and _math.hypot(x_ - radius, y_ - radius) > trueRadius:
                 continue
             if inFOV(tcodMap, cX, cY):
                 touched.add((x_ + x - radius, y_ + y - radius))

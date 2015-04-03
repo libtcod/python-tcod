@@ -30,8 +30,7 @@
        'NUMLOCK', 'SCROLLLOCK', 'SPACE', 'CHAR'
 """
 
-import time
-import ctypes
+import time as _time
 
 from .__tcod import _lib, _Mouse, _Key
 from . import __tcod as _tcod
@@ -295,7 +294,7 @@ class App(object):
         them is a decent way to create a state machine.
         """
         if not hasattr(self, '_App__prevTime'):
-            self.__prevTime = time.clock() # initiate __prevTime
+            self.__prevTime = _time.clock() # initiate __prevTime
         for event in get():
             if event.type: # exclude custom events with a blank type variable
                 # call the ev_* methods
@@ -306,7 +305,7 @@ class App(object):
                 method = 'key_%s' % event.key # key_KEYNAME
                 if hasattr(self, method): # silently exclude undefined methods
                     getattr(self, method)(event)
-        newTime = time.clock()
+        newTime = _time.clock()
         self.update(newTime - self.__prevTime)
         self.__prevTime = newTime
         #_tdl.flush()
@@ -414,7 +413,7 @@ def keyWait():
             if event.type == 'QUIT':
                 # convert QUIT into alt+F4
                 return KeyDown('F4', '', True, False, True, False, False)
-        time.sleep(.001)
+        _time.sleep(.001)
 
 def setKeyRepeat(delay=500, interval=0):
     """Change or disable key repeat.
@@ -439,4 +438,4 @@ def isWindowClosed():
     """
     return _lib.TCOD_console_is_window_closed()
 
-__all__ = [_var for _var in locals().keys() if _var[0] != '_' and _var not in ['time', 'ctypes']]
+__all__ = [_var for _var in locals().keys() if _var[0] != '_']
