@@ -11,7 +11,7 @@
     Getting Started
     ===============
       Once the library is imported you can load the font you want to use with
-      L{tdl.setFont}.
+      L{tdl.set_font}.
       This is optional and when skipped will use a decent default font.
       
       After that you call L{tdl.init} to set the size of the window and get the
@@ -35,7 +35,7 @@
     Drawing
     =======
       Once you have the root console from L{tdl.init} you can start drawing on
-      it using a method such as L{Console.drawChar}.
+      it using a method such as L{Console.draw_char}.
       When using this method you can have the char parameter be an integer or a
       single character string.
       
@@ -61,6 +61,7 @@ import warnings as _warnings
 
 from . import event, map, noise
 from .__tcod import _lib, _Color, _unpackfile
+from . import __style as _style
 
 _IS_PYTHON3 = (_sys.version_info[0] == 3)
 
@@ -240,7 +241,7 @@ class _MetaConsole(object):
     
     def _normalizeCursor(self, x, y):
         """return the normalized the cursor position."""
-        width, height = self.getSize()
+        width, height = self.get_size()
         assert width != 0 and height != 0, 'can not print on a console with a width or height of zero'
         while x >= width:
             x -= width
@@ -263,11 +264,11 @@ class _MetaConsole(object):
             _lib.TCOD_console_set_default_foreground(self.console, self.fgcolor)
             #
             
-    def setMode(self, mode):
+    def set_mode(self, mode):
         """Configure how this console will react to the cursor writing past the
         end if the console.
         
-        This is for methods that use the virtual cursor, such as L{printStr}.
+        This is for methods that use the virtual cursor, such as L{print_str}.
         
         @type mode: string
         @param mode: Possible settings are:
@@ -289,8 +290,8 @@ class _MetaConsole(object):
             raise TDLError('mode must be one of %s, got %s' % (MODES, repr(mode)))
         self._scrollMode = mode.lower()
             
-    def setColors(self, fg=None, bg=None):
-        """Sets the colors to be used with the L{printStr} function.
+    def set_colors(self, fg=None, bg=None):
+        """Sets the colors to be used with the L{print_str} function.
         
         Values of None will only leave the current values unchanged.
         """
@@ -301,13 +302,13 @@ class _MetaConsole(object):
         if bg is not None:
             self._bgcolor = _formatColor(bg)
 
-    def printStr(self, string):
+    def print_str(self, string):
         """Print a string at the virtual cursor.
         
         Handles special characters such as '\\n' and '\\r'.
         Printing past the bottom of the console will scroll everying upwards.
         
-        Colors can be set with L{setColors} and the virtual cursor can be moved
+        Colors can be set with L{set_colors} and the virtual cursor can be moved
         with L{move}.
         
         @type string: string
@@ -323,7 +324,7 @@ class _MetaConsole(object):
                 x = 0
                 continue
             x, y = self._normalizeCursor(x, y)
-            self.drawChar(x, y, char, self._fgcolor, self._bgcolor)
+            self.draw_char(x, y, char, self._fgcolor, self._bgcolor)
             x += 1
         self._cursor = (x, y)
 
@@ -342,7 +343,7 @@ class _MetaConsole(object):
         # there must be an easier way to do this.  The textwrap module didn't
         # help much.
         x, y = self._normalizeCursor(*self._cursor)
-        width, height = self.getSize()
+        width, height = self.get_size()
         wrapper = _textwrap.TextWrapper(initial_indent=(' '*x), width=width)
         writeLines = []
         for line in string.split('\n'):
@@ -354,13 +355,13 @@ class _MetaConsole(object):
 
         for line in writeLines:
             x, y = self._normalizeCursor(x, y)
-            self.drawStr(x, y, line[x:], self._fgcolor, self._bgcolor)
+            self.draw_str(x, y, line[x:], self._fgcolor, self._bgcolor)
             y += 1
             x = 0
         y -= 1
         self._cursor = (x, y)
     
-    def drawChar(self, x, y, char, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def draw_char(self, x, y, char, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a single character.
 
         @type x: int
@@ -394,7 +395,7 @@ class _MetaConsole(object):
         self._setChar(x, y, _formatChar(char),
                       _formatColor(fgcolor), _formatColor(bgcolor))
 
-    def drawStr(self, x, y, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def draw_str(self, x, y, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a string starting at x and y.  Optinally colored.
 
         A string that goes past the right side will wrap around.  A string
@@ -438,10 +439,10 @@ class _MetaConsole(object):
         x, y = self._normalizePoint(x, y)
         assert _verify_colors(fgcolor, bgcolor)
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
-        width, height = self.getSize()
+        width, height = self.get_size()
         batch = [] # prepare a batch operation
         def _drawStrGen(x=x, y=y, string=string, width=width, height=height):
-            """Generator for drawStr
+            """Generator for draw_str
 
             Iterates over ((x, y), ch) data for _setCharBatch, raising an
             error if the end of the console is reached.
@@ -457,7 +458,7 @@ class _MetaConsole(object):
                     y += 1
         self._setCharBatch(_drawStrGen(), fgcolor, bgcolor)
 
-    def drawRect(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def draw_rect(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         """Draws a rectangle starting from x and y and extending to width and height.
         
         If width or height are None then it will extend to the edge of the console.
@@ -508,8 +509,8 @@ class _MetaConsole(object):
         batch = zip(grid, _itertools.repeat(char, width * height))
         self._setCharBatch(batch, fgcolor, bgcolor, nullChar=(char is None))
 
-    def drawFrame(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
-        """Similar to L{drawRect} but only draws the outline of the rectangle.
+    def draw_frame(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+        """Similar to L{draw_rect} but only draws the outline of the rectangle.
 
         @type x: int
         @param x: x coordinate to draw at.
@@ -550,13 +551,13 @@ class _MetaConsole(object):
         fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
         char = _formatChar(string)
         if width == 1 or height == 1: # it's just a single width line here
-            return self.drawRect(x, y, width, height, char, fgcolor, bgcolor)
+            return self.draw_rect(x, y, width, height, char, fgcolor, bgcolor)
 
-        # draw sides of frame with drawRect
-        self.drawRect(x, y, 1, height, char, fgcolor, bgcolor)
-        self.drawRect(x, y, width, 1, char, fgcolor, bgcolor)
-        self.drawRect(x + width - 1, y, 1, height, char, fgcolor, bgcolor)
-        self.drawRect(x, y + height - 1, width, 1, char, fgcolor, bgcolor)
+        # draw sides of frame with draw_rect
+        self.draw_rect(x, y, 1, height, char, fgcolor, bgcolor)
+        self.draw_rect(x, y, width, 1, char, fgcolor, bgcolor)
+        self.draw_rect(x + width - 1, y, 1, height, char, fgcolor, bgcolor)
+        self.draw_rect(x, y + height - 1, width, 1, char, fgcolor, bgcolor)
 
     def blit(self, source, x=0, y=0, width=None, height=None, srcX=0, srcY=0):
         """Blit another console or Window onto the current console.
@@ -615,7 +616,7 @@ class _MetaConsole(object):
         else:
             _lib.TCOD_console_blit(source, srcX, srcY, width, height, self, x, y, fgalpha, bgalpha)
 
-    def getCursor(self):
+    def get_cursor(self):
         """Return the virtual cursor position.
         
         @rtype: (x, y)
@@ -624,7 +625,7 @@ class _MetaConsole(object):
                  
                  This can be changed with the L{move} method."""
         x, y = self._cursor
-        width, height = self.parent.getSize()
+        width, height = self.parent.get_size()
         while x >= width:
             x -= width
             y += 1
@@ -632,7 +633,7 @@ class _MetaConsole(object):
             y = height - 1
         return x, y
             
-    def getSize(self):
+    def get_size(self):
         """Return the size of the console as (width, height)
 
         @rtype: (width, height)
@@ -700,7 +701,7 @@ class _MetaConsole(object):
                 uncover = (length - x, x)
             return cover, uncover
 
-        width, height = self.getSize()
+        width, height = self.get_size()
         if abs(x) >= width or abs(y) >= height:
             return self.clear() # just clear the console normally
 
@@ -719,13 +720,13 @@ class _MetaConsole(object):
         self.blit(self, x, y, width, height, srcx, srcy)
 
         if uncoverX: # clear sides (0x20 is space)
-            self.drawRect(uncoverX[0], coverY[0], uncoverX[1], coverY[1], 0x20, 0x000000, 0x000000)
+            self.draw_rect(uncoverX[0], coverY[0], uncoverX[1], coverY[1], 0x20, 0x000000, 0x000000)
         if uncoverY: # clear top/bottom
-            self.drawRect(coverX[0], uncoverY[0], coverX[1], uncoverY[1], 0x20, 0x000000, 0x000000)
+            self.draw_rect(coverX[0], uncoverY[0], coverX[1], uncoverY[1], 0x20, 0x000000, 0x000000)
         if uncoverX and uncoverY: # clear corner
-            self.drawRect(uncoverX[0], uncoverY[0], uncoverX[1], uncoverY[1], 0x20, 0x000000, 0x000000)
+            self.draw_rect(uncoverX[0], uncoverY[0], uncoverX[1], uncoverY[1], 0x20, 0x000000, 0x000000)
 
-    def getChar(self, x, y):
+    def get_char(self, x, y):
         """Return the character and colors of a tile as (ch, fg, bg)
         
         This method runs very slowly as is not recommended to be called
@@ -810,18 +811,18 @@ class Console(_MetaConsole):
         return clone
         
     def __getstate__(self):
-        # save data from getChar
-        data = [self.getChar(x, y) for x,y in
+        # save data from get_char
+        data = [self.get_char(x, y) for x,y in
                 _itertools.product(range(self.width), range(self.height))]
         return self.width, self.height, data
             
     def __setstate__(self, state):
-        # make console from __init__ and unpack a getChar array
+        # make console from __init__ and unpack a get_char array
         width, height, data = state
         self.__init__(width, height)
         for (x, y), graphic in zip(_itertools.product(range(width),
                                                       range(height)), data):
-            self.drawChar(x, y, *graphic)
+            self.draw_char(x, y, *graphic)
             
     def _replace(self, console):
         """Used internally
@@ -911,7 +912,7 @@ class Console(_MetaConsole):
             for (x, y), char in batch:
                 self._setChar(x, y, char, fgcolor, bgcolor, bgblend)
 
-    def getChar(self, x, y):
+    def get_char(self, x, y):
         # inherit docstring
         x, y = self._normalizePoint(x, y)
         char = _lib.TCOD_console_get_char(self, x, y)
@@ -992,7 +993,7 @@ class Window(_MetaConsole):
         """
         assert _verify_colors(fgcolor, bgcolor)
         assert fgcolor and bgcolor, 'Can not use None with clear'
-        self.drawRect(0, 0, None, None, 0x20, fgcolor, bgcolor)
+        self.draw_rect(0, 0, None, None, 0x20, fgcolor, bgcolor)
 
     def _setChar(self, x, y, char=None, fgcolor=None, bgcolor=None, bgblend=1):
         self.parent._setChar((x + self.x), (y + self.y), char, fgcolor, bgcolor, bgblend)
@@ -1004,30 +1005,32 @@ class Window(_MetaConsole):
                                   fgcolor, bgcolor, bgblend)
     
     
-    def drawChar(self, x, y, char, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def draw_char(self, x, y, char, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         # inherit docstring
         x, y = self._normalizePoint(x, y)
-        self.parent.drawChar(x + self.x, y + self.y, char, fgcolor, bgcolor)
+        self.parent.draw_char(x + self.x, y + self.y, char, fgcolor, bgcolor)
     
-    def drawRect(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def draw_rect(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         # inherit docstring
         x, y, width, height = self._normalizeRect(x, y, width, height)
-        self.parent.drawRect(x + self.x, y + self.y, width, height, string, fgcolor, bgcolor)
+        self.parent.draw_rect(x + self.x, y + self.y, width, height, string, fgcolor, bgcolor)
         
-    def drawFrame(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def draw_frame(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
         # inherit docstring
         x, y, width, height = self._normalizeRect(x, y, width, height)
-        self.parent.drawFrame(x + self.x, y + self.y, width, height, string, fgcolor, bgcolor)
+        self.parent.draw_frame(x + self.x, y + self.y, width, height, string, fgcolor, bgcolor)
 
-    def getChar(self, x, y):
+    def get_char(self, x, y):
         # inherit docstring
         x, y = self._normalizePoint(x, y)
-        return self.console.getChar(self._translate(x, y))
+        return self.console.get_char(self._translate(x, y))
 
     def __repr__(self):
         return "<Window(X=%i Y=%i Width=%i Height=%i)>" % (self.x, self.y,
                                                           self.width,
                                                           self.height)
+#
+
 
 
 def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
@@ -1068,7 +1071,7 @@ def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
     RENDERERS = {'GLSL': 0, 'OPENGL': 1, 'SDL': 2}
     global _rootinitialized, _rootConsoleRef
     if not _fontinitialized: # set the default font to the one that comes with tdl
-        setFont(_unpackfile('terminal8x8.png'), None, None, True, True)
+        set_font(_unpackfile('terminal8x8.png'), None, None, True, True)
 
     if renderer.upper() not in RENDERERS:
         raise TDLError('No such render type "%s", expected one of "%s"' % (renderer, '", "'.join(RENDERERS)))
@@ -1105,7 +1108,7 @@ def flush():
     """Make all changes visible and update the screen.
 
     Remember to call this function after drawing operations.
-    Calls to flush will enfore the frame rate limit set by L{tdl.setFPS}.
+    Calls to flush will enfore the frame rate limit set by L{tdl.set_fps}.
 
     This function can only be called after L{tdl.init}
     """
@@ -1115,8 +1118,8 @@ def flush():
     event.get()
     _lib.TCOD_console_flush()
 
-def setFont(path, columns=None, rows=None, columnFirst=False,
-            greyscale=False, altLayout=False):
+def set_font(path, columns=None, rows=None, columnFirst=False,
+             greyscale=False, altLayout=False):
     """Changes the font to be used for this session.
     This should be called before L{tdl.init}
     
@@ -1221,7 +1224,7 @@ def setFont(path, columns=None, rows=None, columnFirst=False,
             # confirm user set options
             if (fontWidth * columns != imgWidth or
                 fontHeight * rows != imgHeight):
-                _warnings.warn("setFont parameters are set as if the image size is (%d, %d) when the detected size is actually (%i, %i)"
+                _warnings.warn("set_font parameters are set as if the image size is (%d, %d) when the detected size is actually (%i, %i)"
                              % (fontWidth * columns, fontHeight * rows,
                                 imgWidth, imgHeight))
     else:
@@ -1233,7 +1236,7 @@ def setFont(path, columns=None, rows=None, columnFirst=False,
             
     _lib.TCOD_console_set_custom_font(_encodeString(path), flags, columns, rows)
 
-def getFullscreen():
+def get_fullscreen():
     """Returns True if program is fullscreen.
 
     @rtype: boolean
@@ -1244,7 +1247,7 @@ def getFullscreen():
         raise TDLError('Initialize first with tdl.init')
     return _lib.TCOD_console_is_fullscreen()
 
-def setFullscreen(fullscreen):
+def set_fullscreen(fullscreen):
     """Changes the fullscreen state.
 
     @type fullscreen: boolean
@@ -1253,7 +1256,7 @@ def setFullscreen(fullscreen):
         raise TDLError('Initialize first with tdl.init')
     _lib.TCOD_console_set_fullscreen(fullscreen)
 
-def setTitle(title):
+def set_title(title):
     """Change the window title.
 
     @type title: string
@@ -1294,7 +1297,7 @@ def screenshot(path=None):
     #else:
     #    raise TypeError('path is an invalid type: %s' % type(path))
 
-def setFPS(frameRate):
+def set_fps(frameRate):
     """Set the maximum frame rate.
 
     @type frameRate: int
@@ -1309,17 +1312,17 @@ def setFPS(frameRate):
     assert isinstance(frameRate, _INTTYPES), 'frameRate must be an integer or None, got: %s' % repr(frameRate)
     _lib.TCOD_sys_set_fps(frameRate)
 
-def getFPS():
+def get_fps():
     """Return the current frames per second of the running program set by
-    L{setFPS}
+    L{set_fps}
 
     @rtype: int
-    @return: Returns the frameRate set by setFPS.
+    @return: Returns the frameRate set by set_fps.
              If set to no limit, this will return 0.
     """
     return _lib.TCOD_sys_get_fps()
 
-def forceResolution(width, height):
+def force_resolution(width, height):
     """Change the fullscreen resoulution
 
     @type width: int
@@ -1327,8 +1330,36 @@ def forceResolution(width, height):
     """
     _lib.TCOD_sys_force_fullscreen_resolution(width, height)
         
+
 __all__ = [_var for _var in locals().keys() if _var[0] != '_'] # remove modules from __all__
 __all__ += ['_MetaConsole'] # keep this object public to show the documentation in epydoc
+
+# backported function names
+_MetaConsole.setMode = _style.backport(_MetaConsole.set_mode)
+_MetaConsole.setColors = _style.backport(_MetaConsole.set_colors)
+_MetaConsole.printStr = _style.backport(_MetaConsole.print_str)
+_MetaConsole.drawChar = _style.backport(_MetaConsole.draw_char)
+_MetaConsole.drawStr = _style.backport(_MetaConsole.draw_str)
+_MetaConsole.drawRect = _style.backport(_MetaConsole.draw_rect)
+_MetaConsole.drawFrame = _style.backport(_MetaConsole.draw_frame)
+_MetaConsole.getCursor = _style.backport(_MetaConsole.get_cursor)
+_MetaConsole.getSize = _style.backport(_MetaConsole.get_size)
+_MetaConsole.getChar = _style.backport(_MetaConsole.get_char)
+
+Console.getChar = _style.backport(Console.get_char)
+
+Window.drawChar = _style.backport(Window.draw_char)
+Window.drawRect = _style.backport(Window.draw_rect)
+Window.drawFrame = _style.backport(Window.draw_frame)
+Window.getChar = _style.backport(Window.get_char)
+
+setFont = _style.backport(set_font)
+getFullscreen = _style.backport(get_fullscreen)
+setFullscreen = _style.backport(set_fullscreen)
+setTitle = _style.backport(set_title)
+setFPS = _style.backport(set_fps)
+getFPS = _style.backport(get_fps)
+forceResolution = _style.backport(force_resolution)
 
 __license__ = "New BSD License"
 __email__ = "4b796c65+pythonTDL@gmail.com"

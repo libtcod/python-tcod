@@ -34,6 +34,7 @@ import time as _time
 
 from .__tcod import _lib, _Mouse, _Key
 from . import __tcod as _tcod
+from . import __style as _style
 import tdl as _tdl
 
 _eventQueue = []
@@ -284,7 +285,7 @@ class App(object):
         while self.__running:
             self.runOnce()
     
-    def runOnce(self):
+    def run_once(self):
         """Pump events to this App instance and then return.
         
         This works in the way described in L{App.run} except it immediately
@@ -396,7 +397,7 @@ def push(event):
     """
     _pushedEvents.append(event)
     
-def keyWait():
+def key_wait():
     """Waits until the user presses a key.
     Then returns a L{KeyDown} event.
     
@@ -415,7 +416,7 @@ def keyWait():
                 return KeyDown('F4', '', True, False, True, False, False)
         _time.sleep(.001)
 
-def setKeyRepeat(delay=500, interval=0):
+def set_key_repeat(delay=500, interval=0):
     """Change or disable key repeat.
     
     @type delay: int
@@ -430,7 +431,7 @@ def setKeyRepeat(delay=500, interval=0):
     """
     _lib.TCOD_console_set_keyboard_repeat(delay, interval)
         
-def isWindowClosed():
+def is_window_closed():
     """Returns True if the exit button on the window has been clicked and
     stays True afterwards.
     
@@ -439,3 +440,8 @@ def isWindowClosed():
     return _lib.TCOD_console_is_window_closed()
 
 __all__ = [_var for _var in locals().keys() if _var[0] != '_']
+
+App.runOnce = _style.backport(App.run_once)
+keyWait = _style.backport(key_wait)
+setKeyRepeat = _style.backport(set_key_repeat)
+isWindowClosed = _style.backport(is_window_closed)

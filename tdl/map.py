@@ -8,10 +8,11 @@ import math as _math
 
 import tdl as _tdl
 from .__tcod import _lib, _PATHCALL
+from . import __style as _style
 
 _FOVTYPES = {'BASIC' : 0, 'DIAMOND': 1, 'SHADOW': 2, 'RESTRICTIVE': 12, 'PERMISSIVE': 11}
 
-def _getFOVType(fov):
+def _get_fov_type(fov):
     "Return a FOV from a string"
     oldFOV = fov
     fov = str(fov).upper()
@@ -113,7 +114,7 @@ class AStar(object):
             path.append((x.value, y.value))
         return path
     
-def quickFOV(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sphere=True):
+def quick_fov(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sphere=True):
     """All field-of-view functionality in one call.
     
     Before using this call be sure to make a function, lambda, or method that takes 2
@@ -160,7 +161,7 @@ def quickFOV(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sphe
     trueRadius = radius
     radius = int(_math.ceil(radius))
     mapSize = radius * 2 + 1
-    fov = _getFOVType(fov)
+    fov = _get_fov_type(fov)
     
     setProp = _lib.TCOD_map_set_properties # make local
     inFOV = _lib.TCOD_map_is_in_fov
@@ -232,4 +233,6 @@ def bresenham(x1, y1, x2, y2):
         points.reverse()
     return iter(points) # force as iter so I can sleep at night
     
-__all__ = ['AStar', 'quickFOV']
+__all__ = [_var for _var in locals().keys() if _var[0] != '_']
+
+quickFOV = _style.backport(quick_fov)

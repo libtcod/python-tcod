@@ -11,11 +11,11 @@
 
 
 import random as _random
-import itertools
 import ctypes as _ctypes
 
 import tdl as _tdl
 from .__tcod import _lib
+from . import __style as _style
 
 _MERSENNE_TWISTER = 1
 _CARRY_WITH_MULTIPLY = 2
@@ -141,7 +141,7 @@ class Noise(object):
     def __setstate__(self, state):
         self.__init__(*state)
         
-    def getPoint(self, *position):
+    def get_point(self, *position):
         """Return the noise value of a specific position.
         
         Example usage: value = noise.getPoint(x, y, z)
@@ -164,4 +164,6 @@ class Noise(object):
         _lib.TCOD_random_delete(self._random)
         _lib.TCOD_noise_delete(self._noise)
     
-__all__ = ['Noise']
+__all__ = [_var for _var in locals().keys() if _var[0] != '_']
+
+Noise.getPoint = _style.backport(Noise.get_point)
