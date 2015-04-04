@@ -67,7 +67,7 @@
   target="_top">here</a>.</p>
   <h1 class="heading">Getting Started</h1>
     <p>Once the library is imported you can load the font you want to use 
-    with <a href="tdl-module.html#setFont" class="link">tdl.setFont</a>. 
+    with <a href="tdl-module.html#set_font" class="link">tdl.set_font</a>. 
     This is optional and when skipped will use a decent default font.</p>
     <p>After that you call <a href="tdl-module.html#init" 
     class="link">tdl.init</a> to set the size of the window and get the 
@@ -89,8 +89,8 @@
   <h1 class="heading">Drawing</h1>
     <p>Once you have the root console from <a href="tdl-module.html#init" 
     class="link">tdl.init</a> you can start drawing on it using a method 
-    such as <a href="tdl._MetaConsole-class.html#drawChar" 
-    class="link">Console.drawChar</a>. When using this method you can have 
+    such as <a href="tdl._MetaConsole-class.html#draw_char" 
+    class="link">Console.draw_char</a>. When using this method you can have
     the char parameter be an integer or a single character string.</p>
     <p>The fgcolor and bgcolor parameters expect a three item list [red, 
     green, blue] with integers in the 0-255 range with [0, 0, 0] being 
@@ -101,7 +101,10 @@
     screen.</p>
 
 <hr />
-<div class="fields">      <p><strong>License:</strong>
+<div class="fields">      <p><strong>Version:</strong>
+        1.1.7
+      </p>
+      <p><strong>License:</strong>
         New BSD License
       </p>
 </div><!-- ==================== SUBMODULES ==================== -->
@@ -196,11 +199,11 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="tdl-module.html#forceResolution" class="summary-sig-name">forceResolution</a>(<span class="summary-sig-arg">width</span>,
+          <td><span class="summary-sig"><a href="tdl-module.html#force_resolution" class="summary-sig-name">force_resolution</a>(<span class="summary-sig-arg">width</span>,
         <span class="summary-sig-arg">height</span>)</span><br />
       Change the fullscreen resoulution</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="tdl-pysrc.html#forceResolution">source&nbsp;code</a></span>
+            <span class="codelink"><a href="tdl-pysrc.html#force_resolution">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -214,11 +217,11 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="tdl-module.html#getFPS" class="summary-sig-name">getFPS</a>()</span><br />
+          <td><span class="summary-sig"><a href="tdl-module.html#get_fps" class="summary-sig-name">get_fps</a>()</span><br />
       Return the current frames per second of the running program set by <a
-      href="tdl-module.html#setFPS" class="link">setFPS</a></td>
+      href="tdl-module.html#set_fps" class="link">set_fps</a></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="tdl-pysrc.html#getFPS">source&nbsp;code</a></span>
+            <span class="codelink"><a href="tdl-pysrc.html#get_fps">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -232,10 +235,10 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="tdl-module.html#getFullscreen" class="summary-sig-name">getFullscreen</a>()</span><br />
+          <td><span class="summary-sig"><a href="tdl-module.html#get_fullscreen" class="summary-sig-name">get_fullscreen</a>()</span><br />
       Returns True if program is fullscreen.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="tdl-pysrc.html#getFullscreen">source&nbsp;code</a></span>
+            <span class="codelink"><a href="tdl-pysrc.html#get_fullscreen">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -288,24 +291,7 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="tdl-module.html#setFPS" class="summary-sig-name">setFPS</a>(<span class="summary-sig-arg">frameRate</span>)</span><br />
-      Set the maximum frame rate.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="tdl-pysrc.html#setFPS">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="tdl-module.html#setFont" class="summary-sig-name">setFont</a>(<span class="summary-sig-arg">path</span>,
+          <td><span class="summary-sig"><a href="tdl-module.html#set_font" class="summary-sig-name">set_font</a>(<span class="summary-sig-arg">path</span>,
         <span class="summary-sig-arg">columns</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">rows</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">columnFirst</span>=<span class="summary-sig-default">False</span>,
@@ -313,7 +299,7 @@
         <span class="summary-sig-arg">altLayout</span>=<span class="summary-sig-default">False</span>)</span><br />
       Changes the font to be used for this session.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="tdl-pysrc.html#setFont">source&nbsp;code</a></span>
+            <span class="codelink"><a href="tdl-pysrc.html#set_font">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -327,10 +313,27 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="tdl-module.html#setFullscreen" class="summary-sig-name">setFullscreen</a>(<span class="summary-sig-arg">fullscreen</span>)</span><br />
+          <td><span class="summary-sig"><a href="tdl-module.html#set_fps" class="summary-sig-name">set_fps</a>(<span class="summary-sig-arg">frameRate</span>)</span><br />
+      Set the maximum frame rate.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl-pysrc.html#set_fps">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="tdl-module.html#set_fullscreen" class="summary-sig-name">set_fullscreen</a>(<span class="summary-sig-arg">fullscreen</span>)</span><br />
       Changes the fullscreen state.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="tdl-pysrc.html#setFullscreen">source&nbsp;code</a></span>
+            <span class="codelink"><a href="tdl-pysrc.html#set_fullscreen">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -344,10 +347,10 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="tdl-module.html#setTitle" class="summary-sig-name">setTitle</a>(<span class="summary-sig-arg">title</span>)</span><br />
+          <td><span class="summary-sig"><a href="tdl-module.html#set_title" class="summary-sig-name">set_title</a>(<span class="summary-sig-arg">title</span>)</span><br />
       Change the window title.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="tdl-pysrc.html#setTitle">source&nbsp;code</a></span>
+            <span class="codelink"><a href="tdl-pysrc.html#set_title">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -382,25 +385,25 @@
   <p>Make all changes visible and update the screen.</p>
   <p>Remember to call this function after drawing operations. Calls to 
   flush will enfore the frame rate limit set by <a 
-  href="tdl-module.html#setFPS" class="link">tdl.setFPS</a>.</p>
+  href="tdl-module.html#set_fps" class="link">tdl.set_fps</a>.</p>
   <p>This function can only be called after <a href="tdl-module.html#init" 
   class="link">tdl.init</a></p>
   <dl class="fields">
   </dl>
 </td></tr></table>
 </div>
-<a name="forceResolution"></a>
+<a name="force_resolution"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">forceResolution</span>(<span class="sig-arg">width</span>,
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">force_resolution</span>(<span class="sig-arg">width</span>,
         <span class="sig-arg">height</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="tdl-pysrc.html#forceResolution">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="tdl-pysrc.html#force_resolution">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -414,40 +417,40 @@
   </dl>
 </td></tr></table>
 </div>
-<a name="getFPS"></a>
+<a name="get_fps"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">getFPS</span>()</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_fps</span>()</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="tdl-pysrc.html#getFPS">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="tdl-pysrc.html#get_fps">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
   <p>Return the current frames per second of the running program set by <a 
-  href="tdl-module.html#setFPS" class="link">setFPS</a></p>
+  href="tdl-module.html#set_fps" class="link">set_fps</a></p>
   <dl class="fields">
     <dt>Returns: int</dt>
-        <dd>Returns the frameRate set by setFPS. If set to no limit, this 
+        <dd>Returns the frameRate set by set_fps. If set to no limit, this 
           will return 0.</dd>
   </dl>
 </td></tr></table>
 </div>
-<a name="getFullscreen"></a>
+<a name="get_fullscreen"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">getFullscreen</span>()</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_fullscreen</span>()</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="tdl-pysrc.html#getFullscreen">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="tdl-pysrc.html#get_fullscreen">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -530,41 +533,14 @@
   </dl>
 </td></tr></table>
 </div>
-<a name="setFPS"></a>
+<a name="set_font"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">setFPS</span>(<span class="sig-arg">frameRate</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="tdl-pysrc.html#setFPS">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Set the maximum frame rate.</p>
-  <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>frameRate</code></strong> (int) - Further calls to <a href="tdl-module.html#flush" 
-          class="link">tdl.flush</a> will limit the speed of the program to
-          run at &lt;frameRate&gt; frames per second. Can also be set to 0 
-          to run without a limit.
-          <p>Defaults to None.</p></li>
-    </ul></dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="setFont"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">setFont</span>(<span class="sig-arg">path</span>,
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">set_font</span>(<span class="sig-arg">path</span>,
         <span class="sig-arg">columns</span>=<span class="sig-default">None</span>,
         <span class="sig-arg">rows</span>=<span class="sig-default">None</span>,
         <span class="sig-arg">columnFirst</span>=<span class="sig-default">False</span>,
@@ -572,7 +548,7 @@
         <span class="sig-arg">altLayout</span>=<span class="sig-default">False</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="tdl-pysrc.html#setFont">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="tdl-pysrc.html#set_font">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -620,17 +596,44 @@
       </p>
 </div></td></tr></table>
 </div>
-<a name="setFullscreen"></a>
+<a name="set_fps"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">setFullscreen</span>(<span class="sig-arg">fullscreen</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">set_fps</span>(<span class="sig-arg">frameRate</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="tdl-pysrc.html#setFullscreen">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="tdl-pysrc.html#set_fps">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Set the maximum frame rate.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>frameRate</code></strong> (int) - Further calls to <a href="tdl-module.html#flush" 
+          class="link">tdl.flush</a> will limit the speed of the program to
+          run at &lt;frameRate&gt; frames per second. Can also be set to 0 
+          to run without a limit.
+          <p>Defaults to None.</p></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="set_fullscreen"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">set_fullscreen</span>(<span class="sig-arg">fullscreen</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#set_fullscreen">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -643,17 +646,17 @@
   </dl>
 </td></tr></table>
 </div>
-<a name="setTitle"></a>
+<a name="set_title"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">setTitle</span>(<span class="sig-arg">title</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">set_title</span>(<span class="sig-arg">title</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="tdl-pysrc.html#setTitle">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="tdl-pysrc.html#set_title">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -699,7 +702,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Nov 10 19:20:27 2013</a>
+    3.0.1 on Fri Apr 03 23:20:01 2015</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
