@@ -1,6 +1,14 @@
 ===========
  Changelog
 ===========
+1.2.0
+ * The set_colors method now changes the default colors used by the draw_*
+   methods.  You can use Python's Ellipsis to explicitly select default colors
+   this way.
+ * Functions and Methods renamed to match Python's style-guide PEP 8, the old
+   function names still exist and are depreciated.
+ * The fgcolor and bgcolor parameters have been shortened to fg and bg
+
 1.1.7
  * Noise generator now seeds properly
  * The OS event queue will now be handled during a call to tdl.flush. This

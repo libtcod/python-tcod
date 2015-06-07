@@ -1415,4 +1415,5 @@ forceResolution = _style.backport(force_resolution)
 __license__ = "New BSD License"
 __author__ = 'Kyle Stewart'
 __contact__ = "4b796c65+pythonTDL@gmail.com"
-__version__ = '1.1.7'
+__email__ = "4b796c65+pythonTDL@gmail.com"
+__version__ = '1.2.0'
