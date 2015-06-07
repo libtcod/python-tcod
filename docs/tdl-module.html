@@ -58,12 +58,14 @@
 </table>
 <!-- ==================== PACKAGE DESCRIPTION ==================== -->
 <h1 class="epydoc">Package tdl</h1><p class="nomargin-top"><span class="codelink"><a href="tdl-pysrc.html">source&nbsp;code</a></span></p>
-<p>The documentation for python-tdl.  A Pythonic port of <a 
-  href="http://doryen.eptalys.net/libtcod/" target="_top">libtcod</a>.</p>
-  <p>You can find the project page on Google Code <a 
-  href="http://code.google.com/p/python-tdl/" target="_top">here</a>.</p>
-  <p>Report any bugs or issues to the Google Code issue tracker <a 
-  href="https://code.google.com/p/python-tdl/issues/list" 
+<p>This is the official documentation for python-tdl.  A Pythonic port of
+  <a href="http://roguecentral.org/doryen/libtcod/" 
+  target="_top">libtcod</a>.</p>
+  <p>You can find the project page on GitHub <a 
+  href="https://github.com/HexDecimal/python-tdl" 
+  target="_top">here</a>.</p>
+  <p>Report any bugs or issues to the GitHub issue tracker <a 
+  href="https://github.com/HexDecimal/python-tdl/issues" 
   target="_top">here</a>.</p>
   <h1 class="heading">Getting Started</h1>
     <p>Once the library is imported you can load the font you want to use 
@@ -84,25 +86,41 @@
     to minimize draws by using an offscreen <a 
     href="tdl.Console-class.html" class="link">Console</a>, only drawing 
     what needs to be updated, and using <a 
-    href="tdl._MetaConsole-class.html#blit" 
+    href="tdl._BaseConsole-class.html#blit" 
     class="link">Console.blit</a>.</p>
-  <h1 class="heading">Drawing</h1>
+  <h1 class="heading">Drawing and Colors</h1>
     <p>Once you have the root console from <a href="tdl-module.html#init" 
     class="link">tdl.init</a> you can start drawing on it using a method 
-    such as <a href="tdl._MetaConsole-class.html#draw_char" 
+    such as <a href="tdl._BaseConsole-class.html#draw_char" 
     class="link">Console.draw_char</a>. When using this method you can have
     the char parameter be an integer or a single character string.</p>
-    <p>The fgcolor and bgcolor parameters expect a three item list [red, 
-    green, blue] with integers in the 0-255 range with [0, 0, 0] being 
-    black and [255, 255, 255] being white. Or instead you can use None in 
-    the place of any of the three parameters to tell the library to not 
-    overwrite colors. After the drawing functions are called a call to <a 
+    <p>The fg and bg parameters expect a variety of types. The parameters 
+    default to Ellipsis which will tell the function to use the colors 
+    previously set by the <code class="link">set_colors</code> method. The 
+    colors set by <a href="tdl._BaseConsole-class.html#set_colors" 
+    class="link">Console.set_colors</a> are per each <a 
+    href="tdl.Console-class.html" class="link">Console</a>/<a 
+    href="tdl.Window-class.html" class="link">Window</a> and default to 
+    white on black. You can use a 3-item list/tuple of [red, green, blue] 
+    with integers in the 0-255 range with [0, 0, 0] being black and [255, 
+    255, 255] being white. You can even use a single integer of 0xRRGGBB if
+    you like.</p>
+    <p>Using None in the place of any of the three parameters (char, fg, 
+    bg) will tell the function to not overwrite that color or 
+    character.</p>
+    <p>After the drawing functions are called a call to <a 
     href="tdl-module.html#flush" class="link">tdl.flush</a> will update the
     screen.</p>
 
 <hr />
 <div class="fields">      <p><strong>Version:</strong>
         1.1.7
+      </p>
+      <p><strong>Author:</strong>
+        Kyle Stewart
+      </p>
+      <p><strong>Contact:</strong>
+        4b796c65+pythonTDL@gmail.com
       </p>
       <p><strong>License:</strong>
         New BSD License
@@ -161,7 +179,7 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="tdl._MetaConsole-class.html" class="summary-name">_MetaConsole</a><br />
+        <a href="tdl._BaseConsole-class.html" class="summary-name">_BaseConsole</a><br />
       Contains methods shared by both the <a 
         href="tdl.Console-class.html" class="link">Console</a> and <a 
         href="tdl.Window-class.html" class="link">Window</a> classes.
@@ -495,7 +513,7 @@
         <li><strong class="pname"><code>fullscreen</code></strong> (boolean) - Can be set to True to start in fullscreen mode.</li>
         <li><strong class="pname"><code>renderer</code></strong> (string) - Can be one of 'GLSL', 'OPENGL', or 'SDL'.
           <p>Due to way Python works you're unlikely to see much of an 
-          improvement by using 'GLSL' or 'OPENGL' as most of the time 
+          improvement by using 'GLSL' over 'OPENGL' as most of the time 
           Python is slow interacting with the console and the rendering 
           itself is pretty fast even on 'SDL'.</p></li>
     </ul></dd>
@@ -505,7 +523,11 @@
           class="link">tdl.flush</a>. After the root console is garbage 
           collected, the window made by this function will close.</dd>
   </dl>
-</td></tr></table>
+<div class="fields">      <p><strong>See Also:</strong>
+        <a href="tdl.Console-class.html" class="link">Console</a>, <a 
+        href="tdl-module.html#set_font" class="link">set_font</a>
+      </p>
+</div></td></tr></table>
 </div>
 <a name="screenshot"></a>
 <div>
@@ -702,7 +724,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Fri Apr 03 23:20:01 2015</a>
+    3.0.1 on Sat Jun 06 23:13:11 2015</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

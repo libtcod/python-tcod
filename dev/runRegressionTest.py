@@ -37,6 +37,7 @@ class TDLTemplate(unittest.TestCase):
         
     @classmethod
     def tearDownClass(cls):
+        time.sleep(2)
         del cls.console
         gc.collect() # make sure console.__del__ is called quickly
         
@@ -270,11 +271,12 @@ class DrawingTests(TDLTemplate):
         several areas and not clearing the console every loop.
         """
         scrollTests = set([(0, 0), (WIDTH, HEIGHT)]) # include zero and out of bounds
-        while len(scrollTests) < 5: # add 3 more randoms
+        while len(scrollTests) < 10: # add 3 more randoms
             scrollTests.add((random.randint(-WIDTH, WIDTH),
                              random.randint(-HEIGHT, HEIGHT)))
         for sx, sy in scrollTests:
             noiseData = dict(self.randomizeConsole())
+            self.console.set_colors((0, 0, 0), (0, 0, 0))
             self.console.scroll(sx, sy)
             self.flush() # show progress
             for x, y in self.getDrawables():

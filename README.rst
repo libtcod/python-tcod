@@ -28,7 +28,7 @@ Online Documentation: http://pythonhosted.org/tdl/
 
 Issue Tracker: https://github.com/HexDecimal/python-tdl/issues
 
-python-tdl is a ctypes port of "libtcod".  You can find more about libtcod at http://doryen.eptalys.net/libtcod/
+python-tdl is a ctypes port of "libtcod".  You can find more about libtcod at http://roguecentral.org/doryen/libtcod/
 
 ==============
  Requirements

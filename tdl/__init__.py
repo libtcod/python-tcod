@@ -1,12 +1,12 @@
 """
-    The documentation for python-tdl.  A Pythonic port of
-    U{libtcod<http://doryen.eptalys.net/libtcod/>}.
+    This is the official documentation for python-tdl.  A Pythonic port of
+    U{libtcod<http://roguecentral.org/doryen/libtcod/>}.
     
-    You can find the project page on Google Code
-    U{here<http://code.google.com/p/python-tdl/>}.
+    You can find the project page on GitHub
+    U{here<https://github.com/HexDecimal/python-tdl>}.
     
-    Report any bugs or issues to the Google Code issue tracker
-    U{here<https://code.google.com/p/python-tdl/issues/list>}.
+    Report any bugs or issues to the GitHub issue tracker
+    U{here<https://github.com/HexDecimal/python-tdl/issues>}.
 
     Getting Started
     ===============
@@ -32,18 +32,27 @@
       Try to minimize draws by using an offscreen L{Console}, only drawing
       what needs to be updated, and using L{Console.blit}.
       
-    Drawing
-    =======
+    Drawing and Colors
+    ==================
+    
       Once you have the root console from L{tdl.init} you can start drawing on
       it using a method such as L{Console.draw_char}.
       When using this method you can have the char parameter be an integer or a
       single character string.
       
-      The fgcolor and bgcolor parameters expect a three item list
-      [red, green, blue] with integers in the 0-255 range with [0, 0, 0] being
-      black and [255, 255, 255] being white.
-      Or instead you can use None in the place of any of the three parameters
-      to tell the library to not overwrite colors.
+      The fg and bg parameters expect a variety of types.
+      The parameters default to Ellipsis which will tell the function to
+      use the colors previously set by the L{set_colors} method.
+      The colors set by L{Console.set_colors} are per each L{Console}/L{Window}
+      and default to white on black.
+      You can use a 3-item list/tuple of [red, green, blue] with integers in
+      the 0-255 range with [0, 0, 0] being black and [255, 255, 255] being
+      white.
+      You can even use a single integer of 0xRRGGBB if you like.
+      
+      Using None in the place of any of the three parameters (char, fg, bg)
+      will tell the function to not overwrite that color or character.
+      
       After the drawing functions are called a call to L{tdl.flush} will update
       the screen.
 """
@@ -80,9 +89,6 @@ def _encodeString(string): # still used for filepaths, and that's about it
         return string.encode()
     return string
 
-#def _formatString(string):
-#    pass
-
 def _formatChar(char):
     """Prepares a single character for passing to ctypes calls, needs to return
     an integer but can also pass None which will keep the current character
@@ -100,11 +106,11 @@ _fontinitialized = False
 _rootinitialized = False
 _rootConsoleRef = None
 # remove dots from common functions
-_setchar = _lib.TCOD_console_set_char
-_setfore = _lib.TCOD_console_set_char_foreground
-_setback = _lib.TCOD_console_set_char_background
-_setcharEX = _lib.TCOD_console_put_char_ex
-_putchar = _lib.TCOD_console_put_char
+_set_char = _lib.TCOD_console_set_char
+_set_fg = _lib.TCOD_console_set_char_foreground
+_set_bg = _lib.TCOD_console_set_char_background
+_put_char_ex = _lib.TCOD_console_put_char_ex
+_put_char = _lib.TCOD_console_put_char
 
 def _verify_colors(*colors):
     """Used internally.
@@ -160,18 +166,23 @@ class TDLError(Exception):
     The catch all for most TDL specific errors.
     """
 
-class _MetaConsole(object):
+class _BaseConsole(object):
     """
     Contains methods shared by both the L{Console} and L{Window} classes.
+    
+    @undocumented: drawStr drawChar drawFrame drawRect
+                   getCursor getSize getChar printStr setColors setMode
+    @group Drawing Methods: draw_*, blit, clear
+    @group Printing Methods: print_*, move, set_colors, set_mode, write, get_cursor
     """
-    __slots__ = ('width', 'height', 'console', '_cursor', '_fgcolor',
-                 '_bgcolor', '_bgblend', '_colorLock', '__weakref__', '__dict__')
+    __slots__ = ('width', 'height', 'console', '_cursor', '_fg',
+                 '_bg', '_bgblend', '_colorLock', '__weakref__', '__dict__')
 
     def __init__(self):
         self._cursor = (0, 0)
         self._scrollMode = 'error'
-        self._fgcolor = _formatColor((255, 255, 255))
-        self._bgcolor = _formatColor((0, 0, 0))
+        self._fg = _formatColor((255, 255, 255))
+        self._bg = _formatColor((0, 0, 0))
         self._bgblend = 1 # SET
         self._colorLock = None # which object sets the ctype color options
         
@@ -256,6 +267,7 @@ class _MetaConsole(object):
                         
                         You can restrict the region with L{tdl.Window} when
                         doing this.
+        @see: L{write}, L{print_str}
         """
         MODES = ['error', 'scroll']
         if mode.lower() not in MODES:
@@ -263,26 +275,35 @@ class _MetaConsole(object):
         self._scrollMode = mode.lower()
             
     def set_colors(self, fg=None, bg=None):
-        """Sets the colors to be used with the L{print_str} function.
+        """Sets the colors to be used with the L{print_str} and draw_* methods.
         
         Values of None will only leave the current values unchanged.
+        
+        @type fg: (r, g, b), int, Ellipsis, or None
+        @type bg: (r, g, b), int, Ellipsis, or None
+        @param fg: See Drawing and Colors at the L{module level docs<tdl>}
+        @param bg: See Drawing and Colors at the L{module level docs<tdl>}
+        @see: L{move}, L{print_str}
         """
         if fg is not None:
-            self._fgcolor = _formatColor(fg)
+            self._fg = _formatColor(fg)
         if bg is not None:
-            self._bgcolor = _formatColor(bg)
+            self._bg = _formatColor(bg)
 
     def print_str(self, string):
         """Print a string at the virtual cursor.
         
         Handles special characters such as '\\n' and '\\r'.
-        Printing past the bottom of the console will scroll everying upwards.
+        Printing past the bottom of the console will scroll everything upwards
+        if L{set_mode} is set to 'scroll'.
         
         Colors can be set with L{set_colors} and the virtual cursor can be moved
         with L{move}.
         
         @type string: string
         @param string: 
+        @see: L{draw_str}, L{move}, L{set_colors}, L{set_mode}, L{write},
+              L{Window}
         """
         x, y = self._cursor
         for char in string:
@@ -294,7 +315,7 @@ class _MetaConsole(object):
                 x = 0
                 continue
             x, y = self._normalizeCursor(x, y)
-            self.draw_char(x, y, char, self._fgcolor, self._bgcolor)
+            self.draw_char(x, y, char, self._fg, self._bg)
             x += 1
         self._cursor = (x, y)
 
@@ -308,6 +329,7 @@ class _MetaConsole(object):
         change on later versions.
         
         @type string: string
+        @see: L{set_colors}, L{set_mode}, L{Window}
         """
         # some 'basic' line buffer stuff.
         # there must be an easier way to do this.  The textwrap module didn't
@@ -325,13 +347,13 @@ class _MetaConsole(object):
 
         for line in writeLines:
             x, y = self._normalizeCursor(x, y)
-            self.draw_str(x, y, line[x:], self._fgcolor, self._bgcolor)
+            self.draw_str(x, y, line[x:], self._fg, self._bg)
             y += 1
             x = 0
         y -= 1
         self._cursor = (x, y)
     
-    def draw_char(self, x, y, char, fgcolor=Ellipsis, bgcolor=Ellipsis):
+    def draw_char(self, x, y, char, fg=Ellipsis, bg=Ellipsis):
         """Draws a single character.
 
         @type x: int
@@ -345,40 +367,38 @@ class _MetaConsole(object):
                      You can set the char parameter as None if you only want to change
                      the colors of the tile.
 
-        @type fgcolor: (r, g, b) or None
-        @param fgcolor: For fgcolor and bgcolor you use a 3 item list with
-                        integers ranging 0-255 or None.
-                        
-                        None will keep the current color at this position unchanged.
-        @type bgcolor: (r, g, b) or None
-        @param bgcolor: Background color.  See fgcolor
-
+        @type fg: (r, g, b), int, Ellipsis, or None
+        @type bg: (r, g, b), int, Ellipsis, or None
+        @param fg: See Drawing and Colors at the L{module level docs<tdl>}
+        @param bg: See Drawing and Colors at the L{module level docs<tdl>}
+        
         @raise AssertionError: Having x or y values that can't be placed inside
                                of the console will raise an AssertionError.
                                You can use always use ((x, y) in console) to
                                check if a tile is drawable.
+        @see: L{get_char}
         """
 
-        assert _verify_colors(fgcolor, bgcolor)
+        assert _verify_colors(fg, bg)
         x, y = self._normalizePoint(x, y)
         x, y = _ctypes.c_int(x), _ctypes.c_int(y)
-        self._setChar(x, y, _formatChar(char),
-                      _formatColor(fgcolor), _formatColor(bgcolor))
+        self._set_char(x, y, _formatChar(char),
+                      _formatColor(fg), _formatColor(bg))
 
-    def draw_str(self, x, y, string, fgcolor=Ellipsis, bgcolor=Ellipsis):
-        """Draws a string starting at x and y.  Optinally colored.
+    def draw_str(self, x, y, string, fg=Ellipsis, bg=Ellipsis):
+        """Draws a string starting at x and y.
 
         A string that goes past the right side will wrap around.  A string
-        wraping to below the console will raise a L{TDLError} but will still be
+        wrapping to below the console will raise a L{TDLError} but will still be
         written out.  This means you can safely ignore the errors with a
-        try... except block if you're fine with partily written strings.
+        try... except block if you're fine with partially written strings.
 
         \\r and \\n are drawn on the console as normal character tiles.  No
         special encoding is done and any string will translate to the character
         table as is.
         
-        For a string drawing operation that respects special characters see the
-        L{Typewriter} class.
+        For a string drawing operation that respects special characters see
+        L{print_str}.
 
         @type x: int
         @param x: X coordinate to draw at.
@@ -391,30 +411,28 @@ class _MetaConsole(object):
                        Special characters are ignored and rendered as any other
                        character.
         
-        @type fgcolor: (r, g, b) or None
-        @param fgcolor: For fgcolor and bgcolor you use a 3 item list with
-                        integers ranging 0-255 or None.
-                        
-                        None will keep the current color at this position unchanged.
-        @type bgcolor: (r, g, b) or None
-        @param bgcolor: Background color.  See fgcolor
+        @type fg: (r, g, b), int, Ellipsis, or None
+        @type bg: (r, g, b), int, Ellipsis, or None
+        @param fg: See Drawing and Colors at the L{module level docs<tdl>}
+        @param bg: See Drawing and Colors at the L{module level docs<tdl>}
         
         @raise AssertionError: Having x or y values that can't be placed inside
                                of the console will raise an AssertionError.
                                
                                You can use always use ((x, y) in console) to
                                check if a tile is drawable.
+        @see: L{print_str}
         """
 
         x, y = self._normalizePoint(x, y)
-        assert _verify_colors(fgcolor, bgcolor)
-        fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
+        assert _verify_colors(fg, bg)
+        fg, bg = _formatColor(fg), _formatColor(bg)
         width, height = self.get_size()
         batch = [] # prepare a batch operation
         def _drawStrGen(x=x, y=y, string=string, width=width, height=height):
             """Generator for draw_str
 
-            Iterates over ((x, y), ch) data for _setCharBatch, raising an
+            Iterates over ((x, y), ch) data for _set_batch, raising an
             error if the end of the console is reached.
             """
             for char in string:
@@ -426,9 +444,9 @@ class _MetaConsole(object):
                 if x == width: # line break
                     x = 0
                     y += 1
-        self._setCharBatch(_drawStrGen(), fgcolor, bgcolor)
+        self._set_batch(_drawStrGen(), fg, bg)
 
-    def draw_rect(self, x, y, width, height, string, fgcolor=Ellipsis, bgcolor=Ellipsis):
+    def draw_rect(self, x, y, width, height, string, fg=Ellipsis, bg=Ellipsis):
         """Draws a rectangle starting from x and y and extending to width and height.
         
         If width or height are None then it will extend to the edge of the console.
@@ -453,23 +471,21 @@ class _MetaConsole(object):
                        You can set the char parameter as None if you only want
                        to change the colors of an area.
         
-        @type fgcolor: (r, g, b) or None
-        @param fgcolor: For fgcolor and bgcolor you use a 3 item list with
-                        integers ranging 0-255 or None.
-                        
-                        None will keep the current color at this position unchanged.
-        @type bgcolor: (r, g, b) or None
-        @param bgcolor: Background color.  See fgcolor
+        @type fg: (r, g, b), int, Ellipsis, or None
+        @type bg: (r, g, b), int, Ellipsis, or None
+        @param fg: See Drawing and Colors at the L{module level docs<tdl>}
+        @param bg: See Drawing and Colors at the L{module level docs<tdl>}
         
         @raise AssertionError: Having x or y values that can't be placed inside
                                of the console will raise an AssertionError.
                                
                                You can use always use ((x, y) in console) to
                                check if a tile is drawable.
+        @see: L{clear}, L{draw_frame}
         """
         x, y, width, height = self._normalizeRect(x, y, width, height)
-        assert _verify_colors(fgcolor, bgcolor)
-        fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
+        assert _verify_colors(fg, bg)
+        fg, bg = _formatColor(fg), _formatColor(bg)
         char = _formatChar(string)
         # use itertools to make an x,y grid
         # using ctypes here reduces type converstions later
@@ -477,9 +493,9 @@ class _MetaConsole(object):
                                   (_ctypes.c_int(y) for y in range(y, y + height)))
         # zip the single character in a batch variable
         batch = zip(grid, _itertools.repeat(char, width * height))
-        self._setCharBatch(batch, fgcolor, bgcolor, nullChar=(char is None))
+        self._set_batch(batch, fg, bg, nullChar=(char is None))
 
-    def draw_frame(self, x, y, width, height, string, fgcolor=Ellipsis, bgcolor=Ellipsis):
+    def draw_frame(self, x, y, width, height, string, fg=Ellipsis, bg=Ellipsis):
         """Similar to L{draw_rect} but only draws the outline of the rectangle.
 
         @type x: int
@@ -502,32 +518,30 @@ class _MetaConsole(object):
                        You can set the char parameter as None if you only want
                        to change the colors of an area.
         
-        @type fgcolor: (r, g, b) or None
-        @param fgcolor: For fgcolor and bgcolor you use a 3 item list with
-                        integers ranging 0-255 or None.
-                        
-                        None will keep the current color at this position unchanged.
-        @type bgcolor: (r, g, b) or None
-        @param bgcolor: Background color.  See fgcolor
+        @type fg: (r, g, b), int, Ellipsis, or None
+        @type bg: (r, g, b), int, Ellipsis, or None
+        @param fg: See Drawing and Colors at the L{module level docs<tdl>}
+        @param bg: See Drawing and Colors at the L{module level docs<tdl>}
         
         @raise AssertionError: Having x or y values that can't be placed inside
                                of the console will raise an AssertionError.
                                
                                You can use always use ((x, y) in console) to
                                check if a tile is drawable.
+        @see: L{draw_rect}, L{Window}
         """
         x, y, width, height = self._normalizeRect(x, y, width, height)
-        assert _verify_colors(fgcolor, bgcolor)
-        fgcolor, bgcolor = _formatColor(fgcolor), _formatColor(bgcolor)
+        assert _verify_colors(fg, bg)
+        fg, bg = _formatColor(fg), _formatColor(bg)
         char = _formatChar(string)
         if width == 1 or height == 1: # it's just a single width line here
-            return self.draw_rect(x, y, width, height, char, fgcolor, bgcolor)
+            return self.draw_rect(x, y, width, height, char, fg, bg)
 
         # draw sides of frame with draw_rect
-        self.draw_rect(x, y, 1, height, char, fgcolor, bgcolor)
-        self.draw_rect(x, y, width, 1, char, fgcolor, bgcolor)
-        self.draw_rect(x + width - 1, y, 1, height, char, fgcolor, bgcolor)
-        self.draw_rect(x, y + height - 1, width, 1, char, fgcolor, bgcolor)
+        self.draw_rect(x, y, 1, height, char, fg, bg)
+        self.draw_rect(x, y, width, 1, char, fg, bg)
+        self.draw_rect(x + width - 1, y, 1, height, char, fg, bg)
+        self.draw_rect(x, y + height - 1, width, 1, char, fg, bg)
 
     def blit(self, source, x=0, y=0, width=None, height=None, srcX=0, srcY=0):
         """Blit another console or Window onto the current console.
@@ -593,7 +607,9 @@ class _MetaConsole(object):
         @return: Returns (x, y) a 2-integer tuple containing where the next
                  L{addChar} or L{addStr} will start at.
                  
-                 This can be changed with the L{move} method."""
+                 This can be changed with the L{move} method.
+        @see: L{move}
+        """
         x, y = self._cursor
         width, height = self.parent.get_size()
         while x >= width:
@@ -626,6 +642,7 @@ class _MetaConsole(object):
         @param x: X position to place the cursor.
         @type y: int
         @param y: Y position to place the cursor.
+        @see: L{get_cursor}, L{print_str}, L{write}
         """
         self._cursor = self._normalizePoint(x, y)
         
@@ -640,6 +657,7 @@ class _MetaConsole(object):
         @param y: Distance to scroll along y-axis
         @rtype: iter((x, y), ...)
         @return: Iterates over the (x, y) of any tile uncovered after scrolling.
+        @see: L{set_colors}
         """
         assert isinstance(x, _INTTYPES), "x must be an integer, got %s" % repr(x)
         assert isinstance(y, _INTTYPES), "y must be an integer, got %s" % repr(x)
@@ -688,16 +706,15 @@ class _MetaConsole(object):
         x, width, srcx = getSlide(x, width)
         y, height, srcy = getSlide(y, height)
         self.blit(self, x, y, width, height, srcx, srcy)
-
         if uncoverX: # clear sides (0x20 is space)
             self.draw_rect(uncoverX[0], coverY[0], uncoverX[1], coverY[1],
-                           0x20, self._fgcolor, self._bgcolor)
+                           0x20, self._fg, self._bg)
         if uncoverY: # clear top/bottom
             self.draw_rect(coverX[0], uncoverY[0], coverX[1], uncoverY[1],
-                           0x20, self._fgcolor, self._bgcolor)
+                           0x20, self._fg, self._bg)
         if uncoverX and uncoverY: # clear corner
             self.draw_rect(uncoverX[0], uncoverY[0], uncoverX[1], uncoverY[1],
-                           0x20, self._fgcolor, self._bgcolor)
+                           0x20, self._fg, self._bg)
 
     def get_char(self, x, y):
         """Return the character and colors of a tile as (ch, fg, bg)
@@ -709,6 +726,7 @@ class _MetaConsole(object):
         @returns: Returns a 3-item tuple.  The first item is an integer of the
                   character at the position (x, y) the second and third are the
                   foreground and background colors respectfully.
+        @see: L{draw_char}
         """
         raise NotImplementedError('Method here only exists for the docstring')
             
@@ -718,7 +736,7 @@ class _MetaConsole(object):
         x, y = position
         return (0 <= x < self.width) and (0 <= y < self.height)
 
-class Console(_MetaConsole):
+class Console(_BaseConsole):
     """Contains character and color data and can be drawn to.
 
     The console created by the L{tdl.init} function is the root console and is the
@@ -726,6 +744,8 @@ class Console(_MetaConsole):
 
     Any console created from the Console class is an off-screen console that
     can be drawn on before being L{blit} to the root console.
+    
+    @undocumented: getChar
     """
 
     __slots__ = ('_as_parameter_', '_typewriter')
@@ -738,7 +758,7 @@ class Console(_MetaConsole):
         @type height: int
         @param height: Height of the console in tiles
         """
-        _MetaConsole.__init__(self)
+        _BaseConsole.__init__(self)
         if not _rootinitialized:
             raise TDLError('Can not create Console instances before a call to tdl.init')
         self._as_parameter_ = _lib.TCOD_console_new(width, height)
@@ -752,7 +772,7 @@ class Console(_MetaConsole):
     def _newConsole(cls, console):
         """Make a Console instance, from a console ctype"""
         self = cls.__new__(cls)
-        _MetaConsole.__init__(self)
+        _BaseConsole.__init__(self)
         self._as_parameter_ = console
         self.console = self
         self.width = _lib.TCOD_console_get_width(self)
@@ -830,19 +850,26 @@ class Console(_MetaConsole):
                    Unlike most other operations you cannot use None here.
                    To clear only the foreground or background use L{draw_rect}.
         @type bg: (r, g, b)
-        @param bg: Background color.  See fgcolor.
+        @param bg: Background color.  See fg.
+        @see: L{draw_rect}
         """
         assert _verify_colors(fg, bg)
         assert fg is not None and bg is not None, 'Can not use None with clear'
         self._typewriter = None
-        if bg is not Ellipsis:
-            _lib.TCOD_console_set_default_background(self, _formatColor(bg))
-        if fg is not Ellipsis:
-            _lib.TCOD_console_set_default_foreground(self, _formatColor(fg))
+        if fg is Ellipsis:
+            fg = self._fg
+        else:
+            fg = _formatColor(fg)
+        if bg is Ellipsis:
+            bg = self._bg
+        else:
+            bg = _formatColor(bg)
+        _lib.TCOD_console_set_default_foreground(self, fg)
+        _lib.TCOD_console_set_default_background(self, bg)
         _lib.TCOD_console_clear(self)
         
 
-    def _setChar(self, x, y, char, fgcolor=Ellipsis, bgcolor=Ellipsis, bgblend=1):
+    def _set_char(self, x, y, char, fg=Ellipsis, bg=Ellipsis, bgblend=1):
         """
         Sets a character.
         This is called often and is designed to be as fast as possible.
@@ -852,86 +879,90 @@ class Console(_MetaConsole):
         _formatChar and _formatColor before passing to this."""
         # buffer values as ctypes objects
         console = self._as_parameter_
-        if char is not None and fgcolor is not None and bgcolor is not None:
-            if fgcolor is bgcolor is Ellipsis:
+        if char is not None and fg is not None and bg is not None:
+            if fg is bg is Ellipsis:
                 # char is not None and all colors are Ellipsis
                 # use default colors previously set in this console
-                _putchar(console, x, y, char, bgblend)
+                _put_char(console, x, y, char, bgblend)
                 return
             # all parameters are not None
             # use default colors for any ellipsis
-            if fgcolor is Ellipsis:
-                fgcolor = self._fgcolor
-            if bgcolor is Ellipsis:
-                bgcolor = self._bgcolor
+            if fg is Ellipsis:
+                fg = self._fg
+            if bg is Ellipsis:
+                bg = self._bg
                 
-            _setcharEX(console, x, y, char, fgcolor, bgcolor)
+            _put_char_ex(console, x, y, char, fg, bg)
             return
         # some parameters are None
         # selectively commit parameters to the console
         # use default colors for any ellipsis
         if char is not None:
-            _setchar(console, x, y, char)
-        if fgcolor is not None:
-            if fgcolor is Ellipsis:
-                fgcolor = self._fgcolor
-            _setfore(console, x, y, fgcolor)
-        if bgcolor is not None:
-            if bgcolor is Ellipsis:
-                bgcolor = self._bgcolor
-            _setback(console, x, y, bgcolor, bgblend)
+            _set_char(console, x, y, char)
+        if fg is not None:
+            if fg is Ellipsis:
+                fg = self._fg
+            _set_fg(console, x, y, fg)
+        if bg is not None:
+            if bg is Ellipsis:
+                bg = self._bg
+            _set_bg(console, x, y, bg, bgblend)
 
-    def _setCharBatch(self, batch, fgcolor, bgcolor, bgblend=1, nullChar=False):
+    def _set_batch(self, batch, fg, bg, bgblend=1, nullChar=False):
         """
-        Try to perform a batch operation otherwise fall back to _setChar.
-        If fgcolor and bgcolor are defined then this is faster but not by very
+        Try to perform a batch operation otherwise fall back to _set_char.
+        If fg and bg are defined then this is faster but not by very
         much.
+        
+        if any character is None then nullChar is True
 
         batch is a iterable of [(x, y), ch] items
         """
-        if fgcolor is Ellipsis:
-            fgcolor = self._fgcolor
-        if bgcolor is Ellipsis:
-            bgcolor = self._bgcolor
+        if fg is Ellipsis:
+            fg = self._fg
+        if bg is Ellipsis:
+            bg = self._bg
 
-        if fgcolor and not nullChar:
+        if fg and not nullChar:
             # buffer values as ctypes objects
             self._typewriter = None # clear the typewriter as colors will be set
             console = self._as_parameter_
             bgblend = _ctypes.c_int(bgblend)
 
-            if not bgcolor:
+            if not bg:
                 bgblend = 0
             else:
-                _lib.TCOD_console_set_default_background(console, bgcolor)
-            _lib.TCOD_console_set_default_foreground(console, fgcolor)
+                _lib.TCOD_console_set_default_background(console, bg)
+            _lib.TCOD_console_set_default_foreground(console, fg)
             _putChar = _lib.TCOD_console_put_char # remove dots and make local
             for (x, y), char in batch:
                 _putChar(console, x, y, char, bgblend)
             
         else:
             for (x, y), char in batch:
-                self._setChar(x, y, char, fgcolor, bgcolor, bgblend)
+                self._set_char(x, y, char, fg, bg, bgblend)
 
     def get_char(self, x, y):
         # inherit docstring
         x, y = self._normalizePoint(x, y)
         char = _lib.TCOD_console_get_char(self, x, y)
-        bgcolor = _lib.TCOD_console_get_char_background_wrapper(self, x, y)
-        fgcolor = _lib.TCOD_console_get_char_foreground_wrapper(self, x, y)
-        return char, tuple(fgcolor), tuple(bgcolor)
+        bg = _lib.TCOD_console_get_char_background_wrapper(self, x, y)
+        fg = _lib.TCOD_console_get_char_foreground_wrapper(self, x, y)
+        return char, tuple(fg), tuple(bg)
 
     def __repr__(self):
         return "<Console (Width=%i Height=%i)>" % (self.width, self.height)
 
 
-class Window(_MetaConsole):
+class Window(_BaseConsole):
     """A Window contains a small isolated part of a Console.
 
     Drawing on the Window draws on the Console.
 
     Making a Window and setting its width or height to None will extend it to
     the edge of the console.
+    
+    @undocumented: getChar
     """
 
     __slots__ = ('parent', 'x', 'y')
@@ -966,7 +997,7 @@ class Window(_MetaConsole):
         
                        See width.
         """
-        _MetaConsole.__init__(self)
+        _BaseConsole.__init__(self)
         assert isinstance(console, (Console, Window)), 'console parameter must be a Console or Window instance, got %s' % repr(console)
         self.parent = console
         self.x, self.y, self.width, self.height = console._normalizeRect(x, y, width, height)
@@ -982,44 +1013,62 @@ class Window(_MetaConsole):
 
     def clear(self, fg=Ellipsis, bg=Ellipsis):
         """Clears the entire Window.
-
-        @type fgcolor: (r, g, b)
-        @param fgcolor: Foreground color.
         
-                        Must be a 3-item list with integers that range 0-255.
-                        
-                        Unlike most other operations you can not use None here.
-        @type bgcolor: (r, g, b)
-        @param bgcolor: Background color.  See fgcolor.
+        fg and bg can not be None for this function, use L{draw_rect}.
+
+        @type fg: (r, g, b), int, Ellipsis, or None
+        @type bg: (r, g, b), int, Ellipsis, or None
+        @param fg: See Drawing and Colors at the L{module level docs<tdl>}
+        @param bg: See fg
+        @see: L{draw_rect}
         """
         assert _verify_colors(fg, bg)
         assert fg is not None and bg is not None, 'Can not use None with clear'
+        if fg is Ellipsis:
+            fg = self._fg
+        if bg is Ellipsis:
+            bg = self._bg
         self.draw_rect(0, 0, None, None, 0x20, fg, bg)
 
-    def _setChar(self, x, y, char=None, fgcolor=None, bgcolor=None, bgblend=1):
-        self.parent._setChar((x + self.x), (y + self.y), char, fgcolor, bgcolor, bgblend)
+    def _set_char(self, x, y, char=None, fg=None, bg=None, bgblend=1):
+        self.parent._set_char((x + self.x), (y + self.y), char, fg, bg, bgblend)
 
-    def _setCharBatch(self, batch, *args, **kargs):
+    def _set_batch(self, batch, *args, **kargs):
+        # positional values will need to be translated to the parent console
         myX = self.x # remove dots for speed up
         myY = self.y
-        self.parent._setCharBatch((((x + myX, y + myY), ch)
-                                   for ((x, y), ch) in batch),*args,**kargs)
+        self.parent._set_batch((((x + myX, y + myY), ch)
+                                   for ((x, y), ch) in batch), *args, **kargs)
     
     
-    def draw_char(self, x, y, char, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def draw_char(self, x, y, char, fg=Ellipsis, bg=Ellipsis):
         # inherit docstring
         x, y = self._normalizePoint(x, y)
-        self.parent.draw_char(x + self.x, y + self.y, char, fgcolor, bgcolor)
+        if fg is Ellipsis:
+            fg = self._fg
+        if bg is Ellipsis:
+            bg = self._bg
+        self.parent.draw_char(x + self.x, y + self.y, char, fg, bg)
     
-    def draw_rect(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def draw_rect(self, x, y, width, height, string, fg=Ellipsis, bg=Ellipsis):
         # inherit docstring
         x, y, width, height = self._normalizeRect(x, y, width, height)
-        self.parent.draw_rect(x + self.x, y + self.y, width, height, string, fgcolor, bgcolor)
+        if fg is Ellipsis:
+            fg = self._fg
+        if bg is Ellipsis:
+            bg = self._bg
+        self.parent.draw_rect(x + self.x, y + self.y, width, height,
+                              string, fg, bg)
         
-    def draw_frame(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def draw_frame(self, x, y, width, height, string, fg=Ellipsis, bg=Ellipsis):
         # inherit docstring
         x, y, width, height = self._normalizeRect(x, y, width, height)
-        self.parent.draw_frame(x + self.x, y + self.y, width, height, string, fgcolor, bgcolor)
+        if fg is Ellipsis:
+            fg = self._fg
+        if bg is Ellipsis:
+            bg = self._bg
+        self.parent.draw_frame(x + self.x, y + self.y, width, height,
+                               string, fg, bg)
 
     def get_char(self, x, y):
         # inherit docstring
@@ -1059,7 +1108,7 @@ def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
     @param renderer: Can be one of 'GLSL', 'OPENGL', or 'SDL'.
 
                      Due to way Python works you're unlikely to see much of an
-                     improvement by using 'GLSL' or 'OPENGL' as most of the
+                     improvement by using 'GLSL' over 'OPENGL' as most of the
                      time Python is slow interacting with the console and the
                      rendering itself is pretty fast even on 'SDL'.
 
@@ -1068,6 +1117,7 @@ def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
              what's visible after a call to L{tdl.flush}.
              After the root console is garbage collected, the window made by
              this function will close.
+    @see: L{Console}, L{set_font}
     """
     RENDERERS = {'GLSL': 0, 'OPENGL': 1, 'SDL': 2}
     global _rootinitialized, _rootConsoleRef
@@ -1333,19 +1383,19 @@ def force_resolution(width, height):
         
 
 __all__ = [_var for _var in locals().keys() if _var[0] != '_'] # remove modules from __all__
-__all__ += ['_MetaConsole'] # keep this object public to show the documentation in epydoc
+__all__ += ['_BaseConsole'] # keep this object public to show the documentation in epydoc
 
 # backported function names
-_MetaConsole.setMode = _style.backport(_MetaConsole.set_mode)
-_MetaConsole.setColors = _style.backport(_MetaConsole.set_colors)
-_MetaConsole.printStr = _style.backport(_MetaConsole.print_str)
-_MetaConsole.drawChar = _style.backport(_MetaConsole.draw_char)
-_MetaConsole.drawStr = _style.backport(_MetaConsole.draw_str)
-_MetaConsole.drawRect = _style.backport(_MetaConsole.draw_rect)
-_MetaConsole.drawFrame = _style.backport(_MetaConsole.draw_frame)
-_MetaConsole.getCursor = _style.backport(_MetaConsole.get_cursor)
-_MetaConsole.getSize = _style.backport(_MetaConsole.get_size)
-_MetaConsole.getChar = _style.backport(_MetaConsole.get_char)
+_BaseConsole.setMode = _style.backport(_BaseConsole.set_mode)
+_BaseConsole.setColors = _style.backport(_BaseConsole.set_colors)
+_BaseConsole.printStr = _style.backport(_BaseConsole.print_str)
+_BaseConsole.drawChar = _style.backport(_BaseConsole.draw_char)
+_BaseConsole.drawStr = _style.backport(_BaseConsole.draw_str)
+_BaseConsole.drawRect = _style.backport(_BaseConsole.draw_rect)
+_BaseConsole.drawFrame = _style.backport(_BaseConsole.draw_frame)
+_BaseConsole.getCursor = _style.backport(_BaseConsole.get_cursor)
+_BaseConsole.getSize = _style.backport(_BaseConsole.get_size)
+_BaseConsole.getChar = _style.backport(_BaseConsole.get_char)
 
 Console.getChar = _style.backport(Console.get_char)
 
@@ -1363,5 +1413,6 @@ getFPS = _style.backport(get_fps)
 forceResolution = _style.backport(force_resolution)
 
 __license__ = "New BSD License"
-__email__ = "4b796c65+pythonTDL@gmail.com"
+__author__ = 'Kyle Stewart'
+__contact__ = "4b796c65+pythonTDL@gmail.com"
 __version__ = '1.1.7'

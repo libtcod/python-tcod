@@ -51,6 +51,7 @@ class TestApp(tdl.event.App):
         self.width, self.height = self.console.getSize()
         self.total = self.width * self.height
         self.cells = list(itertools.product(range(self.width), range(self.height)))
+        self.tick = 0
         self.init()
         
     def init(self):
@@ -61,6 +62,8 @@ class TestApp(tdl.event.App):
         
     def update(self, deltaTime):
         self.updateTest(deltaTime)
+        self.tick += 1
+        #if self.tick % 50 == 0:
         tdl.setTitle('%s: %i FPS' % (self.__class__.__name__, tdl.getFPS()))
         tdl.flush()
         
@@ -152,7 +155,7 @@ class BlitScrollTest(TestApp):
 WIDTH = 46
 HEIGHT = 20
 def main():
-    console = tdl.init(46, 20)
+    console = tdl.init(46, 20, renderer='OPENGL')
     for Test in [FullDrawCharTest, PreCompiledColorTest, CharOnlyTest, TypewriterCharOnlyTest, ColorOnlyTest, GetCharTest,
                  SingleRectTest, DrawStrTest, BlitScrollTest]:
         Test(console).run()
