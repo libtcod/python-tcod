@@ -30,6 +30,7 @@ tdl.force_resolution	tdl-module.html#force_resolution
 tdl._set_bg	tdl-module.html#_set_bg
 tdl.set_font	tdl-module.html#set_font
 tdl.setFullscreen	tdl-module.html#setFullscreen
+tdl.__email__	tdl-module.html#__email__
 tdl._put_char	tdl-module.html#_put_char
 tdl._STRTYPES	tdl-module.html#_STRTYPES
 tdl.get_fullscreen	tdl-module.html#get_fullscreen
