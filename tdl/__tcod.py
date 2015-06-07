@@ -108,8 +108,8 @@ class _Color(Structure):
     _fields_ = [('r', c_uint8), ('g', c_uint8), ('b', c_uint8)]
     
     @staticmethod
-    def new(color):
-        if color is None or color is False:
+    def parse(color):
+        if color is Ellipsis or color is None or color is False:
             return color
         if isinstance(color, _Color):
             return color

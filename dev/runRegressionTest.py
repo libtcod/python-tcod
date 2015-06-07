@@ -32,6 +32,7 @@ class TDLTemplate(unittest.TestCase):
     def setUp(self):
         tdl.setFont('../fonts/libtcod/terminal8x8_gs_ro.png')
         tdl.event.get()
+        self.console.set_colors((0,0,0), (0,0,0))
         self.console.clear()
         
     @classmethod
@@ -219,7 +220,7 @@ class DrawingTests(TDLTemplate):
     
     def test_drawRect(self):
         consoleCopy = tdl.Console(*(self.console.getSize()))
-        for x,y in random.sample(list(self.getDrawables()), 100):
+        for x,y in random.sample(list(self.getDrawables()), 20):
             consoleCopy.blit(self.console) # copy the console to compare untouched areas
             ch, fg, bg = self.getRandomCharacter()
             width, height = self.console.getSize()
@@ -234,7 +235,7 @@ class DrawingTests(TDLTemplate):
                     
     def test_drawFrame(self):
         consoleCopy = tdl.Console(*(self.console.getSize()))
-        for x,y in random.sample(list(self.getDrawables()), 100):
+        for x,y in random.sample(list(self.getDrawables()), 20):
             consoleCopy.blit(self.console) # copy the console to compare untouched areas
             ch, fg, bg = self.getRandomCharacter()
             width, height = self.console.getSize()

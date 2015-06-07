@@ -13,14 +13,21 @@ def backport(func):
         The docstring is updated to reflect that the new function returned is
         deprecated and that the other function is preferred.
         A DeprecationWarning is also raised for using this function.
+        
+        If the script is run with an optimization flag then the real function
+        will be returned without being wrapped.
     """
+    if not __debug__:
+        return func
+        
     @_functools.wraps(func)
     def deprecated_function(*args, **kargs):
         _warnings.warn('This finction name is deprecated',
                        DeprecationWarning, 2)
         return func(*args, **kargs)
     deprecated_function.__doc__ = """
-    Deprecated version of the function L{%s}, call that instead of this.
+        Deprecated version of the function L{%s}, you should prefer calling
+        that function instead of this one.
     """ % (func.__name__)
     return deprecated_function
     

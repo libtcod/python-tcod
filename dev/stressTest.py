@@ -8,6 +8,10 @@
     Eventually these will be optimized to work better.
 """
 import sys
+import os
+
+import cProfile as profile
+import pstats
 
 import itertools
 import random
@@ -47,6 +51,10 @@ class TestApp(tdl.event.App):
         self.width, self.height = self.console.getSize()
         self.total = self.width * self.height
         self.cells = list(itertools.product(range(self.width), range(self.height)))
+        self.init()
+        
+    def init(self):
+        pass
         
     def ev_MOUSEDOWN(self, event):
         self.suspend()
@@ -64,8 +72,28 @@ class FullDrawCharTest(TestApp):
         char = [random.getrandbits(8) for _ in range(self.total)]
         fgcolor = (255, 255, 255)
         for (x,y), bgcolor, char in zip(self.cells, bgcolors, char):
-            self.console.drawChar(x, y, char, fgcolor, bgcolor)
-        
+            self.console.draw_char(x, y, char, fgcolor, bgcolor)
+
+class PreCompiledColorTest(TestApp):    
+    """
+        This test was to see if the cast to the ctypes Color object was a big
+        impact on performance, turns out there's no hit with this class.
+    """
+    
+    def init(self):
+        self.bgcolors = [tdl._Color(random.getrandbits(7),
+                                    random.getrandbits(7),
+                                    random.getrandbits(7))
+                         for _ in range(256)]
+        self.fgcolor = tdl._Color(255, 255, 255)
+    
+    def updateTest(self, deltaTime):
+        # getrandbits is around 5x faster than using randint
+        char = [random.getrandbits(8) for _ in range(self.total)]
+        for (x,y), char in zip(self.cells, char):
+            self.console.draw_char(x, y, char,
+                                   self.fgcolor, random.choice(self.bgcolors))
+            
 
 class CharOnlyTest(TestApp):
 
@@ -73,7 +101,7 @@ class CharOnlyTest(TestApp):
         self.console.clear((255, 255, 255), (0, 0, 0))
         char = [random.getrandbits(8) for _ in range(self.total)]
         for (x,y), char in zip(self.cells, char):
-            self.console.drawChar(x, y, char, None, None)
+            self.console.draw_char(x, y, char)
 
 class TypewriterCharOnlyTest(TestApp):
 
@@ -82,7 +110,7 @@ class TypewriterCharOnlyTest(TestApp):
         char = [random.getrandbits(8) for _ in range(self.total)]
         for (x,y), char in zip(self.cells, char):
             self.writer.move(x, y)
-            self.writer.printStr(chr(char))
+            self.writer.print_str(chr(char))
             
 class ColorOnlyTest(TestApp):    
     
@@ -90,19 +118,19 @@ class ColorOnlyTest(TestApp):
         # getrandbits is around 5x faster than using randint
         bgcolors = [(random.getrandbits(6), random.getrandbits(6), random.getrandbits(6)) for _ in range(self.total)]
         for (x,y), bgcolor in zip(self.cells, bgcolors):
-            self.console.drawChar(x, y, None, None, bgcolor)
+            self.console.draw_char(x, y, None, None, bgcolor)
 
 class GetCharTest(TestApp):    
     
     def updateTest(self, deltaTime):
         for (x,y) in self.cells:
-            self.console.getChar(x, y)
+            self.console.get_char(x, y)
 
 class SingleRectTest(TestApp):
 
     def updateTest(self, deltaTime):
         bgcolor = (random.getrandbits(6), random.getrandbits(6), random.getrandbits(6))
-        self.console.drawRect(0, 0, None, None, ' ', (255, 255, 255), bgcolor)
+        self.console.draw_rect(0, 0, None, None, ' ', (255, 255, 255), bgcolor)
     
 class DrawStrTest(TestApp):
 
@@ -110,7 +138,7 @@ class DrawStrTest(TestApp):
         for y in range(self.height):
             bgcolor = (random.getrandbits(6), random.getrandbits(6), random.getrandbits(6))
             string = [random.getrandbits(8) for x in range(self.width)]
-            self.console.drawStr(0, y, string, (255, 255, 255), bgcolor)
+            self.console.draw_str(0, y, string, (255, 255, 255), bgcolor)
     
 class BlitScrollTest(TestApp):
     def updateTest(self, deltaTime):
@@ -118,18 +146,28 @@ class BlitScrollTest(TestApp):
         for x in range(self.width):
             bgcolor = (random.getrandbits(6), random.getrandbits(6), random.getrandbits(6))
             ch = random.getrandbits(8)
-            self.console.drawChar(x, 0, ch, bgcolor=bgcolor)
+            self.console.draw_char(x, 0, ch, bgcolor=bgcolor)
     
 # match libtcod sample screen
 WIDTH = 46
 HEIGHT = 20
 def main():
     console = tdl.init(46, 20)
-    for Test in [FullDrawCharTest, CharOnlyTest, TypewriterCharOnlyTest, ColorOnlyTest, GetCharTest,
+    for Test in [FullDrawCharTest, PreCompiledColorTest, CharOnlyTest, TypewriterCharOnlyTest, ColorOnlyTest, GetCharTest,
                  SingleRectTest, DrawStrTest, BlitScrollTest]:
         Test(console).run()
         console.clear()
 
 if __name__ == '__main__':
-    main()
+    pr = profile.Profile()
+    try:
+        pr.runcall(main)
+    finally:
+        pr.dump_stats('profile.prof')
+        stats = pstats.Stats('profile.prof')
+        stats.strip_dirs()
+        stats.sort_stats('time')
+        stats.reverse_order()
+        stats.print_stats()
+        os.remove('profile.prof')
     

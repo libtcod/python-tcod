@@ -92,12 +92,9 @@ def _formatChar(char):
     """
     if char is None:
         return None
-    #if isinstance(char, _INTTYPES):
-    #    return char
     if isinstance(char, _STRTYPES) and len(char) == 1:
         return ord(char)
     return int(char) # conversion faster than type check
-    #raise TypeError('Expected char parameter to be a single character string, number, or None, got: %s' % repr(char))
 
 _fontinitialized = False
 _rootinitialized = False
@@ -107,6 +104,8 @@ _setchar = _lib.TCOD_console_set_char
 _setfore = _lib.TCOD_console_set_char_foreground
 _setback = _lib.TCOD_console_set_char_background
 _setcharEX = _lib.TCOD_console_put_char_ex
+_putchar = _lib.TCOD_console_put_char
+
 def _verify_colors(*colors):
     """Used internally.
     Raise an assertion error if the parameters can not be converted into colors.
@@ -124,6 +123,8 @@ def _iscolor(color):
     It has been made to work with assert and can be skipped with the -O flag.
     Still it's called often and must be optimized.
     """
+    if color is Ellipsis:
+        return True
     if color is None:
         return True
     if isinstance(color, (tuple, list, _Color)):
@@ -132,23 +133,7 @@ def _iscolor(color):
         return True
     return False
 
-## not using this for now
-#class Color(object):
-#    
-#    def __init__(self, r, g, b):
-#        self._color = (r, g, b)
-#        self._ctype = None
-#        
-#    def _getCType(self):
-#        if not self._ctype:
-#            self._ctype = _Color(*self._color)
-#        return self._ctype
-#        
-#    def __len__(self):
-#        return 3
-    
-# Format the color to ctypes, will preserve None and False
-_formatColor = _Color.new
+_formatColor = _Color.parse
 
 def _getImageSize(filename):
     """Try to get the width and height of a bmp of png image file"""
@@ -196,21 +181,16 @@ class _MetaConsole(object):
         Respects Pythons negative indexes.  -1 starts at the bottom right.
         Replaces the _drawable function
         """
-        #assert isinstance(x, _INTTYPES), 'x must be an integer, got %s' % repr(x)
-        #assert isinstance(y, _INTTYPES), 'y must be an integer, got %s' % repr(y)
-        # force int, always faster than type checking
+        # cast to int, always faster than type checking
         x = int(x)
         y = int(y)
 
-        assert (-self.width <= x < self.width) and (-self.height <= y < self.height), \
-                ('(%i, %i) is an invalid postition on %s' % (x, y, self))
+        assert (-self.width <= x < self.width) and \
+               (-self.height <= y < self.height), \
+               ('(%i, %i) is an invalid postition on %s' % (x, y, self))
                  
         # handle negative indexes
-        if x < 0:
-            x += self.width
-        if y < 0:
-            y += self.height
-        return (x, y)
+        return (x % self.width, y % self.height)
 
     def _normalizeRect(self, x, y, width, height):
         """Check if the rectangle is in bounds and make minor adjustments.
@@ -255,14 +235,6 @@ class _MetaConsole(object):
                 self._cursor = (0, 0)
                 raise TDLError('Cursor has reached the end of the console')
         return (x, y)
-        
-    def _lockColors(self, forceUpdate=False):
-        """Make sure the color options on the root console match ths instance"""
-        if self.console._lockColors is not self or forceUpdate:
-            self.console._lockColors = self
-            _lib.TCOD_console_set_default_background(self.console, self.bgcolor)
-            _lib.TCOD_console_set_default_foreground(self.console, self.fgcolor)
-            #
             
     def set_mode(self, mode):
         """Configure how this console will react to the cursor writing past the
@@ -295,8 +267,6 @@ class _MetaConsole(object):
         
         Values of None will only leave the current values unchanged.
         """
-        if self.console._lockColors is self:
-            self.console._lockColors = None
         if fg is not None:
             self._fgcolor = _formatColor(fg)
         if bg is not None:
@@ -361,7 +331,7 @@ class _MetaConsole(object):
         y -= 1
         self._cursor = (x, y)
     
-    def draw_char(self, x, y, char, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def draw_char(self, x, y, char, fgcolor=Ellipsis, bgcolor=Ellipsis):
         """Draws a single character.
 
         @type x: int
@@ -395,7 +365,7 @@ class _MetaConsole(object):
         self._setChar(x, y, _formatChar(char),
                       _formatColor(fgcolor), _formatColor(bgcolor))
 
-    def draw_str(self, x, y, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def draw_str(self, x, y, string, fgcolor=Ellipsis, bgcolor=Ellipsis):
         """Draws a string starting at x and y.  Optinally colored.
 
         A string that goes past the right side will wrap around.  A string
@@ -458,7 +428,7 @@ class _MetaConsole(object):
                     y += 1
         self._setCharBatch(_drawStrGen(), fgcolor, bgcolor)
 
-    def draw_rect(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def draw_rect(self, x, y, width, height, string, fgcolor=Ellipsis, bgcolor=Ellipsis):
         """Draws a rectangle starting from x and y and extending to width and height.
         
         If width or height are None then it will extend to the edge of the console.
@@ -509,7 +479,7 @@ class _MetaConsole(object):
         batch = zip(grid, _itertools.repeat(char, width * height))
         self._setCharBatch(batch, fgcolor, bgcolor, nullChar=(char is None))
 
-    def draw_frame(self, x, y, width, height, string, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
+    def draw_frame(self, x, y, width, height, string, fgcolor=Ellipsis, bgcolor=Ellipsis):
         """Similar to L{draw_rect} but only draws the outline of the rectangle.
 
         @type x: int
@@ -662,7 +632,7 @@ class _MetaConsole(object):
     def scroll(self, x, y):
         """Scroll the contents of the console in the direction of x,y.
 
-        Uncovered areas will be cleared.
+        Uncovered areas will be cleared to the default background color.
         Does not move the virutal cursor.
         @type x: int
         @param x: Distance to scroll along x-axis
@@ -720,11 +690,14 @@ class _MetaConsole(object):
         self.blit(self, x, y, width, height, srcx, srcy)
 
         if uncoverX: # clear sides (0x20 is space)
-            self.draw_rect(uncoverX[0], coverY[0], uncoverX[1], coverY[1], 0x20, 0x000000, 0x000000)
+            self.draw_rect(uncoverX[0], coverY[0], uncoverX[1], coverY[1],
+                           0x20, self._fgcolor, self._bgcolor)
         if uncoverY: # clear top/bottom
-            self.draw_rect(coverX[0], uncoverY[0], coverX[1], uncoverY[1], 0x20, 0x000000, 0x000000)
+            self.draw_rect(coverX[0], uncoverY[0], coverX[1], uncoverY[1],
+                           0x20, self._fgcolor, self._bgcolor)
         if uncoverX and uncoverY: # clear corner
-            self.draw_rect(uncoverX[0], uncoverY[0], uncoverX[1], uncoverY[1], 0x20, 0x000000, 0x000000)
+            self.draw_rect(uncoverX[0], uncoverY[0], uncoverX[1], uncoverY[1],
+                           0x20, self._fgcolor, self._bgcolor)
 
     def get_char(self, x, y):
         """Return the character and colors of a tile as (ch, fg, bg)
@@ -846,26 +819,30 @@ class Console(_MetaConsole):
         untouched"""
         return x, y
 
-    def clear(self, fgcolor=(0, 0, 0), bgcolor=(0, 0, 0)):
+    def clear(self, fg=Ellipsis, bg=Ellipsis):
         """Clears the entire Console.
 
-        @type fgcolor: (r, g, b)
-        @param fgcolor: Foreground color.
+        @type fg: (r, g, b)
+        @param fg: Foreground color.
         
-                        Must be a 3-item list with integers that range 0-255.
+                   Must be a 3-item list with integers that range 0-255.
                         
-                        Unlike most other operations you cannot use None here.
-        @type bgcolor: (r, g, b)
-        @param bgcolor: Background color.  See fgcolor.
+                   Unlike most other operations you cannot use None here.
+                   To clear only the foreground or background use L{draw_rect}.
+        @type bg: (r, g, b)
+        @param bg: Background color.  See fgcolor.
         """
-        assert _verify_colors(fgcolor, bgcolor)
-        assert fgcolor and bgcolor, 'Can not use None with clear'
+        assert _verify_colors(fg, bg)
+        assert fg is not None and bg is not None, 'Can not use None with clear'
         self._typewriter = None
-        _lib.TCOD_console_set_default_background(self, _formatColor(bgcolor))
-        _lib.TCOD_console_set_default_foreground(self, _formatColor(fgcolor))
+        if bg is not Ellipsis:
+            _lib.TCOD_console_set_default_background(self, _formatColor(bg))
+        if fg is not Ellipsis:
+            _lib.TCOD_console_set_default_foreground(self, _formatColor(fg))
         _lib.TCOD_console_clear(self)
+        
 
-    def _setChar(self, x, y, char, fgcolor=None, bgcolor=None, bgblend=1):
+    def _setChar(self, x, y, char, fgcolor=Ellipsis, bgcolor=Ellipsis, bgblend=1):
         """
         Sets a character.
         This is called often and is designed to be as fast as possible.
@@ -875,15 +852,33 @@ class Console(_MetaConsole):
         _formatChar and _formatColor before passing to this."""
         # buffer values as ctypes objects
         console = self._as_parameter_
-
         if char is not None and fgcolor is not None and bgcolor is not None:
+            if fgcolor is bgcolor is Ellipsis:
+                # char is not None and all colors are Ellipsis
+                # use default colors previously set in this console
+                _putchar(console, x, y, char, bgblend)
+                return
+            # all parameters are not None
+            # use default colors for any ellipsis
+            if fgcolor is Ellipsis:
+                fgcolor = self._fgcolor
+            if bgcolor is Ellipsis:
+                bgcolor = self._bgcolor
+                
             _setcharEX(console, x, y, char, fgcolor, bgcolor)
             return
+        # some parameters are None
+        # selectively commit parameters to the console
+        # use default colors for any ellipsis
         if char is not None:
             _setchar(console, x, y, char)
         if fgcolor is not None:
+            if fgcolor is Ellipsis:
+                fgcolor = self._fgcolor
             _setfore(console, x, y, fgcolor)
         if bgcolor is not None:
+            if bgcolor is Ellipsis:
+                bgcolor = self._bgcolor
             _setback(console, x, y, bgcolor, bgblend)
 
     def _setCharBatch(self, batch, fgcolor, bgcolor, bgblend=1, nullChar=False):
@@ -894,6 +889,11 @@ class Console(_MetaConsole):
 
         batch is a iterable of [(x, y), ch] items
         """
+        if fgcolor is Ellipsis:
+            fgcolor = self._fgcolor
+        if bgcolor is Ellipsis:
+            bgcolor = self._bgcolor
+
         if fgcolor and not nullChar:
             # buffer values as ctypes objects
             self._typewriter = None # clear the typewriter as colors will be set
@@ -908,6 +908,7 @@ class Console(_MetaConsole):
             _putChar = _lib.TCOD_console_put_char # remove dots and make local
             for (x, y), char in batch:
                 _putChar(console, x, y, char, bgblend)
+            
         else:
             for (x, y), char in batch:
                 self._setChar(x, y, char, fgcolor, bgcolor, bgblend)
@@ -979,7 +980,7 @@ class Window(_MetaConsole):
         # we add our position relative to our parent and then call then next parent up
         return self.parent._translate((x + self.x), (y + self.y))
 
-    def clear(self, fgcolor=(0, 0, 0), bgcolor=(0, 0, 0)):
+    def clear(self, fg=Ellipsis, bg=Ellipsis):
         """Clears the entire Window.
 
         @type fgcolor: (r, g, b)
@@ -991,18 +992,18 @@ class Window(_MetaConsole):
         @type bgcolor: (r, g, b)
         @param bgcolor: Background color.  See fgcolor.
         """
-        assert _verify_colors(fgcolor, bgcolor)
-        assert fgcolor and bgcolor, 'Can not use None with clear'
-        self.draw_rect(0, 0, None, None, 0x20, fgcolor, bgcolor)
+        assert _verify_colors(fg, bg)
+        assert fg is not None and bg is not None, 'Can not use None with clear'
+        self.draw_rect(0, 0, None, None, 0x20, fg, bg)
 
     def _setChar(self, x, y, char=None, fgcolor=None, bgcolor=None, bgblend=1):
         self.parent._setChar((x + self.x), (y + self.y), char, fgcolor, bgcolor, bgblend)
 
-    def _setCharBatch(self, batch, fgcolor, bgcolor, bgblend=1):
+    def _setCharBatch(self, batch, *args, **kargs):
         myX = self.x # remove dots for speed up
         myY = self.y
-        self.parent._setCharBatch((((x + myX, y + myY), ch) for ((x, y), ch) in batch),
-                                  fgcolor, bgcolor, bgblend)
+        self.parent._setCharBatch((((x + myX, y + myY), ch)
+                                   for ((x, y), ch) in batch),*args,**kargs)
     
     
     def draw_char(self, x, y, char, fgcolor=(255, 255, 255), bgcolor=(0, 0, 0)):
