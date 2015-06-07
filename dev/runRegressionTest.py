@@ -37,7 +37,6 @@ class TDLTemplate(unittest.TestCase):
         
     @classmethod
     def tearDownClass(cls):
-        time.sleep(2)
         del cls.console
         gc.collect() # make sure console.__del__ is called quickly
         

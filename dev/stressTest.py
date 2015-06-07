@@ -149,7 +149,7 @@ class BlitScrollTest(TestApp):
         for x in range(self.width):
             bgcolor = (random.getrandbits(6), random.getrandbits(6), random.getrandbits(6))
             ch = random.getrandbits(8)
-            self.console.draw_char(x, 0, ch, bgcolor=bgcolor)
+            self.console.draw_char(x, 0, ch, bg=bgcolor)
     
 # match libtcod sample screen
 WIDTH = 46
