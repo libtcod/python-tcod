@@ -9,6 +9,8 @@ import tdl
 WIDTH = 80 # must be divisible by 16
 HEIGHT = 48
 
+RENDERER = 'OpenGL'
+
 log = None
 
 def print_result(string):
@@ -96,10 +98,10 @@ def run_benchmark():
     log = open('results.log', 'a')
     print('', file=log)
     print_result('Benchmark run on %s' % time.ctime())
-    renderer='OpenGL'
+    print_result('%i characters/frame' % (WIDTH * HEIGHT))
     
-    console = tdl.init(WIDTH, HEIGHT, renderer=renderer)
-    print_result('Opened console in %s mode' % renderer)
+    console = tdl.init(WIDTH, HEIGHT, renderer=RENDERER)
+    print_result('Opened console in %s mode' % RENDERER)
     Benchmark_DrawChar_DefaultColor().run(console)
     Benchmark_DrawChar_NoColor().run(console)
     Benchmark_DrawStr16_DefaultColor().run(console)
