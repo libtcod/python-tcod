@@ -153,6 +153,7 @@ def main():
         else:
             time.sleep(0.01)
         tdl.flush()
+        tdl.set_title("Conway's Game of Life - %i FPS" % tdl.get_fps())
         
     
 if __name__ == '__main__':
