@@ -3,6 +3,7 @@
 from __future__ import print_function
 
 import time
+import platform
 
 import tdl
 
@@ -97,10 +98,13 @@ def run_benchmark():
     global log
     log = open('results.log', 'a')
     print('', file=log)
-    print_result('Benchmark run on %s' % time.ctime())
-    print_result('%i characters/frame' % (WIDTH * HEIGHT))
-    
     console = tdl.init(WIDTH, HEIGHT, renderer=RENDERER)
+    
+    print_result('Benchmark run on %s' % time.ctime())
+    print_result('Running under %s %s' % (platform.python_implementation(),
+                                          platform.python_version()))
+    print_result('In %s mode' % (['release', 'debug'][__debug__]))
+    print_result('%i characters/frame' % (WIDTH * HEIGHT))
     print_result('Opened console in %s mode' % RENDERER)
     Benchmark_DrawChar_DefaultColor().run(console)
     Benchmark_DrawChar_NoColor().run(console)
