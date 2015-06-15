@@ -156,21 +156,22 @@ WIDTH = 46
 HEIGHT = 20
 def main():
     console = tdl.init(46, 20, renderer='OPENGL')
-    for Test in [FullDrawCharTest, PreCompiledColorTest, CharOnlyTest, TypewriterCharOnlyTest, ColorOnlyTest, GetCharTest,
+    for Test in [FullDrawCharTest, CharOnlyTest, TypewriterCharOnlyTest, ColorOnlyTest, GetCharTest,
                  SingleRectTest, DrawStrTest, BlitScrollTest]:
         Test(console).run()
         console.clear()
 
 if __name__ == '__main__':
-    pr = profile.Profile()
-    try:
-        pr.runcall(main)
-    finally:
-        pr.dump_stats('profile.prof')
-        stats = pstats.Stats('profile.prof')
-        stats.strip_dirs()
-        stats.sort_stats('time')
-        stats.reverse_order()
-        stats.print_stats()
-        os.remove('profile.prof')
+    main()
+    #pr = profile.Profile()
+    #try:
+    #    pr.runcall(main)
+    #finally:
+    #    pr.dump_stats('profile.prof')
+    #    stats = pstats.Stats('profile.prof')
+    #    stats.strip_dirs()
+    #    stats.sort_stats('time')
+    #    stats.reverse_order()
+    #    stats.print_stats()
+    #    os.remove('profile.prof')
     
