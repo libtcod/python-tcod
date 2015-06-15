@@ -402,6 +402,16 @@ ffi.set_source('_libtcod', """
 
 static void set_char(TCOD_console_t console, int x, int y,
                      int ch, int fg, int bg){
+    // normalize x, y
+    int width=TCOD_console_get_width(console);
+    int height=TCOD_console_get_height(console);
+    
+    x = x % width
+    if(x<0){x += width;}
+    y = y % height
+    if(y<0){y += height;}
+    
+    
     TCOD_color_t color;
     if(ch != -1){
         TCOD_console_set_char(console, x, y, ch);

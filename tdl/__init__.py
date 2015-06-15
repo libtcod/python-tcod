@@ -410,7 +410,7 @@ class _BaseConsole(object):
         """
 
         assert _verify_colors(fg, bg)
-        x, y = self._normalizePoint(x, y)
+        #x, y = self._normalizePoint(x, y)
         #x, y = _ctypes.c_int(x), _ctypes.c_int(y)
         _lib.set_char(self._as_parameter_, x, y, _formatChar(char),
                       _formatColor(fg, self._fg), _formatColor(bg, self._bg))
@@ -965,19 +965,19 @@ class Console(_BaseConsole):
         if bg is Ellipsis:
             bg = self._bg
             
-        if fg is not None:
+        if fg != -1:
             fg = _to_tcod_color(fg)
-        if bg is not None:
+        if bg != -1:
             bg = _to_tcod_color(bg)
             
 
-        if fg and not nullChar:
+        if fg != -1 and not nullChar:
             # buffer values as ctypes objects
             self._typewriter = None # clear the typewriter as colors will be set
             console = self._as_parameter_
             #bgblend = _ctypes.c_int(bgblend)
 
-            if not bg:
+            if bg == -1:
                 bgblend = 0
             else:
                 _lib.TCOD_console_set_default_background(console, bg[0])
