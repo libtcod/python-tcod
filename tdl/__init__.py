@@ -70,7 +70,9 @@ import warnings as _warnings
 
 from . import event, map, noise
 from .__tcod import _lib, _Color, _unpackfile
+from .libtcod import _ffi, _lib
 from . import __style as _style
+
 
 _IS_PYTHON3 = (_sys.version_info[0] == 3)
 
@@ -133,13 +135,32 @@ def _iscolor(color):
         return True
     if color is None:
         return True
-    if isinstance(color, (tuple, list, _Color)):
+    if isinstance(color, (tuple, list, _ffi.CData)):
         return len(color) == 3
     if isinstance(color, _INTTYPES):
         return True
     return False
 
-_formatColor = _Color.parse
+# python 2 to 3 workaround
+if _sys.version_info[0] == 2:
+    int_types = (int, long)
+else:
+    int_types = int
+
+    
+#_formatColor = _Color.parse
+def _formatColor(color):
+        if color is Ellipsis or color is None or color is False:
+            return color
+        if (isinstance(color, _ffi.CData) and
+            _ffi.typeof(color) is _ffi.typeof('TCOD_color_t *')):
+            return color
+        if isinstance(color, int_types):
+            # format a web style color with the format 0xRRGGBB
+            return _ffi.new('TCOD_color_t *', (color >> 16 & 0xff,
+                                               color >> 8 & 0xff,
+                                               color & 0xff))
+        return _ffi.new('TCOD_color_t *', color)
 
 def _getImageSize(filename):
     """Try to get the width and height of a bmp of png image file"""
@@ -381,7 +402,7 @@ class _BaseConsole(object):
 
         assert _verify_colors(fg, bg)
         x, y = self._normalizePoint(x, y)
-        x, y = _ctypes.c_int(x), _ctypes.c_int(y)
+        #x, y = _ctypes.c_int(x), _ctypes.c_int(y)
         self._set_char(x, y, _formatChar(char),
                       _formatColor(fg), _formatColor(bg))
 
@@ -489,8 +510,10 @@ class _BaseConsole(object):
         char = _formatChar(string)
         # use itertools to make an x,y grid
         # using ctypes here reduces type converstions later
-        grid = _itertools.product((_ctypes.c_int(x) for x in range(x, x + width)),
-                                  (_ctypes.c_int(y) for y in range(y, y + height)))
+        #grid = _itertools.product((_ctypes.c_int(x) for x in range(x, x + width)),
+        #                          (_ctypes.c_int(y) for y in range(y, y + height)))
+        grid = _itertools.product((x for x in range(x, x + width)),
+                                  (y for y in range(y, y + height)))
         # zip the single character in a batch variable
         batch = zip(grid, _itertools.repeat(char, width * height))
         self._set_batch(batch, fg, bg, nullChar=(char is None))
@@ -595,10 +618,15 @@ class _BaseConsole(object):
             # onto the data, otherwise it tries to copy into itself and
             # starts destroying everything
             tmp = Console(width, height)
-            _lib.TCOD_console_blit(source, srcX, srcY, width, height, tmp, 0, 0, fgalpha, bgalpha)
-            _lib.TCOD_console_blit(tmp, 0, 0, width, height, self, x, y, fgalpha, bgalpha)
+            _lib.TCOD_console_blit(source._as_parameter_,
+                                   srcX, srcY, width, height,
+                                   tmp._as_parameter_, 0, 0, fgalpha, bgalpha)
+            _lib.TCOD_console_blit(tmp._as_parameter_, 0, 0, width, height,
+                                   self._as_parameter_, x, y, fgalpha, bgalpha)
         else:
-            _lib.TCOD_console_blit(source, srcX, srcY, width, height, self, x, y, fgalpha, bgalpha)
+            _lib.TCOD_console_blit(source._as_parameter_,
+                                   srcX, srcY, width, height,
+                                   self._as_parameter_, x, y, fgalpha, bgalpha)
 
     def get_cursor(self):
         """Return the virtual cursor position.
@@ -775,8 +803,8 @@ class Console(_BaseConsole):
         _BaseConsole.__init__(self)
         self._as_parameter_ = console
         self.console = self
-        self.width = _lib.TCOD_console_get_width(self)
-        self.height = _lib.TCOD_console_get_height(self)
+        self.width = _lib.TCOD_console_get_width(console)
+        self.height = _lib.TCOD_console_get_height(console)
         self._typewriter = None
         return self
 
@@ -791,11 +819,11 @@ class Console(_BaseConsole):
             if(_rootConsoleRef and _rootConsoleRef is self):
                 _rootinitialized = False
                 _rootConsoleRef = None
-                _lib.TCOD_console_delete(self)
+                _lib.TCOD_console_delete(self._as_parameter_)
             # if not then assume the console has already been taken care of
         else:
             # this is a normal console pointer and can be safely deleted
-            _lib.TCOD_console_delete(self)
+            _lib.TCOD_console_delete(self._as_parameter_)
 
     def __copy__(self):
         # make a new class and blit
@@ -828,8 +856,8 @@ class Console(_BaseConsole):
               console._as_parameter_, self._as_parameter_ # swap tcod consoles
         else:
             self._as_parameter_ = console
-        self.width = _lib.TCOD_console_get_width(self)
-        self.height = _lib.TCOD_console_get_height(self)
+        self.width = _lib.TCOD_console_get_width(self._as_parameter_)
+        self.height = _lib.TCOD_console_get_height(self._as_parameter_)
         return self
 
     def _translate(self, x, y):
@@ -864,9 +892,9 @@ class Console(_BaseConsole):
             bg = self._bg
         else:
             bg = _formatColor(bg)
-        _lib.TCOD_console_set_default_foreground(self, fg)
-        _lib.TCOD_console_set_default_background(self, bg)
-        _lib.TCOD_console_clear(self)
+        _lib.TCOD_console_set_default_foreground(self._as_parameter_, fg[0])
+        _lib.TCOD_console_set_default_background(self._as_parameter_, bg[0])
+        _lib.TCOD_console_clear(self._as_parameter_)
         
 
     def _set_char(self, x, y, char, fg=Ellipsis, bg=Ellipsis, bgblend=1):
@@ -892,7 +920,7 @@ class Console(_BaseConsole):
             if bg is Ellipsis:
                 bg = self._bg
                 
-            _put_char_ex(console, x, y, char, fg, bg)
+            _put_char_ex(console, x, y, char, fg[0], bg[0])
             return
         # some parameters are None
         # selectively commit parameters to the console
@@ -902,11 +930,11 @@ class Console(_BaseConsole):
         if fg is not None:
             if fg is Ellipsis:
                 fg = self._fg
-            _set_fg(console, x, y, fg)
+            _set_fg(console, x, y, fg[0])
         if bg is not None:
             if bg is Ellipsis:
                 bg = self._bg
-            _set_bg(console, x, y, bg, bgblend)
+            _set_bg(console, x, y, bg[0], bgblend)
 
     def _set_batch(self, batch, fg, bg, bgblend=1, nullChar=False):
         """
@@ -945,9 +973,9 @@ class Console(_BaseConsole):
     def get_char(self, x, y):
         # inherit docstring
         x, y = self._normalizePoint(x, y)
-        char = _lib.TCOD_console_get_char(self, x, y)
-        bg = _lib.TCOD_console_get_char_background_wrapper(self, x, y)
-        fg = _lib.TCOD_console_get_char_foreground_wrapper(self, x, y)
+        char = _lib.TCOD_console_get_char(self._as_parameter_, x, y)
+        bg = _lib.TCOD_console_get_char_background(self._as_parameter_, x, y)
+        fg = _lib.TCOD_console_get_char_foreground(self._as_parameter_, x, y)
         return char, tuple(fg), tuple(bg)
 
     def __repr__(self):
@@ -1079,8 +1107,6 @@ class Window(_BaseConsole):
         return "<Window(X=%i Y=%i Width=%i Height=%i)>" % (self.x, self.y,
                                                           self.width,
                                                           self.height)
-#
-
 
 
 def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
@@ -1150,7 +1176,7 @@ def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
 
     event._eventsflushed = False
     _rootinitialized = True
-    rootconsole = Console._newConsole(_ctypes.c_void_p())
+    rootconsole = Console._newConsole(_ffi.NULL)
     _rootConsoleRef = _weakref.ref(rootconsole)
 
     return rootconsole
