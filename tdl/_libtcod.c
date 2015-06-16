@@ -392,7 +392,17 @@ static PyObject **_cffi_unpack_args(PyObject *args_tuple, Py_ssize_t expected,
 
 static void set_char(TCOD_console_t console, int x, int y,
                      int ch, int fg, int bg){
+    // normalize x, y
+    int width=TCOD_console_get_width(console);
+    int height=TCOD_console_get_height(console);
     TCOD_color_t color;
+    
+    x = x % width;
+    if(x<0){x += width;};
+    y = y % height;
+    if(y<0){y += height;};
+    
+    
     if(ch != -1){
         TCOD_console_set_char(console, x, y, ch);
     }
@@ -416,408 +426,487 @@ static void set_char(TCOD_console_t console, int x, int y,
 /************************************************************/
 
 static void *_cffi_types[] = {
-/*  0 */ _CFFI_OP(_CFFI_OP_FUNCTION, 63), // TCOD_alignment_t()(void *)
-/*  1 */ _CFFI_OP(_CFFI_OP_POINTER, 400), // void *
+/*  0 */ _CFFI_OP(_CFFI_OP_FUNCTION, 122), // TCOD_alignment_t()(void *)
+/*  1 */ _CFFI_OP(_CFFI_OP_POINTER, 479), // void *
 /*  2 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/*  3 */ _CFFI_OP(_CFFI_OP_FUNCTION, 62), // TCOD_bkgnd_flag_t()(void *)
+/*  3 */ _CFFI_OP(_CFFI_OP_FUNCTION, 121), // TCOD_bkgnd_flag_t()(void *)
 /*  4 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /*  5 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/*  6 */ _CFFI_OP(_CFFI_OP_FUNCTION, 138), // TCOD_color_t()(void *)
+/*  6 */ _CFFI_OP(_CFFI_OP_FUNCTION, 210), // TCOD_color_t()(void *)
 /*  7 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /*  8 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/*  9 */ _CFFI_OP(_CFFI_OP_FUNCTION, 138), // TCOD_color_t()(void *, float, float, float, float)
+/*  9 */ _CFFI_OP(_CFFI_OP_FUNCTION, 210), // TCOD_color_t()(void *, float, float, float, float)
 /* 10 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /* 11 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13), // float
 /* 12 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
 /* 13 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
 /* 14 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
 /* 15 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 16 */ _CFFI_OP(_CFFI_OP_FUNCTION, 138), // TCOD_color_t()(void *, int, int)
+/* 16 */ _CFFI_OP(_CFFI_OP_FUNCTION, 210), // TCOD_color_t()(void *, int, int)
 /* 17 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /* 18 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7), // int
 /* 19 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
 /* 20 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 21 */ _CFFI_OP(_CFFI_OP_FUNCTION, 138), // TCOD_color_t()(void)
+/* 21 */ _CFFI_OP(_CFFI_OP_FUNCTION, 210), // TCOD_color_t()(void)
 /* 22 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 23 */ _CFFI_OP(_CFFI_OP_FUNCTION, 379), // TCOD_event_t()(int, TCOD_key_t *, TCOD_mouse_t *)
-/* 24 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 25 */ _CFFI_OP(_CFFI_OP_POINTER, 382), // TCOD_key_t *
-/* 26 */ _CFFI_OP(_CFFI_OP_POINTER, 383), // TCOD_mouse_t *
-/* 27 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 28 */ _CFFI_OP(_CFFI_OP_FUNCTION, 379), // TCOD_event_t()(int, TCOD_key_t *, TCOD_mouse_t *, unsigned char)
-/* 29 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 30 */ _CFFI_OP(_CFFI_OP_NOOP, 25),
-/* 31 */ _CFFI_OP(_CFFI_OP_NOOP, 26),
-/* 32 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 4), // unsigned char
-/* 33 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 34 */ _CFFI_OP(_CFFI_OP_FUNCTION, 382), // TCOD_key_t()(int)
-/* 35 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 23 */ _CFFI_OP(_CFFI_OP_FUNCTION, 98), // TCOD_dice_t()(char const *)
+/* 24 */ _CFFI_OP(_CFFI_OP_POINTER, 465), // char const *
+/* 25 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 26 */ _CFFI_OP(_CFFI_OP_FUNCTION, 459), // TCOD_event_t()(int, TCOD_key_t *, TCOD_mouse_t *)
+/* 27 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 28 */ _CFFI_OP(_CFFI_OP_POINTER, 462), // TCOD_key_t *
+/* 29 */ _CFFI_OP(_CFFI_OP_POINTER, 463), // TCOD_mouse_t *
+/* 30 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 31 */ _CFFI_OP(_CFFI_OP_FUNCTION, 459), // TCOD_event_t()(int, TCOD_key_t *, TCOD_mouse_t *, unsigned char)
+/* 32 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 33 */ _CFFI_OP(_CFFI_OP_NOOP, 28),
+/* 34 */ _CFFI_OP(_CFFI_OP_NOOP, 29),
+/* 35 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 4), // unsigned char
 /* 36 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 37 */ _CFFI_OP(_CFFI_OP_FUNCTION, 382), // TCOD_key_t()(unsigned char)
-/* 38 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 4),
+/* 37 */ _CFFI_OP(_CFFI_OP_FUNCTION, 462), // TCOD_key_t()(int)
+/* 38 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
 /* 39 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 40 */ _CFFI_OP(_CFFI_OP_FUNCTION, 383), // TCOD_mouse_t()(void)
-/* 41 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 42 */ _CFFI_OP(_CFFI_OP_FUNCTION, 142), // TCOD_renderer_t()(void)
-/* 43 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 44 */ _CFFI_OP(_CFFI_OP_FUNCTION, 384), // char *()(void)
-/* 45 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 46 */ _CFFI_OP(_CFFI_OP_FUNCTION, 11), // float()(void)
-/* 47 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 48 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void *)
-/* 49 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 50 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 51 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void *, int, int)
-/* 52 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 53 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 54 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 55 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 56 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void *, int, int, int, int, TCOD_bkgnd_flag_t, TCOD_alignment_t, char const *, ...)
-/* 57 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 58 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 59 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 60 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 61 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 62 */ _CFFI_OP(_CFFI_OP_ENUM, 1), // TCOD_bkgnd_flag_t
-/* 63 */ _CFFI_OP(_CFFI_OP_ENUM, 0), // TCOD_alignment_t
-/* 64 */ _CFFI_OP(_CFFI_OP_POINTER, 385), // char const *
-/* 65 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
-/* 66 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void *, int, int, int, int, TCOD_bkgnd_flag_t, TCOD_alignment_t, wchar_t const *, ...)
-/* 67 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 68 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 69 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 70 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 71 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 72 */ _CFFI_OP(_CFFI_OP_NOOP, 62),
-/* 73 */ _CFFI_OP(_CFFI_OP_NOOP, 63),
-/* 74 */ _CFFI_OP(_CFFI_OP_POINTER, 401), // wchar_t const *
-/* 75 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
-/* 76 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void *, int, int, int, int, char const *, ...)
-/* 77 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 78 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 79 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 80 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 81 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 82 */ _CFFI_OP(_CFFI_OP_NOOP, 64),
-/* 83 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
-/* 84 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void *, int, int, int, int, wchar_t const *, ...)
-/* 85 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 86 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 87 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 88 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 89 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 90 */ _CFFI_OP(_CFFI_OP_NOOP, 74),
-/* 91 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
-/* 92 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void)
-/* 93 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 94 */ _CFFI_OP(_CFFI_OP_FUNCTION, 32), // unsigned char()(TCOD_keycode_t)
-/* 95 */ _CFFI_OP(_CFFI_OP_ENUM, 6), // TCOD_keycode_t
-/* 96 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 97 */ _CFFI_OP(_CFFI_OP_FUNCTION, 32), // unsigned char()(int, int, unsigned char)
-/* 98 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 99 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 100 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 4),
-/* 101 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 102 */ _CFFI_OP(_CFFI_OP_FUNCTION, 32), // unsigned char()(void *, char const *)
-/* 103 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 104 */ _CFFI_OP(_CFFI_OP_NOOP, 64),
-/* 105 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 106 */ _CFFI_OP(_CFFI_OP_FUNCTION, 32), // unsigned char()(void *, int, int)
-/* 107 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 108 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 109 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 110 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 111 */ _CFFI_OP(_CFFI_OP_FUNCTION, 32), // unsigned char()(void)
-/* 112 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 113 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(char const *)
-/* 114 */ _CFFI_OP(_CFFI_OP_NOOP, 64),
-/* 115 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 116 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(int(*)(void *), void *)
-/* 117 */ _CFFI_OP(_CFFI_OP_POINTER, 48), // int(*)(void *)
-/* 118 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 119 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 120 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(int)
-/* 121 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 122 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 123 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(int, int)
-/* 124 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 125 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 126 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 127 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(void *)
-/* 128 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 129 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 130 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(void *, char const *)
-/* 131 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 132 */ _CFFI_OP(_CFFI_OP_NOOP, 64),
-/* 133 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 134 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(void)
-/* 135 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 136 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(TCOD_colctrl_t, TCOD_color_t, TCOD_color_t)
-/* 137 */ _CFFI_OP(_CFFI_OP_ENUM, 2), // TCOD_colctrl_t
-/* 138 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 0), // TCOD_color_t
-/* 139 */ _CFFI_OP(_CFFI_OP_NOOP, 138),
-/* 140 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 141 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(TCOD_renderer_t)
-/* 142 */ _CFFI_OP(_CFFI_OP_ENUM, 7), // TCOD_renderer_t
-/* 143 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 144 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(char const *)
-/* 145 */ _CFFI_OP(_CFFI_OP_NOOP, 64),
-/* 146 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 147 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(char const *, int, int)
-/* 148 */ _CFFI_OP(_CFFI_OP_NOOP, 64),
-/* 149 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 150 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 151 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 152 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(char const *, int, int, int)
-/* 153 */ _CFFI_OP(_CFFI_OP_NOOP, 64),
-/* 154 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 155 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 156 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 157 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 158 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(int *, int *)
-/* 159 */ _CFFI_OP(_CFFI_OP_POINTER, 18), // int *
-/* 160 */ _CFFI_OP(_CFFI_OP_NOOP, 159),
-/* 161 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 162 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(int)
-/* 163 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 40 */ _CFFI_OP(_CFFI_OP_FUNCTION, 462), // TCOD_key_t()(unsigned char)
+/* 41 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 4),
+/* 42 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 43 */ _CFFI_OP(_CFFI_OP_FUNCTION, 463), // TCOD_mouse_t()(void)
+/* 44 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 45 */ _CFFI_OP(_CFFI_OP_FUNCTION, 214), // TCOD_renderer_t()(void)
+/* 46 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 47 */ _CFFI_OP(_CFFI_OP_FUNCTION, 464), // char *()(void)
+/* 48 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 49 */ _CFFI_OP(_CFFI_OP_FUNCTION, 51), // double()(void *, double, double)
+/* 50 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 51 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 14), // double
+/* 52 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 14),
+/* 53 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 54 */ _CFFI_OP(_CFFI_OP_FUNCTION, 51), // double()(void *, double, double, double)
+/* 55 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 56 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 14),
+/* 57 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 14),
+/* 58 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 14),
+/* 59 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 60 */ _CFFI_OP(_CFFI_OP_FUNCTION, 11), // float()(void *, float *)
+/* 61 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 62 */ _CFFI_OP(_CFFI_OP_POINTER, 11), // float *
+/* 63 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 64 */ _CFFI_OP(_CFFI_OP_FUNCTION, 11), // float()(void *, float *, TCOD_noise_type_t)
+/* 65 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 66 */ _CFFI_OP(_CFFI_OP_NOOP, 62),
+/* 67 */ _CFFI_OP(_CFFI_OP_ENUM, 8), // TCOD_noise_type_t
+/* 68 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 69 */ _CFFI_OP(_CFFI_OP_FUNCTION, 11), // float()(void *, float *, float)
+/* 70 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 71 */ _CFFI_OP(_CFFI_OP_NOOP, 62),
+/* 72 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
+/* 73 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 74 */ _CFFI_OP(_CFFI_OP_FUNCTION, 11), // float()(void *, float *, float, TCOD_noise_type_t)
+/* 75 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 76 */ _CFFI_OP(_CFFI_OP_NOOP, 62),
+/* 77 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
+/* 78 */ _CFFI_OP(_CFFI_OP_NOOP, 67),
+/* 79 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 80 */ _CFFI_OP(_CFFI_OP_FUNCTION, 11), // float()(void *, float, float)
+/* 81 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 82 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
+/* 83 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
+/* 84 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 85 */ _CFFI_OP(_CFFI_OP_FUNCTION, 11), // float()(void *, float, float, float)
+/* 86 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 87 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
+/* 88 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
+/* 89 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
+/* 90 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 91 */ _CFFI_OP(_CFFI_OP_FUNCTION, 11), // float()(void)
+/* 92 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 93 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void *)
+/* 94 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 95 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 96 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void *, TCOD_dice_t)
+/* 97 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 98 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 1), // TCOD_dice_t
+/* 99 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 100 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void *, char const *)
+/* 101 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 102 */ _CFFI_OP(_CFFI_OP_NOOP, 24),
+/* 103 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 104 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void *, int, int)
+/* 105 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 106 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 107 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 108 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 109 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void *, int, int, int)
+/* 110 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 111 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 112 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 113 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 114 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 115 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void *, int, int, int, int, TCOD_bkgnd_flag_t, TCOD_alignment_t, char const *, ...)
+/* 116 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 117 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 118 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 119 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 120 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 121 */ _CFFI_OP(_CFFI_OP_ENUM, 1), // TCOD_bkgnd_flag_t
+/* 122 */ _CFFI_OP(_CFFI_OP_ENUM, 0), // TCOD_alignment_t
+/* 123 */ _CFFI_OP(_CFFI_OP_NOOP, 24),
+/* 124 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
+/* 125 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void *, int, int, int, int, TCOD_bkgnd_flag_t, TCOD_alignment_t, wchar_t const *, ...)
+/* 126 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 127 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 128 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 129 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 130 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 131 */ _CFFI_OP(_CFFI_OP_NOOP, 121),
+/* 132 */ _CFFI_OP(_CFFI_OP_NOOP, 122),
+/* 133 */ _CFFI_OP(_CFFI_OP_POINTER, 480), // wchar_t const *
+/* 134 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
+/* 135 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void *, int, int, int, int, char const *, ...)
+/* 136 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 137 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 138 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 139 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 140 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 141 */ _CFFI_OP(_CFFI_OP_NOOP, 24),
+/* 142 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
+/* 143 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void *, int, int, int, int, wchar_t const *, ...)
+/* 144 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 145 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 146 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 147 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 148 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 149 */ _CFFI_OP(_CFFI_OP_NOOP, 133),
+/* 150 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
+/* 151 */ _CFFI_OP(_CFFI_OP_FUNCTION, 18), // int()(void)
+/* 152 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 153 */ _CFFI_OP(_CFFI_OP_FUNCTION, 35), // unsigned char()(TCOD_keycode_t)
+/* 154 */ _CFFI_OP(_CFFI_OP_ENUM, 7), // TCOD_keycode_t
+/* 155 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 156 */ _CFFI_OP(_CFFI_OP_FUNCTION, 35), // unsigned char()(int, int, unsigned char)
+/* 157 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 158 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 159 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 4),
+/* 160 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 161 */ _CFFI_OP(_CFFI_OP_FUNCTION, 35), // unsigned char()(void *, char const *)
+/* 162 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 163 */ _CFFI_OP(_CFFI_OP_NOOP, 24),
 /* 164 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 165 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(int, int)
-/* 166 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 165 */ _CFFI_OP(_CFFI_OP_FUNCTION, 35), // unsigned char()(void *, int, int)
+/* 166 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /* 167 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 168 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 169 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(int, int, char const *, unsigned char, TCOD_renderer_t)
-/* 170 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 171 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 172 */ _CFFI_OP(_CFFI_OP_NOOP, 64),
-/* 173 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 4),
-/* 174 */ _CFFI_OP(_CFFI_OP_NOOP, 142),
-/* 175 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 176 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(int, int, int)
-/* 177 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 178 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 179 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 180 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 181 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(int, int, int, int)
-/* 182 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 183 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 184 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 185 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 186 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 187 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(int, int, int, void *, int, int)
-/* 188 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 189 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 168 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 169 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 170 */ _CFFI_OP(_CFFI_OP_FUNCTION, 35), // unsigned char()(void)
+/* 171 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 172 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(TCOD_random_algo_t)
+/* 173 */ _CFFI_OP(_CFFI_OP_ENUM, 9), // TCOD_random_algo_t
+/* 174 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 175 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(TCOD_random_algo_t, unsigned int)
+/* 176 */ _CFFI_OP(_CFFI_OP_NOOP, 173),
+/* 177 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 8), // unsigned int
+/* 178 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 179 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(char const *)
+/* 180 */ _CFFI_OP(_CFFI_OP_NOOP, 24),
+/* 181 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 182 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(int(*)(void *), void *)
+/* 183 */ _CFFI_OP(_CFFI_OP_POINTER, 93), // int(*)(void *)
+/* 184 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 185 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 186 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(int)
+/* 187 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 188 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 189 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(int, float, float, void *)
 /* 190 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 191 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 192 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 193 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 191 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
+/* 192 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
+/* 193 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /* 194 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 195 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(unsigned char)
-/* 196 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 4),
-/* 197 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 198 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(unsigned char, TCOD_color_t)
-/* 199 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 4),
-/* 200 */ _CFFI_OP(_CFFI_OP_NOOP, 138),
+/* 195 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(int, int)
+/* 196 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 197 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 198 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 199 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(void *)
+/* 200 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /* 201 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 202 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *)
+/* 202 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(void *, char const *)
 /* 203 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 204 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 205 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, TCOD_alignment_t)
-/* 206 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 207 */ _CFFI_OP(_CFFI_OP_NOOP, 63),
-/* 208 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 209 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, TCOD_bkgnd_flag_t)
-/* 210 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 211 */ _CFFI_OP(_CFFI_OP_NOOP, 62),
+/* 204 */ _CFFI_OP(_CFFI_OP_NOOP, 24),
+/* 205 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 206 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // void *()(void)
+/* 207 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 208 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(TCOD_colctrl_t, TCOD_color_t, TCOD_color_t)
+/* 209 */ _CFFI_OP(_CFFI_OP_ENUM, 2), // TCOD_colctrl_t
+/* 210 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 0), // TCOD_color_t
+/* 211 */ _CFFI_OP(_CFFI_OP_NOOP, 210),
 /* 212 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 213 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, TCOD_color_t)
-/* 214 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 215 */ _CFFI_OP(_CFFI_OP_NOOP, 138),
-/* 216 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 217 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, char const *)
-/* 218 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 219 */ _CFFI_OP(_CFFI_OP_NOOP, 64),
-/* 220 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 221 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, int *, int *)
-/* 222 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 223 */ _CFFI_OP(_CFFI_OP_NOOP, 159),
-/* 224 */ _CFFI_OP(_CFFI_OP_NOOP, 159),
-/* 225 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 226 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, int)
-/* 227 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 213 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(TCOD_renderer_t)
+/* 214 */ _CFFI_OP(_CFFI_OP_ENUM, 10), // TCOD_renderer_t
+/* 215 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 216 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(char const *)
+/* 217 */ _CFFI_OP(_CFFI_OP_NOOP, 24),
+/* 218 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 219 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(char const *, int, int)
+/* 220 */ _CFFI_OP(_CFFI_OP_NOOP, 24),
+/* 221 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 222 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 223 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 224 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(char const *, int, int, int)
+/* 225 */ _CFFI_OP(_CFFI_OP_NOOP, 24),
+/* 226 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 227 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
 /* 228 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
 /* 229 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 230 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, int, int)
-/* 231 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 232 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 233 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 234 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 235 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, int, int, TCOD_bkgnd_flag_t, TCOD_alignment_t, char const *, ...)
-/* 236 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 237 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 230 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(int *, int *)
+/* 231 */ _CFFI_OP(_CFFI_OP_POINTER, 18), // int *
+/* 232 */ _CFFI_OP(_CFFI_OP_NOOP, 231),
+/* 233 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 234 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(int)
+/* 235 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 236 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 237 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(int, int)
 /* 238 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 239 */ _CFFI_OP(_CFFI_OP_NOOP, 62),
-/* 240 */ _CFFI_OP(_CFFI_OP_NOOP, 63),
-/* 241 */ _CFFI_OP(_CFFI_OP_NOOP, 64),
-/* 242 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
-/* 243 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, int, int, TCOD_bkgnd_flag_t, TCOD_alignment_t, wchar_t const *, ...)
-/* 244 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 245 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 246 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 247 */ _CFFI_OP(_CFFI_OP_NOOP, 62),
-/* 248 */ _CFFI_OP(_CFFI_OP_NOOP, 63),
-/* 249 */ _CFFI_OP(_CFFI_OP_NOOP, 74),
-/* 250 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
-/* 251 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, int, int, TCOD_color_t)
-/* 252 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 253 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 239 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 240 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 241 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(int, int, char const *, unsigned char, TCOD_renderer_t)
+/* 242 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 243 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 244 */ _CFFI_OP(_CFFI_OP_NOOP, 24),
+/* 245 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 4),
+/* 246 */ _CFFI_OP(_CFFI_OP_NOOP, 214),
+/* 247 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 248 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(int, int, int)
+/* 249 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 250 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 251 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 252 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 253 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(int, int, int, int)
 /* 254 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 255 */ _CFFI_OP(_CFFI_OP_NOOP, 138),
-/* 256 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 257 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, int, int, TCOD_color_t, TCOD_bkgnd_flag_t)
-/* 258 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 259 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 255 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 256 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 257 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 258 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 259 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(int, int, int, void *, int, int)
 /* 260 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 261 */ _CFFI_OP(_CFFI_OP_NOOP, 138),
-/* 262 */ _CFFI_OP(_CFFI_OP_NOOP, 62),
-/* 263 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 264 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, int, int, char const *, ...)
-/* 265 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 266 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 267 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 268 */ _CFFI_OP(_CFFI_OP_NOOP, 64),
-/* 269 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
-/* 270 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, int, int, int)
-/* 271 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 272 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 273 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 274 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 275 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 276 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, int, int, int, TCOD_bkgnd_flag_t)
-/* 277 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 278 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 279 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 280 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 281 */ _CFFI_OP(_CFFI_OP_NOOP, 62),
-/* 282 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 283 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, int, int, int, TCOD_color_t, TCOD_color_t)
-/* 284 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 285 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 286 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 287 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 288 */ _CFFI_OP(_CFFI_OP_NOOP, 138),
-/* 289 */ _CFFI_OP(_CFFI_OP_NOOP, 138),
-/* 290 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 291 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, int, int, int, int, int)
-/* 292 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 293 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 294 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 295 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 296 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 297 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 298 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 299 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, int, int, int, int, unsigned char, TCOD_bkgnd_flag_t)
-/* 300 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 301 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 302 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 303 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 304 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 305 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 4),
-/* 306 */ _CFFI_OP(_CFFI_OP_NOOP, 62),
-/* 307 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 308 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, int, int, int, int, unsigned char, TCOD_bkgnd_flag_t, char const *, ...)
-/* 309 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 310 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 311 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 261 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 262 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 263 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 264 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 265 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 266 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 267 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(unsigned char)
+/* 268 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 4),
+/* 269 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 270 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(unsigned char, TCOD_color_t)
+/* 271 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 4),
+/* 272 */ _CFFI_OP(_CFFI_OP_NOOP, 210),
+/* 273 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 274 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *)
+/* 275 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 276 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 277 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, TCOD_alignment_t)
+/* 278 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 279 */ _CFFI_OP(_CFFI_OP_NOOP, 122),
+/* 280 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 281 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, TCOD_bkgnd_flag_t)
+/* 282 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 283 */ _CFFI_OP(_CFFI_OP_NOOP, 121),
+/* 284 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 285 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, TCOD_color_t)
+/* 286 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 287 */ _CFFI_OP(_CFFI_OP_NOOP, 210),
+/* 288 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 289 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, TCOD_distribution_t)
+/* 290 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 291 */ _CFFI_OP(_CFFI_OP_ENUM, 3), // TCOD_distribution_t
+/* 292 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 293 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, TCOD_noise_type_t)
+/* 294 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 295 */ _CFFI_OP(_CFFI_OP_NOOP, 67),
+/* 296 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 297 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, char const *)
+/* 298 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 299 */ _CFFI_OP(_CFFI_OP_NOOP, 24),
+/* 300 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 301 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, int *, int *)
+/* 302 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 303 */ _CFFI_OP(_CFFI_OP_NOOP, 231),
+/* 304 */ _CFFI_OP(_CFFI_OP_NOOP, 231),
+/* 305 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 306 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, int)
+/* 307 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 308 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 309 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 310 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, int, int)
+/* 311 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /* 312 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
 /* 313 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 314 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 4),
-/* 315 */ _CFFI_OP(_CFFI_OP_NOOP, 62),
-/* 316 */ _CFFI_OP(_CFFI_OP_NOOP, 64),
-/* 317 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
-/* 318 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, int, int, int, int, void *, int, int, float, float)
-/* 319 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 320 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 321 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 322 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 323 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 314 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 315 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, int, int, TCOD_bkgnd_flag_t, TCOD_alignment_t, char const *, ...)
+/* 316 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 317 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 318 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 319 */ _CFFI_OP(_CFFI_OP_NOOP, 121),
+/* 320 */ _CFFI_OP(_CFFI_OP_NOOP, 122),
+/* 321 */ _CFFI_OP(_CFFI_OP_NOOP, 24),
+/* 322 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
+/* 323 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, int, int, TCOD_bkgnd_flag_t, TCOD_alignment_t, wchar_t const *, ...)
 /* 324 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /* 325 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
 /* 326 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 327 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
-/* 328 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
-/* 329 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 330 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, int, int, wchar_t const *, ...)
-/* 331 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 332 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 327 */ _CFFI_OP(_CFFI_OP_NOOP, 121),
+/* 328 */ _CFFI_OP(_CFFI_OP_NOOP, 122),
+/* 329 */ _CFFI_OP(_CFFI_OP_NOOP, 133),
+/* 330 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
+/* 331 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, int, int, TCOD_color_t)
+/* 332 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /* 333 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 334 */ _CFFI_OP(_CFFI_OP_NOOP, 74),
-/* 335 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
-/* 336 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, void *)
-/* 337 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 334 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 335 */ _CFFI_OP(_CFFI_OP_NOOP, 210),
+/* 336 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 337 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, int, int, TCOD_color_t, TCOD_bkgnd_flag_t)
 /* 338 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 339 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 340 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, void *, float, float, TCOD_bkgnd_flag_t, float, float, float)
-/* 341 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 342 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 343 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
-/* 344 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
-/* 345 */ _CFFI_OP(_CFFI_OP_NOOP, 62),
-/* 346 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
-/* 347 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
-/* 348 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
-/* 349 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 350 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, void *, int, int, int, int, TCOD_bkgnd_flag_t)
+/* 339 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 340 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 341 */ _CFFI_OP(_CFFI_OP_NOOP, 210),
+/* 342 */ _CFFI_OP(_CFFI_OP_NOOP, 121),
+/* 343 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 344 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, int, int, char const *, ...)
+/* 345 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 346 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 347 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 348 */ _CFFI_OP(_CFFI_OP_NOOP, 24),
+/* 349 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
+/* 350 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, int, int, int)
 /* 351 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 352 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 352 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
 /* 353 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
 /* 354 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 355 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 356 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 357 */ _CFFI_OP(_CFFI_OP_NOOP, 62),
-/* 358 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 359 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void *, void *, int, int, int, int, int, int)
-/* 360 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 361 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 362 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 363 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 364 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 355 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 356 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, int, int, int, TCOD_bkgnd_flag_t)
+/* 357 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 358 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 359 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 360 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 361 */ _CFFI_OP(_CFFI_OP_NOOP, 121),
+/* 362 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 363 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, int, int, int, TCOD_color_t, TCOD_color_t)
+/* 364 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /* 365 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
 /* 366 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
 /* 367 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 368 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 369 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void(*)(void *))
-/* 370 */ _CFFI_OP(_CFFI_OP_POINTER, 202), // void(*)(void *)
-/* 371 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 372 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(void)
-/* 373 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 374 */ _CFFI_OP(_CFFI_OP_FUNCTION, 400), // void()(wchar_t const *, int, int)
-/* 375 */ _CFFI_OP(_CFFI_OP_NOOP, 74),
+/* 368 */ _CFFI_OP(_CFFI_OP_NOOP, 210),
+/* 369 */ _CFFI_OP(_CFFI_OP_NOOP, 210),
+/* 370 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 371 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, int, int, int, int, int)
+/* 372 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 373 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 374 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 375 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
 /* 376 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
 /* 377 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
 /* 378 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 379 */ _CFFI_OP(_CFFI_OP_ENUM, 3), // TCOD_event_t
-/* 380 */ _CFFI_OP(_CFFI_OP_ENUM, 4), // TCOD_font_flags_t
-/* 381 */ _CFFI_OP(_CFFI_OP_ENUM, 5), // TCOD_key_status_t
-/* 382 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 1), // TCOD_key_t
-/* 383 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 2), // TCOD_mouse_t
-/* 384 */ _CFFI_OP(_CFFI_OP_POINTER, 385), // char *
-/* 385 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 2), // char
-/* 386 */ _CFFI_OP(_CFFI_OP_POINTER, 56), // int(*)(void *, int, int, int, int, TCOD_bkgnd_flag_t, TCOD_alignment_t, char const *, ...)
-/* 387 */ _CFFI_OP(_CFFI_OP_POINTER, 66), // int(*)(void *, int, int, int, int, TCOD_bkgnd_flag_t, TCOD_alignment_t, wchar_t const *, ...)
-/* 388 */ _CFFI_OP(_CFFI_OP_POINTER, 76), // int(*)(void *, int, int, int, int, char const *, ...)
-/* 389 */ _CFFI_OP(_CFFI_OP_POINTER, 84), // int(*)(void *, int, int, int, int, wchar_t const *, ...)
-/* 390 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 9), // long
-/* 391 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 5), // short
-/* 392 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 8), // unsigned int
-/* 393 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 10), // unsigned long
-/* 394 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 6), // unsigned short
-/* 395 */ _CFFI_OP(_CFFI_OP_POINTER, 235), // void(*)(void *, int, int, TCOD_bkgnd_flag_t, TCOD_alignment_t, char const *, ...)
-/* 396 */ _CFFI_OP(_CFFI_OP_POINTER, 243), // void(*)(void *, int, int, TCOD_bkgnd_flag_t, TCOD_alignment_t, wchar_t const *, ...)
-/* 397 */ _CFFI_OP(_CFFI_OP_POINTER, 264), // void(*)(void *, int, int, char const *, ...)
-/* 398 */ _CFFI_OP(_CFFI_OP_POINTER, 308), // void(*)(void *, int, int, int, int, unsigned char, TCOD_bkgnd_flag_t, char const *, ...)
-/* 399 */ _CFFI_OP(_CFFI_OP_POINTER, 330), // void(*)(void *, int, int, wchar_t const *, ...)
-/* 400 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 0), // void
-/* 401 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 16), // wchar_t
+/* 379 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, int, int, int, int, unsigned char, TCOD_bkgnd_flag_t)
+/* 380 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 381 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 382 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 383 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 384 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 385 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 4),
+/* 386 */ _CFFI_OP(_CFFI_OP_NOOP, 121),
+/* 387 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 388 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, int, int, int, int, unsigned char, TCOD_bkgnd_flag_t, char const *, ...)
+/* 389 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 390 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 391 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 392 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 393 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 394 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 4),
+/* 395 */ _CFFI_OP(_CFFI_OP_NOOP, 121),
+/* 396 */ _CFFI_OP(_CFFI_OP_NOOP, 24),
+/* 397 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
+/* 398 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, int, int, int, int, void *, int, int, float, float)
+/* 399 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 400 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 401 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 402 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 403 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 404 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 405 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 406 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 407 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
+/* 408 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
+/* 409 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 410 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, int, int, wchar_t const *, ...)
+/* 411 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 412 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 413 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 414 */ _CFFI_OP(_CFFI_OP_NOOP, 133),
+/* 415 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 1),
+/* 416 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, void *)
+/* 417 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 418 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 419 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 420 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, void *, float, float, TCOD_bkgnd_flag_t, float, float, float)
+/* 421 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 422 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 423 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
+/* 424 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
+/* 425 */ _CFFI_OP(_CFFI_OP_NOOP, 121),
+/* 426 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
+/* 427 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
+/* 428 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13),
+/* 429 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 430 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, void *, int, int, int, int, TCOD_bkgnd_flag_t)
+/* 431 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 432 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 433 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 434 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 435 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 436 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 437 */ _CFFI_OP(_CFFI_OP_NOOP, 121),
+/* 438 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 439 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void *, void *, int, int, int, int, int, int)
+/* 440 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 441 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 442 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 443 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 444 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 445 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 446 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 447 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 448 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 449 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void(*)(void *))
+/* 450 */ _CFFI_OP(_CFFI_OP_POINTER, 274), // void(*)(void *)
+/* 451 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 452 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(void)
+/* 453 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 454 */ _CFFI_OP(_CFFI_OP_FUNCTION, 479), // void()(wchar_t const *, int, int)
+/* 455 */ _CFFI_OP(_CFFI_OP_NOOP, 133),
+/* 456 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 457 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 458 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 459 */ _CFFI_OP(_CFFI_OP_ENUM, 4), // TCOD_event_t
+/* 460 */ _CFFI_OP(_CFFI_OP_ENUM, 5), // TCOD_font_flags_t
+/* 461 */ _CFFI_OP(_CFFI_OP_ENUM, 6), // TCOD_key_status_t
+/* 462 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 2), // TCOD_key_t
+/* 463 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 3), // TCOD_mouse_t
+/* 464 */ _CFFI_OP(_CFFI_OP_POINTER, 465), // char *
+/* 465 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 2), // char
+/* 466 */ _CFFI_OP(_CFFI_OP_POINTER, 115), // int(*)(void *, int, int, int, int, TCOD_bkgnd_flag_t, TCOD_alignment_t, char const *, ...)
+/* 467 */ _CFFI_OP(_CFFI_OP_POINTER, 125), // int(*)(void *, int, int, int, int, TCOD_bkgnd_flag_t, TCOD_alignment_t, wchar_t const *, ...)
+/* 468 */ _CFFI_OP(_CFFI_OP_POINTER, 135), // int(*)(void *, int, int, int, int, char const *, ...)
+/* 469 */ _CFFI_OP(_CFFI_OP_POINTER, 143), // int(*)(void *, int, int, int, int, wchar_t const *, ...)
+/* 470 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 9), // long
+/* 471 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 5), // short
+/* 472 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 10), // unsigned long
+/* 473 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 6), // unsigned short
+/* 474 */ _CFFI_OP(_CFFI_OP_POINTER, 315), // void(*)(void *, int, int, TCOD_bkgnd_flag_t, TCOD_alignment_t, char const *, ...)
+/* 475 */ _CFFI_OP(_CFFI_OP_POINTER, 323), // void(*)(void *, int, int, TCOD_bkgnd_flag_t, TCOD_alignment_t, wchar_t const *, ...)
+/* 476 */ _CFFI_OP(_CFFI_OP_POINTER, 344), // void(*)(void *, int, int, char const *, ...)
+/* 477 */ _CFFI_OP(_CFFI_OP_POINTER, 388), // void(*)(void *, int, int, int, int, unsigned char, TCOD_bkgnd_flag_t, char const *, ...)
+/* 478 */ _CFFI_OP(_CFFI_OP_POINTER, 410), // void(*)(void *, int, int, wchar_t const *, ...)
+/* 479 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 0), // void
+/* 480 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 16), // wchar_t
 };
 
 static int _cffi_const_TCOD_LEFT(unsigned long long *o)
@@ -1012,6 +1101,53 @@ static void _cffi_checkfld_typedef_TCOD_color_t(TCOD_color_t *p)
   (void)((p->b) << 1);  /* check that 'TCOD_color_t.b' is an integer */
 }
 struct _cffi_align_typedef_TCOD_color_t { char x; TCOD_color_t y; };
+
+_CFFI_UNUSED_FN
+static void _cffi_checkfld_typedef_TCOD_dice_t(TCOD_dice_t *p)
+{
+  /* only to generate compile-time warnings or errors */
+  (void)p;
+  (void)((p->nb_rolls) << 1);  /* check that 'TCOD_dice_t.nb_rolls' is an integer */
+  (void)((p->nb_faces) << 1);  /* check that 'TCOD_dice_t.nb_faces' is an integer */
+  { float *tmp = &p->multiplier; (void)tmp; }
+  { float *tmp = &p->addsub; (void)tmp; }
+}
+struct _cffi_align_typedef_TCOD_dice_t { char x; TCOD_dice_t y; };
+
+static int _cffi_const_TCOD_DISTRIBUTION_LINEAR(unsigned long long *o)
+{
+  int n = (TCOD_DISTRIBUTION_LINEAR) <= 0;
+  *o = (unsigned long long)((TCOD_DISTRIBUTION_LINEAR) << 0);  /* check that TCOD_DISTRIBUTION_LINEAR is an integer */
+  return n;
+}
+
+static int _cffi_const_TCOD_DISTRIBUTION_GAUSSIAN(unsigned long long *o)
+{
+  int n = (TCOD_DISTRIBUTION_GAUSSIAN) <= 0;
+  *o = (unsigned long long)((TCOD_DISTRIBUTION_GAUSSIAN) << 0);  /* check that TCOD_DISTRIBUTION_GAUSSIAN is an integer */
+  return n;
+}
+
+static int _cffi_const_TCOD_DISTRIBUTION_GAUSSIAN_RANGE(unsigned long long *o)
+{
+  int n = (TCOD_DISTRIBUTION_GAUSSIAN_RANGE) <= 0;
+  *o = (unsigned long long)((TCOD_DISTRIBUTION_GAUSSIAN_RANGE) << 0);  /* check that TCOD_DISTRIBUTION_GAUSSIAN_RANGE is an integer */
+  return n;
+}
+
+static int _cffi_const_TCOD_DISTRIBUTION_GAUSSIAN_INVERSE(unsigned long long *o)
+{
+  int n = (TCOD_DISTRIBUTION_GAUSSIAN_INVERSE) <= 0;
+  *o = (unsigned long long)((TCOD_DISTRIBUTION_GAUSSIAN_INVERSE) << 0);  /* check that TCOD_DISTRIBUTION_GAUSSIAN_INVERSE is an integer */
+  return n;
+}
+
+static int _cffi_const_TCOD_DISTRIBUTION_GAUSSIAN_RANGE_INVERSE(unsigned long long *o)
+{
+  int n = (TCOD_DISTRIBUTION_GAUSSIAN_RANGE_INVERSE) <= 0;
+  *o = (unsigned long long)((TCOD_DISTRIBUTION_GAUSSIAN_RANGE_INVERSE) << 0);  /* check that TCOD_DISTRIBUTION_GAUSSIAN_RANGE_INVERSE is an integer */
+  return n;
+}
 
 static int _cffi_const_TCOD_EVENT_KEY_PRESS(unsigned long long *o)
 {
@@ -1620,6 +1756,48 @@ static void _cffi_checkfld_typedef_TCOD_mouse_t(TCOD_mouse_t *p)
 }
 struct _cffi_align_typedef_TCOD_mouse_t { char x; TCOD_mouse_t y; };
 
+static int _cffi_const_TCOD_NOISE_PERLIN(unsigned long long *o)
+{
+  int n = (TCOD_NOISE_PERLIN) <= 0;
+  *o = (unsigned long long)((TCOD_NOISE_PERLIN) << 0);  /* check that TCOD_NOISE_PERLIN is an integer */
+  return n;
+}
+
+static int _cffi_const_TCOD_NOISE_SIMPLEX(unsigned long long *o)
+{
+  int n = (TCOD_NOISE_SIMPLEX) <= 0;
+  *o = (unsigned long long)((TCOD_NOISE_SIMPLEX) << 0);  /* check that TCOD_NOISE_SIMPLEX is an integer */
+  return n;
+}
+
+static int _cffi_const_TCOD_NOISE_WAVELET(unsigned long long *o)
+{
+  int n = (TCOD_NOISE_WAVELET) <= 0;
+  *o = (unsigned long long)((TCOD_NOISE_WAVELET) << 0);  /* check that TCOD_NOISE_WAVELET is an integer */
+  return n;
+}
+
+static int _cffi_const_TCOD_NOISE_DEFAULT(unsigned long long *o)
+{
+  int n = (TCOD_NOISE_DEFAULT) <= 0;
+  *o = (unsigned long long)((TCOD_NOISE_DEFAULT) << 0);  /* check that TCOD_NOISE_DEFAULT is an integer */
+  return n;
+}
+
+static int _cffi_const_TCOD_RNG_MT(unsigned long long *o)
+{
+  int n = (TCOD_RNG_MT) <= 0;
+  *o = (unsigned long long)((TCOD_RNG_MT) << 0);  /* check that TCOD_RNG_MT is an integer */
+  return n;
+}
+
+static int _cffi_const_TCOD_RNG_CMWC(unsigned long long *o)
+{
+  int n = (TCOD_RNG_CMWC) <= 0;
+  *o = (unsigned long long)((TCOD_RNG_CMWC) << 0);  /* check that TCOD_RNG_CMWC is an integer */
+  return n;
+}
+
 static int _cffi_const_TCOD_RENDERER_GLSL(unsigned long long *o)
 {
   int n = (TCOD_RENDERER_GLSL) <= 0;
@@ -2008,7 +2186,7 @@ _cffi_f_TCOD_console_check_for_keypress(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(382));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(462));
 }
 #else
 static void _cffi_f_TCOD_console_check_for_keypress(TCOD_key_t *result, int x0)
@@ -2247,13 +2425,13 @@ _cffi_f_TCOD_console_from_file(PyObject *self, PyObject *arg0)
   void * result;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(64), arg0, (char **)&x0);
+      _cffi_type(24), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (char const *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(64), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(24), arg0) < 0)
       return NULL;
   }
 
@@ -2300,7 +2478,7 @@ _cffi_f_TCOD_console_get_alignment(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_deref((char *)&result, _cffi_type(63));
+  return _cffi_from_c_deref((char *)&result, _cffi_type(122));
 }
 #else
 #  define _cffi_f_TCOD_console_get_alignment _cffi_d_TCOD_console_get_alignment
@@ -2336,7 +2514,7 @@ _cffi_f_TCOD_console_get_background_flag(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_deref((char *)&result, _cffi_type(62));
+  return _cffi_from_c_deref((char *)&result, _cffi_type(121));
 }
 #else
 #  define _cffi_f_TCOD_console_get_background_flag _cffi_d_TCOD_console_get_background_flag
@@ -2450,7 +2628,7 @@ _cffi_f_TCOD_console_get_char_background(PyObject *self, PyObject *args)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(138));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(210));
 }
 #else
 static void _cffi_f_TCOD_console_get_char_background(TCOD_color_t *result, void * x0, int x1, int x2)
@@ -2510,7 +2688,7 @@ _cffi_f_TCOD_console_get_char_foreground(PyObject *self, PyObject *args)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(138));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(210));
 }
 #else
 static void _cffi_f_TCOD_console_get_char_foreground(TCOD_color_t *result, void * x0, int x1, int x2)
@@ -2549,7 +2727,7 @@ _cffi_f_TCOD_console_get_default_background(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(138));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(210));
 }
 #else
 static void _cffi_f_TCOD_console_get_default_background(TCOD_color_t *result, void * x0)
@@ -2588,7 +2766,7 @@ _cffi_f_TCOD_console_get_default_foreground(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(138));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(210));
 }
 #else
 static void _cffi_f_TCOD_console_get_default_foreground(TCOD_color_t *result, void * x0)
@@ -2639,7 +2817,7 @@ _cffi_f_TCOD_console_get_fading_color(PyObject *self, PyObject *noarg)
 
   (void)self; /* unused */
   (void)noarg; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(138));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(210));
 }
 #else
 static void _cffi_f_TCOD_console_get_fading_color(TCOD_color_t *result)
@@ -2783,7 +2961,7 @@ _cffi_f_TCOD_console_hline(PyObject *self, PyObject *args)
   if (x3 == (int)-1 && PyErr_Occurred())
     return NULL;
 
-  if (_cffi_to_c((char *)&x4, _cffi_type(62), arg4) < 0)
+  if (_cffi_to_c((char *)&x4, _cffi_type(121), arg4) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -2839,13 +3017,13 @@ _cffi_f_TCOD_console_init_root(PyObject *self, PyObject *args)
     return NULL;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(64), arg2, (char **)&x2);
+      _cffi_type(24), arg2, (char **)&x2);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x2 = (char const *)alloca((size_t)datasize);
     memset((void *)x2, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x2, _cffi_type(64), arg2) < 0)
+    if (_cffi_convert_array_from_object((char *)x2, _cffi_type(24), arg2) < 0)
       return NULL;
   }
 
@@ -2853,7 +3031,7 @@ _cffi_f_TCOD_console_init_root(PyObject *self, PyObject *args)
   if (x3 == (unsigned char)-1 && PyErr_Occurred())
     return NULL;
 
-  if (_cffi_to_c((char *)&x4, _cffi_type(142), arg4) < 0)
+  if (_cffi_to_c((char *)&x4, _cffi_type(214), arg4) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -2905,7 +3083,7 @@ _cffi_f_TCOD_console_is_key_pressed(PyObject *self, PyObject *arg0)
   TCOD_keycode_t x0;
   unsigned char result;
 
-  if (_cffi_to_c((char *)&x0, _cffi_type(95), arg0) < 0)
+  if (_cffi_to_c((char *)&x0, _cffi_type(154), arg0) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -2979,13 +3157,13 @@ _cffi_f_TCOD_console_load_apf(PyObject *self, PyObject *args)
   }
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(64), arg1, (char **)&x1);
+      _cffi_type(24), arg1, (char **)&x1);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x1 = (char const *)alloca((size_t)datasize);
     memset((void *)x1, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(64), arg1) < 0)
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(24), arg1) < 0)
       return NULL;
   }
 
@@ -3036,13 +3214,13 @@ _cffi_f_TCOD_console_load_asc(PyObject *self, PyObject *args)
   }
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(64), arg1, (char **)&x1);
+      _cffi_type(24), arg1, (char **)&x1);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x1 = (char const *)alloca((size_t)datasize);
     memset((void *)x1, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(64), arg1) < 0)
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(24), arg1) < 0)
       return NULL;
   }
 
@@ -3189,13 +3367,13 @@ _cffi_f_TCOD_console_map_string_to_font(PyObject *self, PyObject *args)
   arg2 = aa[2];
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(64), arg0, (char **)&x0);
+      _cffi_type(24), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (char const *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(64), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(24), arg0) < 0)
       return NULL;
   }
 
@@ -3246,13 +3424,13 @@ _cffi_f_TCOD_console_map_string_to_font_utf(PyObject *self, PyObject *args)
   arg2 = aa[2];
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(74), arg0, (char **)&x0);
+      _cffi_type(133), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (wchar_t const *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(74), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(133), arg0) < 0)
       return NULL;
   }
 
@@ -3418,7 +3596,7 @@ _cffi_f_TCOD_console_put_char(PyObject *self, PyObject *args)
   if (x3 == (int)-1 && PyErr_Occurred())
     return NULL;
 
-  if (_cffi_to_c((char *)&x4, _cffi_type(62), arg4) < 0)
+  if (_cffi_to_c((char *)&x4, _cffi_type(121), arg4) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -3491,10 +3669,10 @@ _cffi_f_TCOD_console_put_char_ex(PyObject *self, PyObject *args)
   if (x3 == (int)-1 && PyErr_Occurred())
     return NULL;
 
-  if (_cffi_to_c((char *)&x4, _cffi_type(138), arg4) < 0)
+  if (_cffi_to_c((char *)&x4, _cffi_type(210), arg4) < 0)
     return NULL;
 
-  if (_cffi_to_c((char *)&x5, _cffi_type(138), arg5) < 0)
+  if (_cffi_to_c((char *)&x5, _cffi_type(210), arg5) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -3581,7 +3759,7 @@ _cffi_f_TCOD_console_rect(PyObject *self, PyObject *args)
   if (x5 == (unsigned char)-1 && PyErr_Occurred())
     return NULL;
 
-  if (_cffi_to_c((char *)&x6, _cffi_type(62), arg6) < 0)
+  if (_cffi_to_c((char *)&x6, _cffi_type(121), arg6) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -3632,13 +3810,13 @@ _cffi_f_TCOD_console_save_apf(PyObject *self, PyObject *args)
   }
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(64), arg1, (char **)&x1);
+      _cffi_type(24), arg1, (char **)&x1);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x1 = (char const *)alloca((size_t)datasize);
     memset((void *)x1, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(64), arg1) < 0)
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(24), arg1) < 0)
       return NULL;
   }
 
@@ -3689,13 +3867,13 @@ _cffi_f_TCOD_console_save_asc(PyObject *self, PyObject *args)
   }
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(64), arg1, (char **)&x1);
+      _cffi_type(24), arg1, (char **)&x1);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x1 = (char const *)alloca((size_t)datasize);
     memset((void *)x1, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(64), arg1) < 0)
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(24), arg1) < 0)
       return NULL;
   }
 
@@ -3744,7 +3922,7 @@ _cffi_f_TCOD_console_set_alignment(PyObject *self, PyObject *args)
       return NULL;
   }
 
-  if (_cffi_to_c((char *)&x1, _cffi_type(63), arg1) < 0)
+  if (_cffi_to_c((char *)&x1, _cffi_type(122), arg1) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -3793,7 +3971,7 @@ _cffi_f_TCOD_console_set_background_flag(PyObject *self, PyObject *args)
       return NULL;
   }
 
-  if (_cffi_to_c((char *)&x1, _cffi_type(62), arg1) < 0)
+  if (_cffi_to_c((char *)&x1, _cffi_type(121), arg1) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -3923,10 +4101,10 @@ _cffi_f_TCOD_console_set_char_background(PyObject *self, PyObject *args)
   if (x2 == (int)-1 && PyErr_Occurred())
     return NULL;
 
-  if (_cffi_to_c((char *)&x3, _cffi_type(138), arg3) < 0)
+  if (_cffi_to_c((char *)&x3, _cffi_type(210), arg3) < 0)
     return NULL;
 
-  if (_cffi_to_c((char *)&x4, _cffi_type(62), arg4) < 0)
+  if (_cffi_to_c((char *)&x4, _cffi_type(121), arg4) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -3992,7 +4170,7 @@ _cffi_f_TCOD_console_set_char_foreground(PyObject *self, PyObject *args)
   if (x2 == (int)-1 && PyErr_Occurred())
     return NULL;
 
-  if (_cffi_to_c((char *)&x3, _cffi_type(138), arg3) < 0)
+  if (_cffi_to_c((char *)&x3, _cffi_type(210), arg3) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -4035,13 +4213,13 @@ _cffi_f_TCOD_console_set_color_control(PyObject *self, PyObject *args)
   arg1 = aa[1];
   arg2 = aa[2];
 
-  if (_cffi_to_c((char *)&x0, _cffi_type(137), arg0) < 0)
+  if (_cffi_to_c((char *)&x0, _cffi_type(209), arg0) < 0)
     return NULL;
 
-  if (_cffi_to_c((char *)&x1, _cffi_type(138), arg1) < 0)
+  if (_cffi_to_c((char *)&x1, _cffi_type(210), arg1) < 0)
     return NULL;
 
-  if (_cffi_to_c((char *)&x2, _cffi_type(138), arg2) < 0)
+  if (_cffi_to_c((char *)&x2, _cffi_type(210), arg2) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -4089,13 +4267,13 @@ _cffi_f_TCOD_console_set_custom_font(PyObject *self, PyObject *args)
   arg3 = aa[3];
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(64), arg0, (char **)&x0);
+      _cffi_type(24), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (char const *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(64), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(24), arg0) < 0)
       return NULL;
   }
 
@@ -4157,7 +4335,7 @@ _cffi_f_TCOD_console_set_default_background(PyObject *self, PyObject *args)
       return NULL;
   }
 
-  if (_cffi_to_c((char *)&x1, _cffi_type(138), arg1) < 0)
+  if (_cffi_to_c((char *)&x1, _cffi_type(210), arg1) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -4209,7 +4387,7 @@ _cffi_f_TCOD_console_set_default_foreground(PyObject *self, PyObject *args)
       return NULL;
   }
 
-  if (_cffi_to_c((char *)&x1, _cffi_type(138), arg1) < 0)
+  if (_cffi_to_c((char *)&x1, _cffi_type(210), arg1) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -4309,7 +4487,7 @@ _cffi_f_TCOD_console_set_fade(PyObject *self, PyObject *args)
   if (x0 == (unsigned char)-1 && PyErr_Occurred())
     return NULL;
 
-  if (_cffi_to_c((char *)&x1, _cffi_type(138), arg1) < 0)
+  if (_cffi_to_c((char *)&x1, _cffi_type(210), arg1) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -4389,7 +4567,7 @@ _cffi_f_TCOD_console_set_key_color(PyObject *self, PyObject *args)
       return NULL;
   }
 
-  if (_cffi_to_c((char *)&x1, _cffi_type(138), arg1) < 0)
+  if (_cffi_to_c((char *)&x1, _cffi_type(210), arg1) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -4463,13 +4641,13 @@ _cffi_f_TCOD_console_set_window_title(PyObject *self, PyObject *arg0)
   Py_ssize_t datasize;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(64), arg0, (char **)&x0);
+      _cffi_type(24), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (char const *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(64), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(24), arg0) < 0)
       return NULL;
   }
 
@@ -4540,7 +4718,7 @@ _cffi_f_TCOD_console_vline(PyObject *self, PyObject *args)
   if (x3 == (int)-1 && PyErr_Occurred())
     return NULL;
 
-  if (_cffi_to_c((char *)&x4, _cffi_type(62), arg4) < 0)
+  if (_cffi_to_c((char *)&x4, _cffi_type(121), arg4) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -4579,7 +4757,7 @@ _cffi_f_TCOD_console_wait_for_keypress(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(382));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(462));
 }
 #else
 static void _cffi_f_TCOD_console_wait_for_keypress(TCOD_key_t *result, unsigned char x0)
@@ -4622,13 +4800,13 @@ _cffi_f_TCOD_get_function_address(PyObject *self, PyObject *args)
   }
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(64), arg1, (char **)&x1);
+      _cffi_type(24), arg1, (char **)&x1);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x1 = (char const *)alloca((size_t)datasize);
     memset((void *)x1, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(64), arg1) < 0)
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(24), arg1) < 0)
       return NULL;
   }
 
@@ -4714,7 +4892,7 @@ _cffi_f_TCOD_image_blit(PyObject *self, PyObject *args)
   if (x3 == (float)-1 && PyErr_Occurred())
     return NULL;
 
-  if (_cffi_to_c((char *)&x4, _cffi_type(62), arg4) < 0)
+  if (_cffi_to_c((char *)&x4, _cffi_type(121), arg4) < 0)
     return NULL;
 
   x5 = (float)_cffi_to_c_float(arg5);
@@ -4916,7 +5094,7 @@ _cffi_f_TCOD_image_blit_rect(PyObject *self, PyObject *args)
   if (x5 == (int)-1 && PyErr_Occurred())
     return NULL;
 
-  if (_cffi_to_c((char *)&x6, _cffi_type(62), arg6) < 0)
+  if (_cffi_to_c((char *)&x6, _cffi_type(121), arg6) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -4965,7 +5143,7 @@ _cffi_f_TCOD_image_clear(PyObject *self, PyObject *args)
       return NULL;
   }
 
-  if (_cffi_to_c((char *)&x1, _cffi_type(138), arg1) < 0)
+  if (_cffi_to_c((char *)&x1, _cffi_type(210), arg1) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -5179,7 +5357,7 @@ _cffi_f_TCOD_image_get_mipmap_pixel(PyObject *self, PyObject *args)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(138));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(210));
 }
 #else
 static void _cffi_f_TCOD_image_get_mipmap_pixel(TCOD_color_t *result, void * x0, float x1, float x2, float x3, float x4)
@@ -5239,7 +5417,7 @@ _cffi_f_TCOD_image_get_pixel(PyObject *self, PyObject *args)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(138));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(210));
 }
 #else
 static void _cffi_f_TCOD_image_get_pixel(TCOD_color_t *result, void * x0, int x1, int x2)
@@ -5284,24 +5462,24 @@ _cffi_f_TCOD_image_get_size(PyObject *self, PyObject *args)
   }
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(159), arg1, (char **)&x1);
+      _cffi_type(231), arg1, (char **)&x1);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x1 = (int *)alloca((size_t)datasize);
     memset((void *)x1, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(159), arg1) < 0)
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(231), arg1) < 0)
       return NULL;
   }
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(159), arg2, (char **)&x2);
+      _cffi_type(231), arg2, (char **)&x2);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x2 = (int *)alloca((size_t)datasize);
     memset((void *)x2, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x2, _cffi_type(159), arg2) < 0)
+    if (_cffi_convert_array_from_object((char *)x2, _cffi_type(231), arg2) < 0)
       return NULL;
   }
 
@@ -5461,13 +5639,13 @@ _cffi_f_TCOD_image_load(PyObject *self, PyObject *arg0)
   void * result;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(64), arg0, (char **)&x0);
+      _cffi_type(24), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (char const *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(64), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(24), arg0) < 0)
       return NULL;
   }
 
@@ -5572,7 +5750,7 @@ _cffi_f_TCOD_image_put_pixel(PyObject *self, PyObject *args)
   if (x2 == (int)-1 && PyErr_Occurred())
     return NULL;
 
-  if (_cffi_to_c((char *)&x3, _cffi_type(138), arg3) < 0)
+  if (_cffi_to_c((char *)&x3, _cffi_type(210), arg3) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -5732,13 +5910,13 @@ _cffi_f_TCOD_image_save(PyObject *self, PyObject *args)
   }
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(64), arg1, (char **)&x1);
+      _cffi_type(24), arg1, (char **)&x1);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x1 = (char const *)alloca((size_t)datasize);
     memset((void *)x1, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(64), arg1) < 0)
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(24), arg1) < 0)
       return NULL;
   }
 
@@ -5845,7 +6023,7 @@ _cffi_f_TCOD_image_set_key_color(PyObject *self, PyObject *args)
       return NULL;
   }
 
-  if (_cffi_to_c((char *)&x1, _cffi_type(138), arg1) < 0)
+  if (_cffi_to_c((char *)&x1, _cffi_type(210), arg1) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -5914,13 +6092,13 @@ _cffi_f_TCOD_load_library(PyObject *self, PyObject *arg0)
   void * result;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(64), arg0, (char **)&x0);
+      _cffi_type(24), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (char const *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(64), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(24), arg0) < 0)
       return NULL;
   }
 
@@ -5955,7 +6133,7 @@ _cffi_f_TCOD_mouse_get_status(PyObject *self, PyObject *noarg)
 
   (void)self; /* unused */
   (void)noarg; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(383));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(463));
 }
 #else
 static void _cffi_f_TCOD_mouse_get_status(TCOD_mouse_t *result)
@@ -6190,6 +6368,1326 @@ _cffi_f_TCOD_mutex_out(PyObject *self, PyObject *arg0)
 #  define _cffi_f_TCOD_mutex_out _cffi_d_TCOD_mutex_out
 #endif
 
+static void _cffi_d_TCOD_noise_delete(void * x0)
+{
+  TCOD_noise_delete(x0);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_noise_delete(PyObject *self, PyObject *arg0)
+{
+  void * x0;
+  Py_ssize_t datasize;
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { TCOD_noise_delete(x0); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+#else
+#  define _cffi_f_TCOD_noise_delete _cffi_d_TCOD_noise_delete
+#endif
+
+static float _cffi_d_TCOD_noise_get(void * x0, float * x1)
+{
+  return TCOD_noise_get(x0, x1);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_noise_get(PyObject *self, PyObject *args)
+{
+  void * x0;
+  float * x1;
+  Py_ssize_t datasize;
+  float result;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 2, "TCOD_noise_get");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(62), arg1, (char **)&x1);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x1 = (float *)alloca((size_t)datasize);
+    memset((void *)x1, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(62), arg1) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_noise_get(x0, x1); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_float(result);
+}
+#else
+#  define _cffi_f_TCOD_noise_get _cffi_d_TCOD_noise_get
+#endif
+
+static float _cffi_d_TCOD_noise_get_ex(void * x0, float * x1, TCOD_noise_type_t x2)
+{
+  return TCOD_noise_get_ex(x0, x1, x2);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_noise_get_ex(PyObject *self, PyObject *args)
+{
+  void * x0;
+  float * x1;
+  TCOD_noise_type_t x2;
+  Py_ssize_t datasize;
+  float result;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject *arg2;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 3, "TCOD_noise_get_ex");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+  arg2 = aa[2];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(62), arg1, (char **)&x1);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x1 = (float *)alloca((size_t)datasize);
+    memset((void *)x1, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(62), arg1) < 0)
+      return NULL;
+  }
+
+  if (_cffi_to_c((char *)&x2, _cffi_type(67), arg2) < 0)
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_noise_get_ex(x0, x1, x2); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_float(result);
+}
+#else
+#  define _cffi_f_TCOD_noise_get_ex _cffi_d_TCOD_noise_get_ex
+#endif
+
+static float _cffi_d_TCOD_noise_get_fbm(void * x0, float * x1, float x2)
+{
+  return TCOD_noise_get_fbm(x0, x1, x2);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_noise_get_fbm(PyObject *self, PyObject *args)
+{
+  void * x0;
+  float * x1;
+  float x2;
+  Py_ssize_t datasize;
+  float result;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject *arg2;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 3, "TCOD_noise_get_fbm");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+  arg2 = aa[2];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(62), arg1, (char **)&x1);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x1 = (float *)alloca((size_t)datasize);
+    memset((void *)x1, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(62), arg1) < 0)
+      return NULL;
+  }
+
+  x2 = (float)_cffi_to_c_float(arg2);
+  if (x2 == (float)-1 && PyErr_Occurred())
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_noise_get_fbm(x0, x1, x2); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_float(result);
+}
+#else
+#  define _cffi_f_TCOD_noise_get_fbm _cffi_d_TCOD_noise_get_fbm
+#endif
+
+static float _cffi_d_TCOD_noise_get_fbm_ex(void * x0, float * x1, float x2, TCOD_noise_type_t x3)
+{
+  return TCOD_noise_get_fbm_ex(x0, x1, x2, x3);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_noise_get_fbm_ex(PyObject *self, PyObject *args)
+{
+  void * x0;
+  float * x1;
+  float x2;
+  TCOD_noise_type_t x3;
+  Py_ssize_t datasize;
+  float result;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject *arg2;
+  PyObject *arg3;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 4, "TCOD_noise_get_fbm_ex");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+  arg2 = aa[2];
+  arg3 = aa[3];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(62), arg1, (char **)&x1);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x1 = (float *)alloca((size_t)datasize);
+    memset((void *)x1, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(62), arg1) < 0)
+      return NULL;
+  }
+
+  x2 = (float)_cffi_to_c_float(arg2);
+  if (x2 == (float)-1 && PyErr_Occurred())
+    return NULL;
+
+  if (_cffi_to_c((char *)&x3, _cffi_type(67), arg3) < 0)
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_noise_get_fbm_ex(x0, x1, x2, x3); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_float(result);
+}
+#else
+#  define _cffi_f_TCOD_noise_get_fbm_ex _cffi_d_TCOD_noise_get_fbm_ex
+#endif
+
+static float _cffi_d_TCOD_noise_get_turbulence(void * x0, float * x1, float x2)
+{
+  return TCOD_noise_get_turbulence(x0, x1, x2);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_noise_get_turbulence(PyObject *self, PyObject *args)
+{
+  void * x0;
+  float * x1;
+  float x2;
+  Py_ssize_t datasize;
+  float result;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject *arg2;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 3, "TCOD_noise_get_turbulence");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+  arg2 = aa[2];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(62), arg1, (char **)&x1);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x1 = (float *)alloca((size_t)datasize);
+    memset((void *)x1, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(62), arg1) < 0)
+      return NULL;
+  }
+
+  x2 = (float)_cffi_to_c_float(arg2);
+  if (x2 == (float)-1 && PyErr_Occurred())
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_noise_get_turbulence(x0, x1, x2); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_float(result);
+}
+#else
+#  define _cffi_f_TCOD_noise_get_turbulence _cffi_d_TCOD_noise_get_turbulence
+#endif
+
+static float _cffi_d_TCOD_noise_get_turbulence_ex(void * x0, float * x1, float x2, TCOD_noise_type_t x3)
+{
+  return TCOD_noise_get_turbulence_ex(x0, x1, x2, x3);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_noise_get_turbulence_ex(PyObject *self, PyObject *args)
+{
+  void * x0;
+  float * x1;
+  float x2;
+  TCOD_noise_type_t x3;
+  Py_ssize_t datasize;
+  float result;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject *arg2;
+  PyObject *arg3;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 4, "TCOD_noise_get_turbulence_ex");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+  arg2 = aa[2];
+  arg3 = aa[3];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(62), arg1, (char **)&x1);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x1 = (float *)alloca((size_t)datasize);
+    memset((void *)x1, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(62), arg1) < 0)
+      return NULL;
+  }
+
+  x2 = (float)_cffi_to_c_float(arg2);
+  if (x2 == (float)-1 && PyErr_Occurred())
+    return NULL;
+
+  if (_cffi_to_c((char *)&x3, _cffi_type(67), arg3) < 0)
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_noise_get_turbulence_ex(x0, x1, x2, x3); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_float(result);
+}
+#else
+#  define _cffi_f_TCOD_noise_get_turbulence_ex _cffi_d_TCOD_noise_get_turbulence_ex
+#endif
+
+static void * _cffi_d_TCOD_noise_new(int x0, float x1, float x2, void * x3)
+{
+  return TCOD_noise_new(x0, x1, x2, x3);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_noise_new(PyObject *self, PyObject *args)
+{
+  int x0;
+  float x1;
+  float x2;
+  void * x3;
+  Py_ssize_t datasize;
+  void * result;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject *arg2;
+  PyObject *arg3;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 4, "TCOD_noise_new");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+  arg2 = aa[2];
+  arg3 = aa[3];
+
+  x0 = _cffi_to_c_int(arg0, int);
+  if (x0 == (int)-1 && PyErr_Occurred())
+    return NULL;
+
+  x1 = (float)_cffi_to_c_float(arg1);
+  if (x1 == (float)-1 && PyErr_Occurred())
+    return NULL;
+
+  x2 = (float)_cffi_to_c_float(arg2);
+  if (x2 == (float)-1 && PyErr_Occurred())
+    return NULL;
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg3, (char **)&x3);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x3 = (void *)alloca((size_t)datasize);
+    memset((void *)x3, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x3, _cffi_type(1), arg3) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_noise_new(x0, x1, x2, x3); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_pointer((char *)result, _cffi_type(1));
+}
+#else
+#  define _cffi_f_TCOD_noise_new _cffi_d_TCOD_noise_new
+#endif
+
+static void _cffi_d_TCOD_noise_set_type(void * x0, TCOD_noise_type_t x1)
+{
+  TCOD_noise_set_type(x0, x1);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_noise_set_type(PyObject *self, PyObject *args)
+{
+  void * x0;
+  TCOD_noise_type_t x1;
+  Py_ssize_t datasize;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 2, "TCOD_noise_set_type");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  if (_cffi_to_c((char *)&x1, _cffi_type(67), arg1) < 0)
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { TCOD_noise_set_type(x0, x1); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+#else
+#  define _cffi_f_TCOD_noise_set_type _cffi_d_TCOD_noise_set_type
+#endif
+
+static void _cffi_d_TCOD_random_delete(void * x0)
+{
+  TCOD_random_delete(x0);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_random_delete(PyObject *self, PyObject *arg0)
+{
+  void * x0;
+  Py_ssize_t datasize;
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { TCOD_random_delete(x0); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+#else
+#  define _cffi_f_TCOD_random_delete _cffi_d_TCOD_random_delete
+#endif
+
+static TCOD_dice_t _cffi_d_TCOD_random_dice_new(char const * x0)
+{
+  return TCOD_random_dice_new(x0);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_random_dice_new(PyObject *self, PyObject *arg0)
+{
+  char const * x0;
+  Py_ssize_t datasize;
+  TCOD_dice_t result;
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(24), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (char const *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(24), arg0) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_random_dice_new(x0); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_struct((char *)&result, _cffi_type(98));
+}
+#else
+static void _cffi_f_TCOD_random_dice_new(TCOD_dice_t *result, char const * x0)
+{
+  { *result = TCOD_random_dice_new(x0); }
+}
+#endif
+
+static int _cffi_d_TCOD_random_dice_roll(void * x0, TCOD_dice_t x1)
+{
+  return TCOD_random_dice_roll(x0, x1);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_random_dice_roll(PyObject *self, PyObject *args)
+{
+  void * x0;
+  TCOD_dice_t x1;
+  Py_ssize_t datasize;
+  int result;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 2, "TCOD_random_dice_roll");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  if (_cffi_to_c((char *)&x1, _cffi_type(98), arg1) < 0)
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_random_dice_roll(x0, x1); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_int(result, int);
+}
+#else
+static int _cffi_f_TCOD_random_dice_roll(void * x0, TCOD_dice_t *x1)
+{
+  int result;
+  { result = TCOD_random_dice_roll(x0, *x1); }
+  return result;
+}
+#endif
+
+static int _cffi_d_TCOD_random_dice_roll_s(void * x0, char const * x1)
+{
+  return TCOD_random_dice_roll_s(x0, x1);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_random_dice_roll_s(PyObject *self, PyObject *args)
+{
+  void * x0;
+  char const * x1;
+  Py_ssize_t datasize;
+  int result;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 2, "TCOD_random_dice_roll_s");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(24), arg1, (char **)&x1);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x1 = (char const *)alloca((size_t)datasize);
+    memset((void *)x1, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(24), arg1) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_random_dice_roll_s(x0, x1); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_int(result, int);
+}
+#else
+#  define _cffi_f_TCOD_random_dice_roll_s _cffi_d_TCOD_random_dice_roll_s
+#endif
+
+static double _cffi_d_TCOD_random_get_double(void * x0, double x1, double x2)
+{
+  return TCOD_random_get_double(x0, x1, x2);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_random_get_double(PyObject *self, PyObject *args)
+{
+  void * x0;
+  double x1;
+  double x2;
+  Py_ssize_t datasize;
+  double result;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject *arg2;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 3, "TCOD_random_get_double");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+  arg2 = aa[2];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  x1 = (double)_cffi_to_c_double(arg1);
+  if (x1 == (double)-1 && PyErr_Occurred())
+    return NULL;
+
+  x2 = (double)_cffi_to_c_double(arg2);
+  if (x2 == (double)-1 && PyErr_Occurred())
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_random_get_double(x0, x1, x2); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_double(result);
+}
+#else
+#  define _cffi_f_TCOD_random_get_double _cffi_d_TCOD_random_get_double
+#endif
+
+static double _cffi_d_TCOD_random_get_double_mean(void * x0, double x1, double x2, double x3)
+{
+  return TCOD_random_get_double_mean(x0, x1, x2, x3);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_random_get_double_mean(PyObject *self, PyObject *args)
+{
+  void * x0;
+  double x1;
+  double x2;
+  double x3;
+  Py_ssize_t datasize;
+  double result;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject *arg2;
+  PyObject *arg3;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 4, "TCOD_random_get_double_mean");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+  arg2 = aa[2];
+  arg3 = aa[3];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  x1 = (double)_cffi_to_c_double(arg1);
+  if (x1 == (double)-1 && PyErr_Occurred())
+    return NULL;
+
+  x2 = (double)_cffi_to_c_double(arg2);
+  if (x2 == (double)-1 && PyErr_Occurred())
+    return NULL;
+
+  x3 = (double)_cffi_to_c_double(arg3);
+  if (x3 == (double)-1 && PyErr_Occurred())
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_random_get_double_mean(x0, x1, x2, x3); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_double(result);
+}
+#else
+#  define _cffi_f_TCOD_random_get_double_mean _cffi_d_TCOD_random_get_double_mean
+#endif
+
+static float _cffi_d_TCOD_random_get_float(void * x0, float x1, float x2)
+{
+  return TCOD_random_get_float(x0, x1, x2);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_random_get_float(PyObject *self, PyObject *args)
+{
+  void * x0;
+  float x1;
+  float x2;
+  Py_ssize_t datasize;
+  float result;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject *arg2;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 3, "TCOD_random_get_float");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+  arg2 = aa[2];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  x1 = (float)_cffi_to_c_float(arg1);
+  if (x1 == (float)-1 && PyErr_Occurred())
+    return NULL;
+
+  x2 = (float)_cffi_to_c_float(arg2);
+  if (x2 == (float)-1 && PyErr_Occurred())
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_random_get_float(x0, x1, x2); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_float(result);
+}
+#else
+#  define _cffi_f_TCOD_random_get_float _cffi_d_TCOD_random_get_float
+#endif
+
+static float _cffi_d_TCOD_random_get_float_mean(void * x0, float x1, float x2, float x3)
+{
+  return TCOD_random_get_float_mean(x0, x1, x2, x3);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_random_get_float_mean(PyObject *self, PyObject *args)
+{
+  void * x0;
+  float x1;
+  float x2;
+  float x3;
+  Py_ssize_t datasize;
+  float result;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject *arg2;
+  PyObject *arg3;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 4, "TCOD_random_get_float_mean");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+  arg2 = aa[2];
+  arg3 = aa[3];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  x1 = (float)_cffi_to_c_float(arg1);
+  if (x1 == (float)-1 && PyErr_Occurred())
+    return NULL;
+
+  x2 = (float)_cffi_to_c_float(arg2);
+  if (x2 == (float)-1 && PyErr_Occurred())
+    return NULL;
+
+  x3 = (float)_cffi_to_c_float(arg3);
+  if (x3 == (float)-1 && PyErr_Occurred())
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_random_get_float_mean(x0, x1, x2, x3); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_float(result);
+}
+#else
+#  define _cffi_f_TCOD_random_get_float_mean _cffi_d_TCOD_random_get_float_mean
+#endif
+
+static void * _cffi_d_TCOD_random_get_instance(void)
+{
+  return TCOD_random_get_instance();
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_random_get_instance(PyObject *self, PyObject *noarg)
+{
+  void * result;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_random_get_instance(); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  (void)noarg; /* unused */
+  return _cffi_from_c_pointer((char *)result, _cffi_type(1));
+}
+#else
+#  define _cffi_f_TCOD_random_get_instance _cffi_d_TCOD_random_get_instance
+#endif
+
+static int _cffi_d_TCOD_random_get_int(void * x0, int x1, int x2)
+{
+  return TCOD_random_get_int(x0, x1, x2);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_random_get_int(PyObject *self, PyObject *args)
+{
+  void * x0;
+  int x1;
+  int x2;
+  Py_ssize_t datasize;
+  int result;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject *arg2;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 3, "TCOD_random_get_int");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+  arg2 = aa[2];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  x1 = _cffi_to_c_int(arg1, int);
+  if (x1 == (int)-1 && PyErr_Occurred())
+    return NULL;
+
+  x2 = _cffi_to_c_int(arg2, int);
+  if (x2 == (int)-1 && PyErr_Occurred())
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_random_get_int(x0, x1, x2); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_int(result, int);
+}
+#else
+#  define _cffi_f_TCOD_random_get_int _cffi_d_TCOD_random_get_int
+#endif
+
+static int _cffi_d_TCOD_random_get_int_mean(void * x0, int x1, int x2, int x3)
+{
+  return TCOD_random_get_int_mean(x0, x1, x2, x3);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_random_get_int_mean(PyObject *self, PyObject *args)
+{
+  void * x0;
+  int x1;
+  int x2;
+  int x3;
+  Py_ssize_t datasize;
+  int result;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject *arg2;
+  PyObject *arg3;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 4, "TCOD_random_get_int_mean");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+  arg2 = aa[2];
+  arg3 = aa[3];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  x1 = _cffi_to_c_int(arg1, int);
+  if (x1 == (int)-1 && PyErr_Occurred())
+    return NULL;
+
+  x2 = _cffi_to_c_int(arg2, int);
+  if (x2 == (int)-1 && PyErr_Occurred())
+    return NULL;
+
+  x3 = _cffi_to_c_int(arg3, int);
+  if (x3 == (int)-1 && PyErr_Occurred())
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_random_get_int_mean(x0, x1, x2, x3); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_int(result, int);
+}
+#else
+#  define _cffi_f_TCOD_random_get_int_mean _cffi_d_TCOD_random_get_int_mean
+#endif
+
+static void * _cffi_d_TCOD_random_new(TCOD_random_algo_t x0)
+{
+  return TCOD_random_new(x0);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_random_new(PyObject *self, PyObject *arg0)
+{
+  TCOD_random_algo_t x0;
+  void * result;
+
+  if (_cffi_to_c((char *)&x0, _cffi_type(173), arg0) < 0)
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_random_new(x0); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_pointer((char *)result, _cffi_type(1));
+}
+#else
+#  define _cffi_f_TCOD_random_new _cffi_d_TCOD_random_new
+#endif
+
+static void * _cffi_d_TCOD_random_new_from_seed(TCOD_random_algo_t x0, unsigned int x1)
+{
+  return TCOD_random_new_from_seed(x0, x1);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_random_new_from_seed(PyObject *self, PyObject *args)
+{
+  TCOD_random_algo_t x0;
+  unsigned int x1;
+  void * result;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 2, "TCOD_random_new_from_seed");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+
+  if (_cffi_to_c((char *)&x0, _cffi_type(173), arg0) < 0)
+    return NULL;
+
+  x1 = _cffi_to_c_int(arg1, unsigned int);
+  if (x1 == (unsigned int)-1 && PyErr_Occurred())
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_random_new_from_seed(x0, x1); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_pointer((char *)result, _cffi_type(1));
+}
+#else
+#  define _cffi_f_TCOD_random_new_from_seed _cffi_d_TCOD_random_new_from_seed
+#endif
+
+static void _cffi_d_TCOD_random_restore(void * x0, void * x1)
+{
+  TCOD_random_restore(x0, x1);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_random_restore(PyObject *self, PyObject *args)
+{
+  void * x0;
+  void * x1;
+  Py_ssize_t datasize;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 2, "TCOD_random_restore");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg1, (char **)&x1);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x1 = (void *)alloca((size_t)datasize);
+    memset((void *)x1, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(1), arg1) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { TCOD_random_restore(x0, x1); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+#else
+#  define _cffi_f_TCOD_random_restore _cffi_d_TCOD_random_restore
+#endif
+
+static void * _cffi_d_TCOD_random_save(void * x0)
+{
+  return TCOD_random_save(x0);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_random_save(PyObject *self, PyObject *arg0)
+{
+  void * x0;
+  Py_ssize_t datasize;
+  void * result;
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = TCOD_random_save(x0); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_pointer((char *)result, _cffi_type(1));
+}
+#else
+#  define _cffi_f_TCOD_random_save _cffi_d_TCOD_random_save
+#endif
+
+static void _cffi_d_TCOD_random_set_distribution(void * x0, TCOD_distribution_t x1)
+{
+  TCOD_random_set_distribution(x0, x1);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_TCOD_random_set_distribution(PyObject *self, PyObject *args)
+{
+  void * x0;
+  TCOD_distribution_t x1;
+  Py_ssize_t datasize;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject **aa;
+
+  aa = _cffi_unpack_args(args, 2, "TCOD_random_set_distribution");
+  if (aa == NULL)
+    return NULL;
+  arg0 = aa[0];
+  arg1 = aa[1];
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (void *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(1), arg0) < 0)
+      return NULL;
+  }
+
+  if (_cffi_to_c((char *)&x1, _cffi_type(291), arg1) < 0)
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { TCOD_random_set_distribution(x0, x1); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+#else
+#  define _cffi_f_TCOD_random_set_distribution _cffi_d_TCOD_random_set_distribution
+#endif
+
 static void _cffi_d_TCOD_semaphore_delete(void * x0)
 {
   TCOD_semaphore_delete(x0);
@@ -6356,24 +7854,24 @@ _cffi_f_TCOD_sys_check_for_event(PyObject *self, PyObject *args)
     return NULL;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(25), arg1, (char **)&x1);
+      _cffi_type(28), arg1, (char **)&x1);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x1 = (TCOD_key_t *)alloca((size_t)datasize);
     memset((void *)x1, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(25), arg1) < 0)
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(28), arg1) < 0)
       return NULL;
   }
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(26), arg2, (char **)&x2);
+      _cffi_type(29), arg2, (char **)&x2);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x2 = (TCOD_mouse_t *)alloca((size_t)datasize);
     memset((void *)x2, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x2, _cffi_type(26), arg2) < 0)
+    if (_cffi_convert_array_from_object((char *)x2, _cffi_type(29), arg2) < 0)
       return NULL;
   }
 
@@ -6384,7 +7882,7 @@ _cffi_f_TCOD_sys_check_for_event(PyObject *self, PyObject *args)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_deref((char *)&result, _cffi_type(379));
+  return _cffi_from_c_deref((char *)&result, _cffi_type(459));
 }
 #else
 #  define _cffi_f_TCOD_sys_check_for_event _cffi_d_TCOD_sys_check_for_event
@@ -6408,7 +7906,7 @@ _cffi_f_TCOD_sys_clipboard_get(PyObject *self, PyObject *noarg)
 
   (void)self; /* unused */
   (void)noarg; /* unused */
-  return _cffi_from_c_pointer((char *)result, _cffi_type(384));
+  return _cffi_from_c_pointer((char *)result, _cffi_type(464));
 }
 #else
 #  define _cffi_f_TCOD_sys_clipboard_get _cffi_d_TCOD_sys_clipboard_get
@@ -6426,13 +7924,13 @@ _cffi_f_TCOD_sys_clipboard_set(PyObject *self, PyObject *arg0)
   Py_ssize_t datasize;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(64), arg0, (char **)&x0);
+      _cffi_type(24), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (char const *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(64), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(24), arg0) < 0)
       return NULL;
   }
 
@@ -6514,24 +8012,24 @@ _cffi_f_TCOD_sys_get_char_size(PyObject *self, PyObject *args)
   arg1 = aa[1];
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(159), arg0, (char **)&x0);
+      _cffi_type(231), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (int *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(159), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(231), arg0) < 0)
       return NULL;
   }
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(159), arg1, (char **)&x1);
+      _cffi_type(231), arg1, (char **)&x1);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x1 = (int *)alloca((size_t)datasize);
     memset((void *)x1, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(159), arg1) < 0)
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(231), arg1) < 0)
       return NULL;
   }
 
@@ -6571,24 +8069,24 @@ _cffi_f_TCOD_sys_get_current_resolution(PyObject *self, PyObject *args)
   arg1 = aa[1];
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(159), arg0, (char **)&x0);
+      _cffi_type(231), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (int *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(159), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(231), arg0) < 0)
       return NULL;
   }
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(159), arg1, (char **)&x1);
+      _cffi_type(231), arg1, (char **)&x1);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x1 = (int *)alloca((size_t)datasize);
     memset((void *)x1, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(159), arg1) < 0)
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(231), arg1) < 0)
       return NULL;
   }
 
@@ -6652,24 +8150,24 @@ _cffi_f_TCOD_sys_get_fullscreen_offsets(PyObject *self, PyObject *args)
   arg1 = aa[1];
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(159), arg0, (char **)&x0);
+      _cffi_type(231), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (int *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(159), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(231), arg0) < 0)
       return NULL;
   }
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(159), arg1, (char **)&x1);
+      _cffi_type(231), arg1, (char **)&x1);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x1 = (int *)alloca((size_t)datasize);
     memset((void *)x1, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(159), arg1) < 0)
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(231), arg1) < 0)
       return NULL;
   }
 
@@ -6753,7 +8251,7 @@ _cffi_f_TCOD_sys_get_renderer(PyObject *self, PyObject *noarg)
 
   (void)self; /* unused */
   (void)noarg; /* unused */
-  return _cffi_from_c_deref((char *)&result, _cffi_type(142));
+  return _cffi_from_c_deref((char *)&result, _cffi_type(214));
 }
 #else
 #  define _cffi_f_TCOD_sys_get_renderer _cffi_d_TCOD_sys_get_renderer
@@ -6769,7 +8267,7 @@ _cffi_f_TCOD_sys_register_SDL_renderer(PyObject *self, PyObject *arg0)
 {
   void(* x0)(void *);
 
-  x0 = (void(*)(void *))_cffi_to_c_pointer(arg0, _cffi_type(370));
+  x0 = (void(*)(void *))_cffi_to_c_pointer(arg0, _cffi_type(450));
   if (x0 == (void(*)(void *))NULL && PyErr_Occurred())
     return NULL;
 
@@ -6799,13 +8297,13 @@ _cffi_f_TCOD_sys_save_screenshot(PyObject *self, PyObject *arg0)
   Py_ssize_t datasize;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(64), arg0, (char **)&x0);
+      _cffi_type(24), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (char const *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(64), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(24), arg0) < 0)
       return NULL;
   }
 
@@ -6861,7 +8359,7 @@ _cffi_f_TCOD_sys_set_renderer(PyObject *self, PyObject *arg0)
 {
   TCOD_renderer_t x0;
 
-  if (_cffi_to_c((char *)&x0, _cffi_type(142), arg0) < 0)
+  if (_cffi_to_c((char *)&x0, _cffi_type(214), arg0) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -6989,24 +8487,24 @@ _cffi_f_TCOD_sys_wait_for_event(PyObject *self, PyObject *args)
     return NULL;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(25), arg1, (char **)&x1);
+      _cffi_type(28), arg1, (char **)&x1);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x1 = (TCOD_key_t *)alloca((size_t)datasize);
     memset((void *)x1, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(25), arg1) < 0)
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(28), arg1) < 0)
       return NULL;
   }
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(26), arg2, (char **)&x2);
+      _cffi_type(29), arg2, (char **)&x2);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x2 = (TCOD_mouse_t *)alloca((size_t)datasize);
     memset((void *)x2, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x2, _cffi_type(26), arg2) < 0)
+    if (_cffi_convert_array_from_object((char *)x2, _cffi_type(29), arg2) < 0)
       return NULL;
   }
 
@@ -7021,7 +8519,7 @@ _cffi_f_TCOD_sys_wait_for_event(PyObject *self, PyObject *args)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_deref((char *)&result, _cffi_type(379));
+  return _cffi_from_c_deref((char *)&result, _cffi_type(459));
 }
 #else
 #  define _cffi_f_TCOD_sys_wait_for_event _cffi_d_TCOD_sys_wait_for_event
@@ -7085,7 +8583,7 @@ _cffi_f_TCOD_thread_new(PyObject *self, PyObject *args)
   arg0 = aa[0];
   arg1 = aa[1];
 
-  x0 = (int(*)(void *))_cffi_to_c_pointer(arg0, _cffi_type(117));
+  x0 = (int(*)(void *))_cffi_to_c_pointer(arg0, _cffi_type(183));
   if (x0 == (int(*)(void *))NULL && PyErr_Occurred())
     return NULL;
 
@@ -7318,6 +8816,11 @@ static const struct _cffi_global_s _cffi_globals[] = {
   { "TCOD_COLCTRL_FORE_RGB", (void *)_cffi_const_TCOD_COLCTRL_FORE_RGB, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
   { "TCOD_COLCTRL_NUMBER", (void *)_cffi_const_TCOD_COLCTRL_NUMBER, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
   { "TCOD_COLCTRL_STOP", (void *)_cffi_const_TCOD_COLCTRL_STOP, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
+  { "TCOD_DISTRIBUTION_GAUSSIAN", (void *)_cffi_const_TCOD_DISTRIBUTION_GAUSSIAN, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
+  { "TCOD_DISTRIBUTION_GAUSSIAN_INVERSE", (void *)_cffi_const_TCOD_DISTRIBUTION_GAUSSIAN_INVERSE, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
+  { "TCOD_DISTRIBUTION_GAUSSIAN_RANGE", (void *)_cffi_const_TCOD_DISTRIBUTION_GAUSSIAN_RANGE, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
+  { "TCOD_DISTRIBUTION_GAUSSIAN_RANGE_INVERSE", (void *)_cffi_const_TCOD_DISTRIBUTION_GAUSSIAN_RANGE_INVERSE, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
+  { "TCOD_DISTRIBUTION_LINEAR", (void *)_cffi_const_TCOD_DISTRIBUTION_LINEAR, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
   { "TCOD_EVENT_ANY", (void *)_cffi_const_TCOD_EVENT_ANY, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
   { "TCOD_EVENT_KEY", (void *)_cffi_const_TCOD_EVENT_KEY, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
   { "TCOD_EVENT_KEY_PRESS", (void *)_cffi_const_TCOD_EVENT_KEY_PRESS, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
@@ -7335,175 +8838,218 @@ static const struct _cffi_global_s _cffi_globals[] = {
   { "TCOD_KEY_RELEASED", (void *)_cffi_const_TCOD_KEY_RELEASED, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
   { "TCOD_LEFT", (void *)_cffi_const_TCOD_LEFT, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
   { "TCOD_NB_RENDERERS", (void *)_cffi_const_TCOD_NB_RENDERERS, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
+  { "TCOD_NOISE_DEFAULT", (void *)_cffi_const_TCOD_NOISE_DEFAULT, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
+  { "TCOD_NOISE_PERLIN", (void *)_cffi_const_TCOD_NOISE_PERLIN, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
+  { "TCOD_NOISE_SIMPLEX", (void *)_cffi_const_TCOD_NOISE_SIMPLEX, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
+  { "TCOD_NOISE_WAVELET", (void *)_cffi_const_TCOD_NOISE_WAVELET, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
   { "TCOD_RENDERER_GLSL", (void *)_cffi_const_TCOD_RENDERER_GLSL, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
   { "TCOD_RENDERER_OPENGL", (void *)_cffi_const_TCOD_RENDERER_OPENGL, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
   { "TCOD_RENDERER_SDL", (void *)_cffi_const_TCOD_RENDERER_SDL, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
   { "TCOD_RIGHT", (void *)_cffi_const_TCOD_RIGHT, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
-  { "TCOD_close_library", (void *)_cffi_f_TCOD_close_library, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_close_library },
-  { "TCOD_condition_broadcast", (void *)_cffi_f_TCOD_condition_broadcast, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_condition_broadcast },
-  { "TCOD_condition_delete", (void *)_cffi_f_TCOD_condition_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_condition_delete },
-  { "TCOD_condition_new", (void *)_cffi_f_TCOD_condition_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 134), (void *)_cffi_d_TCOD_condition_new },
-  { "TCOD_condition_signal", (void *)_cffi_f_TCOD_condition_signal, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_condition_signal },
-  { "TCOD_condition_wait", (void *)_cffi_f_TCOD_condition_wait, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 336), (void *)_cffi_d_TCOD_condition_wait },
-  { "TCOD_console_blit", (void *)_cffi_f_TCOD_console_blit, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 318), (void *)_cffi_d_TCOD_console_blit },
-  { "TCOD_console_check_for_keypress", (void *)_cffi_f_TCOD_console_check_for_keypress, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 34), (void *)_cffi_d_TCOD_console_check_for_keypress },
-  { "TCOD_console_clear", (void *)_cffi_f_TCOD_console_clear, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_console_clear },
-  { "TCOD_console_credits", (void *)_cffi_f_TCOD_console_credits, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 372), (void *)_cffi_d_TCOD_console_credits },
-  { "TCOD_console_credits_render", (void *)_cffi_f_TCOD_console_credits_render, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 97), (void *)_cffi_d_TCOD_console_credits_render },
-  { "TCOD_console_credits_reset", (void *)_cffi_f_TCOD_console_credits_reset, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 372), (void *)_cffi_d_TCOD_console_credits_reset },
-  { "TCOD_console_delete", (void *)_cffi_f_TCOD_console_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_console_delete },
-  { "TCOD_console_disable_keyboard_repeat", (void *)_cffi_f_TCOD_console_disable_keyboard_repeat, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 372), (void *)_cffi_d_TCOD_console_disable_keyboard_repeat },
-  { "TCOD_console_flush", (void *)_cffi_f_TCOD_console_flush, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 372), (void *)_cffi_d_TCOD_console_flush },
-  { "TCOD_console_from_file", (void *)_cffi_f_TCOD_console_from_file, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 113), (void *)_cffi_d_TCOD_console_from_file },
+  { "TCOD_RNG_CMWC", (void *)_cffi_const_TCOD_RNG_CMWC, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
+  { "TCOD_RNG_MT", (void *)_cffi_const_TCOD_RNG_MT, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
+  { "TCOD_close_library", (void *)_cffi_f_TCOD_close_library, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_close_library },
+  { "TCOD_condition_broadcast", (void *)_cffi_f_TCOD_condition_broadcast, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_condition_broadcast },
+  { "TCOD_condition_delete", (void *)_cffi_f_TCOD_condition_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_condition_delete },
+  { "TCOD_condition_new", (void *)_cffi_f_TCOD_condition_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 206), (void *)_cffi_d_TCOD_condition_new },
+  { "TCOD_condition_signal", (void *)_cffi_f_TCOD_condition_signal, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_condition_signal },
+  { "TCOD_condition_wait", (void *)_cffi_f_TCOD_condition_wait, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 416), (void *)_cffi_d_TCOD_condition_wait },
+  { "TCOD_console_blit", (void *)_cffi_f_TCOD_console_blit, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 398), (void *)_cffi_d_TCOD_console_blit },
+  { "TCOD_console_check_for_keypress", (void *)_cffi_f_TCOD_console_check_for_keypress, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 37), (void *)_cffi_d_TCOD_console_check_for_keypress },
+  { "TCOD_console_clear", (void *)_cffi_f_TCOD_console_clear, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_console_clear },
+  { "TCOD_console_credits", (void *)_cffi_f_TCOD_console_credits, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 452), (void *)_cffi_d_TCOD_console_credits },
+  { "TCOD_console_credits_render", (void *)_cffi_f_TCOD_console_credits_render, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 156), (void *)_cffi_d_TCOD_console_credits_render },
+  { "TCOD_console_credits_reset", (void *)_cffi_f_TCOD_console_credits_reset, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 452), (void *)_cffi_d_TCOD_console_credits_reset },
+  { "TCOD_console_delete", (void *)_cffi_f_TCOD_console_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_console_delete },
+  { "TCOD_console_disable_keyboard_repeat", (void *)_cffi_f_TCOD_console_disable_keyboard_repeat, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 452), (void *)_cffi_d_TCOD_console_disable_keyboard_repeat },
+  { "TCOD_console_flush", (void *)_cffi_f_TCOD_console_flush, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 452), (void *)_cffi_d_TCOD_console_flush },
+  { "TCOD_console_from_file", (void *)_cffi_f_TCOD_console_from_file, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 179), (void *)_cffi_d_TCOD_console_from_file },
   { "TCOD_console_get_alignment", (void *)_cffi_f_TCOD_console_get_alignment, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 0), (void *)_cffi_d_TCOD_console_get_alignment },
   { "TCOD_console_get_background_flag", (void *)_cffi_f_TCOD_console_get_background_flag, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 3), (void *)_cffi_d_TCOD_console_get_background_flag },
-  { "TCOD_console_get_char", (void *)_cffi_f_TCOD_console_get_char, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 51), (void *)_cffi_d_TCOD_console_get_char },
+  { "TCOD_console_get_char", (void *)_cffi_f_TCOD_console_get_char, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 104), (void *)_cffi_d_TCOD_console_get_char },
   { "TCOD_console_get_char_background", (void *)_cffi_f_TCOD_console_get_char_background, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 16), (void *)_cffi_d_TCOD_console_get_char_background },
   { "TCOD_console_get_char_foreground", (void *)_cffi_f_TCOD_console_get_char_foreground, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 16), (void *)_cffi_d_TCOD_console_get_char_foreground },
   { "TCOD_console_get_default_background", (void *)_cffi_f_TCOD_console_get_default_background, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 6), (void *)_cffi_d_TCOD_console_get_default_background },
   { "TCOD_console_get_default_foreground", (void *)_cffi_f_TCOD_console_get_default_foreground, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 6), (void *)_cffi_d_TCOD_console_get_default_foreground },
-  { "TCOD_console_get_fade", (void *)_cffi_f_TCOD_console_get_fade, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 111), (void *)_cffi_d_TCOD_console_get_fade },
+  { "TCOD_console_get_fade", (void *)_cffi_f_TCOD_console_get_fade, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 170), (void *)_cffi_d_TCOD_console_get_fade },
   { "TCOD_console_get_fading_color", (void *)_cffi_f_TCOD_console_get_fading_color, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 21), (void *)_cffi_d_TCOD_console_get_fading_color },
-  { "TCOD_console_get_height", (void *)_cffi_f_TCOD_console_get_height, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 48), (void *)_cffi_d_TCOD_console_get_height },
-  { "TCOD_console_get_height_rect", (void *)_cffi_const_TCOD_console_get_height_rect, _CFFI_OP(_CFFI_OP_CONSTANT, 388), (void *)0 },
-  { "TCOD_console_get_height_rect_utf", (void *)_cffi_const_TCOD_console_get_height_rect_utf, _CFFI_OP(_CFFI_OP_CONSTANT, 389), (void *)0 },
-  { "TCOD_console_get_width", (void *)_cffi_f_TCOD_console_get_width, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 48), (void *)_cffi_d_TCOD_console_get_width },
-  { "TCOD_console_hline", (void *)_cffi_f_TCOD_console_hline, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 276), (void *)_cffi_d_TCOD_console_hline },
-  { "TCOD_console_init_root", (void *)_cffi_f_TCOD_console_init_root, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 169), (void *)_cffi_d_TCOD_console_init_root },
-  { "TCOD_console_is_fullscreen", (void *)_cffi_f_TCOD_console_is_fullscreen, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 111), (void *)_cffi_d_TCOD_console_is_fullscreen },
-  { "TCOD_console_is_key_pressed", (void *)_cffi_f_TCOD_console_is_key_pressed, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 94), (void *)_cffi_d_TCOD_console_is_key_pressed },
-  { "TCOD_console_is_window_closed", (void *)_cffi_f_TCOD_console_is_window_closed, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 111), (void *)_cffi_d_TCOD_console_is_window_closed },
-  { "TCOD_console_load_apf", (void *)_cffi_f_TCOD_console_load_apf, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 102), (void *)_cffi_d_TCOD_console_load_apf },
-  { "TCOD_console_load_asc", (void *)_cffi_f_TCOD_console_load_asc, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 102), (void *)_cffi_d_TCOD_console_load_asc },
-  { "TCOD_console_map_ascii_code_to_font", (void *)_cffi_f_TCOD_console_map_ascii_code_to_font, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 176), (void *)_cffi_d_TCOD_console_map_ascii_code_to_font },
-  { "TCOD_console_map_ascii_codes_to_font", (void *)_cffi_f_TCOD_console_map_ascii_codes_to_font, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 181), (void *)_cffi_d_TCOD_console_map_ascii_codes_to_font },
-  { "TCOD_console_map_string_to_font", (void *)_cffi_f_TCOD_console_map_string_to_font, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 147), (void *)_cffi_d_TCOD_console_map_string_to_font },
-  { "TCOD_console_map_string_to_font_utf", (void *)_cffi_f_TCOD_console_map_string_to_font_utf, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 374), (void *)_cffi_d_TCOD_console_map_string_to_font_utf },
-  { "TCOD_console_new", (void *)_cffi_f_TCOD_console_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 123), (void *)_cffi_d_TCOD_console_new },
-  { "TCOD_console_print", (void *)_cffi_const_TCOD_console_print, _CFFI_OP(_CFFI_OP_CONSTANT, 397), (void *)0 },
-  { "TCOD_console_print_ex", (void *)_cffi_const_TCOD_console_print_ex, _CFFI_OP(_CFFI_OP_CONSTANT, 395), (void *)0 },
-  { "TCOD_console_print_ex_utf", (void *)_cffi_const_TCOD_console_print_ex_utf, _CFFI_OP(_CFFI_OP_CONSTANT, 396), (void *)0 },
-  { "TCOD_console_print_frame", (void *)_cffi_const_TCOD_console_print_frame, _CFFI_OP(_CFFI_OP_CONSTANT, 398), (void *)0 },
-  { "TCOD_console_print_rect", (void *)_cffi_const_TCOD_console_print_rect, _CFFI_OP(_CFFI_OP_CONSTANT, 388), (void *)0 },
-  { "TCOD_console_print_rect_ex", (void *)_cffi_const_TCOD_console_print_rect_ex, _CFFI_OP(_CFFI_OP_CONSTANT, 386), (void *)0 },
-  { "TCOD_console_print_rect_ex_utf", (void *)_cffi_const_TCOD_console_print_rect_ex_utf, _CFFI_OP(_CFFI_OP_CONSTANT, 387), (void *)0 },
-  { "TCOD_console_print_rect_utf", (void *)_cffi_const_TCOD_console_print_rect_utf, _CFFI_OP(_CFFI_OP_CONSTANT, 389), (void *)0 },
-  { "TCOD_console_print_utf", (void *)_cffi_const_TCOD_console_print_utf, _CFFI_OP(_CFFI_OP_CONSTANT, 399), (void *)0 },
-  { "TCOD_console_put_char", (void *)_cffi_f_TCOD_console_put_char, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 276), (void *)_cffi_d_TCOD_console_put_char },
-  { "TCOD_console_put_char_ex", (void *)_cffi_f_TCOD_console_put_char_ex, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 283), (void *)_cffi_d_TCOD_console_put_char_ex },
-  { "TCOD_console_rect", (void *)_cffi_f_TCOD_console_rect, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 299), (void *)_cffi_d_TCOD_console_rect },
-  { "TCOD_console_save_apf", (void *)_cffi_f_TCOD_console_save_apf, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 102), (void *)_cffi_d_TCOD_console_save_apf },
-  { "TCOD_console_save_asc", (void *)_cffi_f_TCOD_console_save_asc, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 102), (void *)_cffi_d_TCOD_console_save_asc },
-  { "TCOD_console_set_alignment", (void *)_cffi_f_TCOD_console_set_alignment, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 205), (void *)_cffi_d_TCOD_console_set_alignment },
-  { "TCOD_console_set_background_flag", (void *)_cffi_f_TCOD_console_set_background_flag, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 209), (void *)_cffi_d_TCOD_console_set_background_flag },
-  { "TCOD_console_set_char", (void *)_cffi_f_TCOD_console_set_char, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 270), (void *)_cffi_d_TCOD_console_set_char },
-  { "TCOD_console_set_char_background", (void *)_cffi_f_TCOD_console_set_char_background, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 257), (void *)_cffi_d_TCOD_console_set_char_background },
-  { "TCOD_console_set_char_foreground", (void *)_cffi_f_TCOD_console_set_char_foreground, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 251), (void *)_cffi_d_TCOD_console_set_char_foreground },
-  { "TCOD_console_set_color_control", (void *)_cffi_f_TCOD_console_set_color_control, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 136), (void *)_cffi_d_TCOD_console_set_color_control },
-  { "TCOD_console_set_custom_font", (void *)_cffi_f_TCOD_console_set_custom_font, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 152), (void *)_cffi_d_TCOD_console_set_custom_font },
-  { "TCOD_console_set_default_background", (void *)_cffi_f_TCOD_console_set_default_background, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 213), (void *)_cffi_d_TCOD_console_set_default_background },
-  { "TCOD_console_set_default_foreground", (void *)_cffi_f_TCOD_console_set_default_foreground, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 213), (void *)_cffi_d_TCOD_console_set_default_foreground },
-  { "TCOD_console_set_dirty", (void *)_cffi_f_TCOD_console_set_dirty, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 181), (void *)_cffi_d_TCOD_console_set_dirty },
-  { "TCOD_console_set_fade", (void *)_cffi_f_TCOD_console_set_fade, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 198), (void *)_cffi_d_TCOD_console_set_fade },
-  { "TCOD_console_set_fullscreen", (void *)_cffi_f_TCOD_console_set_fullscreen, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 195), (void *)_cffi_d_TCOD_console_set_fullscreen },
-  { "TCOD_console_set_key_color", (void *)_cffi_f_TCOD_console_set_key_color, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 213), (void *)_cffi_d_TCOD_console_set_key_color },
-  { "TCOD_console_set_keyboard_repeat", (void *)_cffi_f_TCOD_console_set_keyboard_repeat, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 165), (void *)_cffi_d_TCOD_console_set_keyboard_repeat },
-  { "TCOD_console_set_window_title", (void *)_cffi_f_TCOD_console_set_window_title, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 144), (void *)_cffi_d_TCOD_console_set_window_title },
-  { "TCOD_console_vline", (void *)_cffi_f_TCOD_console_vline, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 276), (void *)_cffi_d_TCOD_console_vline },
-  { "TCOD_console_wait_for_keypress", (void *)_cffi_f_TCOD_console_wait_for_keypress, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 37), (void *)_cffi_d_TCOD_console_wait_for_keypress },
-  { "TCOD_get_function_address", (void *)_cffi_f_TCOD_get_function_address, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 130), (void *)_cffi_d_TCOD_get_function_address },
-  { "TCOD_image_blit", (void *)_cffi_f_TCOD_image_blit, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 340), (void *)_cffi_d_TCOD_image_blit },
-  { "TCOD_image_blit_2x", (void *)_cffi_f_TCOD_image_blit_2x, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 359), (void *)_cffi_d_TCOD_image_blit_2x },
-  { "TCOD_image_blit_rect", (void *)_cffi_f_TCOD_image_blit_rect, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 350), (void *)_cffi_d_TCOD_image_blit_rect },
-  { "TCOD_image_clear", (void *)_cffi_f_TCOD_image_clear, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 213), (void *)_cffi_d_TCOD_image_clear },
-  { "TCOD_image_delete", (void *)_cffi_f_TCOD_image_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_image_delete },
-  { "TCOD_image_from_console", (void *)_cffi_f_TCOD_image_from_console, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 127), (void *)_cffi_d_TCOD_image_from_console },
-  { "TCOD_image_get_alpha", (void *)_cffi_f_TCOD_image_get_alpha, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 51), (void *)_cffi_d_TCOD_image_get_alpha },
+  { "TCOD_console_get_height", (void *)_cffi_f_TCOD_console_get_height, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 93), (void *)_cffi_d_TCOD_console_get_height },
+  { "TCOD_console_get_height_rect", (void *)_cffi_const_TCOD_console_get_height_rect, _CFFI_OP(_CFFI_OP_CONSTANT, 468), (void *)0 },
+  { "TCOD_console_get_height_rect_utf", (void *)_cffi_const_TCOD_console_get_height_rect_utf, _CFFI_OP(_CFFI_OP_CONSTANT, 469), (void *)0 },
+  { "TCOD_console_get_width", (void *)_cffi_f_TCOD_console_get_width, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 93), (void *)_cffi_d_TCOD_console_get_width },
+  { "TCOD_console_hline", (void *)_cffi_f_TCOD_console_hline, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 356), (void *)_cffi_d_TCOD_console_hline },
+  { "TCOD_console_init_root", (void *)_cffi_f_TCOD_console_init_root, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 241), (void *)_cffi_d_TCOD_console_init_root },
+  { "TCOD_console_is_fullscreen", (void *)_cffi_f_TCOD_console_is_fullscreen, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 170), (void *)_cffi_d_TCOD_console_is_fullscreen },
+  { "TCOD_console_is_key_pressed", (void *)_cffi_f_TCOD_console_is_key_pressed, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 153), (void *)_cffi_d_TCOD_console_is_key_pressed },
+  { "TCOD_console_is_window_closed", (void *)_cffi_f_TCOD_console_is_window_closed, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 170), (void *)_cffi_d_TCOD_console_is_window_closed },
+  { "TCOD_console_load_apf", (void *)_cffi_f_TCOD_console_load_apf, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 161), (void *)_cffi_d_TCOD_console_load_apf },
+  { "TCOD_console_load_asc", (void *)_cffi_f_TCOD_console_load_asc, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 161), (void *)_cffi_d_TCOD_console_load_asc },
+  { "TCOD_console_map_ascii_code_to_font", (void *)_cffi_f_TCOD_console_map_ascii_code_to_font, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 248), (void *)_cffi_d_TCOD_console_map_ascii_code_to_font },
+  { "TCOD_console_map_ascii_codes_to_font", (void *)_cffi_f_TCOD_console_map_ascii_codes_to_font, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 253), (void *)_cffi_d_TCOD_console_map_ascii_codes_to_font },
+  { "TCOD_console_map_string_to_font", (void *)_cffi_f_TCOD_console_map_string_to_font, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 219), (void *)_cffi_d_TCOD_console_map_string_to_font },
+  { "TCOD_console_map_string_to_font_utf", (void *)_cffi_f_TCOD_console_map_string_to_font_utf, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 454), (void *)_cffi_d_TCOD_console_map_string_to_font_utf },
+  { "TCOD_console_new", (void *)_cffi_f_TCOD_console_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 195), (void *)_cffi_d_TCOD_console_new },
+  { "TCOD_console_print", (void *)_cffi_const_TCOD_console_print, _CFFI_OP(_CFFI_OP_CONSTANT, 476), (void *)0 },
+  { "TCOD_console_print_ex", (void *)_cffi_const_TCOD_console_print_ex, _CFFI_OP(_CFFI_OP_CONSTANT, 474), (void *)0 },
+  { "TCOD_console_print_ex_utf", (void *)_cffi_const_TCOD_console_print_ex_utf, _CFFI_OP(_CFFI_OP_CONSTANT, 475), (void *)0 },
+  { "TCOD_console_print_frame", (void *)_cffi_const_TCOD_console_print_frame, _CFFI_OP(_CFFI_OP_CONSTANT, 477), (void *)0 },
+  { "TCOD_console_print_rect", (void *)_cffi_const_TCOD_console_print_rect, _CFFI_OP(_CFFI_OP_CONSTANT, 468), (void *)0 },
+  { "TCOD_console_print_rect_ex", (void *)_cffi_const_TCOD_console_print_rect_ex, _CFFI_OP(_CFFI_OP_CONSTANT, 466), (void *)0 },
+  { "TCOD_console_print_rect_ex_utf", (void *)_cffi_const_TCOD_console_print_rect_ex_utf, _CFFI_OP(_CFFI_OP_CONSTANT, 467), (void *)0 },
+  { "TCOD_console_print_rect_utf", (void *)_cffi_const_TCOD_console_print_rect_utf, _CFFI_OP(_CFFI_OP_CONSTANT, 469), (void *)0 },
+  { "TCOD_console_print_utf", (void *)_cffi_const_TCOD_console_print_utf, _CFFI_OP(_CFFI_OP_CONSTANT, 478), (void *)0 },
+  { "TCOD_console_put_char", (void *)_cffi_f_TCOD_console_put_char, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 356), (void *)_cffi_d_TCOD_console_put_char },
+  { "TCOD_console_put_char_ex", (void *)_cffi_f_TCOD_console_put_char_ex, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 363), (void *)_cffi_d_TCOD_console_put_char_ex },
+  { "TCOD_console_rect", (void *)_cffi_f_TCOD_console_rect, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 379), (void *)_cffi_d_TCOD_console_rect },
+  { "TCOD_console_save_apf", (void *)_cffi_f_TCOD_console_save_apf, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 161), (void *)_cffi_d_TCOD_console_save_apf },
+  { "TCOD_console_save_asc", (void *)_cffi_f_TCOD_console_save_asc, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 161), (void *)_cffi_d_TCOD_console_save_asc },
+  { "TCOD_console_set_alignment", (void *)_cffi_f_TCOD_console_set_alignment, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 277), (void *)_cffi_d_TCOD_console_set_alignment },
+  { "TCOD_console_set_background_flag", (void *)_cffi_f_TCOD_console_set_background_flag, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 281), (void *)_cffi_d_TCOD_console_set_background_flag },
+  { "TCOD_console_set_char", (void *)_cffi_f_TCOD_console_set_char, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 350), (void *)_cffi_d_TCOD_console_set_char },
+  { "TCOD_console_set_char_background", (void *)_cffi_f_TCOD_console_set_char_background, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 337), (void *)_cffi_d_TCOD_console_set_char_background },
+  { "TCOD_console_set_char_foreground", (void *)_cffi_f_TCOD_console_set_char_foreground, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 331), (void *)_cffi_d_TCOD_console_set_char_foreground },
+  { "TCOD_console_set_color_control", (void *)_cffi_f_TCOD_console_set_color_control, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 208), (void *)_cffi_d_TCOD_console_set_color_control },
+  { "TCOD_console_set_custom_font", (void *)_cffi_f_TCOD_console_set_custom_font, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 224), (void *)_cffi_d_TCOD_console_set_custom_font },
+  { "TCOD_console_set_default_background", (void *)_cffi_f_TCOD_console_set_default_background, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 285), (void *)_cffi_d_TCOD_console_set_default_background },
+  { "TCOD_console_set_default_foreground", (void *)_cffi_f_TCOD_console_set_default_foreground, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 285), (void *)_cffi_d_TCOD_console_set_default_foreground },
+  { "TCOD_console_set_dirty", (void *)_cffi_f_TCOD_console_set_dirty, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 253), (void *)_cffi_d_TCOD_console_set_dirty },
+  { "TCOD_console_set_fade", (void *)_cffi_f_TCOD_console_set_fade, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 270), (void *)_cffi_d_TCOD_console_set_fade },
+  { "TCOD_console_set_fullscreen", (void *)_cffi_f_TCOD_console_set_fullscreen, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 267), (void *)_cffi_d_TCOD_console_set_fullscreen },
+  { "TCOD_console_set_key_color", (void *)_cffi_f_TCOD_console_set_key_color, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 285), (void *)_cffi_d_TCOD_console_set_key_color },
+  { "TCOD_console_set_keyboard_repeat", (void *)_cffi_f_TCOD_console_set_keyboard_repeat, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 237), (void *)_cffi_d_TCOD_console_set_keyboard_repeat },
+  { "TCOD_console_set_window_title", (void *)_cffi_f_TCOD_console_set_window_title, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 216), (void *)_cffi_d_TCOD_console_set_window_title },
+  { "TCOD_console_vline", (void *)_cffi_f_TCOD_console_vline, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 356), (void *)_cffi_d_TCOD_console_vline },
+  { "TCOD_console_wait_for_keypress", (void *)_cffi_f_TCOD_console_wait_for_keypress, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 40), (void *)_cffi_d_TCOD_console_wait_for_keypress },
+  { "TCOD_get_function_address", (void *)_cffi_f_TCOD_get_function_address, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 202), (void *)_cffi_d_TCOD_get_function_address },
+  { "TCOD_image_blit", (void *)_cffi_f_TCOD_image_blit, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 420), (void *)_cffi_d_TCOD_image_blit },
+  { "TCOD_image_blit_2x", (void *)_cffi_f_TCOD_image_blit_2x, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 439), (void *)_cffi_d_TCOD_image_blit_2x },
+  { "TCOD_image_blit_rect", (void *)_cffi_f_TCOD_image_blit_rect, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 430), (void *)_cffi_d_TCOD_image_blit_rect },
+  { "TCOD_image_clear", (void *)_cffi_f_TCOD_image_clear, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 285), (void *)_cffi_d_TCOD_image_clear },
+  { "TCOD_image_delete", (void *)_cffi_f_TCOD_image_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_image_delete },
+  { "TCOD_image_from_console", (void *)_cffi_f_TCOD_image_from_console, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 199), (void *)_cffi_d_TCOD_image_from_console },
+  { "TCOD_image_get_alpha", (void *)_cffi_f_TCOD_image_get_alpha, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 104), (void *)_cffi_d_TCOD_image_get_alpha },
   { "TCOD_image_get_mipmap_pixel", (void *)_cffi_f_TCOD_image_get_mipmap_pixel, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 9), (void *)_cffi_d_TCOD_image_get_mipmap_pixel },
   { "TCOD_image_get_pixel", (void *)_cffi_f_TCOD_image_get_pixel, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 16), (void *)_cffi_d_TCOD_image_get_pixel },
-  { "TCOD_image_get_size", (void *)_cffi_f_TCOD_image_get_size, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 221), (void *)_cffi_d_TCOD_image_get_size },
-  { "TCOD_image_hflip", (void *)_cffi_f_TCOD_image_hflip, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_image_hflip },
-  { "TCOD_image_invert", (void *)_cffi_f_TCOD_image_invert, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_image_invert },
-  { "TCOD_image_is_pixel_transparent", (void *)_cffi_f_TCOD_image_is_pixel_transparent, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 106), (void *)_cffi_d_TCOD_image_is_pixel_transparent },
-  { "TCOD_image_load", (void *)_cffi_f_TCOD_image_load, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 113), (void *)_cffi_d_TCOD_image_load },
-  { "TCOD_image_new", (void *)_cffi_f_TCOD_image_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 123), (void *)_cffi_d_TCOD_image_new },
-  { "TCOD_image_put_pixel", (void *)_cffi_f_TCOD_image_put_pixel, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 251), (void *)_cffi_d_TCOD_image_put_pixel },
-  { "TCOD_image_refresh_console", (void *)_cffi_f_TCOD_image_refresh_console, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 336), (void *)_cffi_d_TCOD_image_refresh_console },
-  { "TCOD_image_rotate90", (void *)_cffi_f_TCOD_image_rotate90, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 226), (void *)_cffi_d_TCOD_image_rotate90 },
-  { "TCOD_image_save", (void *)_cffi_f_TCOD_image_save, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 217), (void *)_cffi_d_TCOD_image_save },
-  { "TCOD_image_scale", (void *)_cffi_f_TCOD_image_scale, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 230), (void *)_cffi_d_TCOD_image_scale },
-  { "TCOD_image_set_key_color", (void *)_cffi_f_TCOD_image_set_key_color, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 213), (void *)_cffi_d_TCOD_image_set_key_color },
-  { "TCOD_image_vflip", (void *)_cffi_f_TCOD_image_vflip, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_image_vflip },
-  { "TCOD_load_library", (void *)_cffi_f_TCOD_load_library, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 113), (void *)_cffi_d_TCOD_load_library },
-  { "TCOD_mouse_get_status", (void *)_cffi_f_TCOD_mouse_get_status, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 40), (void *)_cffi_d_TCOD_mouse_get_status },
-  { "TCOD_mouse_is_cursor_visible", (void *)_cffi_f_TCOD_mouse_is_cursor_visible, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 111), (void *)_cffi_d_TCOD_mouse_is_cursor_visible },
-  { "TCOD_mouse_move", (void *)_cffi_f_TCOD_mouse_move, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 165), (void *)_cffi_d_TCOD_mouse_move },
-  { "TCOD_mouse_show_cursor", (void *)_cffi_f_TCOD_mouse_show_cursor, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 195), (void *)_cffi_d_TCOD_mouse_show_cursor },
-  { "TCOD_mutex_delete", (void *)_cffi_f_TCOD_mutex_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_mutex_delete },
-  { "TCOD_mutex_in", (void *)_cffi_f_TCOD_mutex_in, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_mutex_in },
-  { "TCOD_mutex_new", (void *)_cffi_f_TCOD_mutex_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 134), (void *)_cffi_d_TCOD_mutex_new },
-  { "TCOD_mutex_out", (void *)_cffi_f_TCOD_mutex_out, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_mutex_out },
-  { "TCOD_semaphore_delete", (void *)_cffi_f_TCOD_semaphore_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_semaphore_delete },
-  { "TCOD_semaphore_lock", (void *)_cffi_f_TCOD_semaphore_lock, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_semaphore_lock },
-  { "TCOD_semaphore_new", (void *)_cffi_f_TCOD_semaphore_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 120), (void *)_cffi_d_TCOD_semaphore_new },
-  { "TCOD_semaphore_unlock", (void *)_cffi_f_TCOD_semaphore_unlock, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_semaphore_unlock },
-  { "TCOD_sys_check_for_event", (void *)_cffi_f_TCOD_sys_check_for_event, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 23), (void *)_cffi_d_TCOD_sys_check_for_event },
-  { "TCOD_sys_clipboard_get", (void *)_cffi_f_TCOD_sys_clipboard_get, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 44), (void *)_cffi_d_TCOD_sys_clipboard_get },
-  { "TCOD_sys_clipboard_set", (void *)_cffi_f_TCOD_sys_clipboard_set, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 144), (void *)_cffi_d_TCOD_sys_clipboard_set },
-  { "TCOD_sys_force_fullscreen_resolution", (void *)_cffi_f_TCOD_sys_force_fullscreen_resolution, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 165), (void *)_cffi_d_TCOD_sys_force_fullscreen_resolution },
-  { "TCOD_sys_get_char_size", (void *)_cffi_f_TCOD_sys_get_char_size, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 158), (void *)_cffi_d_TCOD_sys_get_char_size },
-  { "TCOD_sys_get_current_resolution", (void *)_cffi_f_TCOD_sys_get_current_resolution, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 158), (void *)_cffi_d_TCOD_sys_get_current_resolution },
-  { "TCOD_sys_get_fps", (void *)_cffi_f_TCOD_sys_get_fps, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 92), (void *)_cffi_d_TCOD_sys_get_fps },
-  { "TCOD_sys_get_fullscreen_offsets", (void *)_cffi_f_TCOD_sys_get_fullscreen_offsets, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 158), (void *)_cffi_d_TCOD_sys_get_fullscreen_offsets },
-  { "TCOD_sys_get_last_frame_length", (void *)_cffi_f_TCOD_sys_get_last_frame_length, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 46), (void *)_cffi_d_TCOD_sys_get_last_frame_length },
-  { "TCOD_sys_get_num_cores", (void *)_cffi_f_TCOD_sys_get_num_cores, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 92), (void *)_cffi_d_TCOD_sys_get_num_cores },
-  { "TCOD_sys_get_renderer", (void *)_cffi_f_TCOD_sys_get_renderer, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 42), (void *)_cffi_d_TCOD_sys_get_renderer },
-  { "TCOD_sys_register_SDL_renderer", (void *)_cffi_f_TCOD_sys_register_SDL_renderer, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 369), (void *)_cffi_d_TCOD_sys_register_SDL_renderer },
-  { "TCOD_sys_save_screenshot", (void *)_cffi_f_TCOD_sys_save_screenshot, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 144), (void *)_cffi_d_TCOD_sys_save_screenshot },
-  { "TCOD_sys_set_fps", (void *)_cffi_f_TCOD_sys_set_fps, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 162), (void *)_cffi_d_TCOD_sys_set_fps },
-  { "TCOD_sys_set_renderer", (void *)_cffi_f_TCOD_sys_set_renderer, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 141), (void *)_cffi_d_TCOD_sys_set_renderer },
-  { "TCOD_sys_update_char", (void *)_cffi_f_TCOD_sys_update_char, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 187), (void *)_cffi_d_TCOD_sys_update_char },
-  { "TCOD_sys_wait_for_event", (void *)_cffi_f_TCOD_sys_wait_for_event, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 28), (void *)_cffi_d_TCOD_sys_wait_for_event },
-  { "TCOD_thread_delete", (void *)_cffi_f_TCOD_thread_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_thread_delete },
-  { "TCOD_thread_new", (void *)_cffi_f_TCOD_thread_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 116), (void *)_cffi_d_TCOD_thread_new },
-  { "TCOD_thread_wait", (void *)_cffi_f_TCOD_thread_wait, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_TCOD_thread_wait },
-  { "set_char", (void *)_cffi_f_set_char, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 291), (void *)_cffi_d_set_char },
+  { "TCOD_image_get_size", (void *)_cffi_f_TCOD_image_get_size, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 301), (void *)_cffi_d_TCOD_image_get_size },
+  { "TCOD_image_hflip", (void *)_cffi_f_TCOD_image_hflip, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_image_hflip },
+  { "TCOD_image_invert", (void *)_cffi_f_TCOD_image_invert, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_image_invert },
+  { "TCOD_image_is_pixel_transparent", (void *)_cffi_f_TCOD_image_is_pixel_transparent, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 165), (void *)_cffi_d_TCOD_image_is_pixel_transparent },
+  { "TCOD_image_load", (void *)_cffi_f_TCOD_image_load, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 179), (void *)_cffi_d_TCOD_image_load },
+  { "TCOD_image_new", (void *)_cffi_f_TCOD_image_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 195), (void *)_cffi_d_TCOD_image_new },
+  { "TCOD_image_put_pixel", (void *)_cffi_f_TCOD_image_put_pixel, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 331), (void *)_cffi_d_TCOD_image_put_pixel },
+  { "TCOD_image_refresh_console", (void *)_cffi_f_TCOD_image_refresh_console, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 416), (void *)_cffi_d_TCOD_image_refresh_console },
+  { "TCOD_image_rotate90", (void *)_cffi_f_TCOD_image_rotate90, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 306), (void *)_cffi_d_TCOD_image_rotate90 },
+  { "TCOD_image_save", (void *)_cffi_f_TCOD_image_save, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 297), (void *)_cffi_d_TCOD_image_save },
+  { "TCOD_image_scale", (void *)_cffi_f_TCOD_image_scale, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 310), (void *)_cffi_d_TCOD_image_scale },
+  { "TCOD_image_set_key_color", (void *)_cffi_f_TCOD_image_set_key_color, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 285), (void *)_cffi_d_TCOD_image_set_key_color },
+  { "TCOD_image_vflip", (void *)_cffi_f_TCOD_image_vflip, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_image_vflip },
+  { "TCOD_load_library", (void *)_cffi_f_TCOD_load_library, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 179), (void *)_cffi_d_TCOD_load_library },
+  { "TCOD_mouse_get_status", (void *)_cffi_f_TCOD_mouse_get_status, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 43), (void *)_cffi_d_TCOD_mouse_get_status },
+  { "TCOD_mouse_is_cursor_visible", (void *)_cffi_f_TCOD_mouse_is_cursor_visible, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 170), (void *)_cffi_d_TCOD_mouse_is_cursor_visible },
+  { "TCOD_mouse_move", (void *)_cffi_f_TCOD_mouse_move, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 237), (void *)_cffi_d_TCOD_mouse_move },
+  { "TCOD_mouse_show_cursor", (void *)_cffi_f_TCOD_mouse_show_cursor, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 267), (void *)_cffi_d_TCOD_mouse_show_cursor },
+  { "TCOD_mutex_delete", (void *)_cffi_f_TCOD_mutex_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_mutex_delete },
+  { "TCOD_mutex_in", (void *)_cffi_f_TCOD_mutex_in, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_mutex_in },
+  { "TCOD_mutex_new", (void *)_cffi_f_TCOD_mutex_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 206), (void *)_cffi_d_TCOD_mutex_new },
+  { "TCOD_mutex_out", (void *)_cffi_f_TCOD_mutex_out, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_mutex_out },
+  { "TCOD_noise_delete", (void *)_cffi_f_TCOD_noise_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_noise_delete },
+  { "TCOD_noise_get", (void *)_cffi_f_TCOD_noise_get, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 60), (void *)_cffi_d_TCOD_noise_get },
+  { "TCOD_noise_get_ex", (void *)_cffi_f_TCOD_noise_get_ex, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 64), (void *)_cffi_d_TCOD_noise_get_ex },
+  { "TCOD_noise_get_fbm", (void *)_cffi_f_TCOD_noise_get_fbm, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 69), (void *)_cffi_d_TCOD_noise_get_fbm },
+  { "TCOD_noise_get_fbm_ex", (void *)_cffi_f_TCOD_noise_get_fbm_ex, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 74), (void *)_cffi_d_TCOD_noise_get_fbm_ex },
+  { "TCOD_noise_get_turbulence", (void *)_cffi_f_TCOD_noise_get_turbulence, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 69), (void *)_cffi_d_TCOD_noise_get_turbulence },
+  { "TCOD_noise_get_turbulence_ex", (void *)_cffi_f_TCOD_noise_get_turbulence_ex, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 74), (void *)_cffi_d_TCOD_noise_get_turbulence_ex },
+  { "TCOD_noise_new", (void *)_cffi_f_TCOD_noise_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 189), (void *)_cffi_d_TCOD_noise_new },
+  { "TCOD_noise_set_type", (void *)_cffi_f_TCOD_noise_set_type, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 293), (void *)_cffi_d_TCOD_noise_set_type },
+  { "TCOD_random_delete", (void *)_cffi_f_TCOD_random_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_random_delete },
+  { "TCOD_random_dice_new", (void *)_cffi_f_TCOD_random_dice_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 23), (void *)_cffi_d_TCOD_random_dice_new },
+  { "TCOD_random_dice_roll", (void *)_cffi_f_TCOD_random_dice_roll, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 96), (void *)_cffi_d_TCOD_random_dice_roll },
+  { "TCOD_random_dice_roll_s", (void *)_cffi_f_TCOD_random_dice_roll_s, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 100), (void *)_cffi_d_TCOD_random_dice_roll_s },
+  { "TCOD_random_get_double", (void *)_cffi_f_TCOD_random_get_double, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 49), (void *)_cffi_d_TCOD_random_get_double },
+  { "TCOD_random_get_double_mean", (void *)_cffi_f_TCOD_random_get_double_mean, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 54), (void *)_cffi_d_TCOD_random_get_double_mean },
+  { "TCOD_random_get_float", (void *)_cffi_f_TCOD_random_get_float, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 80), (void *)_cffi_d_TCOD_random_get_float },
+  { "TCOD_random_get_float_mean", (void *)_cffi_f_TCOD_random_get_float_mean, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 85), (void *)_cffi_d_TCOD_random_get_float_mean },
+  { "TCOD_random_get_instance", (void *)_cffi_f_TCOD_random_get_instance, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 206), (void *)_cffi_d_TCOD_random_get_instance },
+  { "TCOD_random_get_int", (void *)_cffi_f_TCOD_random_get_int, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 104), (void *)_cffi_d_TCOD_random_get_int },
+  { "TCOD_random_get_int_mean", (void *)_cffi_f_TCOD_random_get_int_mean, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 109), (void *)_cffi_d_TCOD_random_get_int_mean },
+  { "TCOD_random_new", (void *)_cffi_f_TCOD_random_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 172), (void *)_cffi_d_TCOD_random_new },
+  { "TCOD_random_new_from_seed", (void *)_cffi_f_TCOD_random_new_from_seed, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 175), (void *)_cffi_d_TCOD_random_new_from_seed },
+  { "TCOD_random_restore", (void *)_cffi_f_TCOD_random_restore, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 416), (void *)_cffi_d_TCOD_random_restore },
+  { "TCOD_random_save", (void *)_cffi_f_TCOD_random_save, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 199), (void *)_cffi_d_TCOD_random_save },
+  { "TCOD_random_set_distribution", (void *)_cffi_f_TCOD_random_set_distribution, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 289), (void *)_cffi_d_TCOD_random_set_distribution },
+  { "TCOD_semaphore_delete", (void *)_cffi_f_TCOD_semaphore_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_semaphore_delete },
+  { "TCOD_semaphore_lock", (void *)_cffi_f_TCOD_semaphore_lock, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_semaphore_lock },
+  { "TCOD_semaphore_new", (void *)_cffi_f_TCOD_semaphore_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 186), (void *)_cffi_d_TCOD_semaphore_new },
+  { "TCOD_semaphore_unlock", (void *)_cffi_f_TCOD_semaphore_unlock, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_semaphore_unlock },
+  { "TCOD_sys_check_for_event", (void *)_cffi_f_TCOD_sys_check_for_event, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 26), (void *)_cffi_d_TCOD_sys_check_for_event },
+  { "TCOD_sys_clipboard_get", (void *)_cffi_f_TCOD_sys_clipboard_get, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 47), (void *)_cffi_d_TCOD_sys_clipboard_get },
+  { "TCOD_sys_clipboard_set", (void *)_cffi_f_TCOD_sys_clipboard_set, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 216), (void *)_cffi_d_TCOD_sys_clipboard_set },
+  { "TCOD_sys_force_fullscreen_resolution", (void *)_cffi_f_TCOD_sys_force_fullscreen_resolution, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 237), (void *)_cffi_d_TCOD_sys_force_fullscreen_resolution },
+  { "TCOD_sys_get_char_size", (void *)_cffi_f_TCOD_sys_get_char_size, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 230), (void *)_cffi_d_TCOD_sys_get_char_size },
+  { "TCOD_sys_get_current_resolution", (void *)_cffi_f_TCOD_sys_get_current_resolution, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 230), (void *)_cffi_d_TCOD_sys_get_current_resolution },
+  { "TCOD_sys_get_fps", (void *)_cffi_f_TCOD_sys_get_fps, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 151), (void *)_cffi_d_TCOD_sys_get_fps },
+  { "TCOD_sys_get_fullscreen_offsets", (void *)_cffi_f_TCOD_sys_get_fullscreen_offsets, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 230), (void *)_cffi_d_TCOD_sys_get_fullscreen_offsets },
+  { "TCOD_sys_get_last_frame_length", (void *)_cffi_f_TCOD_sys_get_last_frame_length, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 91), (void *)_cffi_d_TCOD_sys_get_last_frame_length },
+  { "TCOD_sys_get_num_cores", (void *)_cffi_f_TCOD_sys_get_num_cores, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 151), (void *)_cffi_d_TCOD_sys_get_num_cores },
+  { "TCOD_sys_get_renderer", (void *)_cffi_f_TCOD_sys_get_renderer, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 45), (void *)_cffi_d_TCOD_sys_get_renderer },
+  { "TCOD_sys_register_SDL_renderer", (void *)_cffi_f_TCOD_sys_register_SDL_renderer, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 449), (void *)_cffi_d_TCOD_sys_register_SDL_renderer },
+  { "TCOD_sys_save_screenshot", (void *)_cffi_f_TCOD_sys_save_screenshot, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 216), (void *)_cffi_d_TCOD_sys_save_screenshot },
+  { "TCOD_sys_set_fps", (void *)_cffi_f_TCOD_sys_set_fps, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 234), (void *)_cffi_d_TCOD_sys_set_fps },
+  { "TCOD_sys_set_renderer", (void *)_cffi_f_TCOD_sys_set_renderer, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 213), (void *)_cffi_d_TCOD_sys_set_renderer },
+  { "TCOD_sys_update_char", (void *)_cffi_f_TCOD_sys_update_char, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 259), (void *)_cffi_d_TCOD_sys_update_char },
+  { "TCOD_sys_wait_for_event", (void *)_cffi_f_TCOD_sys_wait_for_event, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 31), (void *)_cffi_d_TCOD_sys_wait_for_event },
+  { "TCOD_thread_delete", (void *)_cffi_f_TCOD_thread_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_thread_delete },
+  { "TCOD_thread_new", (void *)_cffi_f_TCOD_thread_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 182), (void *)_cffi_d_TCOD_thread_new },
+  { "TCOD_thread_wait", (void *)_cffi_f_TCOD_thread_wait, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 274), (void *)_cffi_d_TCOD_thread_wait },
+  { "set_char", (void *)_cffi_f_set_char, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 371), (void *)_cffi_d_set_char },
 };
 
 static const struct _cffi_field_s _cffi_fields[] = {
   { "r", offsetof(TCOD_color_t, r),
          sizeof(((TCOD_color_t *)0)->r),
-         _CFFI_OP(_CFFI_OP_NOOP, 32) },
+         _CFFI_OP(_CFFI_OP_NOOP, 35) },
   { "g", offsetof(TCOD_color_t, g),
          sizeof(((TCOD_color_t *)0)->g),
-         _CFFI_OP(_CFFI_OP_NOOP, 32) },
+         _CFFI_OP(_CFFI_OP_NOOP, 35) },
   { "b", offsetof(TCOD_color_t, b),
          sizeof(((TCOD_color_t *)0)->b),
-         _CFFI_OP(_CFFI_OP_NOOP, 32) },
+         _CFFI_OP(_CFFI_OP_NOOP, 35) },
+  { "nb_rolls", offsetof(TCOD_dice_t, nb_rolls),
+                sizeof(((TCOD_dice_t *)0)->nb_rolls),
+                _CFFI_OP(_CFFI_OP_NOOP, 18) },
+  { "nb_faces", offsetof(TCOD_dice_t, nb_faces),
+                sizeof(((TCOD_dice_t *)0)->nb_faces),
+                _CFFI_OP(_CFFI_OP_NOOP, 18) },
+  { "multiplier", offsetof(TCOD_dice_t, multiplier),
+                  sizeof(((TCOD_dice_t *)0)->multiplier),
+                  _CFFI_OP(_CFFI_OP_NOOP, 11) },
+  { "addsub", offsetof(TCOD_dice_t, addsub),
+              sizeof(((TCOD_dice_t *)0)->addsub),
+              _CFFI_OP(_CFFI_OP_NOOP, 11) },
   { "vk", offsetof(TCOD_key_t, vk),
           sizeof(((TCOD_key_t *)0)->vk),
-          _CFFI_OP(_CFFI_OP_NOOP, 95) },
+          _CFFI_OP(_CFFI_OP_NOOP, 154) },
   { "c", offsetof(TCOD_key_t, c),
          sizeof(((TCOD_key_t *)0)->c),
-         _CFFI_OP(_CFFI_OP_NOOP, 385) },
+         _CFFI_OP(_CFFI_OP_NOOP, 465) },
   { "pressed", offsetof(TCOD_key_t, pressed),
                sizeof(((TCOD_key_t *)0)->pressed),
-               _CFFI_OP(_CFFI_OP_NOOP, 32) },
+               _CFFI_OP(_CFFI_OP_NOOP, 35) },
   { "lalt", offsetof(TCOD_key_t, lalt),
             sizeof(((TCOD_key_t *)0)->lalt),
-            _CFFI_OP(_CFFI_OP_NOOP, 32) },
+            _CFFI_OP(_CFFI_OP_NOOP, 35) },
   { "lctrl", offsetof(TCOD_key_t, lctrl),
              sizeof(((TCOD_key_t *)0)->lctrl),
-             _CFFI_OP(_CFFI_OP_NOOP, 32) },
+             _CFFI_OP(_CFFI_OP_NOOP, 35) },
   { "ralt", offsetof(TCOD_key_t, ralt),
             sizeof(((TCOD_key_t *)0)->ralt),
-            _CFFI_OP(_CFFI_OP_NOOP, 32) },
+            _CFFI_OP(_CFFI_OP_NOOP, 35) },
   { "rctrl", offsetof(TCOD_key_t, rctrl),
              sizeof(((TCOD_key_t *)0)->rctrl),
-             _CFFI_OP(_CFFI_OP_NOOP, 32) },
+             _CFFI_OP(_CFFI_OP_NOOP, 35) },
   { "shift", offsetof(TCOD_key_t, shift),
              sizeof(((TCOD_key_t *)0)->shift),
-             _CFFI_OP(_CFFI_OP_NOOP, 32) },
+             _CFFI_OP(_CFFI_OP_NOOP, 35) },
   { "x", offsetof(TCOD_mouse_t, x),
          sizeof(((TCOD_mouse_t *)0)->x),
          _CFFI_OP(_CFFI_OP_NOOP, 18) },
@@ -7530,87 +9076,101 @@ static const struct _cffi_field_s _cffi_fields[] = {
            _CFFI_OP(_CFFI_OP_NOOP, 18) },
   { "lbutton", offsetof(TCOD_mouse_t, lbutton),
                sizeof(((TCOD_mouse_t *)0)->lbutton),
-               _CFFI_OP(_CFFI_OP_NOOP, 32) },
+               _CFFI_OP(_CFFI_OP_NOOP, 35) },
   { "rbutton", offsetof(TCOD_mouse_t, rbutton),
                sizeof(((TCOD_mouse_t *)0)->rbutton),
-               _CFFI_OP(_CFFI_OP_NOOP, 32) },
+               _CFFI_OP(_CFFI_OP_NOOP, 35) },
   { "mbutton", offsetof(TCOD_mouse_t, mbutton),
                sizeof(((TCOD_mouse_t *)0)->mbutton),
-               _CFFI_OP(_CFFI_OP_NOOP, 32) },
+               _CFFI_OP(_CFFI_OP_NOOP, 35) },
   { "lbutton_pressed", offsetof(TCOD_mouse_t, lbutton_pressed),
                        sizeof(((TCOD_mouse_t *)0)->lbutton_pressed),
-                       _CFFI_OP(_CFFI_OP_NOOP, 32) },
+                       _CFFI_OP(_CFFI_OP_NOOP, 35) },
   { "rbutton_pressed", offsetof(TCOD_mouse_t, rbutton_pressed),
                        sizeof(((TCOD_mouse_t *)0)->rbutton_pressed),
-                       _CFFI_OP(_CFFI_OP_NOOP, 32) },
+                       _CFFI_OP(_CFFI_OP_NOOP, 35) },
   { "mbutton_pressed", offsetof(TCOD_mouse_t, mbutton_pressed),
                        sizeof(((TCOD_mouse_t *)0)->mbutton_pressed),
-                       _CFFI_OP(_CFFI_OP_NOOP, 32) },
+                       _CFFI_OP(_CFFI_OP_NOOP, 35) },
   { "wheel_up", offsetof(TCOD_mouse_t, wheel_up),
                 sizeof(((TCOD_mouse_t *)0)->wheel_up),
-                _CFFI_OP(_CFFI_OP_NOOP, 32) },
+                _CFFI_OP(_CFFI_OP_NOOP, 35) },
   { "wheel_down", offsetof(TCOD_mouse_t, wheel_down),
                   sizeof(((TCOD_mouse_t *)0)->wheel_down),
-                  _CFFI_OP(_CFFI_OP_NOOP, 32) },
+                  _CFFI_OP(_CFFI_OP_NOOP, 35) },
 };
 
 static const struct _cffi_struct_union_s _cffi_struct_unions[] = {
-  { "$TCOD_color_t", 138, _CFFI_F_CHECK_FIELDS,
+  { "$TCOD_color_t", 210, _CFFI_F_CHECK_FIELDS,
     sizeof(TCOD_color_t), offsetof(struct _cffi_align_typedef_TCOD_color_t, y), 0, 3 },
-  { "$TCOD_key_t", 382, _CFFI_F_CHECK_FIELDS,
-    sizeof(TCOD_key_t), offsetof(struct _cffi_align_typedef_TCOD_key_t, y), 3, 8 },
-  { "$TCOD_mouse_t", 383, _CFFI_F_CHECK_FIELDS,
-    sizeof(TCOD_mouse_t), offsetof(struct _cffi_align_typedef_TCOD_mouse_t, y), 11, 16 },
+  { "$TCOD_dice_t", 98, _CFFI_F_CHECK_FIELDS,
+    sizeof(TCOD_dice_t), offsetof(struct _cffi_align_typedef_TCOD_dice_t, y), 3, 4 },
+  { "$TCOD_key_t", 462, _CFFI_F_CHECK_FIELDS,
+    sizeof(TCOD_key_t), offsetof(struct _cffi_align_typedef_TCOD_key_t, y), 7, 8 },
+  { "$TCOD_mouse_t", 463, _CFFI_F_CHECK_FIELDS,
+    sizeof(TCOD_mouse_t), offsetof(struct _cffi_align_typedef_TCOD_mouse_t, y), 15, 16 },
 };
 
 static const struct _cffi_enum_s _cffi_enums[] = {
-  { "$TCOD_alignment_t", 63, _cffi_prim_int(sizeof(TCOD_alignment_t), ((TCOD_alignment_t)-1) <= 0),
+  { "$TCOD_alignment_t", 122, _cffi_prim_int(sizeof(TCOD_alignment_t), ((TCOD_alignment_t)-1) <= 0),
     "TCOD_LEFT,TCOD_RIGHT,TCOD_CENTER" },
-  { "$TCOD_bkgnd_flag_t", 62, _cffi_prim_int(sizeof(TCOD_bkgnd_flag_t), ((TCOD_bkgnd_flag_t)-1) <= 0),
+  { "$TCOD_bkgnd_flag_t", 121, _cffi_prim_int(sizeof(TCOD_bkgnd_flag_t), ((TCOD_bkgnd_flag_t)-1) <= 0),
     "TCOD_BKGND_NONE,TCOD_BKGND_SET,TCOD_BKGND_MULTIPLY,TCOD_BKGND_LIGHTEN,TCOD_BKGND_DARKEN,TCOD_BKGND_SCREEN,TCOD_BKGND_COLOR_DODGE,TCOD_BKGND_COLOR_BURN,TCOD_BKGND_ADD,TCOD_BKGND_ADDA,TCOD_BKGND_BURN,TCOD_BKGND_OVERLAY,TCOD_BKGND_ALPH,TCOD_BKGND_DEFAULT" },
-  { "$TCOD_colctrl_t", 137, _cffi_prim_int(sizeof(TCOD_colctrl_t), ((TCOD_colctrl_t)-1) <= 0),
+  { "$TCOD_colctrl_t", 209, _cffi_prim_int(sizeof(TCOD_colctrl_t), ((TCOD_colctrl_t)-1) <= 0),
     "TCOD_COLCTRL_1,TCOD_COLCTRL_2,TCOD_COLCTRL_3,TCOD_COLCTRL_4,TCOD_COLCTRL_5,TCOD_COLCTRL_NUMBER,TCOD_COLCTRL_FORE_RGB,TCOD_COLCTRL_BACK_RGB,TCOD_COLCTRL_STOP" },
-  { "$TCOD_event_t", 379, _cffi_prim_int(sizeof(TCOD_event_t), ((TCOD_event_t)-1) <= 0),
+  { "$TCOD_distribution_t", 291, _cffi_prim_int(sizeof(TCOD_distribution_t), ((TCOD_distribution_t)-1) <= 0),
+    "TCOD_DISTRIBUTION_LINEAR,TCOD_DISTRIBUTION_GAUSSIAN,TCOD_DISTRIBUTION_GAUSSIAN_RANGE,TCOD_DISTRIBUTION_GAUSSIAN_INVERSE,TCOD_DISTRIBUTION_GAUSSIAN_RANGE_INVERSE" },
+  { "$TCOD_event_t", 459, _cffi_prim_int(sizeof(TCOD_event_t), ((TCOD_event_t)-1) <= 0),
     "TCOD_EVENT_KEY_PRESS,TCOD_EVENT_KEY_RELEASE,TCOD_EVENT_KEY,TCOD_EVENT_MOUSE_MOVE,TCOD_EVENT_MOUSE_PRESS,TCOD_EVENT_MOUSE_RELEASE,TCOD_EVENT_MOUSE,TCOD_EVENT_ANY" },
-  { "$TCOD_font_flags_t", 380, _cffi_prim_int(sizeof(TCOD_font_flags_t), ((TCOD_font_flags_t)-1) <= 0),
+  { "$TCOD_font_flags_t", 460, _cffi_prim_int(sizeof(TCOD_font_flags_t), ((TCOD_font_flags_t)-1) <= 0),
     "TCOD_FONT_LAYOUT_ASCII_INCOL,TCOD_FONT_LAYOUT_ASCII_INROW,TCOD_FONT_TYPE_GREYSCALE,TCOD_FONT_TYPE_GRAYSCALE,TCOD_FONT_LAYOUT_TCOD" },
-  { "$TCOD_key_status_t", 381, _cffi_prim_int(sizeof(TCOD_key_status_t), ((TCOD_key_status_t)-1) <= 0),
+  { "$TCOD_key_status_t", 461, _cffi_prim_int(sizeof(TCOD_key_status_t), ((TCOD_key_status_t)-1) <= 0),
     "TCOD_KEY_PRESSED,TCOD_KEY_RELEASED" },
-  { "$TCOD_keycode_t", 95, _cffi_prim_int(sizeof(TCOD_keycode_t), ((TCOD_keycode_t)-1) <= 0),
+  { "$TCOD_keycode_t", 154, _cffi_prim_int(sizeof(TCOD_keycode_t), ((TCOD_keycode_t)-1) <= 0),
     "TCODK_NONE,TCODK_ESCAPE,TCODK_BACKSPACE,TCODK_TAB,TCODK_ENTER,TCODK_SHIFT,TCODK_CONTROL,TCODK_ALT,TCODK_PAUSE,TCODK_CAPSLOCK,TCODK_PAGEUP,TCODK_PAGEDOWN,TCODK_END,TCODK_HOME,TCODK_UP,TCODK_LEFT,TCODK_RIGHT,TCODK_DOWN,TCODK_PRINTSCREEN,TCODK_INSERT,TCODK_DELETE,TCODK_LWIN,TCODK_RWIN,TCODK_APPS,TCODK_0,TCODK_1,TCODK_2,TCODK_3,TCODK_4,TCODK_5,TCODK_6,TCODK_7,TCODK_8,TCODK_9,TCODK_KP0,TCODK_KP1,TCODK_KP2,TCODK_KP3,TCODK_KP4,TCODK_KP5,TCODK_KP6,TCODK_KP7,TCODK_KP8,TCODK_KP9,TCODK_KPADD,TCODK_KPSUB,TCODK_KPDIV,TCODK_KPMUL,TCODK_KPDEC,TCODK_KPENTER,TCODK_F1,TCODK_F2,TCODK_F3,TCODK_F4,TCODK_F5,TCODK_F6,TCODK_F7,TCODK_F8,TCODK_F9,TCODK_F10,TCODK_F11,TCODK_F12,TCODK_NUMLOCK,TCODK_SCROLLLOCK,TCODK_SPACE,TCODK_CHAR" },
-  { "$TCOD_renderer_t", 142, _cffi_prim_int(sizeof(TCOD_renderer_t), ((TCOD_renderer_t)-1) <= 0),
+  { "$TCOD_noise_type_t", 67, _cffi_prim_int(sizeof(TCOD_noise_type_t), ((TCOD_noise_type_t)-1) <= 0),
+    "TCOD_NOISE_PERLIN,TCOD_NOISE_SIMPLEX,TCOD_NOISE_WAVELET,TCOD_NOISE_DEFAULT" },
+  { "$TCOD_random_algo_t", 173, _cffi_prim_int(sizeof(TCOD_random_algo_t), ((TCOD_random_algo_t)-1) <= 0),
+    "TCOD_RNG_MT,TCOD_RNG_CMWC" },
+  { "$TCOD_renderer_t", 214, _cffi_prim_int(sizeof(TCOD_renderer_t), ((TCOD_renderer_t)-1) <= 0),
     "TCOD_RENDERER_GLSL,TCOD_RENDERER_OPENGL,TCOD_RENDERER_SDL,TCOD_NB_RENDERERS" },
 };
 
 static const struct _cffi_typename_s _cffi_typenames[] = {
-  { "SDL_renderer_t", 370 },
-  { "TCOD_alignment_t", 63 },
-  { "TCOD_bkgnd_flag_t", 62 },
-  { "TCOD_colctrl_t", 137 },
-  { "TCOD_color_t", 138 },
+  { "SDL_renderer_t", 450 },
+  { "TCOD_alignment_t", 122 },
+  { "TCOD_bkgnd_flag_t", 121 },
+  { "TCOD_colctrl_t", 209 },
+  { "TCOD_color_t", 210 },
   { "TCOD_cond_t", 1 },
   { "TCOD_console_t", 1 },
-  { "TCOD_event_t", 379 },
-  { "TCOD_font_flags_t", 380 },
+  { "TCOD_dice_t", 98 },
+  { "TCOD_distribution_t", 291 },
+  { "TCOD_event_t", 459 },
+  { "TCOD_font_flags_t", 460 },
   { "TCOD_image_t", 1 },
-  { "TCOD_key_status_t", 381 },
-  { "TCOD_key_t", 382 },
-  { "TCOD_keycode_t", 95 },
+  { "TCOD_key_status_t", 461 },
+  { "TCOD_key_t", 462 },
+  { "TCOD_keycode_t", 154 },
   { "TCOD_library_t", 1 },
-  { "TCOD_mouse_t", 383 },
+  { "TCOD_mouse_t", 463 },
   { "TCOD_mutex_t", 1 },
-  { "TCOD_renderer_t", 142 },
+  { "TCOD_noise_t", 1 },
+  { "TCOD_noise_type_t", 67 },
+  { "TCOD_random_algo_t", 173 },
+  { "TCOD_random_t", 1 },
+  { "TCOD_renderer_t", 214 },
   { "TCOD_semaphore_t", 1 },
   { "TCOD_thread_t", 1 },
-  { "bool", 32 },
-  { "int16", 391 },
+  { "bool", 35 },
+  { "int16", 471 },
   { "int32", 18 },
-  { "int8", 385 },
-  { "intptr", 390 },
-  { "uint16", 394 },
-  { "uint32", 392 },
-  { "uint8", 32 },
-  { "uintptr", 393 },
+  { "int8", 465 },
+  { "intptr", 470 },
+  { "uint16", 473 },
+  { "uint32", 177 },
+  { "uint8", 35 },
+  { "uintptr", 472 },
 };
 
 static const struct _cffi_type_context_s _cffi_type_context = {
@@ -7620,12 +9180,12 @@ static const struct _cffi_type_context_s _cffi_type_context = {
   _cffi_struct_unions,
   _cffi_enums,
   _cffi_typenames,
-  240,  /* num_globals */
-  3,  /* num_struct_unions */
-  8,  /* num_enums */
-  28,  /* num_typenames */
+  276,  /* num_globals */
+  4,  /* num_struct_unions */
+  11,  /* num_enums */
+  34,  /* num_typenames */
   NULL,  /* no includes */
-  402,  /* num_types */
+  481,  /* num_types */
   0,  /* flags */
 };
 

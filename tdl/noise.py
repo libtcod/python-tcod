@@ -11,10 +11,11 @@
 
 
 import random as _random
-import ctypes as _ctypes
+#import ctypes as _ctypes
 
 import tdl as _tdl
-from .__tcod import _lib
+#from .__tcod import _lib
+from .libtcod import _ffi, _lib
 from . import __style as _style
 
 _MERSENNE_TWISTER = 1
@@ -27,7 +28,7 @@ _NOISE_TYPES = {'PERLIN': 1, 'SIMPLEX': 2, 'WAVELET': 4}
 _NOISE_MODES = {'FLAT': _lib.TCOD_noise_get,
                 'FBM': _lib.TCOD_noise_get_fbm,
                 'TURBULENCE': _lib.TCOD_noise_get_turbulence}
-
+                
 class Noise(object):
     """An advanced noise generator.
     """
@@ -118,16 +119,17 @@ class Noise(object):
         if self._algorithm == 'WAVELET':
             self._dimensions = min(self._dimensions, 3) # Wavelet only goes up to 3
         self._random = _lib.TCOD_random_new_from_seed(_MERSENNE_TWISTER, self._seed)
-        self._hurst = _ctypes.c_float(hurst)
-        self._lacunarity = _ctypes.c_float(lacunarity)
+        self._hurst = hurst
+        self._lacunarity = lacunarity
         self._noise = _lib.TCOD_noise_new(self._dimensions, self._hurst,
                                           self._lacunarity, self._random)
         _lib.TCOD_noise_set_type(self._noise, _NOISE_TYPES[self._algorithm])
         self._noiseFunc = _NOISE_MODES[self._mode]
-        self._octaves = _ctypes.c_float(octaves)
+        self._octaves = octaves
         self._useOctaves = (self._mode != 'FLAT')
-        self._cFloatArray = _ctypes.c_float * self._dimensions
-        self._array = self._cFloatArray()
+        self._arrayType = 'float[%i]' % self._dimensions
+        #self._cFloatArray = _ctypes.c_float * self._dimensions
+        #self._array = self._cFloatArray()
         
     def __copy__(self):
         # using the pickle method is a convenient way to clone this object
@@ -155,14 +157,20 @@ class Noise(object):
         #array = self._array
         #for d, pos in enumerate(position):
         #    array[d] = pos
-        array = self._cFloatArray(*position)
+        #array = self._cFloatArray(*position)
+        array = _ffi.new(self._arrayType, position)
         if self._useOctaves:
             return (self._noiseFunc(self._noise, array, self._octaves) + 1) * 0.5
         return (self._noiseFunc(self._noise, array) + 1) * 0.5
         
     def __del__(self):
-        _lib.TCOD_random_delete(self._random)
-        _lib.TCOD_noise_delete(self._noise)
+        # dealloc only once
+        if self._random:
+            _lib.TCOD_random_delete(self._random)
+            self._random = None
+        if self._noise:
+            _lib.TCOD_noise_delete(self._noise)
+            self._noise = None
     
 __all__ = [_var for _var in locals().keys() if _var[0] != '_']
 

@@ -32,10 +32,10 @@
 
 import time as _time
 
-from .__tcod import _lib, _Mouse, _Key
+#from .__tcod import _lib, _Mouse, _Key
 from .libtcod import _ffi, _lib
 
-from . import __tcod as _tcod
+#from . import __tcod as _tcod
 from . import __style as _style
 import tdl as _tdl
 
@@ -47,7 +47,7 @@ _mousem = 0
 _mouser = 0
 
 # this interpets the constants from libtcod and makes a key -> keyname dictionary
-def _parseKeyNames(module):
+def _parseKeyNames(lib):
     """
     returns a dictionary mapping of human readable key names to their keycodes
     this parses constants with the names of K_* and makes code=name pairs
@@ -55,12 +55,12 @@ def _parseKeyNames(module):
     if (event.key == 'PAGEUP'):
     """
     _keyNames = {}
-    for attr in dir(module): # from the modules variables
-        if attr[:2] == 'K_': # get the K_* constants
-            _keyNames[getattr(_tcod, attr)] = attr[2:] # and make CODE=NAME pairs
+    for attr in dir(lib): # from the modules variables
+        if attr[:6] == 'TCODK_': # get the K_* constants
+            _keyNames[getattr(lib, attr)] = attr[6:] # and make CODE=NAME pairs
     return _keyNames
 
-_keyNames = _parseKeyNames(_tcod)
+_keyNames = _parseKeyNames(_lib)
     
 class Event(object):
     """Base Event class.

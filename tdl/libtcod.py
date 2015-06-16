@@ -1,9 +1,11 @@
 
 import os as _os
-from ._libtcod import ffi
 from tdl import __path__
 
 _os.environ['PATH'] += ';' + _os.path.join(__path__[0], 'lib/win32/')
+
+from ._libtcod import ffi
+
 
 try: # decide how files are unpacked depending on if we have the pkg_resources module
     from pkg_resources import resource_filename
@@ -21,6 +23,22 @@ def _unpackFramework(framework, path):
 def _loadDLL(dll):
     """shorter version of file unpacking and linking"""
     return ffi.LoadLibrary(_unpackfile(dll))
+
+def _get_library_crossplatform():
+    bits, linkage = platform.architecture()
+    libpath = None
+    if 'win32' in sys.platform:
+        pass
+    elif 'linux' in sys.platform:
+        if bits == '32bit':
+            pass
+        elif bits == '64bit':
+            pass
+    elif 'darwin' in sys.platform:
+        pass
+    else:
+        raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
+    return libTCOD, libSDL
 
 
 ffi.dlopen(_unpackfile('lib/win32/zlib1.dll'))

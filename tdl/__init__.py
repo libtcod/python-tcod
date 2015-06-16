@@ -61,6 +61,7 @@ import sys as _sys
 import os as _os
 
 #import ctypes as _ctypes
+import array as _array
 import weakref as _weakref
 import itertools as _itertools
 import textwrap as _textwrap
@@ -69,7 +70,7 @@ import re as _re
 import warnings as _warnings
 
 from . import event, map, noise
-from .__tcod import _lib, _Color, _unpackfile
+from .libtcod import _unpackfile
 from .libtcod import _ffi, _lib
 from . import __style as _style
 
@@ -103,6 +104,15 @@ def _formatChar(char):
     if isinstance(char, _STRTYPES) and len(char) == 1:
         return ord(char)
     return int(char) # conversion faster than type check
+
+_utf32_codec = {'little': 'utf-32le', 'big': 'utf-32le'}[_sys.byteorder]
+    
+def _format_str(string):
+    if isinstance(string, str):
+        array = _array.array('I')
+        array.frombytes(string.encode(_utf32_codec))
+        return array
+    return string
 
 _fontinitialized = False
 _rootinitialized = False
@@ -465,11 +475,11 @@ class _BaseConsole(object):
             Iterates over ((x, y), ch) data for _set_batch, raising an
             error if the end of the console is reached.
             """
-            for char in string:
+            for char in _format_str(string):
                 if y == height:
                     raise TDLError('End of console reached.')
                 #batch.append(((x, y), _formatChar(char))) # ((x, y), ch)
-                yield((x, y), _formatChar(char))
+                yield((x, y), char)
                 x += 1 # advance cursor
                 if x == width: # line break
                     x = 0

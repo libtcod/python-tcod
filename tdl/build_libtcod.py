@@ -389,10 +389,85 @@ typedef void (*SDL_renderer_t) (void *sdl_surface);
 void TCOD_sys_register_SDL_renderer(SDL_renderer_t renderer);
 
 
+// MERSENNE
+
+/* dice roll */
+typedef struct {
+	int nb_rolls;
+	int nb_faces;
+	float multiplier;
+	float addsub;
+} TCOD_dice_t;
+
+/* PRNG algorithms */
+typedef enum {
+    TCOD_RNG_MT,
+    TCOD_RNG_CMWC
+} TCOD_random_algo_t;
+
+typedef enum {
+	TCOD_DISTRIBUTION_LINEAR,
+	TCOD_DISTRIBUTION_GAUSSIAN,
+	TCOD_DISTRIBUTION_GAUSSIAN_RANGE,
+	TCOD_DISTRIBUTION_GAUSSIAN_INVERSE,
+	TCOD_DISTRIBUTION_GAUSSIAN_RANGE_INVERSE
+} TCOD_distribution_t;
+
+typedef void *TCOD_random_t;
+
+TCOD_random_t TCOD_random_get_instance(void);
+TCOD_random_t TCOD_random_new(TCOD_random_algo_t algo);
+TCOD_random_t TCOD_random_save(TCOD_random_t mersenne);
+void TCOD_random_restore(TCOD_random_t mersenne, TCOD_random_t backup);
+TCOD_random_t TCOD_random_new_from_seed(TCOD_random_algo_t algo, uint32 seed);
+void TCOD_random_delete(TCOD_random_t mersenne);
+
+void TCOD_random_set_distribution (TCOD_random_t mersenne, TCOD_distribution_t distribution);
+
+int TCOD_random_get_int (TCOD_random_t mersenne, int min, int max);
+float TCOD_random_get_float (TCOD_random_t mersenne, float min, float max);
+double TCOD_random_get_double (TCOD_random_t mersenne, double min, double max);
+
+int TCOD_random_get_int_mean (TCOD_random_t mersenne, int min, int max, int mean);
+float TCOD_random_get_float_mean (TCOD_random_t mersenne, float min, float max, float mean);
+double TCOD_random_get_double_mean (TCOD_random_t mersenne, double min, double max, double mean);
+
+TCOD_dice_t TCOD_random_dice_new (const char * s);
+int TCOD_random_dice_roll (TCOD_random_t mersenne, TCOD_dice_t dice);
+int TCOD_random_dice_roll_s (TCOD_random_t mersenne, const char * s);
+
+
+
+// NOISE
+
+
+typedef void *TCOD_noise_t;
+
+typedef enum {
+	TCOD_NOISE_PERLIN = 1,
+	TCOD_NOISE_SIMPLEX = 2,
+	TCOD_NOISE_WAVELET = 4,
+	TCOD_NOISE_DEFAULT = 0
+} TCOD_noise_type_t;
+
+/* create a new noise object */
+TCOD_noise_t TCOD_noise_new(int dimensions, float hurst, float lacunarity, TCOD_random_t random);
+
+/* simplified API */
+void TCOD_noise_set_type (TCOD_noise_t noise, TCOD_noise_type_t type);
+float TCOD_noise_get_ex (TCOD_noise_t noise, float *f, TCOD_noise_type_t type);
+float TCOD_noise_get_fbm_ex (TCOD_noise_t noise, float *f, float octaves, TCOD_noise_type_t type);
+float TCOD_noise_get_turbulence_ex (TCOD_noise_t noise, float *f, float octaves, TCOD_noise_type_t type);
+float TCOD_noise_get (TCOD_noise_t noise, float *f);
+float TCOD_noise_get_fbm (TCOD_noise_t noise, float *f, float octaves);
+float TCOD_noise_get_turbulence (TCOD_noise_t noise, float *f, float octaves);
+/* delete the noise object */
+void TCOD_noise_delete(TCOD_noise_t noise);
+
 
 // CUSTOM FUNCTONS
 
-static void set_char(TCOD_console_t console, int x, int y,
+void set_char(TCOD_console_t console, int x, int y,
                      int ch, int fg, int bg);
 
 """)
@@ -400,19 +475,18 @@ static void set_char(TCOD_console_t console, int x, int y,
 ffi.set_source('_libtcod', """
 #include <libtcod.h>
 
-static void set_char(TCOD_console_t console, int x, int y,
+void set_char(TCOD_console_t console, int x, int y,
                      int ch, int fg, int bg){
     // normalize x, y
     int width=TCOD_console_get_width(console);
     int height=TCOD_console_get_height(console);
-    
-    x = x % width
-    if(x<0){x += width;}
-    y = y % height
-    if(y<0){y += height;}
-    
-    
     TCOD_color_t color;
+    
+    x = x % width;
+    if(x<0){x += width;};
+    y = y % height;
+    if(y<0){y += height;};
+    
     if(ch != -1){
         TCOD_console_set_char(console, x, y, ch);
     }

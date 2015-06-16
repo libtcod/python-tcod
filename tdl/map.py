@@ -2,15 +2,19 @@
     Rogue-like map utilitys such as line-of-sight, field-of-view, and path-finding.
     
 """
-import ctypes as _ctypes
+#import ctypes as _ctypes
 import itertools as _itertools
 import math as _math
 
 import tdl as _tdl
-from .__tcod import _lib, _PATHCALL
+#from .__tcod import _lib, _PATHCALL
+from .libtcod import _ffi, _lib
 from . import __style as _style
 
 _FOVTYPES = {'BASIC' : 0, 'DIAMOND': 1, 'SHADOW': 2, 'RESTRICTIVE': 12, 'PERMISSIVE': 11}
+
+
+#_PATHCALL = CFUNCTYPE(c_float, c_int, c_int, c_int, c_int, py_object)
 
 def _get_fov_type(fov):
     "Return a FOV from a string"
@@ -29,6 +33,8 @@ class AStar(object):
     """
     
     __slots__ = ('_as_parameter_', '_callback', '__weakref__')
+    
+    _create_callback = _ffi.callback('float(int, int, int, int, void*)')
 
     def __init__(self, width, height, callback,
                  diagnalCost=_math.sqrt(2), advanced=False):
@@ -85,13 +91,16 @@ class AStar(object):
                 if pathCost:
                     return pathCost
                 return 0.0
-        self._callback = _PATHCALL(newCallback)
-        """A CFUNCTYPE callback to be kept in memory."""
+        self._callback = self._create_callback(newCallback)
+        """A cffi callback to be kept in memory."""
+        
         self._as_parameter_ = _lib.TCOD_path_new_using_function(width, height,
-                                     self._callback, None, diagnalCost)
+                                     self._callback, _ffi.NULL, diagnalCost)
                                      
     def __del__(self):
-        _lib.TCOD_path_delete(self)
+        if self._as_parameter_:
+            _lib.TCOD_path_delete(self)
+            self._as_parameter_ = None
         
     def getPath(self, origX, origY, destX, destY):
         """
@@ -106,12 +115,11 @@ class AStar(object):
         found = _lib.TCOD_path_compute(self, origX, origY, destX, destY)
         if not found:
             return [] # path not found
-        x, y = _ctypes.c_int(), _ctypes.c_int()
-        xRef, yRef = _ctypes.byref(x), _ctypes.byref(y)
-        recalculate = _ctypes.c_bool(True)
+        x, y = _ffi.new('int *'), _ffi.new('int *')
+        recalculate = _ffi.new('bool *', True)
         path = []
-        while _lib.TCOD_path_walk(self, xRef, yRef, recalculate):
-            path.append((x.value, y.value))
+        while _lib.TCOD_path_walk(self, x, y, recalculate):
+            path.append((x[0], y[0]))
         return path
     
 def quick_fov(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sphere=True):
@@ -166,27 +174,29 @@ def quick_fov(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sph
     setProp = _lib.TCOD_map_set_properties # make local
     inFOV = _lib.TCOD_map_is_in_fov
     
-    cTrue = _ctypes.c_bool(1)
-    cFalse = _ctypes.c_bool(False)
+    #cTrue = _ffi.new('bool *', True)
+    #cFalse = _ffi.new('bool *', False)
+    #cFalse = _ctypes.c_bool(False)
     tcodMap = _lib.TCOD_map_new(mapSize, mapSize)
     try:
         # pass one, write callback data to the tcodMap
-        for (x_, cX), (y_, cY) in _itertools.product(((i, _ctypes.c_int(i)) for i in range(mapSize)),
-                                                    ((i, _ctypes.c_int(i)) for i in range(mapSize))):
-            
+        #for (x_, cX), (y_, cY) in _itertools.product(((i, _ctypes.c_int(i)) for i in range(mapSize)),
+        #                                            ((i, _ctypes.c_int(i)) for i in range(mapSize))):
+        for x_, y_ in _itertools.product(range(mapSize), range(mapSize))
             pos = (x_ + x - radius, 
                    y_ + y - radius)
             transparent = bool(callback(*pos))
-            setProp(tcodMap, cX, cY, transparent, cFalse)
+            setProp(tcodMap, x_, y_, transparent, False)
         
         # pass two, compute fov and build a list of points
         _lib.TCOD_map_compute_fov(tcodMap, radius, radius, radius, lightWalls, fov)
         touched = set() # points touched by field of view
-        for (x_, cX),(y_, cY) in _itertools.product(((i, _ctypes.c_int(i)) for i in range(mapSize)),
-                                                   ((i, _ctypes.c_int(i)) for i in range(mapSize))):
+        #for (x_, cX),(y_, cY) in _itertools.product(((i, _ctypes.c_int(i)) for i in range(mapSize)),
+        #                                           ((i, _ctypes.c_int(i)) for i in range(mapSize))):
+        for x_, y_ in _itertools.product(range(mapSize), range(mapSize))
             if sphere and _math.hypot(x_ - radius, y_ - radius) > trueRadius:
                 continue
-            if inFOV(tcodMap, cX, cY):
+            if inFOV(tcodMap, x_, y_):
                 touched.add((x_ + x - radius, y_ + y - radius))
     finally:
         _lib.TCOD_map_delete(tcodMap)
