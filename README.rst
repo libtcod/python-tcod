@@ -11,7 +11,7 @@ This module can also be manually installed by going into the "setup.py" director
 
     python setup.py install
 
-Already compiled libtcod libraries are included as part of the package data.  They won't need to be compiled as part of the installation, but can be replaced with newer versions if necessary.
+This will require that your Python installation can compile binaries.
 
 =======
  About
@@ -28,13 +28,14 @@ Online Documentation: http://pythonhosted.org/tdl/
 
 Issue Tracker: https://github.com/HexDecimal/python-tdl/issues
 
-python-tdl is a ctypes port of "libtcod".  You can find more about libtcod at http://roguecentral.org/doryen/libtcod/
+python-tdl is a cffi port of "libtcod".  You can find more about libtcod at http://roguecentral.org/doryen/libtcod/
 
 ==============
  Requirements
 ==============
 * Python 2.6+ or 3.x
 * 32 bit Windows, 32/64 bit Linux, or Mac OS/X (64 bit architecture)
+* An up-to-date version of the Python module: cffi
 
 =========
  License

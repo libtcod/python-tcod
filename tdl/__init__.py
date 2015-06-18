@@ -70,7 +70,6 @@ import re as _re
 import warnings as _warnings
 
 from . import event, map, noise
-from .libtcod import _unpackfile
 from .libtcod import _ffi, _lib
 from . import style as _style
 
@@ -1140,7 +1139,8 @@ def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
     RENDERERS = {'GLSL': 0, 'OPENGL': 1, 'SDL': 2}
     global _rootinitialized, _rootConsoleRef
     if not _fontinitialized: # set the default font to the one that comes with tdl
-        set_font(_unpackfile('terminal8x8.png'), None, None, True, True)
+        set_font(_os.path.join(__path__[0], 'terminal8x8.png'),
+                 None, None, True, True)
 
     if renderer.upper() not in RENDERERS:
         raise TDLError('No such render type "%s", expected one of "%s"' % (renderer, '", "'.join(RENDERERS)))

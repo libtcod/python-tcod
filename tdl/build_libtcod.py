@@ -437,6 +437,50 @@ int TCOD_random_dice_roll (TCOD_random_t mersenne, TCOD_dice_t dice);
 int TCOD_random_dice_roll_s (TCOD_random_t mersenne, const char * s);
 
 
+// FOV
+
+typedef enum {
+	FOV_BASIC,
+	FOV_DIAMOND,
+	FOV_SHADOW,
+	FOV_PERMISSIVE_0,
+	FOV_PERMISSIVE_1,
+	FOV_PERMISSIVE_2,
+	FOV_PERMISSIVE_3,
+	FOV_PERMISSIVE_4,
+	FOV_PERMISSIVE_5,
+	FOV_PERMISSIVE_6,
+	FOV_PERMISSIVE_7,
+	FOV_PERMISSIVE_8,
+	FOV_RESTRICTIVE,
+	NB_FOV_ALGORITHMS }TCOD_fov_algorithm_t;
+
+typedef void *TCOD_map_t;
+
+/* allocate a new map */
+TCOD_map_t TCOD_map_new(int width, int height);
+/* set all cells as solid rock (cannot see through nor walk) */
+void TCOD_map_clear(TCOD_map_t map, bool transparent, bool walkable);
+/* copy a map to another, reallocating it when needed */
+void TCOD_map_copy(TCOD_map_t source, TCOD_map_t dest);
+/* change a cell properties */
+void TCOD_map_set_properties(TCOD_map_t map, int x, int y, bool is_transparent, bool is_walkable);
+/* destroy a map */
+void TCOD_map_delete(TCOD_map_t map);
+
+/* calculate the field of view (potentially visible cells from player_x,player_y) */
+void TCOD_map_compute_fov(TCOD_map_t map, int player_x, int player_y, int max_radius, bool light_walls, TCOD_fov_algorithm_t algo);
+/* check if a cell is in the last computed field of view */
+bool TCOD_map_is_in_fov(TCOD_map_t map, int x, int y);
+void TCOD_map_set_in_fov(TCOD_map_t map, int x, int y, bool fov);
+
+/* retrieve properties from the map */
+bool TCOD_map_is_transparent(TCOD_map_t map, int x, int y);
+bool TCOD_map_is_walkable(TCOD_map_t map, int x, int y);
+int TCOD_map_get_width(TCOD_map_t map);
+int TCOD_map_get_height(TCOD_map_t map);
+int TCOD_map_get_nb_cells(TCOD_map_t map);
+
 
 // NOISE
 
