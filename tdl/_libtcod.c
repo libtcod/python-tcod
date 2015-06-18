@@ -390,7 +390,7 @@ static PyObject **_cffi_unpack_args(PyObject *args_tuple, Py_ssize_t expected,
 
 #include <libtcod.h>
 
-static void set_char(TCOD_console_t console, int x, int y,
+void set_char(TCOD_console_t console, int x, int y,
                      int ch, int fg, int bg){
     // normalize x, y
     int width=TCOD_console_get_width(console);
@@ -401,7 +401,6 @@ static void set_char(TCOD_console_t console, int x, int y,
     if(x<0){x += width;};
     y = y % height;
     if(y<0){y += height;};
-    
     
     if(ch != -1){
         TCOD_console_set_char(console, x, y, ch);

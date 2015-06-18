@@ -72,7 +72,7 @@ import warnings as _warnings
 from . import event, map, noise
 from .libtcod import _unpackfile
 from .libtcod import _ffi, _lib
-from . import __style as _style
+from . import style as _style
 
 
 _IS_PYTHON3 = (_sys.version_info[0] == 3)
@@ -110,7 +110,10 @@ _utf32_codec = {'little': 'utf-32le', 'big': 'utf-32le'}[_sys.byteorder]
 def _format_str(string):
     if isinstance(string, str):
         array = _array.array('I')
-        array.frombytes(string.encode(_utf32_codec))
+        if _IS_PYTHON3:
+            array.frombytes(string.encode(_utf32_codec))
+        else:
+            array.fromstring(string.encode(_utf32_codec))
         return array
     return string
 

@@ -9,7 +9,7 @@ import math as _math
 import tdl as _tdl
 #from .__tcod import _lib, _PATHCALL
 from .libtcod import _ffi, _lib
-from . import __style as _style
+from . import style as _style
 
 _FOVTYPES = {'BASIC' : 0, 'DIAMOND': 1, 'SHADOW': 2, 'RESTRICTIVE': 12, 'PERMISSIVE': 11}
 
@@ -182,7 +182,7 @@ def quick_fov(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sph
         # pass one, write callback data to the tcodMap
         #for (x_, cX), (y_, cY) in _itertools.product(((i, _ctypes.c_int(i)) for i in range(mapSize)),
         #                                            ((i, _ctypes.c_int(i)) for i in range(mapSize))):
-        for x_, y_ in _itertools.product(range(mapSize), range(mapSize))
+        for x_, y_ in _itertools.product(range(mapSize), range(mapSize)):
             pos = (x_ + x - radius, 
                    y_ + y - radius)
             transparent = bool(callback(*pos))
@@ -193,7 +193,7 @@ def quick_fov(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sph
         touched = set() # points touched by field of view
         #for (x_, cX),(y_, cY) in _itertools.product(((i, _ctypes.c_int(i)) for i in range(mapSize)),
         #                                           ((i, _ctypes.c_int(i)) for i in range(mapSize))):
-        for x_, y_ in _itertools.product(range(mapSize), range(mapSize))
+        for x_, y_ in _itertools.product(range(mapSize), range(mapSize)):
             if sphere and _math.hypot(x_ - radius, y_ - radius) > trueRadius:
                 continue
             if inFOV(tcodMap, x_, y_):

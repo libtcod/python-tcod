@@ -506,8 +506,8 @@ void set_char(TCOD_console_t console, int x, int y,
 }
 
 """,
-include_dirs=['include/'],
-library_dirs=['lib/win32/'],
+include_dirs=['include/', 'tdl/include/'],
+library_dirs=['lib/win32/', 'tdl/lib/win32/'],
 libraries=['libtcod-VS'])
 
 

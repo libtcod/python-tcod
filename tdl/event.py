@@ -36,7 +36,7 @@ import time as _time
 from .libtcod import _ffi, _lib
 
 #from . import __tcod as _tcod
-from . import __style as _style
+from . import style as _style
 import tdl as _tdl
 
 _eventQueue = []
@@ -323,12 +323,12 @@ def _processEvents():
     mouse = _ffi.new('TCOD_mouse_t *')
     libkey = _ffi.new('TCOD_key_t *')
     while 1:
-        libevent = _lib.TCOD_sys_check_for_event(_tcod.TCOD_EVENT_ANY, libkey, mouse)
+        libevent = _lib.TCOD_sys_check_for_event(_lib.TCOD_EVENT_ANY, libkey, mouse)
         if not libevent: # no more events from libtcod
             break
             
         #if mouse.dx or mouse.dy:
-        if libevent & _tcod.TCOD_EVENT_MOUSE_MOVE:
+        if libevent & _lib.TCOD_EVENT_MOUSE_MOVE:
             events.append(MouseMotion((mouse.x, mouse.y),
                                       (mouse.cx, mouse.cy),
                                       (mouse.dx, mouse.dy),
@@ -360,7 +360,7 @@ def _processEvents():
         _mousem = mouse.mbutton
         _mouser = mouse.rbutton
 
-        if libkey.vk == _tcod.K_NONE:
+        if libkey.vk == _lib.TCODK_NONE:
             break
         if libkey.pressed:
             keyevent = KeyDown

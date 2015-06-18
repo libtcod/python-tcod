@@ -16,7 +16,7 @@ import random as _random
 import tdl as _tdl
 #from .__tcod import _lib
 from .libtcod import _ffi, _lib
-from . import __style as _style
+from . import style as _style
 
 _MERSENNE_TWISTER = 1
 _CARRY_WITH_MULTIPLY = 2

@@ -14,11 +14,11 @@ try: # decide how files are unpacked depending on if we have the pkg_resources m
 except ImportError:
     #from tdl import __path__
     def _unpackfile(filename):
-        return os.path.abspath(os.path.join(__path__[0], filename))
+        return _os.path.abspath(_os.path.join(__path__[0], filename))
 
 def _unpackFramework(framework, path):
     """get framework.tar file, remove ".tar" and add path"""
-    return os.path.abspath(os.path.join(_unpackfile(framework)[:-4], path))
+    return _os.path.abspath(_os.path.join(_unpackfile(framework)[:-4], path))
 
 def _loadDLL(dll):
     """shorter version of file unpacking and linking"""
