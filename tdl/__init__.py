@@ -1477,4 +1477,4 @@ __license__ = "New BSD License"
 __author__ = 'Kyle Stewart'
 __contact__ = "4b796c65+pythonTDL@gmail.com"
 __email__ = "4b796c65+pythonTDL@gmail.com"
-__version__ = '1.2.0'
+__version__ = open(_os.path.join(__path__[0], 'version.txt'), 'r').read()

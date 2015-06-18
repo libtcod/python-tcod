@@ -472,7 +472,10 @@ void set_char(TCOD_console_t console, int x, int y,
 
 """)
 
-ffi.set_source('_libtcod', """
+module_name = '_libtcod'
+
+
+ffi.set_source(module_name, """
 #include <libtcod.h>
 
 void set_char(TCOD_console_t console, int x, int y,
@@ -506,7 +509,7 @@ void set_char(TCOD_console_t console, int x, int y,
 }
 
 """,
-include_dirs=['include/', 'tdl/include/'],
+include_dirs=['include/', 'tdl/include/', 'tdl/include/Release/'],
 library_dirs=['lib/win32/', 'tdl/lib/win32/'],
 libraries=['libtcod-VS'])
 

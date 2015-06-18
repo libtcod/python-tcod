@@ -6,11 +6,9 @@ try:
 except ImportError:
     from distutils.core import setup
 
-from tdl import __version__
-
 setup(
     name='tdl',
-    version=__version__,
+    version=open('tdl/version.txt', 'r').read(),
     author='Kyle Stewart',
     author_email='4B796C65+pythonTDL@gmail.com',
     description='Pythonic port of rogue-like library libtcod.',
