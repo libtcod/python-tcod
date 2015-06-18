@@ -978,30 +978,32 @@ class Console(_BaseConsole):
         if bg is Ellipsis:
             bg = self._bg
             
-        if fg != -1:
-            fg = _to_tcod_color(fg)
-        if bg != -1:
-            bg = _to_tcod_color(bg)
+        #if fg != -1:
+        #    fg = _to_tcod_color(fg)
+        #if bg != -1:
+        #    bg = _to_tcod_color(bg)
             
-
-        if fg != -1 and not nullChar:
-            # buffer values as ctypes objects
-            self._typewriter = None # clear the typewriter as colors will be set
-            console = self._as_parameter_
-            #bgblend = _ctypes.c_int(bgblend)
-
-            if bg == -1:
-                bgblend = 0
-            else:
-                _lib.TCOD_console_set_default_background(console, bg[0])
-            _lib.TCOD_console_set_default_foreground(console, fg[0])
-            _putChar = _lib.TCOD_console_put_char # remove dots and make local
-            for (x, y), char in batch:
-                _putChar(console, x, y, char, bgblend)
+        for (x, y), char in batch:
+            self._set_char(x, y, char, fg, bg, bgblend)
             
-        else:
-            for (x, y), char in batch:
-                self._set_char(x, y, char, fg, bg, bgblend)
+        # if fg != -1 and not nullChar:
+            # # buffer values as ctypes objects
+            # self._typewriter = None # clear the typewriter as colors will be set
+            # console = self._as_parameter_
+            # #bgblend = _ctypes.c_int(bgblend)
+
+            # if bg == -1:
+                # bgblend = 0
+            # else:
+                # _lib.TCOD_console_set_default_background(console, bg[0])
+            # _lib.TCOD_console_set_default_foreground(console, fg[0])
+            # _putChar = _lib.TCOD_console_put_char # remove dots and make local
+            # for (x, y), char in batch:
+                # _putChar(console, x, y, char, bgblend)
+            
+        # else:
+            # for (x, y), char in batch:
+                # self._set_char(x, y, char, fg, bg, bgblend)
 
     def get_char(self, x, y):
         # inherit docstring

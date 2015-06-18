@@ -1,11 +1,10 @@
 
-import os as _os
-from tdl import __path__
+import sys
+import os
 
-_os.environ['PATH'] += ';' + _os.path.join(__path__[0], 'lib/win32/')
+import platform
 
-from ._libtcod import ffi
-
+from . import __path__
 
 try: # decide how files are unpacked depending on if we have the pkg_resources module
     from pkg_resources import resource_filename
@@ -14,11 +13,11 @@ try: # decide how files are unpacked depending on if we have the pkg_resources m
 except ImportError:
     #from tdl import __path__
     def _unpackfile(filename):
-        return _os.path.abspath(_os.path.join(__path__[0], filename))
+        return os.path.abspath(os.path.join(__path__[0], filename))
 
 def _unpackFramework(framework, path):
     """get framework.tar file, remove ".tar" and add path"""
-    return _os.path.abspath(_os.path.join(_unpackfile(framework)[:-4], path))
+    return os.path.abspath(os.path.join(_unpackfile(framework)[:-4], path))
 
 def _loadDLL(dll):
     """shorter version of file unpacking and linking"""
@@ -26,24 +25,21 @@ def _loadDLL(dll):
 
 def _get_library_crossplatform():
     bits, linkage = platform.architecture()
-    libpath = None
     if 'win32' in sys.platform:
-        pass
+        return 'lib/win32/'
     elif 'linux' in sys.platform:
         if bits == '32bit':
-            pass
+            return 'lib/linux32/'
         elif bits == '64bit':
-            pass
+            return 'lib/linux64/'
     elif 'darwin' in sys.platform:
-        pass
-    else:
-        raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
-    return libTCOD, libSDL
+        return 'lib/darwin/'
+    raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
 
+os.environ['PATH'] += ';' + os.path.join(__path__[0],
+                                         _get_library_crossplatform())
 
-ffi.dlopen(_unpackfile('lib/win32/zlib1.dll'))
-ffi.dlopen(_unpackfile('lib/win32/SDL.dll'))
-lib = ffi.dlopen(_unpackfile('lib/win32/libtcod-VS.dll'))
+from ._libtcod import ffi, lib
 
 _ffi = ffi
 _lib = lib
