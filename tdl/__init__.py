@@ -165,18 +165,14 @@ else:
 def _formatColor(color, default=Ellipsis):
         if color is Ellipsis:
             return default
-        if color is None or color is False:
+        if color is None:
             return -1
-        #if (isinstance(color, _ffi.CData) and
-        #    _ffi.typeof(color) is _ffi.typeof('TCOD_color_t *')):
-        #    return color
         if isinstance(color, int_types):
             # format a web style color with the format 0xRRGGBB
             return color
-            #return _ffi.new('TCOD_color_t *', (color >> 16 & 0xff,
-            #                                   color >> 8 & 0xff,
-            #                                   color & 0xff))
-        return (color[0] << 16) + (color[1] << 8) + color[2]
+        if isinstance(color, (tuple, list)) and len(color) == 3:
+            return (color[0] << 16) + (color[1] << 8) + color[2]
+        raise TDLError('color must be a 3 item tuple, integer, Ellipsis, or None\nReceived: %r' % (color,))
         #return _ffi.new('TCOD_color_t *', color)
 
 def _to_tcod_color(color):
@@ -422,7 +418,7 @@ class _BaseConsole(object):
         @see: L{get_char}
         """
 
-        assert _verify_colors(fg, bg)
+        #assert _verify_colors(fg, bg)
         #x, y = self._normalizePoint(x, y)
         #x, y = _ctypes.c_int(x), _ctypes.c_int(y)
         _lib.set_char(self._as_parameter_, x, y, _formatChar(char),
@@ -468,7 +464,7 @@ class _BaseConsole(object):
         """
 
         x, y = self._normalizePoint(x, y)
-        assert _verify_colors(fg, bg)
+        #assert _verify_colors(fg, bg)
         fg, bg = _formatColor(fg, self._fg), _formatColor(bg, self._bg)
         width, height = self.get_size()
         batch = [] # prepare a batch operation
@@ -527,7 +523,7 @@ class _BaseConsole(object):
         @see: L{clear}, L{draw_frame}
         """
         x, y, width, height = self._normalizeRect(x, y, width, height)
-        assert _verify_colors(fg, bg)
+        #assert _verify_colors(fg, bg)
         fg, bg = _formatColor(fg, self._fg), _formatColor(bg, self._bg)
         char = _formatChar(string)
         # use itertools to make an x,y grid
@@ -576,7 +572,7 @@ class _BaseConsole(object):
         @see: L{draw_rect}, L{Window}
         """
         x, y, width, height = self._normalizeRect(x, y, width, height)
-        assert _verify_colors(fg, bg)
+        #assert _verify_colors(fg, bg)
         fg, bg = _formatColor(fg, self._fg), _formatColor(bg, self._bg)
         char = _formatChar(string)
         if width == 1 or height == 1: # it's just a single width line here
@@ -904,7 +900,7 @@ class Console(_BaseConsole):
         @param bg: Background color.  See fg.
         @see: L{draw_rect}
         """
-        assert _verify_colors(fg, bg)
+        #assert _verify_colors(fg, bg)
         assert fg is not None and bg is not None, 'Can not use None with clear'
         self._typewriter = None
         fg = _formatColor(fg, self._fg)
@@ -1085,7 +1081,7 @@ class Window(_BaseConsole):
         @param bg: See fg
         @see: L{draw_rect}
         """
-        assert _verify_colors(fg, bg)
+        #assert _verify_colors(fg, bg)
         assert fg is not None and bg is not None, 'Can not use None with clear'
         if fg is Ellipsis:
             fg = self._fg
