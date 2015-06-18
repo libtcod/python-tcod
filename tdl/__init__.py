@@ -92,7 +92,7 @@ def _encodeString(string): # still used for filepaths, and that's about it
         return string.encode()
     return string
 
-def _formatChar(char):
+def _format_char(char):
     """Prepares a single character for passing to ctypes calls, needs to return
     an integer but can also pass None which will keep the current character
     instead of overwriting it.
@@ -103,7 +103,10 @@ def _formatChar(char):
         return -1
     if isinstance(char, _STRTYPES) and len(char) == 1:
         return ord(char)
-    return int(char) # conversion faster than type check
+    try:
+        return int(char) # allow all int-like objects
+    except:
+        raise TypeError('char single character string, integer, or None\nReceived: ' + repr(color))
 
 _utf32_codec = {'little': 'utf-32le', 'big': 'utf-32le'}[_sys.byteorder]
     
@@ -120,39 +123,6 @@ def _format_str(string):
 _fontinitialized = False
 _rootinitialized = False
 _rootConsoleRef = None
-# remove dots from common functions
-_set_char = _lib.TCOD_console_set_char
-_set_fg = _lib.TCOD_console_set_char_foreground
-_set_bg = _lib.TCOD_console_set_char_background
-_put_char_ex = _lib.TCOD_console_put_char_ex
-_put_char = _lib.TCOD_console_put_char
-
-def _verify_colors(*colors):
-    """Used internally.
-    Raise an assertion error if the parameters can not be converted into colors.
-    """
-    for color in colors:
-        assert _iscolor(color), 'a color must be a 3 item tuple, web format, or None, received %s' % repr(color)
-    return True
-
-def _iscolor(color):
-    """Used internally.
-    A debug function to see if an object can be used as a TCOD color struct.
-    None counts as a parameter to keep the current colors instead.
-
-    This function is often part of an inner-loop and can slow a program down.
-    It has been made to work with assert and can be skipped with the -O flag.
-    Still it's called often and must be optimized.
-    """
-    if color is Ellipsis:
-        return True
-    if color is None:
-        return True
-    if isinstance(color, (tuple, list, _ffi.CData)):
-        return len(color) == 3
-    if isinstance(color, _INTTYPES):
-        return True
-    return False
 
 # python 2 to 3 workaround
 if _sys.version_info[0] == 2:
@@ -161,19 +131,17 @@ else:
     int_types = int
 
     
-#_formatColor = _Color.parse
-def _formatColor(color, default=Ellipsis):
+def _format_color(color, default=Ellipsis):
         if color is Ellipsis:
             return default
         if color is None:
             return -1
-        if isinstance(color, int_types):
-            # format a web style color with the format 0xRRGGBB
-            return color
         if isinstance(color, (tuple, list)) and len(color) == 3:
             return (color[0] << 16) + (color[1] << 8) + color[2]
-        raise TDLError('color must be a 3 item tuple, integer, Ellipsis, or None\nReceived: %r' % (color,))
-        #return _ffi.new('TCOD_color_t *', color)
+        try:
+            return int(color) # allow all int-like objects
+        except:
+            raise TypeError('fg and bg must be a 3 item tuple, integer, Ellipsis, or None\nReceived: ' + repr(color))
 
 def _to_tcod_color(color):
     return _ffi.new('TCOD_color_t *', (color >> 16 & 0xff,
@@ -220,8 +188,8 @@ class _BaseConsole(object):
     def __init__(self):
         self._cursor = (0, 0)
         self._scrollMode = 'error'
-        self._fg = _formatColor((255, 255, 255))
-        self._bg = _formatColor((0, 0, 0))
+        self._fg = _format_color((255, 255, 255))
+        self._bg = _format_color((0, 0, 0))
         self._bgblend = 1 # SET
         self._colorLock = None # which object sets the ctype color options
         
@@ -325,9 +293,9 @@ class _BaseConsole(object):
         @see: L{move}, L{print_str}
         """
         if fg is not None:
-            self._fg = _formatColor(fg, self._fg)
+            self._fg = _format_color(fg, self._fg)
         if bg is not None:
-            self._bg = _formatColor(bg, self._bg)
+            self._bg = _format_color(bg, self._bg)
 
     def print_str(self, string):
         """Print a string at the virtual cursor.
@@ -418,11 +386,9 @@ class _BaseConsole(object):
         @see: L{get_char}
         """
 
-        #assert _verify_colors(fg, bg)
         #x, y = self._normalizePoint(x, y)
-        #x, y = _ctypes.c_int(x), _ctypes.c_int(y)
-        _lib.set_char(self._as_parameter_, x, y, _formatChar(char),
-                      _formatColor(fg, self._fg), _formatColor(bg, self._bg))
+        _lib.set_char(self._as_parameter_, x, y, _format_char(char),
+                      _format_color(fg, self._fg), _format_color(bg, self._bg))
 
     def draw_str(self, x, y, string, fg=Ellipsis, bg=Ellipsis):
         """Draws a string starting at x and y.
@@ -464,8 +430,7 @@ class _BaseConsole(object):
         """
 
         x, y = self._normalizePoint(x, y)
-        #assert _verify_colors(fg, bg)
-        fg, bg = _formatColor(fg, self._fg), _formatColor(bg, self._bg)
+        fg, bg = _format_color(fg, self._fg), _format_color(bg, self._bg)
         width, height = self.get_size()
         batch = [] # prepare a batch operation
         def _drawStrGen(x=x, y=y, string=string, width=width, height=height):
@@ -477,7 +442,7 @@ class _BaseConsole(object):
             for char in _format_str(string):
                 if y == height:
                     raise TDLError('End of console reached.')
-                #batch.append(((x, y), _formatChar(char))) # ((x, y), ch)
+                #batch.append(((x, y), _format_char(char))) # ((x, y), ch)
                 yield((x, y), char)
                 x += 1 # advance cursor
                 if x == width: # line break
@@ -523,9 +488,8 @@ class _BaseConsole(object):
         @see: L{clear}, L{draw_frame}
         """
         x, y, width, height = self._normalizeRect(x, y, width, height)
-        #assert _verify_colors(fg, bg)
-        fg, bg = _formatColor(fg, self._fg), _formatColor(bg, self._bg)
-        char = _formatChar(string)
+        fg, bg = _format_color(fg, self._fg), _format_color(bg, self._bg)
+        char = _format_char(string)
         # use itertools to make an x,y grid
         # using ctypes here reduces type converstions later
         #grid = _itertools.product((_ctypes.c_int(x) for x in range(x, x + width)),
@@ -572,9 +536,8 @@ class _BaseConsole(object):
         @see: L{draw_rect}, L{Window}
         """
         x, y, width, height = self._normalizeRect(x, y, width, height)
-        #assert _verify_colors(fg, bg)
-        fg, bg = _formatColor(fg, self._fg), _formatColor(bg, self._bg)
-        char = _formatChar(string)
+        fg, bg = _format_color(fg, self._fg), _format_color(bg, self._bg)
+        char = _format_char(string)
         if width == 1 or height == 1: # it's just a single width line here
             return self.draw_rect(x, y, width, height, char, fg, bg)
 
@@ -900,11 +863,10 @@ class Console(_BaseConsole):
         @param bg: Background color.  See fg.
         @see: L{draw_rect}
         """
-        #assert _verify_colors(fg, bg)
         assert fg is not None and bg is not None, 'Can not use None with clear'
         self._typewriter = None
-        fg = _formatColor(fg, self._fg)
-        bg = _formatColor(bg, self._bg)
+        fg = _format_color(fg, self._fg)
+        bg = _format_color(bg, self._bg)
         _lib.TCOD_console_set_default_foreground(self._as_parameter_,
                                                  _to_tcod_color(fg)[0])
         _lib.TCOD_console_set_default_background(self._as_parameter_,
@@ -919,7 +881,7 @@ class Console(_BaseConsole):
 
         Because of the need for speed this function will do NO TYPE CHECKING
         AT ALL, it's up to the drawing functions to use the functions:
-        _formatChar and _formatColor before passing to this."""
+        _format_char and _format_color before passing to this."""
         # buffer values as ctypes objects
         #console = self._as_parameter_
         if fg is None:
@@ -1081,7 +1043,6 @@ class Window(_BaseConsole):
         @param bg: See fg
         @see: L{draw_rect}
         """
-        #assert _verify_colors(fg, bg)
         assert fg is not None and bg is not None, 'Can not use None with clear'
         if fg is Ellipsis:
             fg = self._fg
