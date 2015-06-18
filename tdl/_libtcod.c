@@ -9190,7 +9190,7 @@ static const struct _cffi_type_context_s _cffi_type_context = {
 
 #ifdef PYPY_VERSION
 PyMODINIT_FUNC
-_cffi_pypyinit_tdl/_libtcod(const void *p[])
+_cffi_pypyinit_tdl\\_libtcod(const void *p[])
 {
     p[0] = (const void *)0x2601;
     p[1] = &_cffi_type_context;
@@ -9198,21 +9198,21 @@ _cffi_pypyinit_tdl/_libtcod(const void *p[])
 #  ifdef _MSC_VER
      PyMODINIT_FUNC
 #  if PY_MAJOR_VERSION >= 3
-     PyInit_tdl/_libtcod(void) { return NULL; }
+     PyInit_tdl\\_libtcod(void) { return NULL; }
 #  else
-     inittdl/_libtcod(void) { }
+     inittdl\\_libtcod(void) { }
 #  endif
 #  endif
 #elif PY_MAJOR_VERSION >= 3
 PyMODINIT_FUNC
-PyInit_tdl/_libtcod(void)
+PyInit_tdl\\_libtcod(void)
 {
-  return _cffi_init("tdl/_libtcod", 0x2601, &_cffi_type_context);
+  return _cffi_init("tdl\\_libtcod", 0x2601, &_cffi_type_context);
 }
 #else
 PyMODINIT_FUNC
-inittdl/_libtcod(void)
+inittdl\\_libtcod(void)
 {
-  _cffi_init("tdl/_libtcod", 0x2601, &_cffi_type_context);
+  _cffi_init("tdl\\_libtcod", 0x2601, &_cffi_type_context);
 }
 #endif

@@ -472,10 +472,7 @@ void set_char(TCOD_console_t console, int x, int y,
 
 """)
 
-module_name = '_libtcod'
-
-
-ffi.set_source(module_name, """
+ffi.set_source('tdl._libtcod', """
 #include <libtcod.h>
 
 void set_char(TCOD_console_t console, int x, int y,
