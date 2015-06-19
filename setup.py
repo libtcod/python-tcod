@@ -22,7 +22,7 @@ setup(
                           'lib/darwin/*.dylib',
                           'lib/linux*/*']},
     setup_requires=["cffi>=1.0.0"],
-    cffi_modules=["tdl/build_libtcod.py:ffi"],
+    cffi_modules=["build_libtcod.py:ffi"],
     install_requires=["cffi>=1.0.0"],
     classifiers=['Development Status :: 5 - Production/Stable',
                'Environment :: Win32 (MS Windows)',

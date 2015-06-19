@@ -2,6 +2,21 @@
 
 from cffi import FFI
 
+import platform
+
+def _get_library_crossplatform():
+    bits, linkage = platform.architecture()
+    if 'win32' in sys.platform:
+        return 'tdl/lib/win32/'
+    elif 'linux' in sys.platform:
+        if bits == '32bit':
+            return 'tdl/lib/linux32/'
+        elif bits == '64bit':
+            return 'tdl/lib/linux64/'
+    elif 'darwin' in sys.platform:
+        return 'tdl/lib/darwin/'
+    raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
+
 ffi = FFI()
 ffi.cdef("""
 
@@ -550,8 +565,8 @@ void set_char(TCOD_console_t console, int x, int y,
 }
 
 """,
-include_dirs=['include/', 'tdl/include/', 'tdl/include/Release/'],
-library_dirs=['lib/win32/', 'tdl/lib/win32/'],
+include_dirs=['tdl/include/', 'tdl/include/Release/'],
+library_dirs=[_get_library_crossplatform()],
 libraries=['libtcod-VS'])
 
 
