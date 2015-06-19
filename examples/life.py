@@ -39,15 +39,20 @@ class LifeBoard():
     def toggle(self, x, y):
         self.live_cells.symmetric_difference_update([(x, y)])
         
+    def wrap_edges(self):
+        for x in range(-1, self.width + 1):
+            self.set(x, -1, self.get(x, -1))
+            self.set(x, self.height, self.get(x, self.height))
+        for y in range(self.height):
+            self.set(-1, y, self.get(-1, y))
+            self.set(self.width, y, self.get(self.width, y))
+        
         
     def get_neighbours(self, x, y):
-        count = 0
-        for neighbour_x in [-1, 0, 1]:
-            for neighbour_y in [-1, 0, 1]:
-                if 0 == neighbour_x == neighbour_y:
-                    continue
-                count += self.get(x + neighbour_x, y + neighbour_y)
-        return count
+        return len(self.live_cells & {(x - 1, y - 1), (x, y - 1),
+                                      (x + 1,y - 1), (x + 1, y),
+                                      (x + 1, y + 1), (x, y + 1),
+                                      (x - 1, y + 1), (x - 1, y)})
         
     def rule(self, is_alive, neighbours):
         """
@@ -66,7 +71,7 @@ class LifeBoard():
             return neighbours == 3
         
     def step(self):
-        
+        self.wrap_edges()
         next_generation = set()
         for x in range(self.width):
             for y in range(self.height):
