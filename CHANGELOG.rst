@@ -1,6 +1,10 @@
 ===========
  Changelog
 ===========
+1.3.0
+ * Updated backend to use python-cffi instead of ctypes.  This gives decent
+   boost to speed in CPython and a drastic to boost in speed in PyPy.
+
 1.2.0
  * The set_colors method now changes the default colors used by the draw_*
    methods.  You can use Python's Ellipsis to explicitly select default colors

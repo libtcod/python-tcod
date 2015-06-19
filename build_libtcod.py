@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
-from cffi import FFI
+import sys
 
 import platform
+
+from cffi import FFI
+
 
 def _get_library_crossplatform():
     bits, linkage = platform.architecture()
