@@ -60,7 +60,8 @@
 import sys as _sys
 import os as _os
 
-import ctypes as _ctypes
+#import ctypes as _ctypes
+import array as _array
 import weakref as _weakref
 import itertools as _itertools
 import textwrap as _textwrap
@@ -69,8 +70,9 @@ import re as _re
 import warnings as _warnings
 
 from . import event, map, noise
-from .__tcod import _lib, _Color, _unpackfile
-from . import __style as _style
+from .libtcod import _ffi, _lib
+from . import style as _style
+
 
 _IS_PYTHON3 = (_sys.version_info[0] == 3)
 
@@ -89,7 +91,7 @@ def _encodeString(string): # still used for filepaths, and that's about it
         return string.encode()
     return string
 
-def _formatChar(char):
+def _format_char(char):
     """Prepares a single character for passing to ctypes calls, needs to return
     an integer but can also pass None which will keep the current character
     instead of overwriting it.
@@ -97,50 +99,54 @@ def _formatChar(char):
     This is called often and needs to be optimized whenever possible.
     """
     if char is None:
-        return None
+        return -1
     if isinstance(char, _STRTYPES) and len(char) == 1:
         return ord(char)
-    return int(char) # conversion faster than type check
+    try:
+        return int(char) # allow all int-like objects
+    except:
+        raise TypeError('char single character string, integer, or None\nReceived: ' + repr(color))
+
+_utf32_codec = {'little': 'utf-32le', 'big': 'utf-32le'}[_sys.byteorder]
+    
+def _format_str(string):
+    if isinstance(string, str):
+        array = _array.array('I')
+        if _IS_PYTHON3:
+            array.frombytes(string.encode(_utf32_codec))
+        else:
+            array.fromstring(string.encode(_utf32_codec))
+        return array
+    return string
 
 _fontinitialized = False
 _rootinitialized = False
 _rootConsoleRef = None
-# remove dots from common functions
-_set_char = _lib.TCOD_console_set_char
-_set_fg = _lib.TCOD_console_set_char_foreground
-_set_bg = _lib.TCOD_console_set_char_background
-_put_char_ex = _lib.TCOD_console_put_char_ex
-_put_char = _lib.TCOD_console_put_char
 
-def _verify_colors(*colors):
-    """Used internally.
-    Raise an assertion error if the parameters can not be converted into colors.
-    """
-    for color in colors:
-        assert _iscolor(color), 'a color must be a 3 item tuple, web format, or None, received %s' % repr(color)
-    return True
+# python 2 to 3 workaround
+if _sys.version_info[0] == 2:
+    int_types = (int, long)
+else:
+    int_types = int
 
-def _iscolor(color):
-    """Used internally.
-    A debug function to see if an object can be used as a TCOD color struct.
-    None counts as a parameter to keep the current colors instead.
+    
+def _format_color(color, default=Ellipsis):
+        if color is Ellipsis:
+            return default
+        if color is None:
+            return -1
+        if isinstance(color, (tuple, list)) and len(color) == 3:
+            return (color[0] << 16) + (color[1] << 8) + color[2]
+        try:
+            return int(color) # allow all int-like objects
+        except:
+            raise TypeError('fg and bg must be a 3 item tuple, integer, Ellipsis, or None\nReceived: ' + repr(color))
 
-    This function is often part of an inner-loop and can slow a program down.
-    It has been made to work with assert and can be skipped with the -O flag.
-    Still it's called often and must be optimized.
-    """
-    if color is Ellipsis:
-        return True
-    if color is None:
-        return True
-    if isinstance(color, (tuple, list, _Color)):
-        return len(color) == 3
-    if isinstance(color, _INTTYPES):
-        return True
-    return False
-
-_formatColor = _Color.parse
-
+def _to_tcod_color(color):
+    return _ffi.new('TCOD_color_t *', (color >> 16 & 0xff,
+                                       color >> 8 & 0xff,
+                                       color & 0xff))
+        
 def _getImageSize(filename):
     """Try to get the width and height of a bmp of png image file"""
     file = open(filename, 'rb')
@@ -181,8 +187,8 @@ class _BaseConsole(object):
     def __init__(self):
         self._cursor = (0, 0)
         self._scrollMode = 'error'
-        self._fg = _formatColor((255, 255, 255))
-        self._bg = _formatColor((0, 0, 0))
+        self._fg = _format_color((255, 255, 255))
+        self._bg = _format_color((0, 0, 0))
         self._bgblend = 1 # SET
         self._colorLock = None # which object sets the ctype color options
         
@@ -286,9 +292,9 @@ class _BaseConsole(object):
         @see: L{move}, L{print_str}
         """
         if fg is not None:
-            self._fg = _formatColor(fg)
+            self._fg = _format_color(fg, self._fg)
         if bg is not None:
-            self._bg = _formatColor(bg)
+            self._bg = _format_color(bg, self._bg)
 
     def print_str(self, string):
         """Print a string at the virtual cursor.
@@ -379,11 +385,9 @@ class _BaseConsole(object):
         @see: L{get_char}
         """
 
-        assert _verify_colors(fg, bg)
-        x, y = self._normalizePoint(x, y)
-        x, y = _ctypes.c_int(x), _ctypes.c_int(y)
-        self._set_char(x, y, _formatChar(char),
-                      _formatColor(fg), _formatColor(bg))
+        #x, y = self._normalizePoint(x, y)
+        _lib.set_char(self._as_parameter_, x, y, _format_char(char),
+                      _format_color(fg, self._fg), _format_color(bg, self._bg))
 
     def draw_str(self, x, y, string, fg=Ellipsis, bg=Ellipsis):
         """Draws a string starting at x and y.
@@ -425,8 +429,7 @@ class _BaseConsole(object):
         """
 
         x, y = self._normalizePoint(x, y)
-        assert _verify_colors(fg, bg)
-        fg, bg = _formatColor(fg), _formatColor(bg)
+        fg, bg = _format_color(fg, self._fg), _format_color(bg, self._bg)
         width, height = self.get_size()
         batch = [] # prepare a batch operation
         def _drawStrGen(x=x, y=y, string=string, width=width, height=height):
@@ -435,11 +438,11 @@ class _BaseConsole(object):
             Iterates over ((x, y), ch) data for _set_batch, raising an
             error if the end of the console is reached.
             """
-            for char in string:
+            for char in _format_str(string):
                 if y == height:
                     raise TDLError('End of console reached.')
-                #batch.append(((x, y), _formatChar(char))) # ((x, y), ch)
-                yield((x, y), _formatChar(char))
+                #batch.append(((x, y), _format_char(char))) # ((x, y), ch)
+                yield((x, y), char)
                 x += 1 # advance cursor
                 if x == width: # line break
                     x = 0
@@ -484,13 +487,14 @@ class _BaseConsole(object):
         @see: L{clear}, L{draw_frame}
         """
         x, y, width, height = self._normalizeRect(x, y, width, height)
-        assert _verify_colors(fg, bg)
-        fg, bg = _formatColor(fg), _formatColor(bg)
-        char = _formatChar(string)
+        fg, bg = _format_color(fg, self._fg), _format_color(bg, self._bg)
+        char = _format_char(string)
         # use itertools to make an x,y grid
         # using ctypes here reduces type converstions later
-        grid = _itertools.product((_ctypes.c_int(x) for x in range(x, x + width)),
-                                  (_ctypes.c_int(y) for y in range(y, y + height)))
+        #grid = _itertools.product((_ctypes.c_int(x) for x in range(x, x + width)),
+        #                          (_ctypes.c_int(y) for y in range(y, y + height)))
+        grid = _itertools.product((x for x in range(x, x + width)),
+                                  (y for y in range(y, y + height)))
         # zip the single character in a batch variable
         batch = zip(grid, _itertools.repeat(char, width * height))
         self._set_batch(batch, fg, bg, nullChar=(char is None))
@@ -531,9 +535,8 @@ class _BaseConsole(object):
         @see: L{draw_rect}, L{Window}
         """
         x, y, width, height = self._normalizeRect(x, y, width, height)
-        assert _verify_colors(fg, bg)
-        fg, bg = _formatColor(fg), _formatColor(bg)
-        char = _formatChar(string)
+        fg, bg = _format_color(fg, self._fg), _format_color(bg, self._bg)
+        char = _format_char(string)
         if width == 1 or height == 1: # it's just a single width line here
             return self.draw_rect(x, y, width, height, char, fg, bg)
 
@@ -595,10 +598,15 @@ class _BaseConsole(object):
             # onto the data, otherwise it tries to copy into itself and
             # starts destroying everything
             tmp = Console(width, height)
-            _lib.TCOD_console_blit(source, srcX, srcY, width, height, tmp, 0, 0, fgalpha, bgalpha)
-            _lib.TCOD_console_blit(tmp, 0, 0, width, height, self, x, y, fgalpha, bgalpha)
+            _lib.TCOD_console_blit(source._as_parameter_,
+                                   srcX, srcY, width, height,
+                                   tmp._as_parameter_, 0, 0, fgalpha, bgalpha)
+            _lib.TCOD_console_blit(tmp._as_parameter_, 0, 0, width, height,
+                                   self._as_parameter_, x, y, fgalpha, bgalpha)
         else:
-            _lib.TCOD_console_blit(source, srcX, srcY, width, height, self, x, y, fgalpha, bgalpha)
+            _lib.TCOD_console_blit(source._as_parameter_,
+                                   srcX, srcY, width, height,
+                                   self._as_parameter_, x, y, fgalpha, bgalpha)
 
     def get_cursor(self):
         """Return the virtual cursor position.
@@ -775,8 +783,8 @@ class Console(_BaseConsole):
         _BaseConsole.__init__(self)
         self._as_parameter_ = console
         self.console = self
-        self.width = _lib.TCOD_console_get_width(self)
-        self.height = _lib.TCOD_console_get_height(self)
+        self.width = _lib.TCOD_console_get_width(console)
+        self.height = _lib.TCOD_console_get_height(console)
         self._typewriter = None
         return self
 
@@ -786,16 +794,17 @@ class Console(_BaseConsole):
         """
         global _rootinitialized, _rootConsoleRef
         # check of see if the pointer is to the special root console
-        if isinstance(self._as_parameter_, _ctypes.c_void_p):
+        #if isinstance(self._as_parameter_, _ctypes.c_void_p):
+        if self._as_parameter_ is _ffi.NULL:
             # do we recognise this root console?
             if(_rootConsoleRef and _rootConsoleRef is self):
                 _rootinitialized = False
                 _rootConsoleRef = None
-                _lib.TCOD_console_delete(self)
+                _lib.TCOD_console_delete(self._as_parameter_)
             # if not then assume the console has already been taken care of
         else:
             # this is a normal console pointer and can be safely deleted
-            _lib.TCOD_console_delete(self)
+            _lib.TCOD_console_delete(self._as_parameter_)
 
     def __copy__(self):
         # make a new class and blit
@@ -828,8 +837,8 @@ class Console(_BaseConsole):
               console._as_parameter_, self._as_parameter_ # swap tcod consoles
         else:
             self._as_parameter_ = console
-        self.width = _lib.TCOD_console_get_width(self)
-        self.height = _lib.TCOD_console_get_height(self)
+        self.width = _lib.TCOD_console_get_width(self._as_parameter_)
+        self.height = _lib.TCOD_console_get_height(self._as_parameter_)
         return self
 
     def _translate(self, x, y):
@@ -853,60 +862,63 @@ class Console(_BaseConsole):
         @param bg: Background color.  See fg.
         @see: L{draw_rect}
         """
-        assert _verify_colors(fg, bg)
         assert fg is not None and bg is not None, 'Can not use None with clear'
         self._typewriter = None
-        if fg is Ellipsis:
-            fg = self._fg
-        else:
-            fg = _formatColor(fg)
-        if bg is Ellipsis:
-            bg = self._bg
-        else:
-            bg = _formatColor(bg)
-        _lib.TCOD_console_set_default_foreground(self, fg)
-        _lib.TCOD_console_set_default_background(self, bg)
-        _lib.TCOD_console_clear(self)
+        fg = _format_color(fg, self._fg)
+        bg = _format_color(bg, self._bg)
+        _lib.TCOD_console_set_default_foreground(self._as_parameter_,
+                                                 _to_tcod_color(fg)[0])
+        _lib.TCOD_console_set_default_background(self._as_parameter_,
+                                                 _to_tcod_color(bg)[0])
+        _lib.TCOD_console_clear(self._as_parameter_)
         
 
-    def _set_char(self, x, y, char, fg=Ellipsis, bg=Ellipsis, bgblend=1):
+    def _set_char(self, x, y, char, fg=None, bg=None, bgblend=1):
         """
         Sets a character.
         This is called often and is designed to be as fast as possible.
 
         Because of the need for speed this function will do NO TYPE CHECKING
         AT ALL, it's up to the drawing functions to use the functions:
-        _formatChar and _formatColor before passing to this."""
+        _format_char and _format_color before passing to this."""
         # buffer values as ctypes objects
-        console = self._as_parameter_
-        if char is not None and fg is not None and bg is not None:
-            if fg is bg is Ellipsis:
-                # char is not None and all colors are Ellipsis
-                # use default colors previously set in this console
-                _put_char(console, x, y, char, bgblend)
-                return
-            # all parameters are not None
-            # use default colors for any ellipsis
-            if fg is Ellipsis:
-                fg = self._fg
-            if bg is Ellipsis:
-                bg = self._bg
+        #console = self._as_parameter_
+        if fg is None:
+            fg = -1
+        if bg is None:
+            bg = -1
+        if char is None:
+            char = -1
+        _lib.set_char(self._as_parameter_, x, y, char, fg, bg)
+        
+        # if char is not None and fg is not None and bg is not None:
+            # if fg is bg is Ellipsis:
+                # # char is not None and all colors are Ellipsis
+                # # use default colors previously set in this console
+                # _put_char(console, x, y, char, bgblend)
+                # return
+            # # all parameters are not None
+            # # use default colors for any ellipsis
+            # if fg is Ellipsis:
+                # fg = self._fg
+            # if bg is Ellipsis:
+                # bg = self._bg
                 
-            _put_char_ex(console, x, y, char, fg, bg)
-            return
-        # some parameters are None
-        # selectively commit parameters to the console
-        # use default colors for any ellipsis
-        if char is not None:
-            _set_char(console, x, y, char)
-        if fg is not None:
-            if fg is Ellipsis:
-                fg = self._fg
-            _set_fg(console, x, y, fg)
-        if bg is not None:
-            if bg is Ellipsis:
-                bg = self._bg
-            _set_bg(console, x, y, bg, bgblend)
+            # _put_char_ex(console, x, y, char, fg[0], bg[0])
+            # return
+        # # some parameters are None
+        # # selectively commit parameters to the console
+        # # use default colors for any ellipsis
+        # if char is not None:
+            # _set_char(console, x, y, char)
+        # if fg is not None:
+            # if fg is Ellipsis:
+                # fg = self._fg
+            # _set_fg(console, x, y, fg[0])
+        # if bg is not None:
+            # if bg is Ellipsis:
+                # bg = self._bg
+            # _set_bg(console, x, y, bg[0], bgblend)
 
     def _set_batch(self, batch, fg, bg, bgblend=1, nullChar=False):
         """
@@ -922,33 +934,41 @@ class Console(_BaseConsole):
             fg = self._fg
         if bg is Ellipsis:
             bg = self._bg
-
-        if fg and not nullChar:
-            # buffer values as ctypes objects
-            self._typewriter = None # clear the typewriter as colors will be set
-            console = self._as_parameter_
-            bgblend = _ctypes.c_int(bgblend)
-
-            if not bg:
-                bgblend = 0
-            else:
-                _lib.TCOD_console_set_default_background(console, bg)
-            _lib.TCOD_console_set_default_foreground(console, fg)
-            _putChar = _lib.TCOD_console_put_char # remove dots and make local
-            for (x, y), char in batch:
-                _putChar(console, x, y, char, bgblend)
             
-        else:
-            for (x, y), char in batch:
-                self._set_char(x, y, char, fg, bg, bgblend)
+        #if fg != -1:
+        #    fg = _to_tcod_color(fg)
+        #if bg != -1:
+        #    bg = _to_tcod_color(bg)
+            
+        for (x, y), char in batch:
+            self._set_char(x, y, char, fg, bg, bgblend)
+            
+        # if fg != -1 and not nullChar:
+            # # buffer values as ctypes objects
+            # self._typewriter = None # clear the typewriter as colors will be set
+            # console = self._as_parameter_
+            # #bgblend = _ctypes.c_int(bgblend)
+
+            # if bg == -1:
+                # bgblend = 0
+            # else:
+                # _lib.TCOD_console_set_default_background(console, bg[0])
+            # _lib.TCOD_console_set_default_foreground(console, fg[0])
+            # _putChar = _lib.TCOD_console_put_char # remove dots and make local
+            # for (x, y), char in batch:
+                # _putChar(console, x, y, char, bgblend)
+            
+        # else:
+            # for (x, y), char in batch:
+                # self._set_char(x, y, char, fg, bg, bgblend)
 
     def get_char(self, x, y):
         # inherit docstring
         x, y = self._normalizePoint(x, y)
-        char = _lib.TCOD_console_get_char(self, x, y)
-        bg = _lib.TCOD_console_get_char_background_wrapper(self, x, y)
-        fg = _lib.TCOD_console_get_char_foreground_wrapper(self, x, y)
-        return char, tuple(fg), tuple(bg)
+        char = _lib.TCOD_console_get_char(self._as_parameter_, x, y)
+        bg = _lib.TCOD_console_get_char_background(self._as_parameter_, x, y)
+        fg = _lib.TCOD_console_get_char_foreground(self._as_parameter_, x, y)
+        return char, (fg.r, fg.g, fg.b), (bg.r, bg.g, bg.b)
 
     def __repr__(self):
         return "<Console (Width=%i Height=%i)>" % (self.width, self.height)
@@ -1022,7 +1042,6 @@ class Window(_BaseConsole):
         @param bg: See fg
         @see: L{draw_rect}
         """
-        assert _verify_colors(fg, bg)
         assert fg is not None and bg is not None, 'Can not use None with clear'
         if fg is Ellipsis:
             fg = self._fg
@@ -1079,8 +1098,6 @@ class Window(_BaseConsole):
         return "<Window(X=%i Y=%i Width=%i Height=%i)>" % (self.x, self.y,
                                                           self.width,
                                                           self.height)
-#
-
 
 
 def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
@@ -1122,7 +1139,8 @@ def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
     RENDERERS = {'GLSL': 0, 'OPENGL': 1, 'SDL': 2}
     global _rootinitialized, _rootConsoleRef
     if not _fontinitialized: # set the default font to the one that comes with tdl
-        set_font(_unpackfile('terminal8x8.png'), None, None, True, True)
+        set_font(_os.path.join(__path__[0], 'terminal8x8.png'),
+                 None, None, True, True)
 
     if renderer.upper() not in RENDERERS:
         raise TDLError('No such render type "%s", expected one of "%s"' % (renderer, '", "'.join(RENDERERS)))
@@ -1150,7 +1168,7 @@ def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
 
     event._eventsflushed = False
     _rootinitialized = True
-    rootconsole = Console._newConsole(_ctypes.c_void_p())
+    rootconsole = Console._newConsole(_ffi.NULL)
     _rootConsoleRef = _weakref.ref(rootconsole)
 
     return rootconsole
@@ -1416,4 +1434,4 @@ __license__ = "New BSD License"
 __author__ = 'Kyle Stewart'
 __contact__ = "4b796c65+pythonTDL@gmail.com"
 __email__ = "4b796c65+pythonTDL@gmail.com"
-__version__ = '1.2.0'
+__version__ = open(_os.path.join(__path__[0], 'version.txt'), 'r').read()

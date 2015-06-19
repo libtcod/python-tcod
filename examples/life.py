@@ -145,6 +145,7 @@ def main():
             console.clear()
             for x, y in board.live_cells:
                 console.draw_char(x, y, '*')
+            #console.draw_rect(0, -1, None, None, None, bg=(64, 64, 80))
             console.draw_rect(0, -1, None, None, None, bg=(64, 64, 80))
             console.draw_str(0, -1, "Mouse:Toggle Cells, Space:%5s, [S]tep, [C]lear, [W]rap Turn %s" % (['Play', 'Pause'][play], ['On', 'Off'][board.wrap]), None, None)
             if (mouse_x, mouse_y) in console:

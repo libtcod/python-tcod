@@ -32,9 +32,11 @@
 
 import time as _time
 
-from .__tcod import _lib, _Mouse, _Key
-from . import __tcod as _tcod
-from . import __style as _style
+#from .__tcod import _lib, _Mouse, _Key
+from .libtcod import _ffi, _lib
+
+#from . import __tcod as _tcod
+from . import style as _style
 import tdl as _tdl
 
 _eventQueue = []
@@ -45,7 +47,7 @@ _mousem = 0
 _mouser = 0
 
 # this interpets the constants from libtcod and makes a key -> keyname dictionary
-def _parseKeyNames(module):
+def _parseKeyNames(lib):
     """
     returns a dictionary mapping of human readable key names to their keycodes
     this parses constants with the names of K_* and makes code=name pairs
@@ -53,12 +55,12 @@ def _parseKeyNames(module):
     if (event.key == 'PAGEUP'):
     """
     _keyNames = {}
-    for attr in dir(module): # from the modules variables
-        if attr[:2] == 'K_': # get the K_* constants
-            _keyNames[getattr(_tcod, attr)] = attr[2:] # and make CODE=NAME pairs
+    for attr in dir(lib): # from the modules variables
+        if attr[:6] == 'TCODK_': # get the K_* constants
+            _keyNames[getattr(lib, attr)] = attr[6:] # and make CODE=NAME pairs
     return _keyNames
 
-_keyNames = _parseKeyNames(_tcod)
+_keyNames = _parseKeyNames(_lib)
     
 class Event(object):
     """Base Event class.
@@ -318,21 +320,28 @@ def _processEvents():
     events = _pushedEvents # get events from event.push
     _pushedEvents = [] # then clear the pushed events queue
     
-    mouse = _Mouse()
-    libkey = _Key()
+    mouse = _ffi.new('TCOD_mouse_t *')
+    libkey = _ffi.new('TCOD_key_t *')
     while 1:
-        libevent = _lib.TCOD_sys_check_for_event(_tcod.TCOD_EVENT_ANY, libkey, mouse)
+        libevent = _lib.TCOD_sys_check_for_event(_lib.TCOD_EVENT_ANY, libkey, mouse)
         if not libevent: # no more events from libtcod
             break
             
         #if mouse.dx or mouse.dy:
-        if libevent & _tcod.TCOD_EVENT_MOUSE_MOVE:
-            events.append(MouseMotion(*mouse.motion))
+        if libevent & _lib.TCOD_EVENT_MOUSE_MOVE:
+            events.append(MouseMotion((mouse.x, mouse.y),
+                                      (mouse.cx, mouse.cy),
+                                      (mouse.dx, mouse.dy),
+                                      (mouse.dcx, mouse.dcy)))
 
         mousepos = ((mouse.x, mouse.y), (mouse.cx, mouse.cy))
 
-        for oldstate, newstate, released, button in zip((_mousel, _mousem, _mouser),
-                                    mouse.button, mouse.button_pressed, (1, 2, 3)):
+        for oldstate, newstate, released, button in \
+            zip((_mousel, _mousem, _mouser),
+                (mouse.lbutton, mouse.mbutton, mouse.rbutton),
+                (mouse.lbutton_pressed, mouse.mbutton_pressed,
+                 mouse.rbutton_pressed),
+                (1, 2, 3)):
             if released:
                 if not oldstate:
                     events.append(MouseDown(button, *mousepos))
@@ -351,13 +360,15 @@ def _processEvents():
         _mousem = mouse.mbutton
         _mouser = mouse.rbutton
 
-        if libkey.vk == _tcod.K_NONE:
+        if libkey.vk == _lib.TCODK_NONE:
             break
         if libkey.pressed:
             keyevent = KeyDown
         else:
             keyevent = KeyUp
-        events.append(keyevent(*tuple(libkey)))
+        events.append(keyevent(libkey.vk, libkey.c,
+                               libkey.lalt, libkey.lctrl,
+                               libkey.ralt, libkey.rctrl, libkey.shift))
     
     if _lib.TCOD_console_is_window_closed():
         events.append(Quit())

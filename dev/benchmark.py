@@ -19,9 +19,9 @@ def print_result(string):
     print(string, file=log)
 
 class Benchmark:
-    default_frames = 50
+    default_frames = 100
         
-    def run(self, console, frames=None, times=3):
+    def run(self, console, frames=None, times=4):
         if times > 1:
             print_result('Running %s' % self.__class__.__name__)
             while times > 0:
