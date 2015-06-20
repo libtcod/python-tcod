@@ -57,5 +57,5 @@ target/
 
 # Custom
 tdl-*/
-tdl/Release/
+Release/
 tdl/_*.c
