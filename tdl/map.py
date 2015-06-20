@@ -34,7 +34,7 @@ class AStar(object):
     
     __slots__ = ('_as_parameter_', '_callback', '__weakref__')
     
-    _create_callback = _ffi.callback('float(int, int, int, int, void*)')
+    
 
     def __init__(self, width, height, callback,
                  diagnalCost=_math.sqrt(2), advanced=False):
@@ -91,7 +91,7 @@ class AStar(object):
                 if pathCost:
                     return pathCost
                 return 0.0
-        self._callback = self._create_callback(newCallback)
+        self._callback = _ffi.callback('TCOD_path_func_t')(newCallback)
         """A cffi callback to be kept in memory."""
         
         self._as_parameter_ = _lib.TCOD_path_new_using_function(width, height,
@@ -99,7 +99,7 @@ class AStar(object):
                                      
     def __del__(self):
         if self._as_parameter_:
-            _lib.TCOD_path_delete(self)
+            _lib.TCOD_path_delete(self._as_parameter_)
             self._as_parameter_ = None
         
     def getPath(self, origX, origY, destX, destY):
@@ -112,13 +112,13 @@ class AStar(object):
                  
                  If no path is found then an empty list is returned.
         """
-        found = _lib.TCOD_path_compute(self, origX, origY, destX, destY)
+        found = _lib.TCOD_path_compute(self._as_parameter_, origX, origY, destX, destY)
         if not found:
             return [] # path not found
         x, y = _ffi.new('int *'), _ffi.new('int *')
-        recalculate = _ffi.new('bool *', True)
+        recalculate = True
         path = []
-        while _lib.TCOD_path_walk(self, x, y, recalculate):
+        while _lib.TCOD_path_walk(self._as_parameter_, x, y, recalculate):
             path.append((x[0], y[0]))
         return path
     
