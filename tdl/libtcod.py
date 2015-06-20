@@ -22,7 +22,18 @@ def _get_library_crossplatform():
 os.environ['PATH'] += ';' + os.path.join(__path__[0],
                                          _get_library_crossplatform())
 
-from ._libtcod import ffi, lib
+try:
+    import _libtcod
+except ImportError:
+    # get implementation specific version of _libtcod.pyd
+    import importlib
+    module_name = '._libtcod'
+    if platform.python_implementation() == 'CPython':
+        module_name += '_cp%i%i' % sys.version_info[:2]
 
-_ffi = ffi
-_lib = lib
+    _libtcod = importlib.import_module(module_name, 'tdl')
+
+_ffi = _libtcod.ffi
+_lib = _libtcod.lib
+
+__all__ = ['_ffi', '_lib']

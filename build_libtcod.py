@@ -7,6 +7,10 @@ import platform
 from cffi import FFI
 
 
+module_name = 'tdl._libtcod'
+if platform.python_implementation() == 'CPython':
+    module_name += '_cp%i%i' % sys.version_info[:2]
+
 def _get_library_crossplatform():
     bits, linkage = platform.architecture()
     if 'win32' in sys.platform:
@@ -22,8 +26,8 @@ def _get_library_crossplatform():
 
 ffi = FFI()
 ffi.cdef(open('tdl/tdl_cdef.h', 'r').read())
-ffi.set_source('tdl._libtcod', open('tdl/tdl_source.c', 'r').read(),
-include_dirs=['tdl/include/', 'tdl/include/Release/'],
+ffi.set_source(module_name, open('tdl/tdl_source.c', 'r').read(),
+include_dirs=['tdl/include/', 'Release/tdl/'],
 library_dirs=[_get_library_crossplatform()],
 libraries=['libtcod-VS'])
 
