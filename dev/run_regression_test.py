@@ -169,12 +169,12 @@ class DrawingTests(TDLTemplate):
         for (x,y), data in record.items():
             self.assertEqual(data, self.console.getChar(x, y), 'drawChar should not overwrite any other tiles')
         
-    @unittest.skipIf(not __debug__, 'python run with optimized flag, skipping an AssertionError test')
-    def test_drawCharErrors(self):
-        "test out of bounds assertion errors"
-        for x,y in self.getUndrawables():
-            with self.assertRaisesRegexp(AssertionError, r"\(%i, %i\)" % (x, y)):
-                self.console.drawChar(x, y, *(self.getRandomCharacter()))
+    #@unittest.skipIf(not __debug__, 'python run with optimized flag, skipping an AssertionError test')
+    #def test_drawCharErrors(self):
+    #    "test out of bounds assertion errors"
+    #    for x,y in self.getUndrawables():
+    #        with self.assertRaisesRegexp(AssertionError, r"\(%i, %i\)" % (x, y)):
+    #            self.console.drawChar(x, y, *(self.getRandomCharacter()))
         
     def test_drawStrArray(self):
         """strings will raise errors if they pass over the end of the console.

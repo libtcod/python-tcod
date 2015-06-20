@@ -2,7 +2,7 @@
 #include <libtcod.h>
 
 int set_char(TCOD_console_t console, int x, int y,
-             int ch, int fg, int bg, TCOD_bkgnd_flag_t flag){
+             int ch, int fg, int bg, TCOD_bkgnd_flag_t blend){
     int width=TCOD_console_get_width(console);
     int height=TCOD_console_get_height(console);
     TCOD_color_t color;
@@ -28,7 +28,7 @@ int set_char(TCOD_console_t console, int x, int y,
         color.r = bg >> 16 & 0xff;
         color.g = bg >> 8 & 0xff;
         color.b = bg & 0xff;
-        TCOD_console_set_char_background(console, x, y, color, flag);
+        TCOD_console_set_char_background(console, x, y, color, blend);
     }
     return 0;
 }

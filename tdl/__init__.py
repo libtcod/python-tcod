@@ -42,7 +42,7 @@
       
       The fg and bg parameters expect a variety of types.
       The parameters default to Ellipsis which will tell the function to
-      use the colors previously set by the L{set_colors} method.
+      use the colors previously set by the L{Console.set_colors} method.
       The colors set by L{Console.set_colors} are per each L{Console}/L{Window}
       and default to white on black.
       You can use a 3-item list/tuple of [red, green, blue] with integers in
@@ -123,6 +123,8 @@ _fontinitialized = False
 _rootinitialized = False
 _rootConsoleRef = None
 
+_set_char = _lib.set_char
+
 # python 2 to 3 workaround
 if _sys.version_info[0] == 2:
     int_types = (int, long)
@@ -182,14 +184,14 @@ class _BaseConsole(object):
     @group Printing Methods: print_*, move, set_colors, set_mode, write, get_cursor
     """
     __slots__ = ('width', 'height', 'console', '_cursor', '_fg',
-                 '_bg', '_bgblend', '_colorLock', '__weakref__', '__dict__')
+                 '_bg', '_blend', '_colorLock', '__weakref__', '__dict__')
 
     def __init__(self):
         self._cursor = (0, 0)
         self._scrollMode = 'error'
         self._fg = _format_color((255, 255, 255))
         self._bg = _format_color((0, 0, 0))
-        self._bgblend = 1 # SET
+        self._blend = _lib.TCOD_BKGND_SET
         self._colorLock = None # which object sets the ctype color options
         
     def _normalizePoint(self, x, y):
@@ -329,7 +331,7 @@ class _BaseConsole(object):
         """This method mimics basic file-like behaviour.
         
         Because of this method you can replace sys.stdout or sys.stderr with
-        a L{Typewriter} instance.
+        a L{Console} or L{Window} instance.
         
         This is a convoluted process and behaviour seen now can be excepted to
         change on later versions.
@@ -385,7 +387,7 @@ class _BaseConsole(object):
         @see: L{get_char}
         """
         #x, y = self._normalizePoint(x, y)
-        _lib.set_char(self._as_parameter_, x, y, _format_char(char),
+        _set_char(self._as_parameter_, x, y, _format_char(char),
                   _format_color(fg, self._fg), _format_color(bg, self._bg), 1)
 
     def draw_str(self, x, y, string, fg=Ellipsis, bg=Ellipsis):
@@ -611,8 +613,8 @@ class _BaseConsole(object):
         """Return the virtual cursor position.
         
         @rtype: (x, y)
-        @return: Returns (x, y) a 2-integer tuple containing where the next
-                 L{addChar} or L{addStr} will start at.
+        @return: Returns (x, y), a 2-integer tuple containing where the next
+                 L{print_str} call will start at.
                  
                  This can be changed with the L{move} method.
         @see: L{move}
@@ -722,7 +724,32 @@ class _BaseConsole(object):
         if uncoverX and uncoverY: # clear corner
             self.draw_rect(uncoverX[0], uncoverY[0], uncoverX[1], uncoverY[1],
                            0x20, self._fg, self._bg)
+    
+    def clear(self, fg=Ellipsis, bg=Ellipsis):
+        """Clears the entire L{Console}/L{Window}.
+        
+        Unlike other drawing functions, fg and bg can not be None.
 
+        @type fg: (r, g, b), int, or Ellipsis
+        @type bg: (r, g, b), int, or Ellipsis
+        @param fg: Can not be None.
+                   See Drawing and Colors at the L{module level docs<tdl>}
+        @param bg: See fg
+        
+        
+        @type fg: (r, g, b)
+        @param fg: Foreground color.
+        
+                   Must be a 3-item list with integers that range 0-255.
+                        
+                   Unlike most other operations you cannot use None here.
+                   To clear only the foreground or background use L{draw_rect}.
+        @type bg: (r, g, b)
+        @param bg: Background color.  See fg.
+        @see: L{draw_rect}
+        """
+        raise NotImplementedError('this method is overwritten by subclasses')
+                           
     def get_char(self, x, y):
         """Return the character and colors of a tile as (ch, fg, bg)
         
@@ -848,19 +875,7 @@ class Console(_BaseConsole):
         return x, y
 
     def clear(self, fg=Ellipsis, bg=Ellipsis):
-        """Clears the entire Console.
-
-        @type fg: (r, g, b)
-        @param fg: Foreground color.
-        
-                   Must be a 3-item list with integers that range 0-255.
-                        
-                   Unlike most other operations you cannot use None here.
-                   To clear only the foreground or background use L{draw_rect}.
-        @type bg: (r, g, b)
-        @param bg: Background color.  See fg.
-        @see: L{draw_rect}
-        """
+        # inherit docstring
         assert fg is not None and bg is not None, 'Can not use None with clear'
         self._typewriter = None
         fg = _format_color(fg, self._fg)
@@ -1026,16 +1041,7 @@ class Window(_BaseConsole):
         return self.parent._translate((x + self.x), (y + self.y))
 
     def clear(self, fg=Ellipsis, bg=Ellipsis):
-        """Clears the entire Window.
-        
-        fg and bg can not be None for this function, use L{draw_rect}.
-
-        @type fg: (r, g, b), int, Ellipsis, or None
-        @type bg: (r, g, b), int, Ellipsis, or None
-        @param fg: See Drawing and Colors at the L{module level docs<tdl>}
-        @param bg: See fg
-        @see: L{draw_rect}
-        """
+        # inherit docstring
         assert fg is not None and bg is not None, 'Can not use None with clear'
         if fg is Ellipsis:
             fg = self._fg
