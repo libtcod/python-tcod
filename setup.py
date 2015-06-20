@@ -1,8 +1,30 @@
 #!/usr/bin/env python2
 
+import sys
+import os
+
+build_docs = None
 try:
     # use setuptools or distribute if available
-    from setuptools import setup
+    from setuptools import setup, Command
+    
+    import subprocess
+    
+    class build_docs(Command):
+        description = "update the documentation using epydoc"
+        user_options = []        
+        def initialize_options(self):
+            pass
+        def finalize_options(self):
+            pass
+        def run(self):
+            'run a command using a local epydoc script'
+            command = [sys.executable,
+                       os.path.join(sys.prefix, 'Scripts\epydoc.py'),
+                       '--config=docs/epydoc.config']
+            
+            subprocess.check_call(command)
+    
 except ImportError:
     from distutils.core import setup
 
@@ -24,6 +46,7 @@ setup(
     setup_requires=["cffi>=1.0.0"],
     cffi_modules=["build_libtcod.py:ffi"],
     install_requires=["cffi>=1.0.0"],
+    cmdclass={'build_docs': build_docs},
     classifiers=['Development Status :: 5 - Production/Stable',
                'Environment :: Win32 (MS Windows)',
                'Environment :: MacOS X',

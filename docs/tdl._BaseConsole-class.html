@@ -243,6 +243,27 @@ object --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a href="tdl._BaseConsole-class.html#clear" class="summary-sig-name">clear</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">fg</span>=<span class="summary-sig-default">Ellipsis</span>,
+        <span class="summary-sig-arg">bg</span>=<span class="summary-sig-default">Ellipsis</span>)</span><br />
+      Clears the entire <a href="tdl.Console-class.html" 
+      class="link">Console</a>/<a href="tdl.Window-class.html" 
+      class="link">Window</a>.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="tdl-pysrc.html#_BaseConsole.clear">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a href="tdl._BaseConsole-class.html#draw_char" class="summary-sig-name">draw_char</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">x</span>,
         <span class="summary-sig-arg">y</span>,
@@ -585,6 +606,47 @@ object --+
   </dl>
 </td></tr></table>
 </div>
+<a name="clear"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">clear</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">fg</span>=<span class="sig-default">Ellipsis</span>,
+        <span class="sig-arg">bg</span>=<span class="sig-default">Ellipsis</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="tdl-pysrc.html#_BaseConsole.clear">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Clears the entire <a href="tdl.Console-class.html" 
+  class="link">Console</a>/<a href="tdl.Window-class.html" 
+  class="link">Window</a>.</p>
+  <p>Unlike other drawing functions, fg and bg can not be None.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>fg</code></strong> ((r, g, b), int, or Ellipsis) - Can not be None. See Drawing and Colors at the <a 
+          href="tdl-module.html" class="link">module level docs</a></li>
+        <li><strong class="pname"><code>bg</code></strong> ((r, g, b), int, or Ellipsis) - See fg</li>
+        <li><strong class="pname"><code>fg</code></strong> ((r, g, b), int, or Ellipsis) - Foreground color.
+          <p>Must be a 3-item list with integers that range 0-255.</p>
+          <p>Unlike most other operations you cannot use None here. To 
+          clear only the foreground or background use <a 
+          href="tdl._BaseConsole-class.html#draw_rect" 
+          class="link">draw_rect</a>.</p></li>
+        <li><strong class="pname"><code>bg</code></strong> ((r, g, b), int, or Ellipsis) - Background color.  See fg.</li>
+    </ul></dd>
+  </dl>
+<div class="fields">      <p><strong>See Also:</strong>
+        <a href="tdl._BaseConsole-class.html#draw_rect" 
+        class="link">draw_rect</a>
+      </p>
+</div></td></tr></table>
+</div>
 <a name="draw_char"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -740,8 +802,8 @@ object --+
     </ul></dd>
   </dl>
 <div class="fields">      <p><strong>See Also:</strong>
-        <code class="link">clear</code>, <a 
-        href="tdl._BaseConsole-class.html#draw_frame" 
+        <a href="tdl._BaseConsole-class.html#clear" class="link">clear</a>,
+        <a href="tdl._BaseConsole-class.html#draw_frame" 
         class="link">draw_frame</a>
       </p>
 </div></td></tr></table>
@@ -852,9 +914,9 @@ object --+
   <p>Return the virtual cursor position.</p>
   <dl class="fields">
     <dt>Returns: (x, y)</dt>
-        <dd>Returns (x, y) a 2-integer tuple containing where the next <code 
-          class="link">addChar</code> or <code class="link">addStr</code> 
-          will start at.
+        <dd>Returns (x, y), a 2-integer tuple containing where the next <a 
+          href="tdl._BaseConsole-class.html#print_str" 
+          class="link">print_str</a> call will start at.
           <p>This can be changed with the <a 
           href="tdl._BaseConsole-class.html#move" class="link">move</a> 
           method.</p></dd>
@@ -1075,7 +1137,8 @@ object --+
   
   <p>This method mimics basic file-like behaviour.</p>
   <p>Because of this method you can replace sys.stdout or sys.stderr with a
-  <code class="link">Typewriter</code> instance.</p>
+  <a href="tdl.Console-class.html" class="link">Console</a> or <a 
+  href="tdl.Window-class.html" class="link">Window</a> instance.</p>
   <p>This is a convoluted process and behaviour seen now can be excepted to
   change on later versions.</p>
   <dl class="fields">
@@ -1126,7 +1189,7 @@ object --+
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sat Jun 06 23:49:38 2015</a>
+    3.0.1 on Sat Jun 20 10:40:23 2015</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
