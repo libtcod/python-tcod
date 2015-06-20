@@ -384,10 +384,9 @@ class _BaseConsole(object):
                                check if a tile is drawable.
         @see: L{get_char}
         """
-
         #x, y = self._normalizePoint(x, y)
         _lib.set_char(self._as_parameter_, x, y, _format_char(char),
-                      _format_color(fg, self._fg), _format_color(bg, self._bg))
+                  _format_color(fg, self._fg), _format_color(bg, self._bg), 1)
 
     def draw_str(self, x, y, string, fg=Ellipsis, bg=Ellipsis):
         """Draws a string starting at x and y.
@@ -873,7 +872,8 @@ class Console(_BaseConsole):
         _lib.TCOD_console_clear(self._as_parameter_)
         
 
-    def _set_char(self, x, y, char, fg=None, bg=None, bgblend=1):
+    def _set_char(self, x, y, char, fg=None, bg=None,
+                  bgblend=_lib.TCOD_BKGND_SET):
         """
         Sets a character.
         This is called often and is designed to be as fast as possible.
@@ -881,15 +881,9 @@ class Console(_BaseConsole):
         Because of the need for speed this function will do NO TYPE CHECKING
         AT ALL, it's up to the drawing functions to use the functions:
         _format_char and _format_color before passing to this."""
-        # buffer values as ctypes objects
-        #console = self._as_parameter_
-        if fg is None:
-            fg = -1
-        if bg is None:
-            bg = -1
-        if char is None:
-            char = -1
-        _lib.set_char(self._as_parameter_, x, y, char, fg, bg)
+        # values are already formatted, honestly this function is redundant
+        return _lib.set_char(self._as_parameter_, x, y, char, fg, bg, bgblend)
+        
         
         # if char is not None and fg is not None and bg is not None:
             # if fg is bg is Ellipsis:
