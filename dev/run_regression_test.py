@@ -79,25 +79,12 @@ class TDLTemplate(unittest.TestCase):
         if console is None:
             console = self.console
         w, h = console.getSize()
-        RANGE = ERROR_RANGE # distance from bounds to test, just needs to be some moderate number
-        results = []
-        for _ in range(8):
-            for x, y in [(-1, 0), (1, 0), (0, -1), (0, 1), # every side
-                        (-1, -1), (-1, 1), (1, 1), (1, -1)]: # every corner
-                if x == -1:
-                    x = random.randint(-RANGE, -1) # over left bound
-                elif x == 1:
-                    x = random.randint(w + 1, w + RANGE) # over right bound
-                else:
-                    x = random.randint(0, w) # within bounds
-                if y == -1:
-                    y = random.randint(-RANGE, -1)
-                elif y == 1:
-                    y = random.randint(h + 1, h + RANGE)
-                else:
-                    y = random.randint(0, h)
-                results.append((x, y))
-        return results
+        for y in range(-1, h+1):
+            yield -w-1, y
+            yield w, y
+        for x in range(0, w):
+            yield x, h
+            yield x, -h-1
         
     def compareConsoles(self, consoleA, consoleB, errorMsg='colors should be the same'):
         "Compare two console assuming they match and failing if they don't"
@@ -182,12 +169,12 @@ class DrawingTests(TDLTemplate):
         for (x,y), data in record.items():
             self.assertEqual(data, self.console.getChar(x, y), 'drawChar should not overwrite any other tiles')
         
-    #@unittest.skipIf(not __debug__, 'python run with optimized flag, skipping an AssertionError test')
-    #def test_drawCharErrors(self):
-    #    "test out of bounds assertion errors"
-    #    for x,y in self.getUndrawables():
-    #        with self.assertRaisesRegexp(AssertionError, r"\(%i, %i\)" % (x, y)):
-    #            self.console.drawChar(x, y, *(self.getRandomCharacter()))
+    @unittest.skipIf(not __debug__, 'python run with optimized flag, skipping an AssertionError test')
+    def test_drawCharErrors(self):
+        "test out of bounds assertion errors"
+        for x,y in self.getUndrawables():
+            with self.assertRaisesRegexp(AssertionError, r"\(%i, %i\)" % (x, y)):
+                self.console.drawChar(x, y, *(self.getRandomCharacter()))
         
     def test_drawStrArray(self):
         """strings will raise errors if they pass over the end of the console.
