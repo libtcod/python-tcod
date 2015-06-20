@@ -1,4 +1,6 @@
 
+// ---------------------------------------------------------------------------
+// libtcod.h BASIC TYPES
 
 /* base types */
 typedef unsigned char uint8;
@@ -13,11 +15,304 @@ typedef unsigned long uintptr;
 
 typedef uint8 bool;
 
-
+// ---------------------------------------------------------------------------
+// color.h
 
 typedef struct {
 	uint8 r,g,b;
 } TCOD_color_t;
+
+/* constructors */
+TCOD_color_t TCOD_color_RGB(uint8 r, uint8 g, uint8 b);
+TCOD_color_t TCOD_color_HSV(float h, float s, float v);
+/* basic operations */
+bool TCOD_color_equals (TCOD_color_t c1, TCOD_color_t c2);
+TCOD_color_t TCOD_color_add (TCOD_color_t c1, TCOD_color_t c2);
+TCOD_color_t TCOD_color_subtract (TCOD_color_t c1, TCOD_color_t c2);
+TCOD_color_t TCOD_color_multiply (TCOD_color_t c1, TCOD_color_t c2);
+TCOD_color_t TCOD_color_multiply_scalar (TCOD_color_t c1, float value);
+TCOD_color_t TCOD_color_lerp (TCOD_color_t c1, TCOD_color_t c2, float coef);
+/* HSV transformations */
+void TCOD_color_set_HSV (TCOD_color_t *c,float h, float s, float v);
+void TCOD_color_get_HSV (TCOD_color_t c,float * h, float * s, float * v);
+float TCOD_color_get_hue (TCOD_color_t c);
+void TCOD_color_set_hue (TCOD_color_t *c, float h);
+float TCOD_color_get_saturation (TCOD_color_t c);
+void TCOD_color_set_saturation (TCOD_color_t *c, float s);
+float TCOD_color_get_value (TCOD_color_t c);
+void TCOD_color_set_value (TCOD_color_t *c, float v);
+void TCOD_color_shift_hue (TCOD_color_t *c, float hshift);
+void TCOD_color_scale_HSV (TCOD_color_t *c, float scoef, float vcoef);
+/* color map */
+void TCOD_color_gen_map(TCOD_color_t *map, int nb_key, TCOD_color_t const *key_color, int const *key_index);
+
+/* color names */
+enum {
+	TCOD_COLOR_RED,
+	TCOD_COLOR_FLAME,
+	TCOD_COLOR_ORANGE,
+	TCOD_COLOR_AMBER,
+	TCOD_COLOR_YELLOW,
+	TCOD_COLOR_LIME,
+	TCOD_COLOR_CHARTREUSE,
+	TCOD_COLOR_GREEN,
+	TCOD_COLOR_SEA,
+	TCOD_COLOR_TURQUOISE,
+	TCOD_COLOR_CYAN,
+	TCOD_COLOR_SKY,
+	TCOD_COLOR_AZURE,
+	TCOD_COLOR_BLUE,
+	TCOD_COLOR_HAN,
+	TCOD_COLOR_VIOLET,
+	TCOD_COLOR_PURPLE,
+	TCOD_COLOR_FUCHSIA,
+	TCOD_COLOR_MAGENTA,
+	TCOD_COLOR_PINK,
+	TCOD_COLOR_CRIMSON,
+	TCOD_COLOR_NB
+};
+
+/* color levels */
+enum {
+	TCOD_COLOR_DESATURATED,
+	TCOD_COLOR_LIGHTEST,
+	TCOD_COLOR_LIGHTER,
+	TCOD_COLOR_LIGHT,
+	TCOD_COLOR_NORMAL,
+	TCOD_COLOR_DARK,
+	TCOD_COLOR_DARKER,
+	TCOD_COLOR_DARKEST,
+	TCOD_COLOR_LEVELS
+};
+
+/* color array */
+// TODO: Fix this extern
+//extern const TCOD_color_t  TCOD_colors[TCOD_COLOR_NB][TCOD_COLOR_LEVELS];
+
+/* grey levels */
+extern const TCOD_color_t TCOD_black;
+extern const TCOD_color_t TCOD_darkest_grey;
+extern const TCOD_color_t TCOD_darker_grey;
+extern const TCOD_color_t TCOD_dark_grey;
+extern const TCOD_color_t TCOD_grey;
+extern const TCOD_color_t TCOD_light_grey;
+extern const TCOD_color_t TCOD_lighter_grey;
+extern const TCOD_color_t TCOD_lightest_grey;
+extern const TCOD_color_t TCOD_darkest_gray;
+extern const TCOD_color_t TCOD_darker_gray;
+extern const TCOD_color_t TCOD_dark_gray;
+extern const TCOD_color_t TCOD_gray;
+extern const TCOD_color_t TCOD_light_gray;
+extern const TCOD_color_t TCOD_lighter_gray;
+extern const TCOD_color_t TCOD_lightest_gray;
+extern const TCOD_color_t TCOD_white;
+
+/* sepia */
+extern const TCOD_color_t TCOD_darkest_sepia;
+extern const TCOD_color_t TCOD_darker_sepia;
+extern const TCOD_color_t TCOD_dark_sepia;
+extern const TCOD_color_t TCOD_sepia;
+extern const TCOD_color_t TCOD_light_sepia;
+extern const TCOD_color_t TCOD_lighter_sepia;
+extern const TCOD_color_t TCOD_lightest_sepia;
+
+/* standard colors */
+extern const TCOD_color_t TCOD_red;
+extern const TCOD_color_t TCOD_flame;
+extern const TCOD_color_t TCOD_orange;
+extern const TCOD_color_t TCOD_amber;
+extern const TCOD_color_t TCOD_yellow;
+extern const TCOD_color_t TCOD_lime;
+extern const TCOD_color_t TCOD_chartreuse;
+extern const TCOD_color_t TCOD_green;
+extern const TCOD_color_t TCOD_sea;
+extern const TCOD_color_t TCOD_turquoise;
+extern const TCOD_color_t TCOD_cyan;
+extern const TCOD_color_t TCOD_sky;
+extern const TCOD_color_t TCOD_azure;
+extern const TCOD_color_t TCOD_blue;
+extern const TCOD_color_t TCOD_han;
+extern const TCOD_color_t TCOD_violet;
+extern const TCOD_color_t TCOD_purple;
+extern const TCOD_color_t TCOD_fuchsia;
+extern const TCOD_color_t TCOD_magenta;
+extern const TCOD_color_t TCOD_pink;
+extern const TCOD_color_t TCOD_crimson;
+
+/* dark colors */
+extern const TCOD_color_t TCOD_dark_red;
+extern const TCOD_color_t TCOD_dark_flame;
+extern const TCOD_color_t TCOD_dark_orange;
+extern const TCOD_color_t TCOD_dark_amber;
+extern const TCOD_color_t TCOD_dark_yellow;
+extern const TCOD_color_t TCOD_dark_lime;
+extern const TCOD_color_t TCOD_dark_chartreuse;
+extern const TCOD_color_t TCOD_dark_green;
+extern const TCOD_color_t TCOD_dark_sea;
+extern const TCOD_color_t TCOD_dark_turquoise;
+extern const TCOD_color_t TCOD_dark_cyan;
+extern const TCOD_color_t TCOD_dark_sky;
+extern const TCOD_color_t TCOD_dark_azure;
+extern const TCOD_color_t TCOD_dark_blue;
+extern const TCOD_color_t TCOD_dark_han;
+extern const TCOD_color_t TCOD_dark_violet;
+extern const TCOD_color_t TCOD_dark_purple;
+extern const TCOD_color_t TCOD_dark_fuchsia;
+extern const TCOD_color_t TCOD_dark_magenta;
+extern const TCOD_color_t TCOD_dark_pink;
+extern const TCOD_color_t TCOD_dark_crimson;
+
+/* darker colors */
+extern const TCOD_color_t TCOD_darker_red;
+extern const TCOD_color_t TCOD_darker_flame;
+extern const TCOD_color_t TCOD_darker_orange;
+extern const TCOD_color_t TCOD_darker_amber;
+extern const TCOD_color_t TCOD_darker_yellow;
+extern const TCOD_color_t TCOD_darker_lime;
+extern const TCOD_color_t TCOD_darker_chartreuse;
+extern const TCOD_color_t TCOD_darker_green;
+extern const TCOD_color_t TCOD_darker_sea;
+extern const TCOD_color_t TCOD_darker_turquoise;
+extern const TCOD_color_t TCOD_darker_cyan;
+extern const TCOD_color_t TCOD_darker_sky;
+extern const TCOD_color_t TCOD_darker_azure;
+extern const TCOD_color_t TCOD_darker_blue;
+extern const TCOD_color_t TCOD_darker_han;
+extern const TCOD_color_t TCOD_darker_violet;
+extern const TCOD_color_t TCOD_darker_purple;
+extern const TCOD_color_t TCOD_darker_fuchsia;
+extern const TCOD_color_t TCOD_darker_magenta;
+extern const TCOD_color_t TCOD_darker_pink;
+extern const TCOD_color_t TCOD_darker_crimson;
+
+/* darkest colors */
+extern const TCOD_color_t TCOD_darkest_red;
+extern const TCOD_color_t TCOD_darkest_flame;
+extern const TCOD_color_t TCOD_darkest_orange;
+extern const TCOD_color_t TCOD_darkest_amber;
+extern const TCOD_color_t TCOD_darkest_yellow;
+extern const TCOD_color_t TCOD_darkest_lime;
+extern const TCOD_color_t TCOD_darkest_chartreuse;
+extern const TCOD_color_t TCOD_darkest_green;
+extern const TCOD_color_t TCOD_darkest_sea;
+extern const TCOD_color_t TCOD_darkest_turquoise;
+extern const TCOD_color_t TCOD_darkest_cyan;
+extern const TCOD_color_t TCOD_darkest_sky;
+extern const TCOD_color_t TCOD_darkest_azure;
+extern const TCOD_color_t TCOD_darkest_blue;
+extern const TCOD_color_t TCOD_darkest_han;
+extern const TCOD_color_t TCOD_darkest_violet;
+extern const TCOD_color_t TCOD_darkest_purple;
+extern const TCOD_color_t TCOD_darkest_fuchsia;
+extern const TCOD_color_t TCOD_darkest_magenta;
+extern const TCOD_color_t TCOD_darkest_pink;
+extern const TCOD_color_t TCOD_darkest_crimson;
+
+/* light colors */
+extern const TCOD_color_t TCOD_light_red;
+extern const TCOD_color_t TCOD_light_flame;
+extern const TCOD_color_t TCOD_light_orange;
+extern const TCOD_color_t TCOD_light_amber;
+extern const TCOD_color_t TCOD_light_yellow;
+extern const TCOD_color_t TCOD_light_lime;
+extern const TCOD_color_t TCOD_light_chartreuse;
+extern const TCOD_color_t TCOD_light_green;
+extern const TCOD_color_t TCOD_light_sea;
+extern const TCOD_color_t TCOD_light_turquoise;
+extern const TCOD_color_t TCOD_light_cyan;
+extern const TCOD_color_t TCOD_light_sky;
+extern const TCOD_color_t TCOD_light_azure;
+extern const TCOD_color_t TCOD_light_blue;
+extern const TCOD_color_t TCOD_light_han;
+extern const TCOD_color_t TCOD_light_violet;
+extern const TCOD_color_t TCOD_light_purple;
+extern const TCOD_color_t TCOD_light_fuchsia;
+extern const TCOD_color_t TCOD_light_magenta;
+extern const TCOD_color_t TCOD_light_pink;
+extern const TCOD_color_t TCOD_light_crimson;
+
+/* lighter colors */
+extern const TCOD_color_t TCOD_lighter_red;
+extern const TCOD_color_t TCOD_lighter_flame;
+extern const TCOD_color_t TCOD_lighter_orange;
+extern const TCOD_color_t TCOD_lighter_amber;
+extern const TCOD_color_t TCOD_lighter_yellow;
+extern const TCOD_color_t TCOD_lighter_lime;
+extern const TCOD_color_t TCOD_lighter_chartreuse;
+extern const TCOD_color_t TCOD_lighter_green;
+extern const TCOD_color_t TCOD_lighter_sea;
+extern const TCOD_color_t TCOD_lighter_turquoise;
+extern const TCOD_color_t TCOD_lighter_cyan;
+extern const TCOD_color_t TCOD_lighter_sky;
+extern const TCOD_color_t TCOD_lighter_azure;
+extern const TCOD_color_t TCOD_lighter_blue;
+extern const TCOD_color_t TCOD_lighter_han;
+extern const TCOD_color_t TCOD_lighter_violet;
+extern const TCOD_color_t TCOD_lighter_purple;
+extern const TCOD_color_t TCOD_lighter_fuchsia;
+extern const TCOD_color_t TCOD_lighter_magenta;
+extern const TCOD_color_t TCOD_lighter_pink;
+extern const TCOD_color_t TCOD_lighter_crimson;
+
+/* lightest colors */
+extern const TCOD_color_t TCOD_lightest_red;
+extern const TCOD_color_t TCOD_lightest_flame;
+extern const TCOD_color_t TCOD_lightest_orange;
+extern const TCOD_color_t TCOD_lightest_amber;
+extern const TCOD_color_t TCOD_lightest_yellow;
+extern const TCOD_color_t TCOD_lightest_lime;
+extern const TCOD_color_t TCOD_lightest_chartreuse;
+extern const TCOD_color_t TCOD_lightest_green;
+extern const TCOD_color_t TCOD_lightest_sea;
+extern const TCOD_color_t TCOD_lightest_turquoise;
+extern const TCOD_color_t TCOD_lightest_cyan;
+extern const TCOD_color_t TCOD_lightest_sky;
+extern const TCOD_color_t TCOD_lightest_azure;
+extern const TCOD_color_t TCOD_lightest_blue;
+extern const TCOD_color_t TCOD_lightest_han;
+extern const TCOD_color_t TCOD_lightest_violet;
+extern const TCOD_color_t TCOD_lightest_purple;
+extern const TCOD_color_t TCOD_lightest_fuchsia;
+extern const TCOD_color_t TCOD_lightest_magenta;
+extern const TCOD_color_t TCOD_lightest_pink;
+extern const TCOD_color_t TCOD_lightest_crimson;
+
+/* desaturated */
+extern const TCOD_color_t TCOD_desaturated_red;
+extern const TCOD_color_t TCOD_desaturated_flame;
+extern const TCOD_color_t TCOD_desaturated_orange;
+extern const TCOD_color_t TCOD_desaturated_amber;
+extern const TCOD_color_t TCOD_desaturated_yellow;
+extern const TCOD_color_t TCOD_desaturated_lime;
+extern const TCOD_color_t TCOD_desaturated_chartreuse;
+extern const TCOD_color_t TCOD_desaturated_green;
+extern const TCOD_color_t TCOD_desaturated_sea;
+extern const TCOD_color_t TCOD_desaturated_turquoise;
+extern const TCOD_color_t TCOD_desaturated_cyan;
+extern const TCOD_color_t TCOD_desaturated_sky;
+extern const TCOD_color_t TCOD_desaturated_azure;
+extern const TCOD_color_t TCOD_desaturated_blue;
+extern const TCOD_color_t TCOD_desaturated_han;
+extern const TCOD_color_t TCOD_desaturated_violet;
+extern const TCOD_color_t TCOD_desaturated_purple;
+extern const TCOD_color_t TCOD_desaturated_fuchsia;
+extern const TCOD_color_t TCOD_desaturated_magenta;
+extern const TCOD_color_t TCOD_desaturated_pink;
+extern const TCOD_color_t TCOD_desaturated_crimson;
+
+/* metallic */
+extern const TCOD_color_t TCOD_brass;
+extern const TCOD_color_t TCOD_copper;
+extern const TCOD_color_t TCOD_gold;
+extern const TCOD_color_t TCOD_silver;
+
+/* miscellaneous */
+extern const TCOD_color_t TCOD_celadon;
+extern const TCOD_color_t TCOD_peach;
+
+
+// ---------------------------------------------------------------------------
+// console_types.h
 
 typedef enum {
 	TCODK_NONE,
@@ -101,6 +396,111 @@ typedef struct {
 } TCOD_key_t;
 
 typedef enum {
+	/* single walls */
+	TCOD_CHAR_HLINE=196,
+	TCOD_CHAR_VLINE=179,
+	TCOD_CHAR_NE=191,
+	TCOD_CHAR_NW=218,
+	TCOD_CHAR_SE=217,
+	TCOD_CHAR_SW=192,
+	TCOD_CHAR_TEEW=180,
+	TCOD_CHAR_TEEE=195,
+	TCOD_CHAR_TEEN=193,
+	TCOD_CHAR_TEES=194,
+	TCOD_CHAR_CROSS=197,
+	/* double walls */
+	TCOD_CHAR_DHLINE=205,
+	TCOD_CHAR_DVLINE=186,
+	TCOD_CHAR_DNE=187,
+	TCOD_CHAR_DNW=201,
+	TCOD_CHAR_DSE=188,
+	TCOD_CHAR_DSW=200,
+	TCOD_CHAR_DTEEW=185,
+	TCOD_CHAR_DTEEE=204,
+	TCOD_CHAR_DTEEN=202,
+	TCOD_CHAR_DTEES=203,
+	TCOD_CHAR_DCROSS=206,
+	/* blocks */
+	TCOD_CHAR_BLOCK1=176,
+	TCOD_CHAR_BLOCK2=177,
+	TCOD_CHAR_BLOCK3=178,
+	/* arrows */
+	TCOD_CHAR_ARROW_N=24,
+	TCOD_CHAR_ARROW_S=25,
+	TCOD_CHAR_ARROW_E=26,
+	TCOD_CHAR_ARROW_W=27,
+	/* arrows without tail */
+	TCOD_CHAR_ARROW2_N=30,
+	TCOD_CHAR_ARROW2_S=31,
+	TCOD_CHAR_ARROW2_E=16,
+	TCOD_CHAR_ARROW2_W=17,
+	/* double arrows */
+	TCOD_CHAR_DARROW_H=29,
+	TCOD_CHAR_DARROW_V=18,
+	/* GUI stuff */
+	TCOD_CHAR_CHECKBOX_UNSET=224,
+	TCOD_CHAR_CHECKBOX_SET=225,
+	TCOD_CHAR_RADIO_UNSET=9,
+	TCOD_CHAR_RADIO_SET=10,
+	/* sub-pixel resolution kit */
+	TCOD_CHAR_SUBP_NW=226,
+	TCOD_CHAR_SUBP_NE=227,
+	TCOD_CHAR_SUBP_N=228,
+	TCOD_CHAR_SUBP_SE=229,
+	TCOD_CHAR_SUBP_DIAG=230,
+	TCOD_CHAR_SUBP_E=231,
+	TCOD_CHAR_SUBP_SW=232,
+	/* miscellaneous */
+	TCOD_CHAR_SMILIE = 1,
+	TCOD_CHAR_SMILIE_INV = 2,
+	TCOD_CHAR_HEART = 3,
+	TCOD_CHAR_DIAMOND = 4,
+	TCOD_CHAR_CLUB = 5,
+	TCOD_CHAR_SPADE = 6,
+	TCOD_CHAR_BULLET = 7,
+	TCOD_CHAR_BULLET_INV = 8,
+	TCOD_CHAR_MALE = 11,
+	TCOD_CHAR_FEMALE = 12,
+	TCOD_CHAR_NOTE = 13,
+	TCOD_CHAR_NOTE_DOUBLE = 14,
+	TCOD_CHAR_LIGHT = 15,
+	TCOD_CHAR_EXCLAM_DOUBLE = 19,
+	TCOD_CHAR_PILCROW = 20,
+	TCOD_CHAR_SECTION = 21,
+	TCOD_CHAR_POUND = 156,
+	TCOD_CHAR_MULTIPLICATION = 158,
+	TCOD_CHAR_FUNCTION = 159,
+	TCOD_CHAR_RESERVED = 169,
+	TCOD_CHAR_HALF = 171,
+	TCOD_CHAR_ONE_QUARTER = 172,
+	TCOD_CHAR_COPYRIGHT = 184,
+	TCOD_CHAR_CENT = 189,
+	TCOD_CHAR_YEN = 190,
+	TCOD_CHAR_CURRENCY = 207,
+	TCOD_CHAR_THREE_QUARTERS = 243,
+	TCOD_CHAR_DIVISION = 246,
+	TCOD_CHAR_GRADE = 248,
+	TCOD_CHAR_UMLAUT = 249,
+	TCOD_CHAR_POW1 = 251,
+	TCOD_CHAR_POW3 = 252,
+	TCOD_CHAR_POW2 = 253,
+	TCOD_CHAR_BULLET_SQUARE = 254,
+	/* diacritics */
+} TCOD_chars_t;
+
+typedef enum {
+	TCOD_COLCTRL_1 = 1,
+	TCOD_COLCTRL_2,
+	TCOD_COLCTRL_3,
+	TCOD_COLCTRL_4,
+	TCOD_COLCTRL_5,
+	TCOD_COLCTRL_NUMBER=5,
+	TCOD_COLCTRL_FORE_RGB,
+	TCOD_COLCTRL_BACK_RGB,
+	TCOD_COLCTRL_STOP
+} TCOD_colctrl_t;
+
+typedef enum {
 	TCOD_BKGND_NONE,
 	TCOD_BKGND_SET,
 	TCOD_BKGND_MULTIPLY,
@@ -116,33 +516,6 @@ typedef enum {
 	TCOD_BKGND_ALPH,
 	TCOD_BKGND_DEFAULT
 } TCOD_bkgnd_flag_t;
-
-
-// MOUSE
-
-/* mouse data */
-typedef struct {
-  int x,y; /* absolute position */
-  int dx,dy; /* movement since last update in pixels */
-  int cx,cy; /* cell coordinates in the root console */
-  int dcx,dcy; /* movement since last update in console cells */
-  bool lbutton ; /* left button status */
-  bool rbutton ; /* right button status */
-  bool mbutton ; /* middle button status */
-  bool lbutton_pressed ; /* left button pressed event */ 
-  bool rbutton_pressed ; /* right button pressed event */ 
-  bool mbutton_pressed ; /* middle button pressed event */ 
-  bool wheel_up ; /* wheel up event */
-  bool wheel_down ; /* wheel down event */
-} TCOD_mouse_t;
-
-void TCOD_mouse_show_cursor(bool visible);
-TCOD_mouse_t TCOD_mouse_get_status();
-bool TCOD_mouse_is_cursor_visible();
-void TCOD_mouse_move(int x, int y);
-//void TCOD_mouse_includes_touch(bool enable);
-
-// CONSOLE TYPES --------------------------------------------------------
 
 typedef enum {
 	TCOD_KEY_PRESSED=1,
@@ -171,19 +544,36 @@ typedef enum {
 	TCOD_CENTER 
 } TCOD_alignment_t;
 
-typedef enum {
-	TCOD_COLCTRL_1 = 1,
-	TCOD_COLCTRL_2,
-	TCOD_COLCTRL_3,
-	TCOD_COLCTRL_4,
-	TCOD_COLCTRL_5,
-	TCOD_COLCTRL_NUMBER=5,
-	TCOD_COLCTRL_FORE_RGB,
-	TCOD_COLCTRL_BACK_RGB,
-	TCOD_COLCTRL_STOP
-} TCOD_colctrl_t;
+// ---------------------------------------------------------------------------
+// mouse_types.h
 
-// CONSOLE --------------------------------------------------------------
+/* mouse data */
+typedef struct {
+  int x,y; /* absolute position */
+  int dx,dy; /* movement since last update in pixels */
+  int cx,cy; /* cell coordinates in the root console */
+  int dcx,dcy; /* movement since last update in console cells */
+  bool lbutton ; /* left button status */
+  bool rbutton ; /* right button status */
+  bool mbutton ; /* middle button status */
+  bool lbutton_pressed ; /* left button pressed event */ 
+  bool rbutton_pressed ; /* right button pressed event */ 
+  bool mbutton_pressed ; /* middle button pressed event */ 
+  bool wheel_up ; /* wheel up event */
+  bool wheel_down ; /* wheel down event */
+} TCOD_mouse_t;
+
+// ---------------------------------------------------------------------------
+// mouse.h
+
+void TCOD_mouse_show_cursor(bool visible);
+TCOD_mouse_t TCOD_mouse_get_status();
+bool TCOD_mouse_is_cursor_visible();
+void TCOD_mouse_move(int x, int y);
+//void TCOD_mouse_includes_touch(bool enable);
+
+// ---------------------------------------------------------------------------
+// console.h
 
 typedef void * TCOD_console_t;
 
@@ -270,8 +660,8 @@ void TCOD_console_credits();
 void TCOD_console_credits_reset();
 bool TCOD_console_credits_render(int x, int y, bool alpha);
 
-// IMAGE -------------------------------------------------
-
+// ---------------------------------------------------------------------------
+// image.h
 
 typedef void *TCOD_image_t;
 
@@ -300,14 +690,42 @@ void TCOD_image_delete(TCOD_image_t image);
 void TCOD_image_set_key_color(TCOD_image_t image, TCOD_color_t key_color);
 bool TCOD_image_is_pixel_transparent(TCOD_image_t image, int x, int y);
 
+// ---------------------------------------------------------------------------
+// list.h
+
+typedef void *TCOD_list_t;
+
+TCOD_list_t TCOD_list_new();
+TCOD_list_t TCOD_list_allocate(int nb_elements);
+TCOD_list_t TCOD_list_duplicate(TCOD_list_t l);
+void TCOD_list_delete(TCOD_list_t l);
+void TCOD_list_push(TCOD_list_t l, const void * elt);
+void * TCOD_list_pop(TCOD_list_t l);
+void * TCOD_list_peek(TCOD_list_t l);
+void TCOD_list_add_all(TCOD_list_t l, TCOD_list_t l2);
+void * TCOD_list_get(TCOD_list_t l,int idx);
+void TCOD_list_set(TCOD_list_t l,const void *elt, int idx);
+void ** TCOD_list_begin(TCOD_list_t l);
+void ** TCOD_list_end(TCOD_list_t l);
+void TCOD_list_reverse(TCOD_list_t l);
+void **TCOD_list_remove_iterator(TCOD_list_t l, void **elt);
+void TCOD_list_remove(TCOD_list_t l, const void * elt);
+void **TCOD_list_remove_iterator_fast(TCOD_list_t l, void **elt);
+void TCOD_list_remove_fast(TCOD_list_t l, const void * elt);
+bool TCOD_list_contains(TCOD_list_t l,const void * elt);
+void TCOD_list_clear(TCOD_list_t l);
+void TCOD_list_clear_and_delete(TCOD_list_t l);
+int TCOD_list_size(TCOD_list_t l);
+void ** TCOD_list_insert_before(TCOD_list_t l,const void *elt,int before);
+bool TCOD_list_is_empty(TCOD_list_t l);
 
 
-// SYS -----------------------------------------------------------
+// ---------------------------------------------------------------------------
+// sys.h
 
-
-//uint32 TCOD_sys_elapsed_milli();
-//float TCOD_sys_elapsed_seconds();
-//void TCOD_sys_sleep_milli(uint32 val);
+uint32 TCOD_sys_elapsed_milli();
+float TCOD_sys_elapsed_seconds();
+void TCOD_sys_sleep_milli(uint32 val);
 void TCOD_sys_save_screenshot(const char *filename);
 void TCOD_sys_force_fullscreen_resolution(int width, int height);
 void TCOD_sys_set_renderer(TCOD_renderer_t renderer);
@@ -319,7 +737,7 @@ void TCOD_sys_get_current_resolution(int *w, int *h);
 void TCOD_sys_get_fullscreen_offsets(int *offx, int *offy);
 void TCOD_sys_update_char(int asciiCode, int fontx, int fonty, TCOD_image_t img, int x, int y);
 void TCOD_sys_get_char_size(int *w, int *h);
-//void *TCOD_sys_get_sdl_window();
+//void *TCOD_sys_get_sdl_window(); // TODO: figure out how to uncomment this
 
 typedef enum {
   TCOD_EVENT_KEY_PRESS=1,
@@ -335,14 +753,14 @@ TCOD_event_t TCOD_sys_wait_for_event(int eventMask, TCOD_key_t *key, TCOD_mouse_
 TCOD_event_t TCOD_sys_check_for_event(int eventMask, TCOD_key_t *key, TCOD_mouse_t *mouse);
 
 /* filesystem stuff */
-//bool TCOD_sys_create_directory(const char *path);
-//bool TCOD_sys_delete_file(const char *path);
-//bool TCOD_sys_delete_directory(const char *path);
-//bool TCOD_sys_is_directory(const char *path);
-//TCOD_list_t TCOD_sys_get_directory_content(const char *path, const char *pattern);
-//bool TCOD_sys_file_exists(const char * filename, ...);
-//bool TCOD_sys_read_file(const char *filename, unsigned char **buf, uint32 *size);
-//bool TCOD_sys_write_file(const char *filename, unsigned char *buf, uint32 size);
+bool TCOD_sys_create_directory(const char *path);
+bool TCOD_sys_delete_file(const char *path);
+bool TCOD_sys_delete_directory(const char *path);
+bool TCOD_sys_is_directory(const char *path);
+TCOD_list_t TCOD_sys_get_directory_content(const char *path, const char *pattern);
+bool TCOD_sys_file_exists(const char * filename, ...);
+bool TCOD_sys_read_file(const char *filename, unsigned char **buf, uint32 *size);
+bool TCOD_sys_write_file(const char *filename, unsigned char *buf, uint32 size);
 
 /* clipboard */
 void TCOD_sys_clipboard_set(const char *value);
@@ -384,7 +802,8 @@ typedef void (*SDL_renderer_t) (void *sdl_surface);
 void TCOD_sys_register_SDL_renderer(SDL_renderer_t renderer);
 
 
-// MERSENNE
+// ---------------------------------------------------------------------------
+// mersenne_types.h
 
 /* dice roll */
 typedef struct {
@@ -407,6 +826,9 @@ typedef enum {
 	TCOD_DISTRIBUTION_GAUSSIAN_INVERSE,
 	TCOD_DISTRIBUTION_GAUSSIAN_RANGE_INVERSE
 } TCOD_distribution_t;
+
+// ---------------------------------------------------------------------------
+// mersenne.h
 
 typedef void *TCOD_random_t;
 
@@ -432,7 +854,8 @@ int TCOD_random_dice_roll (TCOD_random_t mersenne, TCOD_dice_t dice);
 int TCOD_random_dice_roll_s (TCOD_random_t mersenne, const char * s);
 
 
-// FOV
+// ---------------------------------------------------------------------------
+// fov_types.h
 
 typedef enum {
 	FOV_BASIC,
@@ -449,6 +872,9 @@ typedef enum {
 	FOV_PERMISSIVE_8,
 	FOV_RESTRICTIVE,
 	NB_FOV_ALGORITHMS }TCOD_fov_algorithm_t;
+
+// ---------------------------------------------------------------------------
+// fov.h
 
 typedef void *TCOD_map_t;
 
@@ -476,9 +902,8 @@ int TCOD_map_get_width(TCOD_map_t map);
 int TCOD_map_get_height(TCOD_map_t map);
 int TCOD_map_get_nb_cells(TCOD_map_t map);
 
-
-// NOISE
-
+// ---------------------------------------------------------------------------
+// noise.h
 
 typedef void *TCOD_noise_t;
 
@@ -503,8 +928,8 @@ float TCOD_noise_get_turbulence (TCOD_noise_t noise, float *f, float octaves);
 /* delete the noise object */
 void TCOD_noise_delete(TCOD_noise_t noise);
 
-
-// PATH
+// ---------------------------------------------------------------------------
+// path.h
 
 typedef float (*TCOD_path_func_t)( int xFrom, int yFrom, int xTo, int yTo, void *user_data );
 typedef void *TCOD_path_t;
@@ -538,7 +963,195 @@ void TCOD_dijkstra_get(TCOD_dijkstra_t path, int index, int *x, int *y);
 bool TCOD_dijkstra_path_walk (TCOD_dijkstra_t dijkstra, int *x, int *y);
 void TCOD_dijkstra_delete (TCOD_dijkstra_t dijkstra);
 
+// ---------------------------------------------------------------------------
+// bresenham.h
 
+typedef bool (*TCOD_line_listener_t) (int x, int y);
+
+void TCOD_line_init(int xFrom, int yFrom, int xTo, int yTo);
+bool TCOD_line_step(int *xCur, int *yCur); /* advance one step. returns true if we reach destination */
+/* atomic callback function. Stops when the callback returns false */
+bool TCOD_line(int xFrom, int yFrom, int xTo, int yTo, TCOD_line_listener_t listener);
+
+/* thread-safe versions */
+typedef struct {
+	int stepx;
+	int stepy;
+	int e;
+	int deltax;
+	int deltay;
+	int origx; 
+	int origy; 
+	int destx; 
+	int desty; 
+} TCOD_bresenham_data_t;
+
+void TCOD_line_init_mt(int xFrom, int yFrom, int xTo, int yTo, TCOD_bresenham_data_t *data);
+bool TCOD_line_step_mt(int *xCur, int *yCur, TCOD_bresenham_data_t *data);
+bool TCOD_line_mt(int xFrom, int yFrom, int xTo, int yTo, TCOD_line_listener_t listener, TCOD_bresenham_data_t *data);
+
+// ---------------------------------------------------------------------------
+// tree.h
+
+typedef struct _TCOD_tree_t {
+	struct _TCOD_tree_t *next;
+	struct _TCOD_tree_t *father;
+	struct _TCOD_tree_t *sons;
+} TCOD_tree_t;
+
+TCOD_tree_t *TCOD_tree_new();
+void TCOD_tree_add_son(TCOD_tree_t *node, TCOD_tree_t *son);
+
+// ---------------------------------------------------------------------------
+// bsp.h
+
+typedef struct {
+	TCOD_tree_t tree; /* pseudo oop : bsp inherit tree */
+	int x,y,w,h; /* node position & size */
+	int position; /* position of splitting */
+	uint8 level; /* level in the tree */
+	bool horizontal; /* horizontal splitting ? */
+} TCOD_bsp_t;
+
+typedef bool (*TCOD_bsp_callback_t)(TCOD_bsp_t *node, void *userData);
+
+TCOD_bsp_t *TCOD_bsp_new();
+TCOD_bsp_t *TCOD_bsp_new_with_size(int x,int y,int w, int h);
+void TCOD_bsp_delete(TCOD_bsp_t *node);
+
+TCOD_bsp_t * TCOD_bsp_left(TCOD_bsp_t *node);
+TCOD_bsp_t * TCOD_bsp_right(TCOD_bsp_t *node);
+TCOD_bsp_t * TCOD_bsp_father(TCOD_bsp_t *node);
+
+bool TCOD_bsp_is_leaf(TCOD_bsp_t *node);
+bool TCOD_bsp_traverse_pre_order(TCOD_bsp_t *node, TCOD_bsp_callback_t listener, void *userData);
+bool TCOD_bsp_traverse_in_order(TCOD_bsp_t *node, TCOD_bsp_callback_t listener, void *userData);
+bool TCOD_bsp_traverse_post_order(TCOD_bsp_t *node, TCOD_bsp_callback_t listener, void *userData);
+bool TCOD_bsp_traverse_level_order(TCOD_bsp_t *node, TCOD_bsp_callback_t listener, void *userData);
+bool TCOD_bsp_traverse_inverted_level_order(TCOD_bsp_t *node, TCOD_bsp_callback_t listener, void *userData);
+bool TCOD_bsp_contains(TCOD_bsp_t *node, int x, int y);
+TCOD_bsp_t * TCOD_bsp_find_node(TCOD_bsp_t *node, int x, int y);
+void TCOD_bsp_resize(TCOD_bsp_t *node, int x,int y, int w, int h);
+void TCOD_bsp_split_once(TCOD_bsp_t *node, bool horizontal, int position);
+void TCOD_bsp_split_recursive(TCOD_bsp_t *node, TCOD_random_t randomizer, int nb, 
+		int minHSize, int minVSize, float maxHRatio, float maxVRatio);
+void TCOD_bsp_remove_sons(TCOD_bsp_t *node);
+
+// ---------------------------------------------------------------------------
+// heightmap.h
+
+typedef struct {
+	int w,h;
+	float *values;
+} TCOD_heightmap_t;
+
+TCOD_heightmap_t *TCOD_heightmap_new(int w,int h);
+void TCOD_heightmap_delete(TCOD_heightmap_t *hm);
+
+float TCOD_heightmap_get_value(const TCOD_heightmap_t *hm, int x, int y);
+float TCOD_heightmap_get_interpolated_value(const TCOD_heightmap_t *hm, float x, float y);
+void TCOD_heightmap_set_value(TCOD_heightmap_t *hm, int x, int y, float value);
+float TCOD_heightmap_get_slope(const TCOD_heightmap_t *hm, int x, int y);
+void TCOD_heightmap_get_normal(const TCOD_heightmap_t *hm, float x, float y, float n[3], float waterLevel);
+int TCOD_heightmap_count_cells(const TCOD_heightmap_t *hm, float min, float max);
+bool TCOD_heightmap_has_land_on_border(const TCOD_heightmap_t *hm, float waterLevel);
+void TCOD_heightmap_get_minmax(const TCOD_heightmap_t *hm, float *min, float *max);
+
+void TCOD_heightmap_copy(const TCOD_heightmap_t *hm_source,TCOD_heightmap_t *hm_dest);
+void TCOD_heightmap_add(TCOD_heightmap_t *hm, float value);
+void TCOD_heightmap_scale(TCOD_heightmap_t *hm, float value);
+void TCOD_heightmap_clamp(TCOD_heightmap_t *hm, float min, float max);
+void TCOD_heightmap_normalize(TCOD_heightmap_t *hm, float min, float max);
+void TCOD_heightmap_clear(TCOD_heightmap_t *hm);
+void TCOD_heightmap_lerp_hm(const TCOD_heightmap_t *hm1, const TCOD_heightmap_t *hm2, TCOD_heightmap_t *hmres, float coef);
+void TCOD_heightmap_add_hm(const TCOD_heightmap_t *hm1, const TCOD_heightmap_t *hm2, TCOD_heightmap_t *hmres);
+void TCOD_heightmap_multiply_hm(const TCOD_heightmap_t *hm1, const TCOD_heightmap_t *hm2, TCOD_heightmap_t *hmres);
+
+void TCOD_heightmap_add_hill(TCOD_heightmap_t *hm, float hx, float hy, float hradius, float hheight);
+void TCOD_heightmap_dig_hill(TCOD_heightmap_t *hm, float hx, float hy, float hradius, float hheight);
+void TCOD_heightmap_dig_bezier(TCOD_heightmap_t *hm, int px[4], int py[4], float startRadius, float startDepth, float endRadius, float endDepth);
+void TCOD_heightmap_rain_erosion(TCOD_heightmap_t *hm, int nbDrops,float erosionCoef,float sedimentationCoef,TCOD_random_t rnd);
+/* void TCOD_heightmap_heat_erosion(TCOD_heightmap_t *hm, int nbPass,float minSlope,float erosionCoef,float sedimentationCoef,TCOD_random_t rnd); */
+void TCOD_heightmap_kernel_transform(TCOD_heightmap_t *hm, int kernelsize, const int *dx, const int *dy, const float *weight, float minLevel,float maxLevel);
+void TCOD_heightmap_add_voronoi(TCOD_heightmap_t *hm, int nbPoints, int nbCoef, const float *coef,TCOD_random_t rnd);
+/* void TCOD_heightmap_mid_point_deplacement(TCOD_heightmap_t *hm, TCOD_random_t rnd); */
+void TCOD_heightmap_add_fbm(TCOD_heightmap_t *hm, TCOD_noise_t noise,float mulx, float muly, float addx, float addy, float octaves, float delta, float scale); 
+void TCOD_heightmap_scale_fbm(TCOD_heightmap_t *hm, TCOD_noise_t noise,float mulx, float muly, float addx, float addy, float octaves, float delta, float scale); 
+void TCOD_heightmap_islandify(TCOD_heightmap_t *hm, float seaLevel,TCOD_random_t rnd);
+
+// ---------------------------------------------------------------------------
+// namgegen.h
+
+/* the generator typedef */
+typedef void * TCOD_namegen_t;
+
+/* parse a file with syllable sets */
+void TCOD_namegen_parse (const char * filename, TCOD_random_t random);
+/* generate a name */
+char * TCOD_namegen_generate (char * name, bool allocate);
+/* generate a name using a custom generation rule */
+char * TCOD_namegen_generate_custom (char * name, char * rule, bool allocate);
+/* retrieve the list of all available syllable set names */
+TCOD_list_t TCOD_namegen_get_sets (void);
+/* delete a generator */
+void TCOD_namegen_destroy (void);
+
+// ---------------------------------------------------------------------------
+// lex.h
+// TODO: this module requires too many hacks to reasonably export
+
+// ---------------------------------------------------------------------------
+// parser.h
+// TODO: requires lex.h to work
+
+// ---------------------------------------------------------------------------
+// txtfield.h
+
+typedef void * TCOD_text_t;
+
+TCOD_text_t TCOD_text_init(int x, int y, int w, int h, int max_chars);
+void TCOD_text_set_properties(TCOD_text_t txt, int cursor_char, int blink_interval, const char * prompt, int tab_size);
+void TCOD_text_set_colors(TCOD_text_t txt, TCOD_color_t fore, TCOD_color_t back, float back_transparency);
+bool TCOD_text_update(TCOD_text_t txt, TCOD_key_t key);
+void TCOD_text_render(TCOD_text_t txt, TCOD_console_t con);
+const char * TCOD_text_get(TCOD_text_t txt);
+void TCOD_text_reset(TCOD_text_t txt);
+void TCOD_text_delete(TCOD_text_t txt);
+
+// ---------------------------------------------------------------------------
+// zip.h
+
+typedef void *TCOD_zip_t;
+
+TCOD_zip_t TCOD_zip_new();
+void TCOD_zip_delete(TCOD_zip_t zip);
+
+/* output interface */
+void TCOD_zip_put_char(TCOD_zip_t zip, char val);
+void TCOD_zip_put_int(TCOD_zip_t zip, int val);
+void TCOD_zip_put_float(TCOD_zip_t zip, float val);
+void TCOD_zip_put_string(TCOD_zip_t zip, const char *val);
+void TCOD_zip_put_color(TCOD_zip_t zip, const TCOD_color_t val);
+void TCOD_zip_put_image(TCOD_zip_t zip, const TCOD_image_t val);
+void TCOD_zip_put_console(TCOD_zip_t zip, const TCOD_console_t val);
+void TCOD_zip_put_data(TCOD_zip_t zip, int nbBytes, const void *data);
+uint32 TCOD_zip_get_current_bytes(TCOD_zip_t zip);
+int TCOD_zip_save_to_file(TCOD_zip_t zip, const char *filename);
+
+/* input interface */
+int TCOD_zip_load_from_file(TCOD_zip_t zip, const char *filename);
+char TCOD_zip_get_char(TCOD_zip_t zip);
+int TCOD_zip_get_int(TCOD_zip_t zip);
+float TCOD_zip_get_float(TCOD_zip_t zip);
+const char *TCOD_zip_get_string(TCOD_zip_t zip);
+TCOD_color_t TCOD_zip_get_color(TCOD_zip_t zip);
+TCOD_image_t TCOD_zip_get_image(TCOD_zip_t zip);
+TCOD_console_t TCOD_zip_get_console(TCOD_zip_t zip);
+int TCOD_zip_get_data(TCOD_zip_t zip, int nbBytes, void *data);
+uint32 TCOD_zip_get_remaining_bytes(TCOD_zip_t zip);
+void TCOD_zip_skip_bytes(TCOD_zip_t zip, uint32 nbBytes);
+
+// ---------------------------------------------------------------------------
 // TDL FUNCTONS
 
 int set_char(TCOD_console_t console, int x, int y,
