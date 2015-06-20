@@ -1,6 +1,9 @@
 ===========
  Changelog
 ===========
+1.3.1
+ * Fixed pathfinding regressions.
+
 1.3.0
  * Updated backend to use python-cffi instead of ctypes.  This gives decent
    boost to speed in CPython and a drastic to boost in speed in PyPy.
