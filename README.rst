@@ -1,34 +1,29 @@
+=======
+ About
+=======
+
+This is a direct Python CFFI port of libtcod, this is an offshoot of the python-tdl project and has been made into it's own package.
+Both projects are still developed together, and this module provide special functions specifically to be used by python-tdl.
+
+You can find python-tdl here: https://github.com/HexDecimal/python-tdl
+
+And libtcod is here: http://roguecentral.org/doryen/libtcod/
+
 ==============
  Installation
 ==============
-The latest Windows installer can be found on PyPI: https://pypi.python.org/pypi/tdl
+The latest Windows installer can be found on PyPI: https://pypi.python.org/pypi/libtcod-cffi
 
 If it's available you can use pip instead by running the command:
 
-    pip install tdl
+    pip install libtcod-cffi
 
 This module can also be manually installed by going into the "setup.py" directory and running the command:
 
     python setup.py install
 
-This will require that your Python installation can compile binaries.
-
-=======
- About
-=======
-TDL is a port of the C library libtcod in an attempt to make it more "Pythonic"
-
-The library can be used for displaying tilesets (ANSI, Unicode, or graphical) in true color.
-
-It also provides functionality to compute path-finding and field of view.
-
-python-tdl is hosted on GitHub: https://github.com/HexDecimal/python-tdl
-
-Online Documentation: http://pythonhosted.org/tdl/
-
-Issue Tracker: https://github.com/HexDecimal/python-tdl/issues
-
-python-tdl is a cffi port of "libtcod".  You can find more about libtcod at http://roguecentral.org/doryen/libtcod/
+This will require setuptools which you can find here: https://pypi.python.org/pypi/setuptools
+It also requires that your Python installation is set up to compile binaries.
 
 ==============
  Requirements
@@ -40,4 +35,5 @@ python-tdl is a cffi port of "libtcod".  You can find more about libtcod at http
 =========
  License
 =========
-python-tdl is distributed under the FreeBSD license, same as libtcod.  Read LICENSE.txt for more details.
+python-tdl is distributed under the Simplified 2-clause FreeBSD license.
+Read LICENSE.txt, and the libtcod-cffi/lib README's for more details.
