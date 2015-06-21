@@ -31,7 +31,7 @@ It also requires that your Python installation is set up to compile binaries.
 ==============
  Requirements
 ==============
-* Python 2.6+ or 3.2+
+* Python 2.7+ or 3.2+
 * 32 bit Windows, 32/64 bit Linux, or Mac OS/X (64 bit architecture)
 * An up-to-date version of the Python module cffi: https://pypi.python.org/pypi/cffi
 
