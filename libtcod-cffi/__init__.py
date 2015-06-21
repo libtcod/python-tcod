@@ -37,7 +37,7 @@ except ImportError:
         if platform.architecture()[0] == '64bit':
             module_name += '_x64'
 
-    _libtcod = importlib.import_module(module_name, 'tdl')
+    _libtcod = importlib.import_module(module_name, 'libtcod-cffi')
 
 ffi = _libtcod.ffi
 lib = _libtcod.lib
