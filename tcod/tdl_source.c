@@ -5,8 +5,8 @@
 // colors are converted to TCOD_color_t types in C and is much faster than in 
 // Python.
 // Also Python indexing is used, negative x/y will index to (width-x, etc.)
-int TDL_set_char(TCOD_console_t console, int x, int y,
-                 int ch, int fg, int bg, TCOD_bkgnd_flag_t blend){
+int TDL_console_put_char_ex(TCOD_console_t console, int x, int y,
+                            int ch, int fg, int bg, TCOD_bkgnd_flag_t blend){
     int width=TCOD_console_get_width(console);
     int height=TCOD_console_get_height(console);
     TCOD_color_t color;
