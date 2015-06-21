@@ -1,52 +1,27 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
-import sys
-import os
-
-build_docs = None
-try:
-    # use setuptools or distribute if available
-    from setuptools import setup, Command
-    
-    import subprocess
-    
-    class build_docs(Command):
-        description = "update the documentation using epydoc"
-        user_options = []        
-        def initialize_options(self):
-            pass
-        def finalize_options(self):
-            pass
-        def run(self):
-            'run a command using a local epydoc script'
-            command = [sys.executable,
-                       os.path.join(sys.prefix, 'Scripts\epydoc.py'),
-                       '--config=docs/epydoc.config']
-            
-            subprocess.check_call(command)
-    
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup
 
 setup(
-    name='tdl',
-    version=open('tdl/version.txt', 'r').read(),
+    name='libtcod-cffi',
+    version=open('libtcod-cffi/version.txt', 'r').read(),
     author='Kyle Stewart',
     author_email='4B796C65+pythonTDL@gmail.com',
-    description='Pythonic cffi port of libtcod.',
+    description='A direct CFFI port libtcod.',
     long_description='\n'.join([open('README.rst', 'r').read(),
                                 open('CHANGELOG.rst', 'r').read()]),
-    url='https://github.com/HexDecimal/python-tdl',
-    download_url='https://pypi.python.org/pypi/tdl',
-    packages=['tdl'],
-    package_data={'tdl': ['*.txt', '*.rst', 'lib/*.txt', '*.bmp', '*.png',
-                          'lib/win32/*',
-                          'lib/darwin/*.dylib',
-                          'lib/linux*/*']},
-    setup_requires=["cffi>=1.0.0"],
+    url='https://github.com/HexDecimal/libtcod-cffi',
+    download_url='https://pypi.python.org/pypi/libtcod-cffi',
+    packages=['libtcod-cffi'],
+    package_data={'libtcod-cffi': ['*.txt', '*.rst', 'lib/*.txt',
+                                   'lib/win32/*',
+                                   'lib/darwin/*.dylib',
+                                   'lib/linux*/*']},
+    setup_requires=["cffi>=1.1.0"],
     cffi_modules=["build_libtcod.py:ffi"],
-    install_requires=["cffi>=1.0.0"],
-    cmdclass={'build_docs': build_docs},
+    install_requires=["cffi>=1.1.0",
+                      "setuptools>=17.1.0",
+                      "distribute>=0.7.0"],
     classifiers=['Development Status :: 5 - Production/Stable',
                'Environment :: Win32 (MS Windows)',
                'Environment :: MacOS X',
@@ -71,7 +46,7 @@ setup(
                'Topic :: Multimedia :: Graphics',
                'Topic :: Software Development :: Libraries :: Python Modules',
                ],
-    keywords = 'portable rogue-like rogue-likes text cffi ASCII ANSI Unicode libtcod fov',
+    keywords = 'roguelike roguelikes cffi ASCII ANSI Unicode libtcod noise fov heightmap namegen',
     platforms = ['Windows', 'Mac OS X', 'Linux'],
-    license = 'New BSD License'
+    license = 'Simplified BSD License'
     )
