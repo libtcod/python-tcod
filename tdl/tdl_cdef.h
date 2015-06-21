@@ -1098,11 +1098,197 @@ void TCOD_namegen_destroy (void);
 
 // ---------------------------------------------------------------------------
 // lex.h
-// TODO: this module requires too many hacks to reasonably export
+
+typedef struct {
+	int file_line, token_type, token_int_val, token_idx;
+	float token_float_val;
+	char *tok;
+    int toklen;
+	char lastStringDelim;
+	char *pos;
+	char *buf;
+	char *filename;
+	char *last_javadoc_comment;
+	/* private stuff */
+	int nb_symbols, nb_keywords, flags;
+	char symbols[...][...], 
+	keywords[...][...];
+	const char *simpleCmt;
+	const char *cmtStart, *cmtStop, *javadocCmtStart;
+	const char *stringDelim;
+	bool javadoc_read;
+	bool allocBuf;
+	bool savept; /* is this object a savepoint (no free in destructor) */	
+} TCOD_lex_t;
+
+TCOD_lex_t *TCOD_lex_new_intern();
+TCOD_lex_t *TCOD_lex_new(const char **symbols, const char **keywords, const char *simpleComment, 
+		const char *commentStart, const char *commentStop, const char *javadocCommentStart, const char *stringDelim, int flags);
+void TCOD_lex_delete(TCOD_lex_t *lex);
+
+void TCOD_lex_set_data_buffer(TCOD_lex_t *lex,char *dat);
+bool TCOD_lex_set_data_file(TCOD_lex_t *lex,const char *filename);
+
+int TCOD_lex_parse(TCOD_lex_t *lex);
+int TCOD_lex_parse_until_token_type(TCOD_lex_t *lex,int token_type);
+int TCOD_lex_parse_until_token_value(TCOD_lex_t *lex,const char *token_value);
+
+bool TCOD_lex_expect_token_type(TCOD_lex_t *lex,int token_type);
+bool TCOD_lex_expect_token_value(TCOD_lex_t *lex,int token_type,const char *token_value);
+
+void TCOD_lex_savepoint(TCOD_lex_t *lex,TCOD_lex_t *savept);
+void TCOD_lex_restore(TCOD_lex_t *lex,TCOD_lex_t *savept);
+char *TCOD_lex_get_last_javadoc(TCOD_lex_t *lex);
+const char *TCOD_lex_get_token_name(int token_type);
+char *TCOD_lex_get_last_error();
+
+int TCOD_lex_hextoint(char c);
 
 // ---------------------------------------------------------------------------
 // parser.h
-// TODO: requires lex.h to work
+
+/* generic type */
+typedef enum {
+	TCOD_TYPE_NONE,
+	TCOD_TYPE_BOOL,
+	TCOD_TYPE_CHAR,
+	TCOD_TYPE_INT,
+	TCOD_TYPE_FLOAT,
+	TCOD_TYPE_STRING,
+	TCOD_TYPE_COLOR,
+	TCOD_TYPE_DICE,
+	TCOD_TYPE_VALUELIST00,
+	TCOD_TYPE_VALUELIST01,
+	TCOD_TYPE_VALUELIST02,
+	TCOD_TYPE_VALUELIST03,
+	TCOD_TYPE_VALUELIST04,
+	TCOD_TYPE_VALUELIST05,
+	TCOD_TYPE_VALUELIST06,
+	TCOD_TYPE_VALUELIST07,
+	TCOD_TYPE_VALUELIST08,
+	TCOD_TYPE_VALUELIST09,
+	TCOD_TYPE_VALUELIST10,
+	TCOD_TYPE_VALUELIST11,
+	TCOD_TYPE_VALUELIST12,
+	TCOD_TYPE_VALUELIST13,
+	TCOD_TYPE_VALUELIST14,
+	TCOD_TYPE_VALUELIST15,
+	TCOD_TYPE_CUSTOM00,
+	TCOD_TYPE_CUSTOM01,
+	TCOD_TYPE_CUSTOM02,
+	TCOD_TYPE_CUSTOM03,
+	TCOD_TYPE_CUSTOM04,
+	TCOD_TYPE_CUSTOM05,
+	TCOD_TYPE_CUSTOM06,
+	TCOD_TYPE_CUSTOM07,
+	TCOD_TYPE_CUSTOM08,
+	TCOD_TYPE_CUSTOM09,
+	TCOD_TYPE_CUSTOM10,
+	TCOD_TYPE_CUSTOM11,
+	TCOD_TYPE_CUSTOM12,
+	TCOD_TYPE_CUSTOM13,
+	TCOD_TYPE_CUSTOM14,
+	TCOD_TYPE_CUSTOM15,
+	TCOD_TYPE_LIST=1024
+} TCOD_value_type_t;
+
+/* generic value */
+typedef union {
+	bool b;
+	char c;
+	int32 i;
+	float f;
+	char *s;
+	TCOD_color_t col;
+	TCOD_dice_t dice;
+	TCOD_list_t list;
+	void *custom;
+} TCOD_value_t;
+
+/* parser structures */
+typedef void *TCOD_parser_struct_t;
+const char *TCOD_struct_get_name(TCOD_parser_struct_t def);
+void TCOD_struct_add_property(TCOD_parser_struct_t def, const char *name,TCOD_value_type_t type, bool mandatory);
+void TCOD_struct_add_list_property(TCOD_parser_struct_t def, const char *name,TCOD_value_type_t type, bool mandatory);
+void TCOD_struct_add_value_list(TCOD_parser_struct_t def,const char *name, const char **value_list, bool mandatory);
+void TCOD_struct_add_value_list_sized(TCOD_parser_struct_t def,const char *name, const char **value_list, int size, bool mandatory);
+void TCOD_struct_add_flag(TCOD_parser_struct_t def,const char *propname);
+void TCOD_struct_add_structure(TCOD_parser_struct_t def,TCOD_parser_struct_t sub_structure);
+bool TCOD_struct_is_mandatory(TCOD_parser_struct_t def,const char *propname);
+TCOD_value_type_t TCOD_struct_get_type(TCOD_parser_struct_t def, const char *propname);
+
+
+/* parser listener */
+typedef struct {
+	bool (*new_struct)(TCOD_parser_struct_t str,const char *name);
+	bool (*new_flag)(const char *name);
+	bool (*new_property)(const char *propname, TCOD_value_type_t type, TCOD_value_t value);
+	bool (*end_struct)(TCOD_parser_struct_t str, const char *name);
+	void (*error)(const char *msg);
+} TCOD_parser_listener_t;
+
+/* a custom type parser */
+typedef TCOD_value_t (*TCOD_parser_custom_t)(TCOD_lex_t *lex, TCOD_parser_listener_t *listener, TCOD_parser_struct_t str, char *propname);
+
+/* the parser */
+typedef void *TCOD_parser_t;
+
+TCOD_parser_t TCOD_parser_new();
+TCOD_parser_struct_t TCOD_parser_new_struct(TCOD_parser_t parser, char *name);
+TCOD_value_type_t TCOD_parser_new_custom_type(TCOD_parser_t parser,TCOD_parser_custom_t custom_type_parser);
+void TCOD_parser_run(TCOD_parser_t parser, const char *filename, TCOD_parser_listener_t *listener);
+void TCOD_parser_delete(TCOD_parser_t parser);
+/* error during parsing. can be called by the parser listener */
+void TCOD_parser_error(const char *msg, ...);
+/* default parser listener */
+bool TCOD_parser_get_bool_property(TCOD_parser_t parser, const char *name);
+int TCOD_parser_get_char_property(TCOD_parser_t parser, const char *name);
+int TCOD_parser_get_int_property(TCOD_parser_t parser, const char *name);
+float TCOD_parser_get_float_property(TCOD_parser_t parser, const char *name);
+const char * TCOD_parser_get_string_property(TCOD_parser_t parser, const char *name);
+TCOD_color_t TCOD_parser_get_color_property(TCOD_parser_t parser, const char *name);
+TCOD_dice_t TCOD_parser_get_dice_property(TCOD_parser_t parser, const char *name);
+void TCOD_parser_get_dice_property_py(TCOD_parser_t parser, const char *name, TCOD_dice_t *dice);
+void * TCOD_parser_get_custom_property(TCOD_parser_t parser, const char *name);
+TCOD_list_t TCOD_parser_get_list_property(TCOD_parser_t parser, const char *name, TCOD_value_type_t type);
+
+/* parser internals (may be used by custom type parsers) */
+/* parser structures */
+typedef struct {
+	char *name; /* entity type name */
+	/* list of flags */
+	TCOD_list_t flags;
+	/* list of properties (name, type, mandatory) */
+	TCOD_list_t props;
+	/* list of value lists */
+	TCOD_list_t lists;
+	/* list of sub-structures */
+	TCOD_list_t structs;
+} TCOD_struct_int_t;
+/* the parser */
+typedef struct {
+	/* list of structures */
+	TCOD_list_t structs;
+	/* list of custom type parsers */
+	TCOD_parser_custom_t customs[16];
+	/* fatal error occured */
+	bool fatal;
+	/* list of properties if default listener is used */
+	TCOD_list_t props;
+} TCOD_parser_int_t;
+
+// TODO: this code causes CFFI to raise NotImplementedError
+/*
+TCOD_value_t TCOD_parse_bool_value();
+TCOD_value_t TCOD_parse_char_value();
+TCOD_value_t TCOD_parse_integer_value();
+TCOD_value_t TCOD_parse_float_value();
+TCOD_value_t TCOD_parse_string_value();
+TCOD_value_t TCOD_parse_color_value();
+TCOD_value_t TCOD_parse_dice_value();
+TCOD_value_t TCOD_parse_value_list_value(TCOD_struct_int_t *def,int listnum);
+TCOD_value_t TCOD_parse_property_value(TCOD_parser_int_t *parser, TCOD_parser_struct_t def, char *propname, bool list);
+*/
 
 // ---------------------------------------------------------------------------
 // txtfield.h
