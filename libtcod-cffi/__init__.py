@@ -34,6 +34,8 @@ except ImportError:
     module_name = '._libtcod'
     if platform.python_implementation() == 'CPython':
         module_name += '_cp%i%i' % _sys.version_info[:2]
+        if platform.architecture()[0] == '64bit':
+            module_name += '_x64'
 
     _libtcod = importlib.import_module(module_name, 'tdl')
 

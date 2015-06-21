@@ -6,31 +6,41 @@ import platform
 
 from cffi import FFI
 
-
-module_name = 'tdl._libtcod'
+module_name = 'libtcod-cffi._libtcod'
 if platform.python_implementation() == 'CPython':
     module_name += '_cp%i%i' % sys.version_info[:2]
+    if platform.architecture()[0] == '64bit':
+        module_name += '_x64'
 
-def _get_library_crossplatform():
+def _get_library_dirs_crossplatform():
     bits, linkage = platform.architecture()
     if 'win32' in sys.platform:
-        return 'tdl/lib/win32/'
+        return 'libtcod-cffi/lib/win32/'
     elif 'linux' in sys.platform:
         if bits == '32bit':
-            return 'tdl/lib/linux32/'
+            return 'libtcod-cffi/lib/linux32/'
         elif bits == '64bit':
-            return 'tdl/lib/linux64/'
+            return 'libtcod-cffi/lib/linux64/'
     elif 'darwin' in sys.platform:
-        return 'tdl/lib/darwin/'
+        return 'libtcod-cffi/lib/darwin/'
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
 
+def _get_libraries_crossplatform():
+    bits, linkage = platform.architecture()
+    if 'win32' in sys.platform:
+        return ['libtcod-VS']
+    elif 'linux' in sys.platform:
+        return ['libtcod']
+    elif 'darwin' in sys.platform:
+        return ['libtcod']
+    raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
+    
 ffi = FFI()
-ffi.cdef(open('tdl/tdl_cdef.h', 'r').read())
-ffi.set_source(module_name, open('tdl/tdl_source.c', 'r').read(),
-include_dirs=['tdl/include/', 'Release/tdl/'],
-library_dirs=[_get_library_crossplatform()],
-libraries=['libtcod-VS'])
-
+ffi.cdef(open('libtcod-cffi/tdl_cdef.h', 'r').read())
+ffi.set_source(module_name, open('libtcod-cffi/tdl_source.c', 'r').read(),
+include_dirs=['libtcod-cffi/include/', 'Release/libtcod-cffi/'],
+library_dirs=[_get_library_dirs_crossplatform()],
+libraries=_get_libraries_crossplatform())
 
 if __name__ == "__main__":
     ffi.compile()
