@@ -14,7 +14,7 @@ if platform.python_implementation() == 'CPython':
 
 def _get_library_dirs_crossplatform():
     bits, linkage = platform.architecture()
-    if sys.platform  in ['win32', 'win64']:
+    if 'win32' in sys.platform:
         return 'tcod/lib/win32/'
     elif 'linux' in sys.platform:
         if bits == '32bit':

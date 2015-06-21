@@ -6,7 +6,7 @@ import platform as _platform
 
 def _get_library_crossplatform():
     bits, linkage = _platform.architecture()
-    if _sys.platform  in ['win32', 'win64']:
+    if 'win32' in _sys.platform:
         return 'lib/win32/'
     elif 'linux' in _sys.platform:
         if bits == '32bit':
