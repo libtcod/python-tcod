@@ -2,10 +2,10 @@
 import sys as _sys
 import os as _os
 
-import platform
+import platform as _platform
 
 def _get_library_crossplatform():
-    bits, linkage = platform.architecture()
+    bits, linkage = _platform.architecture()
     if 'win32' in _sys.platform:
         return 'lib/win32/'
     elif 'linux' in _sys.platform:
@@ -32,15 +32,15 @@ except ImportError:
     # get implementation specific version of _libtcod.pyd
     import importlib
     module_name = '._libtcod'
-    if platform.python_implementation() == 'CPython':
+    if _platform.python_implementation() == 'CPython':
         module_name += '_cp%i%i' % _sys.version_info[:2]
-        if platform.architecture()[0] == '64bit':
+        if _platform.architecture()[0] == '64bit':
             module_name += '_x64'
 
-    _libtcod = importlib.import_module(module_name, 'libtcod-cffi')
+    _libtcod = importlib.import_module(module_name, 'tcod')
 
 ffi = _libtcod.ffi
 lib = _libtcod.lib
 _import_library_functions(lib)
 
-__all__ = [name for name in globals() if name[0] != '_']
+__all__ = [name for name in list(globals()) if name[0] != '_']

@@ -6,7 +6,7 @@ import platform
 
 from cffi import FFI
 
-module_name = 'libtcod-cffi._libtcod'
+module_name = 'tcod._libtcod'
 if platform.python_implementation() == 'CPython':
     module_name += '_cp%i%i' % sys.version_info[:2]
     if platform.architecture()[0] == '64bit':
@@ -15,14 +15,14 @@ if platform.python_implementation() == 'CPython':
 def _get_library_dirs_crossplatform():
     bits, linkage = platform.architecture()
     if 'win32' in sys.platform:
-        return 'libtcod-cffi/lib/win32/'
+        return 'tcod/lib/win32/'
     elif 'linux' in sys.platform:
         if bits == '32bit':
-            return 'libtcod-cffi/lib/linux32/'
+            return 'tcod/lib/linux32/'
         elif bits == '64bit':
-            return 'libtcod-cffi/lib/linux64/'
+            return 'tcod/lib/linux64/'
     elif 'darwin' in sys.platform:
-        return 'libtcod-cffi/lib/darwin/'
+        return 'tcod/lib/darwin/'
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
 
 def _get_libraries_crossplatform():
@@ -36,9 +36,9 @@ def _get_libraries_crossplatform():
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
     
 ffi = FFI()
-ffi.cdef(open('libtcod-cffi/tdl_cdef.h', 'r').read())
-ffi.set_source(module_name, open('libtcod-cffi/tdl_source.c', 'r').read(),
-include_dirs=['libtcod-cffi/include/', 'Release/libtcod-cffi/'],
+ffi.cdef(open('tcod/tdl_cdef.h', 'r').read())
+ffi.set_source(module_name, open('tcod/tdl_source.c', 'r').read(),
+include_dirs=['tcod/include/', 'Release/tcod/'],
 library_dirs=[_get_library_dirs_crossplatform()],
 libraries=_get_libraries_crossplatform())
 
