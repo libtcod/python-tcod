@@ -1340,5 +1340,5 @@ void TCOD_zip_skip_bytes(TCOD_zip_t zip, uint32 nbBytes);
 // ---------------------------------------------------------------------------
 // TDL FUNCTONS
 
-int set_char(TCOD_console_t console, int x, int y,
-             int ch, int fg, int bg, TCOD_bkgnd_flag_t flag);
+int TDL_set_char(TCOD_console_t console, int x, int y,
+                 int ch, int fg, int bg, TCOD_bkgnd_flag_t flag);

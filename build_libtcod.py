@@ -38,7 +38,7 @@ def _get_libraries_crossplatform():
 ffi = FFI()
 ffi.cdef(open('tcod/tdl_cdef.h', 'r').read())
 ffi.set_source(module_name, open('tcod/tdl_source.c', 'r').read(),
-include_dirs=['tcod/include/', 'Release/tcod/'],
+include_dirs=['tcod/include/libtcod-1.5', 'Release/tcod/'],
 library_dirs=[_get_library_dirs_crossplatform()],
 libraries=_get_libraries_crossplatform())
 
