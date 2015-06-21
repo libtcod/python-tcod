@@ -19,6 +19,12 @@ def _get_library_crossplatform():
         return 'lib/darwin/'
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
 
+def _import_library_functions(lib):
+    g = globals()
+    for name in dir(lib):
+        if name[:5] == 'TCOD_':
+            g[name[5:]] = getattr(lib, name)
+    
 os.environ['PATH'] += ';' + os.path.join(__path__[0],
                                          _get_library_crossplatform())
 
@@ -33,7 +39,6 @@ except ImportError:
 
     _libtcod = importlib.import_module(module_name, 'tdl')
 
-_ffi = _libtcod.ffi
-_lib = _libtcod.lib
-
-__all__ = ['_ffi', '_lib']
+_ffi = ffi = _libtcod.ffi
+_lib = lib = _libtcod.lib
+_import_library_functions(lib)
