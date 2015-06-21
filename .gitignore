@@ -56,6 +56,6 @@ docs/_build/
 target/
 
 # Custom
-tdl-*/
+tcod-*/
 Release/
-tdl/_*.c
+tcod/_*.c
