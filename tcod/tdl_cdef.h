@@ -1340,5 +1340,7 @@ void TCOD_zip_skip_bytes(TCOD_zip_t zip, uint32 nbBytes);
 // ---------------------------------------------------------------------------
 // TDL FUNCTONS
 
+TCOD_color_t TDL_color_from_int(int color);
+
 int TDL_console_put_char_ex(TCOD_console_t console, int x, int y,
                             int ch, int fg, int bg, TCOD_bkgnd_flag_t flag);

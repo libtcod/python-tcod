@@ -1,6 +1,15 @@
 
 #include <libtcod.h>
 
+// get a TCOD color type from a 0xRRGGBB formatted integer
+TCOD_color_t TDL_color_from_int(int color){
+    TCOD_color_t color_t={color >> 16 & 0xff,
+                          color >> 8 & 0xff,
+                          color & 0xff};
+    return color_t;
+}
+
+
 // set functions are called conditionally for ch/fg/bg (-1 is ignored)/
 // colors are converted to TCOD_color_t types in C and is much faster than in 
 // Python.
