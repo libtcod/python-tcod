@@ -9,7 +9,7 @@ import math as _math
 from tcod import ffi as _ffi
 from tcod import lib as _lib
 
-import . as _tdl
+import tdl as _tdl
 from . import style as _style
 
 _FOVTYPES = {'BASIC' : 0, 'DIAMOND': 1, 'SHADOW': 2, 'RESTRICTIVE': 12, 'PERMISSIVE': 11}
