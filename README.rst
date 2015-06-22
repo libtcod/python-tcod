@@ -38,5 +38,5 @@ It also requires that your Python installation is set up to compile binaries.
 =========
  License
 =========
-python-tdl is distributed under the Simplified 2-clause FreeBSD license.
+libtcod-cffi is distributed under the Simplified 2-clause FreeBSD license.
 Read LICENSE.txt, and the libtcod-cffi/lib README's for more details.

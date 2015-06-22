@@ -1,4 +1,6 @@
 
+// extra functions provided for the python-tdl library
+
 #include <libtcod.h>
 
 // get a TCOD color type from a 0xRRGGBB formatted integer

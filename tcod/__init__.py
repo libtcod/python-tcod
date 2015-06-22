@@ -1,10 +1,24 @@
-
+"""
+    This module provides a simple CFFI API to libtcod.
+    
+    This port has large partial support for libtcod's C functions.
+    Use tcod/libtcod_cdef.h in the source distribution to see specially what
+    functions were exported and what new functions have been added by TDL.
+    
+    The ffi and lib variables should be familiar to anyone that has used CFFI
+    before, otherwise it's time to read up on how they work:
+    https://cffi.readthedocs.org/en/latest/using.html
+    
+    Bring any issues or requests to GitHub:
+    https://github.com/HexDecimal/libtcod-cffi
+"""
 import sys as _sys
 import os as _os
 
 import platform as _platform
 
-def _get_library_crossplatform():
+def _get_lib_path_crossplatform():
+    '''Locate the right DLL path for this OS'''
     bits, linkage = _platform.architecture()
     if 'win32' in _sys.platform:
         return 'lib/win32/'
@@ -25,24 +39,28 @@ def _import_library_functions(lib):
         elif name[:4] == 'TCOD': # short constant names
             g[name[4:]] = getattr(lib, name)
     
+# add dll's to PATH
 _os.environ['PATH'] += ';' + _os.path.join(__path__[0],
-                                           _get_library_crossplatform())
+                                           _get_lib_path_crossplatform())
 
+# import the right .pyd file for this Python implementation
 try:
-    import _libtcod
+    import _libtcod # PyPy
 except ImportError:
     # get implementation specific version of _libtcod.pyd
-    import importlib
-    module_name = '._libtcod'
+    import importlib as _importlib
+    _module_name = '._libtcod'
     if _platform.python_implementation() == 'CPython':
-        module_name += '_cp%i%i' % _sys.version_info[:2]
+        _module_name += '_cp%i%i' % _sys.version_info[:2]
         if _platform.architecture()[0] == '64bit':
-            module_name += '_x64'
+            _module_name += '_x64'
 
-    _libtcod = importlib.import_module(module_name, 'tcod')
+    _libtcod = _importlib.import_module(_module_name, 'tcod')
 
 ffi = _libtcod.ffi
 lib = _libtcod.lib
-_import_library_functions(lib)
+
+# make a fancy function importer, then never use it!
+#_import_library_functions(lib)
 
 __all__ = [name for name in list(globals()) if name[0] != '_']

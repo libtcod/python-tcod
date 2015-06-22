@@ -36,7 +36,7 @@ def _get_libraries_crossplatform():
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
     
 ffi = FFI()
-ffi.cdef(open('tcod/tdl_cdef.h', 'r').read())
+ffi.cdef(open('tcod/libtcod_cdef.h', 'r').read())
 ffi.set_source(module_name, open('tcod/tdl_source.c', 'r').read(),
 include_dirs=['tcod/include/libtcod-1.5', 'Release/tcod/'],
 library_dirs=[_get_library_dirs_crossplatform()],
