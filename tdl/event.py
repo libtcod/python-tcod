@@ -31,8 +31,6 @@
        
 """
 
-from __future__ import division
-
 import time as _time
 
 from tcod import ffi as _ffi
@@ -399,21 +397,25 @@ def wait(timeout=None, flush=True):
     """Wait for an event.
     
     @type timeout: int or None
-    @param timeout: 
+    @param timeout: The time in seconds that this function will wait before
+                    giving up and returning None.
+                    
+                    With the default value of None, this will block forever.
     @type flush: boolean
     @param flush: If True a call to L{tdl.flush} will be made before listening
                   for events.
     @rtype: L{Event} or None
-    @return: Returns an instance derived from L{Event} or anything
-             put in a L{push} call that matches the filter.
+    @return: Returns an instance derived from L{Event}, or None if the function
+             has timed out. 
+             Anything added via L{push} will also be returned.
     
     @since: 1.4.0
     """
     if timeout is not None:
-        timeout = timeout / 1000 + _time.clock() # timeout at this time
+        timeout = timeout + _time.clock() # timeout at this time
     while True:
-        for event in _event_generator():
-            return event
+        if _eventQueue:
+            return _eventQueue.pop(0)
         if flush:
             # a full 'round' of events need to be processed before flushing
             _tdl.flush()

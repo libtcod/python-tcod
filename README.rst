@@ -33,11 +33,13 @@ python-tdl is a cffi port of "libtcod".  You can find more about libtcod at http
 ==============
  Requirements
 ==============
-* Python 2.6+ or 3.x
+* Python 2.7+ or 3.x
 * 32 bit Windows, 32/64 bit Linux, or Mac OS/X (64 bit architecture)
-* An up-to-date version of the Python module: cffi
+* libtcod-cffi:  found at https://pypi.python.org/pypi/libtcod-cffi
+* the cffi module: found at https://pypi.python.org/pypi/cffi
 
 =========
  License
 =========
-python-tdl is distributed under the FreeBSD license, same as libtcod.  Read LICENSE.txt for more details.
+python-tdl is distributed under the Simplified 2-clause FreeBSD license.
+Read LICENSE.txt for more details.

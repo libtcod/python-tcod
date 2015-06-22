@@ -1,6 +1,14 @@
 ===========
  Changelog
 ===========
+1.4.0
+ * The DLL's have been moved into another library which you can find at https://github.com/HexDecimal/libtcod-cffi
+   You can use this library to have some raw access to libtcod if you want.
+   Plus it can be used alongside TDL.
+ * The libtocd console objects in Console instances have been made public.
+ * Added tdl.event.wait function.  This function can called with a timeout and
+   can automatically call tdl.flush.
+
 1.3.1
  * Fixed pathfinding regressions.
 

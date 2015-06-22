@@ -72,17 +72,17 @@
 <a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"> </tt>
 <a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"> </tt>
 <a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">random</tt> <tt class="py-keyword">as</tt> <tt class="py-name">_random</tt> </tt>
-<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-comment">#import ctypes as _ctypes</tt> </tt>
-<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"> </tt>
-<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt id="link-0" class="py-name" targets="Package tdl=tdl-module.html"><a title="tdl" class="py-name" href="#" onclick="return doclink('link-0', 'tdl', 'link-0');">tdl</a></tt> <tt class="py-keyword">as</tt> <tt class="py-name">_tdl</tt> </tt>
-<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"><tt class="py-comment">#from .__tcod import _lib</tt> </tt>
-<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt><tt class="py-name">libtcod</tt> <tt class="py-keyword">import</tt> <tt id="link-1" class="py-name" targets="Variable tdl._ffi=tdl-module.html#_ffi,Variable tdl.event._ffi=tdl.event-module.html#_ffi,Variable tdl.map._ffi=tdl.map-module.html#_ffi,Variable tdl.noise._ffi=tdl.noise-module.html#_ffi"><a title="tdl._ffi
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">tcod</tt> <tt class="py-keyword">import</tt> <tt class="py-name">ffi</tt> <tt class="py-keyword">as</tt> <tt id="link-0" class="py-name" targets="Variable tdl._ffi=tdl-module.html#_ffi,Variable tdl.event._ffi=tdl.event-module.html#_ffi,Variable tdl.map._ffi=tdl.map-module.html#_ffi,Variable tdl.noise._ffi=tdl.noise-module.html#_ffi"><a title="tdl._ffi
 tdl.event._ffi
 tdl.map._ffi
-tdl.noise._ffi" class="py-name" href="#" onclick="return doclink('link-1', '_ffi', 'link-1');">_ffi</a></tt><tt class="py-op">,</tt> <tt id="link-2" class="py-name" targets="Variable tdl._lib=tdl-module.html#_lib,Variable tdl.event._lib=tdl.event-module.html#_lib,Variable tdl.map._lib=tdl.map-module.html#_lib,Variable tdl.noise._lib=tdl.noise-module.html#_lib"><a title="tdl._lib
+tdl.noise._ffi" class="py-name" href="#" onclick="return doclink('link-0', '_ffi', 'link-0');">_ffi</a></tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">tcod</tt> <tt class="py-keyword">import</tt> <tt class="py-name">lib</tt> <tt class="py-keyword">as</tt> <tt id="link-1" class="py-name" targets="Variable tdl._lib=tdl-module.html#_lib,Variable tdl.event._lib=tdl.event-module.html#_lib,Variable tdl.map._lib=tdl.map-module.html#_lib,Variable tdl.noise._lib=tdl.noise-module.html#_lib"><a title="tdl._lib
 tdl.event._lib
 tdl.map._lib
-tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-2', '_lib', 'link-2');">_lib</a></tt> </tt>
+tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-1', '_lib', 'link-1');">_lib</a></tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt id="link-2" class="py-name" targets="Package tdl=tdl-module.html"><a title="tdl" class="py-name" href="#" onclick="return doclink('link-2', 'tdl', 'link-2');">tdl</a></tt> <tt class="py-keyword">as</tt> <tt class="py-name">_tdl</tt> </tt>
 <a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt> <tt class="py-keyword">import</tt> <tt class="py-name">style</tt> <tt class="py-keyword">as</tt> <tt class="py-name">_style</tt> </tt>
 <a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"> </tt>
 <a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"><tt id="link-3" class="py-name" targets="Variable tdl.noise._MERSENNE_TWISTER=tdl.noise-module.html#_MERSENNE_TWISTER"><a title="tdl.noise._MERSENNE_TWISTER" class="py-name" href="#" onclick="return doclink('link-3', '_MERSENNE_TWISTER', 'link-3');">_MERSENNE_TWISTER</a></tt> <tt class="py-op">=</tt> <tt class="py-number">1</tt> </tt>
@@ -95,15 +95,15 @@ tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-2', '_lib
 <a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"><tt id="link-8" class="py-name" targets="Variable tdl.noise._NOISE_MODES=tdl.noise-module.html#_NOISE_MODES"><a title="tdl.noise._NOISE_MODES" class="py-name" href="#" onclick="return doclink('link-8', '_NOISE_MODES', 'link-8');">_NOISE_MODES</a></tt> <tt class="py-op">=</tt> <tt class="py-op">{</tt><tt class="py-string">'FLAT'</tt><tt class="py-op">:</tt> <tt id="link-9" class="py-name"><a title="tdl._lib
 tdl.event._lib
 tdl.map._lib
-tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-9', '_lib', 'link-2');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_noise_get</tt><tt class="py-op">,</tt> </tt>
+tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-9', '_lib', 'link-1');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_noise_get</tt><tt class="py-op">,</tt> </tt>
 <a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line">                <tt class="py-string">'FBM'</tt><tt class="py-op">:</tt> <tt id="link-10" class="py-name"><a title="tdl._lib
 tdl.event._lib
 tdl.map._lib
-tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-10', '_lib', 'link-2');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_noise_get_fbm</tt><tt class="py-op">,</tt> </tt>
+tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-10', '_lib', 'link-1');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_noise_get_fbm</tt><tt class="py-op">,</tt> </tt>
 <a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line">                <tt class="py-string">'TURBULENCE'</tt><tt class="py-op">:</tt> <tt id="link-11" class="py-name"><a title="tdl._lib
 tdl.event._lib
 tdl.map._lib
-tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-11', '_lib', 'link-2');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_noise_get_turbulence</tt><tt class="py-op">}</tt> </tt>
+tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-11', '_lib', 'link-1');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_noise_get_turbulence</tt><tt class="py-op">}</tt> </tt>
 <a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line">                 </tt>
 <a name="Noise"></a><div id="Noise-def"><a name="L32"></a><tt class="py-lineno"> 32</tt> <a class="py-toggle" href="#" id="Noise-toggle" onclick="return toggle('Noise');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="tdl.noise.Noise-class.html">Noise</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="Noise-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Noise-expanded"><a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line">    <tt class="py-docstring">"""An advanced noise generator.</tt> </tt>
@@ -197,18 +197,18 @@ tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-11', '_li
 <a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_random</tt> <tt class="py-op">=</tt> <tt id="link-17" class="py-name"><a title="tdl._lib
 tdl.event._lib
 tdl.map._lib
-tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-17', '_lib', 'link-2');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_random_new_from_seed</tt><tt class="py-op">(</tt><tt id="link-18" class="py-name"><a title="tdl.noise._MERSENNE_TWISTER" class="py-name" href="#" onclick="return doclink('link-18', '_MERSENNE_TWISTER', 'link-3');">_MERSENNE_TWISTER</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_seed</tt><tt class="py-op">)</tt> </tt>
+tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-17', '_lib', 'link-1');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_random_new_from_seed</tt><tt class="py-op">(</tt><tt id="link-18" class="py-name"><a title="tdl.noise._MERSENNE_TWISTER" class="py-name" href="#" onclick="return doclink('link-18', '_MERSENNE_TWISTER', 'link-3');">_MERSENNE_TWISTER</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_seed</tt><tt class="py-op">)</tt> </tt>
 <a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_hurst</tt> <tt class="py-op">=</tt> <tt class="py-name">hurst</tt> </tt>
 <a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_lacunarity</tt> <tt class="py-op">=</tt> <tt class="py-name">lacunarity</tt> </tt>
 <a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_noise</tt> <tt class="py-op">=</tt> <tt id="link-19" class="py-name"><a title="tdl._lib
 tdl.event._lib
 tdl.map._lib
-tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-19', '_lib', 'link-2');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_noise_new</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_dimensions</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_hurst</tt><tt class="py-op">,</tt> </tt>
+tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-19', '_lib', 'link-1');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_noise_new</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_dimensions</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_hurst</tt><tt class="py-op">,</tt> </tt>
 <a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line">                                          <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_lacunarity</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_random</tt><tt class="py-op">)</tt> </tt>
 <a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line">        <tt id="link-20" class="py-name"><a title="tdl._lib
 tdl.event._lib
 tdl.map._lib
-tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-20', '_lib', 'link-2');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_noise_set_type</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_noise</tt><tt class="py-op">,</tt> <tt id="link-21" class="py-name"><a title="tdl.noise._NOISE_TYPES" class="py-name" href="#" onclick="return doclink('link-21', '_NOISE_TYPES', 'link-7');">_NOISE_TYPES</a></tt><tt class="py-op">[</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_algorithm</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-20', '_lib', 'link-1');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_noise_set_type</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_noise</tt><tt class="py-op">,</tt> <tt id="link-21" class="py-name"><a title="tdl.noise._NOISE_TYPES" class="py-name" href="#" onclick="return doclink('link-21', '_NOISE_TYPES', 'link-7');">_NOISE_TYPES</a></tt><tt class="py-op">[</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_algorithm</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
 <a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_noiseFunc</tt> <tt class="py-op">=</tt> <tt id="link-22" class="py-name"><a title="tdl.noise._NOISE_MODES" class="py-name" href="#" onclick="return doclink('link-22', '_NOISE_MODES', 'link-8');">_NOISE_MODES</a></tt><tt class="py-op">[</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_mode</tt><tt class="py-op">]</tt> </tt>
 <a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_octaves</tt> <tt class="py-op">=</tt> <tt class="py-name">octaves</tt> </tt>
 <a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_useOctaves</tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_mode</tt> <tt class="py-op">!=</tt> <tt class="py-string">'FLAT'</tt><tt class="py-op">)</tt> </tt>
@@ -254,7 +254,7 @@ tdl.noise.Noise.__init__" class="py-name" href="#" onclick="return doclink('link
 <a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line">        <tt class="py-name">array</tt> <tt class="py-op">=</tt> <tt id="link-25" class="py-name"><a title="tdl._ffi
 tdl.event._ffi
 tdl.map._ffi
-tdl.noise._ffi" class="py-name" href="#" onclick="return doclink('link-25', '_ffi', 'link-1');">_ffi</a></tt><tt class="py-op">.</tt><tt class="py-name">new</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_arrayType</tt><tt class="py-op">,</tt> <tt class="py-name">position</tt><tt class="py-op">)</tt> </tt>
+tdl.noise._ffi" class="py-name" href="#" onclick="return doclink('link-25', '_ffi', 'link-0');">_ffi</a></tt><tt class="py-op">.</tt><tt class="py-name">new</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_arrayType</tt><tt class="py-op">,</tt> <tt class="py-name">position</tt><tt class="py-op">)</tt> </tt>
 <a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_useOctaves</tt><tt class="py-op">:</tt> </tt>
 <a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_noiseFunc</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_noise</tt><tt class="py-op">,</tt> <tt class="py-name">array</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_octaves</tt><tt class="py-op">)</tt> <tt class="py-op">+</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt> <tt class="py-op">*</tt> <tt class="py-number">0.5</tt> </tt>
 <a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_noiseFunc</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_noise</tt><tt class="py-op">,</tt> <tt class="py-name">array</tt><tt class="py-op">)</tt> <tt class="py-op">+</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt> <tt class="py-op">*</tt> <tt class="py-number">0.5</tt> </tt>
@@ -265,13 +265,13 @@ tdl.noise._ffi" class="py-name" href="#" onclick="return doclink('link-25', '_ff
 <a name="L169"></a><tt class="py-lineno">169</tt>  <tt class="py-line">            <tt id="link-26" class="py-name"><a title="tdl._lib
 tdl.event._lib
 tdl.map._lib
-tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-26', '_lib', 'link-2');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_random_delete</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_random</tt><tt class="py-op">)</tt> </tt>
+tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-26', '_lib', 'link-1');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_random_delete</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_random</tt><tt class="py-op">)</tt> </tt>
 <a name="L170"></a><tt class="py-lineno">170</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_random</tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
 <a name="L171"></a><tt class="py-lineno">171</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_noise</tt><tt class="py-op">:</tt> </tt>
 <a name="L172"></a><tt class="py-lineno">172</tt>  <tt class="py-line">            <tt id="link-27" class="py-name"><a title="tdl._lib
 tdl.event._lib
 tdl.map._lib
-tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-27', '_lib', 'link-2');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_noise_delete</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_noise</tt><tt class="py-op">)</tt> </tt>
+tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-27', '_lib', 'link-1');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_noise_delete</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_noise</tt><tt class="py-op">)</tt> </tt>
 <a name="L173"></a><tt class="py-lineno">173</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_noise</tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
 </div></div><a name="L174"></a><tt class="py-lineno">174</tt>  <tt class="py-line">     </tt>
 <a name="L175"></a><tt class="py-lineno">175</tt>  <tt class="py-line"><tt class="py-name">__all__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt id="link-28" class="py-name" targets="Variable tdl._var=tdl-module.html#_var,Variable tdl.event._var=tdl.event-module.html#_var,Variable tdl.map._var=tdl.map-module.html#_var,Variable tdl.noise._var=tdl.noise-module.html#_var"><a title="tdl._var
@@ -325,7 +325,7 @@ expandto(location.href);
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sat Jun 20 10:40:25 2015</a>
+    3.0.1 on Mon Jun 22 16:11:03 2015</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
