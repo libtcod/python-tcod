@@ -823,7 +823,7 @@ class Console(_BaseConsole):
         #if isinstance(self._as_parameter_, _ctypes.c_void_p):
         if self._as_parameter_ is _ffi.NULL:
             # do we recognise this root console?
-            if(_rootConsoleRef and _rootConsoleRef is self):
+            if(_rootConsoleRef and _rootConsoleRef() is self):
                 _rootinitialized = False
                 _rootConsoleRef = None
                 _lib.TCOD_console_delete(self._as_parameter_)
