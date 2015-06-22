@@ -11,11 +11,11 @@
 
 
 import random as _random
-#import ctypes as _ctypes
 
-import tdl as _tdl
-#from .__tcod import _lib
-from .libtcod import _ffi, _lib
+from tcod import ffi as _ffi
+from tcod import lib as _lib
+
+import . as _tdl
 from . import style as _style
 
 _MERSENNE_TWISTER = 1

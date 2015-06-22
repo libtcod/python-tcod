@@ -2,13 +2,14 @@
     Rogue-like map utilitys such as line-of-sight, field-of-view, and path-finding.
     
 """
-#import ctypes as _ctypes
+
 import itertools as _itertools
 import math as _math
 
-import tdl as _tdl
-#from .__tcod import _lib, _PATHCALL
-from .libtcod import _ffi, _lib
+from tcod import ffi as _ffi
+from tcod import lib as _lib
+
+import . as _tdl
 from . import style as _style
 
 _FOVTYPES = {'BASIC' : 0, 'DIAMOND': 1, 'SHADOW': 2, 'RESTRICTIVE': 12, 'PERMISSIVE': 11}

@@ -32,12 +32,11 @@
 
 import time as _time
 
-#from .__tcod import _lib, _Mouse, _Key
-from .libtcod import _ffi, _lib
+from tcod import ffi as _ffi
+from tcod import lib as _lib
 
-#from . import __tcod as _tcod
+import . as _tdl
 from . import style as _style
-import tdl as _tdl
 
 _eventQueue = []
 _pushedEvents = []

@@ -60,7 +60,6 @@
 import sys as _sys
 import os as _os
 
-#import ctypes as _ctypes
 import array as _array
 import weakref as _weakref
 import itertools as _itertools
@@ -69,8 +68,10 @@ import struct as _struct
 import re as _re
 import warnings as _warnings
 
+from tcod import ffi as _ffi
+from tcod import lib as _lib
+
 from . import event, map, noise
-from .libtcod import _ffi, _lib
 from . import style as _style
 
 
@@ -123,7 +124,7 @@ _fontinitialized = False
 _rootinitialized = False
 _rootConsoleRef = None
 
-_set_char = _lib.set_char
+_put_char_ex = _lib.TDL_console_put_char_ex
 
 # python 2 to 3 workaround
 if _sys.version_info[0] == 2:
@@ -387,8 +388,8 @@ class _BaseConsole(object):
         @see: L{get_char}
         """
         #x, y = self._normalizePoint(x, y)
-        _set_char(self._as_parameter_, x, y, _format_char(char),
-                  _format_color(fg, self._fg), _format_color(bg, self._bg), 1)
+        _put_char_ex(self._as_parameter_, x, y, _format_char(char),
+                     _format_color(fg, self._fg), _format_color(bg, self._bg), 1)
 
     def draw_str(self, x, y, string, fg=Ellipsis, bg=Ellipsis):
         """Draws a string starting at x and y.
@@ -813,24 +814,40 @@ class Console(_BaseConsole):
         self.height = _lib.TCOD_console_get_height(console)
         self._typewriter = None
         return self
+        
+    def _root_unhook(self):
+        """Change this root console into a normal Console object and
+        delete the root console from TCOD
+        """
+        global _rootinitialized, _rootConsoleRef
+        # do we recognise this as the root console?
+        # if not then assume the console has already been taken care of
+        if(_rootConsoleRef and _rootConsoleRef() is self):
+            # turn this console into a regular console
+            unhooked = _lib.TCOD_console_new(self.width, self.height)
+            _lib.TCOD_console_blit(self._as_parameter_,
+                                   0, 0, self.width, self.height,
+                                   unhooked, 0, 0, 1, 1)
+            # delete root console from TDL and TCOD
+            _rootinitialized = False
+            _rootConsoleRef = None
+            _lib.TCOD_console_delete(self._as_parameter_)
+            # this Console object is now a regular console
+            self._as_parameter_ = unhooked
 
     def __del__(self):
         """
         If the main console is garbage collected then the window will be closed as well
         """
-        global _rootinitialized, _rootConsoleRef
-        # check of see if the pointer is to the special root console
-        #if isinstance(self._as_parameter_, _ctypes.c_void_p):
+        if self._as_parameter_ is None:
+            return # this console was already deleted
         if self._as_parameter_ is _ffi.NULL:
-            # do we recognise this root console?
-            if(_rootConsoleRef and _rootConsoleRef() is self):
-                _rootinitialized = False
-                _rootConsoleRef = None
-                _lib.TCOD_console_delete(self._as_parameter_)
-            # if not then assume the console has already been taken care of
-        else:
-            # this is a normal console pointer and can be safely deleted
-            _lib.TCOD_console_delete(self._as_parameter_)
+            # a pointer to the special root console
+            self._root_unhook() # unhook the console and leave it to the GC
+            return
+        # this is a normal console pointer and can be safely deleted
+        _lib.TCOD_console_delete(self._as_parameter_)
+        self._as_parameter_ = None
 
     def __copy__(self):
         # make a new class and blit
@@ -897,37 +914,7 @@ class Console(_BaseConsole):
         AT ALL, it's up to the drawing functions to use the functions:
         _format_char and _format_color before passing to this."""
         # values are already formatted, honestly this function is redundant
-        return _lib.set_char(self._as_parameter_, x, y, char, fg, bg, bgblend)
-        
-        
-        # if char is not None and fg is not None and bg is not None:
-            # if fg is bg is Ellipsis:
-                # # char is not None and all colors are Ellipsis
-                # # use default colors previously set in this console
-                # _put_char(console, x, y, char, bgblend)
-                # return
-            # # all parameters are not None
-            # # use default colors for any ellipsis
-            # if fg is Ellipsis:
-                # fg = self._fg
-            # if bg is Ellipsis:
-                # bg = self._bg
-                
-            # _put_char_ex(console, x, y, char, fg[0], bg[0])
-            # return
-        # # some parameters are None
-        # # selectively commit parameters to the console
-        # # use default colors for any ellipsis
-        # if char is not None:
-            # _set_char(console, x, y, char)
-        # if fg is not None:
-            # if fg is Ellipsis:
-                # fg = self._fg
-            # _set_fg(console, x, y, fg[0])
-        # if bg is not None:
-            # if bg is Ellipsis:
-                # bg = self._bg
-            # _set_bg(console, x, y, bg[0], bgblend)
+        return _put_char_ex(self._as_parameter_, x, y, char, fg, bg, bgblend)
 
     def _set_batch(self, batch, fg, bg, bgblend=1, nullChar=False):
         """
@@ -939,37 +926,8 @@ class Console(_BaseConsole):
 
         batch is a iterable of [(x, y), ch] items
         """
-        if fg is Ellipsis:
-            fg = self._fg
-        if bg is Ellipsis:
-            bg = self._bg
-            
-        #if fg != -1:
-        #    fg = _to_tcod_color(fg)
-        #if bg != -1:
-        #    bg = _to_tcod_color(bg)
-            
         for (x, y), char in batch:
             self._set_char(x, y, char, fg, bg, bgblend)
-            
-        # if fg != -1 and not nullChar:
-            # # buffer values as ctypes objects
-            # self._typewriter = None # clear the typewriter as colors will be set
-            # console = self._as_parameter_
-            # #bgblend = _ctypes.c_int(bgblend)
-
-            # if bg == -1:
-                # bgblend = 0
-            # else:
-                # _lib.TCOD_console_set_default_background(console, bg[0])
-            # _lib.TCOD_console_set_default_foreground(console, fg[0])
-            # _putChar = _lib.TCOD_console_put_char # remove dots and make local
-            # for (x, y), char in batch:
-                # _putChar(console, x, y, char, bgblend)
-            
-        # else:
-            # for (x, y), char in batch:
-                # self._set_char(x, y, char, fg, bg, bgblend)
 
     def get_char(self, x, y):
         # inherit docstring
@@ -1148,11 +1106,9 @@ def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
 
     # If a console already exists then make a clone to replace it
     if _rootConsoleRef and _rootConsoleRef():
-        oldroot = _rootConsoleRef()
-        rootreplacement = Console(oldroot.width, oldroot.height)
-        rootreplacement.blit(oldroot)
-        oldroot._replace(rootreplacement)
-        del rootreplacement
+        # unhook the root console, turning into a regular console and deleting
+        # the root console from libTCOD
+        _rootConsoleRef()._root_unhook()
         
     if title is None: # use a default title
         if _sys.argv:
