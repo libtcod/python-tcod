@@ -22,6 +22,8 @@ def _import_library_functions(lib):
     for name in dir(lib):
         if name[:5] == 'TCOD_':
             g[name[5:]] = getattr(lib, name)
+        elif name[:4] == 'TCOD': # short constant names
+            g[name[4:]] = getattr(lib, name)
     
 _os.environ['PATH'] += ';' + _os.path.join(__path__[0],
                                            _get_library_crossplatform())
