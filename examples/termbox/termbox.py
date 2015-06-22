@@ -165,7 +165,7 @@ class Termbox:
 		tb_present()
 		pass
 
-	def change_cell(self, int x, int y, int ch, uint16_t fg, uint16_t bg):
+	def change_cell(self, x, y, ch, fg, bg):
 		"""Change cell in position (x;y).
 		"""
 		tb_change_cell(x, y, ch, fg, bg)
@@ -185,7 +185,7 @@ class Termbox:
 		"""
 		tb_clear()
 
-	def set_cursor(self, int x, int y):
+	def set_cursor(self, x, y):
 		"""Set cursor position to (x;y).
 
 		   Set both arguments to HIDE_CURSOR or use 'hide_cursor' function to hide it.
@@ -197,28 +197,28 @@ class Termbox:
 		"""
 		tb_set_cursor(-1, -1)
 
-	def select_input_mode(self, int mode):
+	def select_input_mode(self, mode):
 		"""Select preferred input mode: INPUT_ESC or INPUT_ALT.
 
 		   INPUT_CURRENT returns the selected mode without changing anything.
 		"""
 		return int(tb_select_input_mode(mode))
 
-	def select_output_mode(self, int mode):
+	def select_output_mode(self, mode):
 		"""Select preferred output mode: one of OUTPUT_* constants.
 
 		   OUTPUT_CURRENT returns the selected mode without changing anything.
 		"""
 		return int(tb_select_output_mode(mode))
 
-	def peek_event(self, int timeout=0):
+	def peek_event(self, timeout=0):
 		"""Wait for an event up to 'timeout' milliseconds and return it.
 
 		   Returns None if there was no event and timeout is expired.
 		   Returns a tuple otherwise: (type, unicode character, key, mod, width, height, mousex, mousey).
 		"""
+		"""
 		cdef tb_event e
-		cdef int result
 		with self._poll_lock:
 			with nogil:
 				result = tb_peek_event(&e, timeout)
@@ -229,6 +229,7 @@ class Termbox:
 			uch = unichr(e.ch)
 		else:
 			uch = None
+		"""
 		return (e.type, uch, e.key, e.mod, e.w, e.h, e.x, e.y)
 
 	def poll_event(self):
@@ -236,8 +237,8 @@ class Termbox:
 
 		   Returns a tuple: (type, unicode character, key, mod, width, height, mousex, mousey).
 		"""
+		"""
 		cdef tb_event e
-		cdef int result
 		with self._poll_lock:
 			with nogil:
 				result = tb_poll_event(&e)
@@ -246,4 +247,5 @@ class Termbox:
 			uch = unichr(e.ch)
 		else:
 			uch = None
+		"""
 		return (e.type, uch, e.key, e.mod, e.w, e.h, e.x, e.y)
