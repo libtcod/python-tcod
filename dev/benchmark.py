@@ -34,14 +34,14 @@ class Benchmark:
         self.total_frames = 0
         self.tiles = 0
         console.clear()
-        self.start_time = time.time()
+        self.start_time = time.clock()
         while self.total_frames < frames:
             self.total_frames += 1
             self.test(console)
             for event in tdl.event.get():
                 if event.type == 'QUIT':
                     raise SystemExit('Benchmark Canceled')
-        self.total_time = time.time() - self.start_time
+        self.total_time = time.clock() - self.start_time
         self.tiles_per_second = self.tiles / self.total_time
         print_result(
             '%i tiles drawn in %.2f seconds, %.2f characters/ms, %.2f FPS' %
