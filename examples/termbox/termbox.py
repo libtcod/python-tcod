@@ -1,49 +1,14 @@
-"""Termbox library python binding.
-
-This is a binding module for termbox library.
 """
+Implementation of Termbox Python API in tdl.
 
-include "termboxconfig.pyx"
-
-## No unichr in python3, use chr instead.
-if PY_MAJOR_VERSION == 3:
-	unichr = chr
-
-cdef extern from "stdint.h":
-	ctypedef unsigned int uint32_t
-	ctypedef unsigned short uint16_t
-	ctypedef signed int int32_t
-
-cdef extern from "../termbox.h":
-	struct tb_event:
-		uint16_t type
-		uint32_t ch
-		uint16_t key
-		uint16_t mod
-		int32_t w
-		int32_t h
-		int32_t x
-		int32_t y
-	int tb_init()
-	void tb_shutdown()
-	void tb_present()
-	void tb_clear()
-	void tb_change_cell(int x, int y, uint32_t ch, uint16_t fg, uint16_t bg)
-	int tb_width()
-	int tb_height()
-	void tb_set_cursor(int x, int y)
-	int tb_select_input_mode(int mode)
-	int tb_select_output_mode(int mode)
-	int tb_peek_event(tb_event *event, int timeout) nogil
-	int tb_poll_event(tb_event *event) nogil
+See README.md for details.
+"""
 
 class TermboxException(Exception):
 	def __init__(self, msg):
 		self.msg = msg
 	def __str__(self):
 		return self.msg
-
-import threading
 
 __instance = None
 
