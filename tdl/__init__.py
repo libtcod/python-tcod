@@ -1379,7 +1379,7 @@ setFPS = _style.backport(set_fps)
 getFPS = _style.backport(get_fps)
 forceResolution = _style.backport(force_resolution)
 
-__license__ = "New BSD License"
+__license__ = "Simplified BSD License"
 __author__ = 'Kyle Stewart'
 __contact__ = "4b796c65+pythonTDL@gmail.com"
 __email__ = "4b796c65+pythonTDL@gmail.com"

@@ -28,7 +28,10 @@
        'KPADD', 'KPSUB', 'KPDIV', 'KPMUL', 'KPDEC', 'KPENTER', 'F1', 'F2',
        'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12',
        'NUMLOCK', 'SCROLLLOCK', 'SPACE', 'CHAR'
+       
 """
+
+from __future__ import division
 
 import time as _time
 
@@ -45,7 +48,7 @@ _mousel = 0
 _mousem = 0
 _mouser = 0
 
-# this interpets the constants from libtcod and makes a key -> keyname dictionary
+# this interprets the constants from libtcod and makes a key -> keyname dictionary
 def _parseKeyNames(lib):
     """
     returns a dictionary mapping of human readable key names to their keycodes
@@ -67,7 +70,6 @@ class Event(object):
     You can easily subclass this to make your own events.  Be sure to set
     the class attribute L{Event.type} for it to be passed to a custom L{App}
     ev_* method."""
-    __slots__ = ('__weakref__',)
     type = None
     """String constant representing the type of event.
     
@@ -93,9 +95,7 @@ class Quit(Event):
     type = 'QUIT'
 
 class KeyEvent(Event):
-    __slots__ = ('key', 'char', 'keychar', 'shift', 'alt', 'control',
-                 'leftAlt', 'leftCtrl', 'rightAlt', 'rightCtrl')
-
+    
     def __init__(self, key, char, lalt, lctrl, ralt, rctrl, shift):
         # Convert keycodes into string, but use string if passed
         self.key = key if isinstance(key, str) else _keyNames[key]
@@ -152,19 +152,16 @@ class KeyEvent(Event):
 class KeyDown(KeyEvent):
     """Fired when the user presses a key on the keyboard or a key repeats.
     """
-    __slots__ = ()
     type = 'KEYDOWN'
 
 class KeyUp(KeyEvent):
     """Fired when the user releases a key on the keyboard.
     """
-    __slots__ = ()
     type = 'KEYUP'
 
 _mouseNames = {1: 'LEFT', 2: 'MIDDLE', 3: 'RIGHT', 4: 'SCROLLUP', 5: 'SCROLLDOWN'}
 class MouseButtonEvent(Event):
-    __slots__ = ('button', 'pos', 'cell')
-
+    
     def __init__(self, button, pos, cell):
         self.button = _mouseNames[button]
         """Can be one of
@@ -189,7 +186,6 @@ class MouseUp(MouseButtonEvent):
 
 class MouseMotion(Event):
     """Fired when the mouse is moved."""
-    __slots__ = ('pos',  'motion', 'cell', 'cellmotion')
     type = 'MOUSEMOTION'
 
     def __init__(self, pos, cell, motion, cellmotion):
@@ -224,6 +220,7 @@ class App(object):
        
        You may want to call drawing routines in this method followed by
        L{tdl.flush}.
+       
     """
     __slots__ = ('__running', '__prevTime')
     
@@ -311,7 +308,7 @@ class App(object):
         self.update(newTime - self.__prevTime)
         self.__prevTime = newTime
         #_tdl.flush()
-
+        
 def _processEvents():
     """Flushes the event queue from libtcod into the global list _eventQueue"""
     global _mousel, _mousem, _mouser, _eventsflushed, _pushedEvents
@@ -377,7 +374,7 @@ def _processEvents():
 def get():
     """Flushes the event queue and returns the list of events.
     
-    This function returns L{Event} objects that can be indentified by their
+    This function returns L{Event} objects that can be identified by their
     type attribute or their class.
     
     @rtype: iterator
@@ -386,15 +383,53 @@ def get():
              interrupted before finishing the excess items are preserved for the
              next call.
     """
-    def eventGenerator():
-        while _eventQueue:
-            # if there is an interruption the rest of the events stay untouched
-            # this means you can break out of a event.get loop without losing
-            # the leftover events
-            yield(_eventQueue.pop(0))
-        raise StopIteration()
     _processEvents()
-    return eventGenerator()
+    return _event_generator()
+    
+def _event_generator():
+    while _eventQueue:
+        # if there is an interruption the rest of the events stay untouched
+        # this means you can break out of a event.get loop without losing
+        # the leftover events
+        yield(_eventQueue.pop(0))
+    raise StopIteration()
+
+    
+def wait(timeout=None, filter=None, flush=True):
+    """Wait for an event.
+    
+    @type timeout: int or None
+    @param timeout: 
+    @type filter: collection or None
+    @param filter: A collection of types to return.
+                   
+                   For example: filter={'KEYUP', 'KEYDOWN', 'QUIT'},
+                   will only return Key events and L{Quit}.
+                   All other events will be discarded.
+    @type flush: boolean
+    @param flush: If True a call to L{tdl.flush} will be made before listening
+                  for events.
+    @rtype: L{Event} or None
+    @return: Returns an instance derived from L{Event} or anything
+             put in a L{push} call that matches the filter.
+    
+    @since: 1.4.0
+    """
+    if timeout is not None:
+        timeout = timeout / 1000 + _time.clock() # timeout at this time
+    while True:
+        for event in _event_generator():
+            if filter and event.type not in filter:
+                continue
+            return event
+        if flush:
+            # a full 'round' of events need to be processed before flushing
+            _tdl.flush()
+        if timeout and _time.clock() >= timeout:
+            return None # return None on timeout
+        _time.sleep(0.001) # sleep 1ms
+        _processEvents()
+
 
 def push(event):
     """Push an event into the event buffer.
@@ -404,6 +439,8 @@ def push(event):
                   An event pushed in the middle of a L{get} will not show until
                   the next time L{get} called preventing push related
                   infinite loops.
+                  
+                  This object should at least have a 'type' attribute.
     """
     _pushedEvents.append(event)
     
@@ -455,3 +492,4 @@ App.runOnce = _style.backport(App.run_once)
 keyWait = _style.backport(key_wait)
 setKeyRepeat = _style.backport(set_key_repeat)
 isWindowClosed = _style.backport(is_window_closed)
+
