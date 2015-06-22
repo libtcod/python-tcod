@@ -395,17 +395,11 @@ def _event_generator():
     raise StopIteration()
 
     
-def wait(timeout=None, filter=None, flush=True):
+def wait(timeout=None, flush=True):
     """Wait for an event.
     
     @type timeout: int or None
     @param timeout: 
-    @type filter: collection or None
-    @param filter: A collection of types to return.
-                   
-                   For example: filter={'KEYUP', 'KEYDOWN', 'QUIT'},
-                   will only return Key events and L{Quit}.
-                   All other events will be discarded.
     @type flush: boolean
     @param flush: If True a call to L{tdl.flush} will be made before listening
                   for events.
@@ -419,8 +413,6 @@ def wait(timeout=None, filter=None, flush=True):
         timeout = timeout / 1000 + _time.clock() # timeout at this time
     while True:
         for event in _event_generator():
-            if filter and event.type not in filter:
-                continue
             return event
         if flush:
             # a full 'round' of events need to be processed before flushing
