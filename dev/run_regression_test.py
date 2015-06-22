@@ -123,7 +123,7 @@ class BasicTests(TDLTemplate):
         clone = pickle.loads(pickled)
         self.compareConsoles(self.console, clone, 'pickled console should match root console')
      
-    ## This isn't really supported.
+    # This isn't really supported.
     #def test_changeFonts(self):
     #    "Fonts are changable on the fly... kind of"
     #    FONT_DIR = '../fonts/X11'
@@ -132,9 +132,10 @@ class BasicTests(TDLTemplate):
     #            continue # skip all those other files
     #        font = os.path.join(FONT_DIR, font)
     #        tdl.setFont(font)
+    #        # only works at all in OPENGL
+    #        self.console = tdl.init(WIDTH, HEIGHT, title=font, renderer='OPENGL')
     #        for x,y in self.getDrawables():
-    #            self.console.drawChar(x, y, *self.getRandomCharacter())
-    #        tdl.setTitle(font)
+    #            self.console.draw_char(x, y, *self.getRandomCharacter())
     #        self.flush()
     #        time.sleep(.05)
         
