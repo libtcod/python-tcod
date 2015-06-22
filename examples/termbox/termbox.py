@@ -162,13 +162,12 @@ class Termbox:
 	def present(self):
 		"""Sync state of the internal cell buffer with the terminal.
 		"""
-		tb_present()
-		pass
+		tdl.flush()
 
 	def change_cell(self, x, y, ch, fg, bg):
 		"""Change cell in position (x;y).
 		"""
-		tb_change_cell(x, y, ch, fg, bg)
+		self.console.draw_char(x, y, ch, fg, bg)
 
 	def width(self):
 		"""Returns width of the terminal screen.
