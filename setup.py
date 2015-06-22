@@ -7,7 +7,7 @@ setup(
     version=open('tcod/version.txt', 'r').read(),
     author='Kyle Stewart',
     author_email='4B796C65+pythonTDL@gmail.com',
-    description='A direct python-cffi port libtcod.',
+    description='A Python cffi port of libtcod.',
     long_description='\n'.join([open('README.rst', 'r').read(),
                                 open('CHANGELOG.rst', 'r').read()]),
     url='https://github.com/HexDecimal/libtcod-cffi',
