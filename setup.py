@@ -39,13 +39,8 @@ setup(
     url='https://github.com/HexDecimal/python-tdl',
     download_url='https://pypi.python.org/pypi/tdl',
     packages=['tdl'],
-    package_data={'tdl': ['*.txt', '*.rst', 'lib/*.txt', '*.bmp', '*.png',
-                          'lib/win32/*',
-                          'lib/darwin/*.dylib',
-                          'lib/linux*/*']},
-    setup_requires=["cffi>=1.0.0"],
-    cffi_modules=["build_libtcod.py:ffi"],
-    install_requires=["cffi>=1.0.0"],
+    package_data={'tdl': ['*.txt', '*.rst', '*.bmp', '*.png']},
+    install_requires=["libtcod-cffi>=0.1.0"],
     cmdclass={'build_docs': build_docs},
     classifiers=['Development Status :: 5 - Production/Stable',
                'Environment :: Win32 (MS Windows)',
@@ -57,7 +52,6 @@ setup(
                'Operating System :: POSIX',
                'Operating System :: MacOS',
                'Operating System :: Microsoft :: Windows',
-               'Programming Language :: Python :: 2.6',
                'Programming Language :: Python :: 2.7',
                'Programming Language :: Python :: 3',
                'Programming Language :: Python :: 3.0',
@@ -71,7 +65,7 @@ setup(
                'Topic :: Multimedia :: Graphics',
                'Topic :: Software Development :: Libraries :: Python Modules',
                ],
-    keywords = 'portable rogue-like rogue-likes text cffi ASCII ANSI Unicode libtcod fov',
+    keywords = 'rogue-like rogue-likes text cffi ASCII ANSI Unicode libtcod fov',
     platforms = ['Windows', 'Mac OS X', 'Linux'],
-    license = 'New BSD License'
+    license = 'Simplified BSD License'
     )
