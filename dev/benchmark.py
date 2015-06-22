@@ -108,8 +108,8 @@ def run_benchmark():
     print_result('Opened console in %s mode' % RENDERER)
     Benchmark_DrawChar_DefaultColor().run(console)
     Benchmark_DrawChar_NoColor().run(console)
-    Benchmark_DrawStr16_DefaultColor().run(console)
-    Benchmark_DrawStr16_NoColor().run(console)
+    #Benchmark_DrawStr16_DefaultColor().run(console)
+    #Benchmark_DrawStr16_NoColor().run(console)
     log.close()
     print('results written to results.log')
     
