@@ -10,7 +10,8 @@ import tdl
 Implementation notes:
  [ ] tdl.init() needs a window, made 132x60
  [ ] Termbox.close() is not implemented, does nothing
-
+ [ ] poll_event needs review, because it does not
+     completely follows the original logic
 
 """
 
@@ -131,6 +132,20 @@ EVENT_KEY        = 1
 EVENT_RESIZE     = 2
 EVENT_MOUSE		= 3
 
+class Event:
+    """ Aggregate for Termbox Event structure """
+    type = None
+    ch = None
+    key = None
+    mod = None
+    width = None
+    height = None
+    mousex = None
+    mousey = None
+
+    def gettuple(self):
+         return (self.type, self.ch, self.key, self.mod, self.width, self.height, self.mousex, self.mousey)
+
 class Termbox:
 	def __init__(self, width=132, height=60):
 		global _instance
@@ -141,6 +156,8 @@ class Termbox:
 			self.console = tdl.init(width, height)
                 except tdl.TDLException as e:
 			raise TermboxException(e)
+
+                self.e = Event() # cache for event data
 
 		_instance = self
 
@@ -247,4 +264,11 @@ class Termbox:
 		else:
 			uch = None
 		"""
-		return (e.type, uch, e.key, e.mod, e.w, e.h, e.x, e.y)
+                for e in tdl.event.get():
+                  # [ ] not all events are passed thru
+                  self.e.type = e.type
+                  if e.type == 'KEYDOWN':
+                    self.e.key = e.key
+                    return self.e.gettuple()
+
+		#return (e.type, uch, e.key, e.mod, e.w, e.h, e.x, e.y)
