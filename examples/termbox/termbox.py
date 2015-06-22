@@ -20,7 +20,7 @@ class TermboxException(Exception):
 	def __str__(self):
 		return self.msg
 
-__instance = None
+_instance = None
 
 # keys ----------------------------------
 KEY_F1               = (0xFFFF-0)
@@ -133,16 +133,16 @@ EVENT_MOUSE		= 3
 
 class Termbox:
 	def __init__(self, width=132, height=60):
-		global __instance
-		if __instance:
+		global _instance
+		if _instance:
 			raise TermboxException("It is possible to create only one instance of Termbox")
 
 		try:
-			tdl.init(width, height)
+			self.console = tdl.init(width, height)
                 except tdl.TDLException as e:
 			raise TermboxException(e)
 
-		__instance = self
+		_instance = self
 
 	def __del__(self):
 		self.close()
@@ -154,9 +154,9 @@ class Termbox:
 		return self
 
 	def close(self):
-		global __instance
+		global _instance
 		# tb_shutdown()
-		__instance = None
+		_instance = None
                 # TBD, does nothing
 
 	def present(self):
@@ -173,17 +173,17 @@ class Termbox:
 	def width(self):
 		"""Returns width of the terminal screen.
 		"""
-		return int(tb_width())
+		return self.console.width
 
 	def height(self):
 		"""Return height of the terminal screen.
 		"""
-		return int(tb_height())
+		return self.console.height
 
 	def clear(self):
 		"""Clear the internal cell buffer.
 		"""
-		tb_clear()
+		self.console.clear()
 
 	def set_cursor(self, x, y):
 		"""Set cursor position to (x;y).
