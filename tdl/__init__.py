@@ -55,6 +55,8 @@
       
       After the drawing functions are called a call to L{tdl.flush} will update
       the screen.
+      
+    @undocumented: style
 """
 
 import sys as _sys
@@ -183,9 +185,13 @@ class _BaseConsole(object):
                    getCursor getSize getChar printStr setColors setMode
     @group Drawing Methods: draw_*, blit, clear
     @group Printing Methods: print_*, move, set_colors, set_mode, write, get_cursor
+    
+    @undocumented: console
+    @ivar width: The width of this console in tiles.  Do not overwrite this.
+    @ivar height: The height of this console in tiles.  Do not overwrite this.
     """
     __slots__ = ('width', 'height', 'console', '_cursor', '_fg',
-                 '_bg', '_blend', '_colorLock', '__weakref__', '__dict__')
+                 '_bg', '_blend', '__weakref__', '__dict__')
 
     def __init__(self):
         self._cursor = (0, 0)
@@ -193,7 +199,6 @@ class _BaseConsole(object):
         self._fg = _format_color((255, 255, 255))
         self._bg = _format_color((0, 0, 0))
         self._blend = _lib.TCOD_BKGND_SET
-        self._colorLock = None # which object sets the ctype color options
         
     def _normalizePoint(self, x, y):
         """Check if a point is in bounds and make minor adjustments.
@@ -388,7 +393,7 @@ class _BaseConsole(object):
         @see: L{get_char}
         """
         #x, y = self._normalizePoint(x, y)
-        _put_char_ex(self._as_parameter_, x, y, _format_char(char),
+        _put_char_ex(self.tcod_console, x, y, _format_char(char),
                      _format_color(fg, self._fg), _format_color(bg, self._bg), 1)
 
     def draw_str(self, x, y, string, fg=Ellipsis, bg=Ellipsis):
@@ -600,15 +605,15 @@ class _BaseConsole(object):
             # onto the data, otherwise it tries to copy into itself and
             # starts destroying everything
             tmp = Console(width, height)
-            _lib.TCOD_console_blit(source._as_parameter_,
+            _lib.TCOD_console_blit(source.tcod_console,
                                    srcX, srcY, width, height,
-                                   tmp._as_parameter_, 0, 0, fgalpha, bgalpha)
-            _lib.TCOD_console_blit(tmp._as_parameter_, 0, 0, width, height,
-                                   self._as_parameter_, x, y, fgalpha, bgalpha)
+                                   tmp.tcod_console, 0, 0, fgalpha, bgalpha)
+            _lib.TCOD_console_blit(tmp.tcod_console, 0, 0, width, height,
+                                   self.tcod_console, x, y, fgalpha, bgalpha)
         else:
-            _lib.TCOD_console_blit(source._as_parameter_,
+            _lib.TCOD_console_blit(source.tcod_console,
                                    srcX, srcY, width, height,
-                                   self._as_parameter_, x, y, fgalpha, bgalpha)
+                                   self.tcod_console, x, y, fgalpha, bgalpha)
 
     def get_cursor(self):
         """Return the virtual cursor position.
@@ -781,9 +786,16 @@ class Console(_BaseConsole):
     can be drawn on before being L{blit} to the root console.
     
     @undocumented: getChar
+    
+    @ivar tcod_console: Public interface to the cffi TCOD_console_t object
+                        of this instance.
+                        
+                        Feel free to pass this variable to libtcod-cffi calls
+                        but keep in mind that as soon as Console instance is
+                        garbage collected the tcod_console will be deleted.
     """
 
-    __slots__ = ('_as_parameter_', '_typewriter')
+    __slots__ = ('tcod_console',)
 
     def __init__(self, width, height):
         """Create a new offscreen console.
@@ -796,23 +808,20 @@ class Console(_BaseConsole):
         _BaseConsole.__init__(self)
         if not _rootinitialized:
             raise TDLError('Can not create Console instances before a call to tdl.init')
-        self._as_parameter_ = _lib.TCOD_console_new(width, height)
+        self.tcod_console = _lib.TCOD_console_new(width, height)
         self.console = self
         self.width = width
         self.height = height
-        self._typewriter = None # "typewriter lock", makes sure the colors are set to the typewriter
-        # will be phased out with the Typewriter class
 
     @classmethod
     def _newConsole(cls, console):
         """Make a Console instance, from a console ctype"""
         self = cls.__new__(cls)
         _BaseConsole.__init__(self)
-        self._as_parameter_ = console
+        self.tcod_console = console
         self.console = self
         self.width = _lib.TCOD_console_get_width(console)
         self.height = _lib.TCOD_console_get_height(console)
-        self._typewriter = None
         return self
         
     def _root_unhook(self):
@@ -825,29 +834,29 @@ class Console(_BaseConsole):
         if(_rootConsoleRef and _rootConsoleRef() is self):
             # turn this console into a regular console
             unhooked = _lib.TCOD_console_new(self.width, self.height)
-            _lib.TCOD_console_blit(self._as_parameter_,
+            _lib.TCOD_console_blit(self.tcod_console,
                                    0, 0, self.width, self.height,
                                    unhooked, 0, 0, 1, 1)
             # delete root console from TDL and TCOD
             _rootinitialized = False
             _rootConsoleRef = None
-            _lib.TCOD_console_delete(self._as_parameter_)
+            _lib.TCOD_console_delete(self.tcod_console)
             # this Console object is now a regular console
-            self._as_parameter_ = unhooked
+            self.tcod_console = unhooked
 
     def __del__(self):
         """
         If the main console is garbage collected then the window will be closed as well
         """
-        if self._as_parameter_ is None:
+        if self.tcod_console is None:
             return # this console was already deleted
-        if self._as_parameter_ is _ffi.NULL:
+        if self.tcod_console is _ffi.NULL:
             # a pointer to the special root console
             self._root_unhook() # unhook the console and leave it to the GC
             return
         # this is a normal console pointer and can be safely deleted
-        _lib.TCOD_console_delete(self._as_parameter_)
-        self._as_parameter_ = None
+        _lib.TCOD_console_delete(self.tcod_console)
+        self.tcod_console = None
 
     def __copy__(self):
         # make a new class and blit
@@ -868,21 +877,6 @@ class Console(_BaseConsole):
         for (x, y), graphic in zip(_itertools.product(range(width),
                                                       range(height)), data):
             self.draw_char(x, y, *graphic)
-            
-    def _replace(self, console):
-        """Used internally
-
-        Mostly used just to replace this Console object with the root console
-        If another Console object is used then they are swapped
-        """
-        if isinstance(console, Console):
-            self._as_parameter_, console._as_parameter_ = \
-              console._as_parameter_, self._as_parameter_ # swap tcod consoles
-        else:
-            self._as_parameter_ = console
-        self.width = _lib.TCOD_console_get_width(self._as_parameter_)
-        self.height = _lib.TCOD_console_get_height(self._as_parameter_)
-        return self
 
     def _translate(self, x, y):
         """Convertion x and y to their position on the root Console for this Window
@@ -894,14 +888,13 @@ class Console(_BaseConsole):
     def clear(self, fg=Ellipsis, bg=Ellipsis):
         # inherit docstring
         assert fg is not None and bg is not None, 'Can not use None with clear'
-        self._typewriter = None
         fg = _format_color(fg, self._fg)
         bg = _format_color(bg, self._bg)
-        _lib.TCOD_console_set_default_foreground(self._as_parameter_,
+        _lib.TCOD_console_set_default_foreground(self.tcod_console,
                                                  _to_tcod_color(fg)[0])
-        _lib.TCOD_console_set_default_background(self._as_parameter_,
+        _lib.TCOD_console_set_default_background(self.tcod_console,
                                                  _to_tcod_color(bg)[0])
-        _lib.TCOD_console_clear(self._as_parameter_)
+        _lib.TCOD_console_clear(self.tcod_console)
         
 
     def _set_char(self, x, y, char, fg=None, bg=None,
@@ -914,7 +907,7 @@ class Console(_BaseConsole):
         AT ALL, it's up to the drawing functions to use the functions:
         _format_char and _format_color before passing to this."""
         # values are already formatted, honestly this function is redundant
-        return _put_char_ex(self._as_parameter_, x, y, char, fg, bg, bgblend)
+        return _put_char_ex(self.tcod_console, x, y, char, fg, bg, bgblend)
 
     def _set_batch(self, batch, fg, bg, bgblend=1, nullChar=False):
         """
@@ -932,9 +925,9 @@ class Console(_BaseConsole):
     def get_char(self, x, y):
         # inherit docstring
         x, y = self._normalizePoint(x, y)
-        char = _lib.TCOD_console_get_char(self._as_parameter_, x, y)
-        bg = _lib.TCOD_console_get_char_background(self._as_parameter_, x, y)
-        fg = _lib.TCOD_console_get_char_foreground(self._as_parameter_, x, y)
+        char = _lib.TCOD_console_get_char(self.tcod_console, x, y)
+        bg = _lib.TCOD_console_get_char_background(self.tcod_console, x, y)
+        fg = _lib.TCOD_console_get_char_foreground(self.tcod_console, x, y)
         return char, (fg.r, fg.g, fg.b), (bg.r, bg.g, bg.b)
 
     def __repr__(self):
