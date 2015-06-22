@@ -7,12 +7,13 @@ See README.md for details.
 import tdl
 
 """
-Implementation notes:
+Implementation status:
  [ ] tdl.init() needs a window, made 132x60
  [ ] Termbox.close() is not implemented, does nothing
  [ ] poll_event needs review, because it does not
      completely follows the original logic
-
+ [ ] peek is stubbed, but not implemented
+ [ ] not all keys/events are mapped
 """
 
 class TermboxException(Exception):
@@ -38,14 +39,10 @@ KEY_F11              = (0xFFFF-10)
 KEY_F12              = (0xFFFF-11)
 KEY_INSERT           = (0xFFFF-12)
 KEY_DELETE           = (0xFFFF-13)
-KEY_HOME             = (0xFFFF-14)
-KEY_END              = (0xFFFF-15)
+
 KEY_PGUP             = (0xFFFF-16)
 KEY_PGDN             = (0xFFFF-17)
-KEY_ARROW_UP         = (0xFFFF-18)
-KEY_ARROW_DOWN       = (0xFFFF-19)
-KEY_ARROW_LEFT       = (0xFFFF-20)
-KEY_ARROW_RIGHT      = (0xFFFF-21)
+
 KEY_MOUSE_LEFT      =(0xFFFF-22)
 KEY_MOUSE_RIGHT      =(0xFFFF-23)
 KEY_MOUSE_MIDDLE      =(0xFFFF-24)
@@ -84,7 +81,19 @@ KEY_CTRL_W           = 0x17
 KEY_CTRL_X           = 0x18
 KEY_CTRL_Y           = 0x19
 KEY_CTRL_Z           = 0x1A
-KEY_ESC              = 0x1B
+
+
+# -- mapped to tdl
+KEY_HOME             = 'HOME'
+KEY_END              = 'END'
+KEY_ARROW_UP         = 'UP'
+KEY_ARROW_DOWN       = 'DOWN'
+KEY_ARROW_LEFT       = 'LEFT'
+KEY_ARROW_RIGHT      = 'RIGHT'
+KEY_ESC              = 'ESCAPE'
+# /--
+
+
 KEY_CTRL_LSQ_BRACKET = 0x1B
 KEY_CTRL_3           = 0x1B
 KEY_CTRL_4           = 0x1C
@@ -103,15 +112,18 @@ MOD_ALT              = 0x01
 
 # attributes ----------------------
 
-DEFAULT   = 0x00
-BLACK     = 0x01
-RED       = 0x02
-GREEN     = 0x03
-YELLOW    = 0x04
-BLUE      = 0x05
-MAGENTA   = 0x06
-CYAN      = 0x07
-WHITE     = 0x08
+#-- mapped to tdl
+DEFAULT   = Ellipsis
+
+BLACK     = 0x000000
+RED       = 0xFF0000
+GREEN     = 0x00FF00
+YELLOW    = 0xFFFF00
+BLUE      = 0x0000FF
+MAGENTA   = 0xFF00FF
+CYAN      = 0x00FFFF
+WHITE     = 0xFFFFFF
+#/--
 
 BOLD      = 0x10
 UNDERLINE = 0x20
@@ -128,7 +140,11 @@ OUTPUT_NORMAL    = 1
 OUTPUT_256       = 2
 OUTPUT_216       = 3
 OUTPUT_GRAYSCALE = 4
-EVENT_KEY        = 1
+
+
+# -- mapped to tdl
+EVENT_KEY        = 'KEYDOWN'
+# /--
 EVENT_RESIZE     = 2
 EVENT_MOUSE		= 3
 
@@ -246,7 +262,7 @@ class Termbox:
 		else:
 			uch = None
 		"""
-		return (e.type, uch, e.key, e.mod, e.w, e.h, e.x, e.y)
+		pass #return (e.type, uch, e.key, e.mod, e.w, e.h, e.x, e.y)
 
 	def poll_event(self):
 		"""Wait for an event and return it.
