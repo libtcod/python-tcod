@@ -4,6 +4,16 @@ Implementation of Termbox Python API in tdl.
 See README.md for details.
 """
 
+import tdl
+
+"""
+Implementation notes:
+ [ ] tdl.init() needs a window, made 132x60
+ [ ] Termbox.close() is not implemented, does nothing
+
+
+"""
+
 class TermboxException(Exception):
 	def __init__(self, msg):
 		self.msg = msg
@@ -121,29 +131,18 @@ EVENT_KEY        = 1
 EVENT_RESIZE     = 2
 EVENT_MOUSE		= 3
 
-cdef class Termbox:
-	cdef int created
-	cdef object _poll_lock
-
-	def __cinit__(self):
-		cdef int ret
+class Termbox:
+	def __init__(self, width=132, height=60):
 		global __instance
-
-		self.created = 0
-		self._poll_lock = threading.Lock()
-
 		if __instance:
 			raise TermboxException("It is possible to create only one instance of Termbox")
 
-		ret = tb_init()
-		ret = 1
-		if ret < 0:
-			raise TermboxException("Failed to init Termbox")
-		__instance = self
-		self.created = 1
+		try:
+			tdl.init(width, height)
+                except tdl.TDLException as e:
+			raise TermboxException(e)
 
-	def __dealloc__(self):
-		self.close()
+		__instance = self
 
 	def __del__(self):
 		self.close()
@@ -156,10 +155,9 @@ cdef class Termbox:
 
 	def close(self):
 		global __instance
-		if self.created:
-			tb_shutdown()
-			self.created = 0
-			__instance = None
+		# tb_shutdown()
+		__instance = None
+                # TBD, does nothing
 
 	def present(self):
 		"""Sync state of the internal cell buffer with the terminal.
