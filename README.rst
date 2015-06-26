@@ -1,7 +1,7 @@
 =======
  About
 =======
-This is a direct Python CFFI port of libtcod, this is an offshoot of the python-tdl project and has been made into it's own package.
+This is a Python CFFI port of libtcod, this is an offshoot of the python-tdl project and has been made into it's own package.
 Both projects are still developed together, and this module provide special functions specifically to be used by python-tdl.
 
 This library is hosted on GitHub: https://github.com/HexDecimal/libtcod-cffi

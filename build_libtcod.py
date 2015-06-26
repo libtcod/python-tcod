@@ -40,7 +40,8 @@ ffi.cdef(open('tcod/libtcod_cdef.h', 'r').read())
 ffi.set_source(module_name, open('tcod/tdl_source.c', 'r').read(),
 include_dirs=['tcod/include/libtcod-1.5', 'Release/tcod/'],
 library_dirs=[_get_library_dirs_crossplatform()],
-libraries=_get_libraries_crossplatform())
+libraries=_get_libraries_crossplatform(),
+extra_compile_args=['/O2', '/W3'])
 
 if __name__ == "__main__":
     ffi.compile()
