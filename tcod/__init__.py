@@ -258,6 +258,24 @@ class Bsp(object):
         self.p.level = value
     level = property(getlev, setlev)
 
+class HeightMap(object):
+    def __init__(self, chm):
+        pchm = cast(chm, _CHeightMap)
+        self.p = pchm
+
+    def getw(self):
+        return self.p.w
+    def setw(self, value):
+        self.p.w = value
+    w = property(getw, setw)
+
+    def geth(self):
+        return self.p.h
+    def seth(self, value):
+        self.p.h = value
+    h = property(geth, seth)
+
+    
 NOISE_DEFAULT_HURST = 0.5
 NOISE_DEFAULT_LACUNARITY = 2.0
 
@@ -309,7 +327,6 @@ def struct_get_type(struct, name):
 
     
 _import_library_functions(lib, True) # depends on Color
-#del line
     
 from . import bsp
 from . import color
@@ -342,132 +359,5 @@ _import_module_functions(parser)
 _import_module_functions(path)
 _import_module_functions(random)
 _import_module_functions(sys)
-
-       
-        
-# # parser
-                                          
-# def parser_run(parser, filename, listener=0):
-    # if listener != 0:
-        # clistener=_CParserListener()
-        # def value_converter(name, typ, value):
-            # if typ == TYPE_BOOL:
-                # return listener.new_property(name, typ, value.c == 1)
-            # elif typ == TYPE_CHAR:
-                # return listener.new_property(name, typ, '%c' % (value.c & 0xFF))
-            # elif typ == TYPE_INT:
-                # return listener.new_property(name, typ, value.i)
-            # elif typ == TYPE_FLOAT:
-                # return listener.new_property(name, typ, value.f)
-            # elif typ == TYPE_STRING or \
-                 # TYPE_VALUELIST15 >= typ >= TYPE_VALUELIST00:
-                 # return listener.new_property(name, typ, value.s)
-            # elif typ == TYPE_COLOR:
-                # col = cast(value.col, POINTER(Color)).contents
-                # return listener.new_property(name, typ, col)
-            # elif typ == TYPE_DICE:
-                # dice = cast(value.dice, POINTER(Dice)).contents
-                # return listener.new_property(name, typ, dice)
-            # elif typ & TYPE_LIST:
-                # return listener.new_property(name, typ,
-                                        # _convert_TCODList(value.custom, typ & 0xFF))
-            # return True
-        # clistener.new_struct = _CFUNC_NEW_STRUCT(listener.new_struct)
-        # clistener.new_flag = _CFUNC_NEW_FLAG(listener.new_flag)
-        # clistener.new_property = _CFUNC_NEW_PROPERTY(value_converter)
-        # clistener.end_struct = _CFUNC_NEW_STRUCT(listener.end_struct)
-        # clistener.error = _CFUNC_NEW_FLAG(listener.error)
-        # lib.TCOD_parser_run(parser, filename, byref(clistener))
-    # else:
-        # lib.TCOD_parser_run(parser, filename, ffi.NULL)
-
-# def Dice(*args):
-    # return ffi.new('TCOD_dice_t *', args)
-
-# # parser
-    
-# def _CParserListener(*args):
-    # return ffi.new('TCOD_parser_listener_t *', args)
-        
-# def _CValue(*args):
-    # return ffi.new('TCOD_value_t *', args)
-    
-# def _CFUNC_NEW_STRUCT(func):
-    # return ffi.callback('bool(TCOD_parser_struct_t, char*)')(func)
-
-# def _CFUNC_NEW_FLAG(func):
-    # return ffi.callback('bool(char*)')(func)
-    
-# def _CFUNC_NEW_PROPERTY(func):
-    # return ffi.callback('bool(char*, TCOD_value_type_t, TCOD_value_t)')(func)
- 
-# # random
-
-# def random_set_distribution(rnd, dist):
-    # if rnd is None:
-        # rnd = ffi.NULL
-    # lib.TCOD_random_set_distribution(rnd, dist)
-
-# def random_get_int(rnd, mi, ma):
-    # if rnd is None:
-        # rnd = ffi.NULL
-    # return lib.TCOD_random_get_int(rnd, mi, ma)
-
-# def random_get_float(rnd, mi, ma):
-    # if rnd is None:
-        # rnd = ffi.NULL
-    # return lib.TCOD_random_get_float(rnd, mi, ma)
-
-# def random_get_double(rnd, mi, ma):
-    # if rnd is None:
-        # rnd = ffi.NULL
-    # return lib.TCOD_random_get_double(rnd, mi, ma)
-
-# def random_get_int_mean(rnd, mi, ma, mean):
-    # if rnd is None:
-        # rnd = ffi.NULL
-    # return lib.TCOD_random_get_int_mean(rnd, mi, ma, mean)
-
-# def random_get_float_mean(rnd, mi, ma, mean):
-    # if rnd is None:
-        # rnd = ffi.NULL
-    # return lib.TCOD_random_get_float_mean(rnd, mi, ma, mean)
-
-# # image
-
-# def image_rotate90(image, num=1) :
-    # lib.TCOD_image_rotate90(image, num)
-    
-# def image_load(filename):
-    # return lib.TCOD_image_load(filename)
-
-# def image_from_console(console):
-    # if not console:
-        # console = ffi.NULL
-    # return lib.TCOD_image_from_console(console)
-
-# def image_refresh_console(image, console):
-    # if not console:
-        # console = ffi.NULL
-    # lib.TCOD_image_refresh_console(image, console)
-
-# def image_get_size(image):
-    # w=ffi.new('int *')
-    # h=ffi.new('int *')
-    # lib.TCOD_image_get_size(image, w, h)
-    # return w[0], h[0]
-
-# def image_blit_rect(image, console, x, y, w, h, bkgnd_flag):
-    # if not console:
-        # console = ffi.NULL
-    # lib.TCOD_image_blit_rect(image, console, x, y, w, h, bkgnd_flag)
-
-# def image_blit_2x(image, console, dx, dy, sx=0, sy=0, w=-1, h=-1):
-    # if not console:
-        # console = ffi.NULL
-    # lib.TCOD_image_blit_2x(image, console, dx,dy,sx,sy,w,h)
-
-# def image_save(image, filename):
-    # _lib.TCOD_image_save(image, filename)
 
 __all__ = [name for name in list(globals()) if name[0] != '_']

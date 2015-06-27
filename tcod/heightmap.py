@@ -1,134 +1,111 @@
 
+import tcod as _tcod
 from .libtcod import _lib, _ffi
 
-class HeightMap(object):
-    def __init__(self, chm):
-        pchm = cast(chm, _CHeightMap)
-        self.p = pchm
-
-    def getw(self):
-        return self.p.w
-    def setw(self, value):
-        self.p.w = value
-    w = property(getw, setw)
-
-    def geth(self):
-        return self.p.h
-    def seth(self, value):
-        self.p.h = value
-    h = property(geth, seth)
-
-def heightmap_new(w, h):
+def new(w, h):
     phm = _lib.TCOD_heightmap_new(w, h)
-    return HeightMap(phm)
+    return _tcod.HeightMap(phm)
 
-def heightmap_set_value(hm, x, y, value):
-    _lib.TCOD_heightmap_set_value(hm.p, x, y, c_float(value))
+def set_value(hm, x, y, value):
+    _lib.TCOD_heightmap_set_value(hm.p, x, y, value)
 
-def heightmap_add(hm, value):
-    _lib.TCOD_heightmap_add(hm.p, c_float(value))
+def add(hm, value):
+    _lib.TCOD_heightmap_add(hm.p, value)
 
-def heightmap_scale(hm, value):
-    _lib.TCOD_heightmap_scale(hm.p, c_float(value))
+def scale(hm, value):
+    _lib.TCOD_heightmap_scale(hm.p, value)
 
-def heightmap_clear(hm):
+def clear(hm):
     _lib.TCOD_heightmap_clear(hm.p)
 
-def heightmap_clamp(hm, mi, ma):
-    _lib.TCOD_heightmap_clamp(hm.p, c_float(mi),c_float(ma))
+def clamp(hm, mi, ma):
+    _lib.TCOD_heightmap_clamp(hm.p, mi, ma)
 
-def heightmap_copy(hm1, hm2):
+def copy(hm1, hm2):
     _lib.TCOD_heightmap_copy(hm1.p, hm2.p)
 
-def heightmap_normalize(hm,  mi=0.0, ma=1.0):
-    _lib.TCOD_heightmap_normalize(hm.p, c_float(mi), c_float(ma))
+def normalize(hm,  mi=0.0, ma=1.0):
+    _lib.TCOD_heightmap_normalize(hm.p, mi, ma)
 
-def heightmap_lerp_hm(hm1, hm2, hm3, coef):
-    _lib.TCOD_heightmap_lerp_hm(hm1.p, hm2.p, hm3.p, c_float(coef))
+def lerp_hm(hm1, hm2, hm3, coef):
+    _lib.TCOD_heightmap_lerp_hm(hm1.p, hm2.p, hm3.p, coef)
 
-def heightmap_add_hm(hm1, hm2, hm3):
+def add_hm(hm1, hm2, hm3):
     _lib.TCOD_heightmap_add_hm(hm1.p, hm2.p, hm3.p)
 
-def heightmap_multiply_hm(hm1, hm2, hm3):
+def multiply_hm(hm1, hm2, hm3):
     _lib.TCOD_heightmap_multiply_hm(hm1.p, hm2.p, hm3.p)
 
-def heightmap_add_hill(hm, x, y, radius, height):
-    _lib.TCOD_heightmap_add_hill(hm.p, c_float( x), c_float( y),
-                                 c_float( radius), c_float( height))
+def add_hill(hm, x, y, radius, height):
+    _lib.TCOD_heightmap_add_hill(hm.p, x, y, radius, height)
 
-def heightmap_dig_hill(hm, x, y, radius, height):
-    _lib.TCOD_heightmap_dig_hill(hm.p, c_float( x), c_float( y),
-                                 c_float( radius), c_float( height))
+def dig_hill(hm, x, y, radius, height):
+    _lib.TCOD_heightmap_dig_hill(hm.p, x, y, radius, height)
 
-def heightmap_rain_erosion(hm, nbDrops, erosionCoef, sedimentationCoef, rnd=0):
-    _lib.TCOD_heightmap_rain_erosion(hm.p, nbDrops, c_float( erosionCoef),
-                                     c_float( sedimentationCoef), rnd)
+def rain_erosion(hm, nbDrops, erosionCoef, sedimentationCoef, rnd=None):
+    _lib.TCOD_heightmap_rain_erosion(hm.p, nbDrops, erosionCoef,
+                                     sedimentationCoef, rnd or _ffi.NULL)
 
-def heightmap_kernel_transform(hm, kernelsize, dx, dy, weight, minLevel,
+def kernel_transform(hm, kernelsize, dx, dy, weight, minLevel,
                                maxLevel):
-    FARRAY = c_float * kernelsize
-    IARRAY = c_int * kernelsize
-    cdx = IARRAY(*dx)
-    cdy = IARRAY(*dy)
-    cweight = FARRAY(*weight)
+    #FARRAY = c_float * kernelsize
+    #IARRAY = c_int * kernelsize
+    cdx = _ffi.new('float[]', dx)
+    cdy = _ffi.new('int[]', dy)
+    cweight = _ffi.new('float[]', weight)
     _lib.TCOD_heightmap_kernel_transform(hm.p, kernelsize, cdx, cdy, cweight,
-                                         c_float(minLevel), c_float(maxLevel))
+                                         minLevel, maxLevel)
 
-def heightmap_add_voronoi(hm, nbPoints, nbCoef, coef, rnd=0):
-    FARRAY = c_float * nbCoef
-    ccoef = FARRAY(*coef)
-    _lib.TCOD_heightmap_add_voronoi(hm.p, nbPoints, nbCoef, ccoef, rnd)
+def add_voronoi(hm, nbPoints, nbCoef, coef, rnd=None):
+    #FARRAY = c_float * nbCoef
+    ccoef = _ffi.new('float[]', coef)
+    _lib.TCOD_heightmap_add_voronoi(hm.p, nbPoints, nbCoef, ccoef, rnd or _ffi.NULL)
 
-def heightmap_add_fbm(hm, noise, mulx, muly, addx, addy, octaves, delta, scale):
-    _lib.TCOD_heightmap_add_fbm(hm.p, noise, c_float(mulx), c_float(muly),
-                                c_float(addx), c_float(addy),
-                                c_float(octaves), c_float(delta),
-                                c_float(scale))
-def heightmap_scale_fbm(hm, noise, mulx, muly, addx, addy, octaves, delta,
+def add_fbm(hm, noise, mulx, muly, addx, addy, octaves, delta, scale):
+    _lib.TCOD_heightmap_add_fbm(hm.p, noise, mulx, muly, addx, addy,
+                                octaves, delta, scale)
+def scale_fbm(hm, noise, mulx, muly, addx, addy, octaves, delta,
                         scale):
-    _lib.TCOD_heightmap_scale_fbm(hm.p, noise, c_float(mulx), c_float(muly),
-                                  c_float(addx), c_float(addy),
-                                  c_float(octaves), c_float(delta),
-                                  c_float(scale))
-def heightmap_dig_bezier(hm, px, py, startRadius, startDepth, endRadius,
-                         endDepth):
-    IARRAY = c_int * 4
-    cpx = IARRAY(*px)
-    cpy = IARRAY(*py)
-    _lib.TCOD_heightmap_dig_bezier(hm.p, cpx, cpy, c_float(startRadius),
-                                   c_float(startDepth), c_float(endRadius),
-                                   c_float(endDepth))
+    _lib.TCOD_heightmap_scale_fbm(hm.p, noise, mulx, muly, addx, addy,
+                                  octaves, delta, scale)
 
-def heightmap_get_value(hm, x, y):
+def dig_bezier(hm, px, py, startRadius, startDepth, endRadius,
+                         endDepth):
+    #IARRAY = c_int * 4
+    cpx = _ffi.new('int[4]', px)
+    cpy = _ffi.new('int[4]', py)
+    _lib.TCOD_heightmap_dig_bezier(hm.p, cpx, cpy, startRadius,
+                                   startDepth, endRadius,
+                                   endDepth)
+
+def get_value(hm, x, y):
     return _lib.TCOD_heightmap_get_value(hm.p, x, y)
 
-def heightmap_get_interpolated_value(hm, x, y):
-    return _lib.TCOD_heightmap_get_interpolated_value(hm.p, c_float(x),
-                                                     c_float(y))
+def get_interpolated_value(hm, x, y):
+    return _lib.TCOD_heightmap_get_interpolated_value(hm.p, x, y)
 
-def heightmap_get_slope(hm, x, y):
+def get_slope(hm, x, y):
     return _lib.TCOD_heightmap_get_slope(hm.p, x, y)
 
-def heightmap_get_normal(hm, x, y, waterLevel):
-    FARRAY = c_float * 3
-    cn = FARRAY()
-    _lib.TCOD_heightmap_get_normal(hm.p, c_float(x), c_float(y), cn,
-                                   c_float(waterLevel))
-    return cn[0], cn[1], cn[2]
+def get_normal(hm, x, y, waterLevel):
+    #FARRAY = c_float * 3
+    cn = _ffi.new('float[3]')
+    _lib.TCOD_heightmap_get_normal(hm.p, x, y, cn, waterLevel)
+    return tuple(cn)
 
-def heightmap_count_cells(hm, mi, ma):
-    return _lib.TCOD_heightmap_count_cells(hm.p, c_float(mi), c_float(ma))
+def count_cells(hm, mi, ma):
+    return _lib.TCOD_heightmap_count_cells(hm.p, mi, ma)
 
-def heightmap_has_land_on_border(hm, waterlevel):
-    return _lib.TCOD_heightmap_has_land_on_border(hm.p, c_float(waterlevel))
+def has_land_on_border(hm, waterlevel):
+    return _lib.TCOD_heightmap_has_land_on_border(hm.p, waterlevel)
 
-def heightmap_get_minmax(hm):
-    mi = c_float()
-    ma = c_float()
-    _lib.TCOD_heightmap_get_minmax(hm.p, byref(mi), byref(ma))
-    return mi.value, ma.value
+def get_minmax(hm):
+    mi = _ffi.new('float *')
+    ma = _ffi.new('float *')
+    _lib.TCOD_heightmap_get_minmax(hm.p, mi, ma)
+    return mi[0], ma[0]
 
-def heightmap_delete(hm):
+def delete(hm):
     _lib.TCOD_heightmap_delete(hm.p)
 
 
