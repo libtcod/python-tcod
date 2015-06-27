@@ -122,7 +122,7 @@ if True:
         def error(self,msg):
             print ('error : ', msg)
             return True
-    #TODO: fix parser
+    #TODO: FIX THIS
     #libtcod.parser_run(parser, os.path.join(b'data',b'cfg',b'sample.cfg'), MyListener())
 #############################################
 # end of parser unit test

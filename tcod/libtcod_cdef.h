@@ -1340,6 +1340,8 @@ void TCOD_zip_skip_bytes(TCOD_zip_t zip, uint32 nbBytes);
 // ---------------------------------------------------------------------------
 // TDL FUNCTONS
 
+bool (*TDL_parser_new_property_func)(const char *propname, TCOD_value_type_t type, TCOD_value_t *value)
+
 // color functions modified to use integers instead of structs
 TCOD_color_t TDL_color_from_int(int color);
 int TDL_color_to_int(TCOD_color_t *color);
