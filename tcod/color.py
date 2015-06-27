@@ -7,7 +7,9 @@ def lerp(c1, c2, a):
     return _Color.from_tcod(_lib.TCOD_color_lerp(c1, c2, a))
 
 def set_hsv(c, h, s, v):
-    _lib.TCOD_color_set_HSV(c._struct, h, s, v)
+    tcod_color = _ffi.new('TCOD_color_t *', c)
+    _lib.TCOD_color_set_HSV(tcod_color, h, s, v)
+    c[0:3] = tcod_color.r, tcod_color.g, tcod_color.b
 
 def get_hsv(c):
     h = _ffi.new('float *')
@@ -17,7 +19,9 @@ def get_hsv(c):
     return h[0], s[0], v[0]
 
 def scale_HSV(c, scoef, vcoef) :
-    _lib.TCOD_color_scale_HSV(c._struct, scoef, vcoef)
+    tcod_color = _ffi.new('TCOD_color_t *', c)
+    _lib.TCOD_color_scale_HSV(tcod_color, scoef, vcoef)
+    c[0:3] = tcod_color.r, tcod_color.g, tcod_color.b
 
 def gen_map(colors, indexes):
     ccolors = (_Color * len(colors))(*colors)

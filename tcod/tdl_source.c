@@ -1,7 +1,8 @@
 
 // extra functions provided for the python-tdl library
 
-#include <libtcod.h>
+#include "libtcod.h"
+#include "wrappers.h"
 
 // get a TCOD color type from a 0xRRGGBB formatted integer
 static TCOD_color_t TDL_color_from_int(int color){

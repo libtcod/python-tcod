@@ -1338,9 +1338,134 @@ uint32 TCOD_zip_get_remaining_bytes(TCOD_zip_t zip);
 void TCOD_zip_skip_bytes(TCOD_zip_t zip, uint32 nbBytes);
 
 // ---------------------------------------------------------------------------
+// wrapper.h
+
+typedef unsigned int colornum_t;
+
+/* color module */
+bool TCOD_color_equals_wrapper (colornum_t c1, colornum_t c2);
+colornum_t TCOD_color_add_wrapper (colornum_t c1,
+						 colornum_t c2);
+colornum_t TCOD_color_subtract_wrapper (colornum_t c1,
+						 colornum_t c2);
+colornum_t TCOD_color_multiply_wrapper (colornum_t c1,
+						      colornum_t c2);
+colornum_t TCOD_color_multiply_scalar_wrapper (colornum_t c1,
+							     float value);
+colornum_t TCOD_color_lerp_wrapper(colornum_t c1,
+						 colornum_t c2, float coef);
+void TCOD_color_get_HSV_wrapper(colornum_t c,float * h,
+					    float * s, float * v);
+float TCOD_color_get_hue_ (colornum_t c);
+float TCOD_color_get_saturation_ (colornum_t c);
+float TCOD_color_get_value_ (colornum_t c);
+
+/* console module */
+/* void TCOD_console_set_custom_font_wrapper(const char *fontFile,
+                        int char_width, int char_height, int nb_char_horiz,
+                        int nb_char_vertic, bool chars_by_row,
+                        colornum_t key_color); */
+
+void TCOD_console_set_default_background_wrapper(TCOD_console_t con,
+						   colornum_t col);
+void TCOD_console_set_default_foreground_wrapper(TCOD_console_t con,
+						   colornum_t col);
+colornum_t TCOD_console_get_default_background_wrapper(TCOD_console_t con);
+colornum_t TCOD_console_get_default_foreground_wrapper(TCOD_console_t con);
+colornum_t TCOD_console_get_char_background_wrapper(TCOD_console_t con,
+						       int x, int y);
+void TCOD_console_set_char_background_wrapper(TCOD_console_t con,int x, int y,
+                                      colornum_t col,
+                                      TCOD_bkgnd_flag_t flag);
+colornum_t TCOD_console_get_char_foreground_wrapper (TCOD_console_t con,
+                                              int x, int y);
+void TCOD_console_set_char_foreground_wrapper(TCOD_console_t con,int x, int y,
+                                      colornum_t col);
+void TCOD_console_put_char_ex_wrapper(TCOD_console_t con, int x,
+	int y, int c, colornum_t fore, colornum_t back);
+void TCOD_console_set_fade_wrapper(uint8 val, colornum_t fade);
+colornum_t TCOD_console_get_fading_color_wrapper();
+void TCOD_console_set_color_control_wrapper(TCOD_colctrl_t con,
+						colornum_t fore,
+						colornum_t back);
+bool TCOD_console_check_for_keypress_wrapper(TCOD_key_t *holder,
+							 int flags);
+void TCOD_console_wait_for_keypress_wrapper(TCOD_key_t *holder,
+							bool flush);
+                            
+// TODO: I am unable to link to some of these.
+// Are these functions in the *.lib file?
+//uint32 TCOD_console_check_for_keypress_bitfield (int flags);
+//uint32 TCOD_console_wait_for_keypress_bitfield (bool flush);
+void TCOD_console_fill_background(TCOD_console_t con, int *r, int *g, int *b);
+void TCOD_console_fill_foreground(TCOD_console_t con, int *r, int *g, int *b);
+void TCOD_console_fill_char(TCOD_console_t con, int *arr);
+
+void TCOD_console_double_hline(TCOD_console_t con,int x,int y, int l,
+					   TCOD_bkgnd_flag_t flag);
+void TCOD_console_double_vline(TCOD_console_t con,int x,int y,
+					   int l, TCOD_bkgnd_flag_t flag);
+void TCOD_console_print_double_frame(TCOD_console_t con,int x,int y,
+						 int w,int h, bool empty,
+						 TCOD_bkgnd_flag_t flag,
+						 const char *fmt, ...);
+
+char *TCOD_console_print_return_string(TCOD_console_t con,int x,
+						   int y, int rw, int rh,
+						   TCOD_bkgnd_flag_t flag,
+						   TCOD_alignment_t align, char *msg,
+						   bool can_split,
+						   bool count_only);
+//void console_set_key_color_wrapper (TCOD_console_t con, colornum_t c);
+
+/* image module */
+
+void TCOD_image_clear_wrapper(TCOD_image_t image,
+					  colornum_t color);
+colornum_t TCOD_image_get_pixel_wrapper(TCOD_image_t image,
+						      int x, int y);
+colornum_t TCOD_image_get_mipmap_pixel_wrapper(TCOD_image_t image,
+				 float x0,float y0, float x1, float y1);
+void TCOD_image_put_pixel_wrapper(TCOD_image_t image,int x, int y,
+				      colornum_t col);
+void TCOD_image_set_key_color_wrapper(TCOD_image_t image,
+					  colornum_t key_color);
+
+                      
+/* mouse module */
+void TCOD_mouse_get_status_wrapper(TCOD_mouse_t *holder);
+// TODO: Also can't link to these
+//int TCOD_mouse_get_x();
+//int TCOD_mouse_get_y();
+//int TCOD_mouse_get_cx();
+//int TCOD_mouse_get_cy();
+//int TCOD_mouse_get_dx();
+//int TCOD_mouse_get_dy();
+//int TCOD_mouse_get_dcx();
+//int TCOD_mouse_get_dcy();
+//uint32 TCOD_mouse_get_lbutton();
+//uint32 TCOD_mouse_get_mbutton();
+//uint32 TCOD_mouse_get_rbutton();
+//uint32 TCOD_mouse_get_lbutton_pressed();
+//uint32 TCOD_mouse_get_mbutton_pressed();
+//uint32 TCOD_mouse_get_rbutton_pressed();
+
+/* parser module */
+colornum_t TCOD_parser_get_color_property_wrapper(TCOD_parser_t parser, const char *name);
+
+/* namegen module */
+int TCOD_namegen_get_nb_sets_wrapper();
+void TCOD_namegen_get_sets_wrapper(char **sets);
+
+/* sys module */
+int TCOD_sys_get_current_resolution_x();
+int TCOD_sys_get_current_resolution_y();
+
+
+// ---------------------------------------------------------------------------
 // TDL FUNCTONS
 
-bool (*TDL_parser_new_property_func)(const char *propname, TCOD_value_type_t type, TCOD_value_t *value)
+//bool (*TDL_parser_new_property_func)(const char *propname, TCOD_value_type_t type, TCOD_value_t *value);
 
 // color functions modified to use integers instead of structs
 TCOD_color_t TDL_color_from_int(int color);

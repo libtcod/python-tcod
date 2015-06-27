@@ -6,6 +6,17 @@ import tcod as _tcod
 from . import Color as _Color
 from .libtcod import _lib, _ffi, _int, _str, _unicode
 
+_numpy = None
+
+def _numpy_available():
+    global _numpy
+    if _numpy is None:
+        try:
+            import numpy as _numpy
+        except ImportError:
+            _numpy = False
+    return _numpy
+
 # initializing the console
 def init_root(w, h, title, fullscreen=False, renderer=_tcod.RENDERER_SDL):
     _lib.TCOD_console_init_root(w, h, title, fullscreen, renderer)
@@ -101,6 +112,7 @@ def set_alignment(con, alignment):
 def get_alignment(con):
     return _lib.TCOD_console_get_alignment(con or _ffi.NULL)
 
+_print = print
 def print(con, x, y, fmt):
     _lib.TCOD_console_print_utf(con or _ffi.NULL, x, y, _unicode(fmt))
 
@@ -205,16 +217,16 @@ def delete(con):
 def fill_foreground(con,r,g,b) :
     if len(r) != len(g) or len(r) != len(b):
         raise TypeError('R, G and B must all have the same size.')
-
-    if (numpy_available and isinstance(r, numpy.ndarray) and
-        isinstance(g, numpy.ndarray) and isinstance(b, numpy.ndarray)):
+    numpy_available = False
+    if (numpy_available and isinstance(r, _numpy.ndarray) and
+        isinstance(g, _numpy.ndarray) and isinstance(b, _numpy.ndarray)):
         #numpy arrays, use numpy's ctypes functions
-        r = numpy.ascontiguousarray(r, dtype=numpy.int_)
-        g = numpy.ascontiguousarray(g, dtype=numpy.int_)
-        b = numpy.ascontiguousarray(b, dtype=numpy.int_)
-        cr = r.ctypes.data_as(POINTER(c_int))
-        cg = g.ctypes.data_as(POINTER(c_int))
-        cb = b.ctypes.data_as(POINTER(c_int))
+        r = _numpy.ascontiguousarray(r, dtype=_numpy.int_)
+        g = _numpy.ascontiguousarray(g, dtype=_numpy.int_)
+        b = _numpy.ascontiguousarray(b, dtype=_numpy.int_)
+        cr = _ffi.cast('int *', r.ctypes.data)
+        cg = _ffi.cast('int *', g.ctypes.data)
+        cb = _ffi.cast('int *', b.ctypes.data)
     else:
         # otherwise convert using ctypes arrays
         cr = (c_int * len(r))(*r)
@@ -226,32 +238,36 @@ def fill_foreground(con,r,g,b) :
 def fill_background(con,r,g,b) :
     if len(r) != len(g) or len(r) != len(b):
         raise TypeError('R, G and B must all have the same size.')
-
-    if (numpy_available and isinstance(r, numpy.ndarray) and
-        isinstance(g, numpy.ndarray) and isinstance(b, numpy.ndarray)):
+    if (_numpy_available() and isinstance(r, _numpy.ndarray) and
+        isinstance(g, _numpy.ndarray) and isinstance(b, _numpy.ndarray)):
         #numpy arrays, use numpy's ctypes functions
-        r = numpy.ascontiguousarray(r, dtype=numpy.int_)
-        g = numpy.ascontiguousarray(g, dtype=numpy.int_)
-        b = numpy.ascontiguousarray(b, dtype=numpy.int_)
-        cr = r.ctypes.data_as(POINTER(c_int))
-        cg = g.ctypes.data_as(POINTER(c_int))
-        cb = b.ctypes.data_as(POINTER(c_int))
+        r = _numpy.ascontiguousarray(r, dtype=_numpy.int_)
+        g = _numpy.ascontiguousarray(g, dtype=_numpy.int_)
+        b = _numpy.ascontiguousarray(b, dtype=_numpy.int_)
+        #cr = r.ctypes.data_as(POINTER(c_int))
+        #cg = g.ctypes.data_as(POINTER(c_int))
+        #cb = b.ctypes.data_as(POINTER(c_int))
+        cr = _ffi.cast('int *', r.ctypes.data)
+        cg = _ffi.cast('int *', g.ctypes.data)
+        cb = _ffi.cast('int *', b.ctypes.data)
     else:
         # otherwise convert using ctypes arrays
-        cr = (c_int * len(r))(*r)
-        cg = (c_int * len(g))(*g)
-        cb = (c_int * len(b))(*b)
+        cr = _ffi.new('int[]', r)
+        cg = _ffi.new('int[]', g)
+        cb = _ffi.new('int[]', b)
 
     _lib.TCOD_console_fill_background(con or _ffi.NULL, cr, cg, cb)
 
 def fill_char(con,arr) :
-    if (numpy_available and isinstance(arr, numpy.ndarray) ):
+    if (_numpy_available() and isinstance(arr, _numpy.ndarray) ):
         #numpy arrays, use numpy's ctypes functions
-        arr = numpy.ascontiguousarray(arr, dtype=numpy.int_)
-        carr = arr.ctypes.data_as(POINTER(c_int))
+        arr = numpy.ascontiguousarray(arr, dtype=_numpy.int_)
+        #carr = arr.ctypes.data_as(POINTER(c_int))
+        carr = _ffi.cast('int *', arr.ctypes.data)
     else:
         #otherwise convert using the struct module
-        carr = struct.pack('%di' % len(arr), *arr)
+        #carr = struct.pack('%di' % len(arr), *arr)
+        carr = _ffi.new('int[]', arr)
 
     _lib.TCOD_console_fill_char(con or _ffi.NULL, carr)
         
