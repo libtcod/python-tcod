@@ -43,14 +43,7 @@ _ffi = ffi = _libtcod.ffi
 _lib = lib = _libtcod.lib
 
 def _unpack_char_p(char_p):
-    string = []
-    index = 0
-    while True:
-        ch =  char_p[index]
-        if ch == b'\x00':
-            return (b''.join(string)).decode()
-        string.append(ch)
-        index += 1
+    return ffi.string(char_p)
 
 def _int(int_or_str):
     'return an integer where a signle character string may be expected'

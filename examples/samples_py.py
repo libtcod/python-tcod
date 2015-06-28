@@ -4,6 +4,8 @@
 # This code demonstrates various usages of libtcod modules
 # It's in the public domain.
 #
+from __future__ import division
+
 import math
 import os
 
@@ -122,7 +124,8 @@ if True:
         def error(self,msg):
             print ('error : ', msg)
             return True
-    #TODO: FIX THIS
+    #TODO This is pretty much the only thing I can't get working
+    print('Custom listener is not supported!')
     #libtcod.parser_run(parser, os.path.join(b'data',b'cfg',b'sample.cfg'), MyListener())
 #############################################
 # end of parser unit test
@@ -202,11 +205,11 @@ def render_colors(first, key, mouse):
         # same, but using the ConsoleBuffer class to speed up rendering
         buffer = libtcod.ConsoleBuffer(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)  # initialize buffer
         c = libtcod.random_get_int(None, ord('a'), ord('z'))
-        for x in xrange(SAMPLE_SCREEN_WIDTH):
+        for x in range(SAMPLE_SCREEN_WIDTH):
             xcoef = float(x) / (SAMPLE_SCREEN_WIDTH - 1)
             top = libtcod.color_lerp(tc_cols[TOPLEFT], tc_cols[TOPRIGHT], xcoef)
             bottom = libtcod.color_lerp(tc_cols[BOTTOMLEFT], tc_cols[BOTTOMRIGHT], xcoef)
-            for y in xrange(SAMPLE_SCREEN_HEIGHT):
+            for y in range(SAMPLE_SCREEN_HEIGHT):
                 # for maximum speed, we avoid using any libtcod function in
                 # this inner loop, except for the ConsoleBuffer's functions.
                 ycoef = float(y) / (SAMPLE_SCREEN_HEIGHT - 1)
@@ -216,7 +219,7 @@ def render_colors(first, key, mouse):
                 c += 1
                 if c > ord('z'): c = ord('a')
                 # set background, foreground and char with a single function
-                buffer.set(x, y, r, g, b, r / 2, g / 2, b / 2, chr(c))
+                buffer.set(x, y, r, g, b, r // 2, g // 2, b // 2, chr(c))
         buffer.blit(sample_console)  # update console with the buffer's contents
         libtcod.console_set_default_foreground(sample_console, libtcod.Color(int(r), int(g), int(b)))
 
@@ -232,7 +235,7 @@ def render_colors(first, key, mouse):
     if key.c == ord('f'): tc_fast = not tc_fast
     libtcod.console_set_default_foreground(sample_console, libtcod.white)
     libtcod.console_print(sample_console, 1, SAMPLE_SCREEN_HEIGHT - 2,
-                           "F : turn fast rendering (python 2.6 only) %s" % ("off" if tc_fast else "on"))
+                           "F : turn fast rendering %s" % ("off" if tc_fast else "on"))
 
 #############################################
 # offscreen console sample

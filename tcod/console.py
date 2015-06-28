@@ -9,6 +9,7 @@ from .libtcod import _lib, _ffi, _int, _str, _unicode
 _numpy = None
 
 def _numpy_available():
+    'check if numpy is available and lazily load it when needed'
     global _numpy
     if _numpy is None:
         try:
@@ -228,7 +229,7 @@ def fill_foreground(con,r,g,b) :
         cg = _ffi.cast('int *', g.ctypes.data)
         cb = _ffi.cast('int *', b.ctypes.data)
     else:
-        # otherwise convert using ctypes arrays
+        # otherwise convert using ffi arrays
         cr = (c_int * len(r))(*r)
         cg = (c_int * len(g))(*g)
         cb = (c_int * len(b))(*b)
@@ -244,14 +245,11 @@ def fill_background(con,r,g,b) :
         r = _numpy.ascontiguousarray(r, dtype=_numpy.int_)
         g = _numpy.ascontiguousarray(g, dtype=_numpy.int_)
         b = _numpy.ascontiguousarray(b, dtype=_numpy.int_)
-        #cr = r.ctypes.data_as(POINTER(c_int))
-        #cg = g.ctypes.data_as(POINTER(c_int))
-        #cb = b.ctypes.data_as(POINTER(c_int))
         cr = _ffi.cast('int *', r.ctypes.data)
         cg = _ffi.cast('int *', g.ctypes.data)
         cb = _ffi.cast('int *', b.ctypes.data)
     else:
-        # otherwise convert using ctypes arrays
+        # otherwise convert using ffi arrays
         cr = _ffi.new('int[]', r)
         cg = _ffi.new('int[]', g)
         cb = _ffi.new('int[]', b)
@@ -262,11 +260,9 @@ def fill_char(con,arr) :
     if (_numpy_available() and isinstance(arr, _numpy.ndarray) ):
         #numpy arrays, use numpy's ctypes functions
         arr = numpy.ascontiguousarray(arr, dtype=_numpy.int_)
-        #carr = arr.ctypes.data_as(POINTER(c_int))
         carr = _ffi.cast('int *', arr.ctypes.data)
     else:
-        #otherwise convert using the struct module
-        #carr = struct.pack('%di' % len(arr), *arr)
+        #otherwise convert using the ffi module
         carr = _ffi.new('int[]', arr)
 
     _lib.TCOD_console_fill_char(con or _ffi.NULL, carr)

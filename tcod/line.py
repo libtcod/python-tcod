@@ -23,9 +23,9 @@ def iter(xo, yo, xd, yd):
     x = _ffi.new('int *')
     y = _ffi.new('int *')
     done = False
-    while not done:
-        yield x[0], y[0]
-        done = _lib.TCOD_line_step_mt(x, y, data)
+    while not _lib.TCOD_line_step_mt(x, y, data):
+        yield (x[0], y[0])
+    
 
 
 __all__ = [name for name in list(globals()) if name[0] != '_']

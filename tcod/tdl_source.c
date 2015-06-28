@@ -4,6 +4,41 @@
 #include "libtcod.h"
 #include "wrappers.h"
 
+//void * TCOD_list_get(TCOD_list_t l,int idx) {
+//	return LIST(l)->array[idx];
+
+static bool TDL_list_get_bool(TCOD_list_t l,int idx){
+    return (bool)TCOD_list_get(l, idx);
+}
+
+static char TDL_list_get_char(TCOD_list_t l,int idx){
+    return (char)TCOD_list_get(l, idx);
+}
+
+static int TDL_list_get_int(TCOD_list_t l,int idx){
+    return (int)TCOD_list_get(l, idx);
+}
+
+static float TDL_list_get_float(TCOD_list_t l,int idx){
+    void *val=TCOD_list_get(l, idx);
+    return *(float*)&val;
+}
+
+static char* TDL_list_get_string(TCOD_list_t l,int idx){
+    return (char*)TCOD_list_get(l, idx);
+}
+
+static TCOD_color_t TDL_list_get_color(TCOD_list_t l,int idx){
+    void *val=TCOD_list_get(l, idx);
+    return *(TCOD_color_t*)&val;
+}
+
+static TCOD_dice_t TDL_list_get_dice(TCOD_list_t l,int idx){
+    void *val=TCOD_list_get(l, idx);
+    return *(TCOD_dice_t*)&val;
+}
+
+
 // get a TCOD color type from a 0xRRGGBB formatted integer
 static TCOD_color_t TDL_color_from_int(int color){
     TCOD_color_t tcod_color={(color >> 16) & 0xff,

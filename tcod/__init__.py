@@ -12,6 +12,7 @@
     Bring any issues or requests to GitHub:
     https://github.com/HexDecimal/libtcod-cffi
 """
+import sys as _sys
 
 from .libtcod import lib, ffi, _lib, _ffi
 
@@ -201,14 +202,17 @@ class ConsoleBuffer:
             console_get_height(dest) != self.height):
             raise ValueError('ConsoleBuffer.blit: Destination console has an incorrect size.')
 
-        s = struct.Struct('%di' % len(self.back_r))
-
         if fill_back:
-            _lib.TCOD_console_fill_background(dest, (c_int * len(self.back_r))(*self.back_r), (c_int * len(self.back_g))(*self.back_g), (c_int * len(self.back_b))(*self.back_b))
-
+            _lib.TCOD_console_fill_background(dest,
+                                              _ffi.new('int[]', self.back_r),
+                                              _ffi.new('int[]', self.back_g),
+                                              _ffi.new('int[]', self.back_b))
         if fill_fore:
-            _lib.TCOD_console_fill_foreground(dest, (c_int * len(self.fore_r))(*self.fore_r), (c_int * len(self.fore_g))(*self.fore_g), (c_int * len(self.fore_b))(*self.fore_b))
-            _lib.TCOD_console_fill_char(dest, (c_int * len(self.char))(*self.char))
+            _lib.TCOD_console_fill_foreground(dest,
+                                              _ffi.new('int[]', self.fore_r),
+                                              _ffi.new('int[]', self.fore_g),
+                                              _ffi.new('int[]', self.fore_b))
+            _lib.TCOD_console_fill_char(dest, _ffi.new('int[]', self.char))
 
 # python class encapsulating the _CBsp pointer
 class Bsp(object):
@@ -359,5 +363,16 @@ _import_module_functions(parser)
 _import_module_functions(path)
 _import_module_functions(random)
 _import_module_functions(sys)
+
+# allow "import tcod.sys"
+_sys.modules['tcod.sys'] = _sys.modules['tcod.sys_'] 
+
+# tcod.line became both a module and a function due to the naming scheme
+class _ModuleProxy():
+    def __init__(self, module):
+        for name in module.__all__:
+            setattr(self, name, getattr(module, name))
+line = _ModuleProxy(line)
+line.__call__ = line.line
 
 __all__ = [name for name in list(globals()) if name[0] != '_']
