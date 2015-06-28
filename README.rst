@@ -20,7 +20,7 @@ And libtcod is here: http://roguecentral.org/doryen/libtcod/
 ==============
 The latest Windows installer can be found on PyPI: https://pypi.python.org/pypi/libtcod-cffi
 
-If it's available you can use pip instead by running the command:::
+If it's available you can use pip instead by running the command::
 
     pip install libtcod-cffi
 
@@ -40,6 +40,7 @@ If you had code that runs on the original module you can use this library as a d
     import tcod as libtcod
     
 Guides and Tutorials for the original library should also work with this one.
+When possible, using PyPy will give the best performance, and is highly reccomended.
 
 ==============
  Requirements
@@ -52,4 +53,4 @@ Guides and Tutorials for the original library should also work with this one.
  License
 =========
 libtcod-cffi is distributed under the Simplified 2-clause FreeBSD license.
-Read LICENSE.txt, and the libtcod-cffi/lib README's for more details.
+Read LICENSE.txt, and the tcod/lib/README's for more details.
