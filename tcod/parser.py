@@ -2,14 +2,6 @@
 import tcod as _tcod
 from .libtcod import _lib, _ffi, _str, _unpack_char_p
 
-class _PythonParser(object):
-    
-    def __init__(self):
-        pass
-        
-    def parse(self, string):
-        pass
-
 # property types
 TYPE_NONE = 0
 TYPE_BOOL = 1

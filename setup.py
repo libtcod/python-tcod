@@ -1,6 +1,25 @@
 #!/usr/bin/env python
 
+import sys
+
+import platform
 from setuptools import setup
+
+
+def _get_lib_path_crossplatform():
+    '''Locate the right DLL path for this OS'''
+    bits, linkage = platform.architecture()
+    if 'win32' in sys.platform:
+        return 'lib/win32/*.dll'
+    elif 'linux' in sys.platform:
+        if bits == '32bit':
+            return 'lib/linux32/*.so'
+        elif bits == '64bit':
+            return 'lib/linux64/*.so'
+    elif 'darwin' in sys.platform:
+        return 'lib/darwin/*.dylib'
+    raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
+
 
 setup(
     name='libtcod-cffi',
@@ -14,9 +33,8 @@ setup(
     download_url='https://pypi.python.org/pypi/libtcod-cffi',
     packages=['tcod'],
     package_data={'tcod': ['*.txt', '*.rst', 'lib/*.txt',
-                           'lib/win32/*',
-                           'lib/darwin/*.dylib',
-                           'lib/linux*/*']},
+    # only add the libraries for the current build platform
+                           _get_lib_path_crossplatform()]},
     setup_requires=["cffi>=1.1.0"],
     cffi_modules=["build_libtcod.py:ffi"],
     install_requires=["cffi>=1.1.0",

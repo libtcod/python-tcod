@@ -45,21 +45,23 @@ def _import_module_functions(module):
 # the next functions are used to mimic the rest of the libtcodpy functionality
     
 class Color(list):
+    '''list-like behaviour could change in the future'''
     
     def __init__(self, r=0, g=0, b=0):
         self[:] = [r,g,b]
-        #print(self)
         
     @classmethod
     def from_tcod(cls, tcod_color):
-        # new in libtcod-cffi
+        '''new in libtcod-cffi'''
         self = cls.__new__(cls)
         self.__init__(tcod_color.r, tcod_color.g, tcod_color.b)
         return self
     
     @classmethod
-    def from_int(cls, integer): # 0xRRGGBB
-        # new in libtcod-cffi
+    def from_int(cls, integer):
+        '''a TDL int: 0xRRGGBB
+        
+        new in libtcod-cffi'''
         return cls.from_tcod(lib.TDL_color_from_int(integer))
 
     def __eq__(self, other):
