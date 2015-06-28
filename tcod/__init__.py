@@ -9,6 +9,9 @@
     before, otherwise it's time to read up on how they work:
     https://cffi.readthedocs.org/en/latest/using.html
     
+    Otherwise this module can be used as a drop in replacement for the official
+    libtcod.py module.
+    
     Bring any issues or requests to GitHub:
     https://github.com/HexDecimal/libtcod-cffi
 """
