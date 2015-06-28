@@ -24,7 +24,7 @@ If it's available you can use pip instead by running the command:::
 
     pip install libtcod-cffi
 
-This module can also be manually installed by going into the "setup.py" directory and running the command:::
+This module can also be manually installed by going into the "setup.py" directory and running the command::
 
     python setup.py install
 
@@ -35,7 +35,7 @@ It also requires that your Python installation is set up to compile binaries.
  Usage
 =======
 This module was designed to be backwards compatible with the libtcod.py script that was distributed with libtcod.
-If you had code that runs on the original module you can use this library as a drop-in replacement like this:::
+If you had code that runs on the original module you can use this library as a drop-in replacement like this::
 
     import tcod as libtcod
     
