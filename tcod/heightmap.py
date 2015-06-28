@@ -108,5 +108,4 @@ def get_minmax(hm):
 def delete(hm):
     _lib.TCOD_heightmap_delete(hm.p)
 
-
-__all__ = [name for name in list(globals()) if name[0] != '_']
+__all__ = [_name for _name in list(globals()) if name[0] != '_']

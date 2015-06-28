@@ -370,7 +370,7 @@ _sys.modules['tcod.sys'] = _sys.modules['tcod.sys_']
 # tcod.line became both a module and a function due to the naming scheme
 class _ModuleProxy():
     def __init__(self, module):
-        for name in module.__all__:
+        for name in dir(module):
             setattr(self, name, getattr(module, name))
 line = _ModuleProxy(line)
 line.__call__ = line.line

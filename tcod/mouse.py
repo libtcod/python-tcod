@@ -16,4 +16,4 @@ def get_status():
     mouse._struct = _lib.TCOD_mouse_get_status()
     return mouse
 
-__all__ = [name for name in list(globals()) if name[0] != '_']
+__all__ = [_name for _name in list(globals()) if name[0] != '_']

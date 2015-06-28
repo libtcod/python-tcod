@@ -25,7 +25,5 @@ def iter(xo, yo, xd, yd):
     done = False
     while not _lib.TCOD_line_step_mt(x, y, data):
         yield (x[0], y[0])
-    
 
-
-__all__ = [name for name in list(globals()) if name[0] != '_']
+__all__ = [_name for _name in list(globals()) if name[0] != '_']

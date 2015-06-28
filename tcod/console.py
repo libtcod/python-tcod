@@ -276,4 +276,4 @@ def load_apf(con, filename) :
 def save_apf(con, filename) :
     _lib.TCOD_console_save_apf(con or _ffi.NULL,_str(filename))
 
-__all__ = [name for name in list(globals()) if name[0] != '_']
+__all__ = [_name for _name in list(globals()) if name[0] != '_']
