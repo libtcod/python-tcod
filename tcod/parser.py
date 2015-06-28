@@ -142,4 +142,4 @@ def get_list_property(parser, name, typ):
     clist = _lib.TCOD_parser_get_list_property(parser, _str(name), typ)
     return _convert_TCODList(clist, typ)
 
-__all__ = [_name for _name in list(globals()) if name[0] != '_']
+__all__ = [_name for _name in list(globals()) if _name[0] != '_']

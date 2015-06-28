@@ -44,4 +44,4 @@ def path_walk(p):
 def delete(p):
     _lib.TCOD_dijkstra_delete(p[0])
 
-__all__ = [_name for _name in list(globals()) if name[0] != '_']
+__all__ = [_name for _name in list(globals()) if _name[0] != '_']

@@ -72,4 +72,4 @@ def save(image, filename):
 def delete(image):
     _lib.TCOD_image_delete(image)
 
-__all__ = [_name for _name in list(globals()) if name[0] != '_']
+__all__ = [_name for _name in list(globals()) if _name[0] != '_']

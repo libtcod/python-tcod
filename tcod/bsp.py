@@ -67,4 +67,4 @@ def delete(node):
     _lib.TCOD_bsp_delete(node.p)
 
 
-__all__ = [_name for _name in list(globals()) if name[0] != '_']
+__all__ = [_name for _name in list(globals()) if _name[0] != '_']

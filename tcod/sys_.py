@@ -63,4 +63,4 @@ def check_for_event(mask, k, m) :
 def wait_for_event(mask, k, m, flush) :
     return _lib.TCOD_sys_wait_for_event(mask, k._struct, m._struct, flush)
     
-__all__ = [_name for _name in list(globals()) if name[0] != '_']
+__all__ = [_name for _name in list(globals()) if _name[0] != '_']

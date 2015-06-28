@@ -43,7 +43,7 @@ _ffi = ffi = _libtcod.ffi
 _lib = lib = _libtcod.lib
 
 def _unpack_char_p(char_p):
-    return ffi.string(char_p)
+    return ffi.string(char_p).decode()
 
 def _int(int_or_str):
     'return an integer where a signle character string may be expected'

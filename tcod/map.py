@@ -49,4 +49,4 @@ def get_width(map):
 def get_height(map):
     return _lib.TCOD_map_get_height(map)
 
-__all__ = [_name for _name in list(globals()) if name[0] != '_']
+__all__ = [_name for _name in list(globals()) if _name[0] != '_']
