@@ -20,7 +20,7 @@ def _numpy_available():
 
 # initializing the console
 def init_root(w, h, title, fullscreen=False, renderer=_tcod.RENDERER_SDL):
-    _lib.TCOD_console_init_root(w, h, title, fullscreen, renderer)
+    _lib.TCOD_console_init_root(int(w), int(h), _str(title), fullscreen, renderer)
     
 
 def set_custom_font(fontFile, flags=_tcod.FONT_LAYOUT_ASCII_INCOL,
@@ -41,16 +41,17 @@ def set_custom_font(fontFile, flags=_tcod.FONT_LAYOUT_ASCII_INCOL,
                                       nb_char_horiz, nb_char_vertic)
 
 def map_ascii_code_to_font(asciiCode, fontCharX, fontCharY):
-    _lib.TCOD_console_map_ascii_code_to_font(_int(asciiCode), fontCharX,
-                                                              fontCharY)
+    _lib.TCOD_console_map_ascii_code_to_font(_int(asciiCode), int(fontCharX),
+                                                              int(fontCharY))
 
 def map_ascii_codes_to_font(firstAsciiCode, nbCodes, fontCharX,
                                     fontCharY):
-    _lib.TCOD_console_map_ascii_codes_to_font(_int(firstAsciiCode), nbCodes,
-                                              fontCharX, fontCharY)
+    _lib.TCOD_console_map_ascii_codes_to_font(_int(firstAsciiCode), int(nbCodes),
+                                              int(fontCharX), int(fontCharY))
 
 def map_string_to_font(s, fontCharX, fontCharY):
-    _lib.TCOD_console_map_string_to_font_utf(_unicode(s), fontCharX, fontCharY)
+    _lib.TCOD_console_map_string_to_font_utf(_unicode(s),
+                                             int(fontCharX), int(fontCharY))
 
 def is_fullscreen():
     return _lib.TCOD_console_is_fullscreen()
@@ -71,7 +72,7 @@ def credits_reset():
     _lib.TCOD_console_credits_reset()
 
 def credits_render(x, y, alpha):
-    return _lib.TCOD_console_credits_render(x, y, alpha)
+    return _lib.TCOD_console_credits_render(int(x), int(y), alpha)
 
 def flush():
     _lib.TCOD_console_flush()
@@ -87,19 +88,19 @@ def clear(con):
     return _lib.TCOD_console_clear(con or _ffi.NULL)
 
 def put_char(con, x, y, c, flag=_tcod.BKGND_DEFAULT):
-    _lib.TCOD_console_put_char(con or _ffi.NULL, x, y, _int(c), flag)
+    _lib.TCOD_console_put_char(con or _ffi.NULL, int(x), int(y), _int(c), flag)
 
 def put_char_ex(con, x, y, c, fore, back):
-    _lib.TCOD_console_put_char_ex(con or _ffi.NULL, x, y, _int(c), fore, back)
+    _lib.TCOD_console_put_char_ex(con or _ffi.NULL, int(x), int(y), _int(c), fore, back)
 
 def set_char_background(con, x, y, col, flag=_tcod.BKGND_SET):
-    _lib.TCOD_console_set_char_background(con or _ffi.NULL, x, y, col, flag)
+    _lib.TCOD_console_set_char_background(con or _ffi.NULL, int(x), int(y), col, flag)
 
 def set_char_foreground(con, x, y, col):
-    _lib.TCOD_console_set_char_foreground(con or _ffi.NULL, x, y, col)
+    _lib.TCOD_console_set_char_foreground(con or _ffi.NULL, int(x), int(y), col)
 
 def set_char(con, x, y, c):
-    _lib.TCOD_console_set_char(con or _ffi.NULL, x, y, _int(c))
+    _lib.TCOD_console_set_char(con or _ffi.NULL, int(x), int(y), _int(c))
 
 def set_background_flag(con, flag):
     _lib.TCOD_console_set_background_flag(con or _ffi.NULL, flag)
@@ -115,36 +116,37 @@ def get_alignment(con):
 
 _print = print
 def print(con, x, y, fmt):
-    _lib.TCOD_console_print_utf(con or _ffi.NULL, x, y, _unicode(fmt))
+    _lib.TCOD_console_print_utf(con or _ffi.NULL, int(x), int(y), _unicode(fmt))
 
 def print_ex(con, x, y, flag, alignment, fmt):
-    _lib.TCOD_console_print_ex_utf(con or _ffi.NULL, x, y,
+    _lib.TCOD_console_print_ex_utf(con or _ffi.NULL, int(x), int(y),
                                    flag, alignment, _unicode(fmt))
 
 def print_rect(con, x, y, w, h, fmt):
-    return _lib.TCOD_console_print_rect_utf(con or _ffi.NULL, x, y, w, h,
-                                            _unicode(fmt))
+    return _lib.TCOD_console_print_rect_utf(con or _ffi.NULL, int(x), int(y),
+                                            int(w), int(h), _unicode(fmt))
 
 def print_rect_ex(con, x, y, w, h, flag, alignment, fmt):
-    _lib.TCOD_console_print_rect_ex_utf(con or _ffi.NULL, x, y, w, h, flag,
+    _lib.TCOD_console_print_rect_ex_utf(con or _ffi.NULL, int(x), int(y),
+                                        int(w), int(h), flag,
                                         alignment, _unicode(fmt))
 
 def get_height_rect(con, x, y, w, h, fmt):
-    return _lib.TCOD_console_get_height_rect_utf(con or _ffi.NULL, x, y, w, h,
-                                                 _unicode(fmt))
+    return _lib.TCOD_console_get_height_rect_utf(con or _ffi.NULL, int(x), int(y),
+                                                 int(w), int(h), _unicode(fmt))
 
 def rect(con, x, y, w, h, clr, flag=_tcod.BKGND_DEFAULT):
-    _lib.TCOD_console_rect(con or _ffi.NULL, x, y, w, h, clr, flag)
+    _lib.TCOD_console_rect(con or _ffi.NULL,  int(x), int(y), int(w), int(h), clr, flag)
 
 def hline(con, x, y, l, flag=_tcod.BKGND_DEFAULT):
-    _lib.TCOD_console_hline(con or _ffi.NULL, x, y, l, flag)
+    _lib.TCOD_console_hline(con or _ffi.NULL, int(x), int(y), l, flag)
 
 def vline(con, x, y, l, flag=_tcod.BKGND_DEFAULT):
-    _lib.TCOD_console_vline(con or _ffi.NULL, x, y, l, flag)
+    _lib.TCOD_console_vline(con or _ffi.NULL, int(x), int(y), l, flag)
 
 def print_frame(con, x, y, w, h, clear=True, flag=_tcod.BKGND_DEFAULT, fmt=b''):
-    _lib.TCOD_console_print_frame(con or _ffi.NULL, x, y, w, h, clear, flag,
-                                  _str(fmt))
+    _lib.TCOD_console_print_frame(con or _ffi.NULL, int(x), int(y),
+                                  int(w), int(h), clear, flag, _str(fmt))
 
 def set_color_control(con, fore, back) :
     _lib.TCOD_console_set_color_control(con or _ffi.NULL, fore, back)
@@ -156,13 +158,13 @@ def get_default_foreground(con):
     return _Color.from_tcod(_lib.TCOD_console_get_default_foreground(con or _ffi.NULL))
 
 def get_char_background(con, x, y):
-    return _Color.from_tcod(_lib.TCOD_console_get_char_background(con or _ffi.NULL, x, y))
+    return _Color.from_tcod(_lib.TCOD_console_get_char_background(con or _ffi.NULL, int(x), int(y)))
 
 def get_char_foreground(con, x, y):
-    return _Color.from_tcod(_lib.TCOD_console_get_char_foreground(con or _ffi.NULL, x, y))
+    return _Color.from_tcod(_lib.TCOD_console_get_char_foreground(con or _ffi.NULL, int(x), int(y)))
 
 def get_char(con, x, y):
-    return _lib.TCOD_console_get_char(con or _ffi.NULL, x, y)
+    return _lib.TCOD_console_get_char(con or _ffi.NULL, int(x), int(y))
 
 def set_fade(fade, fadingColor):
     _lib.TCOD_console_set_fade(fade, fadingColor)
@@ -195,7 +197,7 @@ def disable_keyboard_repeat():
 
 # using offscreen consoles
 def new(w, h):
-    return _lib.TCOD_console_new(w, h)
+    return _lib.TCOD_console_new(int(w), int(h))
 def from_file(filename):
     return _lib.TCOD_console_from_file(_str(filename))
 def get_width(con):
@@ -205,8 +207,8 @@ def get_height(con):
     return _lib.TCOD_console_get_height(con or _ffi.NULL)
 
 def blit(src, x, y, w, h, dst, xdst, ydst, ffade=1.0,bfade=1.0):
-    _lib.TCOD_console_blit(src or _ffi.NULL, x, y, w, h, dst or _ffi.NULL,
-                           xdst, ydst, ffade, bfade)
+    _lib.TCOD_console_blit(src or _ffi.NULL, int(x), int(y), int(w), int(h),
+                           dst or _ffi.NULL, int(xdst), int(ydst), ffade, bfade)
 
 def set_key_color(con, col):
     _lib.TCOD_console_set_key_color(con or _ffi.NULL, col)
