@@ -175,13 +175,13 @@ def get_fading_color():
 
 # handling keyboard input
 def wait_for_keypress(flush):
-    k=Key()
-    _lib.TCOD_console_wait_for_keypress_wrapper(byref(k),c_bool(flush))
+    k=_tcod.Key()
+    _lib.TCOD_console_wait_for_keypress_wrapper(k._struct, flush)
     return k
 
 def check_for_keypress(flags=_tcod.KEY_RELEASED):
-    k=Key()
-    _lib.TCOD_console_check_for_keypress_wrapper(byref(k),c_int(flags))
+    k=_tcod.Key()
+    _lib.TCOD_console_check_for_keypress_wrapper(k._struct, flags)
     return k
 
 def is_key_pressed(key):
