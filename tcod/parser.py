@@ -64,8 +64,8 @@ def new_struct(parser, name):
     return _lib.TCOD_parser_new_struct(parser, name)
 
 def run(parser, filename, listener=None):
-    raise NotImplementedError('The parser callbacks are not supported at this time.')
     if listener:
+        raise NotImplementedError('The listener callbacks are not supported at this time.')
         clistener = _ffi.new('TCOD_parser_listener_t *')
         def value_converter(name, typ, value):
             if typ == TYPE_BOOL:
