@@ -17,6 +17,8 @@ include examples/data/fonts/*.png
 include examples/data/img/*.png
 include examples/data/namegen/*.cfg
 include examples/data/namegen/*.txt
+include examples/tutorial/*.py
+include examples/tutorial/*.png
 include docs/*
 exclude docs/*.bat
 include ez_setup.py
