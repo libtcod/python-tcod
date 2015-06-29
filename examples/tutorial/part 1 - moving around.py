@@ -44,8 +44,8 @@ libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | 
 libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'python/libtcod tutorial', False)
 libtcod.sys_set_fps(LIMIT_FPS)
  
-playerx = SCREEN_WIDTH/2
-playery = SCREEN_HEIGHT/2
+playerx = SCREEN_WIDTH//2
+playery = SCREEN_HEIGHT//2
  
 while not libtcod.console_is_window_closed():
  
