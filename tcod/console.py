@@ -20,7 +20,7 @@ def _numpy_available():
 
 # initializing the console
 def init_root(w, h, title, fullscreen=False, renderer=_tcod.RENDERER_SDL):
-    _lib.TCOD_console_init_root(w, h, title, fullscreen, renderer)
+    _lib.TCOD_console_init_root(w, h, _str(title), fullscreen, renderer)
     
 
 def set_custom_font(fontFile, flags=_tcod.FONT_LAYOUT_ASCII_INCOL,
