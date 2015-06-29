@@ -230,9 +230,9 @@ def fill_foreground(con,r,g,b) :
         cb = _ffi.cast('int *', b.ctypes.data)
     else:
         # otherwise convert using ffi arrays
-        cr = (c_int * len(r))(*r)
-        cg = (c_int * len(g))(*g)
-        cb = (c_int * len(b))(*b)
+        cr = _ffi.new('int[]', r)
+        cg = _ffi.new('int[]', g)
+        cb = _ffi.new('int[]', b)
 
     _lib.TCOD_console_fill_foreground(con or _ffi.NULL, cr, cg, cb)
 
