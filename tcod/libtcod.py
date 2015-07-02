@@ -1,29 +1,44 @@
 
-from . import __path__
-
 import os as _os
 import sys as _sys
 
+import ctypes as _ctypes
 import platform as _platform
+
+from . import __path__
 
 def _get_lib_path_crossplatform():
     '''Locate the right DLL path for this OS'''
     bits, linkage = _platform.architecture()
     if 'win32' in _sys.platform:
-        return 'lib/win32/'
+        return 'lib/win32'
     elif 'linux' in _sys.platform:
         if bits == '32bit':
-            return 'lib/linux32/'
+            return 'lib/linux32'
         elif bits == '64bit':
-            return 'lib/linux64/'
+            return 'lib/linux64'
     elif 'darwin' in _sys.platform:
-        return 'lib/darwin/'
+        return 'lib/darwin'
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (_sys.platform, bits, linkage))
 
-# add dll's to PATH
+def _get_lib_name():
+    bits, linkage = _platform.architecture()
+    if 'win32' in _sys.platform:
+        return 'libtcod-VS.dll'
+    elif 'linux' in _sys.platform:
+        return 'libtcod.so'
+    elif 'darwin' in _sys.platform:
+        return 'libtcod.dylib'
+    
+    
+# add Windows dll's to PATH
 _os.environ['PATH'] += ';' + _os.path.join(__path__[0],
                                            _get_lib_path_crossplatform())
 
+_lib_ctypes = _ctypes.CDLL(
+    _os.path.realpath(
+        _os.path.join(__path__[0],
+            _get_lib_path_crossplatform(), _get_lib_name())))
 
 # import the right .pyd file for this Python implementation
 try:
