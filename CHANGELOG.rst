@@ -1,6 +1,9 @@
 ===========
  Changelog
 ===========
+0.2.2
+ * This module can now compile and link properly on Linux
+
 0.2.1
  * console_check_for_keypress and console_wait_for_keypress will work now
  * console_fill_foreground was fixed
