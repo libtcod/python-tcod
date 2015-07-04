@@ -51,14 +51,12 @@ class Color(list):
     '''list-like behaviour could change in the future'''
     
     def __init__(self, r=0, g=0, b=0):
-        self[:] = [r,g,b]
+        self[:] = (r,g,b)
         
     @classmethod
     def from_tcod(cls, tcod_color):
         '''new in libtcod-cffi'''
-        self = cls.__new__(cls)
-        self.__init__(tcod_color.r, tcod_color.g, tcod_color.b)
-        return self
+        return cls(tcod_color.r, tcod_color.g, tcod_color.b)
     
     @classmethod
     def from_int(cls, integer):
@@ -85,39 +83,28 @@ class Color(list):
     def __repr__(self):
         return "%s%r" % (self.__class__.__name__, list.__repr__(self))
         
-    def __getattr__(self, name):
-        if name == 'r':
-            return self[0]
-            #return self._color >> 16 & 0xff
-        if name == 'g':
-            return self[1]
-            #return self._color >> 8 & 0xff
-        if name == 'b':
-            return self[2]
-            #return self._color & 0xff
-        raise AttributeError('%r object has no attribute %r' %
-                             (self.__class__.__name__, name))
+    def _get_r(self):
+        return self[0]
         
+    def _set_r(self, val):
+        self[0] = val & 0xff
+    
+    def _get_g(self):
+        return self[1]
         
-    def __setattr__(self, name, value):
-        if name == 'r':
-            self[0] = value & 0xff
-            #self._color = (self._color & 0x00ffff) | ((value & 0xff) << 16)
-        elif name == 'g':
-            self[1] = value & 0xff
-            #self._color = (self._color & 0xff00ff) | ((value & 0xff) << 8)
-        elif name == 'b':
-            self[2] = value & 0xff
-            #self._color = (self._color & 0xffff00) | (value & 0xff)
-        else:
-            object.__setattr__(self, name, value)
-
-    #def __setitem__(self, i, c):
-    #    if type(i) == str:
-    #        setattr(self, i, c)
-    #    else:
-    #        setattr(self, "rgb"[i], c)
-
+    def _set_g(self, val):
+        self[1] = val & 0xff
+    
+    def _get_b(self):
+        return self[2]
+        
+    def _set_b(self, val):
+        self[2] = val & 0xff
+        
+    r = property(_get_r, _set_r)
+    g = property(_get_g, _set_g)
+    b = property(_get_b, _set_b)
+    
     def __int__(self):
         # new in libtcod-cffi
         return lib.TDL_color_RGB(*self)
