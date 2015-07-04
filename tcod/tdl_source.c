@@ -1,6 +1,7 @@
 
 // extra functions provided for the python-tdl library
 
+#include "SDL.h"
 #include "libtcod.h"
 #include "wrappers.h"
 

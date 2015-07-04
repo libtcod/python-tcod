@@ -719,6 +719,90 @@ int TCOD_list_size(TCOD_list_t l);
 void ** TCOD_list_insert_before(TCOD_list_t l,const void *elt,int before);
 bool TCOD_list_is_empty(TCOD_list_t l);
 
+// ----------------
+// SDL Surface
+
+typedef int8_t		Sint8;
+typedef uint8_t		Uint8;
+typedef int16_t		Sint16;
+typedef uint16_t	Uint16;
+typedef int32_t		Sint32;
+typedef uint32_t	Uint32;
+
+/** @name Useful data types */
+/*@{*/
+typedef struct SDL_Rect {
+	Sint16 x, y;
+	Uint16 w, h;
+} SDL_Rect;
+
+typedef struct SDL_Color {
+	Uint8 r;
+	Uint8 g;
+	Uint8 b;
+	Uint8 unused;
+} SDL_Color;
+
+typedef struct SDL_Palette {
+	int       ncolors;
+	SDL_Color *colors;
+} SDL_Palette;
+/*@}*/
+
+/** Everything in the pixel format structure is read-only */
+typedef struct SDL_PixelFormat {
+	SDL_Palette *palette;
+	Uint8  BitsPerPixel;
+	Uint8  BytesPerPixel;
+	Uint8  Rloss;
+	Uint8  Gloss;
+	Uint8  Bloss;
+	Uint8  Aloss;
+	Uint8  Rshift;
+	Uint8  Gshift;
+	Uint8  Bshift;
+	Uint8  Ashift;
+	Uint32 Rmask;
+	Uint32 Gmask;
+	Uint32 Bmask;
+	Uint32 Amask;
+
+	/** RGB color key information */
+	Uint32 colorkey;
+	/** Alpha value information (per-surface alpha) */
+	Uint8  alpha;
+} SDL_PixelFormat;
+
+/** This structure should be treated as read-only, except for 'pixels',
+ *  which, if not NULL, contains the raw pixel data for the surface.
+ */
+typedef struct SDL_Surface {
+	Uint32 flags;				/**< Read-only */
+	SDL_PixelFormat *format;		/**< Read-only */
+	int w, h;				/**< Read-only */
+	Uint16 pitch;				/**< Read-only */
+	void *pixels;				/**< Read-write */
+	int offset;				/**< Private */
+
+	/** Hardware-specific surface info */
+	struct private_hwdata *hwdata;
+
+	/** clipping information */
+	SDL_Rect clip_rect;			/**< Read-only */
+	Uint32 unused1;				/**< for binary compatibility */
+
+	/** Allow recursive locks */
+	Uint32 locked;				/**< Private */
+
+	/** info for fast blit mapping to other surfaces */
+	struct SDL_BlitMap *map;		/**< Private */
+
+	/** format version, bumped at every change to invalidate blit maps */
+	unsigned int format_version;		/**< Private */
+
+	/** Reference count -- used when freeing surface */
+	int refcount;				/**< Read-mostly */
+} SDL_Surface;
 
 // ---------------------------------------------------------------------------
 // sys.h
@@ -737,7 +821,7 @@ void TCOD_sys_get_current_resolution(int *w, int *h);
 void TCOD_sys_get_fullscreen_offsets(int *offx, int *offy);
 void TCOD_sys_update_char(int asciiCode, int fontx, int fonty, TCOD_image_t img, int x, int y);
 void TCOD_sys_get_char_size(int *w, int *h);
-//void *TCOD_sys_get_sdl_window(); // TODO: figure out how to uncomment this
+//void *TCOD_sys_get_sdl_window(); // looks like this is missing from the C files
 
 typedef enum {
   TCOD_EVENT_KEY_PRESS=1,
@@ -798,7 +882,7 @@ TCOD_library_t TCOD_load_library(const char *path);
 void * TCOD_get_function_address(TCOD_library_t library, const char *function_name);
 void TCOD_close_library(TCOD_library_t);
 /* SDL renderer callback */
-typedef void (*SDL_renderer_t) (void *sdl_surface);
+typedef void (*SDL_renderer_t) (SDL_Surface *sdl_surface);
 void TCOD_sys_register_SDL_renderer(SDL_renderer_t renderer);
 
 
