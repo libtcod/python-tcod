@@ -17,7 +17,7 @@
 """
 import sys as _sys
 
-from .libtcod import lib, ffi, _lib, _ffi
+from .libtcod import lib, ffi, _lib, _ffi, _unpack_char_p
 
 def _import_library_functions(lib, no_functions=False):
     g = globals()
@@ -81,7 +81,7 @@ class Color(list):
         return lib.TCOD_color_subtract(self, other)
 
     def __repr__(self):
-        return "%s%r" % (self.__class__.__name__, list.__repr__(self))
+        return "<%s%s>" % (self.__class__.__name__, list.__repr__(self))
         
     def _get_r(self):
         return self[0]
@@ -254,6 +254,48 @@ class Bsp(object):
         self.p.level = value
     level = property(getlev, setlev)
 
+class Dice(list):
+    
+    def __init__(self, nb_dices, nb_faces, multiplier, addsub):
+        self[:] = (int(nb_dices), int(nb_faces), multiplier, addsub)
+        
+    @classmethod
+    def from_cdata(cls, dice):
+        return cls(dice.nb_rolls, dice.nb_faces, dice.multiplier, dice.addsub)
+
+    def _get_nb_dices(self):
+        return self[0]
+        
+    def _set_nb_dices(self, value):
+        self[0] = value
+    
+    def _get_nb_faces(self):
+        return self[1]
+        
+    def _set_nb_faces(self, value):
+        self[1] = value
+    
+    def _get_multiplier(self):
+        return self[2]
+        
+    def _set_multiplier(self, value):
+        self[2] = value
+    
+    def _get_addsub(self):
+        return self[3]
+        
+    def _set_addsub(self, value):
+        self[3] = value
+    
+    nb_dices = property(_get_nb_dices, _set_nb_dices)
+    nb_faces = property(_get_nb_faces, _set_nb_faces)
+    multiplier = property(_get_multiplier, _set_multiplier)
+    addsub = property(_get_addsub, _set_addsub)
+        
+    def __repr__(self):
+        return "<Dice(%id%ix%s+(%s))>" % (self.nb_dices, self.nb_faces,
+                                      self.multiplier, self.addsub)
+    
 class HeightMap(object):
     def __init__(self, chm):
         pchm = cast(chm, _CHeightMap)
@@ -288,9 +330,6 @@ def BKGND_ALPHA(a):
 
 def BKGND_ADDALPHA(a):
     return BKGND_ADDA | (int(a * 255) << 8)
-
-def Dice(*args):
-     return ffi.new('TCOD_dice_t *', args)
     
 def struct_add_flag(struct, name):
     _lib.TCOD_struct_add_flag(struct, name)
@@ -313,7 +352,7 @@ def struct_add_structure(struct, sub_struct):
     _lib.TCOD_struct_add_structure(struct, sub_struct)
 
 def struct_get_name(struct):
-    return _lib.TCOD_struct_get_name(struct)
+    return _unpack_char_p(_lib.TCOD_struct_get_name(struct))
 
 def struct_is_mandatory(struct, name):
     return _lib.TCOD_struct_is_mandatory(struct, name)

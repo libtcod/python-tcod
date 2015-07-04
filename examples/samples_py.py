@@ -124,9 +124,7 @@ if True:
         def error(self,msg):
             print ('error : ', msg)
             return True
-    #TODO This is pretty much the only thing I can't get working
-    print('Custom listener is not supported!')
-    #libtcod.parser_run(parser, os.path.join(b'data',b'cfg',b'sample.cfg'), MyListener())
+    libtcod.parser_run(parser, os.path.join(b'data',b'cfg',b'sample.cfg'), MyListener())
 #############################################
 # end of parser unit test
 #############################################
