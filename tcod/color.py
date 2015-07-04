@@ -4,7 +4,7 @@ from .libtcod import _lib, _ffi
 
 
 def lerp(c1, c2, a):
-    return _Color.from_tcod(_lib.TCOD_color_lerp(c1, c2, a))
+    return _Color.from_cdata(_lib.TCOD_color_lerp(c1, c2, a))
 
 def set_hsv(c, h, s, v):
     tcod_color = _ffi.new('TCOD_color_t *', c)

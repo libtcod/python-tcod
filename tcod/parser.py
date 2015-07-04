@@ -45,7 +45,7 @@ def _convert_TCODList(clist, typ):
         elif typ == TYPE_STRING or TYPE_VALUELIST15 >= typ >= TYPE_VALUELIST00:
             elt = _unpack_char_p(_lib.TDL_list_get_string(clist, i))
         elif typ == TYPE_COLOR:
-            elt = _tcod.Color.from_tcod(_lib.TDL_list_get_color(clist, i))
+            elt = _tcod.Color.from_cdata(_lib.TDL_list_get_color(clist, i))
         elif typ == TYPE_DICE:
             elt = _tcod.Dice.from_cdata(_lib.TDL_list_get_dice(clist, i))
         else:
@@ -162,7 +162,7 @@ def get_string_property(parser, name):
     return _unpack_char_p(_lib.TCOD_parser_get_string_property(parser, _str(name)))
 
 def get_color_property(parser, name):
-    return _tcod.Color.from_tcod(_lib.TCOD_parser_get_color_property(parser, _str(name)))
+    return _tcod.Color.from_cdata(_lib.TCOD_parser_get_color_property(parser, _str(name)))
 
 def get_dice_property(parser, name):
     d = _ffi.new('TCOD_dice_t *')

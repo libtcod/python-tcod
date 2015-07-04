@@ -150,16 +150,16 @@ def set_color_control(con, fore, back) :
     _lib.TCOD_console_set_color_control(con or _ffi.NULL, fore, back)
 
 def get_default_background(con):
-    return _Color.from_tcod(_lib.TCOD_console_get_default_background(con or _ffi.NULL))
+    return _Color.from_cdata(_lib.TCOD_console_get_default_background(con or _ffi.NULL))
 
 def get_default_foreground(con):
-    return _Color.from_tcod(_lib.TCOD_console_get_default_foreground(con or _ffi.NULL))
+    return _Color.from_cdata(_lib.TCOD_console_get_default_foreground(con or _ffi.NULL))
 
 def get_char_background(con, x, y):
-    return _Color.from_tcod(_lib.TCOD_console_get_char_background(con or _ffi.NULL, x, y))
+    return _Color.from_cdata(_lib.TCOD_console_get_char_background(con or _ffi.NULL, x, y))
 
 def get_char_foreground(con, x, y):
-    return _Color.from_tcod(_lib.TCOD_console_get_char_foreground(con or _ffi.NULL, x, y))
+    return _Color.from_cdata(_lib.TCOD_console_get_char_foreground(con or _ffi.NULL, x, y))
 
 def get_char(con, x, y):
     return _lib.TCOD_console_get_char(con or _ffi.NULL, x, y)
@@ -171,7 +171,7 @@ def get_fade():
     return _lib.TCOD_console_get_fade()
 
 def get_fading_color():
-    return _Color.from_tcod(_lib.TCOD_console_get_fading_color())
+    return _Color.from_cdata(_lib.TCOD_console_get_fading_color())
 
 # handling keyboard input
 def wait_for_keypress(flush):
