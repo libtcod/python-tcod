@@ -73,15 +73,15 @@ class Color(list):
 
     def __mul__(self, other):
         if isinstance(other,(list, tuple)):
-            return self.from_cdata(_lib.TCOD_color_multiply(self, other))
+            return Color.from_cdata(_lib.TCOD_color_multiply(self, other))
         else:
-            return self.from_cdata(_lib.TCOD_color_multiply_scalar(self, other))
+            return Color.from_cdata(_lib.TCOD_color_multiply_scalar(self, other))
 
     def __add__(self, other):
-        return self.from_cdata(_lib.TCOD_color_add(self, other))
+        return Color.from_cdata(_lib.TCOD_color_add(self, other))
 
     def __sub__(self, other):
-        return self.from_cdata(_lib.TCOD_color_subtract(self, other))
+        return Color.from_cdata(_lib.TCOD_color_subtract(self, other))
 
     def __repr__(self):
         return "<%s%s>" % (self.__class__.__name__, list.__repr__(self))
