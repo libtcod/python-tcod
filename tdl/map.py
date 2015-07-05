@@ -205,11 +205,12 @@ def quick_fov(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sph
     
 def bresenham(x1, y1, x2, y2):
     """
-    Iterate over points in a bresenham line.
+    Return a list of points in a bresenham line.
     
     Implementation hastily copied from RogueBasin.
     
-    @return: Returns an iterator of (x, y) points.
+    @return: Returns a list of (x, y) points, including both the start and 
+             endpoints.
     """
     points = []
     issteep = abs(y2-y1) > abs(x2-x1)
@@ -242,7 +243,7 @@ def bresenham(x1, y1, x2, y2):
     # Reverse the list if the coordinates were reversed
     if rev:
         points.reverse()
-    return iter(points) # force as iter so I can sleep at night
+    return points
     
 __all__ = [_var for _var in locals().keys() if _var[0] != '_']
 
