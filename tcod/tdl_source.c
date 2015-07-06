@@ -137,13 +137,49 @@ static int TDL_color_scale_HSV(int color, float scoef, float vcoef){
     return TDL_color_to_int(&tcod_color);
 }
 
-/* HSV transformations */
-//void TCOD_color_set_HSV (TCOD_color_t *c,float h, float s, float v);
-//void TCOD_color_get_HSV (TCOD_color_t c,float * h, float * s, float * v);
-//void TCOD_color_shift_hue (TCOD_color_t *c, float hshift);
-//void TCOD_color_scale_HSV (TCOD_color_t *c, float scoef, float vcoef);
-/* color map */
-//void TCOD_color_gen_map(TCOD_color_t *map, int nb_key, TCOD_color_t const *key_color, int const *key_index);
+
+#define TRANSPARENT_BIT 1
+#define WALKABLE_BIT 2
+#define FOV_BIT 4
+
+// set map transparent and walkable flags from a buffer
+static void TDL_map_data_from_buffer(TCOD_map_t map, int16 *buffer){
+    int width=TCOD_map_get_width(map);
+    int height=TCOD_map_get_height(map);
+    int x;
+    int y;
+    
+    int i = width*height-1;
+    int16 data;
+    for(y=height-1;y>=0;y--){
+        for(x=width-1;x>=0;x--){
+            data = *(buffer + i--);
+            TCOD_map_set_properties(map, x, y, (data & TRANSPARENT_BIT) != 0,
+                                               (data & WALKABLE_BIT) != 0);
+        }
+    }
+}
+
+// get fov from tcod map
+static void TDL_map_fov_to_buffer(TCOD_map_t map, int16 *buffer,
+                                  bool cumulative){
+    int width=TCOD_map_get_width(map);
+    int height=TCOD_map_get_height(map);
+    int x;
+    int y;
+    int i = width*height-1;
+    for(y=height-1;y>=0;y--){
+        for(x=width-1;x>=0;x--){
+            i--;
+            if(TCOD_map_is_in_fov(map, x, y)){
+                *(buffer + i) |= FOV_BIT;
+            }else if(!cumulative){
+                *(buffer + i) &= ~FOV_BIT;
+            }
+        }
+    }
+}
+
 
 
 // set functions are called conditionally for ch/fg/bg (-1 is ignored)/

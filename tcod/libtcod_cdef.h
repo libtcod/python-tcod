@@ -1578,7 +1578,12 @@ int TDL_color_set_value(int color, float h);
 int TDL_color_shift_hue(int color, float hshift);
 int TDL_color_scale_HSV(int color, float scoef, float vcoef);
 
-
+// map data functions using a bitmap of:
+// 1 = is_transparant
+// 2 = is_walkable
+// 4 = in_fov
+void TDL_map_data_from_buffer(TCOD_map_t map, int16 *buffer);
+void TDL_map_fov_to_buffer(TCOD_map_t map, int16 *buffer, bool cumulative);
 
 int TDL_console_put_char_ex(TCOD_console_t console, int x, int y,
                             int ch, int fg, int bg, TCOD_bkgnd_flag_t flag);
