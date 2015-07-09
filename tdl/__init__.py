@@ -128,13 +128,6 @@ _rootinitialized = False
 _rootConsoleRef = None
 
 _put_char_ex = _lib.TDL_console_put_char_ex
-
-# python 2 to 3 workaround
-if _sys.version_info[0] == 2:
-    int_types = (int, long)
-else:
-    int_types = int
-
     
 def _format_color(color, default=Ellipsis):
         if color is Ellipsis:
@@ -253,7 +246,7 @@ class _BaseConsole(object):
     @ivar height: The height of this console in tiles.  Do not overwrite this.
     """
     
-    class ConsoleAttribute(object):
+    class _ConsoleAttribute(object):
         """Base class for easy access to console attributes
         
         @since: 1.5.0
@@ -272,7 +265,7 @@ class _BaseConsole(object):
             return self.__class__(self._console, self._range_x[slice_x],
                                                  self._range_y[slice_y])
     
-    class AttributeCh(ConsoleAttribute):
+    class _AttributeCh(_ConsoleAttribute):
     
         def __getitem__(self, key):
             if isinstance(key[0], slice) or isinstance(key[1], slice):
@@ -286,7 +279,7 @@ class _BaseConsole(object):
             y = self._range_y[key[1]]
             _lib.TCOD_console_set_char(self._console.tcod_console, x, y, ch)
     
-    class AttributeFG(ConsoleAttribute):
+    class _AttributeFG(_ConsoleAttribute):
     
         def __getitem__(self, key):
             if isinstance(key[0], slice) or isinstance(key[1], slice):
@@ -301,7 +294,7 @@ class _BaseConsole(object):
             y = self._range_y[key[1]]
             _lib.TDL_console_set_fg(self._console.tcod_console, x, y, fg)
     
-    class AttributeBG(ConsoleAttribute):
+    class _AttributeBG(_ConsoleAttribute):
     
         def __getitem__(self, key):
             if isinstance(key[0], slice) or isinstance(key[1], slice):
@@ -939,9 +932,9 @@ class Console(_BaseConsole):
         self._range_y = range(self.height)
         
         # special attributes for slightly lower level access to ch, fg, bg
-        self.ch = self.AttributeCh(self, self._range_x, self._range_y)
-        self.fg = self.AttributeFG(self, self._range_x, self._range_y)
-        self.bg = self.AttributeBG(self, self._range_x, self._range_y)
+        self.ch = self._AttributeCh(self, self._range_x, self._range_y)
+        self.fg = self._AttributeFG(self, self._range_x, self._range_y)
+        self.bg = self._AttributeBG(self, self._range_x, self._range_y)
 
     @classmethod
     def _newConsole(cls, console):
@@ -955,9 +948,9 @@ class Console(_BaseConsole):
         
         self._range_x = range(self.width)
         self._range_y = range(self.height)
-        self.ch = self.AttributeCh(self, self._range_x, self._range_y)
-        self.fg = self.AttributeFG(self, self._range_x, self._range_y)
-        self.bg = self.AttributeBG(self, self._range_x, self._range_y)
+        self.ch = self._AttributeCh(self, self._range_x, self._range_y)
+        self.fg = self._AttributeFG(self, self._range_x, self._range_y)
+        self.bg = self._AttributeBG(self, self._range_x, self._range_y)
         return self
         
     def _root_unhook(self):
@@ -1083,11 +1076,11 @@ class Console(_BaseConsole):
             window = Window(self, 0, 0, 0, 0)
             window._range_x = range(self.width)[x]
             window._range_y = range(self.height)[y]
-            window.ch = window.AttributeCh(self, window._range_x,
+            window.ch = window._AttributeCh(self, window._range_x,
                                                  window._range_y)
-            window.fg = window.AttributeFG(self, window._range_x,
+            window.fg = window._AttributeFG(self, window._range_x,
                                                  window._range_y)
-            window.bg = window.AttributeBG(self, window._range_x,
+            window.bg = window._AttributeBG(self, window._range_x,
                                                  window._range_y)
             return window
         x = self._range_x[x]
@@ -1155,9 +1148,9 @@ class Window(_BaseConsole):
         else:
             self.console = self.parent.console
             
-        self.ch = self.AttributeCh(self.console, self._range_x, self._range_y)
-        self.fg = self.AttributeFG(self.console, self._range_x, self._range_y)
-        self.bg = self.AttributeBG(self.console, self._range_x, self._range_y)
+        self.ch = self._AttributeCh(self.console, self._range_x, self._range_y)
+        self.fg = self._AttributeFG(self.console, self._range_x, self._range_y)
+        self.bg = self._AttributeBG(self.console, self._range_x, self._range_y)
 
     @property
     def x(self):
@@ -1244,11 +1237,11 @@ class Window(_BaseConsole):
             window = Window(self, 0, 0, 0, 0)
             window._range_x = range(self.width)[x]
             window._range_y = range(self.height)[y]
-            window.ch = window.AttributeCh(self.console, window._range_x,
+            window.ch = window._AttributeCh(self.console, window._range_x,
                                                          window._range_y)
-            window.fg = window.AttributeFG(self.console, window._range_x,
+            window.fg = window._AttributeFG(self.console, window._range_x,
                                                          window._range_y)
-            window.bg = window.AttributeBG(self.console, window._range_x,
+            window.bg = window._AttributeBG(self.console, window._range_x,
                                                          window._range_y)
             return window
         x = self._range_x[x]
