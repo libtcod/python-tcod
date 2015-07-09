@@ -61,6 +61,8 @@ class Map(object):
                
                You can set to this attribute if you want, but you'll typically
                be using it to read the field-of-view of a L{compute_fov} call.
+    
+    @since: 1.5.0
     """
 
     class _MapAttribute(object):
@@ -68,7 +70,7 @@ class Map(object):
             self.map = map
             self.bit_index = bit_index
             self.bit = 1 << bit_index
-            self.bit_inverse = 0xFFFF ^ self.bit
+            self.bit_inverse = 0xFF ^ self.bit
             
         def __getitem__(self, key):
             return bool(self.map._array_cdata[key[1]][key[0]] & self.bit)
@@ -160,13 +162,18 @@ class Map(object):
         
     def compute_path(self, start_x, start_y, dest_x, dest_y,
                      diagonal_cost=_math.sqrt(2)):
-        """
+        """Get the shortest path between two points.
+        
+        The start position is not included in the list.
         
         @type diagnalCost: float
         @param diagnalCost: Multiplier for diagonal movement.
         
                             Can be set to zero to disable diagonal movement
                             entirely.
+        @rtype: [(x, y), ...]
+        @return: Returns a the shortest list of points to get to the destination
+                 position from the starting position
         """
         # refresh cdata
         _lib.TDL_map_data_from_buffer(self._map_cdata,
