@@ -143,7 +143,7 @@ static int TDL_color_scale_HSV(int color, float scoef, float vcoef){
 #define FOV_BIT 4
 
 // set map transparent and walkable flags from a buffer
-static void TDL_map_data_from_buffer(TCOD_map_t map, int16 *buffer){
+static void TDL_map_data_from_buffer(TCOD_map_t map, uint8 *buffer){
     int width=TCOD_map_get_width(map);
     int height=TCOD_map_get_height(map);
     int x;
@@ -161,7 +161,7 @@ static void TDL_map_data_from_buffer(TCOD_map_t map, int16 *buffer){
 }
 
 // get fov from tcod map
-static void TDL_map_fov_to_buffer(TCOD_map_t map, int16 *buffer,
+static void TDL_map_fov_to_buffer(TCOD_map_t map, uint8 *buffer,
                                   bool cumulative){
     int width=TCOD_map_get_width(map);
     int height=TCOD_map_get_height(map);
@@ -179,8 +179,6 @@ static void TDL_map_fov_to_buffer(TCOD_map_t map, int16 *buffer,
         }
     }
 }
-
-
 
 // set functions are called conditionally for ch/fg/bg (-1 is ignored)/
 // colors are converted to TCOD_color_t types in C and is much faster than in 
@@ -204,16 +202,32 @@ static int TDL_console_put_char_ex(TCOD_console_t console, int x, int y,
         TCOD_console_set_char(console, x, y, ch);
     }
     if(fg != -1){
-        color.r = fg >> 16 & 0xff;
-        color.g = fg >> 8 & 0xff;
-        color.b = fg & 0xff;
+        color = TDL_color_from_int(fg);
         TCOD_console_set_char_foreground(console, x, y, color);
     }
     if(bg != -1){
-        color.r = bg >> 16 & 0xff;
-        color.g = bg >> 8 & 0xff;
-        color.b = bg & 0xff;
+        color = TDL_color_from_int(bg);
         TCOD_console_set_char_background(console, x, y, color, blend);
     }
     return 0;
+}
+
+static int TDL_console_get_bg(TCOD_console_t console, int x, int y){
+    TCOD_color_t tcod_color=TCOD_console_get_char_background(console, x, y);
+    return TDL_color_to_int(&tcod_color);
+}
+
+static int TDL_console_get_fg(TCOD_console_t console, int x, int y){
+    TCOD_color_t tcod_color=TCOD_console_get_char_foreground(console, x, y);
+    return TDL_color_to_int(&tcod_color);
+}
+
+static void TDL_console_set_bg(TCOD_console_t console, int x, int y, int color,
+                               TCOD_bkgnd_flag_t flag){
+    TCOD_console_set_char_background(console, x, y, TDL_color_from_int(color),
+                                     flag);
+}
+
+static void TDL_console_set_fg(TCOD_console_t console, int x, int y, int color){
+    TCOD_console_set_char_foreground(console, x, y, TDL_color_from_int(color));
 }
