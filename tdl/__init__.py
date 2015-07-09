@@ -251,9 +251,9 @@ class _BaseConsole(object):
     def __init__(self):
         self._cursor = (0, 0)
         self._scrollMode = 'error'
-        self._fg = _format_color((255, 255, 255))
-        self._bg = _format_color((0, 0, 0))
-        self._blend = _lib.TCOD_BKGND_SET
+        self._default_fg = _format_color((255, 255, 255))
+        self._default_bg = _format_color((0, 0, 0))
+        self._default_blend = _lib.TCOD_BKGND_SET
         
     def _normalizePoint(self, x, y):
         """Check if a point is in bounds and make minor adjustments.
@@ -353,9 +353,9 @@ class _BaseConsole(object):
         @see: L{move}, L{print_str}
         """
         if fg is not None:
-            self._fg = _format_color(fg, self._fg)
+            self._default_fg = _format_color(fg, self._default_fg)
         if bg is not None:
-            self._bg = _format_color(bg, self._bg)
+            self._default_bg = _format_color(bg, self._default_bg)
 
     def print_str(self, string):
         """Print a string at the virtual cursor.
@@ -382,7 +382,7 @@ class _BaseConsole(object):
                 x = 0
                 continue
             x, y = self._normalizeCursor(x, y)
-            self.draw_char(x, y, char, self._fg, self._bg)
+            self.draw_char(x, y, char, self._default_fg, self._default_bg)
             x += 1
         self._cursor = (x, y)
 
@@ -414,7 +414,7 @@ class _BaseConsole(object):
 
         for line in writeLines:
             x, y = self._normalizeCursor(x, y)
-            self.draw_str(x, y, line[x:], self._fg, self._bg)
+            self.draw_str(x, y, line[x:], self._default_fg, self._default_bg)
             y += 1
             x = 0
         y -= 1
@@ -447,7 +447,7 @@ class _BaseConsole(object):
         """
         #x, y = self._normalizePoint(x, y)
         _put_char_ex(self.tcod_console, x, y, _format_char(char),
-                     _format_color(fg, self._fg), _format_color(bg, self._bg), 1)
+                     _format_color(fg, self._default_fg), _format_color(bg, self._default_bg), 1)
 
     def draw_str(self, x, y, string, fg=Ellipsis, bg=Ellipsis):
         """Draws a string starting at x and y.
@@ -489,7 +489,7 @@ class _BaseConsole(object):
         """
 
         x, y = self._normalizePoint(x, y)
-        fg, bg = _format_color(fg, self._fg), _format_color(bg, self._bg)
+        fg, bg = _format_color(fg, self._default_fg), _format_color(bg, self._default_bg)
         width, height = self.get_size()
         batch = [] # prepare a batch operation
         def _drawStrGen(x=x, y=y, string=string, width=width, height=height):
@@ -547,7 +547,7 @@ class _BaseConsole(object):
         @see: L{clear}, L{draw_frame}
         """
         x, y, width, height = self._normalizeRect(x, y, width, height)
-        fg, bg = _format_color(fg, self._fg), _format_color(bg, self._bg)
+        fg, bg = _format_color(fg, self._default_fg), _format_color(bg, self._default_bg)
         char = _format_char(string)
         # use itertools to make an x,y grid
         # using ctypes here reduces type converstions later
@@ -595,7 +595,7 @@ class _BaseConsole(object):
         @see: L{draw_rect}, L{Window}
         """
         x, y, width, height = self._normalizeRect(x, y, width, height)
-        fg, bg = _format_color(fg, self._fg), _format_color(bg, self._bg)
+        fg, bg = _format_color(fg, self._default_fg), _format_color(bg, self._default_bg)
         char = _format_char(string)
         if width == 1 or height == 1: # it's just a single width line here
             return self.draw_rect(x, y, width, height, char, fg, bg)
@@ -776,13 +776,13 @@ class _BaseConsole(object):
         self.blit(self, x, y, width, height, srcx, srcy)
         if uncoverX: # clear sides (0x20 is space)
             self.draw_rect(uncoverX[0], coverY[0], uncoverX[1], coverY[1],
-                           0x20, self._fg, self._bg)
+                           0x20, self._default_fg, self._default_bg)
         if uncoverY: # clear top/bottom
             self.draw_rect(coverX[0], uncoverY[0], coverX[1], uncoverY[1],
-                           0x20, self._fg, self._bg)
+                           0x20, self._default_fg, self._default_bg)
         if uncoverX and uncoverY: # clear corner
             self.draw_rect(uncoverX[0], uncoverY[0], uncoverX[1], uncoverY[1],
-                           0x20, self._fg, self._bg)
+                           0x20, self._default_fg, self._default_bg)
     
     def clear(self, fg=Ellipsis, bg=Ellipsis):
         """Clears the entire L{Console}/L{Window}.
@@ -960,8 +960,8 @@ class Console(_BaseConsole):
     def clear(self, fg=Ellipsis, bg=Ellipsis):
         # inherit docstring
         assert fg is not None and bg is not None, 'Can not use None with clear'
-        fg = _format_color(fg, self._fg)
-        bg = _format_color(bg, self._bg)
+        fg = _format_color(fg, self._default_fg)
+        bg = _format_color(bg, self._default_bg)
         _lib.TCOD_console_set_default_foreground(self.tcod_console,
                                                  _to_tcod_color(fg)[0])
         _lib.TCOD_console_set_default_background(self.tcod_console,
@@ -1114,9 +1114,9 @@ class Window(_BaseConsole):
         # inherit docstring
         assert fg is not None and bg is not None, 'Can not use None with clear'
         if fg is Ellipsis:
-            fg = self._fg
+            fg = self._default_fg
         if bg is Ellipsis:
-            bg = self._bg
+            bg = self._default_bg
         self.draw_rect(0, 0, None, None, 0x20, fg, bg)
 
     def _set_char(self, x, y, char=None, fg=None, bg=None, bgblend=1):
@@ -1134,18 +1134,18 @@ class Window(_BaseConsole):
     def draw_char(self, x, y, char, fg=Ellipsis, bg=Ellipsis):
         # inherit docstring
         if fg is Ellipsis:
-            fg = self._fg
+            fg = self._default_fg
         if bg is Ellipsis:
-            bg = self._bg
+            bg = self._default_bg
         self.parent.draw_char(self._range_x[x], self._range_y[y], char, fg, bg)
     
     def draw_rect(self, x, y, width, height, string, fg=Ellipsis, bg=Ellipsis):
         # inherit docstring
         x, y, width, height = self._normalizeRect(x, y, width, height)
         if fg is Ellipsis:
-            fg = self._fg
+            fg = self._default_fg
         if bg is Ellipsis:
-            bg = self._bg
+            bg = self._default_bg
         self.parent.draw_rect(self._range_x[x], self._range_y[y], width, height,
                               string, fg, bg)
         
@@ -1153,9 +1153,9 @@ class Window(_BaseConsole):
         # inherit docstring
         x, y, width, height = self._normalizeRect(x, y, width, height)
         if fg is Ellipsis:
-            fg = self._fg
+            fg = self._default_fg
         if bg is Ellipsis:
-            bg = self._bg
+            bg = self._default_bg
         self.parent.draw_frame(self._range_x[x], self._range_y[y], width, height,
                                string, fg, bg)
 
