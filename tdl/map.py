@@ -90,11 +90,11 @@ class Map(object):
         self.width = width
         self.height = height
         self._map_cdata = _lib.TCOD_map_new(width, height)
-        # cast array into cdata format: int16[y][x]
+        # cast array into cdata format: uint8[y][x]
         # for quick Python access
-        self._array_cdata = _ffi.new('int16[%i][%i]' % (width, height))
+        self._array_cdata = _ffi.new('uint8[%i][%i]' % (width, height))
         # flat array to pass to TDL's C helpers
-        self._array_cdata_flat = _ffi.cast('int16 *', self._array_cdata)
+        self._array_cdata_flat = _ffi.cast('uint8 *', self._array_cdata)
         self.transparent = self._MapAttribute(self, 0)
         self.walkable = self._MapAttribute(self, 1)
         self.fov = self._MapAttribute(self, 2)
