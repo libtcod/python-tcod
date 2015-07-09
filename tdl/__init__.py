@@ -70,6 +70,7 @@ import struct as _struct
 import re as _re
 import warnings as _warnings
 
+import tcod as _tcod
 from tcod import ffi as _ffi
 from tcod import lib as _lib
 
@@ -171,12 +172,73 @@ def _getImageSize(filename):
         # return width, height
         return _struct.unpack('<ii', file.read(8))
     # return None on error, unknown file
-
+    
 class TDLError(Exception):
     """
     The catch all for most TDL specific errors.
     """
 
+class Color(object):
+    
+    def __new__(cls, *rgb):
+        if not rgb:
+            self = object.__new__(cls)
+            self._r = self._g = self._b = 0
+            return self
+        length = len(rgb)
+        if length == 3:
+            self = object.__new__(cls)
+            self.r, self.g, self.b = rgb
+            return self
+        if length == 1:
+            return cls.from_int(int(rgb[0]))
+        raise TypeError('Parameters must be (r,g,b) or (int), got: %a' %
+                        repr(rgb))
+    
+    @classmethod
+    def from_int(cls, color):
+        self = object.__new__(cls)
+        self._r, self._g, self._b = _lib.TDL_color_int_to_array(color)[0:3]
+        return self
+        
+    @classmethod
+    def from_cdata(cls, cdata):
+        self = object.__new__(cls)
+        self._r = cdata.r
+        self._g = cdata.g
+        self._b = cdata.b
+        return self
+        
+    def _get_r(self):
+        return self._r
+        
+    def _set_r(self, value):
+        self._r = value & 0xff
+    
+    def _get_g(self):
+        return self._g
+        
+    def _set_g(self, value):
+        self._g = value & 0xff
+    
+    def _get_b(self):
+        return self._b
+        
+    def _set_b(self, value):
+        self._b = value & 0xff
+    
+    r = property(_get_r, _set_r)
+    g = property(_get_g, _set_g)
+    b = property(_get_b, _set_b)
+    
+    def __repr__(self):
+        return '<%s[%i, %i, %i]>' % (self.__class__.__name__,
+                                     self._r, self._g, self._b)
+    
+    def __int__(self):
+        return _lib.TDL_color_RGB(self._r, self._g, self._b)
+        
+    
 class _BaseConsole(object):
     """
     Contains methods shared by both the L{Console} and L{Window} classes.
@@ -192,7 +254,12 @@ class _BaseConsole(object):
     """
     
     class ConsoleAttribute(object):
+        """Base class for easy access to console attributes
+        
+        @since: 1.5.0
+        """
         def __init__(self, console, range_x, range_y):
+            """initialized internally"""
             self._console = console
             self._range_x = range_x
             self._range_y = range_y
@@ -226,7 +293,8 @@ class _BaseConsole(object):
                 return self._get_slice(*key)
             x = self._range_x[key[0]]
             y = self._range_y[key[1]]
-            return _lib.TDL_console_get_fg(self._console.tcod_console, x, y)
+            return Color.from_int(
+                _lib.TDL_console_get_fg(self._console.tcod_console, x, y))
             
         def __setitem__(self, key, fg):
             x = self._range_x[key[0]]
@@ -240,12 +308,14 @@ class _BaseConsole(object):
                 return self._get_slice(*key)
             x = self._range_x[key[0]]
             y = self._range_y[key[1]]
-            return _lib.TDL_console_get_bg(self._console.tcod_console, x, y)
+            return _lib.TCOD_console_get_char_background(
+                self._console.tcod_console, x, y)
             
         def __setitem__(self, key, bg):
             x = self._range_x[key[0]]
             y = self._range_y[key[1]]
-            _lib.TDL_console_set_bg(self._console.tcod_console, x, y, fg, 1)
+            _lib.TCOD_console_set_char_background(
+                self._console.tcod_console, x, y, fg, 1)
     
                  
     def __init__(self):

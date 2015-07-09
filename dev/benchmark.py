@@ -79,6 +79,30 @@ class Benchmark_DrawChar_Ch_Attribute(Benchmark):
             console.ch[x,y] = ord('C')
             self.tiles += 1
         tdl.flush()
+        
+class Benchmark_Get_FG_Attribute(Benchmark):
+    
+    def test(self, console):
+        for x,y in console:
+            console.fg[x,y]
+            self.tiles += 1
+        tdl.flush()
+
+class Benchmark_Set_FG_Attribute(Benchmark):
+    
+    def test(self, console):
+        for x,y in console:
+            console.fg[x,y] = 0xff00ff
+            self.tiles += 1
+        tdl.flush()
+        
+class Benchmark_GetAndSet_FG_Attribute(Benchmark):
+    
+    def test(self, console):
+        for x,y in console:
+            console.fg[x,y] = console.fg[x,y]
+            self.tiles += 1
+        tdl.flush()
 
         
 class Benchmark_DrawStr16_DefaultColor(Benchmark):
@@ -115,6 +139,9 @@ def run_benchmark():
     print_result('%i characters/frame' % (WIDTH * HEIGHT))
     print_result('Opened console in %s mode' % RENDERER)
     Benchmark_DrawChar_Ch_Attribute().run(console)
+    Benchmark_Get_FG_Attribute().run(console)
+    Benchmark_Set_FG_Attribute().run(console)
+    Benchmark_GetAndSet_FG_Attribute().run(console)
     Benchmark_DrawChar_DefaultColor().run(console)
     Benchmark_DrawChar_NoColor().run(console)
     #Benchmark_DrawStr16_DefaultColor().run(console)
