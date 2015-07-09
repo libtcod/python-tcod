@@ -190,9 +190,64 @@ class _BaseConsole(object):
     @ivar width: The width of this console in tiles.  Do not overwrite this.
     @ivar height: The height of this console in tiles.  Do not overwrite this.
     """
-    __slots__ = ('width', 'height', 'console', '_cursor', '_fg',
-                 '_bg', '_blend', '__weakref__', '__dict__')
-
+    
+    class ConsoleAttribute(object):
+        def __init__(self, console, range_x, range_y):
+            self._console = console
+            self._range_x = range_x
+            self._range_y = range_y
+            
+        def _get_slice(self, slice_x, slice_y):
+            if not isinstance(slice_x, slice):
+                slice_x = slice(slice_x, slice_x + 1)
+            if not isinstance(slice_y, slice):
+                slice_x = slice(slice_y, slice_y + 1)
+            return self.__class__(self._console, self._range_x[slice_x],
+                                                 self._range_y[slice_y])
+    
+    class AttributeCh(ConsoleAttribute):
+    
+        def __getitem__(self, key):
+            if isinstance(key[0], slice) or isinstance(key[1], slice):
+                return self._get_slice(*key)
+            x = self._range_x[key[0]]
+            y = self._range_y[key[1]]
+            return _lib.TCOD_console_get_char(self._console.tcod_console, x, y)
+            
+        def __setitem__(self, key, ch):
+            x = self._range_x[key[0]]
+            y = self._range_y[key[1]]
+            _lib.TCOD_console_set_char(self._console.tcod_console, x, y, ch)
+    
+    class AttributeFG(ConsoleAttribute):
+    
+        def __getitem__(self, key):
+            if isinstance(key[0], slice) or isinstance(key[1], slice):
+                return self._get_slice(*key)
+            x = self._range_x[key[0]]
+            y = self._range_y[key[1]]
+            return _lib.TDL_console_get_fg(self._console.tcod_console, x, y)
+            
+        def __setitem__(self, key, fg):
+            x = self._range_x[key[0]]
+            y = self._range_y[key[1]]
+            _lib.TDL_console_set_fg(self._console.tcod_console, x, y, fg)
+    
+    class AttributeBG(ConsoleAttribute):
+    
+        def __getitem__(self, key):
+            if isinstance(key[0], slice) or isinstance(key[1], slice):
+                return self._get_slice(*key)
+            x = self._range_x[key[0]]
+            y = self._range_y[key[1]]
+            return _lib.TDL_console_get_bg(self._console.tcod_console, x, y)
+            
+        def __setitem__(self, key, bg):
+            x = self._range_x[key[0]]
+            y = self._range_y[key[1]]
+            _lib.TDL_console_set_bg(self._console.tcod_console, x, y, fg, 1)
+    
+                 
     def __init__(self):
         self._cursor = (0, 0)
         self._scrollMode = 'error'
@@ -205,17 +260,15 @@ class _BaseConsole(object):
         
         Respects Pythons negative indexes.  -1 starts at the bottom right.
         Replaces the _drawable function
+        
+        Mostly depreciated at this point
         """
         # cast to int, always faster than type checking
         x = int(x)
         y = int(y)
-
-        assert (-self.width <= x < self.width) and \
-               (-self.height <= y < self.height), \
-               ('(%i, %i) is an invalid postition on %s' % (x, y, self))
-                 
+        
         # handle negative indexes
-        return (x % self.width, y % self.height)
+        return self._range_x[x], self._range_y[y]
 
     def _normalizeRect(self, x, y, width, height):
         """Check if the rectangle is in bounds and make minor adjustments.
@@ -795,8 +848,6 @@ class Console(_BaseConsole):
                         garbage collected the tcod_console will be deleted.
     """
 
-    __slots__ = ('tcod_console',)
-
     def __init__(self, width, height):
         """Create a new offscreen console.
         
@@ -812,6 +863,15 @@ class Console(_BaseConsole):
         self.console = self
         self.width = width
         self.height = height
+        
+        # ranges for easy Python style indexing
+        self._range_x = range(self.width)
+        self._range_y = range(self.height)
+        
+        # special attributes for slightly lower level access to ch, fg, bg
+        self.ch = self.AttributeCh(self, self._range_x, self._range_y)
+        self.fg = self.AttributeFG(self, self._range_x, self._range_y)
+        self.bg = self.AttributeBG(self, self._range_x, self._range_y)
 
     @classmethod
     def _newConsole(cls, console):
@@ -822,6 +882,12 @@ class Console(_BaseConsole):
         self.console = self
         self.width = _lib.TCOD_console_get_width(console)
         self.height = _lib.TCOD_console_get_height(console)
+        
+        self._range_x = range(self.width)
+        self._range_y = range(self.height)
+        self.ch = self.AttributeCh(self, self._range_x, self._range_y)
+        self.fg = self.AttributeFG(self, self._range_x, self._range_y)
+        self.bg = self.AttributeBG(self, self._range_x, self._range_y)
         return self
         
     def _root_unhook(self):
@@ -843,6 +909,12 @@ class Console(_BaseConsole):
             _lib.TCOD_console_delete(self.tcod_console)
             # this Console object is now a regular console
             self.tcod_console = unhooked
+            
+            # point attributes to new console cdata
+            self.ch._cdata = unhooked
+            self.fg._cdata = unhooked
+            self.bg._cdata = unhooked
+            
 
     def __del__(self):
         """
@@ -930,6 +1002,30 @@ class Console(_BaseConsole):
         fg = _lib.TCOD_console_get_char_foreground(self.tcod_console, x, y)
         return char, (fg.r, fg.g, fg.b), (bg.r, bg.g, bg.b)
 
+    def __getitem__(self, key):
+        x, y = key
+        if isinstance(x, slice) or isinstance(y, slice):
+            if not isinstance(x, slice):
+                x = slice(x, x + 1)
+            if not isinstance(y, slice):
+                y = slice(y, y + 1)
+            
+            window = Window(self, 0, 0, 0, 0)
+            window._range_x = range(self.width)[x]
+            window._range_y = range(self.height)[y]
+            window.ch = window.AttributeCh(self, window._range_x,
+                                                 window._range_y)
+            window.fg = window.AttributeFG(self, window._range_x,
+                                                 window._range_y)
+            window.bg = window.AttributeBG(self, window._range_x,
+                                                 window._range_y)
+            return window
+        x = self._range_x[x]
+        y = self._range_y[y]
+        return (_lib.TCOD_console_get_char(self.tcod_console, x, y),
+                _lib.TDL_console_get_fg(self.tcod_console, x, y),
+                _lib.TDL_console_get_bg(self.tcod_console, x, y))
+        
     def __repr__(self):
         return "<Console (Width=%i Height=%i)>" % (self.width, self.height)
 
@@ -944,8 +1040,6 @@ class Window(_BaseConsole):
     
     @undocumented: getChar
     """
-
-    __slots__ = ('parent', 'x', 'y')
 
     def __init__(self, console, x, y, width, height):
         """Isolate part of a L{Console} or L{Window} instance.
@@ -980,16 +1074,41 @@ class Window(_BaseConsole):
         _BaseConsole.__init__(self)
         assert isinstance(console, (Console, Window)), 'console parameter must be a Console or Window instance, got %s' % repr(console)
         self.parent = console
-        self.x, self.y, self.width, self.height = console._normalizeRect(x, y, width, height)
+        
+        slice_x = slice(x, x + width)
+        slice_y = slice(y, y + height)
+        self._range_x = console._range_x[slice_x]
+        self._range_y = console._range_y[slice_y]
+        
         if isinstance(console, Console):
             self.console = console
         else:
             self.console = self.parent.console
+            
+        self.ch = self.AttributeCh(self.console, self._range_x, self._range_y)
+        self.fg = self.AttributeFG(self.console, self._range_x, self._range_y)
+        self.bg = self.AttributeBG(self.console, self._range_x, self._range_y)
 
+    @property
+    def x(self):
+        return self._range_x[0]
+    
+    @property
+    def y(self):
+        return self._range_y[0]
+    
+    @property
+    def width(self):
+        return len(self._range_x)
+    
+    @property
+    def height(self):
+        return len(self._range_y)
+            
     def _translate(self, x, y):
         """Convertion x and y to their position on the root Console"""
         # we add our position relative to our parent and then call then next parent up
-        return self.parent._translate((x + self.x), (y + self.y))
+        return self.parent._translate(self._range_x[x], self._range_y[y])
 
     def clear(self, fg=Ellipsis, bg=Ellipsis):
         # inherit docstring
@@ -1001,24 +1120,24 @@ class Window(_BaseConsole):
         self.draw_rect(0, 0, None, None, 0x20, fg, bg)
 
     def _set_char(self, x, y, char=None, fg=None, bg=None, bgblend=1):
-        self.parent._set_char((x + self.x), (y + self.y), char, fg, bg, bgblend)
+        self.parent._set_char(self._range_x[x], self._range_y[y],
+                              char, fg, bg, bgblend)
 
     def _set_batch(self, batch, *args, **kargs):
         # positional values will need to be translated to the parent console
-        myX = self.x # remove dots for speed up
-        myY = self.y
-        self.parent._set_batch((((x + myX, y + myY), ch)
+        range_x = self._range_x # remove dots for a slight speed up
+        range_y = self._range_y
+        self.parent._set_batch((((range_x[x], range_x[y]), ch)
                                    for ((x, y), ch) in batch), *args, **kargs)
     
     
     def draw_char(self, x, y, char, fg=Ellipsis, bg=Ellipsis):
         # inherit docstring
-        x, y = self._normalizePoint(x, y)
         if fg is Ellipsis:
             fg = self._fg
         if bg is Ellipsis:
             bg = self._bg
-        self.parent.draw_char(x + self.x, y + self.y, char, fg, bg)
+        self.parent.draw_char(self._range_x[x], self._range_y[y], char, fg, bg)
     
     def draw_rect(self, x, y, width, height, string, fg=Ellipsis, bg=Ellipsis):
         # inherit docstring
@@ -1027,7 +1146,7 @@ class Window(_BaseConsole):
             fg = self._fg
         if bg is Ellipsis:
             bg = self._bg
-        self.parent.draw_rect(x + self.x, y + self.y, width, height,
+        self.parent.draw_rect(self._range_x[x], self._range_y[y], width, height,
                               string, fg, bg)
         
     def draw_frame(self, x, y, width, height, string, fg=Ellipsis, bg=Ellipsis):
@@ -1037,14 +1156,38 @@ class Window(_BaseConsole):
             fg = self._fg
         if bg is Ellipsis:
             bg = self._bg
-        self.parent.draw_frame(x + self.x, y + self.y, width, height,
+        self.parent.draw_frame(self._range_x[x], self._range_y[y], width, height,
                                string, fg, bg)
 
     def get_char(self, x, y):
         # inherit docstring
-        x, y = self._normalizePoint(x, y)
-        return self.console.get_char(self._translate(x, y))
+        return self.console.get_char(self._range_x[x], self._range_y[y])
 
+    def __getitem__(self, key):
+        x, y = key
+        if isinstance(x, slice) or isinstance(y, slice):
+            if not isinstance(x, slice):
+                x = slice(x, x + 1)
+            if not isinstance(y, slice):
+                y = slice(y, y + 1)
+            
+            window = Window(self, 0, 0, 0, 0)
+            window._range_x = range(self.width)[x]
+            window._range_y = range(self.height)[y]
+            window.ch = window.AttributeCh(self.console, window._range_x,
+                                                         window._range_y)
+            window.fg = window.AttributeFG(self.console, window._range_x,
+                                                         window._range_y)
+            window.bg = window.AttributeBG(self.console, window._range_x,
+                                                         window._range_y)
+            return window
+        x = self._range_x[x]
+        y = self._range_y[y]
+        return (_lib.TCOD_console_get_char(self.console.tcod_console, x, y),
+                _lib.TDL_console_get_fg(self.console.tcod_console, x, y),
+                _lib.TDL_console_get_bg(self.console.tcod_console, x, y))
+    
+        
     def __repr__(self):
         return "<Window(X=%i Y=%i Width=%i Height=%i)>" % (self.x, self.y,
                                                           self.width,

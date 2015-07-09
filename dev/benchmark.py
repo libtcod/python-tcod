@@ -72,6 +72,14 @@ class Benchmark_DrawChar_NoColor(Benchmark):
             self.tiles += 1
         tdl.flush()
 
+class Benchmark_DrawChar_Ch_Attribute(Benchmark):
+    
+    def test(self, console):
+        for x,y in console:
+            console.ch[x,y] = ord('C')
+            self.tiles += 1
+        tdl.flush()
+
         
 class Benchmark_DrawStr16_DefaultColor(Benchmark):
     default_frames = 100
@@ -106,6 +114,7 @@ def run_benchmark():
     print_result('In %s mode' % (['release', 'debug'][__debug__]))
     print_result('%i characters/frame' % (WIDTH * HEIGHT))
     print_result('Opened console in %s mode' % RENDERER)
+    Benchmark_DrawChar_Ch_Attribute().run(console)
     Benchmark_DrawChar_DefaultColor().run(console)
     Benchmark_DrawChar_NoColor().run(console)
     #Benchmark_DrawStr16_DefaultColor().run(console)
