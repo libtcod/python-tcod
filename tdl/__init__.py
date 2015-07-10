@@ -360,7 +360,7 @@ class _BaseConsole(object):
         self._default_fg = _format_color((255, 255, 255))
         self._default_bg = _format_color((0, 0, 0))
         self._default_blend = _lib.TCOD_BKGND_SET
-        self._color_key = _ffi.NULL
+        self._color_key = _ffi.new('TCOD_color_t *', (0, 0, 0))[0]
         
     def _normalizePoint(self, x, y):
         """Check if a point is in bounds and make minor adjustments.
@@ -464,7 +464,7 @@ class _BaseConsole(object):
         if bg is not None:
             self._default_bg = _format_color(bg, self._default_bg)
 
-    def set_color_key(self, bg=None):
+    def set_color_key(self, bg=(0, 0, 0)):
         """Sets the transparent color key of this instance.
         
         @type bg: (r, g, b), int, or None
@@ -476,11 +476,8 @@ class _BaseConsole(object):
         @see: L{blit},
         @since: 1.5.0
         """
-        bg = _format_color(bg, -1)
-        if bg == -1:
-            bg = _ffi.NULL
-        else:
-            bg = _ffi.new('TCOD_color_t *', bg)
+        bg = Color(bg)
+        bg = _ffi.new('TCOD_color_t *', tuple(bg))[0]
         self._color_key = bg
             
     def print_str(self, string):
