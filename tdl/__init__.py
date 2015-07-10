@@ -172,6 +172,16 @@ class TDLError(Exception):
     """
 
 class Color(object):
+    """A simple mutable color class.
+    
+    Can be initialized in multiple ways::
+        
+        color = tdl.Color(255, 0, 255) # from 3 items
+        color = tdl.Color(0xff00ff) # from 0xRRGGBB
+        color = tdl.Color(color) # copy a color instance
+    
+    @since: 1.5.0
+    """
     
     def __new__(cls, *rgb):
         if not rgb:
@@ -271,6 +281,12 @@ class _BaseConsole(object):
     @undocumented: console
     @ivar width: The width of this console in tiles.  Do not overwrite this.
     @ivar height: The height of this console in tiles.  Do not overwrite this.
+    @ivar ch: Access character data
+              @since: 1.5.0
+    @ivar fg: Access foreground colors
+              @since: 1.5.0
+    @ivar bg: Access background colors
+              @since: 1.5.0
     """
     
     class _ConsoleAttribute(object):
@@ -344,6 +360,7 @@ class _BaseConsole(object):
         self._default_fg = _format_color((255, 255, 255))
         self._default_bg = _format_color((0, 0, 0))
         self._default_blend = _lib.TCOD_BKGND_SET
+        self._color_key = _ffi.NULL
         
     def _normalizePoint(self, x, y):
         """Check if a point is in bounds and make minor adjustments.
@@ -447,6 +464,25 @@ class _BaseConsole(object):
         if bg is not None:
             self._default_bg = _format_color(bg, self._default_bg)
 
+    def set_color_key(self, bg=None):
+        """Sets the transparent color key of this instance.
+        
+        @type bg: (r, g, b), int, or None
+        @param bg: If the background color of the Console matches this color
+                   then the tile will not be copied during a L{blit}.
+                   
+                   Can be set to None to disable the color key.
+        
+        @see: L{blit},
+        @since: 1.5.0
+        """
+        bg = _format_color(bg, -1)
+        if bg == -1:
+            bg = _ffi.NULL
+        else:
+            bg = _ffi.new('TCOD_color_t *', bg)
+        self._color_key = bg
+            
     def print_str(self, string):
         """Print a string at the virtual cursor.
         
@@ -737,12 +773,17 @@ class _BaseConsole(object):
         x, y, width, height = self._normalizeRect(x, y, width, height)
         srcX, srcY, width, height = source._normalizeRect(srcX, srcY, width, height)
 
+        # set key color of console cdata to current Console or Window instance
+        _lib.TCOD_console_set_key_color(source.console.tcod_console,
+                                        source._color_key)
+        
         # translate source and self if any of them are Window instances
         srcX, srcY = source._translate(srcX, srcY)
         source = source.console
         x, y = self._translate(x, y)
         self = self.console
 
+        
         if self == source:
             # if we are the same console then we need a third console to hold
             # onto the data, otherwise it tries to copy into itself and
