@@ -231,6 +231,33 @@ class Color(object):
     def __int__(self):
         return _lib.TDL_color_RGB(self._r, self._g, self._b)
         
+    def __getitem__(self, key):
+        if key == 0:
+            return self._r
+        if key == 1:
+            return self._g
+        if key == 2:
+            return self._b
+        return list(self)[key] # fallback to list-like behaviour
+        
+    def __setitem__(self, key, value):
+        if key == 0:
+            self._r = value & 0xFF
+            return
+        if key == 1:
+            self._g = value & 0xFF
+            return
+        if key == 2:
+            self._b = value & 0xFF
+            return
+        # fallback to list-like behaviour
+        color = [self._r, self._g, self._b]
+        color[key] = value
+        self.r, self.g, self.b = color
+        
+    def __iter__(self):
+        return iter((self._r, self._g, self._b))
+        
     
 class _BaseConsole(object):
     """
@@ -878,7 +905,7 @@ class _BaseConsole(object):
         This method runs very slowly as is not recommended to be called
         frequently.
 
-        @rtype: (int, (r, g, b), (r, g, b))
+        @rtype: (int, L{Color}, L{Color})
         @returns: Returns a 3-item tuple.  The first item is an integer of the
                   character at the position (x, y) the second and third are the
                   foreground and background colors respectfully.
@@ -1059,11 +1086,13 @@ class Console(_BaseConsole):
 
     def get_char(self, x, y):
         # inherit docstring
-        x, y = self._normalizePoint(x, y)
-        char = _lib.TCOD_console_get_char(self.tcod_console, x, y)
-        bg = _lib.TCOD_console_get_char_background(self.tcod_console, x, y)
-        fg = _lib.TCOD_console_get_char_foreground(self.tcod_console, x, y)
-        return char, (fg.r, fg.g, fg.b), (bg.r, bg.g, bg.b)
+        x = self._range_x[x]
+        y = self._range_y[y]
+        return (
+            _lib.TCOD_console_get_char(self.tcod_console, x, y),
+            Color.from_int(_lib.TDL_console_get_bg(self.tcod_console, x, y)),
+            Color.from_int(_lib.TDL_console_get_fg(self.tcod_console, x, y))
+            )
 
     def __getitem__(self, key):
         x, y = key
