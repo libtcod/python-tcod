@@ -1561,6 +1561,7 @@ static TCOD_dice_t TDL_list_get_dice(TCOD_list_t l,int idx);
 // color functions modified to use integers instead of structs
 TCOD_color_t TDL_color_from_int(int color);
 int TDL_color_to_int(TCOD_color_t *color);
+static int* TDL_color_int_to_array(int color);
 int TDL_color_RGB(int r, int g, int b);
 int TDL_color_HSV(float h, float s, float v);
 bool TDL_color_equals(int c1, int c2);

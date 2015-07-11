@@ -52,8 +52,16 @@ static int TDL_color_to_int(TCOD_color_t *color){
     return (color->r << 16) | (color->g << 8) | color->b;
 }
 
+static int* TDL_color_int_to_array(int color){
+    static int array[3];
+    array[0] = (color >> 16) & 0xff;
+    array[1] = (color >> 8) & 0xff;
+    array[2] = color & 0xff;
+    return array;
+}
+
 static int TDL_color_RGB(int r, int g, int b){
-    return ((r >> 16) & 0xff) | ((g >> 8) & 0xff) | (b & 0xff);
+    return ((r << 16) & 0xff) | ((g << 8) & 0xff) | (b & 0xff);
 }
 
 static int TDL_color_HSV(float h, float s, float v){
