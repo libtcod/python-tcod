@@ -184,17 +184,29 @@ class Color(object):
     """
     
     def __new__(cls, *rgb):
+        self = object.__new__(cls)
         if not rgb:
-            self = object.__new__(cls)
-            self._r = self._g = self._b = 0
+            return self # blank (0, 0, 0)
+        try: # check if int-like
+            rgb = int(rgb)
+            self._r, self._g, self._b = _lib.TDL_color_int_to_array(color)[0:3]
             return self
-        length = len(rgb)
-        if length == 3:
-            self = object.__new__(cls)
+        except TypeError:
+            pass # not an int
+        try: # try to unpack (r, g, b)
             self.r, self.g, self.b = rgb
             return self
-        if length == 1:
-            return cls.from_int(int(rgb[0]))
+        except TypeError:
+            pass # not a tuple-like
+        except ValueError:
+            pass # not 3 items
+        try: # try to unpack ((r, g, b),)
+            (self.r, self.g, self.b), = rgb
+            return self
+        except TypeError:
+            pass
+        except ValueError:
+            pass
         raise TypeError('Parameters must be (r,g,b) or (int), got: %a' %
                         repr(rgb))
     
@@ -233,6 +245,11 @@ class Color(object):
     r = property(_get_r, _set_r)
     g = property(_get_g, _set_g)
     b = property(_get_b, _set_b)
+    
+    def __eq__(self, other):
+        return (self._r == other._r and
+                self._g == other._g and
+                self._b == other._b)
     
     def __repr__(self):
         return '<%s[%i, %i, %i]>' % (self.__class__.__name__,
@@ -307,51 +324,129 @@ class _BaseConsole(object):
                 slice_x = slice(slice_y, slice_y + 1)
             return self.__class__(self._console, self._range_x[slice_x],
                                                  self._range_y[slice_y])
+                                                 
+        def __getitem__(self, key):
+            if isinstance(key[0], slice) or isinstance(key[1], slice):
+                return self._get_slice(*key)
+            return self._get_item(self._range_x[key[0]], self._range_y[key[1]])
+        
+        def _get_item(self, x, y):
+            raise NotImplementedError('function should be overwritten by subclass')
+    
+        def __setitem__(self, key, value):
+            if isinstance(key[0], slice) or isinstance(key[1], slice):
+                x, y = key
+                if not isinstance(x, slice):
+                    x = slice(x, x + 1)
+                if not isinstance(y, slice):
+                    y = slice(y, y + 1)
+                self._set_range(self._range_x[x], self._range_y[y])
+            else:
+                self._set_item(self._range_x[key[0]], self._range_y[key[1]], value)
+                
+        def _set_item(self, x, y, value):
+            raise NotImplementedError('function should be overwritten by subclass')
+            
+        def _set_range(self, range_x, range_y, value):
+            raise NotImplementedError('function should be overwritten by subclass')
     
     class _AttributeCh(_ConsoleAttribute):
     
-        def __getitem__(self, key):
-            if isinstance(key[0], slice) or isinstance(key[1], slice):
-                return self._get_slice(*key)
-            x = self._range_x[key[0]]
-            y = self._range_y[key[1]]
+        def _get_item(self, x, y):
             return _lib.TCOD_console_get_char(self._console.tcod_console, x, y)
-            
-        def __setitem__(self, key, ch):
-            x = self._range_x[key[0]]
-            y = self._range_y[key[1]]
+    
+        def _set_item(self, x, y, ch):
             _lib.TCOD_console_set_char(self._console.tcod_console, x, y, ch)
+    
+        def _set_range(self, range_x, range_y, ch):
+            for x in range_x:
+                for y in range_y:
+                    _lib.TCOD_console_set_char(self._console.tcod_console, x, y, ch)
+
+        # def __getitem__(self, key):
+            # if isinstance(key[0], slice) or isinstance(key[1], slice):
+                # return self._get_slice(*key)
+            # x = self._range_x[key[0]]
+            # y = self._range_y[key[1]]
+            # return _lib.TCOD_console_get_char(self._console.tcod_console, x, y)
+            
+        # def __setitem__(self, key, ch):
+            # if isinstance(key[0], slice) or isinstance(key[1], slice):
+                # for y_ in self._range_y[key[1]]:
+                    # for x_ in self._range_x[key[0]]:
+                        # _lib.TCOD_console_set_char(self._console.tcod_console,
+                                                   # x_, y_, ch)
+                # return
+            # _lib.TCOD_console_set_char(self._console.tcod_console,
+                # self._range_x[key[0]], self._range_y[key[1]], ch)
     
     class _AttributeFG(_ConsoleAttribute):
     
-        def __getitem__(self, key):
-            if isinstance(key[0], slice) or isinstance(key[1], slice):
-                return self._get_slice(*key)
-            x = self._range_x[key[0]]
-            y = self._range_y[key[1]]
+        def _get_item(self, x, y):
             return Color.from_int(
                 _lib.TDL_console_get_fg(self._console.tcod_console, x, y))
-            
-        def __setitem__(self, key, fg):
-            x = self._range_x[key[0]]
-            y = self._range_y[key[1]]
+    
+        def _set_item(self, x, y, fg):
             _lib.TDL_console_set_fg(self._console.tcod_console, x, y, fg)
+    
+        def _set_range(self, range_x, range_y, fg):
+            cdata = self._console.tcod_console
+            for x in range_x:
+                for y in range_y:
+                    _lib.TDL_console_set_fg(cdata, x, y, fg)
+        
+        # def __getitem__(self, key):
+            # if isinstance(key[0], slice) or isinstance(key[1], slice):
+                # return self._get_slice(*key)
+            # x = self._range_x[key[0]]
+            # y = self._range_y[key[1]]
+            # return Color.from_int(
+                # _lib.TDL_console_get_fg(self._console.tcod_console, x, y))
+            
+        # def __setitem__(self, key, fg):
+            # x = self._range_x[key[0]]
+            # y = self._range_y[key[1]]
+            # if isinstance(x, range) or isinstance(y, range):
+                # for y_ in y:
+                    # for x_ in x:
+                        # _lib.TDL_console_set_fg(self._console.tcod_console,
+                                                   # x_, y_, fg)
+                # return
+            # _lib.TDL_console_set_fg(self._console.tcod_console, x, y, fg)
     
     class _AttributeBG(_ConsoleAttribute):
     
-        def __getitem__(self, key):
-            if isinstance(key[0], slice) or isinstance(key[1], slice):
-                return self._get_slice(*key)
-            x = self._range_x[key[0]]
-            y = self._range_y[key[1]]
-            return _lib.TCOD_console_get_char_background(
-                self._console.tcod_console, x, y)
+        def _get_item(self, x, y):
+            return Color.from_int(
+                _lib.TDL_console_get_bg(self._console.tcod_console, x, y))
+    
+        def _set_item(self, x, y, fg):
+            _lib.TDL_console_set_bg(self._console.tcod_console, x, y, fg, 1)
+    
+        def _set_range(self, range_x, range_y, fg):
+            cdata = self._console.tcod_console
+            for x in range_x:
+                for y in range_y:
+                    _lib.TDL_console_set_bg(cdata, x, y, bg, 1)
+            # def __getitem__(self, key):
+            # if isinstance(key[0], slice) or isinstance(key[1], slice):
+                # return self._get_slice(*key)
+            # x = self._range_x[key[0]]
+            # y = self._range_y[key[1]]
+            # return _lib.TCOD_console_get_char_background(
+                # self._console.tcod_console, x, y)
             
-        def __setitem__(self, key, bg):
-            x = self._range_x[key[0]]
-            y = self._range_y[key[1]]
-            _lib.TCOD_console_set_char_background(
-                self._console.tcod_console, x, y, fg, 1)
+        # def __setitem__(self, key, bg):
+            # x = self._range_x[key[0]]
+            # y = self._range_y[key[1]]
+            # if isinstance(x, range) or isinstance(y, range):
+                # for y_ in y:
+                    # for x_ in x:
+                        # _lib.TDL_console_set_bg(self._console.tcod_console,
+                                                   # x_, y_, bg)
+                # return
+            # _lib.TDL_console_set_bg(
+                # self._console.tcod_console, x, y, bg, 1)
     
                  
     def __init__(self):
@@ -373,7 +468,6 @@ class _BaseConsole(object):
         # cast to int, always faster than type checking
         x = int(x)
         y = int(y)
-        
         # handle negative indexes
         return self._range_x[x], self._range_y[y]
 
@@ -840,7 +934,7 @@ class _BaseConsole(object):
         @param y: Y position to place the cursor.
         @see: L{get_cursor}, L{print_str}, L{write}
         """
-        self._cursor = self._normalizePoint(x, y)
+        self._cursor = range(self.width)[x], range(self.height)[y]
         
     def scroll(self, x, y):
         """Scroll the contents of the console in the direction of x,y.
@@ -1153,8 +1247,24 @@ class Console(_BaseConsole):
         x = self._range_x[x]
         y = self._range_y[y]
         return (_lib.TCOD_console_get_char(self.tcod_console, x, y),
-                _lib.TDL_console_get_fg(self.tcod_console, x, y),
-                _lib.TDL_console_get_bg(self.tcod_console, x, y))
+                Color.from_int(_lib.TDL_console_get_fg(self.tcod_console, x, y)),
+                Color.from_int(_lib.TDL_console_get_bg(self.tcod_console, x, y)))
+                
+    def __setitem__(self, key, value):
+        if isinstance(key[0], slice) or isinstance(key[1], slice):
+            if isinstance(value, Window):
+                raise NotImplementedError('blit stub')
+            else:
+                ch, fg, bg = value
+                for y in self._range_y[key[1]]:
+                    for x in self._range_x[key[0]]:
+                        _lib.TDL_console_put_char_ex(self.tcod_console, x, y,
+                                                     ch, fg, bg, 1)
+        else:
+            _lib.TDL_console_put_char_ex(self.tcod_console,
+                self._range_x[key[0]], self._range_y[key[1]], value[0],
+                value[1], value[2], 1)
+            
         
     def __repr__(self):
         return "<Console (Width=%i Height=%i)>" % (self.width, self.height)
@@ -1204,7 +1314,10 @@ class Window(_BaseConsole):
         _BaseConsole.__init__(self)
         assert isinstance(console, (Console, Window)), 'console parameter must be a Console or Window instance, got %s' % repr(console)
         self.parent = console
-        
+        if width is None:
+            width = console.width
+        if height is None:
+            height = console.height
         slice_x = slice(x, x + width)
         slice_y = slice(y, y + height)
         self._range_x = console._range_x[slice_x]
@@ -1238,7 +1351,8 @@ class Window(_BaseConsole):
     def _translate(self, x, y):
         """Convertion x and y to their position on the root Console"""
         # we add our position relative to our parent and then call then next parent up
-        return self.parent._translate(self._range_x[x], self._range_y[y])
+        
+        return self.parent._translate(x + self._range_x[0], y + self._range_y[0])
 
     def clear(self, fg=Ellipsis, bg=Ellipsis):
         # inherit docstring
@@ -1271,23 +1385,21 @@ class Window(_BaseConsole):
     
     def draw_rect(self, x, y, width, height, string, fg=Ellipsis, bg=Ellipsis):
         # inherit docstring
-        x, y, width, height = self._normalizeRect(x, y, width, height)
-        if fg is Ellipsis:
-            fg = self._default_fg
-        if bg is Ellipsis:
-            bg = self._default_bg
-        self.parent.draw_rect(self._range_x[x], self._range_y[y], width, height,
-                              string, fg, bg)
+        slice_x = slice(x, x + width)
+        slice_y = slice(y, y + height)
+        fg = _format_color(fg, self._default_fg)
+        bg = _format_color(bg, self._default_bg)
+        self[slice_x, slice_y] = (string, fg, bg)
         
     def draw_frame(self, x, y, width, height, string, fg=Ellipsis, bg=Ellipsis):
         # inherit docstring
         x, y, width, height = self._normalizeRect(x, y, width, height)
+        x, y = self._translate(x, y)
         if fg is Ellipsis:
             fg = self._default_fg
         if bg is Ellipsis:
             bg = self._default_bg
-        self.parent.draw_frame(self._range_x[x], self._range_y[y], width, height,
-                               string, fg, bg)
+        self.parent.draw_frame(x, y, width, height, string, fg, bg)
 
     def get_char(self, x, y):
         # inherit docstring
@@ -1316,6 +1428,21 @@ class Window(_BaseConsole):
         return (_lib.TCOD_console_get_char(self.console.tcod_console, x, y),
                 _lib.TDL_console_get_fg(self.console.tcod_console, x, y),
                 _lib.TDL_console_get_bg(self.console.tcod_console, x, y))
+    
+    def __setitem__(self, key, value):
+        if isinstance(key[0], slice) or isinstance(key[1], slice):
+            if isinstance(value, Window):
+                raise NotImplementedError('blit stub')
+            else:
+                ch, fg, bg = value
+                for y in self._range_y[key[1]]:
+                    for x in self._range_x[key[0]]:
+                        _lib.TDL_console_put_char_ex(self.console.tcod_console,
+                            x, y, ch, fg, bg, 1)
+        else:
+            _lib.TDL_console_put_char_ex(self.console.tcod_console,
+                self._range_x[key[0]], self._range_y[key[1]], value[0],
+                value[1], value[2], 1)
     
         
     def __repr__(self):

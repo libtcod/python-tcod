@@ -104,6 +104,21 @@ class Benchmark_GetAndSet_FG_Attribute(Benchmark):
             self.tiles += 1
         tdl.flush()
 
+class Benchmark_SetItem(Benchmark):
+    
+    def test(self, console):
+        for x,y in console:
+            console[x,y] = (ord('D'), 0xffffff, 0x000000)
+            self.tiles += 1
+        tdl.flush()
+
+class Benchmark_SetRange(Benchmark):
+    
+    def test(self, console):
+        console[:,:] = (ord('E'), 0xffffff, 0x000000)
+        self.tiles += console.width * console.height
+        tdl.flush()
+
         
 class Benchmark_DrawStr16_DefaultColor(Benchmark):
     default_frames = 100
@@ -138,6 +153,8 @@ def run_benchmark():
     print_result('In %s mode' % (['release', 'debug'][__debug__]))
     print_result('%i characters/frame' % (WIDTH * HEIGHT))
     print_result('Opened console in %s mode' % RENDERER)
+    Benchmark_SetItem().run(console)
+    Benchmark_SetRange().run(console)
     Benchmark_DrawChar_Ch_Attribute().run(console)
     Benchmark_Get_FG_Attribute().run(console)
     Benchmark_Set_FG_Attribute().run(console)

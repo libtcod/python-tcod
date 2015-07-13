@@ -22,7 +22,7 @@ def backport(func):
         
     @_functools.wraps(func)
     def deprecated_function(*args, **kargs):
-        _warnings.warn('This finction name is deprecated',
+        _warnings.warn('This function name is deprecated',
                        DeprecationWarning, 2)
         return func(*args, **kargs)
     deprecated_function.__doc__ = """

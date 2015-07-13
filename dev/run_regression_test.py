@@ -19,6 +19,8 @@ WINWIDTH, WINHEIGHT = 10, 10
 
 DEFAULT_CHAR = (0x20, (0, 0, 0), (0, 0, 0))
 
+BLACK = tdl.Color(0, 0, 0)
+
 class TDLTemplate(unittest.TestCase):
     "Nearly all tests need tdl.init to be called"
 
@@ -32,7 +34,7 @@ class TDLTemplate(unittest.TestCase):
     def setUp(self):
         tdl.setFont('../fonts/libtcod/terminal8x8_gs_ro.png')
         tdl.event.get()
-        self.console.set_colors((0,0,0), (0,0,0))
+        self.console.set_colors(BLACK, BLACK)
         self.console.clear()
         
     @classmethod
@@ -62,7 +64,9 @@ class TDLTemplate(unittest.TestCase):
         
     def getRandomColor(self):
         "returns a single random color"
-        return (random.getrandbits(8), random.getrandbits(8), random.getrandbits(8))
+        return tdl.Color((random.getrandbits(8),
+                          random.getrandbits(8),
+                          random.getrandbits(8)))
         
     def getDrawables(self, console=None):
         """return a list of all drawable (x,y) positions
@@ -263,7 +267,7 @@ class DrawingTests(TDLTemplate):
                              random.randint(-HEIGHT, HEIGHT)))
         for sx, sy in scrollTests:
             noiseData = dict(self.randomizeConsole())
-            self.console.set_colors((0, 0, 0), (0, 0, 0))
+            self.console.set_colors(BLACK, BLACK)
             self.console.scroll(sx, sy)
             self.flush() # show progress
             for x, y in self.getDrawables():
