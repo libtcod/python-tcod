@@ -4,6 +4,12 @@ import ctypes as _ctypes
 import tcod as _tcod
 from .libtcod import _lib, _ffi, _lib_ctypes, _str, _unpack_char_p, _unicode
 
+_chr = chr
+try:
+    _chr = unichr # Python 2
+except NameError:
+    pass
+
 # property types
 TYPE_NONE = 0
 TYPE_BOOL = 1
@@ -121,15 +127,21 @@ def run(parser, filename, listener=None):
         @_CFUNC_NEW_STRUCT
         def new_struct(struct, c_char_p):
             struct = _ffi.cast('TCOD_parser_struct_t *', struct)
+            if c_char_p is None:
+                c_char_p = ''
             return listener.new_struct(struct, _unicode(c_char_p))
         
         @_CFUNC_NEW_STRUCT
         def end_struct(struct, c_char_p):
             struct = _ffi.cast('TCOD_parser_struct_t *', struct)
+            if c_char_p is None:
+                c_char_p = ''
             return listener.end_struct(struct, _unicode(c_char_p))
         
         @_CFUNC_NEW_FLAG
         def error(msg):
+            if msg is None:
+                msg = ''
             listener.error(_unicode(msg))
         
         clistener.new_struct = new_struct
@@ -153,7 +165,7 @@ def get_int_property(parser, name):
     return _lib.TCOD_parser_get_int_property(parser, _str(name))
 
 def get_char_property(parser, name):
-    return _unicode(_lib.TCOD_parser_get_char_property(parser, _str(name)))
+    return _chr(_lib.TCOD_parser_get_char_property(parser, _str(name)))
 
 def get_float_property(parser, name):
     return _lib.TCOD_parser_get_float_property(parser, _str(name))
