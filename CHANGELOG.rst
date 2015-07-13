@@ -1,6 +1,11 @@
 ===========
  Changelog
 ===========
+0.2.3
+ * better Color performance
+ * parser now works when using a custom listener class
+ * SDL renderer callback now receives a accessible SDL_Surface cdata object.
+
 0.2.2
  * This module can now compile and link properly on Linux
 
