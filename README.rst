@@ -1,3 +1,6 @@
+.. contents::
+   :backlinks: top
+
 ==============
  Installation
 ==============

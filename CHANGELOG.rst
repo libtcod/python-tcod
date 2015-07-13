@@ -1,6 +1,11 @@
 ===========
  Changelog
 ===========
+1.5.0
+ * python-tdl distributions are now universal builds
+ * new Map class
+ * map.bresenham now returns a list
+
 1.4.0
  * The DLL's have been moved into another library which you can find at https://github.com/HexDecimal/libtcod-cffi
    You can use this library to have some raw access to libtcod if you want.

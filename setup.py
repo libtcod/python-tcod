@@ -40,7 +40,7 @@ setup(
     download_url='https://pypi.python.org/pypi/tdl',
     packages=['tdl'],
     package_data={'tdl': ['*.txt', '*.rst', '*.bmp', '*.png']},
-    install_requires=["libtcod-cffi>=0.1.0"],
+    install_requires=["libtcod-cffi>=0.2.3"],
     cmdclass={'build_docs': build_docs},
     classifiers=['Development Status :: 5 - Production/Stable',
                'Environment :: Win32 (MS Windows)',
