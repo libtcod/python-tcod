@@ -34,16 +34,25 @@ def _get_libraries_crossplatform():
     elif 'darwin' in sys.platform:
         return ['tcod']
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
-    
+
+include_dirs = ['Release/tcod/', 'tcod/include/libtcod-1.5']
+extra_compile_args = []
+
+# only include the provided SDL headers if they're missing from the standard system directories
+# also avoid using gcc commands on Windows
+if sys.platform  in ['win32', 'win64']:
+    include_dirs += ['tcod/include/SDL-1.2']
+else:
+    extra_compile_args += ['-idirafter', 'tcod/include/SDL-1.2']
+
 ffi = FFI()
 ffi.cdef(open('tcod/libtcod_cdef.h', 'r').read())
 ffi.set_source(
     module_name, open('tcod/tdl_source.c', 'r').read(),
-    include_dirs=['tcod/include/libtcod-1.5',
-                  'tcod/include/SDL-1.2', 'Release/tcod/'],
+    include_dirs=include_dirs,
     library_dirs=[_get_library_dirs_crossplatform()],
     libraries=_get_libraries_crossplatform(),
-    #extra_compile_args=['/O2', '/W3']
+    extra_compile_args=extra_compile_args,
 )
 
 if __name__ == "__main__":
