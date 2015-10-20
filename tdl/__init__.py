@@ -59,6 +59,9 @@
     @undocumented: style
 """
 
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
+
 import sys as _sys
 import os as _os
 
@@ -86,11 +89,11 @@ if _IS_PYTHON3: # some type lists to use with isinstance
 else:
     _INTTYPES = (int, long)
     _NUMTYPES = (int, long, float)
-    _STRTYPES = (str,)
+    _STRTYPES = (str, unicode)
 
 def _encodeString(string): # still used for filepaths, and that's about it
     "changes string into bytes if running in python 3, for sending to ctypes"
-    if _IS_PYTHON3 and isinstance(string, str):
+    if isinstance(string, _STRTYPES):
         return string.encode()
     return string
 
@@ -108,7 +111,7 @@ def _format_char(char):
     try:
         return int(char) # allow all int-like objects
     except:
-        raise TypeError('char single character string, integer, or None\nReceived: ' + repr(color))
+        raise TypeError('char single character string, integer, or None\nReceived: ' + repr(char))
 
 _utf32_codec = {'little': 'utf-32le', 'big': 'utf-32le'}[_sys.byteorder]
     

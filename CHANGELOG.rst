@@ -1,11 +1,14 @@
 ===========
  Changelog
 ===========
+current
+ * fixed errors with Unicode literals on Python 2
+
 1.5.0
  * python-tdl distributions are now universal builds
  * new Map class
  * map.bresenham now returns a list
- * this release will require libtcod-cffi 0.2.3 or later
+ * this release will require libtcod-cffi v0.2.3 or later
 
 1.4.0
  * The DLL's have been moved into another library which you can find at https://github.com/HexDecimal/libtcod-cffi
