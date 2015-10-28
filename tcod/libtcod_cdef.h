@@ -882,7 +882,7 @@ TCOD_library_t TCOD_load_library(const char *path);
 void * TCOD_get_function_address(TCOD_library_t library, const char *function_name);
 void TCOD_close_library(TCOD_library_t);
 /* SDL renderer callback */
-typedef void (*SDL_renderer_t) (SDL_Surface *sdl_surface);
+typedef void (*SDL_renderer_t) (void *sdl_surface);
 void TCOD_sys_register_SDL_renderer(SDL_renderer_t renderer);
 
 
