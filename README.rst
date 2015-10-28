@@ -48,7 +48,7 @@ When possible, using PyPy will give the best performance, and is highly reccomen
 * Python 2.7+ or 3.2+
 * 32 bit Windows, 32/64 bit Linux, or Mac OS/X (64 bit architecture)
 * An up-to-date version of python-cffi: https://pypi.python.org/pypi/cffi
-* Linux will require libsdl, libpng, zlib, and python-dev packages
+* Linux will require libsdl1.2, libsdl1.2-dev, libpng, zlib, libffi-dev, and python-dev packages
 
 =========
  License

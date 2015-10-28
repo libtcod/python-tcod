@@ -1,6 +1,10 @@
 ===========
  Changelog
 ===========
+0.2.4
+ * Compiler will now use distribution specific SDL header files before falling
+   back on the included header files.
+
 0.2.3
  * better Color performance
  * parser now works when using a custom listener class
