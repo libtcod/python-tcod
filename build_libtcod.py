@@ -38,12 +38,9 @@ def _get_libraries_crossplatform():
 include_dirs = ['/usr/include/SDL', 'Release/tcod/', 'tcod/include/libtcod-1.5']
 extra_compile_args = []
 
-# only include the provided SDL headers if they're missing from the standard system directories
-# also avoid using gcc commands on Windows
+# included SDL headers are for Windows only
 if sys.platform  in ['win32', 'win64']:
     include_dirs += ['tcod/include/SDL-1.2']
-else:
-    extra_compile_args += ['-idirafter', 'tcod/include/SDL-1.2']
 
 ffi = FFI()
 ffi.cdef(open('tcod/libtcod_cdef.h', 'r').read())
