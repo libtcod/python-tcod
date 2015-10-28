@@ -1,6 +1,10 @@
 ===========
  Changelog
 ===========
+0.2.6
+ * Added requirements.txt to fix a common pip/cffi issue.
+ * Provided SDL headers are now for Windows only.
+ 
 0.2.5
  * Added /usr/include/SDL to include path
 
