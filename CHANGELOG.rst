@@ -1,6 +1,9 @@
 ===========
  Changelog
 ===========
+0.2.5
+ * Added /usr/include/SDL to include path
+
 0.2.4
  * Compiler will now use distribution specific SDL header files before falling
    back on the included header files.
