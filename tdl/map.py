@@ -1,6 +1,6 @@
 """
     Rogue-like map utilitys such as line-of-sight, field-of-view, and path-finding.
-    
+
 """
 
 import itertools as _itertools
@@ -26,42 +26,42 @@ def _get_fov_type(fov):
 
 class Map(object):
     """Fast field-of-view and path-finding on stored data.
-    
+
     Set map conditions with the walkable and transparency attributes, this
     object can be iterated and checked for containment similar to consoles.
-    
+
     For example, you can set all tiles and transparent and walkable with the
     following code::
-    
+
         map = tdl.map.Map(80, 60)
         for x,y in map:
             map.transparent[x,y] = true
             map.walkable[x,y] = true
-    
+
     @ivar transparent: Map transparency, access this attribute with
                        map.transparency[x,y]
-                       
+
                        Set to True to allow field-of-view rays, False will
                        block field-of-view.
-                       
+
                        Transparent tiles only affect field-of-view.
 
     @ivar walkable: Map accessibility, access this attribute with
                     map.walkable[x,y]
-                    
+
                     Set to True to allow path-finding through that tile,
                     False will block passage to that tile.
-                    
+
                     Walkable tiles only affect path-finding.
-                    
+
     @ivar fov: Map tiles touched by a field-of-view computation,
                access this attribute with map.fov[x,y]
-               
+
                Is True if a the tile is if view, otherwise False.
-               
+
                You can set to this attribute if you want, but you'll typically
                be using it to read the field-of-view of a L{compute_fov} call.
-    
+
     @since: 1.5.0
     """
 
@@ -71,19 +71,19 @@ class Map(object):
             self.bit_index = bit_index
             self.bit = 1 << bit_index
             self.bit_inverse = 0xFF ^ self.bit
-            
+
         def __getitem__(self, key):
             return bool(self.map._array_cdata[key[1]][key[0]] & self.bit)
-            
+
         def __setitem__(self, key, value):
             self.map._array_cdata[key[1]][key[0]] = (
                 (self.map._array_cdata[key[1]][key[0]] & self.bit_inverse) |
                 (self.bit * bool(value))
                 )
-                
+
     def __init__(self, width, height):
         """Create a new Map with width and height.
-        
+
         @type width: int
         @type height: int
         @param width: Width of the new Map instance, in tiles.
@@ -100,25 +100,25 @@ class Map(object):
         self.transparent = self._MapAttribute(self, 0)
         self.walkable = self._MapAttribute(self, 1)
         self.fov = self._MapAttribute(self, 2)
-        
+
     def __del__(self):
         if self._map_cdata:
             _lib.TCOD_map_delete(self._map_cdata)
             self._map_cdata = None
-        
+
     def compute_fov(self, x, y, fov='PERMISSIVE', radius=None, light_walls=True,
                     sphere=True, cumulative=False):
         """Compute the field-of-view of this Map and return an iterator of the
         points touched.
-        
+
         @type x: int
         @type y: int
-    
+
         @param x: x center of the field-of-view
         @param y: y center of the field-of-view
         @type fov: string
         @param fov: The type of field-of-view to be used.  Available types are:
-    
+
                     'BASIC', 'DIAMOND', 'SHADOW', 'RESTRICTIVE', 'PERMISSIVE',
                     'PERMISSIVE0', 'PERMISSIVE1', ..., 'PERMISSIVE8'
         @type radius: int
@@ -129,15 +129,15 @@ class Map(object):
         @param sphere: True for a spherical field-of-view.
                        False for a square one.
         @type cumulative: boolean
-        @param cumulative: 
-    
+        @param cumulative:
+
         @rtype: iter((x, y), ...)
         @return: An iterator of (x, y) points of tiles touched by the
                  field-of-view.
-                 
+
                  Unexpected behaviour can happen if you modify the Map while
                  using the iterator.
-                 
+
                  You can use the Map's fov attribute as an alternative to this
                  iterator.
         """
@@ -146,7 +146,7 @@ class Map(object):
                                       self._array_cdata_flat)
         if radius is None: # infinite radius
             radius = max(self.width, self.height)
-        _lib.TCOD_map_compute_fov(self.cdata, x, y, radius, light_walls,
+        _lib.TCOD_map_compute_fov(self._map_cdata, x, y, radius, light_walls,
                                   _get_fov_type(fov))
         _lib.TDL_map_fov_to_buffer(self._map_cdata,
                                    self._array_cdata_flat, cumulative)
@@ -157,18 +157,18 @@ class Map(object):
                     if(_array_cdata[y][x] & 4):
                         yield (x, y)
         return iterate_fov()
-        
-        
-        
+
+
+
     def compute_path(self, start_x, start_y, dest_x, dest_y,
                      diagonal_cost=_math.sqrt(2)):
         """Get the shortest path between two points.
-        
+
         The start position is not included in the list.
-        
+
         @type diagnalCost: float
         @param diagnalCost: Multiplier for diagonal movement.
-        
+
                             Can be set to zero to disable diagonal movement
                             entirely.
         @rtype: [(x, y), ...]
@@ -191,32 +191,32 @@ class Map(object):
         finally:
             _lib.TCOD_path_delete(path_cdata)
         return path
-    
+
     def __iter__(self):
         return _itertools.product(range(self.width), range(self.height))
-        
+
     def __contains__(self, position):
         x, y = position
         return (0 <= x < self.width) and (0 <= y < self.height)
-        
-    
-    
+
+
+
 class AStar(object):
     """A* pathfinder
-    
+
     Using this class requires a callback detailed in L{AStar.__init__}
-    
+
     @undocumented: getPath
     """
-    
+
     __slots__ = ('_as_parameter_', '_callback', '__weakref__')
-    
-    
+
+
 
     def __init__(self, width, height, callback,
                  diagnalCost=_math.sqrt(2), advanced=False):
         """Create an A* pathfinder using a callback.
-        
+
         Before crating this instance you should make one of two types of
         callbacks:
          - A function that returns the cost to move to (x, y)
@@ -225,34 +225,34 @@ class AStar(object):
            (destX, destY, sourceX, sourceY)
         If path is blocked the function should return zero or None.
         When using the second type of callback be sure to set advanced=True
-        
+
         @type width: int
         @param width: width of the pathfinding area in tiles
         @type height: int
         @param height: height of the pathfinding area in tiles
-        
+
         @type callback: function
         @param callback: A callback taking parameters depending on the setting
                          of 'advanced' and returning the cost of
                          movement for an open tile or zero for a
                          blocked tile.
-        
+
         @type diagnalCost: float
         @param diagnalCost: Multiplier for diagonal movement.
-        
+
                             Can be set to zero to disable diagonal movement
                             entirely.
-        
+
         @type advanced: boolean
         @param advanced: A simple callback with 2 positional parameters may not
                          provide enough information.  Setting this to True will
                          call the callback with 2 additional parameters giving
                          you both the destination and the source of movement.
-                         
+
                          When True the callback will need to accept
                          (destX, destY, sourceX, sourceY) as parameters.
                          Instead of just (destX, destY).
-                         
+
         """
         if not diagnalCost: # set None or False to zero
             diagnalCost = 0.0
@@ -270,23 +270,23 @@ class AStar(object):
                 return 0.0
         # float(int, int, int, int, void*)
         self._callback = _ffi.callback('TCOD_path_func_t')(newCallback)
-        
+
         self._as_parameter_ = _lib.TCOD_path_new_using_function(width, height,
                                      self._callback, _ffi.NULL, diagnalCost)
-                                     
+
     def __del__(self):
         if self._as_parameter_:
             _lib.TCOD_path_delete(self._as_parameter_)
             self._as_parameter_ = None
-        
+
     def get_path(self, origX, origY, destX, destY):
         """
         Get the shortest path from origXY to destXY.
-        
+
         @rtype: [(x, y), ...]
         @return: Returns a list walking the path from origXY to destXY.
                  This excludes the starting point and includes the destination.
-                 
+
                  If no path is found then an empty list is returned.
         """
         found = _lib.TCOD_path_compute(self._as_parameter_, origX, origY, destX, destY)
@@ -298,22 +298,22 @@ class AStar(object):
         while _lib.TCOD_path_walk(self._as_parameter_, x, y, recalculate):
             path.append((x[0], y[0]))
         return path
-    
+
 def quick_fov(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sphere=True):
     """All field-of-view functionality in one call.
-    
+
     Before using this call be sure to make a function, lambda, or method that takes 2
     positional parameters and returns True if light can pass through the tile or False
     for light-blocking tiles and for indexes that are out of bounds of the
     dungeon.
-    
+
     This function is 'quick' as in no hassle but can quickly become a very slow
     function call if a large radius is used or the callback provided itself
     isn't optimized.
-    
+
     Always check if the index is in bounds both in the callback and in the
     returned values.  These values can go into the negatives as well.
-    
+
     @type x: int
     @param x: x center of the field-of-view
     @type y: int
@@ -324,22 +324,22 @@ def quick_fov(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sph
                      or False if the tile blocks light or is out of bounds.
     @type fov: string
     @param fov: The type of field-of-view to be used.  Available types are:
-    
+
                 'BASIC', 'DIAMOND', 'SHADOW', 'RESTRICTIVE', 'PERMISSIVE',
                 'PERMISSIVE0', 'PERMISSIVE1', ..., 'PERMISSIVE8'
     @type radius: float
     @param radius: Raduis of the field-of-view.
-    
+
                    When sphere is True a floating point can be used to fine-tune
                    the range.  Otherwise the radius is just rounded up.
-    
+
                    Be careful as a large radius has an exponential affect on
                    how long this function takes.
     @type lightWalls: boolean
     @param lightWalls: Include or exclude wall tiles in the field-of-view.
     @type sphere: boolean
     @param sphere: True for a spherical field-of-view.  False for a square one.
-    
+
     @rtype: set((x, y), ...)
     @return: Returns a set of (x, y) points that are within the field-of-view.
     """
@@ -347,19 +347,19 @@ def quick_fov(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sph
     radius = int(_math.ceil(radius))
     mapSize = radius * 2 + 1
     fov = _get_fov_type(fov)
-    
+
     setProp = _lib.TCOD_map_set_properties # make local
     inFOV = _lib.TCOD_map_is_in_fov
-    
+
     tcodMap = _lib.TCOD_map_new(mapSize, mapSize)
     try:
         # pass no.1, write callback data to the tcodMap
         for x_, y_ in _itertools.product(range(mapSize), range(mapSize)):
-            pos = (x_ + x - radius, 
+            pos = (x_ + x - radius,
                    y_ + y - radius)
             transparent = bool(callback(*pos))
             setProp(tcodMap, x_, y_, transparent, False)
-        
+
         # pass no.2, compute fov and build a list of points
         _lib.TCOD_map_compute_fov(tcodMap, radius, radius, radius, lightWalls, fov)
         touched = set() # points touched by field of view
@@ -371,14 +371,14 @@ def quick_fov(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sph
     finally:
         _lib.TCOD_map_delete(tcodMap)
     return touched
-    
+
 def bresenham(x1, y1, x2, y2):
     """
     Return a list of points in a bresenham line.
-    
+
     Implementation hastily copied from RogueBasin.
-    
-    @return: Returns a list of (x, y) points, including both the start and 
+
+    @return: Returns a list of (x, y) points, including both the start and
              endpoints.
     """
     points = []
@@ -413,8 +413,8 @@ def bresenham(x1, y1, x2, y2):
     if rev:
         points.reverse()
     return points
-    
-    
+
+
 __all__ = [_var for _var in locals().keys() if _var[0] != '_']
 
 quickFOV = _style.backport(quick_fov)
