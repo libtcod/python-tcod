@@ -163,23 +163,27 @@ def _to_tcod_color(color):
         
 def _getImageSize(filename):
     """Try to get the width and height of a bmp of png image file"""
+    result = None
     file = open(filename, 'rb')
     if file.read(8) == b'\x89PNG\r\n\x1a\n': # PNG
         while 1:
             length, = _struct.unpack('>i', file.read(4))
             chunkID = file.read(4)
             if chunkID == '': # EOF
-                return None
+                break
             if chunkID == b'IHDR':
                 # return width, height
-                return _struct.unpack('>ii', file.read(8))
+                result = _struct.unpack('>ii', file.read(8))
+                break
             file.seek(4 + length, 1)
+        file.close()
+        return result
     file.seek(0)
     if file.read(8) == b'BM': # Bitmap
         file.seek(18, 0) # skip to size data
-        # return width, height
-        return _struct.unpack('<ii', file.read(8))
-    # return None on error, unknown file
+        result = _struct.unpack('<ii', file.read(8))
+    file.close()
+    return result # (width, height), or None
 
 class TDLError(Exception):
     """
