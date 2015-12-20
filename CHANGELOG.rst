@@ -1,8 +1,9 @@
 ===========
  Changelog
 ===========
-current
- * fixed errors with Unicode literals on Python 2
+1.5.1
+ * fixed errors with Unicode and non-Unicode literals on Python 2
+ * fixed attribute error in compute_fov
 
 1.5.0
  * python-tdl distributions are now universal builds
