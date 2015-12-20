@@ -38,15 +38,15 @@ class TDLTemplate(unittest.TestCase):
         del cls.console
         gc.collect() # make sure console.__del__ is called quickly
         
-    def inWindow(self, x, y):
+    def in_window(self, x, y):
         "returns True if this point is in the Window"
         return 0 <= x < WINWIDTH and 0 <= y < WINHEIGHT
         
-    def randomizeConsole(self):
+    def randomize_console(self):
         "Randomize the console returning the random data"
-        noise = [((x, y), self.getRandomCharacter()) for x,y in self.getDrawables()]
+        noise = [((x, y), self.get_random_character()) for x,y in self.get_drawables()]
         for (x, y), graphic in noise:
-            self.console.drawChar(x, y, *graphic)
+            self.console.draw_char(x, y, *graphic)
         return noise # [((x, y), (cg, fg, bg)), ...]
         
     def flush(self):
@@ -54,29 +54,29 @@ class TDLTemplate(unittest.TestCase):
         #tdl.event.get() # no longer needed
         tdl.flush()
         
-    def getRandomCharacter(self):
+    def get_random_character(self):
         "returns a tuple with a random character and colors (ch, fg, bg)"
-        return (random.getrandbits(8), self.getRandomColor(), self.getRandomColor())
+        return (random.getrandbits(8), self.get_random_color(), self.get_random_color())
         
-    def getRandomColor(self):
+    def get_random_color(self):
         "returns a single random color"
         return (random.getrandbits(8), random.getrandbits(8), random.getrandbits(8))
         
-    def getDrawables(self, console=None):
+    def get_drawables(self, console=None):
         """return a list of all drawable (x,y) positions
         defaults to self.console
         """
         if console is None:
             console = self.console
-        w, h = console.getSize()
+        w, h = console.get_size()
         return itertools.product(range(w), range(h))
     
-    def getUndrawables(self, console=None):
+    def get_undrawables(self, console=None):
         """return a list of (x,y) positions that should raise errors when used
         positions are mostly random and will have at least one over the bounds of each side and each corner"""
         if console is None:
             console = self.console
-        w, h = console.getSize()
+        w, h = console.get_size()
         for y in range(-1, h+1):
             yield -w-1, y
             yield w, y
@@ -84,42 +84,42 @@ class TDLTemplate(unittest.TestCase):
             yield x, h
             yield x, -h-1
         
-    def compareConsoles(self, consoleA, consoleB, errorMsg='colors should be the same'):
+    def compare_consoles(self, consoleA, consoleB, errorMsg='colors should be the same'):
         "Compare two console assuming they match and failing if they don't"
-        self.assertEqual(consoleA.getSize(), consoleB.getSize(), 'consoles should be the same size')
-        for x, y in self.getDrawables(consoleA):
-            self.assertEqual(consoleA.getChar(x, y),
-                             consoleB.getChar(x, y), '%s, position: (%i, %i)' % (errorMsg, x, y))
+        self.assertEqual(consoleA.get_size(), consoleB.get_size(), 'consoles should be the same size')
+        for x, y in self.get_drawables(consoleA):
+            self.assertEqual(consoleA.get_char(x, y),
+                             consoleB.get_char(x, y), '%s, position: (%i, %i)' % (errorMsg, x, y))
 
 class BasicTests(TDLTemplate):
     
     def test_clearConsole(self):
-        self.randomizeConsole()
-        _, fg, bg = self.getRandomCharacter()
+        self.randomize_console()
+        _, fg, bg = self.get_random_character()
         ch = 0x20 # space
         self.console.clear(fg, bg)
         self.flush()
-        for x,y in self.getDrawables():
-            self.assertEqual((ch, fg, bg), self.console.getChar(x, y), 'color should be changed with clear')
-        _, fg2, bg2 = self.getRandomCharacter()
+        for x,y in self.get_drawables():
+            self.assertEqual((ch, fg, bg), self.console.get_char(x, y), 'color should be changed with clear')
+        _, fg2, bg2 = self.get_random_character()
         self.window.clear(fg2, bg2)
         self.flush()
-        for x,y in self.getDrawables():
-            if self.inWindow(x, y):
-                self.assertEqual((ch, fg2, bg2), self.console.getChar(x, y), 'color in window should be changed')
+        for x,y in self.get_drawables():
+            if self.in_window(x, y):
+                self.assertEqual((ch, fg2, bg2), self.console.get_char(x, y), 'color in window should be changed')
             else:
-                self.assertEqual((ch, fg, bg), self.console.getChar(x, y), 'color outside of window should persist')
+                self.assertEqual((ch, fg, bg), self.console.get_char(x, y), 'color outside of window should persist')
         
     def test_cloneConsole(self):
-        noiseData = self.randomizeConsole()
+        noiseData = self.randomize_console()
         clone = copy.copy(self.console)
-        self.compareConsoles(self.console, clone, 'console clone should match root console')
+        self.compare_consoles(self.console, clone, 'console clone should match root console')
     
     def test_pickleConsole(self):
-        noiseData = self.randomizeConsole()
+        noiseData = self.randomize_console()
         pickled = pickle.dumps(self.console)
         clone = pickle.loads(pickled)
-        self.compareConsoles(self.console, clone, 'pickled console should match root console')
+        self.compare_consoles(self.console, clone, 'pickled console should match root console')
      
     # This isn't really supported.
     #def test_changeFonts(self):
@@ -132,61 +132,61 @@ class BasicTests(TDLTemplate):
     #        tdl.setFont(font)
     #        # only works at all in OPENGL
     #        self.console = tdl.init(WIDTH, HEIGHT, title=font, renderer='OPENGL')
-    #        for x,y in self.getDrawables():
-    #            self.console.draw_char(x, y, *self.getRandomCharacter())
+    #        for x,y in self.get_drawables():
+    #            self.console.draw_char(x, y, *self.get_random_character())
     #        self.flush()
     #        time.sleep(.05)
         
         
 class DrawingTests(TDLTemplate):
 
-    def test_drawCharTuples(self):
-        "Test passing tuple colors and int characters to drawChar"
+    def test_draw_charTuples(self):
+        "Test passing tuple colors and int characters to draw_char"
         record = {}
-        for x,y in self.getDrawables():
-            ch, fg, bg = self.getRandomCharacter()
+        for x,y in self.get_drawables():
+            ch, fg, bg = self.get_random_character()
             record[x,y] = (ch, fg, bg)
-            self.console.drawChar(x, y, ch, fg, bg)
-            self.assertEqual(record[x,y], self.console.getChar(x, y), 'console data should be overwritten')
+            self.console.draw_char(x, y, ch, fg, bg)
+            self.assertEqual(record[x,y], self.console.get_char(x, y), 'console data should be overwritten')
             self.flush() # show progress
             
         for (x,y), data in record.items():
-            self.assertEqual(data, self.console.getChar(x, y), 'drawChar should not overwrite any other tiles')
+            self.assertEqual(data, self.console.get_char(x, y), 'draw_char should not overwrite any other tiles')
 
-    def test_drawCharWebcolor(self):
-        "Test passing web style colors and string characters to drawChar"
+    def test_draw_charWebcolor(self):
+        "Test passing web style colors and string characters to draw_char"
         record = {}
-        for x,y in self.getDrawables():
-            ch, fg, bg = self.getRandomCharacter()
+        for x,y in self.get_drawables():
+            ch, fg, bg = self.get_random_character()
             record[x,y] = (ch, fg, bg)
             ch = chr(ch)
             fg = fg[0] << 16 | fg[1] << 8 | fg[2] # convert to a 0xRRGGBB style number
             bg = bg[0] << 16 | bg[1] << 8 | bg[2]
-            self.console.drawChar(x, y, ch, fg, bg)
-            self.assertEqual(record[x,y], self.console.getChar(x, y), 'console data should be overwritten')
+            self.console.draw_char(x, y, ch, fg, bg)
+            self.assertEqual(record[x,y], self.console.get_char(x, y), 'console data should be overwritten')
             self.flush() # show progress
         for (x,y), data in record.items():
-            self.assertEqual(data, self.console.getChar(x, y), 'drawChar should not overwrite any other tiles')
+            self.assertEqual(data, self.console.get_char(x, y), 'draw_char should not overwrite any other tiles')
         
     #@unittest.skipIf(not __debug__, 'python run with optimized flag, skipping an AssertionError test')
-    #def test_drawCharErrors(self):
+    #def test_draw_charErrors(self):
     #    "test out of bounds assertion errors"
-    #    for x,y in self.getUndrawables():
+    #    for x,y in self.get_undrawables():
     #        with self.assertRaisesRegexp(AssertionError, r"\(%i, %i\)" % (x, y)):
-    #            self.console.drawChar(x, y, *(self.getRandomCharacter()))
+    #            self.console.draw_char(x, y, *(self.get_random_character()))
 
-    def test_drawStr(self):
-        """quick regression test for drawStr"""
-        width, height = self.console.getSize()
+    def test_draw_str(self):
+        """quick regression test for draw_str"""
+        width, height = self.console.get_size()
         def str_check(array, string, desc):
-            fg, bg = self.getRandomColor(), self.getRandomColor()
+            fg, bg = self.get_random_color(), self.get_random_color()
             self.console.clear()
-            self.console.drawStr(0, 0, string, fg, bg)
+            self.console.draw_str(0, 0, string, fg, bg)
             self.flush()
             i = 0
             for y in range(height):
                 for x in range(width):
-                    self.assertEqual(self.console.getChar(x, y), (array[i], fg, bg),
+                    self.assertEqual(self.console.get_char(x, y), (array[i], fg, bg),
                                      '%s should be written out' % desc)
                     i += 1
         
@@ -210,20 +210,20 @@ class DrawingTests(TDLTemplate):
         str_check(array, unicode, 'Unicode string')
         
     
-    def test_drawStrArray(self):
+    def test_draw_strArray(self):
         """strings will raise errors if they pass over the end of the console.
         The data will still be written however."""
-        width, height = self.console.getSize()
-        for x,y in self.getDrawables():
+        width, height = self.console.get_size()
+        for x,y in self.get_drawables():
             string = [random.getrandbits(8) for _ in range(random.randint(2, 10))]
-            fg, bg = self.getRandomColor(), self.getRandomColor()
+            fg, bg = self.get_random_color(), self.get_random_color()
             if len(string) > ((height - y) * width - x): # compare length of string to remaining space on the console
                 with self.assertRaises(tdl.TDLError): # expect end of console error
-                    self.console.drawStr(x, y, string, fg, bg)
+                    self.console.draw_str(x, y, string, fg, bg)
             else:
-                self.console.drawStr(x, y, string, fg, bg)
+                self.console.draw_str(x, y, string, fg, bg)
             for ch in string: # inspect console for changes
-                self.assertEqual(self.console.getChar(x, y), (ch, fg, bg), 'console data should be overwritten, even after an error')
+                self.assertEqual(self.console.get_char(x, y), (ch, fg, bg), 'console data should be overwritten, even after an error')
                 x += 1
                 if x == width:
                     x = 0
@@ -233,54 +233,54 @@ class DrawingTests(TDLTemplate):
             self.flush() # show progress
     
     #@unittest.skipIf(not __debug__, 'python run with optimized flag, skipping an AssertionError test')
-    #def test_drawStrErrors(self):
+    #def test_draw_strErrors(self):
     #    "test out of bounds assertion errors"
-    #    for x,y in self.getUndrawables():
+    #    for x,y in self.get_undrawables():
     #        with self.assertRaisesRegexp(AssertionError, r"\(%i, %i\)" % (x, y)):
-    #            self.console.drawStr(x, y, 'foo', self.getRandomColor(), self.getRandomColor())
+    #            self.console.draw_str(x, y, 'foo', self.get_random_color(), self.get_random_color())
     
-    def test_drawRect(self):
-        consoleCopy = tdl.Console(*(self.console.getSize()))
-        for x,y in random.sample(list(self.getDrawables()), 20):
+    def test_draw_rect(self):
+        consoleCopy = tdl.Console(*(self.console.get_size()))
+        for x,y in random.sample(list(self.get_drawables()), 20):
             consoleCopy.blit(self.console) # copy the console to compare untouched areas
-            ch, fg, bg = self.getRandomCharacter()
-            width, height = self.console.getSize()
+            ch, fg, bg = self.get_random_character()
+            width, height = self.console.get_size()
             width, height = random.randint(1, width - x), random.randint(1, height - y)
-            self.console.drawRect(x, y, width, height, ch, fg, bg)
+            self.console.draw_rect(x, y, width, height, ch, fg, bg)
             self.flush() # show progress
-            for testX,testY in self.getDrawables():
+            for testX,testY in self.get_drawables():
                 if x <= testX < x + width and y <= testY < y + height:
-                    self.assertEqual(self.console.getChar(testX, testY), (ch, fg, bg), 'rectangle area should be overwritten')
+                    self.assertEqual(self.console.get_char(testX, testY), (ch, fg, bg), 'rectangle area should be overwritten')
                 else:
-                    self.assertEqual(self.console.getChar(testX, testY), consoleCopy.getChar(testX, testY), 'this area should remain untouched')
+                    self.assertEqual(self.console.get_char(testX, testY), consoleCopy.get_char(testX, testY), 'this area should remain untouched')
                     
-    def test_drawFrame(self):
-        consoleCopy = tdl.Console(*(self.console.getSize()))
-        for x,y in random.sample(list(self.getDrawables()), 20):
+    def test_draw_frame(self):
+        consoleCopy = tdl.Console(*(self.console.get_size()))
+        for x,y in random.sample(list(self.get_drawables()), 20):
             consoleCopy.blit(self.console) # copy the console to compare untouched areas
-            ch, fg, bg = self.getRandomCharacter()
-            width, height = self.console.getSize()
+            ch, fg, bg = self.get_random_character()
+            width, height = self.console.get_size()
             width, height = random.randint(1, width - x), random.randint(1, height - y)
-            self.console.drawFrame(x, y, width, height, ch, fg, bg)
+            self.console.draw_frame(x, y, width, height, ch, fg, bg)
             self.flush() # show progress
-            for testX,testY in self.getDrawables():
+            for testX,testY in self.get_drawables():
                 if x + 1 <= testX < x + width - 1 and y + 1 <= testY < y + height - 1:
-                    self.assertEqual(self.console.getChar(testX, testY), consoleCopy.getChar(testX, testY), 'inner frame should remain untouched')
+                    self.assertEqual(self.console.get_char(testX, testY), consoleCopy.get_char(testX, testY), 'inner frame should remain untouched')
                 elif x <= testX < x + width and y <= testY < y + height:
-                    self.assertEqual(self.console.getChar(testX, testY), (ch, fg, bg), 'frame area should be overwritten')
+                    self.assertEqual(self.console.get_char(testX, testY), (ch, fg, bg), 'frame area should be overwritten')
                 else:
-                    self.assertEqual(self.console.getChar(testX, testY), consoleCopy.getChar(testX, testY), 'outer frame should remain untouched')
+                    self.assertEqual(self.console.get_char(testX, testY), consoleCopy.get_char(testX, testY), 'outer frame should remain untouched')
     
     #@unittest.skipIf(not __debug__, 'python run with optimized flag, skipping an AssertionError test')
-    #def test_drawRectFrameErrors(self):
-    #    for x,y in self.getDrawables():
-    #        ch, fg, bg = self.getRandomCharacter()
-    #        width, height = self.console.getSize()
+    #def test_draw_rectFrameErrors(self):
+    #    for x,y in self.get_drawables():
+    #        ch, fg, bg = self.get_random_character()
+    #        width, height = self.console.get_size()
     #        width, height = random.randint(x + width, x + width + ERROR_RANGE), random.randint(y + height, y + height + ERROR_RANGE)
     #        with self.assertRaises(AssertionError):
-    #            self.console.drawRect(x, y, width, height, ch, fg, bg)
+    #            self.console.draw_rect(x, y, width, height, ch, fg, bg)
     #        with self.assertRaises(AssertionError):
-    #            self.console.drawFrame(x, y, width, height, ch, fg, bg)
+    #            self.console.draw_frame(x, y, width, height, ch, fg, bg)
     
     #@unittest.skip("Need this to be faster before unskipping")
     def test_scrolling(self):
@@ -295,17 +295,17 @@ class DrawingTests(TDLTemplate):
             scrollTests.add((random.randint(-WIDTH, WIDTH),
                              random.randint(-HEIGHT, HEIGHT)))
         for sx, sy in scrollTests:
-            noiseData = dict(self.randomizeConsole())
+            noiseData = dict(self.randomize_console())
             self.console.set_colors((0, 0, 0), (0, 0, 0))
             self.console.scroll(sx, sy)
             self.flush() # show progress
-            for x, y in self.getDrawables():
+            for x, y in self.get_drawables():
                 nX = x - sx
                 nY = y - sy
                 if (nX, nY) in noiseData:
-                    self.assertEqual(self.console.getChar(x, y), noiseData[nX, nY], 'random noise should be scrolled')
+                    self.assertEqual(self.console.get_char(x, y), noiseData[nX, nY], 'random noise should be scrolled')
                 else:
-                    self.assertEqual(self.console.getChar(x, y), DEFAULT_CHAR, 'scrolled away positions should be clear')
+                    self.assertEqual(self.console.get_char(x, y), DEFAULT_CHAR, 'scrolled away positions should be clear')
         
         
 def suite():
