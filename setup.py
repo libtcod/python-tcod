@@ -67,5 +67,6 @@ setup(
                ],
     keywords = 'rogue-like rogue-likes text cffi ASCII ANSI Unicode libtcod fov',
     platforms = ['Windows', 'Mac OS X', 'Linux'],
-    license = 'Simplified BSD License'
+    license = 'Simplified BSD License',
+    test_suite="testing",
     )

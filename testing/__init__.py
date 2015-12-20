@@ -24,13 +24,11 @@ class TDLTemplate(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        tdl.setFont('../fonts/libtcod/terminal8x8_gs_ro.png')
         cls.console = tdl.init(WIDTH, HEIGHT, 'TDL UnitTest', False, renderer='SDL')
         # make a small window in the corner
         cls.window = tdl.Window(cls.console, 0, 0, WINWIDTH, WINHEIGHT)
 
     def setUp(self):
-        tdl.setFont('../fonts/libtcod/terminal8x8_gs_ro.png')
         tdl.event.get()
         self.console.set_colors((0,0,0), (0,0,0))
         self.console.clear()
@@ -176,7 +174,42 @@ class DrawingTests(TDLTemplate):
     #    for x,y in self.getUndrawables():
     #        with self.assertRaisesRegexp(AssertionError, r"\(%i, %i\)" % (x, y)):
     #            self.console.drawChar(x, y, *(self.getRandomCharacter()))
+
+    def test_drawStr(self):
+        """quick regression test for drawStr"""
+        width, height = self.console.getSize()
+        def str_check(array, string, desc):
+            fg, bg = self.getRandomColor(), self.getRandomColor()
+            self.console.clear()
+            self.console.drawStr(0, 0, string, fg, bg)
+            self.flush()
+            i = 0
+            for y in range(height):
+                for x in range(width):
+                    self.assertEqual(self.console.getChar(x, y), (array[i], fg, bg),
+                                     '%s should be written out' % desc)
+                    i += 1
         
+        # array of numbers
+        array = [random.getrandbits(8) for _ in range(width * height)]
+        str_check(array, array, 'array of numbers')
+        
+        # array of strings
+        #array = [random.getrandbits(8) for _ in range(width * height)]
+        #array_str = [chr(c) for c in array]
+        #str_check(array, array_str, 'array of characters')
+        
+        # standard string
+        array = [random.getrandbits(8) for _ in range(width * height)]
+        string = ''.join((chr(c) for c in array))
+        str_check(array, string, 'standatd string')
+        
+        # Unicode string - Python 2
+        array = [random.getrandbits(8) for _ in range(width * height)]
+        unicode = u''.join((chr(c) for c in array))
+        str_check(array, unicode, 'Unicode string')
+        
+    
     def test_drawStrArray(self):
         """strings will raise errors if they pass over the end of the console.
         The data will still be written however."""
