@@ -18,6 +18,7 @@ include fonts/*.txt
 include fonts/*/*.png
 include fonts/*/*.txt
 include examples/*.py
+include testing/*.py
 include docs/*
 exclude docs/*.bat
 include ez_setup.py
