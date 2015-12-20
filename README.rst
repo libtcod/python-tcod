@@ -4,17 +4,25 @@
 ==============
  Installation
 ==============
-The latest Windows installer can be found on PyPI: https://pypi.python.org/pypi/tdl
+The latest Windows installers can be found on PyPI, you'll need to install the
+latest version of these two packages:
 
-If it's available you can use pip instead by running the command:
+* libtcod-cffi: https://pypi.python.org/pypi/libtcod-cffi
+* python-tdl: https://pypi.python.org/pypi/tdl
 
+If installing from setup.py or pip you might get errors during the
+installation of libtcod-cffi, this can happen if your cffi module is out of
+date.
+
+The recommended way to install is by using pip, but be sure to update your cffi
+module first, use the following commands:
+
+    pip install -U cffi
     pip install tdl
 
-This module can also be manually installed by going into the "setup.py" directory and running the command:
-
-    python setup.py install
-
-This will require that your Python installation can compile binaries.
+You could install manually, but you'd also have to install libtcod-cffi as well
+which is a binary module.  This requires your Python installation to be set up
+with a compiler.
 
 =======
  About
@@ -31,7 +39,8 @@ Online Documentation: http://pythonhosted.org/tdl/
 
 Issue Tracker: https://github.com/HexDecimal/python-tdl/issues
 
-python-tdl is a cffi port of "libtcod".  You can find more about libtcod at http://roguecentral.org/doryen/libtcod/
+python-tdl is a cffi port of "libtcod".  You can find more about libtcod at
+http://roguecentral.org/doryen/libtcod/
 
 ==============
  Requirements
@@ -39,7 +48,6 @@ python-tdl is a cffi port of "libtcod".  You can find more about libtcod at http
 * Python 2.7+ or 3.x
 * 32 bit Windows, 32/64 bit Linux, or Mac OS/X (64 bit architecture)
 * libtcod-cffi:  found at https://pypi.python.org/pypi/libtcod-cffi
-* the cffi module: found at https://pypi.python.org/pypi/cffi
 
 =========
  License
