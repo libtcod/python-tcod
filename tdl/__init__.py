@@ -116,12 +116,18 @@ def _format_char(char):
 _utf32_codec = {'little': 'utf-32le', 'big': 'utf-32le'}[_sys.byteorder]
     
 def _format_str(string):
-    if isinstance(string, str):
-        array = _array.array('I')
+    """Attempt fast string handing by decoding directly into an array."""
+    if isinstance(string, _STRTYPES):
         if _IS_PYTHON3:
+            array = _array.array('I')
             array.frombytes(string.encode(_utf32_codec))
-        else:
-            array.fromstring(string.encode(_utf32_codec))
+        else: # Python 2
+            if isinstance(string, unicode):
+                array = _array.array(b'I')
+                array.fromstring(string.encode(_utf32_codec))
+            else:
+                array = _array.array(b'B')
+                array.fromstring(string)
         return array
     return string
 
