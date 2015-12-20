@@ -205,7 +205,7 @@ class DrawingTests(TDLTemplate):
         str_check(array, string, 'standatd string')
         
         # Unicode string - Python 2
-        array = [random.getrandbits(8) for _ in range(width * height)]
+        array = [random.getrandbits(7) for _ in range(width * height)]
         unicode = u''.join((chr(c) for c in array))
         str_check(array, unicode, 'Unicode string')
         
