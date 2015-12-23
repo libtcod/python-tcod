@@ -9,36 +9,36 @@ WIDTH = 80
 HEIGHT = 40
 
 class LifeBoard():
-    
+
     def __init__(self, width, height):
         self.width = width
         self.height = height
         self.live_cells = set()
         self.wrap = True
-        
+
     def set(self, x, y, value):
         if value:
             self.live_cells.add((x, y))
         else:
             self.live_cells.discard((x, y))
-            
+
     def set_batch(self, x, y, batch):
         for y_, line in enumerate(batch):
             for x_, char in enumerate(line):
                 self.set(x + x_, y + y_, char != ' ')
-            
+
     def get(self, x, y):
         if(self.wrap is False
            and not (0 <= x < self.width and 0 <= y < self.height)):
             return False
         return (x % self.width, y % self.height) in self.live_cells
-        
+
     def clear(self):
         self.live_cells.clear()
-        
+
     def toggle(self, x, y):
         self.live_cells.symmetric_difference_update([(x, y)])
-        
+
     def wrap_edges(self):
         for x in range(-1, self.width + 1):
             self.set(x, -1, self.get(x, -1))
@@ -46,14 +46,14 @@ class LifeBoard():
         for y in range(self.height):
             self.set(-1, y, self.get(-1, y))
             self.set(self.width, y, self.get(self.width, y))
-        
-        
+
+
     def get_neighbours(self, x, y):
         return len(self.live_cells & {(x - 1, y - 1), (x, y - 1),
                                       (x + 1,y - 1), (x + 1, y),
                                       (x + 1, y + 1), (x, y + 1),
                                       (x - 1, y + 1), (x - 1, y)})
-        
+
     def rule(self, is_alive, neighbours):
         """
         1. Any live cell with fewer than two live neighbours dies, as if caused
@@ -69,7 +69,7 @@ class LifeBoard():
             return 2 <= neighbours <= 3
         else:
             return neighbours == 3
-        
+
     def step(self):
         self.wrap_edges()
         next_generation = set()
@@ -78,7 +78,7 @@ class LifeBoard():
                 if self.rule(self.get(x, y), self.get_neighbours(x, y)):
                     next_generation.add((x, y))
         self.live_cells = next_generation
-                    
+
 def main():
     console = tdl.init(WIDTH, HEIGHT)
     board = LifeBoard(WIDTH, HEIGHT - 1)
@@ -87,13 +87,13 @@ def main():
     #                [' **',
     #                 '** ',
     #                 ' * '])
-    
+
     # Diehard
     #board.set_batch(WIDTH // 2 - 5,HEIGHT // 2 - 2,
     #                ['      * ',
     #                 '**      ',
     #                 ' *   ***'])
-    
+
     # Gosper glider gun
     board.set_batch(1, 1,
                     ['                                    ',
@@ -106,7 +106,7 @@ def main():
                      '          *     *       *           ',
                      '           *   *                    ',
                      '            **                      '])
-    
+
     play = False
     redraw = True
     mouse_drawing = None
@@ -160,8 +160,8 @@ def main():
             time.sleep(0.01)
         tdl.flush()
         tdl.set_title("Conway's Game of Life - %i FPS" % tdl.get_fps())
-        
-    
+
+
 if __name__ == '__main__':
     main()
 

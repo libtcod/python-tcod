@@ -1,10 +1,10 @@
 """
     This is the official documentation for python-tdl.  A Pythonic port of
     U{libtcod<http://roguecentral.org/doryen/libtcod/>}.
-    
+
     You can find the project page on GitHub
     U{here<https://github.com/HexDecimal/python-tdl>}.
-    
+
     Report any bugs or issues to the GitHub issue tracker
     U{here<https://github.com/HexDecimal/python-tdl/issues>}.
 
@@ -13,7 +13,7 @@
       Once the library is imported you can load the font you want to use with
       L{tdl.set_font}.
       This is optional and when skipped will use a decent default font.
-      
+
       After that you call L{tdl.init} to set the size of the window and get the
       root console in return.
       This console is the canvas to what will appear on the screen.
@@ -25,21 +25,21 @@
       starting at the bottom right.
       You can also check if a point is part of a console using containment
       logic i.e. ((x, y) in console).
-      
+
       You may also iterate over a console using a for statement.  This returns
       every x,y coordinate available to draw on but it will be extremely slow
       to actually operate on every coordinate individualy.
       Try to minimize draws by using an offscreen L{Console}, only drawing
       what needs to be updated, and using L{Console.blit}.
-      
+
     Drawing and Colors
     ==================
-    
+
       Once you have the root console from L{tdl.init} you can start drawing on
       it using a method such as L{Console.draw_char}.
       When using this method you can have the char parameter be an integer or a
       single character string.
-      
+
       The fg and bg parameters expect a variety of types.
       The parameters default to Ellipsis which will tell the function to
       use the colors previously set by the L{Console.set_colors} method.
@@ -49,13 +49,13 @@
       the 0-255 range with [0, 0, 0] being black and [255, 255, 255] being
       white.
       You can even use a single integer of 0xRRGGBB if you like.
-      
+
       Using None in the place of any of the three parameters (char, fg, bg)
       will tell the function to not overwrite that color or character.
-      
+
       After the drawing functions are called a call to L{tdl.flush} will update
       the screen.
-      
+
     @undocumented: style
 """
 
@@ -114,7 +114,7 @@ def _format_char(char):
         raise TypeError('char single character string, integer, or None\nReceived: ' + repr(char))
 
 _utf32_codec = {'little': 'utf-32le', 'big': 'utf-32le'}[_sys.byteorder]
-    
+
 def _format_str(string):
     """Attempt fast string handing by decoding directly into an array."""
     if isinstance(string, _STRTYPES):
@@ -143,7 +143,7 @@ if _sys.version_info[0] == 2:
 else:
     int_types = int
 
-    
+
 def _format_color(color, default=Ellipsis):
         if color is Ellipsis:
             return default
@@ -160,7 +160,7 @@ def _to_tcod_color(color):
     return _ffi.new('TCOD_color_t *', (color >> 16 & 0xff,
                                        color >> 8 & 0xff,
                                        color & 0xff))
-        
+
 def _getImageSize(filename):
     """Try to get the width and height of a bmp of png image file"""
     result = None
@@ -193,12 +193,12 @@ class TDLError(Exception):
 class _BaseConsole(object):
     """
     Contains methods shared by both the L{Console} and L{Window} classes.
-    
+
     @undocumented: drawStr drawChar drawFrame drawRect
                    getCursor getSize getChar printStr setColors setMode
     @group Drawing Methods: draw_*, blit, clear
     @group Printing Methods: print_*, move, set_colors, set_mode, write, get_cursor
-    
+
     @undocumented: console
     @ivar width: The width of this console in tiles.  Do not overwrite this.
     @ivar height: The height of this console in tiles.  Do not overwrite this.
@@ -212,10 +212,10 @@ class _BaseConsole(object):
         self._fg = _format_color((255, 255, 255))
         self._bg = _format_color((0, 0, 0))
         self._blend = _lib.TCOD_BKGND_SET
-        
+
     def _normalizePoint(self, x, y):
         """Check if a point is in bounds and make minor adjustments.
-        
+
         Respects Pythons negative indexes.  -1 starts at the bottom right.
         Replaces the _drawable function
         """
@@ -226,7 +226,7 @@ class _BaseConsole(object):
         assert (-self.width <= x < self.width) and \
                (-self.height <= y < self.height), \
                ('(%i, %i) is an invalid postition on %s' % (x, y, self))
-                 
+
         # handle negative indexes
         return (x % self.width, y % self.height)
 
@@ -235,10 +235,10 @@ class _BaseConsole(object):
         raise AssertionError's for any problems
         """
         x, y = self._normalizePoint(x, y) # inherit _normalizePoint logic
-        
+
         assert width is None or isinstance(width, _INTTYPES), 'width must be an integer or None, got %s' % repr(width)
         assert height is None or isinstance(height, _INTTYPES), 'height must be an integer or None, got %s' % repr(height)
-        
+
         # if width or height are None then extend them to the edge
         if width is None:
             width = self.width - x
@@ -254,9 +254,9 @@ class _BaseConsole(object):
         # reduce rect size to bounds
         width = min(width, self.width - x)
         height = min(height, self.height - y)
-        
+
         return x, y, width, height
-    
+
     def _normalizeCursor(self, x, y):
         """return the normalized the cursor position."""
         width, height = self.get_size()
@@ -273,25 +273,25 @@ class _BaseConsole(object):
                 self._cursor = (0, 0)
                 raise TDLError('Cursor has reached the end of the console')
         return (x, y)
-            
+
     def set_mode(self, mode):
         """Configure how this console will react to the cursor writing past the
         end if the console.
-        
+
         This is for methods that use the virtual cursor, such as L{print_str}.
-        
+
         @type mode: string
         @param mode: Possible settings are:
-        
+
                       - 'error' - A TDLError will be raised once the cursor
                         reaches the end of the console.  Everything up until
                         the error will still be drawn.
-                        
+
                         This is the default setting.
-                        
+
                       - 'scroll' - The console will scroll up as stuff is
                         written to the end.
-                        
+
                         You can restrict the region with L{tdl.Window} when
                         doing this.
         @see: L{write}, L{print_str}
@@ -300,12 +300,12 @@ class _BaseConsole(object):
         if mode.lower() not in MODES:
             raise TDLError('mode must be one of %s, got %s' % (MODES, repr(mode)))
         self._scrollMode = mode.lower()
-            
+
     def set_colors(self, fg=None, bg=None):
         """Sets the colors to be used with the L{print_str} and draw_* methods.
-        
+
         Values of None will only leave the current values unchanged.
-        
+
         @type fg: (r, g, b), int, Ellipsis, or None
         @type bg: (r, g, b), int, Ellipsis, or None
         @param fg: See Drawing and Colors at the L{module level docs<tdl>}
@@ -319,16 +319,16 @@ class _BaseConsole(object):
 
     def print_str(self, string):
         """Print a string at the virtual cursor.
-        
+
         Handles special characters such as '\\n' and '\\r'.
         Printing past the bottom of the console will scroll everything upwards
         if L{set_mode} is set to 'scroll'.
-        
+
         Colors can be set with L{set_colors} and the virtual cursor can be moved
         with L{move}.
-        
+
         @type string: string
-        @param string: 
+        @param string:
         @see: L{draw_str}, L{move}, L{set_colors}, L{set_mode}, L{write},
               L{Window}
         """
@@ -348,13 +348,13 @@ class _BaseConsole(object):
 
     def write(self, string):
         """This method mimics basic file-like behaviour.
-        
+
         Because of this method you can replace sys.stdout or sys.stderr with
         a L{Console} or L{Window} instance.
-        
+
         This is a convoluted process and behaviour seen now can be excepted to
         change on later versions.
-        
+
         @type string: string
         @see: L{set_colors}, L{set_mode}, L{Window}
         """
@@ -379,7 +379,7 @@ class _BaseConsole(object):
             x = 0
         y -= 1
         self._cursor = (x, y)
-    
+
     def draw_char(self, x, y, char, fg=Ellipsis, bg=Ellipsis):
         """Draws a single character.
 
@@ -387,7 +387,7 @@ class _BaseConsole(object):
         @param x: X coordinate to draw at.
         @type y: int
         @param y: Y coordinate to draw at.
-        
+
         @type char: int, string, or None
         @param char: Should be an integer, single character string, or None.
 
@@ -398,7 +398,7 @@ class _BaseConsole(object):
         @type bg: (r, g, b), int, Ellipsis, or None
         @param fg: See Drawing and Colors at the L{module level docs<tdl>}
         @param bg: See Drawing and Colors at the L{module level docs<tdl>}
-        
+
         @raise AssertionError: Having x or y values that can't be placed inside
                                of the console will raise an AssertionError.
                                You can use always use ((x, y) in console) to
@@ -420,7 +420,7 @@ class _BaseConsole(object):
         \\r and \\n are drawn on the console as normal character tiles.  No
         special encoding is done and any string will translate to the character
         table as is.
-        
+
         For a string drawing operation that respects special characters see
         L{print_str}.
 
@@ -428,21 +428,21 @@ class _BaseConsole(object):
         @param x: X coordinate to draw at.
         @type y: int
         @param y: Y coordinate to draw at.
-        
+
         @type string: string or iterable
         @param string: Can be a string or an iterable of numbers.
-                       
+
                        Special characters are ignored and rendered as any other
                        character.
-        
+
         @type fg: (r, g, b), int, Ellipsis, or None
         @type bg: (r, g, b), int, Ellipsis, or None
         @param fg: See Drawing and Colors at the L{module level docs<tdl>}
         @param bg: See Drawing and Colors at the L{module level docs<tdl>}
-        
+
         @raise AssertionError: Having x or y values that can't be placed inside
                                of the console will raise an AssertionError.
-                               
+
                                You can use always use ((x, y) in console) to
                                check if a tile is drawable.
         @see: L{print_str}
@@ -471,37 +471,37 @@ class _BaseConsole(object):
 
     def draw_rect(self, x, y, width, height, string, fg=Ellipsis, bg=Ellipsis):
         """Draws a rectangle starting from x and y and extending to width and height.
-        
+
         If width or height are None then it will extend to the edge of the console.
 
         @type x: int
         @param x: x coordinate to draw at.
         @type y: int
         @param y: y coordinate to draw at.
-        
+
         @type width: int or None
         @param width: Width of the rectangle.
-                      
+
                       Can be None to extend to the bottom right of the
                       console or can be a negative number to be sized reltive
                       to the total size of the console.
         @type height: int or None
         @param height: Height of the rectangle.  See width.
-        
+
         @type string: int, string, or None
         @param string: Should be an integer, single character string, or None.
 
                        You can set the char parameter as None if you only want
                        to change the colors of an area.
-        
+
         @type fg: (r, g, b), int, Ellipsis, or None
         @type bg: (r, g, b), int, Ellipsis, or None
         @param fg: See Drawing and Colors at the L{module level docs<tdl>}
         @param bg: See Drawing and Colors at the L{module level docs<tdl>}
-        
+
         @raise AssertionError: Having x or y values that can't be placed inside
                                of the console will raise an AssertionError.
-                               
+
                                You can use always use ((x, y) in console) to
                                check if a tile is drawable.
         @see: L{clear}, L{draw_frame}
@@ -526,30 +526,30 @@ class _BaseConsole(object):
         @param x: x coordinate to draw at.
         @type y: int
         @param y: y coordinate to draw at.
-        
+
         @type width: int or None
         @param width: Width of the rectangle.
-                      
+
                       Can be None to extend to the bottom right of the
                       console or can be a negative number to be sized reltive
                       to the total size of the console.
         @type height: int or None
         @param height: Height of the rectangle.  See width.
-        
+
         @type string: int, string, or None
         @param string: Should be an integer, single character string, or None.
 
                        You can set the char parameter as None if you only want
                        to change the colors of an area.
-        
+
         @type fg: (r, g, b), int, Ellipsis, or None
         @type bg: (r, g, b), int, Ellipsis, or None
         @param fg: See Drawing and Colors at the L{module level docs<tdl>}
         @param bg: See Drawing and Colors at the L{module level docs<tdl>}
-        
+
         @raise AssertionError: Having x or y values that can't be placed inside
                                of the console will raise an AssertionError.
-                               
+
                                You can use always use ((x, y) in console) to
                                check if a tile is drawable.
         @see: L{draw_rect}, L{Window}
@@ -574,22 +574,22 @@ class _BaseConsole(object):
         @type source: L{Console} or L{Window}
         @param source: Source window can be a L{Console} or L{Window} instance.
                        It can even blit to itself without any problems.
-        
+
         @type x: int
         @param x: X coordinate to blit to.
         @type y: int
         @param y: Y coordinate to blit to.
-        
+
         @type width: int or None
         @param width: Width of the rectangle.
-                      
+
                       Can be None to extend as far as possible to the
                       bottom right corner of the blit area or can be a negative
                       number to be sized reltive to the total size of the
                       B{destination} console.
         @type height: int or None
         @param height: Height of the rectangle.  See width.
-        
+
         @type srcX: int
         @param srcX: The source consoles x coordinate to blit from.
         @type srcY: int
@@ -630,11 +630,11 @@ class _BaseConsole(object):
 
     def get_cursor(self):
         """Return the virtual cursor position.
-        
+
         @rtype: (x, y)
         @return: Returns (x, y), a 2-integer tuple containing where the next
                  L{print_str} call will start at.
-                 
+
                  This can be changed with the L{move} method.
         @see: L{move}
         """
@@ -646,7 +646,7 @@ class _BaseConsole(object):
         if y >= height and self.scrollMode == 'scroll':
             y = height - 1
         return x, y
-            
+
     def get_size(self):
         """Return the size of the console as (width, height)
 
@@ -656,16 +656,16 @@ class _BaseConsole(object):
 
     def __iter__(self):
         """Return an iterator with every possible (x, y) value for this console.
-        
+
         It goes without saying that working on the console this way is a
         slow process, especially for Python, and should be minimized.
         @rtype: iter((x, y), ...)
         """
         return _itertools.product(range(self.width), range(self.height))
-        
+
     def move(self, x, y):
         """Move the virtual cursor.
-        
+
         @type x: int
         @param x: X position to place the cursor.
         @type y: int
@@ -673,7 +673,7 @@ class _BaseConsole(object):
         @see: L{get_cursor}, L{print_str}, L{write}
         """
         self._cursor = self._normalizePoint(x, y)
-        
+
     def scroll(self, x, y):
         """Scroll the contents of the console in the direction of x,y.
 
@@ -743,10 +743,10 @@ class _BaseConsole(object):
         if uncoverX and uncoverY: # clear corner
             self.draw_rect(uncoverX[0], uncoverY[0], uncoverX[1], uncoverY[1],
                            0x20, self._fg, self._bg)
-    
+
     def clear(self, fg=Ellipsis, bg=Ellipsis):
         """Clears the entire L{Console}/L{Window}.
-        
+
         Unlike other drawing functions, fg and bg can not be None.
 
         @type fg: (r, g, b), int, or Ellipsis
@@ -754,13 +754,13 @@ class _BaseConsole(object):
         @param fg: Can not be None.
                    See Drawing and Colors at the L{module level docs<tdl>}
         @param bg: See fg
-        
-        
+
+
         @type fg: (r, g, b)
         @param fg: Foreground color.
-        
+
                    Must be a 3-item list with integers that range 0-255.
-                        
+
                    Unlike most other operations you cannot use None here.
                    To clear only the foreground or background use L{draw_rect}.
         @type bg: (r, g, b)
@@ -768,10 +768,10 @@ class _BaseConsole(object):
         @see: L{draw_rect}
         """
         raise NotImplementedError('this method is overwritten by subclasses')
-                           
+
     def get_char(self, x, y):
         """Return the character and colors of a tile as (ch, fg, bg)
-        
+
         This method runs very slowly as is not recommended to be called
         frequently.
 
@@ -782,7 +782,7 @@ class _BaseConsole(object):
         @see: L{draw_char}
         """
         raise NotImplementedError('Method here only exists for the docstring')
-            
+
     def __contains__(self, position):
         """Use ((x, y) in console) to check if a position is drawable on this console.
         """
@@ -797,12 +797,12 @@ class Console(_BaseConsole):
 
     Any console created from the Console class is an off-screen console that
     can be drawn on before being L{blit} to the root console.
-    
+
     @undocumented: getChar
-    
+
     @ivar tcod_console: Public interface to the cffi TCOD_console_t object
                         of this instance.
-                        
+
                         Feel free to pass this variable to libtcod-cffi calls
                         but keep in mind that as soon as Console instance is
                         garbage collected the tcod_console will be deleted.
@@ -812,7 +812,7 @@ class Console(_BaseConsole):
 
     def __init__(self, width, height):
         """Create a new offscreen console.
-        
+
         @type width: int
         @param width: Width of the console in tiles
         @type height: int
@@ -836,7 +836,7 @@ class Console(_BaseConsole):
         self.width = _lib.TCOD_console_get_width(console)
         self.height = _lib.TCOD_console_get_height(console)
         return self
-        
+
     def _root_unhook(self):
         """Change this root console into a normal Console object and
         delete the root console from TCOD
@@ -876,13 +876,13 @@ class Console(_BaseConsole):
         clone = self.__class__(self.width, self.height)
         clone.blit(self)
         return clone
-        
+
     def __getstate__(self):
         # save data from get_char
         data = [self.get_char(x, y) for x,y in
                 _itertools.product(range(self.width), range(self.height))]
         return self.width, self.height, data
-            
+
     def __setstate__(self, state):
         # make console from __init__ and unpack a get_char array
         width, height, data = state
@@ -908,7 +908,7 @@ class Console(_BaseConsole):
         _lib.TCOD_console_set_default_background(self.tcod_console,
                                                  _to_tcod_color(bg)[0])
         _lib.TCOD_console_clear(self.tcod_console)
-        
+
 
     def _set_char(self, x, y, char, fg=None, bg=None,
                   bgblend=_lib.TCOD_BKGND_SET):
@@ -927,7 +927,7 @@ class Console(_BaseConsole):
         Try to perform a batch operation otherwise fall back to _set_char.
         If fg and bg are defined then this is faster but not by very
         much.
-        
+
         if any character is None then nullChar is True
 
         batch is a iterable of [(x, y), ch] items
@@ -954,7 +954,7 @@ class Window(_BaseConsole):
 
     Making a Window and setting its width or height to None will extend it to
     the edge of the console.
-    
+
     @undocumented: getChar
     """
 
@@ -962,32 +962,32 @@ class Window(_BaseConsole):
 
     def __init__(self, console, x, y, width, height):
         """Isolate part of a L{Console} or L{Window} instance.
-        
+
         @type console: L{Console} or L{Window}
         @param console: The parent object which can be a L{Console} or another
                         L{Window} instance.
-        
+
         @type x: int
         @param x: X coordinate to place the Window.
-                  
+
                   This follows the normal rules for indexing so you can use a
                   negative integer to place the Window relative to the bottom
                   right of the parent Console instance.
         @type y: int
         @param y: Y coordinate to place the Window.
-        
+
                   See x.
-        
+
         @type width: int or None
         @param width: Width of the Window.
-                      
+
                       Can be None to extend as far as possible to the
                       bottom right corner of the parent Console or can be a
                       negative number to be sized reltive to the Consoles total
                       size.
         @type height: int or None
         @param height: Height of the Window.
-        
+
                        See width.
         """
         _BaseConsole.__init__(self)
@@ -1022,8 +1022,8 @@ class Window(_BaseConsole):
         myY = self.y
         self.parent._set_batch((((x + myX, y + myY), ch)
                                    for ((x, y), ch) in batch), *args, **kargs)
-    
-    
+
+
     def draw_char(self, x, y, char, fg=Ellipsis, bg=Ellipsis):
         # inherit docstring
         x, y = self._normalizePoint(x, y)
@@ -1032,7 +1032,7 @@ class Window(_BaseConsole):
         if bg is Ellipsis:
             bg = self._bg
         self.parent.draw_char(x + self.x, y + self.y, char, fg, bg)
-    
+
     def draw_rect(self, x, y, width, height, string, fg=Ellipsis, bg=Ellipsis):
         # inherit docstring
         x, y, width, height = self._normalizeRect(x, y, width, height)
@@ -1042,7 +1042,7 @@ class Window(_BaseConsole):
             bg = self._bg
         self.parent.draw_rect(x + self.x, y + self.y, width, height,
                               string, fg, bg)
-        
+
     def draw_frame(self, x, y, width, height, string, fg=Ellipsis, bg=Ellipsis):
         # inherit docstring
         x, y, width, height = self._normalizeRect(x, y, width, height)
@@ -1073,15 +1073,15 @@ def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
 
     @type width: int
     @param width: width of the root console (in tiles)
-    
+
     @type height: int
     @param height: height of the root console (in tiles)
-    
+
     @type title: string
     @param title: Text to display as the window title.
-                  
+
                   If left None it defaults to the running scripts filename.
-    
+
     @type fullscreen: boolean
     @param fullscreen: Can be set to True to start in fullscreen mode.
 
@@ -1115,7 +1115,7 @@ def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
         # unhook the root console, turning into a regular console and deleting
         # the root console from libTCOD
         _rootConsoleRef()._root_unhook()
-        
+
     if title is None: # use a default title
         if _sys.argv:
             # Use the script filename as the title.
@@ -1153,7 +1153,7 @@ def set_font(path, columns=None, rows=None, columnFirst=False,
              greyscale=False, altLayout=False):
     """Changes the font to be used for this session.
     This should be called before L{tdl.init}
-    
+
     If the font specifies its size in its filename (i.e. font_NxN.png) then this
     function can auto-detect the tileset formatting and the parameters columns
     and rows can be left None.
@@ -1166,12 +1166,12 @@ def set_font(path, columns=None, rows=None, columnFirst=False,
 
     @type columns: int
     @param columns: Number of columns in the tileset.
-                    
+
                     Can be left None for auto-detection.
 
     @type rows: int
     @param rows: Number of rows in the tileset.
-                 
+
                  Can be left None for auto-detection.
 
     @type columnFirst: boolean
@@ -1185,7 +1185,7 @@ def set_font(path, columns=None, rows=None, columnFirst=False,
     @type greyscale: boolean
     @param greyscale: Creates an anti-aliased font from a greyscale bitmap.
                       Otherwise it uses the alpha channel for anti-aliasing.
-                      
+
                       Unless you actually need anti-aliasing from a font you
                       know uses a smooth greyscale channel you should leave
                       this on False.
@@ -1224,7 +1224,7 @@ def set_font(path, columns=None, rows=None, columnFirst=False,
     if not _os.path.exists(path):
         raise TDLError('no file exists at: "%s"' % path)
     path = _os.path.abspath(path)
-    
+
     # and the rest is the auto-detect script
     imgSize = _getImageSize(path) # try to find image size
     if imgSize:
@@ -1234,13 +1234,13 @@ def set_font(path, columns=None, rows=None, columnFirst=False,
         if match:
             fontWidth, fontHeight = match.groups()
             fontWidth, fontHeight = int(fontWidth), int(fontHeight)
-            
+
             # estimate correct tileset size
             estColumns, remC = divmod(imgWidth, fontWidth)
             estRows, remR = divmod(imgHeight, fontHeight)
             if remC or remR:
                 _warnings.warn("Font may be incorrectly formatted.")
-            
+
             if not columns:
                 columns = estColumns
             if not rows:
@@ -1250,7 +1250,7 @@ def set_font(path, columns=None, rows=None, columnFirst=False,
             if not (columns and rows):
                 # no matched font size and no tileset is given
                 raise TDLError('%s has no font size in filename' % _os.path.basename(path))
-            
+
         if columns and rows:
             # confirm user set options
             if (fontWidth * columns != imgWidth or
@@ -1260,11 +1260,11 @@ def set_font(path, columns=None, rows=None, columnFirst=False,
                                 imgWidth, imgHeight))
     else:
         _warnings.warn("%s is probably not an image." % _os.path.basename(path))
-    
+
     if not (columns and rows):
         # didn't auto-detect
         raise TDLError('Can not auto-detect the tileset of %s' % _os.path.basename(path))
-            
+
     _lib.TCOD_console_set_custom_font(_encodeString(path), flags, columns, rows)
 
 def get_fullscreen():
@@ -1360,7 +1360,7 @@ def force_resolution(width, height):
     @type height: int
     """
     _lib.TCOD_sys_force_fullscreen_resolution(width, height)
-        
+
 
 __all__ = [_var for _var in locals().keys() if _var[0] != '_'] # remove modules from __all__
 __all__ += ['_BaseConsole'] # keep this object public to show the documentation in epydoc

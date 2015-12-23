@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 """
     This script shows the basic use of the tdl module.
-    
+
     The font is configured and the module is initialized, the script then goes
     into an infinite loop where it will draw "Hello World" on the screen and
     then check for an event that tells that the user has closed the window.
-    
+
     When the window is closed the script quits out by raising a SystemExit
     exception.
 """
@@ -27,17 +27,17 @@ console = tdl.init(WIDTH, HEIGHT, 'python-tdl tutorial')
 
 # Start an infinite loop.  Drawing and game logic will be put in this loop.
 while True:
-    
+
     # Reset the console to a blank slate before drawing on it.
     console.clear()
-    
+
     # Now draw out 'Hello World' starting at an x,y of 1,2.
     console.drawStr(1, 2, 'Hello World')
-    
+
     # Now to update the image on the window we make sure to call tdl.flush
     # in every loop.
     tdl.flush()
-    
+
     # Handle events by iterating over the values returned by tdl.event.get
     for event in tdl.event.get():
         # Check if this is a 'QUIT' event

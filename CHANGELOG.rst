@@ -52,7 +52,7 @@
  * You can now configure or disable key repeating with tdl.event.setKeyRepeat
  * Typewriter class removed, use a Window instance for the same functionality
  * setColors method fixed
- 
+
 1.1.4
  * Merged the Typewriter and MetaConsole classes,
    You now have a virtual cursor with Console and Window objects

@@ -45,7 +45,7 @@ def main():
     print()
     print('Python %s' % sys.version)
     print('Press ESC to quit')
-    
+
     buffer = ''
     commands = ['']
     banner = sys.ps1
@@ -58,7 +58,7 @@ def main():
         except tdl.TDLError:
             pass
         tdl.flush()
-        
+
         for event in tdl.event.get():
             if event.type == 'QUIT':
                 raise SystemExit()

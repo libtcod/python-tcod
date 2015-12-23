@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-    
+
 """
 
 import tdl
@@ -16,7 +16,7 @@ MOVEMENT_KEYS = {
                  'DOWN': [0, 1],
                  'LEFT': [-1, 0],
                  'RIGHT': [1, 0],
-                 
+
                  # diagonal keys
                  # keep in mind that the keypad won't use these keys even if
                  # num-lock is off
@@ -24,7 +24,7 @@ MOVEMENT_KEYS = {
                  'PAGEUP': [1, -1],
                  'PAGEDOWN': [1, 1],
                  'END': [-1, 1],
-                 
+
                  # number-pad keys
                  # These keys will always show as KPx regardless if num-lock
                  # is on or off.  Keep in mind that some keyboards and laptops
@@ -52,16 +52,16 @@ console = tdl.init(WIDTH, HEIGHT, 'python-tdl tutorial')
 playerX, playerY = 1, 2
 
 while True: # Continue in an infinite game loop.
-    
+
     console.clear() # Blank the console.
-    
+
     # Using "(x, y) in console" we can quickly check if a position is inside of
     # a console.  And skip a draw operation that would otherwise fail.
     if (playerX, playerY) in console:
         console.drawChar(playerX, playerY, '@')
-    
+
     tdl.flush() # Update the window.
-    
+
     for event in tdl.event.get(): # Iterate over recent events.
         if event.type == 'KEYDOWN':
             # We mix special keys with normal characters so we use keychar.
@@ -71,7 +71,7 @@ while True: # Continue in an infinite game loop.
                 # Then we add the vector to the current player position.
                 playerX += keyX
                 playerY += keyY
-                
+
         if event.type == 'QUIT':
             # Halt the script using SystemExit
             raise SystemExit('The window has been closed.')

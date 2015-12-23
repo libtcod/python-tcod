@@ -28,7 +28,7 @@ while 1:
         console.drawRect(0, HEIGHT - 1, None, None, ' ')
         console.drawStr(0, HEIGHT - 1, 'MOUSEMOTION event - pos=%i,%i cell=%i,%i motion=%i,%i cellmotion=%i,%i' % (event.pos + event.cell + event.motion + event.cellmotion))
         continue # prevent scrolling
-    
+
     textWindow.scroll(0, -1)
     if event.type == 'KEYDOWN' or event.type == 'KEYUP':
         textWindow.drawStr(0, HEIGHT-3, '%s event - char=%s key=%s alt=%i control=%i shift=%i' % (event.type.ljust(7), repr(event.char), repr(event.key), event.alt, event.control, event.shift))

@@ -34,4 +34,3 @@ for algo in ['PERLIN', 'SIMPLEX', 'WAVELET']:
                 else:
                     val = int(noise.getPoint(noiseX, noiseY) * 255)
                 noiseFile.write(bytes((val,)))
-        

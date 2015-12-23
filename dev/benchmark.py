@@ -20,7 +20,7 @@ def print_result(string):
 
 class Benchmark:
     default_frames = 100
-        
+
     def run(self, console, frames=None, times=4):
         if times > 1:
             print_result('Running %s' % self.__class__.__name__)
@@ -47,35 +47,35 @@ class Benchmark:
             '%i tiles drawn in %.2f seconds, %.2f characters/ms, %.2f FPS' %
             (self.tiles, self.total_time,self.tiles_per_second / 1000,
              self.total_frames / self.total_time))
-        
+
     def test(self, console):
         for x,y in console:
             console.draw_char(x, y, '.')
             tiles += 1
         tdl.flush()
-        
-        
+
+
 class Benchmark_DrawChar_DefaultColor(Benchmark):
-    
+
     def test(self, console):
         for x,y in console:
             console.draw_char(x, y, 'A')
             self.tiles += 1
         tdl.flush()
 
-        
+
 class Benchmark_DrawChar_NoColor(Benchmark):
-    
+
     def test(self, console):
         for x,y in console:
             console.draw_char(x, y, 'B', None, None)
             self.tiles += 1
         tdl.flush()
 
-        
+
 class Benchmark_DrawStr16_DefaultColor(Benchmark):
     default_frames = 100
-    
+
     def test(self, console):
         for y in range(HEIGHT):
             for x in range(0, WIDTH, 16):
@@ -83,10 +83,10 @@ class Benchmark_DrawStr16_DefaultColor(Benchmark):
                 self.tiles += 16
         tdl.flush()
 
-        
+
 class Benchmark_DrawStr16_NoColor(Benchmark):
     default_frames = 100
-    
+
     def test(self, console):
         for y in range(HEIGHT):
             for x in range(0, WIDTH, 16):
@@ -99,7 +99,7 @@ def run_benchmark():
     log = open('results.log', 'a')
     print('', file=log)
     console = tdl.init(WIDTH, HEIGHT, renderer=RENDERER)
-    
+
     print_result('Benchmark run on %s' % time.ctime())
     print_result('Running under %s %s' % (platform.python_implementation(),
                                           platform.python_version()))
@@ -112,6 +112,6 @@ def run_benchmark():
     #Benchmark_DrawStr16_NoColor().run(console)
     log.close()
     print('results written to results.log')
-    
+
 if __name__ == '__main__':
     run_benchmark()

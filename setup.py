@@ -7,12 +7,12 @@ build_docs = None
 try:
     # use setuptools or distribute if available
     from setuptools import setup, Command
-    
+
     import subprocess
-    
+
     class build_docs(Command):
         description = "update the documentation using epydoc"
-        user_options = []        
+        user_options = []
         def initialize_options(self):
             pass
         def finalize_options(self):
@@ -22,9 +22,9 @@ try:
             command = [sys.executable,
                        os.path.join(sys.prefix, 'Scripts\epydoc.py'),
                        '--config=docs/epydoc.config']
-            
+
             subprocess.check_call(command)
-    
+
 except ImportError:
     from distutils.core import setup
 
