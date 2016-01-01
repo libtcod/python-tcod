@@ -20,16 +20,23 @@ And libtcod is here: http://roguecentral.org/doryen/libtcod/
 ==============
 The latest Windows installer can be found on PyPI: https://pypi.python.org/pypi/libtcod-cffi
 
-If it's available you can use pip instead by running the command::
+If installing from setup.py or pip you might get errors during the
+installation of libtcod-cffi, this can happen if your cffi module is out of
+date.
 
+The recommended way to install is by using pip, but be sure to update your cffi
+module first, use the following commands:
+
+    pip install -U cffi
     pip install libtcod-cffi
 
-This module can also be manually installed by going into the "setup.py" directory and running the command::
+This module can also be manually installed, make sure Python modules
+"setuptools" and "cffi" are up to date.
+Then go into the "setup.py" directory and running the command::
 
     python setup.py install
 
-This will require setuptools which you can find here: https://pypi.python.org/pypi/setuptools
-It also requires that your Python installation is set up to compile binaries.
+A manual install requires that your Python environment is set up to compile binaries.
 
 =======
  Usage
