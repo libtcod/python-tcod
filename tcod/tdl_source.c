@@ -13,10 +13,10 @@ union TCODListItem {
     bool b;
     char ch;
     int i;
-    float f;
+    float *f;
     char *ch_p;
-    TCOD_color_t color;
-    TCOD_dice_t dice;
+    TCOD_color_t *color;
+    TCOD_dice_t *dice;
 };
 
 static union TCODListItem TDL_list_get_union(TCOD_list_t l,int idx){
@@ -38,7 +38,7 @@ static int TDL_list_get_int(TCOD_list_t l,int idx){
 }
 
 static float TDL_list_get_float(TCOD_list_t l,int idx){
-    return TDL_list_get_union(l, idx).f;
+    return *TDL_list_get_union(l, idx).f;
 }
 
 static char* TDL_list_get_string(TCOD_list_t l,int idx){
@@ -46,11 +46,11 @@ static char* TDL_list_get_string(TCOD_list_t l,int idx){
 }
 
 static TCOD_color_t TDL_list_get_color(TCOD_list_t l,int idx){
-    return TDL_list_get_union(l, idx).color;
+    return *TDL_list_get_union(l, idx).color;
 }
 
 static TCOD_dice_t TDL_list_get_dice(TCOD_list_t l,int idx){
-    return TDL_list_get_union(l, idx).dice;
+    return *TDL_list_get_union(l, idx).dice;
 }
 
 
