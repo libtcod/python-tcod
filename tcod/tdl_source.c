@@ -8,35 +8,49 @@
 //void * TCOD_list_get(TCOD_list_t l,int idx) {
 //	return LIST(l)->array[idx];
 
+union TCODListItem {
+    void *v;
+    bool b;
+    char ch;
+    int i;
+    float f;
+    char *ch_p;
+    TCOD_color_t color;
+    TCOD_dice_t dice;
+};
+
+static union TCODListItem TDL_list_get_union(TCOD_list_t l,int idx){
+    union TCODListItem item;
+    item.v = TCOD_list_get(l, idx);
+    return item;
+}
+
 static bool TDL_list_get_bool(TCOD_list_t l,int idx){
-    return (bool)TCOD_list_get(l, idx);
+    return TDL_list_get_union(l, idx).b;
 }
 
 static char TDL_list_get_char(TCOD_list_t l,int idx){
-    return (char)TCOD_list_get(l, idx);
+    return TDL_list_get_union(l, idx).ch;
 }
 
 static int TDL_list_get_int(TCOD_list_t l,int idx){
-    return (int)TCOD_list_get(l, idx);
+    return TDL_list_get_union(l, idx).i;
 }
 
 static float TDL_list_get_float(TCOD_list_t l,int idx){
-    void *val=TCOD_list_get(l, idx);
-    return *(float*)&val;
+    return TDL_list_get_union(l, idx).f;
 }
 
 static char* TDL_list_get_string(TCOD_list_t l,int idx){
-    return (char*)TCOD_list_get(l, idx);
+    return TDL_list_get_union(l, idx).ch_p;
 }
 
 static TCOD_color_t TDL_list_get_color(TCOD_list_t l,int idx){
-    void *val=TCOD_list_get(l, idx);
-    return *(TCOD_color_t*)&val;
+    return TDL_list_get_union(l, idx).color;
 }
 
 static TCOD_dice_t TDL_list_get_dice(TCOD_list_t l,int idx){
-    void *val=TCOD_list_get(l, idx);
-    return *(TCOD_dice_t*)&val;
+    return TDL_list_get_union(l, idx).dice;
 }
 
 
