@@ -10,12 +10,12 @@ latest version of these two packages:
 * libtcod-cffi: https://pypi.python.org/pypi/libtcod-cffi
 * python-tdl: https://pypi.python.org/pypi/tdl
 
-If installing from setup.py or pip you might get errors during the
-installation of libtcod-cffi, this can happen if your cffi module is out of
-date.
+You might get errors during the installation of libtcod-cffi such as
+"ImportError: No module named 'cffi.setuptools_ext'"
+This will happen if your cffi module is out of date.
 
 The recommended way to install is by using pip, but be sure to update your cffi
-module first, use the following commands:
+module first.  Use the following commands:
 
     pip install -U cffi
     pip install tdl
