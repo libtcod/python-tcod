@@ -189,7 +189,7 @@ static void TDL_map_fov_to_buffer(TCOD_map_t map, uint8 *buffer,
     int height=TCOD_map_get_height(map);
     int x;
     int y;
-    int i = width*height-1;
+    int i = width*height;
     for(y=height-1;y>=0;y--){
         for(x=width-1;x>=0;x--){
             i--;
