@@ -94,7 +94,7 @@ class Map(object):
         self._map_cdata = _lib.TCOD_map_new(width, height)
         # cast array into cdata format: uint8[y][x]
         # for quick Python access
-        self._array_cdata = _ffi.new('uint8[%i][%i]' % (width, height))
+        self._array_cdata = _ffi.new('uint8[%i][%i]' % (height, width))
         # flat array to pass to TDL's C helpers
         self._array_cdata_flat = _ffi.cast('uint8 *', self._array_cdata)
         self.transparent = self._MapAttribute(self, 0)
@@ -152,8 +152,8 @@ class Map(object):
                                    self._array_cdata_flat, cumulative)
         def iterate_fov():
             _array_cdata = self._array_cdata
-            for y in range(self.width):
-                for x in range(self.height):
+            for y in range(self.height):
+                for x in range(self.width):
                     if(_array_cdata[y][x] & 4):
                         yield (x, y)
         return iterate_fov()
