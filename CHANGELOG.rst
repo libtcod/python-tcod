@@ -1,15 +1,18 @@
 ===========
  Changelog
 ===========
+0.2.8
+ * Fixed off by one error in fov buffer
+
 0.2.7
  * Re-factored some code to reduce compiler warnings
  * Instructions on how to solve pip/cffi issues added to the readme
  * Official support for Python 3.5
- 
+
 0.2.6
  * Added requirements.txt to fix a common pip/cffi issue.
  * Provided SDL headers are now for Windows only.
- 
+
 0.2.5
  * Added /usr/include/SDL to include path
 
