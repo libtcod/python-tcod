@@ -1,6 +1,9 @@
 ===========
  Changelog
 ===========
+1.5.2
+ * fixed non-square Map instances
+
 1.5.1
  * fixed errors with Unicode and non-Unicode literals on Python 2
  * fixed attribute error in compute_fov
