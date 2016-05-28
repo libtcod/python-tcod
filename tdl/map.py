@@ -39,7 +39,7 @@ class Map(object):
             map.walkable[x,y] = true
 
     @ivar transparent: Map transparency, access this attribute with
-                       map.transparency[x,y]
+                       map.transparent[x,y]
 
                        Set to True to allow field-of-view rays, False will
                        block field-of-view.

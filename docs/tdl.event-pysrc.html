@@ -61,26 +61,26 @@
 <pre class="py-src">
 <a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
 <a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-docstring">    This module handles user input.</tt> </tt>
-<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring">    To handle user input you will likely want to use the L{event.get} function</tt> </tt>
 <a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring">    or create a subclass of L{event.App}.</tt> </tt>
 <a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring">     - L{event.get} iterates over recent events.</tt> </tt>
 <a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring">     - L{event.App} passes events to the overridable methods: ev_* and key_*.</tt> </tt>
-<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring">    But there are other options such as L{event.keyWait} and L{event.isWindowClosed}.</tt> </tt>
-<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-docstring">    A few event attributes are actually string constants.</tt> </tt>
 <a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-docstring">    Here's a reference for those:</tt> </tt>
 <a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-docstring">     - L{Event.type}</tt> </tt>
-<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-docstring">     </tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"><tt class="py-docstring">       'QUIT', 'KEYDOWN', 'KEYUP', 'MOUSEDOWN', 'MOUSEUP', or 'MOUSEMOTION.'</tt> </tt>
-<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-docstring">       </tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"><tt class="py-docstring">     - L{MouseButtonEvent.button} (found in L{MouseDown} and L{MouseUp} events)</tt> </tt>
-<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"><tt class="py-docstring">     </tt> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"><tt class="py-docstring">       'LEFT', 'MIDDLE', 'RIGHT', 'SCROLLUP', 'SCROLLDOWN'</tt> </tt>
-<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"><tt class="py-docstring">       </tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"><tt class="py-docstring">     - L{KeyEvent.key} (found in L{KeyDown} and L{KeyUp} events)</tt> </tt>
-<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"><tt class="py-docstring">     </tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"><tt class="py-docstring">       'NONE', 'ESCAPE', 'BACKSPACE', 'TAB', 'ENTER', 'SHIFT', 'CONTROL',</tt> </tt>
 <a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"><tt class="py-docstring">       'ALT', 'PAUSE', 'CAPSLOCK', 'PAGEUP', 'PAGEDOWN', 'END', 'HOME', 'UP',</tt> </tt>
 <a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line"><tt class="py-docstring">       'LEFT', 'RIGHT', 'DOWN', 'PRINTSCREEN', 'INSERT', 'DELETE', 'LWIN',</tt> </tt>
@@ -89,7 +89,7 @@
 <a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"><tt class="py-docstring">       'KPADD', 'KPSUB', 'KPDIV', 'KPMUL', 'KPDEC', 'KPENTER', 'F1', 'F2',</tt> </tt>
 <a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line"><tt class="py-docstring">       'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12',</tt> </tt>
 <a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line"><tt class="py-docstring">       'NUMLOCK', 'SCROLLLOCK', 'SPACE', 'CHAR'</tt> </tt>
-<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line"><tt class="py-docstring">       </tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
 <a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line"> </tt>
 <a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">time</tt> <tt class="py-keyword">as</tt> <tt class="py-name">_time</tt> </tt>
@@ -131,10 +131,10 @@ tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-1', '_lib
 tdl.event._lib
 tdl.map._lib
 tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-12', '_lib', 'link-1');">_lib</a></tt><tt class="py-op">)</tt> </tt>
-<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">     </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line"> </tt>
 <a name="Event"></a><div id="Event-def"><a name="L65"></a><tt class="py-lineno"> 65</tt> <a class="py-toggle" href="#" id="Event-toggle" onclick="return toggle('Event');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="tdl.event.Event-class.html">Event</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="Event-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Event-expanded"><a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line">    <tt class="py-docstring">"""Base Event class.</tt> </tt>
-<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line"><tt class="py-docstring">    You can easily subclass this to make your own events.  Be sure to set</tt> </tt>
 <a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line"><tt class="py-docstring">    the class attribute L{Event.type} for it to be passed to a custom L{App}</tt> </tt>
 <a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line"><tt class="py-docstring">    ev_* method."""</tt> </tt>
@@ -146,9 +146,9 @@ tdl.event.MouseMotion.type
 tdl.event.MouseUp.type
 tdl.event.Quit.type" class="py-name" href="#" onclick="return doclink('link-13', 'type', 'link-13');">type</a></tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
 <a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">    <tt class="py-string">"""String constant representing the type of event.</tt> </tt>
-<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line"><tt class="py-string">    </tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line"><tt class="py-string"></tt> </tt>
 <a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line"><tt class="py-string">    The L{App} ev_* methods depend on this attribute.</tt> </tt>
-<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line"><tt class="py-string">    </tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line"><tt class="py-string"></tt> </tt>
 <a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line"><tt class="py-string">    Can be: 'QUIT', 'KEYDOWN', 'KEYUP', 'MOUSEDOWN', 'MOUSEUP', or 'MOUSEMOTION.'</tt> </tt>
 <a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line"><tt class="py-string">    """</tt> </tt>
 <a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line"> </tt>
@@ -175,13 +175,13 @@ tdl.event.MouseUp.type
 tdl.event.Quit.type" class="py-name" href="#" onclick="return doclink('link-14', 'type', 'link-13');">type</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'QUIT'</tt> </tt>
 </div><a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line"> </tt>
 <a name="KeyEvent"></a><div id="KeyEvent-def"><a name="L95"></a><tt class="py-lineno"> 95</tt> <a class="py-toggle" href="#" id="KeyEvent-toggle" onclick="return toggle('KeyEvent');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="tdl.event.KeyEvent-class.html">KeyEvent</a><tt class="py-op">(</tt><tt class="py-base-class">Event</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
-</div><div id="KeyEvent-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="KeyEvent-expanded"><a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line">     </tt>
+</div><div id="KeyEvent-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="KeyEvent-expanded"><a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line"> </tt>
 <a name="KeyEvent.__init__"></a><div id="KeyEvent.__init__-def"><a name="L97"></a><tt class="py-lineno"> 97</tt> <a class="py-toggle" href="#" id="KeyEvent.__init__-toggle" onclick="return toggle('KeyEvent.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event.KeyEvent-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">key</tt><tt class="py-op">,</tt> <tt class="py-param">char</tt><tt class="py-op">,</tt> <tt class="py-param">lalt</tt><tt class="py-op">,</tt> <tt class="py-param">lctrl</tt><tt class="py-op">,</tt> <tt class="py-param">ralt</tt><tt class="py-op">,</tt> <tt class="py-param">rctrl</tt><tt class="py-op">,</tt> <tt class="py-param">shift</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="KeyEvent.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="KeyEvent.__init__-expanded"><a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line">        <tt class="py-comment"># Convert keycodes into string, but use string if passed</tt> </tt>
 <a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">key</tt> <tt class="py-op">=</tt> <tt class="py-name">key</tt> <tt class="py-keyword">if</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">key</tt><tt class="py-op">,</tt> <tt class="py-name">str</tt><tt class="py-op">)</tt> <tt class="py-keyword">else</tt> <tt id="link-15" class="py-name"><a title="tdl.event._keyNames" class="py-name" href="#" onclick="return doclink('link-15', '_keyNames', 'link-8');">_keyNames</a></tt><tt class="py-op">[</tt><tt class="py-name">key</tt><tt class="py-op">]</tt> </tt>
 <a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line">        <tt class="py-string">"""Human readable names of the key pressed.</tt> </tt>
 <a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line"><tt class="py-string">        Non special characters will show up as 'CHAR'.</tt> </tt>
-<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line"><tt class="py-string">        </tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line"><tt class="py-string"></tt> </tt>
 <a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line"><tt class="py-string">        Can be one of</tt> </tt>
 <a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line"><tt class="py-string">        'NONE', 'ESCAPE', 'BACKSPACE', 'TAB', 'ENTER', 'SHIFT', 'CONTROL',</tt> </tt>
 <a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line"><tt class="py-string">        'ALT', 'PAUSE', 'CAPSLOCK', 'PAGEUP', 'PAGEDOWN', 'END', 'HOME', 'UP',</tt> </tt>
@@ -191,13 +191,13 @@ tdl.event.Quit.type" class="py-name" href="#" onclick="return doclink('link-14',
 <a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line"><tt class="py-string">        'KPADD', 'KPSUB', 'KPDIV', 'KPMUL', 'KPDEC', 'KPENTER', 'F1', 'F2',</tt> </tt>
 <a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line"><tt class="py-string">        'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12',</tt> </tt>
 <a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line"><tt class="py-string">        'NUMLOCK', 'SCROLLLOCK', 'SPACE', 'CHAR'</tt> </tt>
-<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line"><tt class="py-string">        </tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line"><tt class="py-string"></tt> </tt>
 <a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line"><tt class="py-string">        For the actual character instead of 'CHAR' use L{keychar}.</tt> </tt>
 <a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line"><tt class="py-string">        @type: string"""</tt> </tt>
 <a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line">        <tt class="py-name">char</tt> <tt class="py-op">=</tt> <tt class="py-name">char</tt> <tt class="py-keyword">if</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">char</tt><tt class="py-op">,</tt> <tt class="py-name">str</tt><tt class="py-op">)</tt> <tt class="py-keyword">else</tt> <tt class="py-name">char</tt><tt class="py-op">.</tt><tt class="py-name">decode</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
 <a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">char</tt> <tt class="py-op">=</tt> <tt class="py-name">char</tt><tt class="py-op">.</tt><tt class="py-name">replace</tt><tt class="py-op">(</tt><tt class="py-string">'\x00'</tt><tt class="py-op">,</tt> <tt class="py-string">''</tt><tt class="py-op">)</tt> <tt class="py-comment"># change null to empty string</tt> </tt>
 <a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line">        <tt class="py-string">"""A single character string of the letter or symbol pressed.</tt> </tt>
-<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line"><tt class="py-string">        </tt> </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line"><tt class="py-string"></tt> </tt>
 <a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line"><tt class="py-string">        Special characters like delete and return are not cross-platform.</tt> </tt>
 <a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line"><tt class="py-string">        L{key} or L{keychar} should be used instead for special keys.</tt> </tt>
 <a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line"><tt class="py-string">        Characters are also case sensitive.</tt> </tt>
@@ -206,7 +206,7 @@ tdl.event.Quit.type" class="py-name" href="#" onclick="return doclink('link-14',
 <a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">keychar</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">char</tt> <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">key</tt> <tt class="py-op">==</tt> <tt class="py-string">'CHAR'</tt> <tt class="py-keyword">else</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">key</tt> </tt>
 <a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line">        <tt class="py-string">"""Similar to L{key} but returns a case sensitive letter or symbol</tt> </tt>
 <a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line"><tt class="py-string">        instead of 'CHAR'.</tt> </tt>
-<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line"><tt class="py-string">        </tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line"><tt class="py-string"></tt> </tt>
 <a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line"><tt class="py-string">        This variable makes available the widest variety of symbols and should</tt> </tt>
 <a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line"><tt class="py-string">        be used for key-mappings or anywhere where a narrower sample of keys</tt> </tt>
 <a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line"><tt class="py-string">        isn't needed.</tt> </tt>
@@ -253,7 +253,7 @@ tdl.event.Quit.type" class="py-name" href="#" onclick="return doclink('link-17',
 </div><a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line"> </tt>
 <a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line"><tt id="link-18" class="py-name" targets="Variable tdl.event._mouseNames=tdl.event-module.html#_mouseNames"><a title="tdl.event._mouseNames" class="py-name" href="#" onclick="return doclink('link-18', '_mouseNames', 'link-18');">_mouseNames</a></tt> <tt class="py-op">=</tt> <tt class="py-op">{</tt><tt class="py-number">1</tt><tt class="py-op">:</tt> <tt class="py-string">'LEFT'</tt><tt class="py-op">,</tt> <tt class="py-number">2</tt><tt class="py-op">:</tt> <tt class="py-string">'MIDDLE'</tt><tt class="py-op">,</tt> <tt class="py-number">3</tt><tt class="py-op">:</tt> <tt class="py-string">'RIGHT'</tt><tt class="py-op">,</tt> <tt class="py-number">4</tt><tt class="py-op">:</tt> <tt class="py-string">'SCROLLUP'</tt><tt class="py-op">,</tt> <tt class="py-number">5</tt><tt class="py-op">:</tt> <tt class="py-string">'SCROLLDOWN'</tt><tt class="py-op">}</tt> </tt>
 <a name="MouseButtonEvent"></a><div id="MouseButtonEvent-def"><a name="L161"></a><tt class="py-lineno">161</tt> <a class="py-toggle" href="#" id="MouseButtonEvent-toggle" onclick="return toggle('MouseButtonEvent');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="tdl.event.MouseButtonEvent-class.html">MouseButtonEvent</a><tt class="py-op">(</tt><tt class="py-base-class">Event</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
-</div><div id="MouseButtonEvent-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="MouseButtonEvent-expanded"><a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line">     </tt>
+</div><div id="MouseButtonEvent-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="MouseButtonEvent-expanded"><a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line"> </tt>
 <a name="MouseButtonEvent.__init__"></a><div id="MouseButtonEvent.__init__-def"><a name="L163"></a><tt class="py-lineno">163</tt> <a class="py-toggle" href="#" id="MouseButtonEvent.__init__-toggle" onclick="return toggle('MouseButtonEvent.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event.MouseButtonEvent-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">button</tt><tt class="py-op">,</tt> <tt class="py-param">pos</tt><tt class="py-op">,</tt> <tt class="py-param">cell</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="MouseButtonEvent.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="MouseButtonEvent.__init__-expanded"><a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">button</tt> <tt class="py-op">=</tt> <tt id="link-19" class="py-name"><a title="tdl.event._mouseNames" class="py-name" href="#" onclick="return doclink('link-19', '_mouseNames', 'link-18');">_mouseNames</a></tt><tt class="py-op">[</tt><tt class="py-name">button</tt><tt class="py-op">]</tt> </tt>
 <a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line">        <tt class="py-string">"""Can be one of</tt> </tt>
@@ -315,74 +315,74 @@ tdl.event.Quit.type" class="py-name" href="#" onclick="return doclink('link-22',
 <a name="App"></a><div id="App-def"><a name="L203"></a><tt class="py-lineno">203</tt> <a class="py-toggle" href="#" id="App-toggle" onclick="return toggle('App');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="tdl.event.App-class.html">App</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="App-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="App-expanded"><a name="L204"></a><tt class="py-lineno">204</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
 <a name="L205"></a><tt class="py-lineno">205</tt>  <tt class="py-line"><tt class="py-docstring">    Application framework.</tt> </tt>
-<a name="L206"></a><tt class="py-lineno">206</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L206"></a><tt class="py-lineno">206</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L207"></a><tt class="py-lineno">207</tt>  <tt class="py-line"><tt class="py-docstring">     - ev_*: Events are passed to methods based on their L{Event.type} attribute.</tt> </tt>
 <a name="L208"></a><tt class="py-lineno">208</tt>  <tt class="py-line"><tt class="py-docstring">       If an event type is 'KEYDOWN' the ev_KEYDOWN method will be called</tt> </tt>
 <a name="L209"></a><tt class="py-lineno">209</tt>  <tt class="py-line"><tt class="py-docstring">       with the event instance as a parameter.</tt> </tt>
-<a name="L210"></a><tt class="py-lineno">210</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L210"></a><tt class="py-lineno">210</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L211"></a><tt class="py-lineno">211</tt>  <tt class="py-line"><tt class="py-docstring">     - key_*: When a key is pressed another method will be called based on the</tt> </tt>
 <a name="L212"></a><tt class="py-lineno">212</tt>  <tt class="py-line"><tt class="py-docstring">       L{KeyEvent.key} attribute.  For example the 'ENTER' key will call key_ENTER</tt> </tt>
 <a name="L213"></a><tt class="py-lineno">213</tt>  <tt class="py-line"><tt class="py-docstring">       with the associated L{KeyDown} event as its parameter.</tt> </tt>
-<a name="L214"></a><tt class="py-lineno">214</tt>  <tt class="py-line"><tt class="py-docstring">       </tt> </tt>
+<a name="L214"></a><tt class="py-lineno">214</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L215"></a><tt class="py-lineno">215</tt>  <tt class="py-line"><tt class="py-docstring">     - L{update}: This method is called every loop.  It is passed a single</tt> </tt>
 <a name="L216"></a><tt class="py-lineno">216</tt>  <tt class="py-line"><tt class="py-docstring">       parameter detailing the time in seconds since the last update</tt> </tt>
 <a name="L217"></a><tt class="py-lineno">217</tt>  <tt class="py-line"><tt class="py-docstring">       (often known as deltaTime.)</tt> </tt>
-<a name="L218"></a><tt class="py-lineno">218</tt>  <tt class="py-line"><tt class="py-docstring">       </tt> </tt>
+<a name="L218"></a><tt class="py-lineno">218</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L219"></a><tt class="py-lineno">219</tt>  <tt class="py-line"><tt class="py-docstring">       You may want to call drawing routines in this method followed by</tt> </tt>
 <a name="L220"></a><tt class="py-lineno">220</tt>  <tt class="py-line"><tt class="py-docstring">       L{tdl.flush}.</tt> </tt>
-<a name="L221"></a><tt class="py-lineno">221</tt>  <tt class="py-line"><tt class="py-docstring">       </tt> </tt>
+<a name="L221"></a><tt class="py-lineno">221</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L222"></a><tt class="py-lineno">222</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
 <a name="L223"></a><tt class="py-lineno">223</tt>  <tt class="py-line">    <tt class="py-name">__slots__</tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-string">'__running'</tt><tt class="py-op">,</tt> <tt class="py-string">'__prevTime'</tt><tt class="py-op">)</tt> </tt>
-<a name="L224"></a><tt class="py-lineno">224</tt>  <tt class="py-line">     </tt>
+<a name="L224"></a><tt class="py-lineno">224</tt>  <tt class="py-line"> </tt>
 <a name="App.ev_QUIT"></a><div id="App.ev_QUIT-def"><a name="L225"></a><tt class="py-lineno">225</tt> <a class="py-toggle" href="#" id="App.ev_QUIT-toggle" onclick="return toggle('App.ev_QUIT');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event.App-class.html#ev_QUIT">ev_QUIT</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">event</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="App.ev_QUIT-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="App.ev_QUIT-expanded"><a name="L226"></a><tt class="py-lineno">226</tt>  <tt class="py-line">        <tt class="py-docstring">"""Unless overridden this method raises a SystemExit exception closing</tt> </tt>
 <a name="L227"></a><tt class="py-lineno">227</tt>  <tt class="py-line"><tt class="py-docstring">        the program."""</tt> </tt>
 <a name="L228"></a><tt class="py-lineno">228</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">SystemExit</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
-</div><a name="L229"></a><tt class="py-lineno">229</tt>  <tt class="py-line">     </tt>
+</div><a name="L229"></a><tt class="py-lineno">229</tt>  <tt class="py-line"> </tt>
 <a name="App.ev_KEYDOWN"></a><div id="App.ev_KEYDOWN-def"><a name="L230"></a><tt class="py-lineno">230</tt> <a class="py-toggle" href="#" id="App.ev_KEYDOWN-toggle" onclick="return toggle('App.ev_KEYDOWN');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event.App-class.html#ev_KEYDOWN">ev_KEYDOWN</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">event</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="App.ev_KEYDOWN-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="App.ev_KEYDOWN-expanded"><a name="L231"></a><tt class="py-lineno">231</tt>  <tt class="py-line">        <tt class="py-docstring">"""Override this method to handle a L{KeyDown} event."""</tt> </tt>
-</div><a name="L232"></a><tt class="py-lineno">232</tt>  <tt class="py-line">     </tt>
+</div><a name="L232"></a><tt class="py-lineno">232</tt>  <tt class="py-line"> </tt>
 <a name="App.ev_KEYUP"></a><div id="App.ev_KEYUP-def"><a name="L233"></a><tt class="py-lineno">233</tt> <a class="py-toggle" href="#" id="App.ev_KEYUP-toggle" onclick="return toggle('App.ev_KEYUP');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event.App-class.html#ev_KEYUP">ev_KEYUP</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">event</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="App.ev_KEYUP-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="App.ev_KEYUP-expanded"><a name="L234"></a><tt class="py-lineno">234</tt>  <tt class="py-line">        <tt class="py-docstring">"""Override this method to handle a L{KeyUp} event."""</tt> </tt>
-</div><a name="L235"></a><tt class="py-lineno">235</tt>  <tt class="py-line">     </tt>
+</div><a name="L235"></a><tt class="py-lineno">235</tt>  <tt class="py-line"> </tt>
 <a name="App.ev_MOUSEDOWN"></a><div id="App.ev_MOUSEDOWN-def"><a name="L236"></a><tt class="py-lineno">236</tt> <a class="py-toggle" href="#" id="App.ev_MOUSEDOWN-toggle" onclick="return toggle('App.ev_MOUSEDOWN');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event.App-class.html#ev_MOUSEDOWN">ev_MOUSEDOWN</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">event</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="App.ev_MOUSEDOWN-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="App.ev_MOUSEDOWN-expanded"><a name="L237"></a><tt class="py-lineno">237</tt>  <tt class="py-line">        <tt class="py-docstring">"""Override this method to handle a L{MouseDown} event."""</tt> </tt>
-</div><a name="L238"></a><tt class="py-lineno">238</tt>  <tt class="py-line">     </tt>
+</div><a name="L238"></a><tt class="py-lineno">238</tt>  <tt class="py-line"> </tt>
 <a name="App.ev_MOUSEUP"></a><div id="App.ev_MOUSEUP-def"><a name="L239"></a><tt class="py-lineno">239</tt> <a class="py-toggle" href="#" id="App.ev_MOUSEUP-toggle" onclick="return toggle('App.ev_MOUSEUP');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event.App-class.html#ev_MOUSEUP">ev_MOUSEUP</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">event</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="App.ev_MOUSEUP-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="App.ev_MOUSEUP-expanded"><a name="L240"></a><tt class="py-lineno">240</tt>  <tt class="py-line">        <tt class="py-docstring">"""Override this method to handle a L{MouseUp} event."""</tt> </tt>
-</div><a name="L241"></a><tt class="py-lineno">241</tt>  <tt class="py-line">     </tt>
+</div><a name="L241"></a><tt class="py-lineno">241</tt>  <tt class="py-line"> </tt>
 <a name="App.ev_MOUSEMOTION"></a><div id="App.ev_MOUSEMOTION-def"><a name="L242"></a><tt class="py-lineno">242</tt> <a class="py-toggle" href="#" id="App.ev_MOUSEMOTION-toggle" onclick="return toggle('App.ev_MOUSEMOTION');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event.App-class.html#ev_MOUSEMOTION">ev_MOUSEMOTION</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">event</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="App.ev_MOUSEMOTION-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="App.ev_MOUSEMOTION-expanded"><a name="L243"></a><tt class="py-lineno">243</tt>  <tt class="py-line">        <tt class="py-docstring">"""Override this method to handle a L{MouseMotion} event."""</tt> </tt>
-</div><a name="L244"></a><tt class="py-lineno">244</tt>  <tt class="py-line">     </tt>
+</div><a name="L244"></a><tt class="py-lineno">244</tt>  <tt class="py-line"> </tt>
 <a name="App.update"></a><div id="App.update-def"><a name="L245"></a><tt class="py-lineno">245</tt> <a class="py-toggle" href="#" id="App.update-toggle" onclick="return toggle('App.update');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event.App-class.html#update">update</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">deltaTime</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="App.update-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="App.update-expanded"><a name="L246"></a><tt class="py-lineno">246</tt>  <tt class="py-line">        <tt class="py-docstring">"""Override this method to handle per frame logic and drawing.</tt> </tt>
-<a name="L247"></a><tt class="py-lineno">247</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L247"></a><tt class="py-lineno">247</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L248"></a><tt class="py-lineno">248</tt>  <tt class="py-line"><tt class="py-docstring">        @type deltaTime: float</tt> </tt>
 <a name="L249"></a><tt class="py-lineno">249</tt>  <tt class="py-line"><tt class="py-docstring">        @param deltaTime: This parameter tells the amount of time passed since</tt> </tt>
 <a name="L250"></a><tt class="py-lineno">250</tt>  <tt class="py-line"><tt class="py-docstring">                          the last call measured in seconds as a floating point</tt> </tt>
 <a name="L251"></a><tt class="py-lineno">251</tt>  <tt class="py-line"><tt class="py-docstring">                          number.</tt> </tt>
-<a name="L252"></a><tt class="py-lineno">252</tt>  <tt class="py-line"><tt class="py-docstring">                          </tt> </tt>
+<a name="L252"></a><tt class="py-lineno">252</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L253"></a><tt class="py-lineno">253</tt>  <tt class="py-line"><tt class="py-docstring">                          You can use this variable to make your program</tt> </tt>
 <a name="L254"></a><tt class="py-lineno">254</tt>  <tt class="py-line"><tt class="py-docstring">                          frame rate independent.</tt> </tt>
 <a name="L255"></a><tt class="py-lineno">255</tt>  <tt class="py-line"><tt class="py-docstring">                          Use this parameter to adjust the speed of motion,</tt> </tt>
 <a name="L256"></a><tt class="py-lineno">256</tt>  <tt class="py-line"><tt class="py-docstring">                          timers, and other game logic.</tt> </tt>
 <a name="L257"></a><tt class="py-lineno">257</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
 <a name="L258"></a><tt class="py-lineno">258</tt>  <tt class="py-line">        <tt class="py-keyword">pass</tt> </tt>
-</div><a name="L259"></a><tt class="py-lineno">259</tt>  <tt class="py-line">         </tt>
+</div><a name="L259"></a><tt class="py-lineno">259</tt>  <tt class="py-line"> </tt>
 <a name="App.suspend"></a><div id="App.suspend-def"><a name="L260"></a><tt class="py-lineno">260</tt> <a class="py-toggle" href="#" id="App.suspend-toggle" onclick="return toggle('App.suspend');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event.App-class.html#suspend">suspend</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="App.suspend-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="App.suspend-expanded"><a name="L261"></a><tt class="py-lineno">261</tt>  <tt class="py-line">        <tt class="py-docstring">"""When called the App will begin to return control to where</tt> </tt>
 <a name="L262"></a><tt class="py-lineno">262</tt>  <tt class="py-line"><tt class="py-docstring">        L{App.run} was called.</tt> </tt>
-<a name="L263"></a><tt class="py-lineno">263</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L263"></a><tt class="py-lineno">263</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L264"></a><tt class="py-lineno">264</tt>  <tt class="py-line"><tt class="py-docstring">        Some further events are processed and the L{App.update} method will be</tt> </tt>
 <a name="L265"></a><tt class="py-lineno">265</tt>  <tt class="py-line"><tt class="py-docstring">        called one last time before exiting</tt> </tt>
 <a name="L266"></a><tt class="py-lineno">266</tt>  <tt class="py-line"><tt class="py-docstring">        (unless suspended during a call to L{App.update}.)</tt> </tt>
 <a name="L267"></a><tt class="py-lineno">267</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
 <a name="L268"></a><tt class="py-lineno">268</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__running</tt> <tt class="py-op">=</tt> <tt class="py-name">False</tt> </tt>
-</div><a name="L269"></a><tt class="py-lineno">269</tt>  <tt class="py-line">         </tt>
+</div><a name="L269"></a><tt class="py-lineno">269</tt>  <tt class="py-line"> </tt>
 <a name="App.run"></a><div id="App.run-def"><a name="L270"></a><tt class="py-lineno">270</tt> <a class="py-toggle" href="#" id="App.run-toggle" onclick="return toggle('App.run');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event.App-class.html#run">run</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="App.run-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="App.run-expanded"><a name="L271"></a><tt class="py-lineno">271</tt>  <tt class="py-line">        <tt class="py-docstring">"""Delegate control over to this App instance.  This function will</tt> </tt>
 <a name="L272"></a><tt class="py-lineno">272</tt>  <tt class="py-line"><tt class="py-docstring">        process all events and send them to the special methods ev_* and key_*.</tt> </tt>
-<a name="L273"></a><tt class="py-lineno">273</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L273"></a><tt class="py-lineno">273</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L274"></a><tt class="py-lineno">274</tt>  <tt class="py-line"><tt class="py-docstring">        A call to L{App.suspend} will return the control flow back to where</tt> </tt>
 <a name="L275"></a><tt class="py-lineno">275</tt>  <tt class="py-line"><tt class="py-docstring">        this function is called.  And then the App can be run again.</tt> </tt>
 <a name="L276"></a><tt class="py-lineno">276</tt>  <tt class="py-line"><tt class="py-docstring">        But a single App instance can not be run multiple times simultaneously.</tt> </tt>
@@ -392,13 +392,13 @@ tdl.event.Quit.type" class="py-name" href="#" onclick="return doclink('link-22',
 <a name="L280"></a><tt class="py-lineno">280</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__running</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
 <a name="L281"></a><tt class="py-lineno">281</tt>  <tt class="py-line">        <tt class="py-keyword">while</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__running</tt><tt class="py-op">:</tt> </tt>
 <a name="L282"></a><tt class="py-lineno">282</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-24" class="py-name" targets="Method tdl.event.App.runOnce()=tdl.event.App-class.html#runOnce"><a title="tdl.event.App.runOnce" class="py-name" href="#" onclick="return doclink('link-24', 'runOnce', 'link-24');">runOnce</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
-</div><a name="L283"></a><tt class="py-lineno">283</tt>  <tt class="py-line">     </tt>
+</div><a name="L283"></a><tt class="py-lineno">283</tt>  <tt class="py-line"> </tt>
 <a name="App.run_once"></a><div id="App.run_once-def"><a name="L284"></a><tt class="py-lineno">284</tt> <a class="py-toggle" href="#" id="App.run_once-toggle" onclick="return toggle('App.run_once');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event.App-class.html#run_once">run_once</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="App.run_once-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="App.run_once-expanded"><a name="L285"></a><tt class="py-lineno">285</tt>  <tt class="py-line">        <tt class="py-docstring">"""Pump events to this App instance and then return.</tt> </tt>
-<a name="L286"></a><tt class="py-lineno">286</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L286"></a><tt class="py-lineno">286</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L287"></a><tt class="py-lineno">287</tt>  <tt class="py-line"><tt class="py-docstring">        This works in the way described in L{App.run} except it immediately</tt> </tt>
 <a name="L288"></a><tt class="py-lineno">288</tt>  <tt class="py-line"><tt class="py-docstring">        returns after the first L{update} call.</tt> </tt>
-<a name="L289"></a><tt class="py-lineno">289</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L289"></a><tt class="py-lineno">289</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L290"></a><tt class="py-lineno">290</tt>  <tt class="py-line"><tt class="py-docstring">        Having multiple L{App} instances and selectively calling runOnce on</tt> </tt>
 <a name="L291"></a><tt class="py-lineno">291</tt>  <tt class="py-line"><tt class="py-docstring">        them is a decent way to create a state machine.</tt> </tt>
 <a name="L292"></a><tt class="py-lineno">292</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
@@ -436,14 +436,14 @@ tdl.event.Quit.type" class="py-name" href="#" onclick="return doclink('link-33',
 <a name="L306"></a><tt class="py-lineno">306</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-36" class="py-name" targets="Method tdl.event.App.update()=tdl.event.App-class.html#update"><a title="tdl.event.App.update" class="py-name" href="#" onclick="return doclink('link-36', 'update', 'link-36');">update</a></tt><tt class="py-op">(</tt><tt class="py-name">newTime</tt> <tt class="py-op">-</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__prevTime</tt><tt class="py-op">)</tt> </tt>
 <a name="L307"></a><tt class="py-lineno">307</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__prevTime</tt> <tt class="py-op">=</tt> <tt class="py-name">newTime</tt> </tt>
 </div></div><a name="L308"></a><tt class="py-lineno">308</tt>  <tt class="py-line">        <tt class="py-comment">#_tdl.flush()</tt> </tt>
-<a name="L309"></a><tt class="py-lineno">309</tt>  <tt class="py-line">         </tt>
+<a name="L309"></a><tt class="py-lineno">309</tt>  <tt class="py-line"> </tt>
 <a name="_processEvents"></a><div id="_processEvents-def"><a name="L310"></a><tt class="py-lineno">310</tt> <a class="py-toggle" href="#" id="_processEvents-toggle" onclick="return toggle('_processEvents');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event-module.html#_processEvents">_processEvents</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="_processEvents-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="_processEvents-expanded"><a name="L311"></a><tt class="py-lineno">311</tt>  <tt class="py-line">    <tt class="py-docstring">"""Flushes the event queue from libtcod into the global list _eventQueue"""</tt> </tt>
 <a name="L312"></a><tt class="py-lineno">312</tt>  <tt class="py-line">    <tt class="py-keyword">global</tt> <tt id="link-37" class="py-name"><a title="tdl.event._mousel" class="py-name" href="#" onclick="return doclink('link-37', '_mousel', 'link-5');">_mousel</a></tt><tt class="py-op">,</tt> <tt id="link-38" class="py-name"><a title="tdl.event._mousem" class="py-name" href="#" onclick="return doclink('link-38', '_mousem', 'link-6');">_mousem</a></tt><tt class="py-op">,</tt> <tt id="link-39" class="py-name"><a title="tdl.event._mouser" class="py-name" href="#" onclick="return doclink('link-39', '_mouser', 'link-7');">_mouser</a></tt><tt class="py-op">,</tt> <tt class="py-name">_eventsflushed</tt><tt class="py-op">,</tt> <tt id="link-40" class="py-name"><a title="tdl.event._pushedEvents" class="py-name" href="#" onclick="return doclink('link-40', '_pushedEvents', 'link-4');">_pushedEvents</a></tt> </tt>
 <a name="L313"></a><tt class="py-lineno">313</tt>  <tt class="py-line">    <tt class="py-name">_eventsflushed</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
 <a name="L314"></a><tt class="py-lineno">314</tt>  <tt class="py-line">    <tt class="py-name">events</tt> <tt class="py-op">=</tt> <tt id="link-41" class="py-name"><a title="tdl.event._pushedEvents" class="py-name" href="#" onclick="return doclink('link-41', '_pushedEvents', 'link-4');">_pushedEvents</a></tt> <tt class="py-comment"># get events from event.push</tt> </tt>
 <a name="L315"></a><tt class="py-lineno">315</tt>  <tt class="py-line">    <tt id="link-42" class="py-name"><a title="tdl.event._pushedEvents" class="py-name" href="#" onclick="return doclink('link-42', '_pushedEvents', 'link-4');">_pushedEvents</a></tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt> <tt class="py-comment"># then clear the pushed events queue</tt> </tt>
-<a name="L316"></a><tt class="py-lineno">316</tt>  <tt class="py-line">     </tt>
+<a name="L316"></a><tt class="py-lineno">316</tt>  <tt class="py-line"> </tt>
 <a name="L317"></a><tt class="py-lineno">317</tt>  <tt class="py-line">    <tt class="py-name">mouse</tt> <tt class="py-op">=</tt> <tt id="link-43" class="py-name"><a title="tdl._ffi
 tdl.event._ffi
 tdl.map._ffi
@@ -462,7 +462,7 @@ tdl.map._lib
 tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-46', '_lib', 'link-1');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_EVENT_ANY</tt><tt class="py-op">,</tt> <tt class="py-name">libkey</tt><tt class="py-op">,</tt> <tt class="py-name">mouse</tt><tt class="py-op">)</tt> </tt>
 <a name="L321"></a><tt class="py-lineno">321</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">libevent</tt><tt class="py-op">:</tt> <tt class="py-comment"># no more events from libtcod</tt> </tt>
 <a name="L322"></a><tt class="py-lineno">322</tt>  <tt class="py-line">            <tt class="py-keyword">break</tt> </tt>
-<a name="L323"></a><tt class="py-lineno">323</tt>  <tt class="py-line">             </tt>
+<a name="L323"></a><tt class="py-lineno">323</tt>  <tt class="py-line"> </tt>
 <a name="L324"></a><tt class="py-lineno">324</tt>  <tt class="py-line">        <tt class="py-comment">#if mouse.dx or mouse.dy:</tt> </tt>
 <a name="L325"></a><tt class="py-lineno">325</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">libevent</tt> <tt class="py-op">&amp;</tt> <tt id="link-47" class="py-name"><a title="tdl._lib
 tdl.event._lib
@@ -489,12 +489,12 @@ tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-47', '_li
 <a name="L344"></a><tt class="py-lineno">344</tt>  <tt class="py-line">                    <tt class="py-name">events</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt id="link-58" class="py-name"><a title="tdl.event.MouseDown" class="py-name" href="#" onclick="return doclink('link-58', 'MouseDown', 'link-56');">MouseDown</a></tt><tt class="py-op">(</tt><tt class="py-name">button</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-name">mousepos</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
 <a name="L345"></a><tt class="py-lineno">345</tt>  <tt class="py-line">            <tt class="py-keyword">elif</tt> <tt class="py-name">newstate</tt> <tt class="py-keyword">and</tt> <tt class="py-keyword">not</tt> <tt class="py-name">oldstate</tt><tt class="py-op">:</tt> </tt>
 <a name="L346"></a><tt class="py-lineno">346</tt>  <tt class="py-line">                <tt class="py-name">events</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt id="link-59" class="py-name"><a title="tdl.event.MouseDown" class="py-name" href="#" onclick="return doclink('link-59', 'MouseDown', 'link-56');">MouseDown</a></tt><tt class="py-op">(</tt><tt class="py-name">button</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-name">mousepos</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
-<a name="L347"></a><tt class="py-lineno">347</tt>  <tt class="py-line">         </tt>
+<a name="L347"></a><tt class="py-lineno">347</tt>  <tt class="py-line"> </tt>
 <a name="L348"></a><tt class="py-lineno">348</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">mouse</tt><tt class="py-op">.</tt><tt class="py-name">wheel_up</tt><tt class="py-op">:</tt> </tt>
 <a name="L349"></a><tt class="py-lineno">349</tt>  <tt class="py-line">            <tt class="py-name">events</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt id="link-60" class="py-name"><a title="tdl.event.MouseDown" class="py-name" href="#" onclick="return doclink('link-60', 'MouseDown', 'link-56');">MouseDown</a></tt><tt class="py-op">(</tt><tt class="py-number">4</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-name">mousepos</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
 <a name="L350"></a><tt class="py-lineno">350</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">mouse</tt><tt class="py-op">.</tt><tt class="py-name">wheel_down</tt><tt class="py-op">:</tt> </tt>
 <a name="L351"></a><tt class="py-lineno">351</tt>  <tt class="py-line">            <tt class="py-name">events</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt id="link-61" class="py-name"><a title="tdl.event.MouseDown" class="py-name" href="#" onclick="return doclink('link-61', 'MouseDown', 'link-56');">MouseDown</a></tt><tt class="py-op">(</tt><tt class="py-number">5</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-name">mousepos</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
-<a name="L352"></a><tt class="py-lineno">352</tt>  <tt class="py-line">             </tt>
+<a name="L352"></a><tt class="py-lineno">352</tt>  <tt class="py-line"> </tt>
 <a name="L353"></a><tt class="py-lineno">353</tt>  <tt class="py-line">        <tt id="link-62" class="py-name"><a title="tdl.event._mousel" class="py-name" href="#" onclick="return doclink('link-62', '_mousel', 'link-5');">_mousel</a></tt> <tt class="py-op">=</tt> <tt class="py-name">mouse</tt><tt class="py-op">.</tt><tt class="py-name">lbutton</tt> </tt>
 <a name="L354"></a><tt class="py-lineno">354</tt>  <tt class="py-line">        <tt id="link-63" class="py-name"><a title="tdl.event._mousem" class="py-name" href="#" onclick="return doclink('link-63', '_mousem', 'link-6');">_mousem</a></tt> <tt class="py-op">=</tt> <tt class="py-name">mouse</tt><tt class="py-op">.</tt><tt class="py-name">mbutton</tt> </tt>
 <a name="L355"></a><tt class="py-lineno">355</tt>  <tt class="py-line">        <tt id="link-64" class="py-name"><a title="tdl.event._mouser" class="py-name" href="#" onclick="return doclink('link-64', '_mouser', 'link-7');">_mouser</a></tt> <tt class="py-op">=</tt> <tt class="py-name">mouse</tt><tt class="py-op">.</tt><tt class="py-name">rbutton</tt> </tt>
@@ -511,7 +511,7 @@ tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-65', '_li
 <a name="L363"></a><tt class="py-lineno">363</tt>  <tt class="py-line">        <tt class="py-name">events</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt class="py-name">keyevent</tt><tt class="py-op">(</tt><tt class="py-name">libkey</tt><tt class="py-op">.</tt><tt class="py-name">vk</tt><tt class="py-op">,</tt> <tt class="py-name">libkey</tt><tt class="py-op">.</tt><tt class="py-name">c</tt><tt class="py-op">,</tt> </tt>
 <a name="L364"></a><tt class="py-lineno">364</tt>  <tt class="py-line">                               <tt class="py-name">libkey</tt><tt class="py-op">.</tt><tt class="py-name">lalt</tt><tt class="py-op">,</tt> <tt class="py-name">libkey</tt><tt class="py-op">.</tt><tt class="py-name">lctrl</tt><tt class="py-op">,</tt> </tt>
 <a name="L365"></a><tt class="py-lineno">365</tt>  <tt class="py-line">                               <tt class="py-name">libkey</tt><tt class="py-op">.</tt><tt class="py-name">ralt</tt><tt class="py-op">,</tt> <tt class="py-name">libkey</tt><tt class="py-op">.</tt><tt class="py-name">rctrl</tt><tt class="py-op">,</tt> <tt class="py-name">libkey</tt><tt class="py-op">.</tt><tt class="py-name">shift</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
-<a name="L366"></a><tt class="py-lineno">366</tt>  <tt class="py-line">     </tt>
+<a name="L366"></a><tt class="py-lineno">366</tt>  <tt class="py-line"> </tt>
 <a name="L367"></a><tt class="py-lineno">367</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt id="link-68" class="py-name"><a title="tdl._lib
 tdl.event._lib
 tdl.map._lib
@@ -519,13 +519,13 @@ tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-68', '_li
 <a name="L368"></a><tt class="py-lineno">368</tt>  <tt class="py-line">        <tt class="py-name">events</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt id="link-69" class="py-name" targets="Class tdl.event.Quit=tdl.event.Quit-class.html"><a title="tdl.event.Quit" class="py-name" href="#" onclick="return doclink('link-69', 'Quit', 'link-69');">Quit</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
 <a name="L369"></a><tt class="py-lineno">369</tt>  <tt class="py-line"> </tt>
 <a name="L370"></a><tt class="py-lineno">370</tt>  <tt class="py-line">    <tt id="link-70" class="py-name"><a title="tdl.event._eventQueue" class="py-name" href="#" onclick="return doclink('link-70', '_eventQueue', 'link-3');">_eventQueue</a></tt><tt class="py-op">.</tt><tt class="py-name">extend</tt><tt class="py-op">(</tt><tt class="py-name">events</tt><tt class="py-op">)</tt> </tt>
-</div><a name="L371"></a><tt class="py-lineno">371</tt>  <tt class="py-line">     </tt>
+</div><a name="L371"></a><tt class="py-lineno">371</tt>  <tt class="py-line"> </tt>
 <a name="get"></a><div id="get-def"><a name="L372"></a><tt class="py-lineno">372</tt> <a class="py-toggle" href="#" id="get-toggle" onclick="return toggle('get');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event-module.html#get">get</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="get-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="get-expanded"><a name="L373"></a><tt class="py-lineno">373</tt>  <tt class="py-line">    <tt class="py-docstring">"""Flushes the event queue and returns the list of events.</tt> </tt>
-<a name="L374"></a><tt class="py-lineno">374</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L374"></a><tt class="py-lineno">374</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L375"></a><tt class="py-lineno">375</tt>  <tt class="py-line"><tt class="py-docstring">    This function returns L{Event} objects that can be identified by their</tt> </tt>
 <a name="L376"></a><tt class="py-lineno">376</tt>  <tt class="py-line"><tt class="py-docstring">    type attribute or their class.</tt> </tt>
-<a name="L377"></a><tt class="py-lineno">377</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L377"></a><tt class="py-lineno">377</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L378"></a><tt class="py-lineno">378</tt>  <tt class="py-line"><tt class="py-docstring">    @rtype: iterator</tt> </tt>
 <a name="L379"></a><tt class="py-lineno">379</tt>  <tt class="py-line"><tt class="py-docstring">    @return: Returns an iterable of objects derived from L{Event} or anything</tt> </tt>
 <a name="L380"></a><tt class="py-lineno">380</tt>  <tt class="py-line"><tt class="py-docstring">             put in a L{push} call.  If the iterator is deleted or otherwise</tt> </tt>
@@ -534,7 +534,7 @@ tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-68', '_li
 <a name="L383"></a><tt class="py-lineno">383</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
 <a name="L384"></a><tt class="py-lineno">384</tt>  <tt class="py-line">    <tt class="py-name">_processEvents</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
 <a name="L385"></a><tt class="py-lineno">385</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">_event_generator</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
-</div><a name="L386"></a><tt class="py-lineno">386</tt>  <tt class="py-line">     </tt>
+</div><a name="L386"></a><tt class="py-lineno">386</tt>  <tt class="py-line"> </tt>
 <a name="_event_generator"></a><div id="_event_generator-def"><a name="L387"></a><tt class="py-lineno">387</tt> <a class="py-toggle" href="#" id="_event_generator-toggle" onclick="return toggle('_event_generator');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event-module.html#_event_generator">_event_generator</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="_event_generator-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="_event_generator-expanded"><a name="L388"></a><tt class="py-lineno">388</tt>  <tt class="py-line">    <tt class="py-keyword">while</tt> <tt id="link-71" class="py-name"><a title="tdl.event._eventQueue" class="py-name" href="#" onclick="return doclink('link-71', '_eventQueue', 'link-3');">_eventQueue</a></tt><tt class="py-op">:</tt> </tt>
 <a name="L389"></a><tt class="py-lineno">389</tt>  <tt class="py-line">        <tt class="py-comment"># if there is an interruption the rest of the events stay untouched</tt> </tt>
@@ -543,23 +543,23 @@ tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-68', '_li
 <a name="L392"></a><tt class="py-lineno">392</tt>  <tt class="py-line">        <tt class="py-keyword">yield</tt><tt class="py-op">(</tt><tt id="link-72" class="py-name"><a title="tdl.event._eventQueue" class="py-name" href="#" onclick="return doclink('link-72', '_eventQueue', 'link-3');">_eventQueue</a></tt><tt class="py-op">.</tt><tt class="py-name">pop</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
 <a name="L393"></a><tt class="py-lineno">393</tt>  <tt class="py-line">    <tt class="py-keyword">raise</tt> <tt class="py-name">StopIteration</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
 </div><a name="L394"></a><tt class="py-lineno">394</tt>  <tt class="py-line"> </tt>
-<a name="L395"></a><tt class="py-lineno">395</tt>  <tt class="py-line">     </tt>
+<a name="L395"></a><tt class="py-lineno">395</tt>  <tt class="py-line"> </tt>
 <a name="wait"></a><div id="wait-def"><a name="L396"></a><tt class="py-lineno">396</tt> <a class="py-toggle" href="#" id="wait-toggle" onclick="return toggle('wait');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event-module.html#wait">wait</a><tt class="py-op">(</tt><tt class="py-param">timeout</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">flush</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="wait-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="wait-expanded"><a name="L397"></a><tt class="py-lineno">397</tt>  <tt class="py-line">    <tt class="py-docstring">"""Wait for an event.</tt> </tt>
-<a name="L398"></a><tt class="py-lineno">398</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L398"></a><tt class="py-lineno">398</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L399"></a><tt class="py-lineno">399</tt>  <tt class="py-line"><tt class="py-docstring">    @type timeout: int or None</tt> </tt>
 <a name="L400"></a><tt class="py-lineno">400</tt>  <tt class="py-line"><tt class="py-docstring">    @param timeout: The time in seconds that this function will wait before</tt> </tt>
 <a name="L401"></a><tt class="py-lineno">401</tt>  <tt class="py-line"><tt class="py-docstring">                    giving up and returning None.</tt> </tt>
-<a name="L402"></a><tt class="py-lineno">402</tt>  <tt class="py-line"><tt class="py-docstring">                    </tt> </tt>
+<a name="L402"></a><tt class="py-lineno">402</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L403"></a><tt class="py-lineno">403</tt>  <tt class="py-line"><tt class="py-docstring">                    With the default value of None, this will block forever.</tt> </tt>
 <a name="L404"></a><tt class="py-lineno">404</tt>  <tt class="py-line"><tt class="py-docstring">    @type flush: boolean</tt> </tt>
 <a name="L405"></a><tt class="py-lineno">405</tt>  <tt class="py-line"><tt class="py-docstring">    @param flush: If True a call to L{tdl.flush} will be made before listening</tt> </tt>
 <a name="L406"></a><tt class="py-lineno">406</tt>  <tt class="py-line"><tt class="py-docstring">                  for events.</tt> </tt>
 <a name="L407"></a><tt class="py-lineno">407</tt>  <tt class="py-line"><tt class="py-docstring">    @rtype: L{Event} or None</tt> </tt>
 <a name="L408"></a><tt class="py-lineno">408</tt>  <tt class="py-line"><tt class="py-docstring">    @return: Returns an instance derived from L{Event}, or None if the function</tt> </tt>
-<a name="L409"></a><tt class="py-lineno">409</tt>  <tt class="py-line"><tt class="py-docstring">             has timed out. </tt> </tt>
+<a name="L409"></a><tt class="py-lineno">409</tt>  <tt class="py-line"><tt class="py-docstring">             has timed out.</tt> </tt>
 <a name="L410"></a><tt class="py-lineno">410</tt>  <tt class="py-line"><tt class="py-docstring">             Anything added via L{push} will also be returned.</tt> </tt>
-<a name="L411"></a><tt class="py-lineno">411</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L411"></a><tt class="py-lineno">411</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L412"></a><tt class="py-lineno">412</tt>  <tt class="py-line"><tt class="py-docstring">    @since: 1.4.0</tt> </tt>
 <a name="L413"></a><tt class="py-lineno">413</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
 <a name="L414"></a><tt class="py-lineno">414</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">timeout</tt> <tt class="py-keyword">is</tt> <tt class="py-keyword">not</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
@@ -578,25 +578,25 @@ tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-68', '_li
 <a name="L427"></a><tt class="py-lineno">427</tt>  <tt class="py-line"> </tt>
 <a name="push"></a><div id="push-def"><a name="L428"></a><tt class="py-lineno">428</tt> <a class="py-toggle" href="#" id="push-toggle" onclick="return toggle('push');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event-module.html#push">push</a><tt class="py-op">(</tt><tt class="py-param">event</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="push-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="push-expanded"><a name="L429"></a><tt class="py-lineno">429</tt>  <tt class="py-line">    <tt class="py-docstring">"""Push an event into the event buffer.</tt> </tt>
-<a name="L430"></a><tt class="py-lineno">430</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L430"></a><tt class="py-lineno">430</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L431"></a><tt class="py-lineno">431</tt>  <tt class="py-line"><tt class="py-docstring">    @type event: L{Event}-like object</tt> </tt>
 <a name="L432"></a><tt class="py-lineno">432</tt>  <tt class="py-line"><tt class="py-docstring">    @param event: The event will be available on the next call to L{event.get}.</tt> </tt>
 <a name="L433"></a><tt class="py-lineno">433</tt>  <tt class="py-line"><tt class="py-docstring">                  An event pushed in the middle of a L{get} will not show until</tt> </tt>
 <a name="L434"></a><tt class="py-lineno">434</tt>  <tt class="py-line"><tt class="py-docstring">                  the next time L{get} called preventing push related</tt> </tt>
 <a name="L435"></a><tt class="py-lineno">435</tt>  <tt class="py-line"><tt class="py-docstring">                  infinite loops.</tt> </tt>
-<a name="L436"></a><tt class="py-lineno">436</tt>  <tt class="py-line"><tt class="py-docstring">                  </tt> </tt>
+<a name="L436"></a><tt class="py-lineno">436</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L437"></a><tt class="py-lineno">437</tt>  <tt class="py-line"><tt class="py-docstring">                  This object should at least have a 'type' attribute.</tt> </tt>
 <a name="L438"></a><tt class="py-lineno">438</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
 <a name="L439"></a><tt class="py-lineno">439</tt>  <tt class="py-line">    <tt id="link-77" class="py-name"><a title="tdl.event._pushedEvents" class="py-name" href="#" onclick="return doclink('link-77', '_pushedEvents', 'link-4');">_pushedEvents</a></tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt id="link-78" class="py-name"><a title="tdl.event" class="py-name" href="#" onclick="return doclink('link-78', 'event', 'link-25');">event</a></tt><tt class="py-op">)</tt> </tt>
-</div><a name="L440"></a><tt class="py-lineno">440</tt>  <tt class="py-line">     </tt>
+</div><a name="L440"></a><tt class="py-lineno">440</tt>  <tt class="py-line"> </tt>
 <a name="key_wait"></a><div id="key_wait-def"><a name="L441"></a><tt class="py-lineno">441</tt> <a class="py-toggle" href="#" id="key_wait-toggle" onclick="return toggle('key_wait');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event-module.html#key_wait">key_wait</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="key_wait-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="key_wait-expanded"><a name="L442"></a><tt class="py-lineno">442</tt>  <tt class="py-line">    <tt class="py-docstring">"""Waits until the user presses a key.</tt> </tt>
 <a name="L443"></a><tt class="py-lineno">443</tt>  <tt class="py-line"><tt class="py-docstring">    Then returns a L{KeyDown} event.</tt> </tt>
-<a name="L444"></a><tt class="py-lineno">444</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L444"></a><tt class="py-lineno">444</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L445"></a><tt class="py-lineno">445</tt>  <tt class="py-line"><tt class="py-docstring">    Key events will repeat if held down.</tt> </tt>
-<a name="L446"></a><tt class="py-lineno">446</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L446"></a><tt class="py-lineno">446</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L447"></a><tt class="py-lineno">447</tt>  <tt class="py-line"><tt class="py-docstring">    A click to close the window will be converted into an Alt+F4 KeyDown event.</tt> </tt>
-<a name="L448"></a><tt class="py-lineno">448</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L448"></a><tt class="py-lineno">448</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L449"></a><tt class="py-lineno">449</tt>  <tt class="py-line"><tt class="py-docstring">    @rtype: L{KeyDown}</tt> </tt>
 <a name="L450"></a><tt class="py-lineno">450</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
 <a name="L451"></a><tt class="py-lineno">451</tt>  <tt class="py-line">    <tt class="py-keyword">while</tt> <tt class="py-number">1</tt><tt class="py-op">:</tt> </tt>
@@ -622,26 +622,26 @@ tdl.event.Quit.type" class="py-name" href="#" onclick="return doclink('link-85',
 </div><a name="L459"></a><tt class="py-lineno">459</tt>  <tt class="py-line"> </tt>
 <a name="set_key_repeat"></a><div id="set_key_repeat-def"><a name="L460"></a><tt class="py-lineno">460</tt> <a class="py-toggle" href="#" id="set_key_repeat-toggle" onclick="return toggle('set_key_repeat');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event-module.html#set_key_repeat">set_key_repeat</a><tt class="py-op">(</tt><tt class="py-param">delay</tt><tt class="py-op">=</tt><tt class="py-number">500</tt><tt class="py-op">,</tt> <tt class="py-param">interval</tt><tt class="py-op">=</tt><tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="set_key_repeat-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="set_key_repeat-expanded"><a name="L461"></a><tt class="py-lineno">461</tt>  <tt class="py-line">    <tt class="py-docstring">"""Change or disable key repeat.</tt> </tt>
-<a name="L462"></a><tt class="py-lineno">462</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L462"></a><tt class="py-lineno">462</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L463"></a><tt class="py-lineno">463</tt>  <tt class="py-line"><tt class="py-docstring">    @type delay: int</tt> </tt>
 <a name="L464"></a><tt class="py-lineno">464</tt>  <tt class="py-line"><tt class="py-docstring">    @param delay: Milliseconds before a held key begins to repeat.</tt> </tt>
-<a name="L465"></a><tt class="py-lineno">465</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L465"></a><tt class="py-lineno">465</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L466"></a><tt class="py-lineno">466</tt>  <tt class="py-line"><tt class="py-docstring">                  Key repeat can be disabled entirely by setting a delay of zero.</tt> </tt>
-<a name="L467"></a><tt class="py-lineno">467</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L467"></a><tt class="py-lineno">467</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L468"></a><tt class="py-lineno">468</tt>  <tt class="py-line"><tt class="py-docstring">    @type interval: int</tt> </tt>
 <a name="L469"></a><tt class="py-lineno">469</tt>  <tt class="py-line"><tt class="py-docstring">    @param interval: Milliseconds between key repeats.</tt> </tt>
-<a name="L470"></a><tt class="py-lineno">470</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L470"></a><tt class="py-lineno">470</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L471"></a><tt class="py-lineno">471</tt>  <tt class="py-line"><tt class="py-docstring">                     An interval of zero will repeat every frame.</tt> </tt>
 <a name="L472"></a><tt class="py-lineno">472</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
 <a name="L473"></a><tt class="py-lineno">473</tt>  <tt class="py-line">    <tt id="link-87" class="py-name"><a title="tdl._lib
 tdl.event._lib
 tdl.map._lib
 tdl.noise._lib" class="py-name" href="#" onclick="return doclink('link-87', '_lib', 'link-1');">_lib</a></tt><tt class="py-op">.</tt><tt class="py-name">TCOD_console_set_keyboard_repeat</tt><tt class="py-op">(</tt><tt class="py-name">delay</tt><tt class="py-op">,</tt> <tt class="py-name">interval</tt><tt class="py-op">)</tt> </tt>
-</div><a name="L474"></a><tt class="py-lineno">474</tt>  <tt class="py-line">         </tt>
+</div><a name="L474"></a><tt class="py-lineno">474</tt>  <tt class="py-line"> </tt>
 <a name="is_window_closed"></a><div id="is_window_closed-def"><a name="L475"></a><tt class="py-lineno">475</tt> <a class="py-toggle" href="#" id="is_window_closed-toggle" onclick="return toggle('is_window_closed');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="tdl.event-module.html#is_window_closed">is_window_closed</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
 </div><div id="is_window_closed-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="is_window_closed-expanded"><a name="L476"></a><tt class="py-lineno">476</tt>  <tt class="py-line">    <tt class="py-docstring">"""Returns True if the exit button on the window has been clicked and</tt> </tt>
 <a name="L477"></a><tt class="py-lineno">477</tt>  <tt class="py-line"><tt class="py-docstring">    stays True afterwards.</tt> </tt>
-<a name="L478"></a><tt class="py-lineno">478</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L478"></a><tt class="py-lineno">478</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
 <a name="L479"></a><tt class="py-lineno">479</tt>  <tt class="py-line"><tt class="py-docstring">    @rtype: boolean</tt> </tt>
 <a name="L480"></a><tt class="py-lineno">480</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
 <a name="L481"></a><tt class="py-lineno">481</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt id="link-88" class="py-name"><a title="tdl._lib
@@ -703,7 +703,7 @@ expandto(location.href);
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Mon Jul 13 12:48:16 2015</a>
+    3.0.1 on Sat May 28 16:09:38 2016</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

@@ -1364,6 +1364,10 @@ def force_resolution(width, height):
 
 __all__ = [_var for _var in locals().keys() if _var[0] != '_'] # remove modules from __all__
 __all__ += ['_BaseConsole'] # keep this object public to show the documentation in epydoc
+__all__.remove('absolute_import')
+__all__.remove('division')
+__all__.remove('print_function')
+__all__.remove('unicode_literals')
 
 # backported function names
 _BaseConsole.setMode = _style.backport(_BaseConsole.set_mode)
