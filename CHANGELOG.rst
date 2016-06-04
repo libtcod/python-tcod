@@ -1,6 +1,9 @@
 ===========
  Changelog
 ===========
+1.5.3
+ * set_font no longer crashes when loading a file without the implied font size in its name
+
 1.5.2
  * fixed non-square Map instances
 
