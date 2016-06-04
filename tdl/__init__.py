@@ -1228,6 +1228,7 @@ def set_font(path, columns=None, rows=None, columnFirst=False,
     # and the rest is the auto-detect script
     imgSize = _getImageSize(path) # try to find image size
     if imgSize:
+        fontWidth, fontHeight = None, None
         imgWidth, imgHeight = imgSize
         # try to get font size from filename
         match = _re.match('.*?([0-9]+)[xX]([0-9]+)', _os.path.basename(path))
@@ -1246,6 +1247,14 @@ def set_font(path, columns=None, rows=None, columnFirst=False,
             if not rows:
                 rows = estRows
         else:
+            # filename doesn't contain NxN, but we can still estimate the fontWidth
+            # and fontHeight given number of columns and rows.
+            if columns and rows:
+                fontWidth, remC = divmod(imgWidth, columns)
+                fontHeight, remR = divmod(imgHeight, rows)
+                if remC or remR:
+                    _warnings.warn("Font may be incorrectly formatted.")
+
             # the font name excluded the fonts size
             if not (columns and rows):
                 # no matched font size and no tileset is given
