@@ -18,6 +18,7 @@ The recommended way to install is by using pip, but be sure to update your cffi
 module first.  Use the following commands:
 
     pip install -U cffi
+
     pip install tdl
 
 You could install manually, but you'd also have to install libtcod-cffi as well
