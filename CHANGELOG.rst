@@ -1,6 +1,9 @@
 ===========
  Changelog
 ===========
+0.2.9
+ * Fixed crashes in list and parser modules
+
 0.2.8
  * Fixed off by one error in fov buffer
 
