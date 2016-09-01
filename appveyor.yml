@@ -17,10 +17,11 @@ install:
 build: off
 test: off
 deploy_script:
-- ps: >-
-    if($env:APPVEYOR_REPO_TAG -eq "true"){
-      "echo [pypi] > $Env:USERPROFILE\.pypirc"
-      "echo username: $Env:pypi_user >> $Env:USERPROFILE\.pypirc"
-      "echo password: $Env:pypi_pass >> $Env:USERPROFILE\.pypirc"
-      "$Env:PYTHON\python.exe setup.py bdist_wheel upload"
-    }
+- cmd: >-
+    "echo [pypi] > %USERPROFILE%\.pypirc"
+
+    "echo username: %pypi_user% >> %USERPROFILE%\.pypirc"
+
+    "echo password: %pypi_pass% >> %USERPROFILE%\.pypirc"
+
+    %PYTHON%\python.exe setup.py bdist_wheel upload
