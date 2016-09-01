@@ -10,7 +10,6 @@ import copy
 import pickle
 import gc
 
-sys.path.insert(0, '..')
 import tdl
 
 #ERROR_RANGE = 100 # a number to test out of bound errors
@@ -18,6 +17,8 @@ WIDTH, HEIGHT = 30, 20
 WINWIDTH, WINHEIGHT = 10, 10
 
 DEFAULT_CHAR = (0x20, (0, 0, 0), (0, 0, 0))
+
+IS_PYTHON2 = (sys.version_info[0] == 2)
 
 class TDLTemplate(unittest.TestCase):
     "Nearly all tests need tdl.init to be called"
@@ -205,9 +206,10 @@ class DrawingTests(TDLTemplate):
         str_check(array, string, 'standatd string')
 
         # Unicode string - Python 2
-        array = [random.getrandbits(7) for _ in range(width * height)]
-        unicode = u''.join((chr(c) for c in array))
-        str_check(array, unicode, 'Unicode string')
+        if IS_PYTHON2:
+            array = [random.getrandbits(7) for _ in range(width * height)]
+            unicode = u''.join((chr(c) for c in array))
+            str_check(array, unicode, 'Unicode string')
 
 
     def test_draw_strArray(self):
