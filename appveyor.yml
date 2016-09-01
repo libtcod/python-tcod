@@ -18,7 +18,7 @@ build: off
 test: off
 deploy_script:
 - ps: >-
-    if($APPVEYOR_REPO_TAG){
+    if($env:APPVEYOR_REPO_TAG -eq "true"){
       "echo [pypi] > $Env:USERPROFILE\\.pypirc"
       "echo username: $Env:pypi_user >> $Env:USERPROFILE\\.pypirc"
       "echo password: $Env:pypi_pass >> $Env:USERPROFILE\\.pypirc"
