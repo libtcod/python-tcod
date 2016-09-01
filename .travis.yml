@@ -11,10 +11,6 @@ matrix:
 sudo: required
 dist: trusty
 
-os:
-- linux
-- osx
-
 addons:
   apt:
     packages:
