@@ -15,13 +15,12 @@ install:
 
     %PYTHON%\python.exe -m pip install .
 build: off
-test_script:
-- cmd: '%PYTHON%\\python.exe setup.py test'
+test: off
 deploy_script:
 - ps: >-
     #if($APPVEYOR_REPO_TAG){
       "echo [pypi] > $Env:USERPROFILE\\.pypirc"
       "echo username: $Env:pypi_user >> $Env:USERPROFILE\\.pypirc"
       "echo password: $Env:pypi_pass >> $Env:USERPROFILE\\.pypirc"
-      $Env:PYTHON\\python.exe setup.py bdist_wheel
+      "$Env:PYTHON\\python.exe setup.py bdist_wheel"
     #}
