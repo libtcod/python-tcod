@@ -207,8 +207,8 @@ class DrawingTests(TDLTemplate):
 
         # Unicode string - Python 2
         array = [random.getrandbits(7) for _ in range(width * height)]
-        unicode = unicode().join((chr(c) for c in array))
-        str_check(array, unicode, 'Unicode string')
+        ucode = unicode().join((chr(c) for c in array))
+        str_check(array, ucode, 'Unicode string')
 
 
     def test_draw_strArray(self):
