@@ -1,0 +1,11 @@
+language: python
+python:
+  - "2.7"
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+install:
+# make sure cffi is up-to-date
+ - pip install -U cffi
+ - pip install .
