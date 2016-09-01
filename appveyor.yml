@@ -1,0 +1,27 @@
+environment:
+  fast_finish: true
+  pypi_user:
+    secure: JqPPu1iW5YANTHA3ie2o9A==
+  pypi_pass:
+    secure: o55+E9ICiWljWnSSajeGUw==
+  matrix:
+  - PYTHON: C:\Python27
+  - PYTHON: C:\Python33
+  - PYTHON: C:\Python34
+  - PYTHON: C:\Python35
+install:
+- cmd: >-
+    %PYTHON%\python.exe -m pip install cffi wheel
+
+    %PYTHON%\python.exe -m pip install .
+build: off
+test_script:
+- cmd: '%PYTHON%\\python.exe setup.py test'
+deploy_script:
+- ps: >-
+    #if($APPVEYOR_REPO_TAG){
+      "echo [pypi] > $Env:USERPROFILE\\.pypirc"
+      "echo username: $Env:pypi_user >> $Env:USERPROFILE\\.pypirc"
+      "echo password: $Env:pypi_pass >> $Env:USERPROFILE\\.pypirc"
+      $Env:PYTHON\\python.exe setup.py bdist_wheel
+    #}
