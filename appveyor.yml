@@ -30,4 +30,4 @@ deploy_script:
 
     echo password=%pypi_pass% >> "%USERPROFILE%\\.pypirc"
 
-    %PYTHON%\\python.exe setup.py bdist_wheel upload
+    if "%APPVEYOR_REPO_TAG%"=="true" (%PYTHON%\\python.exe setup.py bdist_wheel upload)
