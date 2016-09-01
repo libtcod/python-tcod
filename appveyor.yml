@@ -18,10 +18,10 @@ build: off
 test: off
 deploy_script:
 - cmd: >-
-    "echo [pypi] > %USERPROFILE%\.pypirc"
+    "echo [pypi] > %USERPROFILE%\\.pypirc"
 
-    "echo username: %pypi_user% >> %USERPROFILE%\.pypirc"
+    "echo username: %pypi_user% >> %USERPROFILE%\\.pypirc"
 
-    "echo password: %pypi_pass% >> %USERPROFILE%\.pypirc"
+    "echo password: %pypi_pass% >> %USERPROFILE%\\.pypirc"
 
-    %PYTHON%\python.exe setup.py bdist_wheel upload
+    %PYTHON%\\python.exe setup.py bdist_wheel upload
