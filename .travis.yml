@@ -9,3 +9,12 @@ install:
 # make sure cffi is up-to-date
  - pip install -U cffi
  - pip install .
+addons:
+  apt:
+    packages:
+        libsdl1.2
+        libsdl1.2-dev
+        libpng
+        zlib
+        libffi-dev
+        python-dev
