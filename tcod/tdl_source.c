@@ -5,23 +5,10 @@
 #include "libtcod.h"
 #include "wrappers.h"
 
-//void * TCOD_list_get(TCOD_list_t l,int idx) {
-//	return LIST(l)->array[idx];
 
-union TCODListItem {
-    void *v;
-    bool b;
-    char ch;
-    int i;
-    float *f;
-    char *ch_p;
-    TCOD_color_t *color;
-    TCOD_dice_t *dice;
-};
-
-static union TCODListItem TDL_list_get_union(TCOD_list_t l,int idx){
-    union TCODListItem item;
-    item.v = TCOD_list_get(l, idx);
+static TCOD_value_t TDL_list_get_union(TCOD_list_t l,int idx){
+    TCOD_value_t item;
+    item.custom = TCOD_list_get(l, idx);
     return item;
 }
 
@@ -30,7 +17,7 @@ static bool TDL_list_get_bool(TCOD_list_t l,int idx){
 }
 
 static char TDL_list_get_char(TCOD_list_t l,int idx){
-    return TDL_list_get_union(l, idx).ch;
+    return TDL_list_get_union(l, idx).c;
 }
 
 static int TDL_list_get_int(TCOD_list_t l,int idx){
@@ -38,19 +25,19 @@ static int TDL_list_get_int(TCOD_list_t l,int idx){
 }
 
 static float TDL_list_get_float(TCOD_list_t l,int idx){
-    return *TDL_list_get_union(l, idx).f;
+    return TDL_list_get_union(l, idx).f;
 }
 
 static char* TDL_list_get_string(TCOD_list_t l,int idx){
-    return TDL_list_get_union(l, idx).ch_p;
+    return TDL_list_get_union(l, idx).s;
 }
 
 static TCOD_color_t TDL_list_get_color(TCOD_list_t l,int idx){
-    return *TDL_list_get_union(l, idx).color;
+    return TDL_list_get_union(l, idx).col;
 }
 
 static TCOD_dice_t TDL_list_get_dice(TCOD_list_t l,int idx){
-    return *TDL_list_get_union(l, idx).dice;
+    return TDL_list_get_union(l, idx).dice;
 }
 
 

@@ -1549,10 +1549,10 @@ int TCOD_sys_get_current_resolution_y();
 // ---------------------------------------------------------------------------
 // TDL FUNCTONS
 
-bool TDL_list_get_bool(TCOD_list_t l,int idx);
-char TDL_list_get_char(TCOD_list_t l,int idx);
-int TDL_list_get_int(TCOD_list_t l,int idx);
-float TDL_list_get_float(TCOD_list_t l,int idx);
+static bool TDL_list_get_bool(TCOD_list_t l,int idx);
+static char TDL_list_get_char(TCOD_list_t l,int idx);
+static int TDL_list_get_int(TCOD_list_t l,int idx);
+static float TDL_list_get_float(TCOD_list_t l,int idx);
 static char* TDL_list_get_string(TCOD_list_t l,int idx);
 static TCOD_color_t TDL_list_get_color(TCOD_list_t l,int idx);
 static TCOD_dice_t TDL_list_get_dice(TCOD_list_t l,int idx);
