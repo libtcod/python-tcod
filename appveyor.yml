@@ -6,19 +6,17 @@ environment:
     secure: o55+E9ICiWljWnSSajeGUw==
   matrix:
   - PYTHON: C:\Python27\python.exe
-  - PYTHON: C:\Python33\python.exe
-  - PYTHON: C:\Python34\python.exe
+  - PYPY: pypy2-v5.4.0-win32
   - PYTHON: C:\Python35\python.exe
 
-  - PYPY: pypy2-v5.4.0-win32
+  - PYTHON: C:\Python34\python.exe
+  - PYTHON: C:\Python33\python.exe
+
   - PYPY: pypy2-v5.3.1-win32
   - PYPY: pypy-5.1.1-win32
   - PYPY: pypy-5.0.1-win32
   - PYPY: pypy-4.0.1-win32
   - PYPY: pypy-2.6.1-win32
-  - PYPY: pypy-2.5.1-win32
-  - PYPY: pypy-2.4.0-win32
-  - PYPY: pypy3-2.4.0-win32
 
 install:
 - ps: |
