@@ -16,7 +16,7 @@ install:
 - ps: |
     if ($env:PYPY_DOWNLOAD){
         Invoke-WebRequest $env:PYPY_DOWNLOAD -OutFile C:\pypy.zip
-        & '7z' x C:\pypy.zip -o C:\
+        & '7z' x C:\pypy.zip -oC:\
         $env:PATH += ';' + $env:PYPY_PATH
     }
 - ps: "& $env:PYTHON -m pip install cffi wheel twine"
