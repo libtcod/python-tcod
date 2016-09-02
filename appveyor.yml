@@ -25,7 +25,7 @@ install:
 build: off
 test: off
 deploy_script:
-- ps: "& $env:PYTHON -W ignore::RuntimeWarning setup.py bdist_wheel"
+- cmd: "%PYTHON% setup.py bdist_wheel"
 - if "%APPVEYOR_REPO_TAG%"=="true" ( %PYTHON% -m twine -u %pypi_user% -p %pypi_pass% --skip-existing dist/* )
 artifacts:
 - path: dist/*
