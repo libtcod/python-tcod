@@ -19,7 +19,8 @@ install:
         & '7z' x C:\pypy.zip -oC:\
         $env:PATH += ';' + $env:PYPY_PATH
         & $env:PYTHON -m ensurepip
-        & $env:PYTHON -m pip install -U pip 2>&1
+        $ErrorActionPreference = "SilentlyContinue"
+        & $env:PYTHON -m pip install -U pip
     }
 - ps: "& $env:PYTHON -m pip install cffi wheel twine"
 - ps: "& $env:PYTHON -m pip install ."
