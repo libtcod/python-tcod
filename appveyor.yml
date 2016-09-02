@@ -18,13 +18,17 @@ environment:
     PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.3.1-win32.zip
     PYPY_PATH: C:\pypy2-v5.3.1-win32\
 
-  - PYTHON: C:\pypy2-v5.1.1-win32\pypy.exe
-    PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy-5.1.1-win32.zip
-    PYPY_PATH: C:\pypy2-v5.1.1-win32\
+  - PYTHON: C:\pypy2-v5.3.0-win32\pypy.exe
+    PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.3.0-win32.zip
+    PYPY_PATH: C:\pypy2-v5.3.0-win32\
 
-  - PYTHON: C:\pypy2-v5.0.1-win32\pypy.exe
+  - PYTHON: C:\pypy-v5.1.1-win32\pypy.exe
+    PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy-5.1.1-win32.zip
+    PYPY_PATH: C:\pypy-v5.1.1-win32\
+
+  - PYTHON: C:\pypy-v5.0.1-win32\pypy.exe
     PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy-5.0.1-win32.zip
-    PYPY_PATH: C:\pypy2-v5.0.1-win32\
+    PYPY_PATH: C:\pypy-v5.0.1-win32\
 
 install:
 - ps: |
