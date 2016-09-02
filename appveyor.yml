@@ -13,18 +13,18 @@ environment:
     PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.4.0-win32.zip
     PYPY_PATH: C:\pypy2-v5.4.0-win32\
 install:
-- ps: >-
+- ps: |
     if ($env:PYPY_DOWNLOAD){
         Invoke-WebRequest $env:PYPY_DOWNLOAD -OutFile C:\pypy.zip
         & '7z' x C:\pypy.zip -o C:\
         $env:PATH += ';' + $env:PYPY_PATH
     }
-- %PYTHON% -m pip install cffi wheel twine
-- %PYTHON% -m pip install .
+- ps: $env:%PYTHON -m pip install cffi wheel twine
+- ps: $env:%PYTHON -m pip install .
 build: off
 test: off
 deploy_script:
-- %PYTHON% setup.py bdist_wheel
+- ps: $env:%PYTHON setup.py bdist_wheel
 - if "%APPVEYOR_REPO_TAG%"=="true" ( %PYTHON% -m twine -u %pypi_user% -p %pypi_pass% --skip-existing dist/* )
 artifacts:
 - path: dist/*
