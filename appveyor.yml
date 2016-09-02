@@ -10,48 +10,24 @@ environment:
   - PYTHON: C:\Python34\python.exe
   - PYTHON: C:\Python35\python.exe
 
-  - PYTHON: C:\pypy2-v5.4.0-win32\pypy.exe
-    PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.4.0-win32.zip
-    PYPY_PATH: C:\pypy2-v5.4.0-win32\
-
-  - PYTHON: C:\pypy2-v5.3.1-win32\pypy.exe
-    PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.3.1-win32.zip
-    PYPY_PATH: C:\pypy2-v5.3.1-win32\
-
-  - PYTHON: C:\pypy-5.1.1-win32\pypy.exe
-    PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy-5.1.1-win32.zip
-    PYPY_PATH: C:\pypy-5.1.1-win32\
-
-  - PYTHON: C:\pypy-5.0.1-win32\pypy.exe
-    PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy-5.0.1-win32.zip
-    PYPY_PATH: C:\pypy-5.0.1-win32\
-
-  - PYTHON: C:\pypy-4.0.1-win32\pypy.exe
-    PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy-4.0.1-win32.zip
-    PYPY_PATH: C:\pypy-4.0.1-win32\
-
-  - PYTHON: C:\pypy-2.6.1-win32\pypy.exe
-    PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy-2.6.1-win32.zip
-    PYPY_PATH: C:\pypy-2.6.1-win32\
-
-  - PYTHON: C:\pypy-2.5.1-win32\pypy.exe
-    PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy-2.5.1-win32.zip
-    PYPY_PATH: C:\pypy-2.5.1-win32\
-
-  - PYTHON: C:\pypy-2.4.0-win32\pypy.exe
-    PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy-2.4.0-win32.zip
-    PYPY_PATH: C:\pypy-2.4.0-win32\
-
-  - PYTHON: C:\pypy3-2.4.0-win32\pypy.exe
-    PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy3-2.4.0-win32.zip
-    PYPY_PATH: C:\pypy3-2.4.0-win32\
+  - PYPY: pypy2-v5.4.0-win32
+  - PYPY: pypy2-v5.3.1-win32
+  - PYPY: pypy-5.1.1-win32
+  - PYPY: pypy-5.0.1-win32
+  - PYPY: pypy-4.0.1-win32
+  - PYPY: pypy-2.6.1-win32
+  - PYPY: pypy-2.5.1-win32
+  - PYPY: pypy-2.4.0-win32
+  - PYPY: pypy3-2.4.0-win32
 
 install:
 - ps: |
-    if ($env:PYPY_DOWNLOAD){
-        Invoke-WebRequest $env:PYPY_DOWNLOAD -OutFile C:\pypy.zip
+    if ($env:PYPY){
+        $env:PYTHON = 'C:\' + $env:PYPY + '\pypy.exe'
+        $env:PATH += ';' + 'C:\' + $env:PYPY + '\'
+        $PYPY_DOWNLOAD = 'https://bitbucket.org/pypy/pypy/downloads/' + $env:PYPY + '.zip'
+        Invoke-WebRequest $PYPY_DOWNLOAD -OutFile C:\pypy.zip
         & '7z' x C:\pypy.zip -oC:\
-        $env:PATH += ';' + $env:PYPY_PATH
         & $env:PYTHON -m ensurepip
         & $env:PYTHON -m pip install --disable-pip-version-check -U pip
         # manually install a version of wheel with pypy fixes
