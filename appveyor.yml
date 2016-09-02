@@ -20,6 +20,9 @@ install:
         $env:PATH += ';' + $env:PYPY_PATH
         & $env:PYTHON -m ensurepip
         & $env:PYTHON -m pip install --disable-pip-version-check -U pip
+        # manually install a version of wheel with pypy fixes
+        Invoke-WebRequest https://bitbucket.org/pypa/wheel/get/f4d5d07efa60.zip -OutFile C:\wheel_dev.zip
+        & $env:PYTHON -m pip install C:\wheel_dev.zip
     }
 - ps: "& $env:PYTHON -m pip install cffi wheel twine"
 - ps: "& $env:PYTHON -m pip install ."
