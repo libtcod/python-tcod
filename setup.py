@@ -38,8 +38,7 @@ setup(
     setup_requires=["cffi>=1.1.0"],
     cffi_modules=["build_libtcod.py:ffi"],
     install_requires=["cffi>=1.1.0",
-                      "setuptools>=17.1.0",
-                      "distribute>=0.7.3"], # seems to be needed for Python 2.7
+                      "setuptools>=17.1.0"],
     classifiers=['Development Status :: 5 - Production/Stable',
                'Environment :: Win32 (MS Windows)',
                'Environment :: MacOS X',
