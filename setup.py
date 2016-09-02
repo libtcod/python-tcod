@@ -10,14 +10,16 @@ def _get_lib_path_crossplatform():
     '''Locate the right DLL path for this OS'''
     bits, linkage = platform.architecture()
     if 'win32' in sys.platform:
-        return 'lib/win32/*.dll'
+        return ['lib/win32/SDL.dll',
+                'lib/win32/zlib1.dll',
+                'lib/win32/libtcod-VS.dll']
     elif 'linux' in sys.platform:
         if bits == '32bit':
-            return 'lib/linux32/*.so'
+            return ['lib/linux32/*.so']
         elif bits == '64bit':
-            return 'lib/linux64/*.so'
+            return ['lib/linux64/*.so']
     elif 'darwin' in sys.platform:
-        return 'lib/darwin/*.dylib'
+        return ['lib/darwin/*.dylib']
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
 
 
@@ -32,9 +34,9 @@ setup(
     url='https://github.com/HexDecimal/libtcod-cffi',
     download_url='https://pypi.python.org/pypi/libtcod-cffi',
     packages=['tcod'],
-    package_data={'tcod': ['*.txt', '*.rst', 'lib/*.txt',
-    # only add the libraries for the current build platform
-                           _get_lib_path_crossplatform()]},
+    package_data={'tcod':
+    # only add the libraries needed for the current build platform
+        ['*.txt', '*.rst', 'lib/*.txt'] + _get_lib_path_crossplatform()},
     setup_requires=["cffi>=1.1.0"],
     cffi_modules=["build_libtcod.py:ffi"],
     install_requires=["cffi>=1.1.0",
