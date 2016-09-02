@@ -18,8 +18,8 @@ install:
         Invoke-WebRequest $env:PYPY_DOWNLOAD -OutFile C:\pypy.zip
         & '7z' x C:\pypy.zip -oC:\
         $env:PATH += ';' + $env:PYPY_PATH
+        & $env:PYTHON -m ensurepip -U
     }
-- ps: "& $env:PYTHON -m ensurepip"
 - ps: "& $env:PYTHON -m pip install cffi wheel twine"
 - ps: "& $env:PYTHON -m pip install ."
 build: off
