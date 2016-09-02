@@ -6,11 +6,11 @@ python:
  - "3.4"
  - "3.5"
  - "pypy"
+ - "pypy3"
 matrix:
   fast_finish: true
   allow_failures:
     - os: osx
-    - python: pypy
   include:
   - os: osx
     python: "2.7"
