@@ -9,9 +9,23 @@ environment:
   - PYTHON: C:\Python33\python.exe
   - PYTHON: C:\Python34\python.exe
   - PYTHON: C:\Python35\python.exe
+
   - PYTHON: C:\pypy2-v5.4.0-win32\pypy.exe
     PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.4.0-win32.zip
     PYPY_PATH: C:\pypy2-v5.4.0-win32\
+
+  - PYTHON: C:\pypy2-v5.3.1-win32\pypy.exe
+    PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.3.1-win32.zip
+    PYPY_PATH: C:\pypy2-v5.3.1-win32\
+
+  - PYTHON: C:\pypy2-v5.1.1-win32\pypy.exe
+    PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy-5.1.1-win32.zip
+    PYPY_PATH: C:\pypy2-v5.1.1-win32\
+
+  - PYTHON: C:\pypy2-v5.0.1-win32\pypy.exe
+    PYPY_DOWNLOAD: https://bitbucket.org/pypy/pypy/downloads/pypy-5.0.1-win32.zip
+    PYPY_PATH: C:\pypy2-v5.0.1-win32\
+
 install:
 - ps: |
     if ($env:PYPY_DOWNLOAD){
