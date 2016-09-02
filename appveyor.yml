@@ -25,10 +25,10 @@ install:
     }
 - ps: "& $env:PYTHON -m pip install cffi wheel twine"
 - ps: "& $env:PYTHON -m pip install ."
-build: off
+build:
+- cmd: "%PYTHON% setup.py bdist_wheel"
 test: off
 deploy_script:
-- cmd: "%PYTHON% setup.py bdist_wheel"
 - if "%APPVEYOR_REPO_TAG%"=="true" ( %PYTHON% -m twine -u %pypi_user% -p %pypi_pass% --skip-existing dist/* )
 artifacts:
 - path: dist/*
