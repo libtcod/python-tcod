@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import os
 
 import platform
 import subprocess
@@ -22,7 +23,9 @@ def update_and_get_version():
         with open('tcod/version.txt', 'wb') as f:
             f.write(version)
     except subprocess.CalledProcessError:
-        pass # when run from an sdist the version is already up-to-date
+        # when run from an sdist version.txt is already up-to-date
+        if not os.path.exists('tcod/version.txt'):
+            raise
     with open('tcod/version.txt', 'r') as f:
         return f.read()
 
