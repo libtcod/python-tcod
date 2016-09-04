@@ -45,19 +45,7 @@ _lib_ctypes = _ctypes.CDLL(
         _os.path.join(__path__[0],
             _get_lib_path_crossplatform(), _get_lib_name())))
 
-# import the right .pyd file for this Python implementation
-try:
-    import _libtcod # PyPy
-except ImportError:
-    # get implementation specific version of _libtcod.pyd
-    import importlib as _importlib
-    _module_name = '._libtcod'
-    if _platform.python_implementation() == 'CPython':
-        _module_name += '_cp%i%i' % _sys.version_info[:2]
-        if _platform.architecture()[0] == '64bit':
-            _module_name += '_x64'
-
-    _libtcod = _importlib.import_module(_module_name, 'tcod')
+import _libtcod
 
 _ffi = ffi = _libtcod.ffi
 _lib = lib = _libtcod.lib
