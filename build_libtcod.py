@@ -35,12 +35,8 @@ def _get_libraries_crossplatform():
         return ['tcod']
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
 
-include_dirs = ['/usr/include/SDL', 'Release/tcod/', 'tcod/include/libtcod-1.5']
+include_dirs = ['Release/tcod/', 'tcod/include/']
 extra_compile_args = []
-
-# included SDL headers are for whatever OS's don't easily come with them
-if sys.platform  in ['win32', 'win64', 'darwin']:
-    include_dirs += ['tcod/include/SDL-1.2']
 
 ffi = FFI()
 ffi.cdef(open('tcod/libtcod_cdef.h', 'r').read())
