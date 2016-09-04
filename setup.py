@@ -19,7 +19,9 @@ def update_and_get_version():
         version = version[:-1] # remove newline
         version = version.replace(b'v', b'') # remove the v from old tags
         tag, commit, obj = version.split(b'-')
-        version = b'.'.join((tag, commit))
+        # using anything other than the tag with the current setup is not
+        # useful at this moment
+        version  = tag
         with open('tcod/version.txt', 'wb') as f:
             f.write(version)
     except subprocess.CalledProcessError:
