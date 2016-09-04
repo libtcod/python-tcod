@@ -13,13 +13,7 @@ matrix:
   - os: osx
     language: generic
 
-sudo: required
-dist: trusty
-
-addons:
-  apt:
-    packages:
-      - libsdl1.2-dev
+sudo: false
 
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
