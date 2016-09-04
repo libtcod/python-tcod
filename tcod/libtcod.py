@@ -45,7 +45,7 @@ _lib_ctypes = _ctypes.CDLL(
         _os.path.join(__path__[0],
             _get_lib_path_crossplatform(), _get_lib_name())))
 
-import _libtcod
+from . import _libtcod
 
 _ffi = ffi = _libtcod.ffi
 _lib = lib = _libtcod.lib
