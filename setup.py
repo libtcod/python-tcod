@@ -3,8 +3,28 @@
 import sys
 
 import platform
+import subprocess
+
 from setuptools import setup
 
+def update_and_get_version():
+    '''Update tcod/version.txt to the version number provided by git, then
+    return the result, regardless if the update was successful.
+
+    tcod/version.txt is placed in sdist, but is not in the master branch
+    '''
+    try:
+        version = subprocess.check_output(['git', 'describe'])
+        version = version[:-1] # remove newline
+        version = version.replace(b'v', b'') # remove the v from old tags
+        tag, commit, obj = version.split(b'-')
+        version = b'.'.join((tag, commit))
+        with open('tcod/version.txt', 'wb') as f:
+            f.write(version)
+    except subprocess.CalledProcessError:
+        pass # when run from an sdist the version is already up-to-date
+    with open('tcod/version.txt', 'r') as f:
+        return f.read()
 
 def _get_lib_path_crossplatform():
     '''Locate the right DLL path for this OS'''
@@ -25,7 +45,7 @@ def _get_lib_path_crossplatform():
 
 setup(
     name='libtcod-cffi',
-    version=open('tcod/version.txt', 'r').read(),
+    version=update_and_get_version(),
     author='Kyle Stewart',
     author_email='4B796C65+pythonTDL@gmail.com',
     description='A Python cffi port of libtcod.',

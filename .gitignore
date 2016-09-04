@@ -59,3 +59,4 @@ target/
 tcod-*/
 Release/
 tcod/_*.c
+tcod/version.txt
