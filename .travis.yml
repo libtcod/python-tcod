@@ -28,14 +28,14 @@ addons:
       - libsdl1.2-dev
 
 git:
-  depth: 100
+  # builds will fail if a release tag doesn't exist at this depth
+  depth: 200
 
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv venv -p $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
 install:
- - git describe
  - pip install cffi
  - pip install .
 script:
