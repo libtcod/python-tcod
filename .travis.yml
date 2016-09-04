@@ -54,7 +54,10 @@ install:
 script:
  - python setup.py test
 
+before_deploy:
+- pip install wheel twine
 deploy:
+  skip_cleanup: true
   provider: pypi
   user:
     secure: "nkClTjb3yReSLmEb6ZlgIrpVFzMFxcV8kwK/mfuivYLHTuoXPFRC0rIL/gGzeV34/wiKiTSlYQ3YqcWPy38TA0ZV4RyLfkdtqkQXk848stafOwoGnUqxOxetqphjLBBi9DLE+3C5/lDazC6fBx0vg4MYwsivdeou22qrvyfwDzE7ZrVshXZLadgSNF7xwSg0CAoC2jrTNyUpZltygEWx/Bh3Q7RUAEw7X4qmkFprVzF/FKbQd/+D3/k9hc05WmggIQa8oIkGC5i76NextuIpwX693qJ3dYwqBj0SaCbKYJlrTu+kBSoIFQ6+yi7G5AW7hg6chzIL7ZYn161b0UlYkvmozh5Y8pbxe/wm4tt3rWmdO6gQr12WL5Om7KNSsjqK2Febs9ci+XADk1DbtQOsQd+9Tr8osLFQZno/s2NcpYk2p3Hu+YIm1lGFxBfd0viwzs26Nw3KVHH93zvujktvEW4UsgOMV4kKInH8JCL8Js6vQE+/bjvYIWfL9utiGoEsOGSo8zM6Nkq2vBW+ub1TAMtYua5On6OIY80fzPF2w6KVOymY2gtg2dqXWNvSbPCSfRV6NUgxQYVtREF/NHhpkl2sBIZqHPTT7a5P4qQISjZZ1ZjyGNBJ3xTznC825EEdeTv+6XDpcopqxVF77znAdj0hzSCxLv24YRvoSfqo7PU="

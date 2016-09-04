@@ -37,7 +37,7 @@ build_script:
 - cmd: "%PYTHON% setup.py bdist_wheel"
 test: off
 deploy_script:
-- "%PYTHON% -m twine -u %pypi_user% -p %pypi_pass% --skip-existing dist/*"
+- "%PYTHON% -m twine upload -u %pypi_user% -p %pypi_pass% --skip-existing dist/*"
 artifacts:
 - path: dist/*
   name: wheel
