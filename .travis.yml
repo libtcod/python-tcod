@@ -27,6 +27,9 @@ addons:
     packages:
       - libsdl1.2-dev
 
+git:
+  depth: 100
+
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv venv -p $PYTHON; fi
