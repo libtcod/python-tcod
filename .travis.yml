@@ -18,6 +18,12 @@ matrix:
     language: generic
     python: python3
     env: PYTHON=python3
+    language: generic
+    python: pypy
+    env: PYTHON=pypy
+    language: generic
+    python: pypy3
+    env: PYTHON=pypy3
 
 sudo: required
 dist: trusty
