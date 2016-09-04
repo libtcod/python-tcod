@@ -29,11 +29,16 @@ def _get_lib_name():
         return 'libtcod.so'
     elif 'darwin' in _sys.platform:
         return 'libtcod.dylib'
-    
-    
+
 # add Windows dll's to PATH
-_os.environ['PATH'] += ';' + _os.path.join(__path__[0],
-                                           _get_lib_path_crossplatform())
+if 'win' in _sys.platform:
+    _os.environ['PATH'] += ';' + _os.path.join(__path__[0],
+                                               _get_lib_path_crossplatform())
+
+# add Mac dylib's to DYLD_LIBRARY_PATH
+if 'darwin' in _sys.platform:
+    _os.environ['DYLD_LIBRARY_PATH'] += ':' + _os.path.join(__path__[0],
+                                                _get_lib_path_crossplatform())
 
 _lib_ctypes = _ctypes.CDLL(
     _os.path.realpath(
@@ -73,12 +78,12 @@ if _sys.version_info[0] == 2: # Python 2
         if isinstance(string, unicode):
             return string.encode()
         return string
-    
+
     def _unicode(string):
         if not isinstance(string, unicode):
             return string.decode()
         return string
-        
+
 else: # Python 3
     def _str(string):
         if isinstance(string, str):
