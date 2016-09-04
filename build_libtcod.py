@@ -11,14 +11,14 @@ module_name = 'tcod._libtcod'
 def _get_library_dirs_crossplatform():
     bits, linkage = platform.architecture()
     if 'win32' in sys.platform:
-        return 'tcod/lib/win32'
+        return 'tcod/lib/win32/'
     elif 'linux' in sys.platform:
         if bits == '32bit':
-            return 'tcod/lib/linux32'
+            return 'tcod/lib/linux32/'
         elif bits == '64bit':
-            return 'tcod/lib/linux64'
+            return 'tcod/lib/linux64/'
     elif 'darwin' in sys.platform:
-        return 'tcod/lib/darwin'
+        return 'tcod/lib/darwin/'
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
 
 def _get_libraries_crossplatform():
