@@ -38,6 +38,10 @@ def _get_libraries_crossplatform():
 include_dirs = ['Release/tcod/', 'tcod/include/']
 extra_compile_args = []
 
+# included SDL headers are for whatever OS's don't easily come with them
+if sys.platform  in ['win32', 'win64', 'darwin']:
+    include_dirs += ['tcod/includeSDL/']
+
 ffi = FFI()
 ffi.cdef(open('tcod/libtcod_cdef.h', 'r').read())
 ffi.set_source(
