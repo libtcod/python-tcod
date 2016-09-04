@@ -13,9 +13,11 @@ matrix:
   - os: osx
     language: generic
     python: python
+    PYTHON=python
   - os: osx
     language: generic
     python: python3
+    PYTHON=python3
 
 sudo: required
 dist: trusty
