@@ -11,14 +11,14 @@ def _get_lib_path_crossplatform():
     '''Locate the right DLL path for this OS'''
     bits, linkage = _platform.architecture()
     if 'win32' in _sys.platform:
-        return 'lib/win32'
+        return 'lib/win32/'
     elif 'linux' in _sys.platform:
         if bits == '32bit':
-            return 'lib/linux32'
+            return 'lib/linux32/'
         elif bits == '64bit':
-            return 'lib/linux64'
+            return 'lib/linux64/'
     elif 'darwin' in _sys.platform:
-        return 'lib/darwin'
+        return 'lib/darwin/'
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (_sys.platform, bits, linkage))
 
 def _get_lib_name():
