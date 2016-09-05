@@ -62,9 +62,9 @@ setup(
     package_data={'tcod':
     # only add the libraries needed for the current build platform
         ['*.txt', '*.rst', 'lib/*.txt'] + _get_lib_path_crossplatform()},
-    setup_requires=["cffi>=1.1.0"],
+    setup_requires=["cffi>=1.1.0,<2"],
     cffi_modules=["build_libtcod.py:ffi"],
-    install_requires=["cffi>=1.1.0",
+    install_requires=["cffi>=1.1.0,<2",
                       "setuptools>=17.1.0"],
     classifiers=['Development Status :: 5 - Production/Stable',
                'Environment :: Win32 (MS Windows)',
