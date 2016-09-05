@@ -40,7 +40,7 @@ setup(
     download_url='https://pypi.python.org/pypi/tdl',
     packages=['tdl'],
     package_data={'tdl': ['*.txt', '*.rst', '*.bmp', '*.png']},
-    install_requires=["libtcod-cffi>=0.2.8"],
+    install_requires=["libtcod-cffi>=0.2.8,<2"],
     cmdclass={'build_docs': build_docs},
     classifiers=['Development Status :: 5 - Production/Stable',
                'Environment :: Win32 (MS Windows)',
@@ -68,5 +68,6 @@ setup(
     keywords = 'rogue-like rogue-likes text cffi ASCII ANSI Unicode libtcod fov',
     platforms = ['Windows', 'Mac OS X', 'Linux'],
     license = 'Simplified BSD License',
-    test_suite="testing",
+    tests_require = ['nose2', 'cov-core'],
+    test_suite='nose2.collector.collector',
     )

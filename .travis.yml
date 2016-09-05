@@ -21,8 +21,10 @@ addons:
 install:
  - pip install cffi
  - pip install .
+before_script:
+ - pip install nose2 cov-core
 script:
- - python setup.py test
+ - python -m nose2 -v
 
 deploy:
   provider: pypi
