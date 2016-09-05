@@ -35,16 +35,6 @@ if 'win' in _sys.platform:
     _os.environ['PATH'] += ';' + _os.path.join(__path__[0],
                                                _get_lib_path_crossplatform())
 
-# add Mac dylib's to DYLD_LIBRARY_PATH
-if 'darwin' in _sys.platform:
-    _os.environ['DYLD_LIBRARY_PATH'] = _os.path.join(__path__[0],
-                                                _get_lib_path_crossplatform())
-
-_lib_ctypes = _ctypes.CDLL(
-    _os.path.realpath(
-        _os.path.join(__path__[0],
-            _get_lib_path_crossplatform(), _get_lib_name())))
-
 from . import _libtcod
 
 _ffi = ffi = _libtcod.ffi
