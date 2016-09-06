@@ -1,9 +1,9 @@
 environment:
   fast_finish: true
   pypi_user:
-    secure: JqPPu1iW5YANTHA3ie2o9A==
+    secure: 6EhNSnUl0yOO26EeQ5WG1pQx8v/vp99/u24NRpZvF0k=
   pypi_pass:
-    secure: o55+E9ICiWljWnSSajeGUw==
+    secure: YhPdxLme3DzBgwQBteEZ6u0GxLHmDkBmBMMka78rNIw=
   matrix:
   - PYTHON: C:\Python27\python.exe
   - PYPY: pypy2-v5.4.0-win32
