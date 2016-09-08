@@ -125,9 +125,15 @@ class ColorOnlyTest(TestApp):
 
 class GetCharTest(TestApp):
 
+    def init(self):
+        for (x,y) in self.cells:
+            bgcolor = (random.getrandbits(6), random.getrandbits(6), random.getrandbits(6))
+            ch = random.getrandbits(8)
+            self.console.get_char(x, y, ch, bgcolor=bgcolor)
+
     def updateTest(self, deltaTime):
         for (x,y) in self.cells:
-            self.console.get_char(x, y)
+            self.console.draw_char(x, y, *self.console.get_char(x, y))
 
 class SingleRectTest(TestApp):
 
