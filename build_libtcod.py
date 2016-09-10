@@ -7,7 +7,7 @@ import platform
 
 from cffi import FFI
 
-module_name = 'src._libtcod'
+module_name = 'tcod._libtcod'
 
 def _get_library_dirs_crossplatform():
     bits, linkage = platform.architecture()

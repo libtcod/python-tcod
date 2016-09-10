@@ -60,6 +60,7 @@ setup(
                                 open('CHANGELOG.rst', 'r').read()]),
     url='https://github.com/HexDecimal/libtcod-cffi',
     download_url='https://pypi.python.org/pypi/libtcod-cffi',
+    packages=['tcod'],
     package_dir={'tcod': 'src'},
     package_data={'tcod':
     # only add the libraries needed for the current build platform
