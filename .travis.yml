@@ -52,7 +52,7 @@ install:
  - pip install cffi
  - pip install .
 script:
- - python setup.py test
+ - python -m pytest
 
 before_deploy:
 - pip install wheel twine
