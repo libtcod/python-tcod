@@ -15,6 +15,7 @@
     Bring any issues or requests to GitHub:
     https://github.com/HexDecimal/libtcod-cffi
 """
+import os as _os
 import sys as _sys
 
 from .libtcod import lib, ffi, _lib, _ffi, _unpack_char_p
@@ -445,7 +446,7 @@ class _ModuleProxy():
 line = _ModuleProxy(line)
 line.__call__ = line.line
 
-with open('version.txt', 'r') as _f:
+with open(_os.path.join(__path__, 'version.txt'), 'r') as _f:
     # exclude the git commit number (PEP 396)
     __version__ = _f.read().rsplit('.', 1)[0]
 
