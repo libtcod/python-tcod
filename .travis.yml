@@ -30,6 +30,8 @@ matrix:
     python: pypy
   - os: osx
     python: pypy3
+  - os: linux
+    python: pypy3
 
 sudo: required
 dist: trusty
