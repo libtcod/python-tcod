@@ -39,9 +39,8 @@ extra_compile_args = []
 if sys.platform  in ['win32', 'win64', 'darwin']:
     include_dirs += ['src/includeSDL/']
 
-if 'linux' in sys.platform or 'darwin' in sys.platform:
-    extra_compile_args += ['-Wl,-rpath=%s' %
-        os.path.join('$ORIGIN', _get_library_dirs_crossplatform())]
+if 'darwin' in sys.platform:
+    extra_compile_args += ['-Wl,-rpath=lib/darwin/']
 
 ffi = FFI()
 ffi.cdef(open('src/libtcod_cdef.h', 'r').read())
