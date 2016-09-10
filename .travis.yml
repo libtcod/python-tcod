@@ -9,6 +9,28 @@ python:
  - "pypy3"
 matrix:
   fast_finish: true
+  include:
+  - os: osx
+    language: generic
+    python: python
+    env: PYTHON=python
+  - os: osx
+    language: generic
+    python: python3
+    env: PYTHON=python3
+  - os: osx
+    language: generic
+    python: pypy
+    env: PYTHON=pypy
+  - os: osx
+    language: generic
+    python: pypy3
+    env: PYTHON=pypy3
+  allow_failures:
+  - os: osx
+    python: pypy
+  - os: osx
+    python: pypy3
 
 sudo: required
 dist: trusty
@@ -18,6 +40,10 @@ addons:
     packages:
       - libsdl1.2-dev
 
+before_install:
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install $PYTHON; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv venv -p $PYTHON; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
 install:
  - pip install cffi
  - pip install .
