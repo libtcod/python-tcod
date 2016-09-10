@@ -446,7 +446,7 @@ class _ModuleProxy():
 line = _ModuleProxy(line)
 line.__call__ = line.line
 
-with open(_os.path.join(__path__, 'version.txt'), 'r') as _f:
+with open(_os.path.join(__path__[0], 'version.txt'), 'r') as _f:
     # exclude the git commit number (PEP 396)
     __version__ = _f.read().rsplit('.', 1)[0]
 
