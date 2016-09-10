@@ -58,5 +58,4 @@ target/
 # Custom
 tcod-*/
 Release/
-tcod/_*.c
-tcod/version.txt
+src/version.txt

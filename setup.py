@@ -8,6 +8,8 @@ import subprocess
 
 from setuptools import setup
 
+VERSION_PATH = 'src/version.txt'
+
 def update_and_get_version():
     '''Update tcod/version.txt to the version number provided by git, then
     return the result, regardless if the update was successful.
@@ -22,13 +24,13 @@ def update_and_get_version():
         # using anything other than the tag with the current setup is not
         # useful at this moment
         version  = tag
-        with open('tcod/version.txt', 'wb') as f:
+        with open(VERSION_PATH, 'wb') as f:
             f.write(version)
     except subprocess.CalledProcessError:
         # when run from an sdist version.txt is already up-to-date
-        if not os.path.exists('tcod/version.txt'):
+        if not os.path.exists(VERSION_PATH):
             raise
-    with open('tcod/version.txt', 'r') as f:
+    with open(VERSION_PATH, 'r') as f:
         return f.read()
 
 def _get_lib_path_crossplatform():
@@ -58,7 +60,7 @@ setup(
                                 open('CHANGELOG.rst', 'r').read()]),
     url='https://github.com/HexDecimal/libtcod-cffi',
     download_url='https://pypi.python.org/pypi/libtcod-cffi',
-    packages=['tcod'],
+    package_dir={'tcod': 'src'},
     package_data={'tcod':
     # only add the libraries needed for the current build platform
         ['*.txt', '*.rst', 'lib/*.txt'] + _get_lib_path_crossplatform()},
