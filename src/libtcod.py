@@ -73,3 +73,7 @@ else: # Python 3
             return string.decode()
         return string
 
+_lib_ctypes = _ctypes.CDLL(
+    _os.path.realpath(
+        _os.path.join(__path__[0],
+        _get_lib_path_crossplatform(), _get_lib_name())))
