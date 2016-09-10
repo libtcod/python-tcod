@@ -43,7 +43,11 @@ _lib_ctypes = _ctypes.CDLL(
 
 # add Mac dylib's to DYLD_LIBRARY_PATH
 if 'darwin' in _sys.platform:
-    _os.environ['DYLD_LIBRARY_PATH'] += ':' + _os.path.join(__path__[0],
+    if 'DYLD_LIBRARY_PATH' in _os.environ:
+        _os.environ['DYLD_LIBRARY_PATH'] += ':' + _os.path.join(__path__[0],
+                                                _get_lib_path_crossplatform())
+    else:
+        _os.environ['DYLD_LIBRARY_PATH'] = _os.path.join(__path__[0],
                                                 _get_lib_path_crossplatform())
 
 from . import _libtcod
