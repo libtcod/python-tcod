@@ -51,6 +51,8 @@ before_install:
 install:
  - pip install cffi
  - pip install .
+before_script:
+ - pip install pytest
 script:
  - python -m pytest
 
