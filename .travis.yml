@@ -51,7 +51,7 @@ before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
 install:
  - pip install cffi
- - pip install .
+ - pip install -v .
 before_script:
  - pip install pytest
 script:
