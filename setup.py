@@ -6,7 +6,7 @@ import os
 import platform
 import subprocess
 
-from setuptools import setup
+from setuptools import setup, Command
 
 VERSION_PATH = 'src/version.txt'
 
@@ -49,6 +49,16 @@ def _get_lib_path_crossplatform():
         return ['lib/darwin/*.dylib']
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
 
+class PyTest(Command):
+    user_options = []
+    def initialize_options(self):
+        pass
+    def finalize_options(self):
+        pass
+    def run(self):
+        import sys,subprocess
+        errno = subprocess.call([sys.executable, 'runtests.py'])
+        raise SystemExit(errno)
 
 setup(
     name='libtcod-cffi',
@@ -92,5 +102,6 @@ setup(
                ],
     keywords = 'roguelike roguelikes cffi ASCII ANSI Unicode libtcod noise fov heightmap namegen',
     platforms = ['Windows', 'Mac OS X', 'Linux'],
-    license = 'Simplified BSD License'
+    license = 'Simplified BSD License',
+    cmdclass = {'test': PyTest},
     )
