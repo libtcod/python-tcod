@@ -40,7 +40,7 @@ if sys.platform  in ['win32', 'win64', 'darwin']:
     include_dirs += ['src/includeSDL/']
 
 if 'darwin' in sys.platform:
-    extra_compile_args += ['-Wl,-rpath=lib/darwin/']
+    extra_compile_args += ['-Wl,-rpath=.']
 
 ffi = FFI()
 ffi.cdef(open('src/libtcod_cdef.h', 'r').read())
