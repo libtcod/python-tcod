@@ -41,7 +41,11 @@ dist: trusty
 addons:
   apt:
     packages:
+      - libsdl1.2
       - libsdl1.2-dev
+      - zlib-dev
+      - libffi-dev
+      - python-dev
       - mesa-common-dev
 
 git:
