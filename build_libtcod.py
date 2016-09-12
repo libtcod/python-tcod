@@ -31,6 +31,14 @@ def _get_libraries_crossplatform():
         return ['tcod']
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, BITSIZE, LINKAGE))
 
+
+def walk_sources(directory):
+    for path, dirs, files in os.walk(directory):
+        for source in files:
+            if not source.endswith('.c'):
+                continue
+            yield os.path.join(path, source)
+
 def find_sources(directory):
     return [os.path.join(directory, source)
             for source in os.listdir(directory)
@@ -43,12 +51,11 @@ include_dirs = ['Release/tcod/',
 extra_compile_args = []
 sources = []
 
-sources += [file for file in find_sources('dependencies/libtcod-1.5.1/src')
+sources += [file for file in walk_sources('dependencies/libtcod-1.5.1/src')
             if 'sys_sfml_c' not in file]
-sources += find_sources('dependencies/libtcod-1.5.1/src/png')
 sources += find_sources('dependencies/zlib-1.2.8/')
 
-libraries = ['SDL']
+libraries = []
 library_dirs = _get_library_dirs_crossplatform()
 define_macros = [('LIBTCOD_EXPORTS', None)]
 
@@ -59,6 +66,11 @@ if sys.platform == 'win32':
     libraries += ['User32', 'OpenGL32']
 else:
     libraries += ['GL']
+
+if sys.platform == 'darwin':
+    sources += walk_sources('dependencies/SDL-1.2.15/src/')
+else:
+    libraries += ['SDL']
 
 # included SDL headers are for whatever OS's don't easily come with them
 if sys.platform in ['win32', 'darwin']:
