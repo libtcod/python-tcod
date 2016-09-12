@@ -68,8 +68,9 @@ else:
     libraries += ['GL']
 
 if sys.platform == 'darwin':
-    sources += walk_sources('dependencies/SDL-1.2.15/src/')
-    include_dirs += ['dependencies/SDL-1.2.15/include/SDL']
+    #sources += walk_sources('dependencies/SDL-1.2.15/src/')
+    #include_dirs += ['dependencies/SDL-1.2.15/include/SDL']
+    extra_compile_args += ['-Fsrc/Frameworks', '-framework', 'SDL']
 else:
     libraries += ['SDL']
 
