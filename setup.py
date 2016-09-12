@@ -33,27 +33,27 @@ def update_and_get_version():
     with open(VERSION_PATH, 'r') as f:
         return f.read()
 
-def get_data_files():
+def get_package_data():
     '''get data files which will be included in the main tcod/ directory'''
     BITSIZE, LINKAGE = platform.architecture()
-    files = ['src/version.txt',
-             'src/lib/LIBTCOD-CREDITS.txt',
-             'src/lib/LIBTCOD-LICENSE.txt',
-             'src/lib/README-SDL.txt']
+    files = ['version.txt',
+             'lib/LIBTCOD-CREDITS.txt',
+             'lib/LIBTCOD-LICENSE.txt',
+             'lib/README-SDL.txt']
     if 'win32' in sys.platform:
         if BITSIZE == '32bit':
-            files += ['src/lib/win32/SDL.dll']
+            files += ['lib/win32/SDL.dll']
         else:
-            files += ['src/lib/win64/SDL.dll']
+            files += ['lib/win64/SDL.dll']
     elif 'linux' in sys.platform:
         pass
     elif 'darwin' in sys.platform:
-        files += ['src/lib/darwin/SDL.dylib']
+        files += ['lib/darwin/SDL.dylib']
     else:
         raise ImportError('Operating system "%s" has no supported dynamic '
                           'link libarary. (%s, %s)' %
                           (sys.platform, BITSIZE, LINKAGE))
-    return [('tcod', files)]
+    return {'tcod': files}
 
 class PyTest(Command):
     user_options = []
@@ -78,7 +78,7 @@ setup(
     download_url='https://pypi.python.org/pypi/libtcod-cffi',
     packages=['tcod'],
     package_dir={'tcod': 'src'},
-    data_files=get_data_files(),
+    package_data=get_package_data(),
     setup_requires=["cffi>=1.1.0,<2"],
     cffi_modules=["build_libtcod.py:ffi"],
     install_requires=["cffi>=1.1.0,<2",
