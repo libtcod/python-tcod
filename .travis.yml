@@ -56,9 +56,9 @@ install:
  - pip install cffi
  - pip install -v .
 before_script:
- - pip install pytest
+ - pip install nose2
 script:
- - python -m pytest
+ - python -m nose2
 
 before_deploy:
 - pip install wheel twine
