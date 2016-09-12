@@ -64,13 +64,16 @@ with open('src/tdl_source.c', 'r') as file_source:
 
 if sys.platform == 'win32':
     libraries += ['User32', 'OpenGL32']
-else:
+
+if 'linux' in sys.platform:
     libraries += ['GL']
 
 if sys.platform == 'darwin':
     #sources += walk_sources('dependencies/SDL-1.2.15/src/')
     #include_dirs += ['dependencies/SDL-1.2.15/include/SDL']
-    extra_compile_args += ['-Fsrc/Frameworks', '-framework', 'SDL']
+    extra_compile_args += ['-Fsrc/Frameworks']
+    extra_compile_args += ['-framework', 'SDL']
+    extra_compile_args += ['-framework', 'OpenGL']
 else:
     libraries += ['SDL']
 
