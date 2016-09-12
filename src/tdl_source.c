@@ -2,9 +2,8 @@
 // extra functions provided for the python-tdl library
 
 #include <SDL/SDL.h>
-#include <libtcod-1.5/libtcod.h>
-#include <libtcod-1.5/wrappers.h>
-
+#include <libtcod.h>
+#include <wrappers.h>
 
 static TCOD_value_t TDL_list_get_union(TCOD_list_t l,int idx){
     TCOD_value_t item;

@@ -539,9 +539,9 @@ typedef enum {
 } TCOD_renderer_t;
 
 typedef enum {
-	TCOD_LEFT, 
-	TCOD_RIGHT, 
-	TCOD_CENTER 
+	TCOD_LEFT,
+	TCOD_RIGHT,
+	TCOD_CENTER
 } TCOD_alignment_t;
 
 // ---------------------------------------------------------------------------
@@ -556,9 +556,9 @@ typedef struct {
   bool lbutton ; /* left button status */
   bool rbutton ; /* right button status */
   bool mbutton ; /* middle button status */
-  bool lbutton_pressed ; /* left button pressed event */ 
-  bool rbutton_pressed ; /* right button pressed event */ 
-  bool mbutton_pressed ; /* middle button pressed event */ 
+  bool lbutton_pressed ; /* left button pressed event */
+  bool rbutton_pressed ; /* right button pressed event */
+  bool mbutton_pressed ; /* middle button pressed event */
   bool wheel_up ; /* wheel up event */
   bool wheel_down ; /* wheel down event */
 } TCOD_mouse_t;
@@ -681,9 +681,9 @@ TCOD_color_t TCOD_image_get_pixel(TCOD_image_t image,int x, int y);
 int TCOD_image_get_alpha(TCOD_image_t image,int x, int y);
 TCOD_color_t TCOD_image_get_mipmap_pixel(TCOD_image_t image,float x0,float y0, float x1, float y1);
 void TCOD_image_put_pixel(TCOD_image_t image,int x, int y,TCOD_color_t col);
-void TCOD_image_blit(TCOD_image_t image, TCOD_console_t console, float x, float y, 
+void TCOD_image_blit(TCOD_image_t image, TCOD_console_t console, float x, float y,
 	TCOD_bkgnd_flag_t bkgnd_flag, float scalex, float scaley, float angle);
-void TCOD_image_blit_rect(TCOD_image_t image, TCOD_console_t console, int x, int y, int w, int h, 
+void TCOD_image_blit_rect(TCOD_image_t image, TCOD_console_t console, int x, int y, int w, int h,
 	TCOD_bkgnd_flag_t bkgnd_flag);
 void TCOD_image_blit_2x(TCOD_image_t image, TCOD_console_t dest, int dx, int dy, int sx, int sy, int w, int h);
 void TCOD_image_delete(TCOD_image_t image);
@@ -1064,10 +1064,10 @@ typedef struct {
 	int e;
 	int deltax;
 	int deltay;
-	int origx; 
-	int origy; 
-	int destx; 
-	int desty; 
+	int origx;
+	int origy;
+	int destx;
+	int desty;
 } TCOD_bresenham_data_t;
 
 void TCOD_line_init_mt(int xFrom, int yFrom, int xTo, int yTo, TCOD_bresenham_data_t *data);
@@ -1117,7 +1117,7 @@ bool TCOD_bsp_contains(TCOD_bsp_t *node, int x, int y);
 TCOD_bsp_t * TCOD_bsp_find_node(TCOD_bsp_t *node, int x, int y);
 void TCOD_bsp_resize(TCOD_bsp_t *node, int x,int y, int w, int h);
 void TCOD_bsp_split_once(TCOD_bsp_t *node, bool horizontal, int position);
-void TCOD_bsp_split_recursive(TCOD_bsp_t *node, TCOD_random_t randomizer, int nb, 
+void TCOD_bsp_split_recursive(TCOD_bsp_t *node, TCOD_random_t randomizer, int nb,
 		int minHSize, int minVSize, float maxHRatio, float maxVRatio);
 void TCOD_bsp_remove_sons(TCOD_bsp_t *node);
 
@@ -1159,8 +1159,8 @@ void TCOD_heightmap_rain_erosion(TCOD_heightmap_t *hm, int nbDrops,float erosion
 void TCOD_heightmap_kernel_transform(TCOD_heightmap_t *hm, int kernelsize, const int *dx, const int *dy, const float *weight, float minLevel,float maxLevel);
 void TCOD_heightmap_add_voronoi(TCOD_heightmap_t *hm, int nbPoints, int nbCoef, const float *coef,TCOD_random_t rnd);
 /* void TCOD_heightmap_mid_point_deplacement(TCOD_heightmap_t *hm, TCOD_random_t rnd); */
-void TCOD_heightmap_add_fbm(TCOD_heightmap_t *hm, TCOD_noise_t noise,float mulx, float muly, float addx, float addy, float octaves, float delta, float scale); 
-void TCOD_heightmap_scale_fbm(TCOD_heightmap_t *hm, TCOD_noise_t noise,float mulx, float muly, float addx, float addy, float octaves, float delta, float scale); 
+void TCOD_heightmap_add_fbm(TCOD_heightmap_t *hm, TCOD_noise_t noise,float mulx, float muly, float addx, float addy, float octaves, float delta, float scale);
+void TCOD_heightmap_scale_fbm(TCOD_heightmap_t *hm, TCOD_noise_t noise,float mulx, float muly, float addx, float addy, float octaves, float delta, float scale);
 void TCOD_heightmap_islandify(TCOD_heightmap_t *hm, float seaLevel,TCOD_random_t rnd);
 
 // ---------------------------------------------------------------------------
@@ -1195,18 +1195,18 @@ typedef struct {
 	char *last_javadoc_comment;
 	/* private stuff */
 	int nb_symbols, nb_keywords, flags;
-	char symbols[...][...], 
+	char symbols[...][...],
 	keywords[...][...];
 	const char *simpleCmt;
 	const char *cmtStart, *cmtStop, *javadocCmtStart;
 	const char *stringDelim;
 	bool javadoc_read;
 	bool allocBuf;
-	bool savept; /* is this object a savepoint (no free in destructor) */	
+	bool savept; /* is this object a savepoint (no free in destructor) */
 } TCOD_lex_t;
 
 TCOD_lex_t *TCOD_lex_new_intern();
-TCOD_lex_t *TCOD_lex_new(const char **symbols, const char **keywords, const char *simpleComment, 
+TCOD_lex_t *TCOD_lex_new(const char **symbols, const char **keywords, const char *simpleComment,
 		const char *commentStart, const char *commentStop, const char *javadocCommentStart, const char *stringDelim, int flags);
 void TCOD_lex_delete(TCOD_lex_t *lex);
 
@@ -1476,7 +1476,7 @@ bool TCOD_console_check_for_keypress_wrapper(TCOD_key_t *holder,
 							 int flags);
 void TCOD_console_wait_for_keypress_wrapper(TCOD_key_t *holder,
 							bool flush);
-                            
+
 // TODO: I am unable to link to some of these.
 // Are these functions in the *.lib file?
 //uint32 TCOD_console_check_for_keypress_bitfield (int flags);
@@ -1515,7 +1515,7 @@ void TCOD_image_put_pixel_wrapper(TCOD_image_t image,int x, int y,
 void TCOD_image_set_key_color_wrapper(TCOD_image_t image,
 					  colornum_t key_color);
 
-                      
+
 /* mouse module */
 void TCOD_mouse_get_status_wrapper(TCOD_mouse_t *holder);
 // TODO: Also can't link to these

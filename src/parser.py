@@ -2,7 +2,7 @@
 import ctypes as _ctypes
 
 import tcod as _tcod
-from .libtcod import _lib, _ffi, _lib_ctypes, _str, _unpack_char_p, _unicode
+from .libtcod import _lib, _ffi, _str, _unpack_char_p, _unicode
 
 _chr = chr
 try:
@@ -37,6 +37,33 @@ TYPE_VALUELIST14 = 22
 TYPE_VALUELIST15 = 23
 TYPE_LIST = 1024
 
+def _unpack_union(typ, value):
+    '''
+        unpack items from parser new_property (value_converter)
+
+        needs to be rewritten
+    '''
+    #union = _lib.TDL_get_union_from_void(value)
+    if typ == TYPE_BOOL:
+        return bool(union.b)
+    elif typ == TYPE_CHAR:
+        return _unicode(union.c)
+    elif typ == TYPE_INT:
+        return union.i
+    elif typ == TYPE_FLOAT:
+        return union.f#float(_ffi.cast('float', value))
+    elif typ == TYPE_STRING or \
+         TYPE_VALUELIST15 >= typ >= TYPE_VALUELIST00:
+         return _unpack_char_p(union.s)
+    elif typ == TYPE_COLOR:
+        return _tcod.Color.from_cdata(_ffi.cast('TCOD_color_t *', union))
+    elif typ == TYPE_DICE:
+        return _tcod.Dice.from_cdata(_ffi.cast('TCOD_dice_t *', union))
+    elif typ & TYPE_LIST:
+        return _convert_TCODList(_ffi.cast('TCOD_list_t *', union), typ & 0xFF)
+    else:
+        raise RuntimeError('Unknown libtcod type: %i' % typ)
+
 def _convert_TCODList(clist, typ):
     res = list()
     for i in range(_lib.TCOD_list_size(clist)):
@@ -55,7 +82,7 @@ def _convert_TCODList(clist, typ):
         elif typ == TYPE_DICE:
             elt = _tcod.Dice.from_cdata(_lib.TDL_list_get_dice(clist, i))
         else:
-            raise TypeError('No type for %i' % typ)
+            raise TypeError('Unknown libtcod type: %i' % typ)
         res.append(elt)
     return res
 
@@ -65,95 +92,52 @@ def new():
 def new_struct(parser, name):
     return _lib.TCOD_parser_new_struct(parser, name)
 
-class _CValue(_ctypes.Union):
-    _fields_=[('c',_ctypes.c_uint8),
-              ('i',_ctypes.c_int),
-              ('f',_ctypes.c_float),
-              ('s',_ctypes.c_char_p),
-              # JBR03192012 See http://bugs.python.org/issue14354 for why these are not defined as their actual types
-              ('col',_ctypes.c_uint8 * 3),
-              ('dice',_ctypes.c_int * 4),
-              ('custom',_ctypes.c_void_p),
-              ]
-
-_CFUNC_NEW_STRUCT = _ctypes.CFUNCTYPE(_ctypes.c_uint, _ctypes.c_void_p, 
-                                      _ctypes.c_char_p)
-_CFUNC_NEW_FLAG = _ctypes.CFUNCTYPE(_ctypes.c_uint, _ctypes.c_char_p)
-_CFUNC_NEW_PROPERTY = _ctypes.CFUNCTYPE(_ctypes.c_uint, _ctypes.c_char_p,
-                                        _ctypes.c_int, _CValue)
-              
-                   
-class _CParserListener(_ctypes.Structure):
-    _fields_=[('new_struct', _CFUNC_NEW_STRUCT),
-              ('new_flag',_CFUNC_NEW_FLAG),
-              ('new_property',_CFUNC_NEW_PROPERTY),
-              ('end_struct',_CFUNC_NEW_STRUCT),
-              ('error',_CFUNC_NEW_FLAG),
-              ]
- 
-    
 def run(parser, filename, listener=None):
     if listener:
+        return # STUB LISTENER
+
         # cast cffi parser to ctypes
-        ctypes_parser = _ctypes.c_void_p.from_param(int(_ffi.cast('int', parser)))
-        clistener = _CParserListener()
-        @_CFUNC_NEW_PROPERTY
+        #ctypes_parser = parser#_ctypes.c_void_p.from_param(int(_ffi.cast('int', parser)))
+        #clistener = _CParserListener()
+        clistener = _ffi.new('TCOD_parser_listener_t *')
+        #@_CFUNC_NEW_PROPERTY
+
+        # code for handing unions, whenever cffi supports this
+        @_ffi.callback('bool (*new_property)(const char *propname, TCOD_value_type_t type, TCOD_value_t value)')
+
+        # cast TCOD_value_t to void* for the moment
+        #@_ffi.callback('bool (*new_property)(const char *propname, TCOD_value_type_t type, void *value)')
         def value_converter(name, typ, value):
-            name = _unicode(name)
-            if typ == TYPE_BOOL:
-                return listener.new_property(name, typ, value.c == 1)
-            elif typ == TYPE_CHAR:
-                return listener.new_property(name, typ, '%c' % (value.c & 0xFF))
-            elif typ == TYPE_INT:
-                return listener.new_property(name, typ, value.i)
-            elif typ == TYPE_FLOAT:
-                return listener.new_property(name, typ, value.f)
-            elif typ == TYPE_STRING or \
-                 TYPE_VALUELIST15 >= typ >= TYPE_VALUELIST00:
-                 return listener.new_property(name, typ, value.s)
-            elif typ == TYPE_COLOR:
-                col = _tcod.Color(*value.col)
-                return listener.new_property(name, typ, col)
-            elif typ == TYPE_DICE:
-                dice = _ffi.cast('TCOD_dice_t *', _ctypes.addressof(value.dice))
-                return listener.new_property(name, typ,
-                                             _tcod.Dice.from_cdata(dice))
-            elif typ & TYPE_LIST:
-                value = _ffi.cast('TCOD_list_t *', value.custom)
-                return listener.new_property(name, typ,
-                                _convert_TCODList(value, typ & 0xFF))
-            return True
-        
-        @_CFUNC_NEW_STRUCT
+            name = _unpack_char_p(name)
+            return listener.new_property(name, typ, _unpack_union(typ, value))
+
+        #@_CFUNC_NEW_STRUCT
+        @_ffi.callback('bool (*new_struct)(TCOD_parser_struct_t str,const char *name)')
         def new_struct(struct, c_char_p):
             struct = _ffi.cast('TCOD_parser_struct_t *', struct)
-            if c_char_p is None:
-                c_char_p = ''
-            return listener.new_struct(struct, _unicode(c_char_p))
-        
-        @_CFUNC_NEW_STRUCT
+            return listener.new_struct(struct, _unpack_char_p(c_char_p))
+
+        #@_CFUNC_NEW_STRUCT
+        @_ffi.callback('bool (*end_struct)(TCOD_parser_struct_t str, const char *name)')
         def end_struct(struct, c_char_p):
             struct = _ffi.cast('TCOD_parser_struct_t *', struct)
-            if c_char_p is None:
-                c_char_p = ''
-            return listener.end_struct(struct, _unicode(c_char_p))
-        
-        @_CFUNC_NEW_FLAG
+            return listener.end_struct(struct, _unpack_char_p(c_char_p))
+
+        #@_CFUNC_NEW_FLAG
+        @_ffi.callback('void (*error)(const char *msg)')
         def error(msg):
-            if msg is None:
-                msg = ''
-            listener.error(_unicode(msg))
-        
+            listener.error(_unpack_char_p(msg))
+
+        # cast void* parameter to TCOD_value_t until cffi can handle unions
+        clistener.new_property = _ffi.cast('bool (*new_property)(const char *propname, TCOD_value_type_t type, TCOD_value_t value)', value_converter)
+
         clistener.new_struct = new_struct
         clistener.end_struct = end_struct
-        clistener.new_property = value_converter
         clistener.error = error
-        
-        _lib_ctypes.TCOD_parser_run(ctypes_parser,
-                                    _ctypes.c_char_p(filename),
-                                    _ctypes.byref(clistener))
+
     else:
-        _lib.TCOD_parser_run(parser, _str(filename), _ffi.NULL)
+        clistener = _ffi.NULL
+    _lib.TCOD_parser_run(parser, _str(filename), clistener)
 
 def delete(parser):
     _lib.TCOD_parser_delete(parser)

@@ -7,46 +7,49 @@ import platform as _platform
 
 from . import __path__
 
-def _get_lib_path_crossplatform():
-    '''Locate the right DLL path for this OS'''
-    bits, linkage = _platform.architecture()
-    if 'win32' in _sys.platform:
-        return 'lib/win32/'
-    elif 'linux' in _sys.platform:
-        if bits == '32bit':
-            return 'lib/linux32/'
-        elif bits == '64bit':
-            return 'lib/linux64/'
-    elif 'darwin' in _sys.platform:
-        return 'lib/darwin/'
-    raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (_sys.platform, bits, linkage))
+#def _get_lib_path_crossplatform():
+#    '''Locate the right DLL path for this OS'''
+#    bits, linkage = _platform.architecture()
+#    if 'win32' in _sys.platform:
+#        if bits == '32bit':
+#            return 'lib/win32/'
+#        else:
+#            return 'lib/win64/'
+#    elif 'linux' in _sys.platform:
+#        if bits == '32bit':
+#            return 'lib/linux32/'
+#        elif bits == '64bit':
+#            return 'lib/linux64/'
+#    elif 'darwin' in _sys.platform:
+#        return 'lib/darwin/'
+#    raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (_sys.platform, bits, linkage))
 
-def _get_lib_name():
-    bits, linkage = _platform.architecture()
-    if 'win32' in _sys.platform:
-        return 'libtcod-VS.dll'
-    elif 'linux' in _sys.platform:
-        return 'libtcod.so'
-    elif 'darwin' in _sys.platform:
-        return 'libtcod.dylib'
+#def _get_lib_name():
+#    bits, linkage = _platform.architecture()
+#    if 'win32' in _sys.platform:
+#        return 'libtcod-VS.dll'
+#    elif 'linux' in _sys.platform:
+#        return 'libtcod.so'
+#    elif 'darwin' in _sys.platform:
+#        return 'libtcod.dylib'
 
 # add Windows dll's to PATH
-if 'win' in _sys.platform:
-    _os.environ['PATH'] += ';' + _os.path.join(__path__[0],
-                                               _get_lib_path_crossplatform())
+#if 'win' in _sys.platform:
+#    _os.environ['PATH'] += ';' + _os.path.join(__path__[0],
+#                                               _get_lib_path_crossplatform())
 
 # load library in ctypes
-_lib_ctypes = _ctypes.CDLL(
-    _os.path.realpath(
-        _os.path.join(__path__[0],
-        _get_lib_path_crossplatform(), _get_lib_name())))
+#_lib_ctypes = _ctypes.CDLL(
+#    _os.path.realpath(
+#        _os.path.join(__path__[0],
+#        _get_lib_path_crossplatform(), _get_lib_name())))
 
 # add Mac dylib's to DYLD_LIBRARY_PATH
-if 'darwin' in _sys.platform:
-    if 'DYLD_LIBRARY_PATH' in _os.environ:
-        _os.environ['DYLD_LIBRARY_PATH'] += ':' + _os.path.realpath(_os.path.join(__path__[0], _get_lib_path_crossplatform()))
-    else:
-        _os.environ['DYLD_LIBRARY_PATH'] = _os.path.realpath(_os.path.join(__path__[0], _get_lib_path_crossplatform()))
+#if 'darwin' in _sys.platform:
+#    if 'DYLD_LIBRARY_PATH' in _os.environ:
+#        _os.environ['DYLD_LIBRARY_PATH'] += ':' + _os.path.realpath(_os.path.join(__path__[0], _get_lib_path_crossplatform()))
+#    else:
+#        _os.environ['DYLD_LIBRARY_PATH'] = _os.path.realpath(_os.path.join(__path__[0], _get_lib_path_crossplatform()))
 
 from . import _libtcod
 
@@ -54,10 +57,12 @@ _ffi = ffi = _libtcod.ffi
 _lib = lib = _libtcod.lib
 
 def _unpack_char_p(char_p):
+    if char_p == _ffi.NULL:
+        return ''
     return ffi.string(char_p).decode()
 
 def _int(int_or_str):
-    'return an integer where a signle character string may be expected'
+    'return an integer where a single character string may be expected'
     if isinstance(int_or_str, str):
         return ord(int_or_str)
     if isinstance(int_or_str, bytes):

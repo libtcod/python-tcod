@@ -33,21 +33,27 @@ def update_and_get_version():
     with open(VERSION_PATH, 'r') as f:
         return f.read()
 
-def _get_lib_path_crossplatform():
-    '''Locate the right DLL path for this OS'''
-    bits, linkage = platform.architecture()
+def get_data_files():
+    '''get data files which will be included in the main tcod/ directory'''
+    BITSIZE, LINKAGE = platform.architecture()
+    files = ['src/version.txt',
+             'src/lib/LIBTCOD-CREDITS.txt',
+             'src/lib/LIBTCOD-LICENSE.txt',
+             'src/lib/README-SDL.txt']
     if 'win32' in sys.platform:
-        return ['lib/win32/SDL.dll',
-                'lib/win32/zlib1.dll',
-                'lib/win32/libtcod-VS.dll']
+        if BITSIZE == '32bit':
+            files += ['src/lib/win32/SDL.dll']
+        else:
+            files += ['src/lib/win64/SDL.dll']
     elif 'linux' in sys.platform:
-        if bits == '32bit':
-            return ['lib/linux32/*.so']
-        elif bits == '64bit':
-            return ['lib/linux64/*.so']
+        pass
     elif 'darwin' in sys.platform:
-        return ['lib/darwin/*.dylib']
-    raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, bits, linkage))
+        files += ['src/lib/darwin/SDL.dylib']
+    else:
+        raise ImportError('Operating system "%s" has no supported dynamic '
+                          'link libarary. (%s, %s)' %
+                          (sys.platform, BITSIZE, LINKAGE))
+    return [('tcod', files)]
 
 class PyTest(Command):
     user_options = []
@@ -72,9 +78,7 @@ setup(
     download_url='https://pypi.python.org/pypi/libtcod-cffi',
     packages=['tcod'],
     package_dir={'tcod': 'src'},
-    package_data={'tcod':
-    # only add the libraries needed for the current build platform
-        ['*.txt', '*.rst', 'lib/*.txt'] + _get_lib_path_crossplatform()},
+    data_files=get_data_files(),
     setup_requires=["cffi>=1.1.0,<2"],
     cffi_modules=["build_libtcod.py:ffi"],
     install_requires=["cffi>=1.1.0,<2",
@@ -103,5 +107,5 @@ setup(
     keywords = 'roguelike roguelikes cffi ASCII ANSI Unicode libtcod noise fov heightmap namegen',
     platforms = ['Windows', 'Mac OS X', 'Linux'],
     license = 'Simplified BSD License',
-    cmdclass = {'test': PyTest},
+    test_suite='nose2.collector.collector',
     )
