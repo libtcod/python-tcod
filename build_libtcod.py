@@ -77,7 +77,7 @@ else:
 if sys.platform in ['win32', 'darwin']:
     include_dirs += ['dependencies/SDL-1.2.15/include', 'dependencies/zlib-1.2.8/']
 
-    if BITSIZE == '32bits':
+    if BITSIZE == '32bit':
         library_dirs += [os.path.realpath('dependencies/SDL-1.2.15/lib/x86')]
     else:
         library_dirs += [os.path.realpath('dependencies/SDL-1.2.15/lib/x64')]
