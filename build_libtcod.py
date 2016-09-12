@@ -71,6 +71,7 @@ if sys.platform == 'darwin':
     sources += walk_sources('dependencies/SDL-1.2.15/src/')
 else:
     libraries += ['SDL']
+    include_dirs += ['dependencies/SDL-1.2.15/include/SDL']
 
 # included SDL headers are for whatever OS's don't easily come with them
 if sys.platform in ['win32', 'darwin']:
