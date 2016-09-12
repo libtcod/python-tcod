@@ -52,7 +52,7 @@ install:
         & $env:PYTHON -m pip install https://bitbucket.org/pypa/wheel/get/f4d5d07efa60.zip
     }
 - ps: "& $env:PYTHON -m pip install cffi wheel twine nose2"
-- ps: "& $env:PYTHON -m pip install ."
+- ps: "& $env:PYTHON -m pip install -v ."
 build_script:
 - cmd: "%PYTHON% setup.py bdist_wheel"
 test_script:
