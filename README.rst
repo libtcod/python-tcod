@@ -15,20 +15,43 @@ python-tdl is a port of libtcod made to be "Pythonic", you can find it here: htt
 
 And libtcod is here: http://roguecentral.org/doryen/libtcod/
 
-==============
- Installation
-==============
-The latest Windows installer can be found on PyPI: https://pypi.python.org/pypi/libtcod-cffi
+=================================
+ Installation (Windows, Mac OSX)
+=================================
+The recommended way to install is by using pip, make sure pip is up-to-date
+otherwise it won't find the wheel and will attempt to build from source.
+
+It's reccomended to use the following commands to install libtcod-cffi::
+
+    python -m pip install --upgrade pip
+    python -m pip install libtcod-cffi
+
+======================
+ Installation (Linux)
+======================
+There are no libtcod-cffi wheels for Linux, you can still use pip to install
+libtcod-cffi but will need to have the proper build enviroment set up first.
+
+Install the needed dev packages, update the cffi module, then install via pip.
+Assuming you are using a debian like distribution you can use the following
+commands to do this:
+
+    apt-get install libsdl1.2 libsdl1.2-dev zlib-dev libffi-dev python-dev mesa-common-dev
+    python -m pip install --upgrade cffi<2 cffi>=1.1
+    python -m pip install libtcod-cffi
+
+The Python cffi module must be 1.1 or later
 
 You might get errors during the installation of libtcod-cffi such as
 "ImportError: No module named 'cffi.setuptools_ext'"
 This will happen if your cffi module is out of date.
 
+
 The recommended way to install is by using pip, but be sure to update your cffi
 module first.  Use the following commands::
 
-    pip install -U cffi
-    pip install libtcod-cffi
+    python -m pip install -U cffi
+    python -m pip install libtcod-cffi
 
 This module can also be manually installed, make sure Python modules
 "setuptools" and "cffi" are up to date.
@@ -37,6 +60,7 @@ Then go into the "setup.py" directory and running the command::
     python setup.py install
 
 A manual install requires that your Python environment is set up to compile binaries.
+
 
 =======
  Usage
@@ -52,8 +76,12 @@ When possible, using PyPy will give the best performance, and is highly reccomen
 ==============
  Requirements
 ==============
-* Python 2.7+ or 3.2+
-* 32 bit Windows, 32/64 bit Linux, or Mac OS/X (64 bit architecture)
+* Python 2.7+, Python 3.3+, or PyPy
+* Windows, Linux, or Mac OSX
+* Supports all 32-bit and 64-bit platforms
+* Running on Linux requires the following packages: libsdl1.2
+* Installing on Linux or form source will require the following packages:
+  python-cffi 1.1+
 * An up-to-date version of python-cffi: https://pypi.python.org/pypi/cffi
 * Linux will require libsdl1.2, libsdl1.2-dev, libpng, zlib, libffi-dev, and python-dev packages
 
