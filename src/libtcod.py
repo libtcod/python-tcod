@@ -21,7 +21,7 @@ def _get_lib_path_crossplatform():
         elif bits == '64bit':
             return 'lib/linux64/'
     elif 'darwin' in _sys.platform:
-        return 'lib/darwin/'
+        return 'Frameworks/SDL.framework/Versions/A/'
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (_sys.platform, bits, linkage))
 
 #def _get_lib_name():
