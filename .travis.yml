@@ -7,7 +7,6 @@ python:
  - "pypy"
  - "pypy3"
 matrix:
-  fast_finish: true
   include:
   - os: osx
     language: generic
@@ -33,6 +32,9 @@ matrix:
   - os: linux
     python: pypy3
 
+matrix:
+  fast_finish: true
+
 sudo: required
 dist: trusty
 
@@ -40,6 +42,7 @@ addons:
   apt:
     packages:
       - libsdl1.2-dev
+      - mesa-common-dev
 
 git:
   # builds will fail if a release tag doesn't exist at this depth

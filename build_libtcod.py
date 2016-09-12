@@ -48,7 +48,7 @@ sources += [file for file in find_sources('dependencies/libtcod-1.5.1/src')
 sources += find_sources('dependencies/libtcod-1.5.1/src/png')
 sources += find_sources('dependencies/zlib-1.2.8/')
 
-libraries = ['SDL', 'OpenGL32']
+libraries = ['SDL']
 library_dirs = _get_library_dirs_crossplatform()
 define_macros = [('LIBTCOD_EXPORTS', None)]
 
@@ -56,10 +56,12 @@ with open('src/tdl_source.c', 'r') as file_source:
     source = file_source.read()
 
 if sys.platform == 'win32':
-    libraries += ['User32']
+    libraries += ['User32', 'OpenGL32']
+else:
+    libraries += ['GL']
 
 # included SDL headers are for whatever OS's don't easily come with them
-if sys.platform  in ['win32', 'darwin']:
+if sys.platform in ['win32', 'darwin']:
     include_dirs += ['dependencies/SDL-1.2.15/include', 'dependencies/zlib-1.2.8/']
 
     if BITSIZE == '32bit':
