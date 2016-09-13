@@ -24,25 +24,10 @@ def _get_lib_path_crossplatform():
         return 'SDL.framework/Versions/A/'
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (_sys.platform, bits, linkage))
 
-#def _get_lib_name():
-#    bits, linkage = _platform.architecture()
-#    if 'win32' in _sys.platform:
-#        return 'libtcod-VS.dll'
-#    elif 'linux' in _sys.platform:
-#        return 'libtcod.so'
-#    elif 'darwin' in _sys.platform:
-#        return 'libtcod.dylib'
-
 # add Windows dll's to PATH
 if 'win' in _sys.platform:
     _os.environ['PATH'] += ';' + _os.path.join(__path__[0],
                                                _get_lib_path_crossplatform())
-
-# load library in ctypes
-#_lib_ctypes = _ctypes.CDLL(
-#    _os.path.realpath(
-#        _os.path.join(__path__[0],
-#        _get_lib_path_crossplatform(), _get_lib_name())))
 
 # add Mac dylib's to DYLD_LIBRARY_PATH
 if 'darwin' in _sys.platform:
@@ -50,9 +35,6 @@ if 'darwin' in _sys.platform:
         _os.environ['DYLD_LIBRARY_PATH'] += ':' + _os.path.realpath(_os.path.join(__path__[0], _get_lib_path_crossplatform()))
     else:
         _os.environ['DYLD_LIBRARY_PATH'] = _os.path.realpath(_os.path.join(__path__[0], _get_lib_path_crossplatform()))
-    _os.environ['DYLD_LIBRARY_PATH'] += ':' + __path__[0]
-    _os.environ['PATH'] += ':' + __path__[0]
-    #_ctypes.CDLL(_os.path.join(__path__[0], 'SDL.framework/Versions/A/SDL'))
 
 from . import _libtcod
 

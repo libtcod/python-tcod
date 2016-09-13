@@ -55,7 +55,7 @@ sources += [file for file in walk_sources('dependencies/libtcod-1.5.1/src')
             if 'sys_sfml_c' not in file]
 sources += find_sources('dependencies/zlib-1.2.8/')
 
-libraries = []
+libraries = ['SDL']
 library_dirs = _get_library_dirs_crossplatform()
 define_macros = [('LIBTCOD_EXPORTS', None)]
 
@@ -69,17 +69,9 @@ if 'linux' in sys.platform:
     libraries += ['GL']
 
 if sys.platform == 'darwin':
-    #sources += walk_sources('dependencies/SDL-1.2.15/src/')
-    #include_dirs += ['dependencies/SDL-1.2.15/include/SDL']
-    #extra_compile_args += ['-Fsrc/']
-    #extra_compile_args += ['-F.']
-    #extra_compile_args += ['-framework', 'SDL']
     extra_compile_args += ['-framework', 'OpenGL']
 
-    libraries += ['SDL']
     library_dirs += ['src/SDL.framework/Versions/A/']
-else:
-    libraries += ['SDL']
 
 # included SDL headers are for whatever OS's don't easily come with them
 if sys.platform in ['win32', 'darwin']:
@@ -89,9 +81,6 @@ if sys.platform in ['win32', 'darwin']:
         library_dirs += [os.path.realpath('dependencies/SDL-1.2.15/lib/x86')]
     else:
         library_dirs += [os.path.realpath('dependencies/SDL-1.2.15/lib/x64')]
-
-#if sys.platform == 'darwin':
-#    extra_compile_args += ['-Wl,-rpath=.']
 
 ffi = FFI()
 with open('src/libtcod_cdef.h', 'r') as file_cdef:
