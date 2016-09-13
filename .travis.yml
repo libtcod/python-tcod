@@ -37,7 +37,6 @@ git:
   depth: 300
 
 before_install:
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install pyenv; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install pyenv-virtualenv; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then eval "$(pyenv init -)"; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then eval "$(pyenv virtualenv-init -)"; fi
