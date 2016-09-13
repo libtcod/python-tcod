@@ -48,7 +48,7 @@ def get_package_data():
     elif 'linux' in sys.platform:
         pass
     elif 'darwin' in sys.platform:
-        for path, dirs, walk_files in os.walk('src/Frameworks'):
+        for path, dirs, walk_files in os.walk('src/SDL.framework'):
             for walk_file in walk_files:
                 files += os.path.relpath(os.path.join(path, walk_file), 'src/')
     else:
