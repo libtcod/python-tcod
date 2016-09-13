@@ -20,7 +20,10 @@ def update_and_get_version():
         version = subprocess.check_output(['git', 'describe'])
         version = version[:-1] # remove newline
         version = version.replace(b'v', b'') # remove the v from old tags
-        tag, commit, obj = version.split(b'-')
+        if b'-' in version:
+            tag, commit, obj = version.split(b'-')
+        else:
+            tag = version
         # using anything other than the tag with the current setup is not
         # useful at this moment
         version  = tag
