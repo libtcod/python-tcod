@@ -21,7 +21,7 @@ And libtcod is here: http://roguecentral.org/doryen/libtcod/
 The recommended way to install is by using pip, make sure pip is up-to-date
 otherwise it won't find the wheel and will attempt to build from source.
 
-It's reccomended to use the following commands to install libtcod-cffi::
+With Python installed, run the following commands to install libtcod-cffi::
 
     python -m pip install --upgrade pip
     python -m pip install libtcod-cffi
@@ -34,33 +34,14 @@ libtcod-cffi but will need to have the proper build enviroment set up first.
 
 Install the needed dev packages, update the cffi module, then install via pip.
 Assuming you are using a debian like distribution you can use the following
-commands to do this:
+commands to do this::
 
     apt-get install libsdl1.2 libsdl1.2-dev zlib-dev libffi-dev python-dev mesa-common-dev
     python -m pip install --upgrade cffi<2 cffi>=1.1
     python -m pip install libtcod-cffi
 
-The Python cffi module must be 1.1 or later
-
-You might get errors during the installation of libtcod-cffi such as
-"ImportError: No module named 'cffi.setuptools_ext'"
-This will happen if your cffi module is out of date.
-
-
-The recommended way to install is by using pip, but be sure to update your cffi
-module first.  Use the following commands::
-
-    python -m pip install -U cffi
-    python -m pip install libtcod-cffi
-
-This module can also be manually installed, make sure Python modules
-"setuptools" and "cffi" are up to date.
-Then go into the "setup.py" directory and running the command::
-
-    python setup.py install
-
-A manual install requires that your Python environment is set up to compile binaries.
-
+The Python cffi module must be 1.1 or later, otherwise you will recieve the
+following error:: "ImportError: No module named 'cffi.setuptools_ext'"
 
 =======
  Usage
@@ -69,7 +50,7 @@ This module was designed to be backwards compatible with the libtcod.py script t
 If you had code that runs on the original module you can use this library as a drop-in replacement like this::
 
     import tcod as libtcod
-    
+
 Guides and Tutorials for the original library should also work with this one.
 When possible, using PyPy will give the best performance, and is highly reccomended.
 
