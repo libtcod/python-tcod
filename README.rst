@@ -15,10 +15,10 @@ python-tdl is a port of libtcod made to be "Pythonic", you can find it here: htt
 
 And libtcod is here: http://roguecentral.org/doryen/libtcod/
 
-=================================
- Installation (Windows, Mac OSX)
-=================================
-The recommended way to install is by using pip, make sure pip is up-to-date
+==================================
+ Installation (Windows, Mac OS X)
+==================================
+The recommended way to install is by using pip, make sure pip is up-to-date,
 otherwise it won't find the wheel and will attempt to build from source.
 
 With Python installed, run the following commands to install libtcod-cffi::
@@ -36,7 +36,7 @@ Install the needed dev packages, update the cffi module, then install via pip.
 Assuming you are using a debian like distribution you can use the following
 commands to do this::
 
-    apt-get install libsdl1.2 libsdl1.2-dev zlib-dev libffi-dev python-dev mesa-common-dev
+    apt-get install libsdl1.2 libsdl1.2-dev libffi-dev python-dev mesa-common-dev
     python -m pip install --upgrade cffi<2 cffi>=1.1
     python -m pip install libtcod-cffi
 
@@ -58,13 +58,14 @@ When possible, using PyPy will give the best performance, and is highly reccomen
  Requirements
 ==============
 * Python 2.7+, Python 3.3+, or PyPy
-* Windows, Linux, or Mac OSX
+* Windows, Linux, or Mac OS X
 * Supports all 32-bit and 64-bit platforms
 * Running on Linux requires the following packages: libsdl1.2
 * Installing on Linux or form source will require the following packages:
   python-cffi 1.1+
 * An up-to-date version of python-cffi: https://pypi.python.org/pypi/cffi
-* Linux will require libsdl1.2, libsdl1.2-dev, libpng, zlib, libffi-dev, and python-dev packages
+* Linux will require the package libsdl1.2 to run, and the packages
+  libsdl1.2-dev, libffi-dev, python-dev, and mesa-common-dev to install
 
 =========
  License
