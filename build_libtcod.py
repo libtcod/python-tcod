@@ -71,10 +71,13 @@ if 'linux' in sys.platform:
 if sys.platform == 'darwin':
     #sources += walk_sources('dependencies/SDL-1.2.15/src/')
     #include_dirs += ['dependencies/SDL-1.2.15/include/SDL']
-    extra_compile_args += ['-Fsrc/']
-    extra_compile_args += ['-F.']
-    extra_compile_args += ['-framework', 'SDL']
+    #extra_compile_args += ['-Fsrc/']
+    #extra_compile_args += ['-F.']
+    #extra_compile_args += ['-framework', 'SDL']
     extra_compile_args += ['-framework', 'OpenGL']
+
+    libraries += ['SDL']
+    library_dirs += ['src/SDL.framework/Versions/A/']
 else:
     libraries += ['SDL']
 
