@@ -25,6 +25,7 @@ addons:
   apt:
     packages:
       - libsdl1.2-dev
+      - mesa-common-dev
 
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install $PYTHON; fi
