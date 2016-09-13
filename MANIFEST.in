@@ -1,25 +1,22 @@
-include *.py
-include *.txt
-include *.rst
-include src/*.txt
-include src/*.c
-include src/*.h
-include src/*/*.h
-include src/lib/*.txt
-include src/lib/linux*/*.so
-include src/lib/win32/*.dll
-include src/lib/win32/*.lib
-include src/lib/darwin/*.dylib
-include examples/*.py
-include examples/data/cfg/*.cfg
-include examples/data/fonts/*.png
-include examples/data/img/*.png
-include examples/data/namegen/*.cfg
-include examples/data/namegen/*.txt
-include examples/tutorial/*.py
-include examples/tutorial/*.png
-include docs/*
-prune build/*
-prune dist/*
-prune *.egg
-prune .eggs
+include *.py *.cfg *.txt *.rst
+
+recursive-include src *.py *.c *.h *.txt *.dll
+graft src/SDL.framework
+
+recursive-include testing *.py *.cfg *.png *.txt
+recursive-include examples *.py *.cfg *.png *.txt
+
+recursive-include dependencies/libtcod-*/include *.h
+recursive-include dependencies/libtcod-*/src *.c *.h
+include dependencies/libtcod-*/*.txt
+
+include dependencies/zlib-*/*.c
+include dependencies/zlib-*/*.h
+include dependencies/zlib-*/README
+prune dependencies/zlib-*/examples
+prune dependencies/zlib-*/test
+prune dependencies/zlib-*/contrib
+
+recursive-include dependencies/SDL-* *.h *.dll *.lib
+include dependencies/SDL-*/*.txt
+prune dependencies/SDL-*/src
