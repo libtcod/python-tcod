@@ -10,20 +10,8 @@ matrix:
   include:
   - os: osx
     language: generic
-    python: python
-    env: PYTHON=python
-  - os: osx
-    language: generic
-    python: python3
-    env: PYTHON=python3
-  - os: osx
-    language: generic
-    python: pypy
-    env: PYTHON=pypy
-  - os: osx
-    language: generic
-    python: pypy3
-    env: PYTHON=pypy3
+    python: "2.7.12"
+    env: PYTHON=2.7.12
 
   allow_failures:
   - os: osx
@@ -49,9 +37,14 @@ git:
   depth: 300
 
 before_install:
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install $PYTHON; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv venv -p $PYTHON; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install pyenv; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install pyenv-virtualenv; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then eval "$(pyenv init -)"; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then eval "$(pyenv virtualenv-init -)"; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv install $PYTHON; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv global $PYTHON; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv virtualenv venv $PYTHON; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv activate venv; fi
 install:
  - pip install cffi
  - pip install -v .
