@@ -49,7 +49,6 @@ git:
   depth: 300
 
 before_install:
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install sdl; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv venv -p $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
