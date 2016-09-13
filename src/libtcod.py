@@ -21,7 +21,7 @@ def _get_lib_path_crossplatform():
         elif bits == '64bit':
             return 'lib/linux64/'
     elif 'darwin' in _sys.platform:
-        return 'Frameworks/SDL.framework/Versions/A/'
+        return 'SDL.framework/Versions/A/'
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (_sys.platform, bits, linkage))
 
 #def _get_lib_name():
@@ -50,7 +50,7 @@ if 'darwin' in _sys.platform:
         _os.environ['DYLD_LIBRARY_PATH'] += ':' + _os.path.realpath(_os.path.join(__path__[0], _get_lib_path_crossplatform()))
     else:
         _os.environ['DYLD_LIBRARY_PATH'] = _os.path.realpath(_os.path.join(__path__[0], _get_lib_path_crossplatform()))
-    _ctypes.CDLL(_os.path.join(__path__[0], 'Frameworks/SDL.framework/Versions/A/SDL'))
+    _ctypes.CDLL(_os.path.join(__path__[0], 'SDL.framework/Versions/A/SDL'))
 
 from . import _libtcod
 
