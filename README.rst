@@ -1,29 +1,24 @@
 .. contents::
    :backlinks: top
 
-==============
- Installation
-==============
-The latest Windows installers can be found on PyPI, you'll need to install the
-latest version of these two packages:
+==================================
+ Installation (Windows, Mac OS X)
+==================================
+The recommended way to install is by using pip, make sure pip is up-to-date,
+old versions of pip may have issues installing libtcod-cffi.
+
+To install using pip, use the following commands::
+
+    python -m pip install --upgrade pip
+    python -m pip install tdl
+
+======================
+ Installation (Linux)
+======================
+Installing on Linux is similar to on Windows or Mac OS X, but you will have to
+meet the dependancies of libtcod-cffi first.
 
 * libtcod-cffi: https://pypi.python.org/pypi/libtcod-cffi
-* python-tdl: https://pypi.python.org/pypi/tdl
-
-You might get errors during the installation of libtcod-cffi such as
-"ImportError: No module named 'cffi.setuptools_ext'"
-This will happen if your cffi module is out of date.
-
-The recommended way to install is by using pip, but be sure to update your cffi
-module first.  Use the following commands:
-
-    pip install -U cffi
-
-    pip install tdl
-
-You could install manually, but you'd also have to install libtcod-cffi as well
-which is a binary module.  This requires your Python installation to be set up
-with a compiler.
 
 =======
  About
@@ -46,8 +41,9 @@ http://roguecentral.org/doryen/libtcod/
 ==============
  Requirements
 ==============
-* Python 2.7+ or 3.x
-* 32 bit Windows, 32/64 bit Linux, or Mac OS/X (64 bit architecture)
+* Python 2.7+, 3.3+, or PyPy
+* Windows, Linux, or Mac OS X
+* Supports all 32-bit and 64-bit platforms
 * libtcod-cffi:  found at https://pypi.python.org/pypi/libtcod-cffi
 
 =========
