@@ -1,6 +1,13 @@
 ===========
  Changelog
 ===========
+0.2.10
+ * now using GitHub integrations, gaps in platform support have been filled,
+   there should now be wheels for Mac OSX and 64-bit Python on Windows
+ * the building process was simplified from a linking standpoint, most
+   libraries are now statically linked
+ * parser module is broken again
+
 0.2.9
  * Fixed crashes in list and parser modules
 
