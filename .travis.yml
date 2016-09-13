@@ -44,6 +44,7 @@ before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv global $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv virtualenv venv $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv activate venv; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv rehash; fi
 install:
  - pip install cffi
  - pip install -v .
