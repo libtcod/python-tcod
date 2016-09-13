@@ -50,7 +50,9 @@ if 'darwin' in _sys.platform:
         _os.environ['DYLD_LIBRARY_PATH'] += ':' + _os.path.realpath(_os.path.join(__path__[0], _get_lib_path_crossplatform()))
     else:
         _os.environ['DYLD_LIBRARY_PATH'] = _os.path.realpath(_os.path.join(__path__[0], _get_lib_path_crossplatform()))
-    _ctypes.CDLL(_os.path.join(__path__[0], 'SDL.framework/Versions/A/SDL'))
+    _os.environ['DYLD_LIBRARY_PATH'] += ':' + __path__[0]
+    _os.environ['PATH'] += ':' + __path__[0]
+    #_ctypes.CDLL(_os.path.join(__path__[0], 'SDL.framework/Versions/A/SDL'))
 
 from . import _libtcod
 
