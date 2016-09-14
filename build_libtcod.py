@@ -72,16 +72,13 @@ if 'linux' in sys.platform:
 if sys.platform == 'darwin':
     extra_link_args += ['-framework', 'OpenGL']
 
-    library_dirs += ['src/SDL.framework/Versions/A/']
+    #library_dirs += ['src/SDL.framework/Versions/A/']
     library_dirs += ['src/lib/']
 
-    extra_link_args += ['-Fsrc/']
-    extra_link_args += ['-F.']
-    extra_link_args += ['-framework', 'SDL']
-    extra_link_args += ['-rpath', '@loader_path/SDL.framework/Versions/A/SDL']
+    extra_link_args += ['-rpath', '@loader_path/']
 
-else:
-    libraries += ['SDL']
+
+libraries += ['SDL']
 
 # included SDL headers are for whatever OS's don't easily come with them
 if sys.platform in ['win32', 'darwin']:
