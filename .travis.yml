@@ -11,7 +11,6 @@ matrix:
   - os: osx
     language: generic
     python: "2.7.8"
-    env: PYTHON=2.7.8
 
   allow_failures:
   - os: osx
@@ -41,9 +40,9 @@ before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then eval "$(pyenv init -)"; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then eval "$(pyenv virtualenv-init -)"; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv install --list; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv install $PYTHON; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv global $PYTHON; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv virtualenv $PYTHON venv; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv install $TRAVIS_PYTHON_VERSION; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv global $TRAVIS_PYTHON_VERSION; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv virtualenv $TRAVIS_PYTHON_VERSION venv; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv activate venv; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv rehash; fi
 install:
