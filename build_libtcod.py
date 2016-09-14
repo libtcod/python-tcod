@@ -18,7 +18,7 @@ def _get_library_dirs_crossplatform():
         elif BITSIZE == '64bit':
             return ['src/lib/linux64/']
     elif 'darwin' in sys.platform:
-        return ['src/lib/darwin/']
+        return ['src/SDL.framework/Versions/A/']
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, BITSIZE, LINKAGE))
 
 def _get_libraries_crossplatform():
@@ -56,7 +56,7 @@ sources += [file for file in walk_sources('dependencies/libtcod-1.5.1/src')
 sources += find_sources('dependencies/zlib-1.2.8/')
 
 libraries = ['SDL']
-library_dirs = _get_library_dirs_crossplatform()
+library_dirs = []
 define_macros = [('LIBTCOD_EXPORTS', None)]
 
 with open('src/tdl_source.c', 'r') as file_source:
