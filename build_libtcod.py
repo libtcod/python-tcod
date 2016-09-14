@@ -49,6 +49,7 @@ include_dirs = ['Release/tcod/',
                 'dependencies/libtcod-1.5.1/include/',
                 'dependencies/libtcod-1.5.1/src/png/']
 extra_compile_args = []
+extra_link_args = []
 sources = []
 
 sources += [file for file in walk_sources('dependencies/libtcod-1.5.1/src')
@@ -69,15 +70,15 @@ if 'linux' in sys.platform:
     libraries += ['GL']
 
 if sys.platform == 'darwin':
-    extra_compile_args += ['-framework', 'OpenGL']
+    extra_link_args += ['-framework', 'OpenGL']
 
     library_dirs += ['src/SDL.framework/Versions/A/']
     library_dirs += ['src/lib/']
 
-    extra_compile_args += ['-Fsrc/']
-    extra_compile_args += ['-F.']
-    extra_compile_args += ['-framework', 'SDL']
-    extra_compile_args += ['-rpath', '@loader_path/SDL.framework/Versions/A/SDL']
+    extra_link_args += ['-Fsrc/']
+    extra_link_args += ['-F.']
+    extra_link_args += ['-framework', 'SDL']
+    extra_link_args += ['-rpath', '@loader_path/SDL.framework/Versions/A/SDL']
 
 else:
     libraries += ['SDL']
@@ -101,6 +102,7 @@ ffi.set_source(
     sources=sources,
     libraries=libraries,
     extra_compile_args=extra_compile_args,
+    extra_link_args=extra_link_args,
     define_macros=define_macros,
 )
 
