@@ -72,6 +72,7 @@ if sys.platform == 'darwin':
     extra_compile_args += ['-framework', 'OpenGL']
 
     library_dirs += ['src/SDL.framework/Versions/A/']
+    library_dirs += ['src/lib/']
 
 # included SDL headers are for whatever OS's don't easily come with them
 if sys.platform in ['win32', 'darwin']:

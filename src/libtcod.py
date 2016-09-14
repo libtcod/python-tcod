@@ -21,7 +21,7 @@ def _get_lib_path_crossplatform():
         elif bits == '64bit':
             return 'lib/linux64/'
     elif 'darwin' in _sys.platform:
-        return 'SDL.framework/Versions/A/'
+        return 'lib/'
     raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (_sys.platform, bits, linkage))
 
 # add Windows dll's to PATH
