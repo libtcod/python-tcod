@@ -50,7 +50,7 @@ before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv rehash; fi
 - pip install cffi wheel
 install:
-- python setup.py build install
+- python setup.py build install bdist_wheel bdist_egg
 before_script:
  - pip install nose2
 script:
