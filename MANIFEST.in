@@ -1,27 +1,14 @@
-include *.py
-include *.txt
-include *.rst
-include tdl/*.bmp
-include tdl/*.png
-include tdl/*.txt
-include tdl/*.c
-include tdl/*.h
-include tdl/include/*.h
-exclude tdl/_*.c
-include tdl/lib/*.txt
-include tdl/lib/linux*/*.so
-include tdl/lib/win32/*.dll
-include tdl/lib/win32/*.lib
-include tdl/lib/darwin/*.dylib
-include fonts/*.png
-include fonts/*.txt
-include fonts/*/*.png
-include fonts/*/*.txt
-include examples/*.py
-include testing/*.py
+include *.py *.cfg *.txt *.rst
+
+recursive-include tdl *.py *.png *.txt
+
+recursive-include fonts *.png *.txt
+
+recursive-include examples *.py *.png *.md
+
 include docs/*
 exclude docs/*.bat
-include ez_setup.py
+
 prune build/*
 prune dist/*
 prune *.egg
