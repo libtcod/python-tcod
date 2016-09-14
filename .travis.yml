@@ -12,10 +12,6 @@ matrix:
     language: generic
     python: "2.7.8"
     env: PYTHON=2.7.8
-  - os: osx
-    language: generic
-    python: "2.7.8"
-    env: PYTHON=2.7.8 PYTHON_CONFIGURE_OPTS="--with-arch=i386" PYTHON_CFLAGS="-arch i386" PYTHON_LDFLAGS="-arch i386"
 
   allow_failures:
   - os: osx
