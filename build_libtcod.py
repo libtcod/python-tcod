@@ -74,7 +74,7 @@ if sys.platform == 'darwin':
     extra_link_args += ['-framework', 'OpenGL']
 
     # swipe libSDL from brew install
-    shutil.copyfile('/usr/local/Cellar/sdl/1.2.15/lib/libSDL.dylib', 'src/libSDL.dylib'
+    shutil.copyfile('/usr/local/Cellar/sdl/1.2.15/lib/libSDL.dylib', 'src/libSDL.dylib')
 
     library_dirs += ['src/']
     extra_link_args += ['-rpath', '@loader_path/libSDL.dylib']
