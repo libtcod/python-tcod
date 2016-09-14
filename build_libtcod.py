@@ -3,6 +3,7 @@
 import os
 import sys
 
+import shutil
 import platform
 
 from cffi import FFI
@@ -72,10 +73,11 @@ if 'linux' in sys.platform:
 if sys.platform == 'darwin':
     extra_link_args += ['-framework', 'OpenGL']
 
-    #library_dirs += ['src/SDL.framework/Versions/A/']
-    library_dirs += ['src/lib/']
+    # swipe libSDL from brew install
+    shutil.copyfile('/usr/local/Cellar/sdl/1.2.15/lib/libSDL.dylib', 'src/libSDL.dylib'
 
-    extra_link_args += ['-rpath', '@loader_path/']
+    library_dirs += ['src/']
+    extra_link_args += ['-rpath', '@loader_path/libSDL.dylib']
 
 
 libraries += ['SDL']
