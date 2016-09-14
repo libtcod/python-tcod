@@ -10,8 +10,8 @@ matrix:
   include:
   - os: osx
     language: generic
-    python: "2.7.12"
-    env: PYTHON=2.7.12
+    python: "2.7"
+    env: PYTHON=2.7
 
   allow_failures:
   - os: osx
@@ -40,6 +40,7 @@ before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install pyenv-virtualenv; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then eval "$(pyenv init -)"; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then eval "$(pyenv virtualenv-init -)"; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv install --list; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv install $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv global $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv virtualenv venv $PYTHON; fi
