@@ -41,7 +41,7 @@ commands to do this::
     python -m pip install libtcod-cffi
 
 The Python cffi module must be 1.1 or later, otherwise you will recieve the
-following error:: "ImportError: No module named 'cffi.setuptools_ext'"
+following error: "ImportError: No module named 'cffi.setuptools_ext'"
 
 =======
  Usage
@@ -52,14 +52,13 @@ If you had code that runs on the original module you can use this library as a d
     import tcod as libtcod
 
 Guides and Tutorials for the original library should also work with this one.
-When possible, using PyPy will give the best performance, and is highly reccomended.
+When possible, using PyPy will give the best performance, and is highly recommended.
 
 ==============
  Requirements
 ==============
 * Python 2.7+, Python 3.3+, or PyPy
 * Windows, Linux, or Mac OS X
-* Supports all 32-bit and 64-bit platforms
 * Running on Linux requires the following packages: libsdl1.2
 * Installing on Linux or form source will require the following packages:
   python-cffi 1.1+
