@@ -55,7 +55,7 @@ sources += [file for file in walk_sources('dependencies/libtcod-1.5.1/src')
             if 'sys_sfml_c' not in file]
 sources += find_sources('dependencies/zlib-1.2.8/')
 
-libraries = ['SDL']
+libraries = []
 library_dirs = []
 define_macros = [('LIBTCOD_EXPORTS', None)]
 
@@ -73,6 +73,14 @@ if sys.platform == 'darwin':
 
     library_dirs += ['src/SDL.framework/Versions/A/']
     library_dirs += ['src/lib/']
+
+    extra_compile_args += ['-Fsrc/']
+    extra_compile_args += ['-F.']
+    extra_compile_args += ['-framework', 'SDL']
+    extra_compile_args += ['-rpath', '@loader_path/SDL.framework/Versions/A/']
+
+else:
+    libraries += ['SDL']
 
 # included SDL headers are for whatever OS's don't easily come with them
 if sys.platform in ['win32', 'darwin']:
