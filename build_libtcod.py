@@ -77,7 +77,7 @@ if sys.platform == 'darwin':
     extra_compile_args += ['-Fsrc/']
     extra_compile_args += ['-F.']
     extra_compile_args += ['-framework', 'SDL']
-    extra_compile_args += ['-rpath', '@loader_path/SDL.framework/Versions/A/']
+    extra_compile_args += ['-rpath', '@loader_path/SDL.framework/Versions/A/SDL']
 
 else:
     libraries += ['SDL']
