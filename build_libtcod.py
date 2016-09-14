@@ -79,6 +79,8 @@ if sys.platform == 'darwin':
     library_dirs += ['src/']
     extra_link_args += ['-rpath', '@loader_path/libSDL.dylib']
 
+    extra_compile_args += ['-arch', 'i386', '-arch', 'x86_64']
+    extra_link_args += ['-arch', 'i386', '-arch', 'x86_64']
 
 libraries += ['SDL']
 

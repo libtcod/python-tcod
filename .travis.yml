@@ -38,7 +38,7 @@ git:
 
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew info sdl; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install -v sdl; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install -v sdl --universal; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install pyenv-virtualenv; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then eval "$(pyenv init -)"; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then eval "$(pyenv virtualenv-init -)"; fi
