@@ -37,6 +37,8 @@ git:
   depth: 300
 
 before_install:
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew info sdl; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install -v sdl; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install pyenv-virtualenv; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then eval "$(pyenv init -)"; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then eval "$(pyenv virtualenv-init -)"; fi
@@ -46,16 +48,16 @@ before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv virtualenv $PYTHON venv; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv activate venv; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv rehash; fi
+- pip install cffi wheel
 install:
- - pip install cffi
- - pip install -v .
+- python setup.py build install
 before_script:
  - pip install nose2
 script:
  - python -m nose2
 
 before_deploy:
-- pip install wheel twine
+- pip install twine
 deploy:
   skip_cleanup: true
   provider: pypi
