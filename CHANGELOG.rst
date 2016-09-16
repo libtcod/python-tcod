@@ -1,6 +1,9 @@
 ===========
  Changelog
 ===========
+0.2.11
+ * SDL is now bundled correctly in all Python wheels
+
 0.2.10
  * now using GitHub integrations, gaps in platform support have been filled,
    there should now be wheels for Mac OSX and 64-bit Python on Windows
