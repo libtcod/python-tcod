@@ -10,29 +10,7 @@ from setuptools import setup, Command
 
 VERSION_PATH = 'src/version.txt'
 
-def update_and_get_version():
-    '''Update tcod/version.txt to the version number provided by git, then
-    return the result, regardless if the update was successful.
-
-    tcod/version.txt is placed in sdist, but is not in the master branch
-    '''
-    try:
-        version = subprocess.check_output(['git', 'describe'])
-        version = version[:-1] # remove newline
-        version = version.replace(b'v', b'') # remove the v from old tags
-        if b'-' in version:
-            tag, commit, obj = version.split(b'-')
-        else:
-            tag = version
-        # using anything other than the tag with the current setup is not
-        # useful at this moment
-        version  = tag
-        with open(VERSION_PATH, 'wb') as f:
-            f.write(version)
-    except subprocess.CalledProcessError:
-        # when run from an sdist version.txt is already up-to-date
-        if not os.path.exists(VERSION_PATH):
-            raise
+def get_version():
     with open(VERSION_PATH, 'r') as f:
         return f.read()
 
@@ -58,20 +36,9 @@ def get_package_data():
                           (sys.platform, BITSIZE, LINKAGE))
     return {'tcod': files}
 
-class PyTest(Command):
-    user_options = []
-    def initialize_options(self):
-        pass
-    def finalize_options(self):
-        pass
-    def run(self):
-        import sys,subprocess
-        errno = subprocess.call([sys.executable, 'runtests.py'])
-        raise SystemExit(errno)
-
 setup(
     name='libtcod-cffi',
-    version=update_and_get_version(),
+    version=get_version(),
     author='Kyle Stewart',
     author_email='4B796C65+pythonTDL@gmail.com',
     description='A Python cffi port of libtcod-1.5.1',
