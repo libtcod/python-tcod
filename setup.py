@@ -51,7 +51,7 @@ def get_package_data():
     elif 'linux' in sys.platform:
         pass
     elif 'darwin' in sys.platform:
-        files += ['libSDL.dylib']
+        pass
     else:
         raise ImportError('Operating system "%s" has no supported dynamic '
                           'link libarary. (%s, %s)' %
