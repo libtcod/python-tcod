@@ -23,8 +23,8 @@ before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv venv -p $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
 install:
- - pip install cffi
- - pip install .
+ - pip install -U pip
+ - python setup.py install
 before_script:
  - pip install nose2 cov-core
 script:
