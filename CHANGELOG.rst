@@ -1,6 +1,9 @@
 ===========
  Changelog
 ===========
+0.2.12
+ * version increment due to how extremely broken the non-Windows builds were
+
 0.2.11
  * SDL is now bundled correctly in all Python wheels
 
