@@ -18,15 +18,6 @@ matrix:
     python: python3
     env: PYTHON=python3
 
-sudo: required
-dist: trusty
-
-addons:
-  apt:
-    packages:
-      - libsdl1.2-dev
-      - mesa-common-dev
-
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv venv -p $PYTHON; fi
