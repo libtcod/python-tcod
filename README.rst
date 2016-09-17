@@ -15,33 +15,14 @@ python-tdl is a port of libtcod made to be "Pythonic", you can find it here: htt
 
 And libtcod is here: http://roguecentral.org/doryen/libtcod/
 
-==================================
- Installation (Windows, Mac OS X)
-==================================
-The recommended way to install is by using pip, make sure pip is up-to-date,
-otherwise it won't find the wheel and will attempt to build from source.
+==============
+ Installation
+==============
+The recommended way to install is by using pip.
 
-With Python installed, run the following commands to install libtcod-cffi::
+With Python installed, run the following command to install libtcod-cffi::
 
-    python -m pip install --upgrade pip
     python -m pip install libtcod-cffi
-
-======================
- Installation (Linux)
-======================
-There are no libtcod-cffi wheels for Linux, you can still use pip to install
-libtcod-cffi but will need to have the proper build enviroment set up first.
-
-Install the needed dev packages, update the cffi module, then install via pip.
-Assuming you are using a debian like distribution you can use the following
-commands to do this::
-
-    apt-get install libsdl1.2 libsdl1.2-dev libffi-dev python-dev mesa-common-dev
-    python -m pip install --upgrade cffi<2 cffi>=1.1
-    python -m pip install libtcod-cffi
-
-The Python cffi module must be 1.1 or later, otherwise you will recieve the
-following error: "ImportError: No module named 'cffi.setuptools_ext'"
 
 =======
  Usage
