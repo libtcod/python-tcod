@@ -1,7 +1,6 @@
 language: python
 python:
  - "2.7"
- - "3.2"
  - "3.3"
  - "3.4"
  - "3.5"
@@ -17,6 +16,9 @@ matrix:
     language: generic
     python: python3
     env: PYTHON=python3
+
+  allow_failures:
+  - python: pypy
 
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install $PYTHON; fi
