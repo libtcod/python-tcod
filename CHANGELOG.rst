@@ -3,6 +3,7 @@
 ===========
 0.2.12
  * version increment due to how extremely broken the non-Windows builds were
+   (false alarm, this module is just really hard to run integrated tests on)
 
 0.2.11
  * SDL is now bundled correctly in all Python wheels

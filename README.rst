@@ -24,28 +24,32 @@ With Python installed, run the following command to install libtcod-cffi::
 
     python -m pip install libtcod-cffi
 
+See the requirements section when building from source.
+
 =======
  Usage
 =======
-This module was designed to be backwards compatible with the libtcod.py script that was distributed with libtcod.
-If you had code that runs on the original module you can use this library as a drop-in replacement like this::
+This module was designed to be backwards compatible with the libtcod.py script
+that was distributed with libtcod.
+If you had code that runs on the original module you can use this library as a
+drop-in replacement like this::
 
     import tcod as libtcod
 
 Guides and Tutorials for the original library should also work with this one.
-When possible, using PyPy will give the best performance, and is highly recommended.
+When possible, using PyPy will give the best performance, and is highly
+recommended.
 
 ==============
  Requirements
 ==============
 * Python 2.7+, Python 3.3+, or PyPy
 * Windows, Linux, or Mac OS X
-* Running on Linux requires the following packages: libsdl1.2
-* Installing on Linux or form source will require the following packages:
-  python-cffi 1.1+
-* An up-to-date version of python-cffi: https://pypi.python.org/pypi/cffi
-* Linux will require the package libsdl1.2 to run, and the packages
-  libsdl1.2-dev, libffi-dev, python-dev, and mesa-common-dev to install
+* python-cffi must be version 1.1 or higher
+* Installing from source on Mac OS X requires sdl1.2, which can be installed
+  using the homebrew command: "brew install sdl"
+* Installing from source on Linux requires the following packages:
+  libsdl1.2-dev, libffi-dev, python-dev, and mesa-common-dev
 
 =========
  License
