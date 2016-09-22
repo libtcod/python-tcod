@@ -50,4 +50,4 @@ install:
 before_script:
  - pip install nose2
 script:
- - python -m nose2
+ - python -c "import tcod"
