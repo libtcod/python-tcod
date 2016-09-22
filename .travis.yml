@@ -28,7 +28,7 @@ install:
 before_script:
  - pip install nose2 cov-core
 script:
- - python -m nose2 -v
+ - python -c "import tdl"
 
 deploy:
   provider: pypi
