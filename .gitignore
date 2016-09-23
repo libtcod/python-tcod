@@ -58,3 +58,4 @@ target/
 # Custom
 tcod-*/
 Release/
+/tcod/

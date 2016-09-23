@@ -4,7 +4,7 @@ import os
 import sys
 
 import platform
-
+from pycparser import c_parser, c_ast, parse_file, c_generator
 from cffi import FFI
 
 BITSIZE, LINKAGE = platform.architecture()
@@ -83,9 +83,55 @@ if sys.platform in ['win32', 'darwin']:
     else:
         library_dirs += [os.path.realpath('dependencies/SDL-1.2.15/lib/x64')]
 
+def get_cdef():
+    generator = c_generator.CGenerator()
+    return generator.visit(get_ast())
+
+def get_ast():
+    ast = parse_file(filename='src/libtcod_cdef.h', use_cpp=True,
+                     cpp_args=[r'-Idependencies/fake_libc_include',
+                               r'-Idependencies/libtcod-1.5.1/include',
+                               r'-DDECLSPEC=',
+                               r'-DSDLCALL=',
+                               r'-DTCODLIB_API=',
+                               r'-D__inline__=',
+                               r'-U__GNUC__',
+                               ])
+    for node in list(ast.ext):
+        # resolve binary ops in TCOD_event_t enum
+        if not isinstance(node, c_ast.Typedef):
+            continue
+        if node.name == 'wchar_t':
+            ast.ext.remove(node) # remove wchar_t placeholder
+        if node.name != 'TCOD_event_t':
+            continue
+
+        # get to enumerator list node
+        (type, node), = node.children()
+        (type, node), = node.children()
+        (type, node), = node.children()
+
+        consts = {}
+        for type, enum in node.children():
+            consts[enum.name] = value = resolve_ast(enum.value, consts)
+            enum.value = c_ast.Constant('int', str(value))
+    return ast
+
+def resolve_ast(ast, consts):
+    if isinstance(ast, c_ast.Constant):
+        return int(ast.value)
+    elif isinstance(ast, c_ast.ID):
+        return consts[ast.name]
+    elif isinstance(ast, c_ast.BinaryOp):
+        return resolve_ast(ast.left, consts) | resolve_ast(ast.right, consts)
+    else:
+        raise RuntimeError('Unexpected ast node: %r' % ast)
+
+
 ffi = FFI()
-with open('src/libtcod_cdef.h', 'r') as file_cdef:
-    ffi.cdef(file_cdef.read())
+ffi.cdef(get_cdef())
+#with open('src/libtcod_cdef.h', 'r') as file_cdef:
+#    ffi.cdef(file_cdef.read())
 ffi.set_source(
     module_name, source,
     include_dirs=include_dirs,

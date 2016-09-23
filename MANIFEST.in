@@ -17,6 +17,8 @@ prune dependencies/zlib-*/examples
 prune dependencies/zlib-*/test
 prune dependencies/zlib-*/contrib
 
+recursive-include dependencies/fake_libc_include *.h
+
 recursive-include dependencies/SDL-* *.h *.dll *.lib
 include dependencies/SDL-*/*.txt
 prune dependencies/SDL-*/src

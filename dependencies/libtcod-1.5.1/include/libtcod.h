@@ -135,6 +135,7 @@ typedef uint8 bool;
 #endif
 
 /* DLL export */
+#ifndef TCODLIB_API
 #ifdef TCOD_WINDOWS
 #ifdef LIBTCOD_EXPORTS
 #define TCODLIB_API __declspec(dllexport)
@@ -143,6 +144,7 @@ typedef uint8 bool;
 #endif
 #else
 #define TCODLIB_API
+#endif
 #endif
 
 #ifdef __cplusplus

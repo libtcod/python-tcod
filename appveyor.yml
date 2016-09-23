@@ -58,4 +58,4 @@ build: off
 test_script:
 - cmd: "%PYTHON% -m nose2"
 deploy_script:
-- "%PYTHON% -m twine upload -u %pypi_user% -p %pypi_pass% --skip-existing dist/*"
+- "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% -m twine upload -u %pypi_user% -p %pypi_pass% --skip-existing dist/*"

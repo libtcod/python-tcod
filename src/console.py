@@ -113,7 +113,6 @@ def set_alignment(con, alignment):
 def get_alignment(con):
     return _lib.TCOD_console_get_alignment(con or _ffi.NULL)
 
-_print = print
 def print(con, x, y, fmt):
     _lib.TCOD_console_print_utf(con or _ffi.NULL, x, y, _unicode(fmt))
 
