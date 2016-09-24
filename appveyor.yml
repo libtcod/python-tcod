@@ -52,7 +52,7 @@ install:
         & $env:PYTHON -m pip install https://bitbucket.org/pypa/wheel/get/f4d5d07efa60.zip
     }
 - cmd: "set PATH=%PATH%;C:\\MinGW\\bin"
-- ps: "& $env:PYTHON -m pip install cffi wheel twine nose2"
+- ps: "& $env:PYTHON -m pip install cffi pycparser wheel twine nose2"
 - cmd: echo "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 > "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64/vcvars64.bat"
 - cmd: "%PYTHON% setup.py install bdist_wheel"
 build: off

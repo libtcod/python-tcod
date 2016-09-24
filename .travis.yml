@@ -22,6 +22,8 @@ matrix:
   - os: osx
     python: pypy3
   - os: linux
+    python: pypy
+  - os: linux
     python: pypy3
 
   fast_finish: true
