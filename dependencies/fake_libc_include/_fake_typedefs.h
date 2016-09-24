@@ -147,9 +147,6 @@ typedef int uintptr_t;
 typedef int intmax_t;
 typedef int uintmax_t;
 
-/* C99 stdbool.h bool type. _Bool is built-in in C99 */
-//typedef _Bool bool;
-
 typedef int va_list;
 
 #endif
