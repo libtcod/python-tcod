@@ -128,6 +128,15 @@ def resolve_ast(ast, consts):
 
 ffi = FFI()
 ffi.cdef(get_cdef())
+ffi.cdef('''
+extern "Python" {
+    static bool pycall_parser_new_struct(TCOD_parser_struct_t str,const char *name);
+    static bool pycall_parser_new_flag(const char *name);
+    static bool pycall_parser_new_property(const char *propname, TCOD_value_type_t type, TCOD_value_t value);
+    static bool pycall_parser_end_struct(TCOD_parser_struct_t str, const char *name);
+    static void pycall_parser_error(const char *msg);
+}
+''')
 #with open('src/libtcod_cdef.h', 'r') as file_cdef:
 #    ffi.cdef(file_cdef.read())
 ffi.set_source(

@@ -73,9 +73,6 @@ def test_parser():
 ##          libtcod.parser_get_list_property(parser, b'myStruct.dice_list',
 ##                                                           libtcod.TYPE_DICE))
 
-    # skip final part for now
-    return
-
     # custom listener
     print ('***** Custom listener *****')
     class MyListener:

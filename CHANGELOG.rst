@@ -1,6 +1,10 @@
 ===========
  Changelog
 ===========
+ * switched to using pycparser to compile libtcod headers, this may have
+   included many more functions in tcod's namespace than before
+ * parser custom listener fixed again, likely for good
+
 0.2.12
  * version increment due to how extremely broken the non-Windows builds were
    (false alarm, this module is just really hard to run integrated tests on)
