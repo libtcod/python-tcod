@@ -135,6 +135,8 @@ extern "Python" {
     static bool pycall_parser_new_property(const char *propname, TCOD_value_type_t type, TCOD_value_t value);
     static bool pycall_parser_end_struct(TCOD_parser_struct_t str, const char *name);
     static void pycall_parser_error(const char *msg);
+
+    static bool _pycall_bsp_callback(TCOD_bsp_t *node, void *userData);
 }
 ''')
 #with open('src/libtcod_cdef.h', 'r') as file_cdef:

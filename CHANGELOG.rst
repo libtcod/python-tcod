@@ -1,6 +1,9 @@
 ===========
  Changelog
 ===========
+ * bsp functions which take a callback now accept *args and **kargs to pass
+   parameters to the call instead of the single userData parameter
+
 0.3
  * switched to using pycparser to compile libtcod headers, this may have
    included many more functions in tcod's namespace than before
