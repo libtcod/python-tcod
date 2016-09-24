@@ -35,9 +35,4 @@ TCODLIB_API TCOD_mouse_t TCOD_mouse_get_status();
 TCODLIB_API bool TCOD_mouse_is_cursor_visible();
 TCODLIB_API void TCOD_mouse_move(int x, int y);
 
-//#include <SDL/SDL.h>
-//#if SDL_VERSION_ATLEAST(2,0,0)
-//TCODLIB_API void TCOD_mouse_includes_touch(bool enable);
-//#endif
-
 #endif
