@@ -24,24 +24,6 @@ environment:
 
   - PYPY: pypy2-v5.4.1-win32
     platform: Any CPU
-  - PYPY: pypy2-v5.3.1-win32
-    platform: Any CPU
-  - PYPY: pypy-5.1.1-win32
-    platform: Any CPU
-  - PYPY: pypy-5.0.1-win32
-    platform: Any CPU
-  - PYPY: pypy-4.0.1-win32
-    platform: Any CPU
-  - PYPY: pypy-2.6.1-win32
-    platform: Any CPU
-
-matrix:
-  allow_failures:
-  - PYPY: pypy2-v5.3.1-win32
-  - PYPY: pypy-5.1.1-win32
-  - PYPY: pypy-5.0.1-win32
-  - PYPY: pypy-4.0.1-win32
-  - PYPY: pypy-2.6.1-win32
 
 install:
 - ps: |
