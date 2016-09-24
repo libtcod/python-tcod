@@ -2,8 +2,7 @@
 #include <libtcod.h>
 #include <wrappers.h>
 
-// ---------------------------------------------------------------------------
-// TDL FUNCTONS
+/* TDL FUNCTONS ----------------------------------------------------------- */
 
 static bool TDL_list_get_bool(TCOD_list_t l,int idx);
 static char TDL_list_get_char(TCOD_list_t l,int idx);
@@ -12,9 +11,9 @@ static float TDL_list_get_float(TCOD_list_t l,int idx);
 static char* TDL_list_get_string(TCOD_list_t l,int idx);
 static TCOD_color_t TDL_list_get_color(TCOD_list_t l,int idx);
 static TCOD_dice_t TDL_list_get_dice(TCOD_list_t l,int idx);
-//bool (*TDL_parser_new_property_func)(const char *propname, TCOD_value_type_t type, TCOD_value_t *value);
+/*bool (*TDL_parser_new_property_func)(const char *propname, TCOD_value_type_t type, TCOD_value_t *value);*/
 
-// color functions modified to use integers instead of structs
+/* color functions modified to use integers instead of structs */
 TCOD_color_t TDL_color_from_int(int color);
 int TDL_color_to_int(TCOD_color_t *color);
 static int* TDL_color_int_to_array(int color);
@@ -35,10 +34,11 @@ int TDL_color_set_value(int color, float h);
 int TDL_color_shift_hue(int color, float hshift);
 int TDL_color_scale_HSV(int color, float scoef, float vcoef);
 
-// map data functions using a bitmap of:
-// 1 = is_transparant
-// 2 = is_walkable
-// 4 = in_fov
+/* map data functions using a bitmap of:
+ * 1 = is_transparant
+ * 2 = is_walkable
+ * 4 = in_fov
+ */
 void TDL_map_data_from_buffer(TCOD_map_t map, uint8 *buffer);
 void TDL_map_fov_to_buffer(TCOD_map_t map, uint8 *buffer, bool cumulative);
 
