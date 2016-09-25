@@ -3,11 +3,10 @@ from . import Bsp as _Bsp
 from .libtcod import _lib, _ffi
 
 @_ffi.def_extern()
-def _pycall_bsp_callback(node, userData):
+def _pycall_bsp_callback(node, func_handle):
     '''static bool _pycall_bsp_callback(TCOD_bsp_t *node, void *userData);
     '''
-    func, args, kargs = _ffi.from_handle(userData)
-    return bool(func(_Bsp(node), *args, **kargs))
+    return _ffi.from_handle(func_handle)(_Bsp(node))
 
 def new_with_size(x, y, w, h):
     return _Bsp(_lib.TCOD_bsp_new_with_size(x, y, w, h))
@@ -41,32 +40,27 @@ def contains(node, cx, cy):
 def find_node(node, cx, cy):
     return _Bsp(_lib.TCOD_bsp_find_node(node.p, cx, cy))
 
-def _bsp_traverse(node, func, callback, *args, **kargs):
+def _bsp_traverse(node, func, callback):
     '''pack (callback, *args, **kargs) into a handle for use with the callback
     _pycall_bsp_callback
     '''
-    python_data = _ffi.new_handle((callback, args, kargs))
+    python_data = _ffi.new_handle(callback)
     func(node.p, _lib._pycall_bsp_callback, python_data)
 
-def traverse_pre_order(node, callback, *args, **kargs):
-    _bsp_traverse(node, _lib.TCOD_bsp_traverse_pre_order,
-                  callback, *args, **kargs)
+def traverse_pre_order(node, callback):
+    _bsp_traverse(node, _lib.TCOD_bsp_traverse_pre_order, callback)
 
-def traverse_in_order(node, callback, *args, **kargs):
-    _bsp_traverse(node, _lib.TCOD_bsp_traverse_in_order,
-                  callback, *args, **kargs)
+def traverse_in_order(node, callback):
+    _bsp_traverse(node, _lib.TCOD_bsp_traverse_in_order, callback)
 
-def traverse_post_order(node, callback, *args, **kargs):
-    _bsp_traverse(node, _lib.TCOD_bsp_traverse_post_order,
-                  callback, *args, **kargs)
+def traverse_post_order(node, callback):
+    _bsp_traverse(node, _lib.TCOD_bsp_traverse_post_order, callback)
 
-def traverse_level_order(node, callback, *args, **kargs):
-    _bsp_traverse(node, _lib.TCOD_bsp_traverse_level_order,
-                  callback, *args, **kargs)
+def traverse_level_order(node, callback):
+    _bsp_traverse(node, _lib.TCOD_bsp_traverse_level_order, callback)
 
-def traverse_inverted_level_order(node, callback, *args, **kargs):
-    _bsp_traverse(node, _lib.TCOD_bsp_traverse_inverted_level_order,
-                  callback, *args, **kargs)
+def traverse_inverted_level_order(node, callback):
+    _bsp_traverse(node, _lib.TCOD_bsp_traverse_inverted_level_order, callback)
 
 def remove_sons(node):
     _lib.TCOD_bsp_remove_sons(node.p)

@@ -1,4 +1,6 @@
 
+import threading as _threading
+
 from .libtcod import _lib, _ffi
 
 def init(xo, yo, xd, yd):
@@ -12,10 +14,15 @@ def step():
         return x[0], y[0]
     return None,None
 
+_line_listener_lock = _threading.Lock()
+
 def line(xo, yo, xd, yd, py_callback) :
     'callback: bool(int, int)'
-    c_callback = _ffi.callback('TCOD_line_listener_t')(py_callback)
-    return _lib.TCOD_line(xo, yo, xd, yd, c_callback)
+    with _line_listener_lock:
+        @_ffi.def_extern()
+        def _pycall_line_listener(x, y):
+            return py_callback(x, y)
+        return _lib.TCOD_line(xo, yo, xd, yd, _lib._pycall_line_listener)
 
 def iter(xo, yo, xd, yd):
     data = _ffi.new('TCOD_bresenham_data_t *')

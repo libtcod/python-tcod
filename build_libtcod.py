@@ -137,6 +137,12 @@ extern "Python" {
     static void pycall_parser_error(const char *msg);
 
     static bool _pycall_bsp_callback(TCOD_bsp_t *node, void *userData);
+
+    static float _pycall_path_func( int xFrom, int yFrom, int xTo, int yTo, void *user_data );
+
+    static bool _pycall_line_listener(int x, int y);
+
+    static void _pycall_sdl_hook(void *);
 }
 ''')
 #with open('src/libtcod_cdef.h', 'r') as file_cdef:

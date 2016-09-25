@@ -1,8 +1,9 @@
 ===========
  Changelog
 ===========
- * bsp functions which take a callback now accept *args and **kargs to pass
-   parameters to the call instead of the single userData parameter
+ * bsp and pathfinding functions which take a callback no longer have the
+   userdata parameter, if you need to pass data then you should use functools,
+   methods, or enclosing scope rules
 
 0.3
  * switched to using pycparser to compile libtcod headers, this may have

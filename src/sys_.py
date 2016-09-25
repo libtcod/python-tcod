@@ -50,12 +50,11 @@ def get_char_size():
 def update_char(asciiCode, fontx, fonty, img, x, y) :
     _lib.TCOD_sys_update_char(_int(asciiCode), fontx, fonty, img, x, y)
 
-# custom SDL post renderer
-SDL_RENDERER_FUNC = _ffi.callback('void(void*)')
 def register_SDL_renderer(callback):
-    global _sdl_renderer_func
-    _sdl_renderer_func = SDL_RENDERER_FUNC(callback)
-    _lib.TCOD_sys_register_SDL_renderer(_sdl_renderer_func)
+    @_ffi.def_extern()
+    def _pycall_sdl_hook(sdl_surface):
+        callback(sdl_surface)
+    _lib.TCOD_sys_register_SDL_renderer(_lib._pycall_sdl_hook)
 
 def check_for_event(mask, k, m) :
     return _lib.TCOD_sys_check_for_event(mask, k._struct, m._struct)

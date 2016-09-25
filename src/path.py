@@ -1,20 +1,19 @@
 
 from .libtcod import _lib, _ffi
 
-#PATH_CBK_FUNC = CFUNCTYPE(c_float, c_int, c_int, c_int, c_int, py_object)
-def PATH_CBK_FUNC(func):
-    def path_cb(x1, y1, x2, y2, pyobj):
-        return func(x1, y1, x2, y2, _ffi.from_handle(pyobj))
-    return _ffi.calback('float(int,int,int,int,void*)')(path_cb)
+@_ffi.def_extern()
+def _pycall_path_func(x1, y1, x2, y2, func_handle):
+    '''static float _pycall_path_func( int xFrom, int yFrom, int xTo, int yTo, void *user_data );
+    '''
+    return _ffi.from_handle(func_handle)(x1, y1, x2, y2)
 
 def new_using_map(m, dcost=1.41):
     return (_lib.TCOD_path_new_using_map(m, dcost), None)
 
-def new_using_function(w, h, func, userdata=None, dcost=1.41):
-    cbk_func = PATH_CBK_FUNC(func)
-    userdata = _ffi.new_handle(userdata)
-    return (_lib.TCOD_path_new_using_function(w, h, cbk_func,
-            userdata, dcost), cbk_func)
+def new_using_function(w, h, func, dcost=1.41):
+    python_handle = _ffi.new_handle(func)
+    return (_lib.TCOD_path_new_using_function(w, h, _lib._pycall_path_func,
+            python_handle, dcost), python_handle)
 
 def compute(p, ox, oy, dx, dy):
     return _lib.TCOD_path_compute(p[0], ox, oy, dx, dy)
@@ -35,7 +34,7 @@ def size(p):
     return _lib.TCOD_path_size(p[0])
 
 def reverse(p):
-    _lib.TCOD_path_reverse(p[0])  
+    _lib.TCOD_path_reverse(p[0])
 
 def get(p, idx):
     x = _ffi.new('int *')

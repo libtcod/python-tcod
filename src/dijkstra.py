@@ -1,14 +1,13 @@
 
 from .libtcod import _lib, _ffi
-from .path import PATH_CBK_FUNC
 
 def new(m, dcost=1.41):
     return (_lib.TCOD_dijkstra_new(m, dcost), None)
 
-def new_using_function(w, h, func, userdata=0, dcost=1.41):
-    cbk_func = PATH_CBK_FUNC(func)
-    return (_lib.TCOD_path_dijkstra_using_function(w, h, cbk_func,
-            py_object(userdata), c_float(dcost)), cbk_func)
+def new_using_function(w, h, func, dcost=1.41):
+    python_handle = _ffi.new_handle(func)
+    return (_lib.TCOD_path_dijkstra_using_function(w, h, _lib._pycall_path_func,
+            python_handle, c_float(dcost)), python_handle)
 
 def compute(p, ox, oy):
     _lib.TCOD_dijkstra_compute(p[0], ox, oy)

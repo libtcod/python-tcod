@@ -980,7 +980,7 @@ def hline_right(m, x, y):
         x += 1
 
 # the class building the dungeon from the bsp nodes
-def traverse_node(node, dat):
+def traverse_node(node, *dat):
     global bsp_map
     if libtcod.bsp_is_leaf(node):
         # calculate the room size
