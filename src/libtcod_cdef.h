@@ -4,6 +4,7 @@
 
 /* TDL FUNCTONS ----------------------------------------------------------- */
 
+static TCOD_value_t TDL_list_get_union(TCOD_list_t l,int idx);
 static bool TDL_list_get_bool(TCOD_list_t l,int idx);
 static char TDL_list_get_char(TCOD_list_t l,int idx);
 static int TDL_list_get_int(TCOD_list_t l,int idx);

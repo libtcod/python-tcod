@@ -36,27 +36,8 @@ def _unpack_union(type, union):
         raise RuntimeError('Unknown libtcod type: %i' % type)
 
 def _convert_TCODList(clist, type):
-    res = list()
-    for i in range(_lib.TCOD_list_size(clist)):
-        if type == _lib.TCOD_TYPE_BOOL:
-            elt = bool(_lib.TDL_list_get_bool(clist, i))
-        elif type == _lib.TCOD_TYPE_CHAR:
-            elt = _unicode(_lib.TDL_list_get_char(clist, i))
-        elif type == _lib.TCOD_TYPE_INT:
-            elt = _lib.TDL_list_get_int(clist, i)
-        elif type == _lib.TCOD_TYPE_FLOAT:
-            elt = _lib.TDL_list_get_float(clist, i)
-        elif (type == _lib.TCOD_TYPE_STRING or
-             _lib.TCOD_TYPE_VALUELIST15 >= type >= _lib.TCOD_TYPE_VALUELIST00):
-            elt = _unpack_char_p(_lib.TDL_list_get_string(clist, i))
-        elif type == _lib.TCOD_TYPE_COLOR:
-            elt = _tcod.Color.from_cdata(_lib.TDL_list_get_color(clist, i))
-        elif type == _lib.TCOD_TYPE_DICE:
-            elt = _tcod.Dice.from_cdata(_lib.TDL_list_get_dice(clist, i))
-        else:
-            raise TypeError('Unknown libtcod type: %i' % type)
-        res.append(elt)
-    return res
+    return [_unpack_union(type, _lib.TDL_list_get_union(clist, i))
+            for i in range(_lib.TCOD_list_size(clist))]
 
 def parser_new():
     return _lib.TCOD_parser_new()
