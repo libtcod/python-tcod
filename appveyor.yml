@@ -44,7 +44,7 @@ install:
 - cmd: "%PYTHON% -m pip install -v ."
 build: off
 test_script:
-- cmd: "%PYTHON% -m pip install nose2"
+- cmd: "%PYTHON% -m pip install nose2 cov-core"
 - cmd: "%PYTHON% -m nose2"
 deploy_script:
 - "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% setup.py -m pip install wheel twine"

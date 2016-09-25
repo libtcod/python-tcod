@@ -221,9 +221,9 @@ def console_fill_foreground(con,r,g,b) :
     if (numpy_available and isinstance(r, _numpy.ndarray) and
         isinstance(g, _numpy.ndarray) and isinstance(b, _numpy.ndarray)):
         #numpy arrays, use numpy's ctypes functions
-        r = _numpy.ascontiguousarray(r, dtype=_numpy.int_)
-        g = _numpy.ascontiguousarray(g, dtype=_numpy.int_)
-        b = _numpy.ascontiguousarray(b, dtype=_numpy.int_)
+        r = _numpy.ascontiguousarray(r, dtype=_numpy.intc)
+        g = _numpy.ascontiguousarray(g, dtype=_numpy.intc)
+        b = _numpy.ascontiguousarray(b, dtype=_numpy.intc)
         cr = _ffi.cast('int *', r.ctypes.data)
         cg = _ffi.cast('int *', g.ctypes.data)
         cb = _ffi.cast('int *', b.ctypes.data)
@@ -241,9 +241,9 @@ def console_fill_background(con,r,g,b) :
     if (_numpy_available() and isinstance(r, _numpy.ndarray) and
         isinstance(g, _numpy.ndarray) and isinstance(b, _numpy.ndarray)):
         #numpy arrays, use numpy's ctypes functions
-        r = _numpy.ascontiguousarray(r, dtype=_numpy.int_)
-        g = _numpy.ascontiguousarray(g, dtype=_numpy.int_)
-        b = _numpy.ascontiguousarray(b, dtype=_numpy.int_)
+        r = _numpy.ascontiguousarray(r, dtype=_numpy.intc)
+        g = _numpy.ascontiguousarray(g, dtype=_numpy.intc)
+        b = _numpy.ascontiguousarray(b, dtype=_numpy.intc)
         cr = _ffi.cast('int *', r.ctypes.data)
         cg = _ffi.cast('int *', g.ctypes.data)
         cb = _ffi.cast('int *', b.ctypes.data)
@@ -258,7 +258,7 @@ def console_fill_background(con,r,g,b) :
 def console_fill_char(con,arr) :
     if (_numpy_available() and isinstance(arr, _numpy.ndarray) ):
         #numpy arrays, use numpy's ctypes functions
-        arr = numpy.ascontiguousarray(arr, dtype=_numpy.int_)
+        arr = numpy.ascontiguousarray(arr, dtype=_numpy.intc)
         carr = _ffi.cast('int *', arr.ctypes.data)
     else:
         #otherwise convert using the ffi module

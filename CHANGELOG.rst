@@ -5,6 +5,7 @@
  * bsp and pathfinding functions which take a callback no longer have the
    userdata parameter, if you need to pass data then you should use functools,
    methods, or enclosing scope rules
+ * numpy buffer alignment issues fixed on 64-bit OS's
 
 0.3
  * switched to using pycparser to compile libtcod headers, this may have
