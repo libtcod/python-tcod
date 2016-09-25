@@ -1,16 +1,16 @@
 
 from .libtcod import _lib, _ffi, _str, _unpack_char_p
 
-def parse(filename,random=None):
+def namegen_parse(filename,random=None):
     _lib.TCOD_namegen_parse(filename,random or _ffi.NULL)
 
-def generate(name):
+def namegen_generate(name):
     return _unpack_char_p(_lib.TCOD_namegen_generate(_str(name), False))
 
-def generate_custom(name, rule):
+def namegen_generate_custom(name, rule):
     return _unpack_char_p(_lib.TCOD_namegen_generate(_str(name), rule, False))
 
-def get_sets():
+def namegen_get_sets():
     sets = _lib.TCOD_namegen_get_sets()
     try:
         lst = []
@@ -20,7 +20,7 @@ def get_sets():
         _lib.TCOD_list_delete(sets)
     return lst
 
-def destroy():
+def namegen_destroy():
     _lib.TCOD_namegen_destroy()
 
 __all__ = [_name for _name in list(globals()) if _name[0] != '_']

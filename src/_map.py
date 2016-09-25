@@ -16,37 +16,37 @@ FOV_PERMISSIVE_8 = 11
 FOV_RESTRICTIVE = 12
 NB_FOV_ALGORITHMS = 13
 
-def new(w, h):
+def map_new(w, h):
     return _lib.TCOD_map_new(w, h)
 
-def copy(source, dest):
+def map_copy(source, dest):
     return _lib.TCOD_map_copy(source, dest)
 
-def set_properties(m, x, y, isTrans, isWalk):
+def map_set_properties(m, x, y, isTrans, isWalk):
     _lib.TCOD_map_set_properties(m, x, y, isTrans, isWalk)
 
-def clear(m,walkable=False,transparent=False):
+def map_clear(m,walkable=False,transparent=False):
     _lib.TCOD_map_clear(m, walkable, transparent)
 
-def compute_fov(m, x, y, radius=0, light_walls=True, algo=FOV_RESTRICTIVE ):
+def map_compute_fov(m, x, y, radius=0, light_walls=True, algo=FOV_RESTRICTIVE ):
     _lib.TCOD_map_compute_fov(m, x, y, radius, light_walls, algo)
 
-def is_in_fov(m, x, y):
+def map_is_in_fov(m, x, y):
     return _lib.TCOD_map_is_in_fov(m, x, y)
 
-def is_transparent(m, x, y):
+def map_is_transparent(m, x, y):
     return _lib.TCOD_map_is_transparent(m, x, y)
 
-def is_walkable(m, x, y):
+def map_is_walkable(m, x, y):
     return _lib.TCOD_map_is_walkable(m, x, y)
 
-def delete(m):
+def map_delete(m):
     return _lib.TCOD_map_delete(m)
 
-def get_width(map):
+def map_get_width(map):
     return _lib.TCOD_map_get_width(map)
 
-def get_height(map):
+def map_get_height(map):
     return _lib.TCOD_map_get_height(map)
 
 __all__ = [_name for _name in list(globals()) if _name[0] != '_']

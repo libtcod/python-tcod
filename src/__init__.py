@@ -410,52 +410,23 @@ def struct_is_mandatory(struct, name):
 def struct_get_type(struct, name):
     return _lib.TCOD_struct_get_type(struct, name)
 
-_import_library_functions(lib, True)
-
-from . import bsp
-from . import color
-from . import console
-from . import dijkstra
-from . import heightmap
-from . import image
-from . import line
-from . import map
-from . import mouse
-from . import namegen
-from . import noise
-from . import parser
-from . import path
-from . import random
-from . import sys_ as sys
-
-_import_module_functions(bsp)
-_import_module_functions(color)
-_import_module_functions(console)
-_import_module_functions(dijkstra)
-_import_module_functions(heightmap)
-_import_module_functions(image)
-_import_module_functions(line)
-_import_module_functions(map)
-_import_module_functions(mouse)
-_import_module_functions(namegen)
-_import_module_functions(noise)
-_import_module_functions(parser)
-_import_module_functions(path)
-_import_module_functions(random)
-_import_module_functions(sys)
-
-# allow "import tcod.sys"
-_sys.modules['tcod.sys'] = _sys.modules['tcod.sys_']
-
-# tcod.line became both a module and a function due to the naming scheme
-class _ModuleProxy():
-    def __init__(self, module):
-        for name in dir(module):
-            setattr(self, name, getattr(module, name))
-line = _ModuleProxy(line)
-line.__call__ = line.line
-
 _import_library_functions(lib, False)
+
+from ._bsp import *
+from ._color import *
+from ._console import *
+from ._dijkstra import *
+from ._heightmap import *
+from ._image import *
+from ._line import *
+from ._map import *
+from ._mouse import *
+from ._namegen import *
+from ._noise import *
+from ._parser import *
+from ._path import *
+from ._random import *
+from ._sys import *
 
 with open(_os.path.join(__path__[0], 'version.txt'), 'r') as _f:
     # exclude the git commit number (PEP 396)

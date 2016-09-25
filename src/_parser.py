@@ -58,16 +58,16 @@ def _convert_TCODList(clist, type):
         res.append(elt)
     return res
 
-def new():
+def parser_new():
     return _lib.TCOD_parser_new()
 
-def new_struct(parser, name):
+def parser_new_struct(parser, name):
     return _lib.TCOD_parser_new_struct(parser, name)
 
 # prevent multiple threads from messing with def_extern callbacks
 _parser_callback_lock = _threading.Lock()
 
-def run(parser, filename, listener=None):
+def parser_run(parser, filename, listener=None):
     if not listener:
         _lib.TCOD_parser_run(parser, _str(filename), _ffi.NULL)
         return
@@ -104,33 +104,33 @@ def run(parser, filename, listener=None):
 
         _lib.TCOD_parser_run(parser, _str(filename), clistener)
 
-def delete(parser):
+def parser_delete(parser):
     _lib.TCOD_parser_delete(parser)
 
-def get_bool_property(parser, name):
+def parser_get_bool_property(parser, name):
     return bool(_lib.TCOD_parser_get_bool_property(parser, _str(name)))
 
-def get_int_property(parser, name):
+def parser_get_int_property(parser, name):
     return _lib.TCOD_parser_get_int_property(parser, _str(name))
 
-def get_char_property(parser, name):
+def parser_get_char_property(parser, name):
     return _chr(_lib.TCOD_parser_get_char_property(parser, _str(name)))
 
-def get_float_property(parser, name):
+def parser_get_float_property(parser, name):
     return _lib.TCOD_parser_get_float_property(parser, _str(name))
 
-def get_string_property(parser, name):
+def parser_get_string_property(parser, name):
     return _unpack_char_p(_lib.TCOD_parser_get_string_property(parser, _str(name)))
 
-def get_color_property(parser, name):
+def parser_get_color_property(parser, name):
     return _tcod.Color.from_cdata(_lib.TCOD_parser_get_color_property(parser, _str(name)))
 
-def get_dice_property(parser, name):
+def parser_get_dice_property(parser, name):
     d = _ffi.new('TCOD_dice_t *')
     _lib.TCOD_parser_get_dice_property_py(parser, _str(name), d)
     return _tcod.Dice.from_cdata(d)
 
-def get_list_property(parser, name, type):
+def parser_get_list_property(parser, name, type):
     clist = _lib.TCOD_parser_get_list_property(parser, _str(name), type)
     return _convert_TCODList(clist, type)
 
