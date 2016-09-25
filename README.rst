@@ -45,7 +45,7 @@ recommended.
 ==============
 * Python 2.7+, Python 3.3+, or PyPy 5.4+
 * Windows, Linux, or Mac OS X
-* python-cffi must be version 1.1 or higher
+* python-cffi must be version 1.8 or higher
 * Installing from source on Mac OS X requires sdl1.2, which can be installed
   using the homebrew command: "brew install sdl"
 * Installing from source on Linux requires the following packages:
