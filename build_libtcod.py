@@ -46,13 +46,13 @@ def find_sources(directory):
 
 module_name = 'tcod._libtcod'
 include_dirs = ['Release/tcod/',
-                'dependencies/libtcod-1.5.1/include/',
-                'dependencies/libtcod-1.5.1/src/png/']
+                'dependencies/libtcod/include/',
+                'dependencies/libtcod/src/png/']
 extra_compile_args = []
 extra_link_args = []
 sources = []
 
-sources += [file for file in walk_sources('dependencies/libtcod-1.5.1/src')
+sources += [file for file in walk_sources('dependencies/libtcod/src')
             if 'sys_sfml_c' not in file]
 sources += find_sources('dependencies/zlib-1.2.8/')
 
@@ -90,7 +90,7 @@ def get_cdef():
 def get_ast():
     ast = parse_file(filename='src/libtcod_cdef.h', use_cpp=True,
                      cpp_args=[r'-Idependencies/fake_libc_include',
-                               r'-Idependencies/libtcod-1.5.1/include',
+                               r'-Idependencies/libtcod/include',
                                r'-DDECLSPEC=',
                                r'-DSDLCALL=',
                                r'-DTCODLIB_API=',
