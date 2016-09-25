@@ -1,6 +1,7 @@
 ===========
  Changelog
 ===========
+ * sub packages have been removed to follow the libtcodpy API more closely
  * bsp and pathfinding functions which take a callback no longer have the
    userdata parameter, if you need to pass data then you should use functools,
    methods, or enclosing scope rules
