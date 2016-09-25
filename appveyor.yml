@@ -47,6 +47,6 @@ test_script:
 - cmd: "%PYTHON% -m pip install nose2 cov-core"
 - cmd: "%PYTHON% -m nose2"
 deploy_script:
-- "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% setup.py -m pip install wheel twine"
+- "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% -m pip install wheel twine"
 - "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% setup.py sdist bdist_wheel bdist_egg"
 - "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% -m twine upload -u %pypi_user% -p %pypi_pass% --skip-existing dist/*"
