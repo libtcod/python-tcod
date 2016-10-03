@@ -1,0 +1,24 @@
+syntax: regexp
+
+build/dependencies
+build/packages
+\.vcproj$
+\.vcxproj.user$
+cbproj
+xcodeproj
+libtcod.build
+CMakeFiles
+CMakeScripts
+.*\.cmake$
+Makefile$
+.*\.dylib$
+.*/[Release|Debug]
+CMakeCache.txt
+\.a$
+\.egg-info/
+__pycache__
+\.py[co]
+\.deps/
+\.dirstamp
+\.o
+\.lo
