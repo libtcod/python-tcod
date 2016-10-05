@@ -97,7 +97,7 @@ def get_ast():
                                r'-DDECLSPEC=',
                                r'-DSDLCALL=',
                                r'-DTCODLIB_API=',
-                               r'-TCOD_NO_MACOSX_SDL_MAIN=',
+                               r'-DTCOD_NO_MACOSX_SDL_MAIN=',
                                ])
     for node in list(ast.ext):
         # resolve binary ops in TCOD_event_t enum
