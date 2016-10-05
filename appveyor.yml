@@ -28,6 +28,7 @@ environment:
 clone_depth: 20
 
 install:
+- ps: "git submodule update --init --recursive"
 - ps: |
     if ($env:PYPY){
         $env:PYTHON = 'C:\' + $env:PYPY + '\pypy.exe'
