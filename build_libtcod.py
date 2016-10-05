@@ -55,7 +55,9 @@ extra_link_args = []
 sources = []
 
 sources += [file for file in walk_sources('libtcod/src')
-            if 'sys_sfml_c' not in file]
+            if 'sys_sfml_c' not in file
+            and 'sdl2' not in file
+            ]
 
 libraries = []
 library_dirs = []
