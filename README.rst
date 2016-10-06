@@ -47,7 +47,9 @@ recommended.
 * Windows, Linux, or Mac OS X
 * Python cffi module must be version 1.8 or higher
 
-### Extra requirements when installing directly from source
+
+Extra requirements when installing directly from source
+-------------------------------------------------------
 
 * Python pycparser module must be 2.14 or higher
 * MinGW gcc.exe must be on Windows path for use with pycparser, or an
