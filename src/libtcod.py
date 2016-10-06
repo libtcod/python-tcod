@@ -12,9 +12,9 @@ def _get_lib_path_crossplatform():
     bits, linkage = _platform.architecture()
     if 'win32' in _sys.platform:
         if bits == '32bit':
-            return 'lib/win32/'
+            return 'x86/'
         else:
-            return 'lib/win64/'
+            return 'x64/'
     elif 'linux' in _sys.platform:
         if bits == '32bit':
             return 'lib/linux32/'

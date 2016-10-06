@@ -56,12 +56,15 @@ sources = []
 
 sources += [file for file in walk_sources('libtcod/src')
             if 'sys_sfml_c' not in file
-            and 'sdl2' not in file
+            and 'sdl12' not in file
             ]
 
 libraries = []
 library_dirs = []
-define_macros = [('LIBTCOD_EXPORTS', None)]
+define_macros = [('LIBTCOD_EXPORTS', None),
+                 ('TCOD_SDL2', None),
+                 ('NO_OPENGL', None),
+                 ]
 
 with open('src/tdl_source.c', 'r') as file_source:
     source = file_source.read()
@@ -75,16 +78,16 @@ if 'linux' in sys.platform:
 if sys.platform == 'darwin':
     extra_link_args += ['-framework', 'OpenGL']
 
-libraries += ['SDL']
+libraries += ['SDL2']
 
 # included SDL headers are for whatever OS's don't easily come with them
 if sys.platform in ['win32', 'darwin']:
-    include_dirs += ['dependencies/SDL-1.2.15/include', 'libtcod/src/zlib/']
+    include_dirs += ['dependencies/SDL2-2.0.4/include', 'libtcod/src/zlib/']
 
     if BITSIZE == '32bit':
-        library_dirs += [os.path.realpath('dependencies/SDL-1.2.15/lib/x86')]
+        library_dirs += [os.path.realpath('dependencies/SDL2-2.0.4/lib/x86')]
     else:
-        library_dirs += [os.path.realpath('dependencies/SDL-1.2.15/lib/x64')]
+        library_dirs += [os.path.realpath('dependencies/SDL2-2.0.4/lib/x64')]
 
 def get_cdef():
     generator = c_generator.CGenerator()
@@ -98,6 +101,8 @@ def get_ast():
                                r'-DSDLCALL=',
                                r'-DTCODLIB_API=',
                                r'-DTCOD_NO_MACOSX_SDL_MAIN=',
+                               r'-DTCOD_SDL2=',
+                               r'-DNO_OPENGL',
                                ])
     for node in list(ast.ext):
         # resolve binary ops in TCOD_event_t enum

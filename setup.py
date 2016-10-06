@@ -23,9 +23,9 @@ def get_package_data():
              'lib/README-SDL.txt']
     if 'win32' in sys.platform:
         if BITSIZE == '32bit':
-            files += ['lib/win32/SDL.dll']
+            files += ['x86/SDL2.dll']
         else:
-            files += ['lib/win64/SDL.dll']
+            files += ['x64/SDL2.dll']
     elif 'linux' in sys.platform:
         pass
     elif 'darwin' in sys.platform:
