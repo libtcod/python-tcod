@@ -46,15 +46,18 @@ def find_sources(directory):
 
 module_name = 'tcod._libtcod'
 include_dirs = ['Release/tcod/',
-                'dependencies/libtcod/include/',
-                'dependencies/libtcod/src/png/']
+                'libtcod/include/',
+                'libtcod/src/png/',
+                'libtcod/src/zlib/',
+                ]
 extra_compile_args = []
 extra_link_args = []
 sources = []
 
-sources += [file for file in walk_sources('dependencies/libtcod/src')
-            if 'sys_sfml_c' not in file]
-sources += find_sources('dependencies/zlib-1.2.8/')
+sources += [file for file in walk_sources('libtcod/src')
+            if 'sys_sfml_c' not in file
+            and 'sdl2' not in file
+            ]
 
 libraries = []
 library_dirs = []
@@ -76,7 +79,7 @@ libraries += ['SDL']
 
 # included SDL headers are for whatever OS's don't easily come with them
 if sys.platform in ['win32', 'darwin']:
-    include_dirs += ['dependencies/SDL-1.2.15/include', 'dependencies/zlib-1.2.8/']
+    include_dirs += ['dependencies/SDL-1.2.15/include', 'libtcod/src/zlib/']
 
     if BITSIZE == '32bit':
         library_dirs += [os.path.realpath('dependencies/SDL-1.2.15/lib/x86')]
@@ -90,10 +93,11 @@ def get_cdef():
 def get_ast():
     ast = parse_file(filename='src/libtcod_cdef.h', use_cpp=True,
                      cpp_args=[r'-Idependencies/fake_libc_include',
-                               r'-Idependencies/libtcod/include',
+                               r'-Ilibtcod/include',
                                r'-DDECLSPEC=',
                                r'-DSDLCALL=',
                                r'-DTCODLIB_API=',
+                               r'-DTCOD_NO_MACOSX_SDL_MAIN=',
                                ])
     for node in list(ast.ext):
         # resolve binary ops in TCOD_event_t enum
