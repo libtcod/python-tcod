@@ -49,6 +49,7 @@ include_dirs = ['Release/tcod/',
                 'libtcod/include/',
                 'libtcod/src/png/',
                 'libtcod/src/zlib/',
+                '/usr/include/SDL2/',
                 ]
 extra_compile_args = []
 extra_link_args = []
@@ -81,13 +82,16 @@ if sys.platform == 'darwin':
 libraries += ['SDL2']
 
 # included SDL headers are for whatever OS's don't easily come with them
-if sys.platform in ['win32', 'darwin']:
-    include_dirs += ['dependencies/SDL2-2.0.4/include', 'libtcod/src/zlib/']
+if sys.platform in ['win32']:
+    include_dirs += ['dependencies/SDL2-2.0.4/include']
 
     if BITSIZE == '32bit':
         library_dirs += [os.path.realpath('dependencies/SDL2-2.0.4/lib/x86')]
     else:
         library_dirs += [os.path.realpath('dependencies/SDL2-2.0.4/lib/x64')]
+
+if sys.platform in ['win32', 'darwin']:
+    include_dirs += ['libtcod/src/zlib/']
 
 def get_cdef():
     generator = c_generator.CGenerator()

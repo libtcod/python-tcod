@@ -38,7 +38,7 @@ addons:
       - mesa-common-dev
 
 before_install:
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install sdl2; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install -v sdl2; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv venv -p $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
