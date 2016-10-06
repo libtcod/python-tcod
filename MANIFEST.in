@@ -1,24 +1,12 @@
 include *.py *.cfg *.txt *.rst
 
 recursive-include src *.py *.c *.h *.txt *.dll
-graft src/SDL.framework
 
-recursive-include testing *.py *.cfg *.png *.txt
+recursive-include tests *.py *.cfg *.png *.txt
 recursive-include examples *.py *.cfg *.png *.txt
 
-recursive-include dependencies/libtcod-*/include *.h
-recursive-include dependencies/libtcod-*/src *.c *.h
-include dependencies/libtcod-*/*.txt
+recursive-include libtcod/include *.h
+recursive-include libtcod/src *.c *.h
+include libtcod/*.txt
 
-include dependencies/zlib-*/*.c
-include dependencies/zlib-*/*.h
-include dependencies/zlib-*/README
-prune dependencies/zlib-*/examples
-prune dependencies/zlib-*/test
-prune dependencies/zlib-*/contrib
-
-recursive-include dependencies/fake_libc_include *.h
-
-recursive-include dependencies/SDL-* *.h *.dll *.lib
-include dependencies/SDL-*/*.txt
-prune dependencies/SDL-*/src
+recursive-include dependencies *.h *.c *.dll *.lib
