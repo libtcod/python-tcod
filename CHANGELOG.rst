@@ -1,6 +1,9 @@
 ===========
  Changelog
 ===========
+2.0a
+ * updated to compile with libtcod-1.6.2 and SDL-2.0.4
+
 1.0
  * sub packages have been removed to follow the libtcodpy API more closely
  * bsp and pathfinding functions which take a callback no longer have the
