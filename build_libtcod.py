@@ -3,9 +3,7 @@
 import os
 import sys
 
-import subprocess
 import platform
-
 from pycparser import c_parser, c_ast, parse_file, c_generator
 from cffi import FFI
 
@@ -75,13 +73,6 @@ with open('src/tdl_source.c', 'r') as file_source:
 
 if sys.platform == 'win32':
     libraries += ['User32', 'OpenGL32']
-    libraries += ['SDL2']
-else:
-
-    extra_compile_args += subprocess.check_output('sdl2-config --cflags',
-                                                  shell=True).split(b' ')
-    extra_link_args += subprocess.check_output('sdl2-config --libs',
-                                               shell=True).split(b' ')
 
 if 'linux' in sys.platform:
     libraries += ['GL']
@@ -89,6 +80,7 @@ if 'linux' in sys.platform:
 if sys.platform == 'darwin':
     extra_link_args += ['-framework', 'OpenGL']
 
+libraries += ['SDL2']
 
 # included SDL headers are for whatever OS's don't easily come with them
 if sys.platform in ['win32', 'darwin']:
