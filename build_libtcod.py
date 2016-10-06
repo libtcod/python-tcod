@@ -3,7 +3,9 @@
 import os
 import sys
 
+import subprocess
 import platform
+
 from pycparser import c_parser, c_ast, parse_file, c_generator
 from cffi import FFI
 
@@ -75,8 +77,11 @@ if sys.platform == 'win32':
     libraries += ['User32', 'OpenGL32']
     libraries += ['SDL2']
 else:
-    extra_compile_args += ['`sdl2-config --cflags`']
-    extra_link_args += ['`sdl2-config --static-libs`']
+
+    extra_compile_args += subprocess.check_output('sdl2-config --cflags',
+                                                  shell=True).split(b' ')
+    extra_link_args += subprocess.check_output('sdl2-config --libs',
+                                               shell=True).split(b' ')
 
 if 'linux' in sys.platform:
     libraries += ['GL']
