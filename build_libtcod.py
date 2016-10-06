@@ -65,6 +65,7 @@ library_dirs = []
 define_macros = [('LIBTCOD_EXPORTS', None),
                  ('TCOD_SDL2', None),
                  ('NO_OPENGL', None),
+                 ('TCOD_NO_MACOSX_SDL_MAIN', None),
                  ]
 
 with open('src/tdl_source.c', 'r') as file_source:
@@ -82,7 +83,7 @@ if sys.platform == 'darwin':
 libraries += ['SDL2']
 
 # included SDL headers are for whatever OS's don't easily come with them
-if sys.platform in ['win32']:
+if sys.platform in ['win32', 'darwin']:
     include_dirs += ['dependencies/SDL2-2.0.4/include']
 
     if BITSIZE == '32bit':
