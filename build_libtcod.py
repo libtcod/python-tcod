@@ -9,29 +9,6 @@ from cffi import FFI
 
 BITSIZE, LINKAGE = platform.architecture()
 
-def _get_library_dirs_crossplatform():
-    if 'win32' in sys.platform:
-        return ['src/lib/win32/']
-    elif 'linux' in sys.platform:
-        if BITSIZE == '32bit':
-            return ['src/lib/linux32/']
-        elif BITSIZE == '64bit':
-            return ['src/lib/linux64/']
-    elif 'darwin' in sys.platform:
-        return ['src/SDL.framework/Versions/A/']
-    raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, BITSIZE, LINKAGE))
-
-def _get_libraries_crossplatform():
-    return ['SDL', 'OpenGL32']
-    if sys.platform == 'win32':
-        return ['libtcod-VS']
-    elif 'linux' in sys.platform:
-        return ['tcod']
-    elif 'darwin' in sys.platform:
-        return ['tcod']
-    raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (sys.platform, BITSIZE, LINKAGE))
-
-
 def walk_sources(directory):
     for path, dirs, files in os.walk(directory):
         for source in files:
@@ -51,6 +28,7 @@ include_dirs = ['Release/tcod/',
                 'libtcod/src/zlib/',
                 '/usr/include/SDL2/',
                 ]
+
 extra_compile_args = []
 extra_link_args = []
 sources = []
@@ -68,7 +46,7 @@ define_macros = [('LIBTCOD_EXPORTS', None),
                  ('TCOD_NO_MACOSX_SDL_MAIN', None),
                  ]
 
-with open('src/tdl_source.c', 'r') as file_source:
+with open('tcod/tdl_source.c', 'r') as file_source:
     source = file_source.read()
 
 if sys.platform == 'win32':
@@ -83,6 +61,7 @@ if sys.platform == 'darwin':
 libraries += ['SDL2']
 
 # included SDL headers are for whatever OS's don't easily come with them
+
 if sys.platform in ['win32', 'darwin']:
     include_dirs += ['dependencies/SDL2-2.0.4/include']
 
@@ -99,7 +78,7 @@ def get_cdef():
     return generator.visit(get_ast())
 
 def get_ast():
-    ast = parse_file(filename='src/libtcod_cdef.h', use_cpp=True,
+    ast = parse_file(filename='tcod/libtcod_cdef.h', use_cpp=True,
                      cpp_args=[r'-Idependencies/fake_libc_include',
                                r'-Ilibtcod/include',
                                r'-DDECLSPEC=',
@@ -159,8 +138,6 @@ extern "Python" {
     static void _pycall_sdl_hook(void *);
 }
 ''')
-#with open('src/libtcod_cdef.h', 'r') as file_cdef:
-#    ffi.cdef(file_cdef.read())
 ffi.set_source(
     module_name, source,
     include_dirs=include_dirs,

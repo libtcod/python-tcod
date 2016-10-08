@@ -56,6 +56,6 @@ docs/_build/
 target/
 
 # Custom
-tcod-*/
 Release/
-/tcod/
+tcod/_*.c
+tcod/_*.pyd

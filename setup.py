@@ -8,7 +8,7 @@ import subprocess
 
 from setuptools import setup, Command
 
-VERSION_PATH = 'src/version.txt'
+VERSION_PATH = 'tcod/version.txt'
 
 def get_version():
     with open(VERSION_PATH, 'r') as f:
@@ -47,7 +47,6 @@ setup(
     url='https://github.com/HexDecimal/libtcod-cffi',
     download_url='https://pypi.python.org/pypi/libtcod-cffi',
     packages=['tcod'],
-    package_dir={'tcod': 'src'},
     package_data=get_package_data(),
     setup_requires=["cffi>=1.8.1,<2", "pycparser>=2.14,<3"],
     cffi_modules=["build_libtcod.py:ffi"],
