@@ -44,8 +44,11 @@ before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
 - pip install --upgrade pip
 install:
-- pip install -v .
+- pip install -v -e .
 before_script:
+ - "export DISPLAY=:99.0"
+ - "sh -e /etc/init.d/xvfb start"
+ - sleep 3 # give xvfb some time to start
  - pip install nose2 cov-core
 script:
- - python -c "import tcod"
+ - python -m nose2
