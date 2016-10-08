@@ -53,3 +53,6 @@ before_script:
 script:
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then python -m nose2; fi'
  - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python -c "import tcod"; fi'
+after_success:
+ - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip install python-coveralls; fi'
+ - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then coveralls; fi'
