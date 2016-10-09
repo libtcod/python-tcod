@@ -5,6 +5,10 @@ environment:
     secure: YhPdxLme3DzBgwQBteEZ6u0GxLHmDkBmBMMka78rNIw=
   COVERALLS_REPO_TOKEN:
     secure: RfPO0w4cXW1mq0QzexFhqm/A63BjsAcIagiGcgXgxzDTcLqEsGHaVGH6OOa1kMyz
+  COVERALLS_PARALLEL: true
+  COVERALLS_SERVICE_NAME: AppVeyor
+  CODACY_PROJECT_TOKEN:
+    secure: Fdt5ClRgYNTWeL05pVaxoEfUMlF+M26+bqY1fgZKJca7NP7mtclMN81ZCNNVCsJ4
   matrix:
   - PYPY: pypy2-v5.4.1-win32
     platform: Any CPU
@@ -50,11 +54,14 @@ test_script:
 - cmd: "%PYTHON% -m pip install nose2 cov-core"
 - cmd: "%PYTHON% -m nose2"
 
+
 on_success:
 - "C:\\Python27\\python.exe -m virtualenv py27venv"
 - py27venv\Scripts\activate.bat
-- "pip install git+https://github.com/HexDecimal/python-coveralls.git@windows-support"
+- "pip install codacy-coverage git+https://github.com/HexDecimal/python-coveralls.git@windows-support"
 - coveralls
+- coverage xml
+- python-codacy-coverage -r coverage.xml
 
 deploy_script:
 - "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% -m pip install wheel twine"
