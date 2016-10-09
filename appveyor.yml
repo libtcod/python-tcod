@@ -3,27 +3,27 @@ environment:
     secure: 6EhNSnUl0yOO26EeQ5WG1pQx8v/vp99/u24NRpZvF0k=
   pypi_pass:
     secure: YhPdxLme3DzBgwQBteEZ6u0GxLHmDkBmBMMka78rNIw=
+  COVERALLS_REPO_TOKEN:
+    secure: RfPO0w4cXW1mq0QzexFhqm/A63BjsAcIagiGcgXgxzDTcLqEsGHaVGH6OOa1kMyz
   matrix:
-  - PYTHON: C:\Python27\python.exe
-    platform: Any CPU
-  - PYTHON: C:\Python35\python.exe
-    platform: Any CPU
-  - PYTHON: C:\Python34\python.exe
-    platform: Any CPU
-  - PYTHON: C:\Python33\python.exe
-    platform: Any CPU
-
-  - PYTHON: C:\Python27-x64\python.exe
-    platform: x64
-  - PYTHON: C:\Python35-x64\python.exe
-    platform: x64
-  - PYTHON: C:\Python34-x64\python.exe
-    platform: x64
-  - PYTHON: C:\Python33-x64\python.exe
-    platform: x64
-
   - PYPY: pypy2-v5.4.1-win32
     platform: Any CPU
+  - PYTHON: C:\Python27\python.exe
+    platform: Any CPU
+  - PYTHON: C:\Python27-x64\python.exe
+    platform: x64
+  - PYTHON: C:\Python33\python.exe
+    platform: Any CPU
+  - PYTHON: C:\Python33-x64\python.exe
+    platform: x64
+  - PYTHON: C:\Python34\python.exe
+    platform: Any CPU
+  - PYTHON: C:\Python34-x64\python.exe
+    platform: x64
+  - PYTHON: C:\Python35\python.exe
+    platform: Any CPU
+  - PYTHON: C:\Python35-x64\python.exe
+    platform: x64
 
 clone_depth: 20
 
@@ -49,6 +49,13 @@ build: off
 test_script:
 - cmd: "%PYTHON% -m pip install nose2 cov-core"
 - cmd: "%PYTHON% -m nose2"
+
+on_success:
+- "C:\\Python27\\python.exe -m virtualenv py27venv"
+- py27venv\Scripts\activate.bat
+- "pip install git+https://github.com/HexDecimal/python-coveralls.git@windows-support"
+- coveralls
+
 deploy_script:
 - "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% -m pip install wheel twine"
 - "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% setup.py sdist bdist_wheel bdist_egg"
