@@ -1,4 +1,6 @@
 
+import functools as _functools
+
 from . import Bsp as _Bsp
 from .libtcod import _lib, _ffi
 
@@ -40,27 +42,29 @@ def bsp_contains(node, cx, cy):
 def bsp_find_node(node, cx, cy):
     return _Bsp(_lib.TCOD_bsp_find_node(node.p, cx, cy))
 
-def _bsp_traverse(node, func, callback):
-    '''pack (callback, *args, **kargs) into a handle for use with the callback
+def _bsp_traverse(node, func, callback, userData):
+    '''pack callback into a handle for use with the callback
     _pycall_bsp_callback
     '''
+    callback = _functools.partial(callback, userData)
     python_data = _ffi.new_handle(callback)
     func(node.p, _lib._pycall_bsp_callback, python_data)
 
-def bsp_traverse_pre_order(node, callback):
-    _bsp_traverse(node, _lib.TCOD_bsp_traverse_pre_order, callback)
+def bsp_traverse_pre_order(node, callback, userData=0):
+    _bsp_traverse(node, _lib.TCOD_bsp_traverse_pre_order, callback, userData)
 
-def bsp_traverse_in_order(node, callback):
-    _bsp_traverse(node, _lib.TCOD_bsp_traverse_in_order, callback)
+def bsp_traverse_in_order(node, callback, userData=0):
+    _bsp_traverse(node, _lib.TCOD_bsp_traverse_in_order, callback, userData)
 
-def bsp_traverse_post_order(node, callback):
-    _bsp_traverse(node, _lib.TCOD_bsp_traverse_post_order, callback)
+def bsp_traverse_post_order(node, callback, userData=0):
+    _bsp_traverse(node, _lib.TCOD_bsp_traverse_post_order, callback, userData)
 
-def bsp_traverse_level_order(node, callback):
-    _bsp_traverse(node, _lib.TCOD_bsp_traverse_level_order, callback)
+def bsp_traverse_level_order(node, callback, userData=0):
+    _bsp_traverse(node, _lib.TCOD_bsp_traverse_level_order, callback, userData)
 
-def bsp_traverse_inverted_level_order(node, callback):
-    _bsp_traverse(node, _lib.TCOD_bsp_traverse_inverted_level_order, callback)
+def bsp_traverse_inverted_level_order(node, callback, userData=0):
+    _bsp_traverse(node, _lib.TCOD_bsp_traverse_inverted_level_order,
+                  callback, userData)
 
 def bsp_remove_sons(node):
     _lib.TCOD_bsp_remove_sons(node.p)

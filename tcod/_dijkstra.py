@@ -1,10 +1,13 @@
 
+import functools as _functools
+
 from .libtcod import _lib, _ffi
 
 def dijkstra_new(m, dcost=1.41):
     return (_lib.TCOD_dijkstra_new(m, dcost), None)
 
-def dijkstra_new_using_function(w, h, func, dcost=1.41):
+def dijkstra_new_using_function(w, h, func, userData=0, dcost=1.41):
+    func = _functools(func, userData)
     python_handle = _ffi.new_handle(func)
     return (_lib.TCOD_path_dijkstra_using_function(w, h, _lib._pycall_path_func,
             python_handle, c_float(dcost)), python_handle)

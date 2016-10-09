@@ -1,4 +1,6 @@
 
+import functools as _functools
+
 from .libtcod import _lib, _ffi
 
 @_ffi.def_extern()
@@ -10,7 +12,8 @@ def _pycall_path_func(x1, y1, x2, y2, func_handle):
 def path_new_using_map(m, dcost=1.41):
     return (_lib.TCOD_path_new_using_map(m, dcost), None)
 
-def path_new_using_function(w, h, func, dcost=1.41):
+def path_new_using_function(w, h, func, userData=0, dcost=1.41):
+    func = _functools.parital(func, userData)
     python_handle = _ffi.new_handle(func)
     return (_lib.TCOD_path_new_using_function(w, h, _lib._pycall_path_func,
             python_handle, dcost), python_handle)
