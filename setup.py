@@ -8,11 +8,8 @@ import subprocess
 
 from setuptools import setup, Command
 
-VERSION_PATH = 'tcod/version.txt'
-
-def get_version():
-    with open(VERSION_PATH, 'r') as f:
-        return f.read()
+with open('tcod/version.txt', 'r') as f:
+    version = f.read()
 
 def get_package_data():
     '''get data files which will be included in the main tcod/ directory'''
@@ -26,19 +23,11 @@ def get_package_data():
             files += ['x86/SDL2.dll']
         else:
             files += ['x64/SDL2.dll']
-    elif 'linux' in sys.platform:
-        pass
-    elif 'darwin' in sys.platform:
-        pass
-    else:
-        raise ImportError('Operating system "%s" has no supported dynamic '
-                          'link libarary. (%s, %s)' %
-                          (sys.platform, BITSIZE, LINKAGE))
     return {'tcod': files}
 
 setup(
     name='libtcod-cffi',
-    version=get_version(),
+    version=version,
     author='Kyle Stewart',
     author_email='4B796C65+pythonTDL@gmail.com',
     description='A Python cffi port of libtcod-1.6',
