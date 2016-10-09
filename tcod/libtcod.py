@@ -7,34 +7,11 @@ import platform as _platform
 
 from . import __path__
 
-def _get_lib_path_crossplatform():
-    '''Locate the right DLL path for this OS'''
-    bits, linkage = _platform.architecture()
-    if 'win32' in _sys.platform:
-        if bits == '32bit':
-            return 'x86/'
-        else:
-            return 'x64/'
-    elif 'linux' in _sys.platform:
-        if bits == '32bit':
-            return 'lib/linux32/'
-        elif bits == '64bit':
-            return 'lib/linux64/'
-    elif 'darwin' in _sys.platform:
-        return 'lib/'
-    raise ImportError('Operating system "%s" has no supported dynamic link libarary. (%s, %s)' % (_sys.platform, bits, linkage))
-
 # add Windows dll's to PATH
-if 'win' in _sys.platform:
-    _os.environ['PATH'] += ';' + _os.path.join(__path__[0],
-                                               _get_lib_path_crossplatform())
-
-# add Mac dylib's to DYLD_LIBRARY_PATH
-if 'darwin' in _sys.platform:
-    if 'DYLD_LIBRARY_PATH' in _os.environ:
-        _os.environ['DYLD_LIBRARY_PATH'] += ':' + _os.path.realpath(_os.path.join(__path__[0], _get_lib_path_crossplatform()))
-    else:
-        _os.environ['DYLD_LIBRARY_PATH'] = _os.path.realpath(_os.path.join(__path__[0], _get_lib_path_crossplatform()))
+if 'win32' in _sys.platform:
+    _bits, _linkage = _platform.architecture()
+    _os.environ['PATH'] += (';' + \
+        _os.path.join(__path__[0], 'x86/' if _bits == '32bit' else 'x64'))
 
 from . import _libtcod
 
