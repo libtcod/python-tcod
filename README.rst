@@ -1,6 +1,11 @@
 .. contents::
    :backlinks: top
 
+========
+ Status
+========
+|AppveyorBadge| |TravisBadge| |CoverallsBadge| |PyPIBadge|
+
 =======
  About
 =======
@@ -64,3 +69,15 @@ Extra requirements when installing directly from source
 =========
 libtcod-cffi is distributed under the Simplified 2-clause FreeBSD license.
 Read LICENSE.txt, and the tcod/lib/README's for more details.
+
+.. |AppveyorBadge| image:: https://ci.appveyor.com/api/projects/status/7c6bj01971ic3omd/branch/master?svg=true
+                   :target: https://ci.appveyor.com/project/HexDecimal/libtcod-cffi/branch/master
+
+.. |TravisBadge| image:: https://travis-ci.org/HexDecimal/libtcod-cffi.svg?branch=master
+                 :target: https://travis-ci.org/HexDecimal/libtcod-cffi
+
+.. |CoverallsBadge| image:: https://coveralls.io/repos/github/HexDecimal/libtcod-cffi/badge.svg?branch=coverage
+                    :target: https://coveralls.io/github/HexDecimal/libtcod-cffi?branch=coverage
+
+.. |PyPIBadge| image:: https://img.shields.io/pypi/v/libtcod-cffi.svg?maxAge=10800
+               :target: https://pypi.python.org/pypi/libtcod-cffi
