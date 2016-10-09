@@ -4,7 +4,7 @@
 ========
  Status
 ========
-|AppveyorBadge| |TravisBadge| |CoverallsBadge| |PyPIBadge|
+|PyPIBadge| |AppveyorBadge| |TravisBadge| |CoverallsBadge| |CodacyBadge|
 
 =======
  About
@@ -81,3 +81,18 @@ Read LICENSE.txt, and the tcod/lib/README's for more details.
 
 .. |PyPIBadge| image:: https://img.shields.io/pypi/v/libtcod-cffi.svg?maxAge=10800
                :target: https://pypi.python.org/pypi/libtcod-cffi
+
+.. |LicenseBadge| image:: https://img.shields.io/pypi/l/libtcod-cffi.svg?maxAge=2592000
+    :target: https://github.com/HexDecimal/libtcod-cffi/blob/master/LICENSE.txt
+
+.. |ImplementationBadge| image:: https://img.shields.io/pypi/implementation/libtcod-cffi.svg?maxAge=2592000
+    :target:
+
+.. |VersionsBadge| image:: https://img.shields.io/pypi/pyversions/libtcod-cffi.svg?maxAge=2592000
+    :target:
+
+.. |IssuesBadge| image:: https://img.shields.io/github/issues/HexDecimal/libtcod-cffi.svg?maxAge=3600
+    :target: https://github.com/HexDecimal/libtcod-cffi/issues
+
+.. |CodacyBadge| image:: https://img.shields.io/codacy/grade/4e6b8926dbb04ae183e7f62b1d842caf.svg?maxAge=10800
+    :target: https://www.codacy.com/app/4b796c65-github/libtcod-cffi
