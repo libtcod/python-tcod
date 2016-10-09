@@ -92,7 +92,7 @@ def get_ast():
         # resolve binary ops in TCOD_event_t enum
         if not isinstance(node, c_ast.Typedef):
             continue
-        if node.name == 'wchar_t':
+        if node.name in ['wchar_t', 'size_t']:
             ast.ext.remove(node) # remove wchar_t placeholder
         if node.name != 'TCOD_event_t':
             continue

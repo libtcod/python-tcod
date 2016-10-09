@@ -4,7 +4,6 @@ python:
  - "3.3"
  - "3.4"
  - "3.5"
- - "pypy"
 matrix:
   include:
   - os: osx
@@ -44,7 +43,7 @@ before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
 - pip install --upgrade pip
 install:
-- pip install -v -e .
+- python setup.py develop
 before_script:
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi'
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi'

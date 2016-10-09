@@ -4,7 +4,7 @@
 #include <libtcod.h>
 #include <wrappers.h>
 
-void CustomSDLMain(){}; /* CustomSDLMain stub for Mac build */
+void CustomSDLMain(void){}; /* CustomSDLMain stub for Mac build */
 
 static TCOD_value_t TDL_list_get_union(TCOD_list_t l,int idx){
     TCOD_value_t item;
