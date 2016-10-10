@@ -3,7 +3,7 @@ import ctypes as _ctypes
 import threading as _threading
 
 import tcod as _tcod
-from .libtcod import _lib, _ffi, _str, _unpack_char_p, _unicode
+from .libtcod import _lib, _ffi, _str, _unpack_char_p, _unicode, _PropagateException
 
 _chr = chr
 try:
@@ -53,27 +53,30 @@ def parser_run(parser, filename, listener=None):
         _lib.TCOD_parser_run(parser, _str(filename), _ffi.NULL)
         return
 
+    propagate_manager = _PropagateException()
+    propagate = propagate_manager.propagate
+
     with _parser_callback_lock:
         clistener = _ffi.new('TCOD_parser_listener_t *')
 
-        @_ffi.def_extern()
+        @_ffi.def_extern(onerror=propagate)
         def pycall_parser_new_struct(struct, name):
             return listener.end_struct(struct, _unpack_char_p(name))
 
-        @_ffi.def_extern()
+        @_ffi.def_extern(onerror=propagate)
         def pycall_parser_new_flag(name):
             return listener.new_flag(_unpack_char_p(name))
 
-        @_ffi.def_extern()
+        @_ffi.def_extern(onerror=propagate)
         def pycall_parser_new_property(propname, type, value):
             return listener.new_property(_unpack_char_p(propname), type,
                                          _unpack_union(type, value))
 
-        @_ffi.def_extern()
+        @_ffi.def_extern(onerror=propagate)
         def pycall_parser_end_struct(struct, name):
             return listener.end_struct(struct, _unpack_char_p(name))
 
-        @_ffi.def_extern()
+        @_ffi.def_extern(onerror=propagate)
         def pycall_parser_error(msg):
             listener.error(_unpack_char_p(msg))
 
@@ -83,7 +86,8 @@ def parser_run(parser, filename, listener=None):
         clistener.end_struct = _lib.pycall_parser_end_struct
         clistener.error = _lib.pycall_parser_error
 
-        _lib.TCOD_parser_run(parser, _str(filename), clistener)
+        with propagate_manager:
+            _lib.TCOD_parser_run(parser, _str(filename), clistener)
 
 def parser_delete(parser):
     _lib.TCOD_parser_delete(parser)

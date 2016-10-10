@@ -1,14 +1,21 @@
 
+import sys as _sys
+
 import functools as _functools
 
 from . import Bsp as _Bsp
-from .libtcod import _lib, _ffi
+from .libtcod import _lib, _ffi, _PropagateException
 
 @_ffi.def_extern()
-def _pycall_bsp_callback(node, func_handle):
+def _pycall_bsp_callback(node, handle):
     '''static bool _pycall_bsp_callback(TCOD_bsp_t *node, void *userData);
     '''
-    return _ffi.from_handle(func_handle)(_Bsp(node))
+    func, propagate = _ffi.from_handle(handle)
+    try:
+        return func(_Bsp(node))
+    except BaseException:
+        propagate(*_sys.exc_info())
+        return None
 
 def bsp_new_with_size(x, y, w, h):
     return _Bsp(_lib.TCOD_bsp_new_with_size(x, y, w, h))
@@ -47,8 +54,9 @@ def _bsp_traverse(node, func, callback, userData):
     _pycall_bsp_callback
     '''
     callback = _functools.partial(callback, userData)
-    python_data = _ffi.new_handle(callback)
-    func(node.p, _lib._pycall_bsp_callback, python_data)
+    with _PropagateException() as propagate:
+        handle = _ffi.new_handle((callback, propagate))
+        func(node.p, _lib._pycall_bsp_callback, handle)
 
 def bsp_traverse_pre_order(node, callback, userData=0):
     _bsp_traverse(node, _lib.TCOD_bsp_traverse_pre_order, callback, userData)

@@ -21,7 +21,7 @@ def _numpy_available():
 # initializing the console
 def console_init_root(w, h, title, fullscreen=False, renderer=_tcod.RENDERER_SDL):
     _lib.TCOD_console_init_root(w, h, _str(title), fullscreen, renderer)
-    
+
 
 def console_set_custom_font(fontFile, flags=_tcod.FONT_LAYOUT_ASCII_INCOL,
                             nb_char_horiz=0, nb_char_vertic=0):
@@ -265,7 +265,7 @@ def console_fill_char(con,arr) :
         carr = _ffi.new('int[]', arr)
 
     _lib.TCOD_console_fill_char(con or _ffi.NULL, carr)
-        
+
 def console_load_asc(con, filename) :
     _lib.TCOD_console_load_asc(con or _ffi.NULL, _str(filename))
 def console_save_asc(con, filename) :

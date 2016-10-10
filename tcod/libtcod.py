@@ -52,3 +52,47 @@ else: # Python 3
         if isinstance(string, bytes):
             return string.decode()
         return string
+
+class _PropagateException():
+    ''' context manager designed to propagate exceptions outside of a cffi
+    callback context.  normally cffi suppresses the exception
+
+    when propagate is called this class will hold onto the error until the
+    control flow leaves the context, then the error will be raised
+
+    with _PropagateException as propagate:
+    # give propagate as onerror parameter for _ffi.def_extern
+    '''
+
+    def __init__(self):
+        self.exc_info = None # (exception, exc_value, traceback)
+
+    def propagate(self, *exc_info):
+        ''' set an exception to be raised once this context exits
+
+        if multiple errors are caught, only keep the first exception raised
+        '''
+        if not self.exc_info:
+            self.exc_info = exc_info
+
+    def __enter__(self):
+        ''' once in context, only the propagate call is needed to use this
+        class effectively
+        '''
+        return self.propagate
+
+    def __exit__(self, type, value, traceback):
+        ''' if we're holding on to an exception, raise it now
+
+        prefers our held exception over any current raising error
+
+        self.exc_info is reset now in case of nested manager shenanigans
+        '''
+        if self.exc_info:
+            type, value, traceback = self.exc_info
+            self.exc_info = None
+        if type:
+            # Python 2/3 compatible throw
+            exception = type(value)
+            exception.__traceback__ = traceback
+            raise exception

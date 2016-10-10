@@ -1,25 +1,31 @@
 
 import functools as _functools
 
-from .libtcod import _lib, _ffi
+from .libtcod import _lib, _ffi, _PropagateException
 
 @_ffi.def_extern()
-def _pycall_path_func(x1, y1, x2, y2, func_handle):
+def _pycall_path_func(x1, y1, x2, y2, handle):
     '''static float _pycall_path_func( int xFrom, int yFrom, int xTo, int yTo, void *user_data );
     '''
-    return _ffi.from_handle(func_handle)(x1, y1, x2, y2)
+    func, propagate_manager = _ffi.from_handle(handle)
+    try:
+        return func(x1, y1, x2, y2)
+    except BaseException:
+        propagate_manager.propagate(*_sys.exc_info())
+        return None
 
 def path_new_using_map(m, dcost=1.41):
     return (_lib.TCOD_path_new_using_map(m, dcost), None)
 
 def path_new_using_function(w, h, func, userData=0, dcost=1.41):
     func = _functools.parital(func, userData)
-    python_handle = _ffi.new_handle(func)
+    handle = _ffi.new_handle((func, _PropagateException()))
     return (_lib.TCOD_path_new_using_function(w, h, _lib._pycall_path_func,
-            python_handle, dcost), python_handle)
+            handle, dcost), handle)
 
 def path_compute(p, ox, oy, dx, dy):
-    return _lib.TCOD_path_compute(p[0], ox, oy, dx, dy)
+    with p[1]:
+        return _lib.TCOD_path_compute(p[0], ox, oy, dx, dy)
 
 def path_get_origin(p):
     x = _ffi.new('int *')
@@ -51,8 +57,9 @@ def path_is_empty(p):
 def path_walk(p, recompute):
     x = _ffi.new('int *')
     y = _ffi.new('int *')
-    if _lib.TCOD_path_walk(p[0], x, y, recompute):
-        return x[0], y[0]
+    with p[1]:
+        if _lib.TCOD_path_walk(p[0], x, y, recompute):
+            return x[0], y[0]
     return None,None
 
 def path_delete(p):

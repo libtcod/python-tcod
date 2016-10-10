@@ -1,5 +1,5 @@
 
-from .libtcod import _lib, _ffi, _int
+from .libtcod import _lib, _ffi, _int, _PropagateException
 
 # high precision time functions
 def sys_set_fps(fps):
@@ -51,10 +51,11 @@ def sys_update_char(asciiCode, fontx, fonty, img, x, y) :
     _lib.TCOD_sys_update_char(_int(asciiCode), fontx, fonty, img, x, y)
 
 def sys_register_SDL_renderer(callback):
-    @_ffi.def_extern()
-    def _pycall_sdl_hook(sdl_surface):
-        callback(sdl_surface)
-    _lib.TCOD_sys_register_SDL_renderer(_lib._pycall_sdl_hook)
+    with _PropagateException as propagate:
+        @_ffi.def_extern(onerror=propagate)
+        def _pycall_sdl_hook(sdl_surface):
+            callback(sdl_surface)
+        _lib.TCOD_sys_register_SDL_renderer(_lib._pycall_sdl_hook)
 
 def sys_check_for_event(mask, k, m) :
     return _lib.TCOD_sys_check_for_event(mask, k._struct, m._struct)
