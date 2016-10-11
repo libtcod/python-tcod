@@ -32,7 +32,7 @@ def _int(int_or_str):
     return int(int_or_str)
 
 if _sys.version_info[0] == 2: # Python 2
-    def _str(string):
+    def _bytes(string):
         if isinstance(string, unicode):
             return string.encode()
         return string
@@ -43,7 +43,7 @@ if _sys.version_info[0] == 2: # Python 2
         return string
 
 else: # Python 3
-    def _str(string):
+    def _bytes(string):
         if isinstance(string, str):
             return string.encode()
         return string

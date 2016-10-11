@@ -1,5 +1,5 @@
 
-from .libtcod import _lib, _ffi, _str
+from .libtcod import _lib, _ffi, _bytes
 
 
 def image_new(width, height):
@@ -33,7 +33,7 @@ def image_is_pixel_transparent(image,x,y) :
     return _lib.TCOD_image_is_pixel_transparent(image, x, y)
 
 def image_load(filename):
-    return _lib.TCOD_image_load(_str(filename))
+    return _lib.TCOD_image_load(_bytes(filename))
 
 def image_from_console(console):
     return _lib.TCOD_image_from_console(console)
@@ -67,7 +67,7 @@ def image_blit_2x(image, console, dx, dy, sx=0, sy=0, w=-1, h=-1):
     _lib.TCOD_image_blit_2x(image, console or _ffi.NULL, dx,dy,sx,sy,w,h)
 
 def image_save(image, filename):
-    _lib.TCOD_image_save(image, _str(filename))
+    _lib.TCOD_image_save(image, _bytes(filename))
 
 def image_delete(image):
     _lib.TCOD_image_delete(image)

@@ -4,7 +4,7 @@ import sys as _sys
 
 import tcod as _tcod
 from . import Color as _Color
-from .libtcod import _lib, _ffi, _int, _str, _unicode
+from .libtcod import _lib, _ffi, _int, _bytes, _unicode
 
 _numpy = None
 
@@ -20,13 +20,13 @@ def _numpy_available():
 
 # initializing the console
 def console_init_root(w, h, title, fullscreen=False, renderer=_tcod.RENDERER_SDL):
-    _lib.TCOD_console_init_root(w, h, _str(title), fullscreen, renderer)
+    _lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
     return None # root console is None
 
 
 def console_set_custom_font(fontFile, flags=_tcod.FONT_LAYOUT_ASCII_INCOL,
                             nb_char_horiz=0, nb_char_vertic=0):
-    _lib.TCOD_console_set_custom_font(fontFile, flags,
+    _lib.TCOD_console_set_custom_font(_bytes(fontFile), flags,
                                      nb_char_horiz, nb_char_vertic)
 
 
@@ -58,7 +58,7 @@ def console_is_window_closed():
     return _lib.TCOD_console_is_window_closed()
 
 def console_set_window_title(title):
-    _lib.TCOD_console_set_window_title(_str(title))
+    _lib.TCOD_console_set_window_title(_bytes(title))
 
 def console_credits():
     _lib.TCOD_console_credits()
@@ -139,7 +139,7 @@ def console_vline(con, x, y, l, flag=_tcod.BKGND_DEFAULT):
 
 def console_print_frame(con, x, y, w, h, clear=True, flag=_tcod.BKGND_DEFAULT, fmt=b''):
     _lib.TCOD_console_print_frame(con or _ffi.NULL, x, y, w, h, clear, flag,
-                                  _str(fmt))
+                                  _bytes(fmt))
 
 def console_set_color_control(con, fore, back) :
     _lib.TCOD_console_set_color_control(con or _ffi.NULL, fore, back)
@@ -192,7 +192,7 @@ def console_disable_keyboard_repeat():
 def console_new(w, h):
     return _lib.TCOD_console_new(w, h)
 def console_from_file(filename):
-    return _lib.TCOD_console_from_file(_str(filename))
+    return _lib.TCOD_console_from_file(_bytes(filename))
 
 def console_blit(src, x, y, w, h, dst, xdst, ydst, ffade=1.0,bfade=1.0):
     _lib.TCOD_console_blit(src or _ffi.NULL, x, y, w, h, dst or _ffi.NULL,
@@ -258,12 +258,12 @@ def console_fill_char(con,arr) :
     _lib.TCOD_console_fill_char(con or _ffi.NULL, carr)
 
 def console_load_asc(con, filename) :
-    _lib.TCOD_console_load_asc(con or _ffi.NULL, _str(filename))
+    _lib.TCOD_console_load_asc(con or _ffi.NULL, _bytes(filename))
 def console_save_asc(con, filename) :
-    _lib.TCOD_console_save_asc(con or _ffi.NULL,_str(filename))
+    _lib.TCOD_console_save_asc(con or _ffi.NULL,_bytes(filename))
 def console_load_apf(con, filename) :
-    _lib.TCOD_console_load_apf(con or _ffi.NULL,_str(filename))
+    _lib.TCOD_console_load_apf(con or _ffi.NULL,_bytes(filename))
 def console_save_apf(con, filename) :
-    _lib.TCOD_console_save_apf(con or _ffi.NULL,_str(filename))
+    _lib.TCOD_console_save_apf(con or _ffi.NULL,_bytes(filename))
 
 __all__ = [_name for _name in list(globals()) if _name[0] != '_']

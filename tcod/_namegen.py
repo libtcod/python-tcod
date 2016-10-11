@@ -1,14 +1,14 @@
 
-from .libtcod import _lib, _ffi, _str, _unpack_char_p
+from .libtcod import _lib, _ffi, _bytes, _unpack_char_p
 
 def namegen_parse(filename,random=None):
     _lib.TCOD_namegen_parse(filename,random or _ffi.NULL)
 
 def namegen_generate(name):
-    return _unpack_char_p(_lib.TCOD_namegen_generate(_str(name), False))
+    return _unpack_char_p(_lib.TCOD_namegen_generate(_bytes(name), False))
 
 def namegen_generate_custom(name, rule):
-    return _unpack_char_p(_lib.TCOD_namegen_generate(_str(name), rule, False))
+    return _unpack_char_p(_lib.TCOD_namegen_generate(_bytes(name), rule, False))
 
 def namegen_get_sets():
     sets = _lib.TCOD_namegen_get_sets()
