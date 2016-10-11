@@ -46,7 +46,7 @@ class TestLibtcodpyLine(unittest.TestCase):
             self.assertEqual(tcod.line_step(), expected_xy)
         self.assertEqual(tcod.line_step(), (None, None))
 
-    def raise_error(*args):
+    def raise_error(self, *args):
         raise Exception()
 
     def test_line(self):
@@ -59,8 +59,8 @@ class TestLibtcodpyLine(unittest.TestCase):
         def line_test(*test_xy):
             test_result.append(test_xy)
             return 1
-        self.assertEqual(tcod.line_line(*self.LINE_ARGS,
-                                        py_callback=line_test), 1)
+        self.assertEqual(tcod.line(*self.LINE_ARGS,
+                                   py_callback=line_test), 1)
         self.assertEqual(test_result, self.INCLUSIVE_RESULTS)
 
         # test lazy evaluation

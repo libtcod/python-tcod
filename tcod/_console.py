@@ -21,6 +21,7 @@ def _numpy_available():
 # initializing the console
 def console_init_root(w, h, title, fullscreen=False, renderer=_tcod.RENDERER_SDL):
     _lib.TCOD_console_init_root(w, h, _str(title), fullscreen, renderer)
+    return None # root console is None
 
 
 def console_set_custom_font(fontFile, flags=_tcod.FONT_LAYOUT_ASCII_INCOL,
@@ -34,11 +35,6 @@ def console_get_width(con):
 
 def console_get_height(con):
     return _lib.TCOD_console_get_height(con or _ffi.NULL)
-
-def console_set_custom_font(fontFile, flags=_tcod.FONT_LAYOUT_ASCII_INCOL,
-                            nb_char_horiz=0, nb_char_vertic=0):
-    _lib.TCOD_console_set_custom_font(_str(fontFile), flags,
-                                      nb_char_horiz, nb_char_vertic)
 
 def console_map_ascii_code_to_font(asciiCode, fontCharX, fontCharY):
     _lib.TCOD_console_map_ascii_code_to_font(_int(asciiCode), fontCharX,
@@ -197,11 +193,6 @@ def console_new(w, h):
     return _lib.TCOD_console_new(w, h)
 def console_from_file(filename):
     return _lib.TCOD_console_from_file(_str(filename))
-def console_get_width(con):
-    return _lib.TCOD_console_get_width(con or _ffi.NULL)
-
-def console_get_height(con):
-    return _lib.TCOD_console_get_height(con or _ffi.NULL)
 
 def console_blit(src, x, y, w, h, dst, xdst, ydst, ffade=1.0,bfade=1.0):
     _lib.TCOD_console_blit(src or _ffi.NULL, x, y, w, h, dst or _ffi.NULL,
