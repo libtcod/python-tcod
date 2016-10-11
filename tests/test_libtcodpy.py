@@ -50,7 +50,7 @@ class TestLibtcodpyLine(unittest.TestCase):
         raise Exception()
 
     def test_line(self):
-        ''' tcod.line_line: normal, lazy, error
+        ''' tcod.line: normal, lazy, error
 
         tests normal use, lazy evaluation, and error propagation
         '''
@@ -68,13 +68,13 @@ class TestLibtcodpyLine(unittest.TestCase):
         def return_false(*test_xy):
             test_result.append(test_xy)
             return False
-        self.assertEqual(tcod.line_line(*self.LINE_ARGS,
+        self.assertEqual(tcod.line(*self.LINE_ARGS,
                                         py_callback=return_false), 0)
         self.assertEqual(test_result, self.INCLUSIVE_RESULTS[:1])
 
         # exception propagation
         with self.assertRaises(Exception):
-            tcod.line_line(*LINE_ARGS, py_callback=self.raise_error)
+            tcod.line(*LINE_ARGS, py_callback=self.raise_error)
 
     def test_line_iter(self):
         ''' tcod.line_iter
