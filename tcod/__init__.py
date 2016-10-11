@@ -256,54 +256,6 @@ class ConsoleBuffer:
                                               _ffi.new('int[]', self.fore_b))
             _lib.TCOD_console_fill_char(dest, _ffi.new('int[]', self.char))
 
-# python class encapsulating the _CBsp pointer
-class Bsp(object):
-    def __init__(self, cnode):
-        pcbsp = cnode
-        self.p = pcbsp
-
-    def getx(self):
-        return self.p.x
-    def setx(self, value):
-        self.p.x = value
-    x = property(getx, setx)
-
-    def gety(self):
-        return self.p.y
-    def sety(self, value):
-        self.p.y = value
-    y = property(gety, sety)
-
-    def getw(self):
-        return self.p.w
-    def setw(self, value):
-        self.p.w = value
-    w = property(getw, setw)
-
-    def geth(self):
-        return self.p.h
-    def seth(self, value):
-        self.p.h = value
-    h = property(geth, seth)
-
-    def getpos(self):
-        return self.p.position
-    def setpos(self, value):
-        self.p.position = value
-    position = property(getpos, setpos)
-
-    def gethor(self):
-        return self.p.horizontal
-    def sethor(self,value):
-        self.p.horizontal = value
-    horizontal = property(gethor, sethor)
-
-    def getlev(self):
-        return self.p.level
-    def setlev(self,value):
-        self.p.level = value
-    level = property(getlev, setlev)
-
 class Dice(list):
 
     def __init__(self, nb_dices, nb_faces, multiplier, addsub):
