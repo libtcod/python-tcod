@@ -367,6 +367,20 @@ class TestLibtcodpy(unittest.TestCase):
         self.assertEquals(colors[0], tcod.Color(0, 0, 0))
         self.assertEquals(colors[-1], tcod.Color(255, 255, 255))
 
+    def test_namegen_parse(self):
+        tcod.namegen_parse('libtcod/data/namegen/jice_celtic.cfg')
+        self.assertTrue(tcod.namegen_generate('Celtic female'))
+        self.assertTrue(tcod.namegen_get_sets())
+        tcod.namegen_destroy()
+
+    def test_noise(self):
+        noise = tcod.noise_new(1)
+        tcod.noise_set_type(noise, tcod.NOISE_SIMPLEX)
+        self.assertIsInstance(tcod.noise_get(noise, [0]), float)
+        self.assertIsInstance(tcod.noise_get_fbm(noise, [0], 4), float)
+        self.assertIsInstance(tcod.noise_get_turbulence(noise, [0], 4), float)
+        tcod.noise_delete(noise)
+
 class TestLibtcodpyMap(unittest.TestCase):
 
     MAP = (
