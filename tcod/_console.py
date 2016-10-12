@@ -121,8 +121,8 @@ def console_print_rect(con, x, y, w, h, fmt):
                                             _unicode(fmt))
 
 def console_print_rect_ex(con, x, y, w, h, flag, alignment, fmt):
-    _lib.TCOD_console_print_rect_ex_utf(con or _ffi.NULL, x, y, w, h, flag,
-                                        alignment, _unicode(fmt))
+    return _lib.TCOD_console_print_rect_ex_utf(con or _ffi.NULL, x, y, w, h,
+                                               flag, alignment, _unicode(fmt))
 
 def console_get_height_rect(con, x, y, w, h, fmt):
     return _lib.TCOD_console_get_height_rect_utf(con or _ffi.NULL, x, y, w, h,
@@ -208,8 +208,7 @@ def console_delete(con):
 def console_fill_foreground(con,r,g,b) :
     if len(r) != len(g) or len(r) != len(b):
         raise TypeError('R, G and B must all have the same size.')
-    numpy_available = False
-    if (numpy_available and isinstance(r, _numpy.ndarray) and
+    if (_numpy_available() and isinstance(r, _numpy.ndarray) and
         isinstance(g, _numpy.ndarray) and isinstance(b, _numpy.ndarray)):
         #numpy arrays, use numpy's ctypes functions
         r = _numpy.ascontiguousarray(r, dtype=_numpy.intc)
@@ -249,7 +248,7 @@ def console_fill_background(con,r,g,b) :
 def console_fill_char(con,arr) :
     if (_numpy_available() and isinstance(arr, _numpy.ndarray) ):
         #numpy arrays, use numpy's ctypes functions
-        arr = numpy.ascontiguousarray(arr, dtype=_numpy.intc)
+        arr = _numpy.ascontiguousarray(arr, dtype=_numpy.intc)
         carr = _ffi.cast('int *', arr.ctypes.data)
     else:
         #otherwise convert using the ffi module
@@ -258,11 +257,11 @@ def console_fill_char(con,arr) :
     _lib.TCOD_console_fill_char(con or _ffi.NULL, carr)
 
 def console_load_asc(con, filename) :
-    _lib.TCOD_console_load_asc(con or _ffi.NULL, _bytes(filename))
+    return _lib.TCOD_console_load_asc(con or _ffi.NULL, _bytes(filename))
 def console_save_asc(con, filename) :
     _lib.TCOD_console_save_asc(con or _ffi.NULL,_bytes(filename))
 def console_load_apf(con, filename) :
-    _lib.TCOD_console_load_apf(con or _ffi.NULL,_bytes(filename))
+    return _lib.TCOD_console_load_apf(con or _ffi.NULL,_bytes(filename))
 def console_save_apf(con, filename) :
     _lib.TCOD_console_save_apf(con or _ffi.NULL,_bytes(filename))
 
