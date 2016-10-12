@@ -237,6 +237,34 @@ class TestLibtcodpyConsole(unittest.TestCase):
         tcod.sys_clipboard_set('')
         tcod.sys_clipboard_get()
 
+    def test_image(self):
+        img = tcod.image_new(16, 16)
+        tcod.image_clear(img, (0, 0, 0))
+        tcod.image_invert(img)
+        tcod.image_hflip(img)
+        tcod.image_rotate90(img)
+        tcod.image_vflip(img)
+        tcod.image_scale(img, 24, 24)
+        tcod.image_set_key_color(img, (255, 255, 255))
+        tcod.image_get_alpha(img, 0, 0)
+        tcod.image_is_pixel_transparent(img, 0, 0)
+        tcod.image_get_size(img)
+        tcod.image_get_pixel(img, 0, 0)
+        tcod.image_get_mipmap_pixel(img, 0, 0, 1, 1)
+        tcod.image_put_pixel(img, 0, 0, (255, 255, 255))
+        tcod.image_blit(img, self.console, 0, 0, tcod.BKGND_SET, 1, 1, 0)
+        tcod.image_blit_rect(img, self.console, 0, 0, 16, 16, tcod.BKGND_SET)
+        tcod.image_blit_2x(img, self.console, 0, 0)
+        tcod.image_save(img, tempfile.mktemp(dir=self.temp_dir))
+        tcod.image_delete(img)
+
+        img = tcod.image_from_console(self.console)
+        tcod.image_refresh_console(img, self.console)
+        tcod.image_delete(img)
+
+        tcod.image_delete(tcod.image_load('libtcod/data/img/circle.png'))
+
+
 class TestLibtcodpy(unittest.TestCase):
     # arguments to test with and the results expected from these arguments
     LINE_ARGS = (-5, 0, 5, 10)

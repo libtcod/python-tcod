@@ -37,23 +37,24 @@ def image_load(filename):
                    _lib.TCOD_image_delete)
 
 def image_from_console(console):
-    return _ffi.gc(_lib.TCOD_image_from_console(console),
+    return _ffi.gc(_lib.TCOD_image_from_console(console or _ffi.NULL),
                    _lib.TCOD_image_delete)
 
 def image_refresh_console(image, console):
-    _lib.TCOD_image_refresh_console(image, console)
+    _lib.TCOD_image_refresh_console(image, console or _ffi.NULL)
 
 def image_get_size(image):
     w = _ffi.new('int *')
     h = _ffi.new('int *')
     _lib.TCOD_image_get_size(image, w, h)
-    return w.value, h.value
+    return w[0], h[0]
 
 def image_get_pixel(image, x, y):
     return _lib.TCOD_image_get_pixel(image, x, y)
 
 def image_get_mipmap_pixel(image, x0, y0, x1, y1):
     return _lib.TCOD_image_get_mipmap_pixel(image, x0, y0, x1, y1)
+
 def image_put_pixel(image, x, y, col):
     _lib.TCOD_image_put_pixel(image, x, y, col)
     ##_lib.TCOD_image_put_pixel_wrapper(image, x, y, col)
