@@ -14,7 +14,7 @@ def _pycall_bsp_callback(node, handle):
         return func(BSP.from_cdata(node), userData)
     except BaseException:
         propagate(*_sys.exc_info())
-        return None
+        return False
 
 class BSP(object):
     """
@@ -22,9 +22,6 @@ class BSP(object):
     .. versionchanged:: 2.0
        You can create BSP's with this class contructor instead of using
        `bsp_new_with_size`
-
-       You can no longer set attributes: position, horizontal, or level.
-       They had no effect when you changed them.
 
     """
 
@@ -87,6 +84,13 @@ class BSP(object):
                 (self.__class__.__name__,
                  self.x, self.y, self.w, self.h, self.depth(), status))
 
+    def __eq__(self, other):
+        try:
+            return (other.cdata != _ffi.NULL and
+                    self.cdata == other.cdata)
+        except AttributeError:
+            return False
+
     def getx(self):
         assert self._assert_sanity()
         return self.cdata.x
@@ -125,7 +129,7 @@ class BSP(object):
     def setpos(self, value):
         assert self._assert_sanity()
         self.cdata.position = value
-    position = property(getpos)
+    position = property(getpos, setpos)
 
     def gethor(self):
         assert self._assert_sanity()
@@ -133,7 +137,7 @@ class BSP(object):
     def sethor(self,value):
         assert self._assert_sanity()
         self.cdata.horizontal = value
-    horizontal = property(gethor)
+    horizontal = property(gethor, sethor)
 
     def getlev(self):
         assert self._assert_sanity()
@@ -141,7 +145,7 @@ class BSP(object):
     def setlev(self,value):
         assert self._assert_sanity()
         self.cdata.level = value
-    level = property(getlev)
+    level = property(getlev, setlev)
 
     def depth(self):
         """
@@ -171,8 +175,25 @@ class BSP(object):
         """
         # orientation = horz
         assert self._assert_sanity()
-        _lib.TCOD_bsp_split_once(self.cdata, orientation, position)
+        if orientation[:1].lower() == 'h':
+            _lib.TCOD_bsp_split_once(self.cdata, True, position)
+        elif orientation[:1].lower() == 'v':
+            _lib.TCOD_bsp_split_once(self.cdata, False, position)
+        else:
+            raise ValueError("orientation must be 'horizontal' or 'vertical'"
+                             "\nNot %r" % orientation)
         return self.children()
+
+    def split_recursive(self, depth, min_width, min_height,
+                        max_horz_ratio, max_vert_raito, random=None):
+        """
+
+        .. versionadded:: 2.0
+        """
+        assert self._assert_sanity()
+        _lib.TCOD_bsp_split_recursive(self.cdata, random or _ffi.NULL,
+                                      depth, min_width, min_height,
+                                      max_horz_ratio, max_vert_raito)
 
     def resize(self, x, y, w, h):
         """Resize this BSP to the provided rectangle.
@@ -225,9 +246,10 @@ class BSP(object):
         .. versionadded:: 2.0
         """
         assert self._assert_sanity()
-        if self.is_leaf():
+        node = BSP.from_cdata(_lib.TCOD_bsp_father(self.cdata), self)
+        if node.cdata == _ffi.NULL:
             return None
-        return BSP.from_cdata(_lib.TCOD_bsp_father(self.cdata), self)
+        return node
 
     def children(self):
         """Return as a tuple, this instances immediate children, if any.
@@ -306,12 +328,12 @@ def bsp_split_once(node, horizontal, position):
     .. deprecated:: 2.0
        Use `BSP.split_once` instead.
     """
-    return node.split_once()
+    return node.split_once('h' if horizontal else 'v', position)
 
 def bsp_split_recursive(node, randomizer, nb, minHSize, minVSize, maxHRatio,
                         maxVRatio):
-    _lib.TCOD_bsp_split_recursive(node.cdata, randomizer or _ffi.NULL, nb, minHSize, minVSize,
-                                  maxHRatio, maxVRatio)
+    return node.split_recursive(nb, minHSize, minVSize,
+                                maxHRatio, maxVRatio, randomizer)
 
 def bsp_resize(node, x, y, w, h):
     """
@@ -360,7 +382,7 @@ def bsp_find_node(node, cx, cy):
     .. deprecated:: 2.0
        Use `BSP.find_node` instead.
     """
-    return node.find_node()
+    return node.find_node(cx, cy)
 
 def _bsp_traverse(node, func, callback, userData):
     """pack callback into a handle for use with the callback
@@ -371,12 +393,27 @@ def _bsp_traverse(node, func, callback, userData):
         func(node.cdata, _lib._pycall_bsp_callback, handle)
 
 def bsp_traverse_pre_order(node, callback, userData=0):
+    """Traverse this nodes hierarchy with a callback.
+
+    .. deprecated:: 2.0
+       Use `BSP.walk` instead.
+    """
     _bsp_traverse(node, _lib.TCOD_bsp_traverse_pre_order, callback, userData)
 
 def bsp_traverse_in_order(node, callback, userData=0):
+    """Traverse this nodes hierarchy with a callback.
+
+    .. deprecated:: 2.0
+       Use `BSP.walk` instead.
+    """
     _bsp_traverse(node, _lib.TCOD_bsp_traverse_in_order, callback, userData)
 
 def bsp_traverse_post_order(node, callback, userData=0):
+    """Traverse this nodes hierarchy with a callback.
+
+    .. deprecated:: 2.0
+       Use `BSP.walk` instead.
+    """
     _bsp_traverse(node, _lib.TCOD_bsp_traverse_post_order, callback, userData)
 
 def bsp_traverse_level_order(node, callback, userData=0):
