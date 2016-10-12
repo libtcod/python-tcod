@@ -245,16 +245,17 @@ class ConsoleBuffer:
             raise ValueError('ConsoleBuffer.blit: Destination console has an incorrect size.')
 
         if fill_back:
-            _lib.TCOD_console_fill_background(dest,
+            _lib.TCOD_console_fill_background(dest or _ffi.NULL,
                                               _ffi.new('int[]', self.back_r),
                                               _ffi.new('int[]', self.back_g),
                                               _ffi.new('int[]', self.back_b))
         if fill_fore:
-            _lib.TCOD_console_fill_foreground(dest,
+            _lib.TCOD_console_fill_foreground(dest or _ffi.NULL,
                                               _ffi.new('int[]', self.fore_r),
                                               _ffi.new('int[]', self.fore_g),
                                               _ffi.new('int[]', self.fore_b))
-            _lib.TCOD_console_fill_char(dest, _ffi.new('int[]', self.char))
+            _lib.TCOD_console_fill_char(dest or _ffi.NULL,
+                                        _ffi.new('int[]', self.char))
 
 class Dice(list):
 

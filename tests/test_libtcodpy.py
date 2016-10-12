@@ -175,6 +175,19 @@ class TestLibtcodpyConsole(unittest.TestCase):
         tcod.console_fill_foreground(self.console, fill, fill, fill)
         tcod.console_fill_char(self.console, fill)
 
+    def test_console_buffer(self):
+        buffer = tcod.ConsoleBuffer(self.WIDTH, self.HEIGHT)
+        buffer = buffer.copy()
+        buffer.set_fore(0, 0, 0, 0, 0, '@')
+        buffer.set_back(0, 0, 0, 0, 0)
+        buffer.set(0, 0, 0, 0, 0, 0, 0, 0, '@')
+        buffer.blit(self.console)
+
+    def test_console_buffer_error(self):
+        buffer = tcod.ConsoleBuffer(0, 0)
+        with self.assertRaises(ValueError):
+            buffer.blit(self.console)
+
     def test_console_font_mapping(self):
         tcod.console_map_ascii_code_to_font('@', 0, 0)
         tcod.console_map_ascii_codes_to_font('@', 1, 0, 0)
