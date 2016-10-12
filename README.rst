@@ -76,8 +76,8 @@ Read LICENSE.txt, and the tcod/lib/README's for more details.
 .. |TravisBadge| image:: https://travis-ci.org/HexDecimal/libtcod-cffi.svg?branch=master
                  :target: https://travis-ci.org/HexDecimal/libtcod-cffi
 
-.. |CoverallsBadge| image:: https://coveralls.io/repos/github/HexDecimal/libtcod-cffi/badge.svg?branch=coverage
-                    :target: https://coveralls.io/github/HexDecimal/libtcod-cffi?branch=coverage
+.. |CoverallsBadge| image:: https://coveralls.io/repos/github/HexDecimal/libtcod-cffi/badge.svg?branch=master
+                    :target: https://coveralls.io/github/HexDecimal/libtcod-cffi?branch=master
 
 .. |PyPIBadge| image:: https://img.shields.io/pypi/v/libtcod-cffi.svg?maxAge=10800
                :target: https://pypi.python.org/pypi/libtcod-cffi
