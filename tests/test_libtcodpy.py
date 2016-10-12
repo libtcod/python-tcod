@@ -381,6 +381,25 @@ class TestLibtcodpy(unittest.TestCase):
         self.assertIsInstance(tcod.noise_get_turbulence(noise, [0], 4), float)
         tcod.noise_delete(noise)
 
+    def test_random(self):
+        rand = tcod.random_get_instance()
+        rand = tcod.random_new()
+        tcod.random_delete(rand)
+        rand = tcod.random_new_from_seed(42)
+        tcod.random_set_distribution(rand, tcod.DISTRIBUTION_LINEAR)
+        self.assertIsInstance(tcod.random_get_int(rand, 0, 1), int)
+        self.assertIsInstance(tcod.random_get_int_mean(rand, 0, 1, 0), int)
+        self.assertIsInstance(tcod.random_get_float(rand, 0, 1), float)
+        self.assertIsInstance(tcod.random_get_double(rand, 0, 1), float)
+        self.assertIsInstance(tcod.random_get_float_mean(rand, 0, 1, 0), float)
+        self.assertIsInstance(tcod.random_get_double_mean(rand, 0, 1, 0), float)
+
+        backup = tcod.random_save(rand)
+        tcod.random_restore(rand, backup)
+
+        tcod.random_delete(rand)
+        tcod.random_delete(backup)
+
 class TestLibtcodpyMap(unittest.TestCase):
 
     MAP = (
