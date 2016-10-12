@@ -1,21 +1,20 @@
 
-import functools as _functools
-
-from .libtcod import _lib, _ffi
+from .libtcod import _lib, _ffi, _PropagateException
 
 def dijkstra_new(m, dcost=1.41):
     return (_ffi.gc(_lib.TCOD_dijkstra_new(m, dcost),
-                    _lib.TCOD_dijkstra_delete), None)
+                    _lib.TCOD_dijkstra_delete), _PropagateException())
 
 def dijkstra_new_using_function(w, h, func, userData=0, dcost=1.41):
-    func = _functools(func, userData)
-    python_handle = _ffi.new_handle(func)
-    return (_ffi.gc(_lib.TCOD_path_dijkstra_using_function(w, h,
-                    _pycall_path_func, python_handle, c_float(dcost)),
-                    _lib.TCOD_dijkstra_delete), python_handle)
+    propagator = _PropagateException()
+    handle = _ffi.new_handle((func, propagator, (userData,)))
+    return (_ffi.gc(_lib.TCOD_dijkstra_new_using_function(w, h,
+                    _lib._pycall_path_func, handle, dcost),
+                    _lib.TCOD_dijkstra_delete), propagator, handle)
 
 def dijkstra_compute(p, ox, oy):
-    _lib.TCOD_dijkstra_compute(p[0], ox, oy)
+    with p[1]:
+        _lib.TCOD_dijkstra_compute(p[0], ox, oy)
 
 def dijkstra_path_set(p, x, y):
     return _lib.TCOD_dijkstra_path_set(p[0], x, y)

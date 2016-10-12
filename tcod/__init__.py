@@ -284,23 +284,6 @@ class Dice(list):
         return "<Dice(%id%ix%s+(%s))>" % (self.nb_dices, self.nb_faces,
                                       self.multiplier, self.addsub)
 
-class HeightMap(object):
-    def __init__(self, chm):
-        pchm = cast(chm, _CHeightMap)
-        self.p = pchm
-
-    def getw(self):
-        return self.p.w
-    def setw(self, value):
-        self.p.w = value
-    w = property(getw, setw)
-
-    def geth(self):
-        return self.p.h
-    def seth(self, value):
-        self.p.h = value
-    h = property(geth, seth)
-
 
 NOISE_DEFAULT_HURST = 0.5
 NOISE_DEFAULT_LACUNARITY = 2.0

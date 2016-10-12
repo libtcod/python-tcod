@@ -400,6 +400,48 @@ class TestLibtcodpy(unittest.TestCase):
         tcod.random_delete(rand)
         tcod.random_delete(backup)
 
+    def test_heightmap(self):
+        hmap = tcod.heightmap_new(16, 16)
+        print(hmap)
+        noise = tcod.noise_new(2)
+
+        # basic operations
+        tcod.heightmap_set_value(hmap, 0, 0, 1)
+        tcod.heightmap_add(hmap, 1)
+        tcod.heightmap_scale(hmap, 1)
+        tcod.heightmap_clear(hmap)
+        tcod.heightmap_clamp(hmap, 0, 0)
+        tcod.heightmap_copy(hmap, hmap)
+        tcod.heightmap_normalize(hmap)
+        tcod.heightmap_lerp_hm(hmap, hmap, hmap, 0)
+        tcod.heightmap_add_hm(hmap, hmap, hmap)
+        tcod.heightmap_multiply_hm(hmap, hmap, hmap)
+
+        # modifying the heightmap
+        tcod.heightmap_add_hill(hmap, 0, 0, 4, 1)
+        tcod.heightmap_dig_hill(hmap, 0, 0, 4, 1)
+        tcod.heightmap_rain_erosion(hmap, 1, 1, 1)
+        tcod.heightmap_kernel_transform(hmap, 3, [-1, 1, 0], [0, 0, 0],
+                                        [.33, .33, .33], 0, 1)
+        tcod.heightmap_add_voronoi(hmap, 10, 3, [1,3,5])
+        tcod.heightmap_add_fbm(hmap, noise, 1, 1, 1, 1, 4, 1, 1)
+        tcod.heightmap_scale_fbm(hmap, noise, 1, 1, 1, 1, 4, 1, 1)
+        tcod.heightmap_dig_bezier(hmap, [0, 16, 16, 0], [0, 0, 16, 16],
+                                  1, 1, 1, 1)
+
+        # read data
+        self.assertIsInstance(tcod.heightmap_get_value(hmap, 0, 0), float)
+        self.assertIsInstance(tcod.heightmap_get_interpolated_value(hmap, 0, 0)
+                              , float)
+        self.assertIsInstance(tcod.heightmap_get_slope(hmap, 0, 0), float)
+        tcod.heightmap_get_normal(hmap, 0, 0, 0)
+        self.assertIsInstance(tcod.heightmap_count_cells(hmap, 0, 0), int)
+        tcod.heightmap_has_land_on_border(hmap, 0)
+        tcod.heightmap_get_minmax(hmap)
+
+        tcod.noise_delete(noise)
+        tcod.heightmap_delete(hmap)
+
 class TestLibtcodpyMap(unittest.TestCase):
 
     MAP = (
@@ -470,3 +512,33 @@ class TestLibtcodpyMap(unittest.TestCase):
                                              self.path_callback)
         tcod.path_compute(astar, *self.POINTS_AB)
         tcod.path_delete(astar)
+
+    def test_dijkstra(self):
+        path = tcod.dijkstra_new(self.map)
+
+        tcod.dijkstra_compute(path, *self.POINT_A)
+
+        self.assertFalse(tcod.dijkstra_path_set(path, *self.POINT_C))
+        self.assertEquals(tcod.dijkstra_get_distance(path, *self.POINT_C), -1)
+
+        self.assertTrue(tcod.dijkstra_path_set(path, *self.POINT_B))
+        self.assertTrue(tcod.dijkstra_size(path))
+        self.assertFalse(tcod.dijkstra_is_empty(path))
+
+        tcod.dijkstra_reverse(path)
+
+        for i in range(tcod.dijkstra_size(path)):
+            x, y = tcod.dijkstra_get(path, i)
+            self.assertIsInstance(x, int)
+            self.assertIsInstance(y, int)
+
+        while (x, y) != (None, None):
+            x, y = tcod.dijkstra_path_walk(path)
+
+        tcod.dijkstra_delete(path)
+
+    def test_dijkstra_callback(self):
+        path = tcod.dijkstra_new_using_function(self.WIDTH, self.HEIGHT,
+                                                self.path_callback)
+        tcod.dijkstra_compute(path, *self.POINT_A)
+        tcod.dijkstra_delete(path)
