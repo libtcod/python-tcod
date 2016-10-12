@@ -10,8 +10,8 @@ def dijkstra_new(m, dcost=1.41):
 def dijkstra_new_using_function(w, h, func, userData=0, dcost=1.41):
     func = _functools(func, userData)
     python_handle = _ffi.new_handle(func)
-    return (_ffi.gc(_lib.TCOD_path_dijkstra_using_function(w, h
-                    _lib._pycall_path_func, python_handle, c_float(dcost)),
+    return (_ffi.gc(_lib.TCOD_path_dijkstra_using_function(w, h,
+                    _pycall_path_func, python_handle, c_float(dcost)),
                     _lib.TCOD_dijkstra_delete), python_handle)
 
 def dijkstra_compute(p, ox, oy):

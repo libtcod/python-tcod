@@ -190,7 +190,7 @@ def console_disable_keyboard_repeat():
 
 # using offscreen consoles
 def console_new(w, h):
-    return _ffi.gc(_lib.TCOD_console_new(w, h), TCOD_console_delete)
+    return _ffi.gc(_lib.TCOD_console_new(w, h), _lib.TCOD_console_delete)
 def console_from_file(filename):
     return _lib.TCOD_console_from_file(_bytes(filename))
 

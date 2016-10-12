@@ -20,19 +20,26 @@ class TestLibtcodpyConsole(unittest.TestCase):
     FULLSCREEN = False
     RENDERER = tcod.RENDERER_SDL
 
+    @classmethod
+    def setUpClass(cls):
+        cls.temp_dir = tempfile.mkdtemp()
+        tcod.console_set_custom_font(cls.FONT_FILE)
+        cls.console = tcod.console_init_root(cls.WIDTH, cls.HEIGHT,
+                                             cls.TITLE, cls.FULLSCREEN,
+                                             cls.RENDERER)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.temp_dir)
+        tcod.console_delete(cls.console)
+
     def setUp(self):
-        tcod.console_set_custom_font(self.FONT_FILE)
-        self.console = tcod.console_init_root(self.WIDTH, self.HEIGHT,
-                                              self.TITLE, self.FULLSCREEN,
-                                              self.RENDERER)
+        tcod.console_clear(self.console)
         self.pad = tcod.console_new(self.WIDTH, self.HEIGHT)
-        self.temp_dir = tempfile.mkdtemp()
 
     def tearDown(self):
         tcod.console_flush()
         tcod.console_delete(self.pad)
-        tcod.console_delete(self.console)
-        shutil.rmtree(self.temp_dir)
 
     def test_console_info(self):
         self.assertEqual(tcod.console_get_width(self.console), self.WIDTH)
@@ -310,3 +317,86 @@ class TestLibtcodpy(unittest.TestCase):
         self.assertEqual(tcod.map_is_walkable(map, 0, 0), True)
         tcod.map_is_in_fov(map, 0, 0)
         tcod.map_delete(map)
+
+    def test_color(self):
+        color = tcod.color_lerp([0,0,0], [255,255,255], 0.5)
+        tcod.color_set_hsv(color, 0, 0, 0)
+        tcod.color_get_hsv(color)
+        tcod.color_scale_HSV(color, 0, 0)
+
+    def test_color_gen_map(self):
+        colors = tcod.color_gen_map([(0, 0, 0), (255, 255, 255)], [0, 8])
+        print(colors)
+        self.assertEquals(colors[0], tcod.Color(0, 0, 0))
+        self.assertEquals(colors[-1], tcod.Color(255, 255, 255))
+
+class TestLibtcodpyMap(unittest.TestCase):
+
+    MAP = (
+           '############',
+           '#   ###    #',
+           '#   ###    #',
+           '#   ### ####',
+           '## #### # ##',
+           '##      ####',
+           '############',
+           )
+
+    WIDTH = len(MAP[0])
+    HEIGHT = len(MAP)
+
+    POINT_A = (2, 2)
+    POINT_B = (9, 2)
+    POINT_C = (9, 4)
+
+    POINTS_AB = POINT_A + POINT_B
+    POINTS_AC = POINT_A + POINT_C
+
+    def setUp(self):
+        self.map = tcod.map_new(self.WIDTH, self.HEIGHT)
+        for y, line in enumerate(self.MAP):
+            for x, ch in enumerate(line):
+                tcod.map_set_properties(self.map, x, y, ch == ' ', ch == ' ')
+
+    def tearDown(self):
+        tcod.map_delete(self.map)
+
+    def path_callback(self, ox, oy, dx, dy, user_data):
+        if tcod.map_is_walkable(self.map, dx, dy):
+            return 1
+        return 0
+
+    def test_map_fov(self):
+        tcod.map_compute_fov(self.map, *self.POINT_A)
+
+    def test_astar(self):
+        astar = tcod.path_new_using_map(self.map)
+
+        self.assertFalse(tcod.path_compute(astar, *self.POINTS_AC))
+        self.assertEquals(tcod.path_size(astar), 0)
+        self.assertTrue(tcod.path_compute(astar, *self.POINTS_AB))
+        self.assertEquals(tcod.path_get_origin(astar), self.POINT_A)
+        self.assertEquals(tcod.path_get_destination(astar), self.POINT_B)
+        tcod.path_reverse(astar)
+        self.assertEquals(tcod.path_get_origin(astar), self.POINT_B)
+        self.assertEquals(tcod.path_get_destination(astar), self.POINT_A)
+
+        self.assertNotEquals(tcod.path_size(astar), 0)
+        self.assertIsInstance(tcod.path_size(astar), int)
+        self.assertFalse(tcod.path_is_empty(astar))
+
+        for i in range(tcod.path_size(astar)):
+            x, y = tcod.path_get(astar, i)
+            self.assertIsInstance(x, int)
+            self.assertIsInstance(y, int)
+
+        while (x, y) != (None, None):
+            x, y = tcod.path_walk(astar, False)
+
+        tcod.path_delete(astar)
+
+    def test_astar_callback(self):
+        astar = tcod.path_new_using_function(self.WIDTH, self.HEIGHT,
+                                             self.path_callback)
+        tcod.path_compute(astar, *self.POINTS_AB)
+        tcod.path_delete(astar)

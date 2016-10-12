@@ -1,4 +1,6 @@
 
+import sys as _sys
+
 import functools as _functools
 
 from .libtcod import _lib, _ffi, _PropagateException
@@ -7,22 +9,22 @@ from .libtcod import _lib, _ffi, _PropagateException
 def _pycall_path_func(x1, y1, x2, y2, handle):
     '''static float _pycall_path_func( int xFrom, int yFrom, int xTo, int yTo, void *user_data );
     '''
-    func, propagate_manager = _ffi.from_handle(handle)
+    func, propagate_manager, user_data = _ffi.from_handle(handle)
     try:
-        return func(x1, y1, x2, y2)
+        return func(x1, y1, x2, y2, *user_data)
     except BaseException:
         propagate_manager.propagate(*_sys.exc_info())
         return None
 
 def path_new_using_map(m, dcost=1.41):
     return (_ffi.gc(_lib.TCOD_path_new_using_map(m, dcost),
-                    _lib.TCOD_path_delete), None)
+                    _lib.TCOD_path_delete), _PropagateException())
 
 def path_new_using_function(w, h, func, userData=0, dcost=1.41):
-    func = _functools.parital(func, userData)
-    handle = _ffi.new_handle((func, _PropagateException()))
+    propagator = _PropagateException()
+    handle = _ffi.new_handle((func, propagator, (userData,)))
     return (_ffi.gc(_lib.TCOD_path_new_using_function(w, h, _lib._pycall_path_func,
-            handle, dcost), _lib.TCOD_path_delete), handle)
+            handle, dcost), _lib.TCOD_path_delete), propagator, handle)
 
 def path_compute(p, ox, oy, dx, dy):
     with p[1]:
