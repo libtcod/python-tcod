@@ -200,6 +200,43 @@ class TestLibtcodpyConsole(unittest.TestCase):
         tcod.console_map_ascii_codes_to_font('@', 1, 0, 0)
         tcod.console_map_string_to_font('@', 0, 0)
 
+    def test_mouse(self):
+        tcod.mouse_show_cursor(True)
+        tcod.mouse_is_cursor_visible()
+        mouse = tcod.mouse_get_status()
+        print(mouse)
+        tcod.mouse_move(0, 0)
+
+    def test_sys_time(self):
+        tcod.sys_set_fps(0)
+        self.assertIsInstance(tcod.sys_get_fps(), int)
+        self.assertIsInstance(tcod.sys_get_last_frame_length(), float)
+        tcod.sys_sleep_milli(0)
+        tcod.sys_elapsed_milli()
+        self.assertIsInstance(tcod.sys_elapsed_seconds(), float)
+
+    def test_sys_screenshot(self):
+        tcod.sys_save_screenshot(tempfile.mktemp(dir=self.temp_dir))
+
+    def test_sys_custom_render(self):
+        escape = []
+        def sdl_callback(sdl_surface):
+            escape.append(True)
+            tcod.console_set_dirty(0, 0, 0, 0)
+        tcod.sys_register_SDL_renderer(sdl_callback)
+        tcod.console_flush()
+        self.assertTrue(escape, 'proof that sdl_callback was called')
+
+    def test_sys_other(self):
+        tcod.sys_get_current_resolution()
+        tcod.sys_get_char_size()
+        tcod.sys_set_renderer(self.RENDERER)
+        tcod.sys_get_renderer()
+
+    def test_sys_clipboard(self):
+        tcod.sys_clipboard_set('')
+        tcod.sys_clipboard_get()
+
 class TestLibtcodpy(unittest.TestCase):
     # arguments to test with and the results expected from these arguments
     LINE_ARGS = (-5, 0, 5, 10)

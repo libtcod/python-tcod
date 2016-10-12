@@ -1,5 +1,5 @@
 
-from .libtcod import _lib, _ffi, _int, _PropagateException
+from .libtcod import _lib, _ffi, _int, _bytes, _unpack_char_p, _PropagateException
 
 # high precision time functions
 def sys_set_fps(fps):
@@ -28,7 +28,9 @@ def sys_get_renderer():
 
 # easy screenshots
 def sys_save_screenshot(name=_ffi.NULL):
-    _lib.TCOD_sys_save_screenshot(nam)
+    if name != _ffi.NULL:
+        name = _bytes(name)
+    _lib.TCOD_sys_save_screenshot(name)
 
 # custom fullscreen resolution
 def sys_force_fullscreen_resolution(width, height):
@@ -51,7 +53,7 @@ def sys_update_char(asciiCode, fontx, fonty, img, x, y) :
     _lib.TCOD_sys_update_char(_int(asciiCode), fontx, fonty, img, x, y)
 
 def sys_register_SDL_renderer(callback):
-    with _PropagateException as propagate:
+    with _PropagateException() as propagate:
         @_ffi.def_extern(onerror=propagate)
         def _pycall_sdl_hook(sdl_surface):
             callback(sdl_surface)
@@ -62,5 +64,19 @@ def sys_check_for_event(mask, k, m) :
 
 def sys_wait_for_event(mask, k, m, flush) :
     return _lib.TCOD_sys_wait_for_event(mask, k._struct, m._struct, flush)
-    
+
+def sys_clipboard_set(value):
+    """
+
+    .. versionadded:: 2.0
+    """
+    _lib.TCOD_sys_clipboard_set(_bytes(value))
+
+def sys_clipboard_get():
+    """
+
+    .. versionadded:: 2.0
+    """
+    return _unpack_char_p(_lib.TCOD_sys_clipboard_get())
+
 __all__ = [_name for _name in list(globals()) if _name[0] != '_']
