@@ -58,8 +58,8 @@ test_script:
 on_success:
 - "C:\\Python27\\python.exe -m virtualenv py27venv"
 - py27venv\Scripts\activate.bat
-- "pip install codacy-coverage git+https://github.com/HexDecimal/python-coveralls.git@windows-support"
-- coveralls
+- "pip install codacy-coverage python-coveralls"
+#- coveralls
 - coverage xml
 - python-codacy-coverage -r coverage.xml
 
