@@ -22,7 +22,7 @@ import re as _re
 
 from .libtcod import lib, ffi, _lib, _ffi, _unpack_char_p
 
-def _import_library_functions(lib, no_functions=False):
+def _import_library_functions(lib):
     # imports libtcod namespace into thie module
     # does not override existing names
     g = globals()
@@ -35,25 +35,10 @@ def _import_library_functions(lib, no_functions=False):
                 g[name[5:]] = FrozenColor.from_cdata(getattr(lib, name))
             elif name.isupper():
                 g[name[5:]] = getattr(lib, name) # const names
-            else:
-                if not no_functions:
-                    g[name[5:]] = getattr(lib, name) # function names
+            #else:
+            #    g[name[5:]] = getattr(lib, name) # function names
         elif name[:6] == 'TCODK_': # key name
-            if 'KEY_' + name[6:] in g:
-                continue
             g['KEY_' + name[6:]] = getattr(lib, name)
-        elif name[:4] == 'TCOD': # short constant names
-            if name[4:] in g:
-                continue
-            g[name[4:]] = getattr(lib, name)
-
-def _import_module_functions(module):
-    g = globals()
-    mod_name = module.__name__.rsplit('.')[-1]
-    if mod_name[-1] == '_': # remove underscore from sys_.py
-        mod_name = mod_name[:-1]
-    for name in module.__all__:
-        g['%s_%s' % (mod_name, name)] = getattr(module, name)
 
 # ----------------------------------------------------------------------------
 # the next functions are used to mimic the rest of the libtcodpy functionality
@@ -334,36 +319,7 @@ def BKGND_ALPHA(a):
 def BKGND_ADDALPHA(a):
     return BKGND_ADDA | (int(a * 255) << 8)
 
-def struct_add_flag(struct, name):
-    _lib.TCOD_struct_add_flag(struct, name)
-
-def struct_add_property(struct, name, typ, mandatory):
-    _lib.TCOD_struct_add_property(struct, name, typ, mandatory)
-
-def struct_add_value_list(struct, name, value_list, mandatory):
-    CARRAY = c_char_p * (len(value_list) + 1)
-    cvalue_list = CARRAY()
-    for i in range(len(value_list)):
-        cvalue_list[i] = cast(value_list[i], c_char_p)
-    cvalue_list[len(value_list)] = 0
-    _lib.TCOD_struct_add_value_list(struct, name, cvalue_list, mandatory)
-
-def struct_add_list_property(struct, name, typ, mandatory):
-    _lib.TCOD_struct_add_list_property(struct, name, typ, mandatory)
-
-def struct_add_structure(struct, sub_struct):
-    _lib.TCOD_struct_add_structure(struct, sub_struct)
-
-def struct_get_name(struct):
-    return _unpack_char_p(_lib.TCOD_struct_get_name(struct))
-
-def struct_is_mandatory(struct, name):
-    return _lib.TCOD_struct_is_mandatory(struct, name)
-
-def struct_get_type(struct, name):
-    return _lib.TCOD_struct_get_type(struct, name)
-
-_import_library_functions(lib, False)
+_import_library_functions(lib)
 
 from ._bsp import *
 from ._color import *
@@ -380,6 +336,7 @@ from ._parser import *
 from ._path import *
 from ._random import *
 from ._sys import *
+from ._struct import *
 
 with open(_os.path.join(__path__[0], 'version.txt'), 'r') as _f:
     # exclude the git commit number (PEP 396)

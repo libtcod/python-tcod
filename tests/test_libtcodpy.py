@@ -298,3 +298,15 @@ class TestLibtcodpy(unittest.TestCase):
         print(son)
 
         tcod.bsp_delete(bsp)
+
+    def test_map(self):
+        map = tcod.map_new(16, 16)
+        self.assertEqual(tcod.map_get_width(map), 16)
+        self.assertEqual(tcod.map_get_height(map), 16)
+        tcod.map_copy(map, map)
+        tcod.map_clear(map)
+        tcod.map_set_properties(map, 0, 0, True, True)
+        self.assertEqual(tcod.map_is_transparent(map, 0, 0), True)
+        self.assertEqual(tcod.map_is_walkable(map, 0, 0), True)
+        tcod.map_is_in_fov(map, 0, 0)
+        tcod.map_delete(map)
