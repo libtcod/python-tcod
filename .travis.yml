@@ -4,6 +4,8 @@ python:
  - "3.3"
  - "3.4"
  - "3.5"
+ - "3.5-dev"
+ - "3.6-dev"
 matrix:
   include:
   - os: osx
@@ -24,6 +26,8 @@ matrix:
     python: pypy
   - os: linux
     python: pypy3
+  - python: "3.5-dev"
+  - python: "3.6-dev"
 
   fast_finish: true
 
@@ -38,7 +42,7 @@ addons:
 
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install sdl2; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install $PYTHON; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" && "$PYTHON" == "python3" ]]; then brew install $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv venv -p $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
 - pip install --upgrade pip

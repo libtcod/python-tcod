@@ -84,10 +84,12 @@ class BSP(object):
                 (self.__class__.__name__,
                  self.x, self.y, self.w, self.h, self.depth(), status))
 
+    def __hash__(self):
+        return hash(self.cdata)
+
     def __eq__(self, other):
         try:
-            return (other.cdata != _ffi.NULL and
-                    self.cdata == other.cdata)
+            return self.cdata == other.cdata
         except AttributeError:
             return False
 
