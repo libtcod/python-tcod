@@ -40,7 +40,7 @@ def _convert_TCODList(clist, type):
             for i in range(_lib.TCOD_list_size(clist))]
 
 def parser_new():
-    return _lib.TCOD_parser_new()
+    return _ffi.gc(_lib.TCOD_parser_new(), _lib.TCOD_parser_delete)
 
 def parser_new_struct(parser, name):
     return _lib.TCOD_parser_new_struct(parser, name)
@@ -90,7 +90,7 @@ def parser_run(parser, filename, listener=None):
             _lib.TCOD_parser_run(parser, _bytes(filename), clistener)
 
 def parser_delete(parser):
-    _lib.TCOD_parser_delete(parser)
+    pass
 
 def parser_get_bool_property(parser, name):
     return bool(_lib.TCOD_parser_get_bool_property(parser, _bytes(name)))

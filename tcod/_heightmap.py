@@ -3,7 +3,7 @@ import tcod as _tcod
 from .libtcod import _lib, _ffi
 
 def heightmap_new(w, h):
-    phm = _lib.TCOD_heightmap_new(w, h)
+    phm = _ffi.gc(_lib.TCOD_heightmap_new(w, h), _lib.TCOD_heightmap_delete)
     return _tcod.HeightMap(phm)
 
 def heightmap_set_value(hm, x, y, value):
@@ -106,6 +106,6 @@ def heightmap_get_minmax(hm):
     return mi[0], ma[0]
 
 def heightmap_delete(hm):
-    _lib.TCOD_heightmap_delete(hm.p)
+    pass
 
 __all__ = [_name for _name in list(globals()) if _name[0] != '_']

@@ -17,7 +17,7 @@ FOV_RESTRICTIVE = 12
 NB_FOV_ALGORITHMS = 13
 
 def map_new(w, h):
-    return _lib.TCOD_map_new(w, h)
+    return _ffi.gc(_lib.TCOD_map_new(w, h), _lib.TCOD_map_delete)
 
 def map_copy(source, dest):
     return _lib.TCOD_map_copy(source, dest)
@@ -41,7 +41,7 @@ def map_is_walkable(m, x, y):
     return _lib.TCOD_map_is_walkable(m, x, y)
 
 def map_delete(m):
-    return _lib.TCOD_map_delete(m)
+    pass
 
 def map_get_width(map):
     return _lib.TCOD_map_get_width(map)

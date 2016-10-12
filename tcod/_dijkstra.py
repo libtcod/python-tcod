@@ -4,13 +4,15 @@ import functools as _functools
 from .libtcod import _lib, _ffi
 
 def dijkstra_new(m, dcost=1.41):
-    return (_lib.TCOD_dijkstra_new(m, dcost), None)
+    return (_ffi.gc(_lib.TCOD_dijkstra_new(m, dcost),
+                    _lib.TCOD_dijkstra_delete), None)
 
 def dijkstra_new_using_function(w, h, func, userData=0, dcost=1.41):
     func = _functools(func, userData)
     python_handle = _ffi.new_handle(func)
-    return (_lib.TCOD_path_dijkstra_using_function(w, h, _lib._pycall_path_func,
-            python_handle, c_float(dcost)), python_handle)
+    return (_ffi.gc(_lib.TCOD_path_dijkstra_using_function(w, h
+                    _lib._pycall_path_func, python_handle, c_float(dcost)),
+                    _lib.TCOD_dijkstra_delete), python_handle)
 
 def dijkstra_compute(p, ox, oy):
     _lib.TCOD_dijkstra_compute(p[0], ox, oy)
@@ -44,6 +46,6 @@ def dijkstra_path_walk(p):
     return None,None
 
 def dijkstra_delete(p):
-    _lib.TCOD_dijkstra_delete(p[0])
+    pass
 
 __all__ = [_name for _name in list(globals()) if _name[0] != '_']

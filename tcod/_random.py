@@ -14,10 +14,11 @@ def random_get_instance():
     return _lib.TCOD_random_get_instance()
 
 def random_new(algo=RNG_CMWC):
-    return _lib.TCOD_random_new(algo)
+    return _ffi.gc(_lib.TCOD_random_new(algo), _lib.TCOD_random_delete)
 
 def random_new_from_seed(seed, algo=RNG_CMWC):
-    return _lib.TCOD_random_new_from_seed(algo, seed)
+    return _ffi.gc(_lib.TCOD_random_new_from_seed(algo, seed),
+                   _lib.TCOD_random_delete)
 
 def random_set_distribution(rnd, dist) :
 	_lib.TCOD_random_set_distribution(rnd or _ffi.NULL, dist)
@@ -41,12 +42,13 @@ def random_get_double_mean(rnd, mi, ma, mean):
     return _lib.TCOD_random_get_double_mean(rnd or _ffi.NULL, mi, ma, mean)
 
 def random_save(rnd):
-    return _lib.TCOD_random_save(rnd or _ffi.NULL)
+    return _ffi.gc(_lib.TCOD_random_save(rnd or _ffi.NULL),
+                   _lib.TCOD_random_delete)
 
 def random_restore(rnd, backup):
     _lib.TCOD_random_restore(rnd or _ffi.NULL, backup)
 
 def random_delete(rnd):
-    _lib.TCOD_random_delete(rnd)
+    pass
 
 __all__ = [_name for _name in list(globals()) if _name[0] != '_']

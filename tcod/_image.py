@@ -3,7 +3,7 @@ from .libtcod import _lib, _ffi, _bytes
 
 
 def image_new(width, height):
-    return _lib.TCOD_image_new(width, height)
+    return _ffi.gc(_lib.TCOD_image_new(width, height), _lib.TCOD_image_delete)
 
 def image_clear(image,col) :
     _lib.TCOD_image_clear(image,col)
@@ -33,10 +33,12 @@ def image_is_pixel_transparent(image,x,y) :
     return _lib.TCOD_image_is_pixel_transparent(image, x, y)
 
 def image_load(filename):
-    return _lib.TCOD_image_load(_bytes(filename))
+    return _ffi.gc(_lib.TCOD_image_load(_bytes(filename)),
+                   _lib.TCOD_image_delete)
 
 def image_from_console(console):
-    return _lib.TCOD_image_from_console(console)
+    return _ffi.gc(_lib.TCOD_image_from_console(console),
+                   _lib.TCOD_image_delete)
 
 def image_refresh_console(image, console):
     _lib.TCOD_image_refresh_console(image, console)
@@ -70,6 +72,6 @@ def image_save(image, filename):
     _lib.TCOD_image_save(image, _bytes(filename))
 
 def image_delete(image):
-    _lib.TCOD_image_delete(image)
+    pass
 
 __all__ = [_name for _name in list(globals()) if _name[0] != '_']

@@ -15,13 +15,14 @@ def _pycall_path_func(x1, y1, x2, y2, handle):
         return None
 
 def path_new_using_map(m, dcost=1.41):
-    return (_lib.TCOD_path_new_using_map(m, dcost), None)
+    return (_ffi.gc(_lib.TCOD_path_new_using_map(m, dcost),
+                    _lib.TCOD_path_delete), None)
 
 def path_new_using_function(w, h, func, userData=0, dcost=1.41):
     func = _functools.parital(func, userData)
     handle = _ffi.new_handle((func, _PropagateException()))
-    return (_lib.TCOD_path_new_using_function(w, h, _lib._pycall_path_func,
-            handle, dcost), handle)
+    return (_ffi.gc(_lib.TCOD_path_new_using_function(w, h, _lib._pycall_path_func,
+            handle, dcost), _lib.TCOD_path_delete), handle)
 
 def path_compute(p, ox, oy, dx, dy):
     with p[1]:
@@ -63,6 +64,6 @@ def path_walk(p, recompute):
     return None,None
 
 def path_delete(p):
-    _lib.TCOD_path_delete(p[0])
+    pass
 
 __all__ = [_name for _name in list(globals()) if _name[0] != '_']

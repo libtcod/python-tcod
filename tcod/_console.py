@@ -190,7 +190,7 @@ def console_disable_keyboard_repeat():
 
 # using offscreen consoles
 def console_new(w, h):
-    return _lib.TCOD_console_new(w, h)
+    return _ffi.gc(_lib.TCOD_console_new(w, h), TCOD_console_delete)
 def console_from_file(filename):
     return _lib.TCOD_console_from_file(_bytes(filename))
 
@@ -202,7 +202,9 @@ def console_set_key_color(con, col):
     _lib.TCOD_console_set_key_color(con or _ffi.NULL, col)
 
 def console_delete(con):
-    _lib.TCOD_console_delete(con or _ffi.NULL)
+    con = con or _ffi.NULL
+    if con == _ffi.NULL:
+        _lib.TCOD_console_delete(con)
 
 # fast color filling
 def console_fill_foreground(con,r,g,b) :
