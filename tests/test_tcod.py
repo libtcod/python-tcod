@@ -19,9 +19,9 @@ class TestLibtcodpy(unittest.TestCase):
         """
         bsp = tcod.BSP(0, 0, 16, 16)
 
-        self.assertEquals(bsp.depth(), 0)
-        self.assertFalse(bsp.orientation())
-        self.assertFalse(bsp.children())
+        self.assertEquals(bsp.get_depth(), 0)
+        self.assertFalse(bsp.get_orientation())
+        self.assertFalse(bsp.get_children())
 
         with self.assertRaises(Exception):
             tcod.bsp_traverse_pre_order(bsp, raise_Exception)

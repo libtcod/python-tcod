@@ -3,6 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. module:: tcod
+
 Welcome to libtcod-cffi's documentation!
 ========================================
 
@@ -13,7 +15,7 @@ Hello World
 .. toctree::
    :maxdepth: 2
 
-   getting_started
+   tcod
    libtcodpy
 
 Indices and tables

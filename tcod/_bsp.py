@@ -16,12 +16,32 @@ def _pycall_bsp_callback(node, handle):
         propagate(*_sys.exc_info())
         return False
 
+def _ensure_sanity(func):
+    """Any BSP methods which use a cdata object in a TCOD call need to have
+    a sanity check, otherwise it may end up passing a NULL pointer"""
+    if __debug__:
+        @_functools.wraps(func)
+        def check_sanity(*args, **kargs):
+            assert self.cdata != _ffi.NULL, 'This BSP instance was deleted!'
+            return func(*args, **kargs)
+    return func
+
 class BSP(object):
     """
 
+    .. attribute:: x
+    .. attribute:: y
+    .. attribute:: w
+    .. attribute:: h
+
+    :param int x: rectangle left coordinate
+    :param int y: rectangle top coordinate
+    :param int w: rectangle width
+    :param int h: rectangle height
+
     .. versionchanged:: 2.0
        You can create BSP's with this class contructor instead of using
-       `bsp_new_with_size`
+       :any:`bsp_new_with_size`.
 
     """
 
@@ -39,13 +59,14 @@ class BSP(object):
 
     @classmethod
     def from_cdata(cls, cdata, reference=None):
-        """Create a BSP instance from a CData instance.
+        """Create a BSP instance from a "TCOD_bsp_t*" pointer.
 
         This is an alternative constructor, normally for internal use.
 
-        :param TCOD_bsp_t cdata: Pointer to a TCOD_bsp_t CData instance.
-        :param BSP reference: Used internally to prevent the root BSP from
-                              beomcing garbage collected.
+        :param TCOD_bsp_t* cdata: Must be a TCOD_bsp_t*
+                                 :any:`CData <ffi-cdata>` instance.
+        :param BSP reference: Used internally to prevent the root BSP
+                              from becoming garbage collected.
 
         .. versionadded:: 2.0
         """
@@ -60,15 +81,10 @@ class BSP(object):
     def _invalidate_children(self):
         """Invalidates BSP instances known to be based off of this one."""
         for child in self._children:
-            child.cdata = _ffi.NULL
             child._reference = None
             child._invalidate_children()
+            child.cdata = _ffi.NULL
         self._children.clear()
-
-    def _assert_sanity(self):
-        """Make sure nobody broke everything by using bsp_remove_sons"""
-        assert self.cdata != _ffi.NULL, 'This BSP instance was deleted!'
-        return True
 
     def __repr__(self):
         """Provide a useful readout when printed."""
@@ -77,12 +93,12 @@ class BSP(object):
 
         status = 'leaf'
         if not self.is_leaf():
-            status = ('split at position=%i,orientation=%r' %
-                      (self.position, self.orientation()))
+            status = ('split at dicision=%i,orientation=%r' %
+                      (self.get_division(), self.get_orientation()))
 
         return ('<%s(x=%i,y=%i,w=%i,h=%i)depth=%i,%s>' %
                 (self.__class__.__name__,
-                 self.x, self.y, self.w, self.h, self.depth(), status))
+                 self.x, self.y, self.w, self.h, self.get_depth(), status))
 
     def __hash__(self):
         return hash(self.cdata)
@@ -91,78 +107,44 @@ class BSP(object):
         try:
             return self.cdata == other.cdata
         except AttributeError:
-            return False
+            return NotImplemented
 
-    def getx(self):
-        assert self._assert_sanity()
-        return self.cdata.x
-    def setx(self, value):
-        assert self._assert_sanity()
-        self.cdata.x = value
-    x = property(getx, setx)
+    def __getattr__(self, attr):
+        return getattr(self.__dict__['cdata'], attr)
 
-    def gety(self):
-        assert self._assert_sanity()
-        return self.cdata.y
-    def sety(self, value):
-        assert self._assert_sanity()
-        self.cdata.y = value
-    y = property(gety, sety)
+    def __setattr__(self, attr, value):
+        if attr != 'cdata' and hasattr(self.cdata, attr):
+            setattr(self.cdata, attr, value)
+            return
+        object.__setattr__(self, attr, value)
 
-    def getw(self):
-        assert self._assert_sanity()
-        return self.cdata.w
-    def setw(self, value):
-        assert self._assert_sanity()
-        self.cdata.w = value
-    w = property(getw, setw)
+    def get_depth(self):
+        """Return the depth of this node.
 
-    def geth(self):
-        assert self._assert_sanity()
-        return self.cdata.h
-    def seth(self, value):
-        assert self._assert_sanity()
-        self.cdata.h = value
-    h = property(geth, seth)
+        :rtype: int
 
-    def getpos(self):
-        assert self._assert_sanity()
+        .. versionadded:: 2.0
+        """
+        return self.cdata.level
+
+    def get_division(self):
+        """Return the point where this node was divided into parts.
+
+        :rtype: :any:`int` or :any:`None`
+
+        .. versionadded:: 2.0
+        """
+        if self.is_leaf():
+            return None
         return self.cdata.position
-    def setpos(self, value):
-        assert self._assert_sanity()
-        self.cdata.position = value
-    position = property(getpos, setpos)
 
-    def gethor(self):
-        assert self._assert_sanity()
-        return self.cdata.horizontal
-    def sethor(self,value):
-        assert self._assert_sanity()
-        self.cdata.horizontal = value
-    horizontal = property(gethor, sethor)
-
-    def getlev(self):
-        assert self._assert_sanity()
-        return self.cdata.level
-    def setlev(self,value):
-        assert self._assert_sanity()
-        self.cdata.level = value
-    level = property(getlev, setlev)
-
-    def depth(self):
+    def get_orientation(self):
         """
+
+        :rtype: str
 
         .. versionadded:: 2.0
         """
-        assert self._assert_sanity()
-        return self.cdata.level
-
-    def orientation(self):
-        """
-
-        .. versionadded:: 2.0
-        """
-        assert self._assert_sanity()
         if self.is_leaf():
             return ''
         elif self.cdata.horizontal:
@@ -170,13 +152,15 @@ class BSP(object):
         else:
             return 'vertical'
 
+    @_ensure_sanity
     def split_once(self, orientation, position):
         """
+
+        :rtype: tuple
 
         .. versionadded:: 2.0
         """
         # orientation = horz
-        assert self._assert_sanity()
         if orientation[:1].lower() == 'h':
             _lib.TCOD_bsp_split_once(self.cdata, True, position)
         elif orientation[:1].lower() == 'v':
@@ -184,99 +168,96 @@ class BSP(object):
         else:
             raise ValueError("orientation must be 'horizontal' or 'vertical'"
                              "\nNot %r" % orientation)
-        return self.children()
+        return self.get_children()
 
+    @_ensure_sanity
     def split_recursive(self, depth, min_width, min_height,
                         max_horz_ratio, max_vert_raito, random=None):
         """
 
+        :rtype: iter
+
         .. versionadded:: 2.0
         """
-        assert self._assert_sanity()
         _lib.TCOD_bsp_split_recursive(self.cdata, random or _ffi.NULL,
                                       depth, min_width, min_height,
                                       max_horz_ratio, max_vert_raito)
+        return self.walk()
 
+    @_ensure_sanity
     def resize(self, x, y, w, h):
         """Resize this BSP to the provided rectangle.
 
-        :param int x: new left coordinate
-        :param int y: new top coordinate
-        :param int w: new width
-        :param int h: new height
+        :param int x: rectangle left coordinate
+        :param int y: rectangle top coordinate
+        :param int w: rectangle width
+        :param int h: rectangle height
 
         .. versionadded:: 2.0
         """
-        assert self._assert_sanity()
         _lib.TCOD_bsp_resize(self.cdata, x, y, w, h)
 
-
-    def left(self):
+    @_ensure_sanity
+    def get_left(self):
         """Return this BSP's 'left' child.
 
         Returns None if this BSP is a leaf node.
 
         :return: BSP's left/top child or None.
+        :rtype: :any:`BSP` or :any:`None`
 
         .. versionadded:: 2.0
         """
-        assert self._assert_sanity()
         if self.is_leaf():
             return None
         return BSP.from_cdata(_lib.TCOD_bsp_left(self.cdata), self)
 
-    def right(self):
+    @_ensure_sanity
+    def get_right(self):
         """Return this BSP's 'right' child.
 
         Returns None if this BSP is a leaf node.
 
         :return: BSP's right/bottom child or None.
+        :rtype: :any:`BSP` or :any:`None`
 
         .. versionadded:: 2.0
         """
-        assert self._assert_sanity()
         if self.is_leaf():
             return None
         return BSP.from_cdata(_lib.TCOD_bsp_right(self.cdata), self)
 
-    def parent(self):
+    @_ensure_sanity
+    def get_parent(self):
         """Return this BSP's parent node.
 
         :return: Returns the parent node as a BSP instance.
                  Returns None if this BSP has no parent.
+        :rtype: :any:`BSP` or :any:`None`
 
         .. versionadded:: 2.0
         """
-        assert self._assert_sanity()
         node = BSP.from_cdata(_lib.TCOD_bsp_father(self.cdata), self)
         if node.cdata == _ffi.NULL:
             return None
         return node
 
-    def children(self):
+    @_ensure_sanity
+    def get_children(self):
         """Return as a tuple, this instances immediate children, if any.
 
-        An ideal usage of this function is:
-
-        .. code-block:: python
-            try:
-                left, right = bsp.children()
-            except ValueError:
-                pass # this node is a leaf
-            else:
-                pass # work with children here
-
-        :return: Returns a tuple of (left, right) BSP instances
-                 Returns None if this BSP has no children.
+        :return: Returns a tuple of (left, right) BSP instances.
+                 The returned tuple is empty if this BSP has no children.
+        :rtype: tuple
 
         .. versionadded:: 2.0
         """
-        assert self._assert_sanity()
         if self.is_leaf():
             return ()
         return (BSP.from_cdata(_lib.TCOD_bsp_left(self.cdata), self),
                 BSP.from_cdata(_lib.TCOD_bsp_right(self.cdata), self))
 
+    @_ensure_sanity
     def walk(self):
         """Iterate over this BSP's hieracrhy.
 
@@ -285,33 +266,43 @@ class BSP(object):
         order.
 
         :return: Returns an iterator of BSP instances.
+        :rtype: iter
 
         .. versionadded:: 2.0
         """
-        assert self._assert_sanity()
-        yield self
-        for child in self.children():
+        for child in self.get_children():
             for grandchild in child.walk():
                 yield grandchild
+        yield self
 
+    @_ensure_sanity
     def is_leaf(self):
         """Returns True if this node is a leaf.  False when this node has children.
 
+        :rtype: bool
+
         .. versionadded:: 2.0
         """
-        assert self._assert_sanity()
         return bool(_lib.TCOD_bsp_is_leaf(self.cdata))
 
+    @_ensure_sanity
     def contains(self, x, y):
         """Returns True if this node contains these coordinates.
 
+        :rtype: bool
+
         .. versionadded:: 2.0
         """
-        assert self._assert_sanity()
         return bool(_lib.TCOD_bsp_contains(self.cdata, x, y))
 
+    @_ensure_sanity
     def find_node(self, x, y):
-        assert self._assert_sanity()
+        """Return the deepest node which contains these coordinates.
+
+        :rtype: :any:`BSP` or :any:`None`
+
+        .. versionadded:: 2.0
+        """
         node = BSP.from_cdata(_lib.TCOD_bsp_find_node(self.cdata, x, y), self)
         if node.cdata == _ffi.NULL:
             node = None
@@ -319,70 +310,77 @@ class BSP(object):
 
 
 def bsp_new_with_size(x, y, w, h):
-    """
+    """Create a new :any:`BSP` instance with the given rectangle.
+
+    :param int x: rectangle left coordinate
+    :param int y: rectangle top coordinate
+    :param int w: rectangle width
+    :param int h: rectangle height
+    :rtype: BSP
+
     .. deprecated:: 2.0
-       Initialize by `BSP` directly.
+       Calling the :any:`BSP` class instead.
     """
     return BSP(x, y, w, h)
 
 def bsp_split_once(node, horizontal, position):
     """
     .. deprecated:: 2.0
-       Use `BSP.split_once` instead.
+       Use :any:`BSP.split_once` instead.
     """
-    return node.split_once('h' if horizontal else 'v', position)
+    node.split_once('h' if horizontal else 'v', position)
 
 def bsp_split_recursive(node, randomizer, nb, minHSize, minVSize, maxHRatio,
                         maxVRatio):
-    return node.split_recursive(nb, minHSize, minVSize,
-                                maxHRatio, maxVRatio, randomizer)
+    node.split_recursive(nb, minHSize, minVSize,
+                         maxHRatio, maxVRatio, randomizer)
 
 def bsp_resize(node, x, y, w, h):
     """
     .. deprecated:: 2.0
-       Use `BSP.resize` instead.
+       Use :any:`BSP.resize` instead.
     """
     node.resize(x, y, w, h)
 
 def bsp_left(node):
     """
     .. deprecated:: 2.0
-       Use `BSP.left` instead.
+       Use :any:`BSP.get_left` instead.
     """
-    return node.left()
+    return node.get_left()
 
 def bsp_right(node):
     """
     .. deprecated:: 2.0
-       Use `BSP.right` instead.
+       Use :any:`BSP.get_right` instead.
     """
-    return node.right()
+    return node.get_right()
 
 def bsp_father(node):
     """
     .. deprecated:: 2.0
-       Use `BSP.parent` instead.
+       Use :any:`BSP.get_parent` instead.
     """
-    return node.parent()
+    return node.get_parent()
 
 def bsp_is_leaf(node):
     """
     .. deprecated:: 2.0
-       Use `BSP.is_leaf` instead.
+       Use :any:`BSP.is_leaf` instead.
     """
     return node.is_leaf()
 
 def bsp_contains(node, cx, cy):
     """
     .. deprecated:: 2.0
-       Use `BSP.contains` instead.
+       Use :any:`BSP.contains` instead.
     """
     return node.contains(cx, cy)
 
 def bsp_find_node(node, cx, cy):
     """
     .. deprecated:: 2.0
-       Use `BSP.find_node` instead.
+       Use :any:`BSP.find_node` instead.
     """
     return node.find_node(cx, cy)
 
@@ -398,7 +396,7 @@ def bsp_traverse_pre_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
 
     .. deprecated:: 2.0
-       Use `BSP.walk` instead.
+       Use :any:`BSP.walk` instead.
     """
     _bsp_traverse(node, _lib.TCOD_bsp_traverse_pre_order, callback, userData)
 
@@ -406,7 +404,7 @@ def bsp_traverse_in_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
 
     .. deprecated:: 2.0
-       Use `BSP.walk` instead.
+       Use :any:`BSP.walk` instead.
     """
     _bsp_traverse(node, _lib.TCOD_bsp_traverse_in_order, callback, userData)
 
@@ -414,7 +412,7 @@ def bsp_traverse_post_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
 
     .. deprecated:: 2.0
-       Use `BSP.walk` instead.
+       Use :any:`BSP.walk` instead.
     """
     _bsp_traverse(node, _lib.TCOD_bsp_traverse_post_order, callback, userData)
 
@@ -422,7 +420,7 @@ def bsp_traverse_level_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
 
     .. deprecated:: 2.0
-       Use `BSP.walk` instead.
+       Use :any:`BSP.walk` instead.
     """
     _bsp_traverse(node, _lib.TCOD_bsp_traverse_level_order, callback, userData)
 
@@ -430,7 +428,7 @@ def bsp_traverse_inverted_level_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
 
     .. deprecated:: 2.0
-       Use `BSP.walk` instead.
+       Use :any:`BSP.walk` instead.
     """
     _bsp_traverse(node, _lib.TCOD_bsp_traverse_inverted_level_order,
                   callback, userData)
@@ -458,5 +456,6 @@ def bsp_delete(node):
     .. deprecated:: 2.0
        BSP deletion is automatic.
     """
+    pass
 
 __all__ = [_name for _name in list(globals()) if _name[0] != '_']
