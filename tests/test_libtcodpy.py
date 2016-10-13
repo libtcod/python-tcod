@@ -233,10 +233,6 @@ class TestLibtcodpyConsole(unittest.TestCase):
         tcod.sys_set_renderer(self.RENDERER)
         tcod.sys_get_renderer()
 
-    def test_sys_clipboard(self):
-        tcod.sys_clipboard_set('')
-        tcod.sys_clipboard_get()
-
     def test_image(self):
         img = tcod.image_new(16, 16)
         tcod.image_clear(img, (0, 0, 0))

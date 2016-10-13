@@ -13,6 +13,10 @@ class TestLibtcodpy(unittest.TestCase):
         with self.assertRaises(Exception):
             tcod.line(*LINE_ARGS, py_callback=self.raise_Exception)
 
+    def test_clipboard(self):
+        tcod.clipboard_set('')
+        tcod.clipboard_get()
+
     def test_tcod_bsp(self):
         """
         test tcod additions to BSP
