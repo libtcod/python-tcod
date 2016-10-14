@@ -1,23 +1,20 @@
 
-#include <libtcod.h>
-#include <wrappers.h>
-
 /* TDL FUNCTONS ----------------------------------------------------------- */
 
-static TCOD_value_t TDL_list_get_union(TCOD_list_t l,int idx);
-static bool TDL_list_get_bool(TCOD_list_t l,int idx);
-static char TDL_list_get_char(TCOD_list_t l,int idx);
-static int TDL_list_get_int(TCOD_list_t l,int idx);
-static float TDL_list_get_float(TCOD_list_t l,int idx);
-static char* TDL_list_get_string(TCOD_list_t l,int idx);
-static TCOD_color_t TDL_list_get_color(TCOD_list_t l,int idx);
-static TCOD_dice_t TDL_list_get_dice(TCOD_list_t l,int idx);
+TCOD_value_t TDL_list_get_union(TCOD_list_t l,int idx);
+bool TDL_list_get_bool(TCOD_list_t l,int idx);
+char TDL_list_get_char(TCOD_list_t l,int idx);
+int TDL_list_get_int(TCOD_list_t l,int idx);
+float TDL_list_get_float(TCOD_list_t l,int idx);
+char* TDL_list_get_string(TCOD_list_t l,int idx);
+TCOD_color_t TDL_list_get_color(TCOD_list_t l,int idx);
+TCOD_dice_t TDL_list_get_dice(TCOD_list_t l,int idx);
 /*bool (*TDL_parser_new_property_func)(const char *propname, TCOD_value_type_t type, TCOD_value_t *value);*/
 
 /* color functions modified to use integers instead of structs */
 TCOD_color_t TDL_color_from_int(int color);
 int TDL_color_to_int(TCOD_color_t *color);
-static int* TDL_color_int_to_array(int color);
+int* TDL_color_int_to_array(int color);
 int TDL_color_RGB(int r, int g, int b);
 int TDL_color_HSV(float h, float s, float v);
 bool TDL_color_equals(int c1, int c2);

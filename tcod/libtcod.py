@@ -1,98 +1,52 @@
+"""This module handles loading of the libtcod cffi API.
+"""
+from __future__ import absolute_import as _
 
-import os as _os
 import sys as _sys
+import os as _os
 
-import ctypes as _ctypes
 import platform as _platform
 
-from . import __path__
+from tcod import __path__
 
 # add Windows dll's to PATH
-if 'win32' in _sys.platform:
+if _sys.platform == 'win32':
     _bits, _linkage = _platform.architecture()
-    _os.environ['PATH'] += (';' + \
+    _os.environ['PATH'] += (';' +
         _os.path.join(__path__[0], 'x86/' if _bits == '32bit' else 'x64'))
 
-from . import _libtcod
+from tcod._libtcod import lib, ffi
 
-_ffi = ffi = _libtcod.ffi
-_lib = lib = _libtcod.lib
+def _import_library_functions(lib):
+    # imports libtcod namespace into thie module
+    # does not override existing names
+    g = globals()
+    for name in dir(lib):
+        if name[:5] == 'TCOD_':
+            if (isinstance(getattr(lib, name), ffi.CData) and
+                ffi.typeof(getattr(lib, name)) == ffi.typeof('TCOD_color_t')):
+                g[name[5:]] = _FrozenColor.from_cdata(getattr(lib, name))
+            elif name.isupper():
+                g[name[5:]] = getattr(lib, name) # const names
+            #else:
+            #    g[name[5:]] = getattr(lib, name) # function names
+        elif name[:6] == 'TCODK_': # key name
+            g['KEY_' + name[6:]] = getattr(lib, name)
 
-def _unpack_char_p(char_p):
-    if char_p == _ffi.NULL:
-        return ''
-    return ffi.string(char_p).decode()
+NOISE_DEFAULT_HURST = 0.5
+NOISE_DEFAULT_LACUNARITY = 2.0
 
-def _int(int_or_str):
-    'return an integer where a single character string may be expected'
-    if isinstance(int_or_str, str):
-        return ord(int_or_str)
-    if isinstance(int_or_str, bytes):
-        return int_or_str[0]
-    return int(int_or_str)
+def FOV_PERMISSIVE(p) :
+    return FOV_PERMISSIVE_0+p
 
-if _sys.version_info[0] == 2: # Python 2
-    def _bytes(string):
-        if isinstance(string, unicode):
-            return string.encode()
-        return string
+def BKGND_ALPHA(a):
+    return BKGND_ALPH | (int(a * 255) << 8)
 
-    def _unicode(string):
-        if not isinstance(string, unicode):
-            return string.decode()
-        return string
+def BKGND_ADDALPHA(a):
+    return BKGND_ADDA | (int(a * 255) << 8)
 
-else: # Python 3
-    def _bytes(string):
-        if isinstance(string, str):
-            return string.encode()
-        return string
+from tcod.tcod import FrozenColor as _FrozenColor
 
-    def _unicode(string):
-        if isinstance(string, bytes):
-            return string.decode()
-        return string
+_import_library_functions(lib)
 
-class _PropagateException():
-    ''' context manager designed to propagate exceptions outside of a cffi
-    callback context.  normally cffi suppresses the exception
-
-    when propagate is called this class will hold onto the error until the
-    control flow leaves the context, then the error will be raised
-
-    with _PropagateException as propagate:
-    # give propagate as onerror parameter for _ffi.def_extern
-    '''
-
-    def __init__(self):
-        self.exc_info = None # (exception, exc_value, traceback)
-
-    def propagate(self, *exc_info):
-        ''' set an exception to be raised once this context exits
-
-        if multiple errors are caught, only keep the first exception raised
-        '''
-        if not self.exc_info:
-            self.exc_info = exc_info
-
-    def __enter__(self):
-        ''' once in context, only the propagate call is needed to use this
-        class effectively
-        '''
-        return self.propagate
-
-    def __exit__(self, type, value, traceback):
-        ''' if we're holding on to an exception, raise it now
-
-        prefers our held exception over any current raising error
-
-        self.exc_info is reset now in case of nested manager shenanigans
-        '''
-        if self.exc_info:
-            type, value, traceback = self.exc_info
-            self.exc_info = None
-        if type:
-            # Python 2/3 compatible throw
-            exception = type(value)
-            exception.__traceback__ = traceback
-            raise exception
+__all__ = [_name for _name in list(globals()) if _name[0] != '_']

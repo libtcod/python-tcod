@@ -1,6 +1,6 @@
 include *.py *.cfg *.txt *.rst
 
-recursive-include src *.py *.c *.h *.txt *.dll
+recursive-include tcod *.py *.c *.h *.txt *.dll
 
 recursive-include tests *.py *.cfg *.png *.txt
 recursive-include examples *.py *.cfg *.png *.txt

@@ -22,7 +22,9 @@ def find_sources(directory):
             if source.endswith('.c')]
 
 module_name = 'tcod._libtcod'
-include_dirs = ['Release/tcod/',
+include_dirs = [
+                'tcod/',
+                'Release/tcod/',
                 'libtcod/include/',
                 'libtcod/src/png/',
                 'libtcod/src/zlib/',
@@ -46,8 +48,7 @@ define_macros = [('LIBTCOD_EXPORTS', None),
                  ('TCOD_NO_MACOSX_SDL_MAIN', None),
                  ]
 
-with open('tcod/tdl_source.c', 'r') as file_source:
-    source = file_source.read()
+sources += find_sources('tcod/')
 
 if sys.platform == 'win32':
     libraries += ['User32', 'OpenGL32']
@@ -78,7 +79,7 @@ def get_cdef():
     return generator.visit(get_ast())
 
 def get_ast():
-    ast = parse_file(filename='tcod/libtcod_cdef.h', use_cpp=True,
+    ast = parse_file(filename='tcod/tcod.h', use_cpp=True,
                      cpp_args=[r'-Idependencies/fake_libc_include',
                                r'-Ilibtcod/include',
                                r'-DDECLSPEC=',
@@ -139,7 +140,7 @@ extern "Python" {
 }
 ''')
 ffi.set_source(
-    module_name, source,
+    module_name, '#include <tcod.h>',
     include_dirs=include_dirs,
     library_dirs=library_dirs,
     sources=sources,
