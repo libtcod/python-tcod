@@ -20,16 +20,20 @@ def _int(int_or_str):
         return ord(int_or_str)
     if isinstance(int_or_str, bytes):
         return int_or_str[0]
-    return int(int_or_str)
+    return int(int_or_str) # check for __count__
 
 def _cdata(cdata):
-    try:
+    """covert value into a cffi.CData instance"""
+    try: # first check for _CDataWrapper
         cdata = cdata.cdata
-    except AttributeError:
+    except AttributeError: # assume cdata is valid
         pass
-    if cdata is None:
+    if cdata is None: # convert None to NULL
         cdata = ffi.NULL
     return cdata
+
+def _color(color):
+    return color
 
 if _sys.version_info[0] == 2: # Python 2
     def _bytes(string):
@@ -54,7 +58,7 @@ else: # Python 3
         return string
 
 class _PropagateException():
-    ''' context manager designed to propagate exceptions outside of a cffi
+    """ context manager designed to propagate exceptions outside of a cffi
     callback context.  normally cffi suppresses the exception
 
     when propagate is called this class will hold onto the error until the
@@ -62,32 +66,32 @@ class _PropagateException():
 
     with _PropagateException as propagate:
     # give propagate as onerror parameter for ffi.def_extern
-    '''
+    """
 
     def __init__(self):
         self.exc_info = None # (exception, exc_value, traceback)
 
     def propagate(self, *exc_info):
-        ''' set an exception to be raised once this context exits
+        """ set an exception to be raised once this context exits
 
         if multiple errors are caught, only keep the first exception raised
-        '''
+        """
         if not self.exc_info:
             self.exc_info = exc_info
 
     def __enter__(self):
-        ''' once in context, only the propagate call is needed to use this
+        """ once in context, only the propagate call is needed to use this
         class effectively
-        '''
+        """
         return self.propagate
 
     def __exit__(self, type, value, traceback):
-        ''' if we're holding on to an exception, raise it now
+        """ if we're holding on to an exception, raise it now
 
         prefers our held exception over any current raising error
 
         self.exc_info is reset now in case of nested manager shenanigans
-        '''
+        """
         if self.exc_info:
             type, value, traceback = self.exc_info
             self.exc_info = None
@@ -110,8 +114,8 @@ class _CDataWrapper(object):
             return args[0]
         else:
             return None
-        
-        
+
+
     def __hash__(self):
         return hash(self.cdata)
 
@@ -392,6 +396,8 @@ class BSP(_CDataWrapper):
         return node
 
 class HeightMap(_CDataWrapper):
+    """libtcod HeightMap instance
+    """
 
     def __init__(self, *args, **kargs):
         super(HeightMap, self).__init__(*args, **kargs)
@@ -404,7 +410,7 @@ class HeightMap(_CDataWrapper):
 
 
 class Color(list):
-    '''list-like behaviour could change in the future'''
+    """list-like behaviour could change in the future"""
 
     def __init__(self, *rgb):
         if len(rgb) < 3:
@@ -413,14 +419,14 @@ class Color(list):
 
     @classmethod
     def from_cdata(cls, tcod_color):
-        '''new in libtcod-cffi'''
+        """new in libtcod-cffi"""
         return cls(tcod_color.r, tcod_color.g, tcod_color.b)
 
     @classmethod
     def from_int(cls, integer):
-        '''a TDL int color: 0xRRGGBB
+        """a TDL int color: 0xRRGGBB
 
-        new in libtcod-cffi'''
+        new in libtcod-cffi"""
         return cls.from_cdata(lib.TDL_color_from_int(integer))
 
     def __eq__(self, other):
@@ -470,7 +476,7 @@ class Color(list):
 
 
 class FrozenColor(tuple):
-    '''new in libtcod-cffi'''
+    """new in libtcod-cffi"""
     def __new__(cls, *rgb):
         if len(rgb) < 3:
             rgb += (0,) * (3 - len(rgb))
@@ -505,6 +511,8 @@ class FrozenColor(tuple):
     __int__ = Color.__int__
 
 class Key(_CDataWrapper):
+    """Key Event instance
+    """
 
     def __init__(self, *args):
         super(Key, self).__init__(*args)
@@ -518,6 +526,8 @@ class Key(_CDataWrapper):
             return super(Key, self).__getattr__(attr)
 
 class Mouse(_CDataWrapper):
+    """Mouse event instance
+    """
 
     def __init__(self, *args):
         super(Mouse, self).__init__(*args)

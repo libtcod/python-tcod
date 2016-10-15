@@ -5,6 +5,8 @@
 
 .. module:: tcod
 
+.. currentmodule:: tcod
+
 Welcome to libtcod-cffi's documentation!
 ========================================
 

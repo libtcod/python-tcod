@@ -7,7 +7,7 @@ import threading as _threading
 
 from tcod.libtcod import *
 
-from tcod.tcod import _int, _cdata, _bytes, _unicode, _unpack_char_p
+from tcod.tcod import _int, _cdata, _color, _bytes, _unicode, _unpack_char_p
 from tcod.tcod import _CDataWrapper
 from tcod.tcod import _PropagateException
 from tcod.tcod import BSP as Bsp
@@ -100,7 +100,7 @@ class ConsoleBuffer(object):
 
 class Dice(_CDataWrapper):
     """
-    
+
     .. versionchanged:: 2.0
        This class has been standardized to behave like other CData wrapped
        classes.  This claas no longer acts like a list.
@@ -117,12 +117,12 @@ class Dice(_CDataWrapper):
         self.nb_faces = nb_faces
         self.multiplier = multiplier
         self.addsub = addsub
-        
+
     def __getattr__(self, attr):
         if attr == 'nb_dices':
             attr = 'nb_faces'
         return super(Dice, self).__getattr__(attr)
-        
+
     def __setattr__(self, attr, value):
         if attr == 'nb_dices':
             attr = 'nb_faces'
@@ -283,14 +283,32 @@ def bsp_delete(node):
     pass
 
 def color_lerp(c1, c2, a):
+    """Return the linear interpolation between two colors.
+
+    :param c1: The first color like object.
+    :param c2: The second color like object.
+    :param float a: The interpolation value,
+                    with 0 returing c1, 1 returning c2, and 0.5 returing a
+                    color halfway between both.
+    """
     return Color.from_cdata(lib.TCOD_color_lerp(c1, c2, a))
 
 def color_set_hsv(c, h, s, v):
+    """Set a color using: hue, saturation, and value parameters.
+
+    :param Color c: Must be a :any:`Color` instance.
+    """
+    # TODO: this may not work as expected, need to fix colors in general
     tcod_color = ffi.new('TCOD_color_t *', c)
     lib.TCOD_color_set_HSV(tcod_color, h, s, v)
     c[0:3] = tcod_color.r, tcod_color.g, tcod_color.b
 
 def color_get_hsv(c):
+    """Return the (hue, saturation, value) of a color.
+
+    :param c: Can be any color like object.
+    :returns: Returns 3-item tuple of :any:float (hue, saturation, value)
+    """
     h = ffi.new('float *')
     s = ffi.new('float *')
     v = ffi.new('float *')
@@ -298,11 +316,29 @@ def color_get_hsv(c):
     return h[0], s[0], v[0]
 
 def color_scale_HSV(c, scoef, vcoef):
+    """Scale a color's saturation and value.
+
+    :param c: Must be a :any:`Color` instance.
+    :param float scoef: saturation multiplier, use 1 to keep current saturation
+    :param float vcoef: value multiplier, use 1 to keep current value
+    """
     tcod_color = ffi.new('TCOD_color_t *', c)
     lib.TCOD_color_scale_HSV(tcod_color, scoef, vcoef)
     c[0:3] = tcod_color.r, tcod_color.g, tcod_color.b
 
 def color_gen_map(colors, indexes):
+    """Return a smoothly defined scale of colors.
+
+    For example::
+
+        tcod.color_gen_map([(0, 0, 0), (255, 255, 255)], [0, 8])
+
+    Will return a smooth grey-scale, from black to white, with a length of 8.
+
+    :param colors: Array of colors to be sampled.
+    :param indexes:
+
+    """
     ccolors = ffi.new('TCOD_color_t[]', colors)
     cindexes = ffi.new('int[]', indexes)
     cres = ffi.new('TCOD_color_t[]', max(indexes) + 1)
@@ -324,21 +360,53 @@ def _numpy_available():
 # initializing the console
 def console_init_root(w, h, title, fullscreen=False,
                       renderer=RENDERER_SDL):
+    """Set up the primary display and return the root console.
+
+    .. note:: Currently only the SDL renderer is supported at the moment.
+              Do not attempt to change it.
+
+    :param int w: Width in character tiles for the root console.
+    :param int h: Height in character tiles for the root console.
+    :param unicode title: A Unicode or system encoded string.
+                          This string will be displayed on the created windows
+                          title bar.
+    :param renderer: Rendering mode for libtcod to use.
+    """
     lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
     return None # root console is None
 
 
 def console_set_custom_font(fontFile, flags=FONT_LAYOUT_ASCII_INCOL,
                             nb_char_horiz=0, nb_char_vertic=0):
+    """Load a custom font file.
+
+    Call this before function before calling :any:`tcod.console_init_root`.
+
+    Flags can be a mix of the following:
+
+    * tcod.FONT_LAYOUT_ASCII_INCOL
+    * tcod.FONT_LAYOUT_ASCII_INROW
+    * tcod.FONT_TYPE_GREYSCALE
+    * tcod.FONT_TYPE_GRAYSCALE
+    * tcod.FONT_LAYOUT_TCOD
+
+    :param str fontFile: Path to a font file.
+    :param flags:
+    :param int nb_char_horiz:
+    :param int nb_char_vertic:
+
+    """
     lib.TCOD_console_set_custom_font(_bytes(fontFile), flags,
                                      nb_char_horiz, nb_char_vertic)
 
 
 def console_get_width(con):
-    return lib.TCOD_console_get_width(con or ffi.NULL)
+    """Return the width of a console."""
+    return lib.TCOD_console_get_width(_cdata(con))
 
 def console_get_height(con):
-    return lib.TCOD_console_get_height(con or ffi.NULL)
+    """Return the height of a console."""
+    return lib.TCOD_console_get_height(_cdata(con))
 
 def console_map_ascii_code_to_font(asciiCode, fontCharX, fontCharY):
     lib.TCOD_console_map_ascii_code_to_font(_int(asciiCode), fontCharX,
@@ -353,15 +421,19 @@ def console_map_string_to_font(s, fontCharX, fontCharY):
     lib.TCOD_console_map_string_to_font_utf(_unicode(s), fontCharX, fontCharY)
 
 def console_is_fullscreen():
+    """Returns True if the display is fullscreen, otherwise False."""
     return lib.TCOD_console_is_fullscreen()
 
 def console_set_fullscreen(fullscreen):
+    """Change the display to be fullscreen or windowed."""
     lib.TCOD_console_set_fullscreen(fullscreen)
 
 def console_is_window_closed():
+    """Returns True if the window has received and exit event."""
     return lib.TCOD_console_is_window_closed()
 
 def console_set_window_title(title):
+    """Change the current title bar string."""
     lib.TCOD_console_set_window_title(_bytes(title))
 
 def console_credits():
@@ -374,94 +446,168 @@ def console_credits_render(x, y, alpha):
     return lib.TCOD_console_credits_render(x, y, alpha)
 
 def console_flush():
+    """Update the display to represent the root consoles current state."""
     lib.TCOD_console_flush()
 
 # drawing on a console
 def console_set_default_background(con, col):
-    lib.TCOD_console_set_default_background(con or ffi.NULL, col)
+    """Change the default background color for this console."""
+    lib.TCOD_console_set_default_background(_cdata(con), _color(col))
 
 def console_set_default_foreground(con, col):
-    lib.TCOD_console_set_default_foreground(con or ffi.NULL, col)
+    """Change the default foreround color for this console."""
+    lib.TCOD_console_set_default_foreground(_cdata(con), _color(col))
 
 def console_clear(con):
-    return lib.TCOD_console_clear(con or ffi.NULL)
+    """Reset this console to its default colors and the space character."""
+    return lib.TCOD_console_clear(_cdata(con))
 
 def console_put_char(con, x, y, c, flag=BKGND_DEFAULT):
-    lib.TCOD_console_put_char(con or ffi.NULL, x, y, _int(c), flag)
+    """Draw the character c at x,y using the default colors and a blend mode.
+
+    :param int x: Character position from the left.
+    :param int y: Character position from the top.
+    :param c: Character to draw, can be an integer or string.
+    :param flag: Blending mode to use.
+
+    .. seealso::
+       :any:`console_set_default_background`
+       :any:`console_set_default_foreground`
+    """
+    lib.TCOD_console_put_char(_cdata(con), x, y, _int(c), flag)
 
 def console_put_char_ex(con, x, y, c, fore, back):
-    lib.TCOD_console_put_char_ex(con or ffi.NULL, x, y, _int(c), fore, back)
+    """Draw the character c at x,y using the colors fore and back."""
+    lib.TCOD_console_put_char_ex(_cdata(con), x, y,
+                                 _int(c), _color(fore), _color(back))
 
 def console_set_char_background(con, x, y, col, flag=BKGND_SET):
-    lib.TCOD_console_set_char_background(con or ffi.NULL, x, y, col, flag)
+    """Change the background color of x,y to col using a blend mode."""
+    lib.TCOD_console_set_char_background(_cdata(con), x, y, _color(col), flag)
 
 def console_set_char_foreground(con, x, y, col):
-    lib.TCOD_console_set_char_foreground(con or ffi.NULL, x, y, col)
+    """Change the foreground color of x,y to col."""
+    lib.TCOD_console_set_char_foreground(_cdata(con), x, y, _color(col))
 
 def console_set_char(con, x, y, c):
-    lib.TCOD_console_set_char(con or ffi.NULL, x, y, _int(c))
+    """Change the character at x,y to c, keeping the current colors."""
+    lib.TCOD_console_set_char(_cdata(con), x, y, _int(c))
 
 def console_set_background_flag(con, flag):
-    lib.TCOD_console_set_background_flag(con or ffi.NULL, flag)
+    """Change the default blend mode for this console."""
+    lib.TCOD_console_set_background_flag(_cdata(con), flag)
 
 def console_get_background_flag(con):
-    return lib.TCOD_console_get_background_flag(con or ffi.NULL)
+    """Return this consoles current blend mode."""
+    return lib.TCOD_console_get_background_flag(_cdata(con))
 
 def console_set_alignment(con, alignment):
-    lib.TCOD_console_set_alignment(con or ffi.NULL, alignment)
+    """Change this consoles current alignment mode.
+
+    * tcod.LEFT
+    * tcod.CENTER
+    * tcod.RIGHT
+    """
+    lib.TCOD_console_set_alignment(_cdata(con), alignment)
 
 def console_get_alignment(con):
-    return lib.TCOD_console_get_alignment(con or ffi.NULL)
+    """Return this consoles current alignment mode."""
+    return lib.TCOD_console_get_alignment(_cdata(con))
 
 def console_print(con, x, y, fmt):
-    lib.TCOD_console_print_utf(con or ffi.NULL, x, y, _unicode(fmt))
+    """Print a string on a console."""
+    lib.TCOD_console_print_utf(_cdata(con), x, y, _unicode(fmt))
 
 def console_print_ex(con, x, y, flag, alignment, fmt):
-    lib.TCOD_console_print_ex_utf(con or ffi.NULL, x, y,
+    """Print a string on a console using a blend mode and alignment mode."""
+    lib.TCOD_console_print_ex_utf(_cdata(con), x, y,
                                    flag, alignment, _unicode(fmt))
 
 def console_print_rect(con, x, y, w, h, fmt):
-    return lib.TCOD_console_print_rect_utf(con or ffi.NULL, x, y, w, h,
+    """Print a string constrained to a rectangle.
+
+    If h > 0 and the bottom of the rectangle is reached,
+    the string is truncated. If h = 0,
+    the string is only truncated if it reaches the bottom of the console.
+
+    :returns: Returns the number of lines of the text once word-wrapped.
+    :rtype: int
+    """
+    return lib.TCOD_console_print_rect_utf(_cdata(con), x, y, w, h,
                                             _unicode(fmt))
 
 def console_print_rect_ex(con, x, y, w, h, flag, alignment, fmt):
-    return lib.TCOD_console_print_rect_ex_utf(con or ffi.NULL, x, y, w, h,
+    """Print a string constrained to a rectangle with blend and alignment.
+
+    :returns: Returns the number of lines of the text once word-wrapped.
+    :rtype: int
+    """
+    return lib.TCOD_console_print_rect_ex_utf(_cdata(con), x, y, w, h,
                                                flag, alignment, _unicode(fmt))
 
 def console_get_height_rect(con, x, y, w, h, fmt):
-    return lib.TCOD_console_get_height_rect_utf(con or ffi.NULL, x, y, w, h,
+    """Return the height of this text once word-wrapped into this rectangle.
+
+    :returns: Returns the number of lines of the text once word-wrapped.
+    :rtype: int
+    """
+    return lib.TCOD_console_get_height_rect_utf(_cdata(con), x, y, w, h,
                                                  _unicode(fmt))
 
 def console_rect(con, x, y, w, h, clr, flag=BKGND_DEFAULT):
-    lib.TCOD_console_rect(con or ffi.NULL, x, y, w, h, clr, flag)
+    """Draw a the background color on a rect optionally clearing the text.
+
+    If clr is True the affected tiles are changed to space character.
+    """
+    lib.TCOD_console_rect(_cdata(con), x, y, w, h, clr, flag)
 
 def console_hline(con, x, y, l, flag=BKGND_DEFAULT):
-    lib.TCOD_console_hline(con or ffi.NULL, x, y, l, flag)
+    """Draw a horizontal line on the console.
+
+    This always uses the character 196, the horizontal line character.
+    """
+    lib.TCOD_console_hline(_cdata(con), x, y, l, flag)
 
 def console_vline(con, x, y, l, flag=BKGND_DEFAULT):
-    lib.TCOD_console_vline(con or ffi.NULL, x, y, l, flag)
+    """Draw a vertical line on the console.
+
+    This always uses the character 179, the vertical line character.
+    """
+    lib.TCOD_console_vline(_cdata(con), x, y, l, flag)
 
 def console_print_frame(con, x, y, w, h, clear=True, flag=BKGND_DEFAULT, fmt=b''):
-    lib.TCOD_console_print_frame(con or ffi.NULL, x, y, w, h, clear, flag,
+    """Draw a framed rectangle with optinal text.
+
+    This uses the default background color and blend mode to fill the
+    rectangle and the default foreground to draw the outline.
+
+    fmt will be printed on the inside of the rectangle, word-wrapped.
+    """
+    lib.TCOD_console_print_frame(_cdata(con), x, y, w, h, clear, flag,
                                   _bytes(fmt))
 
 def console_set_color_control(con, fore, back):
-    lib.TCOD_console_set_color_control(con or ffi.NULL, fore, back)
+    lib.TCOD_console_set_color_control(_cdata(con), fore, back)
 
 def console_get_default_background(con):
-    return Color.from_cdata(lib.TCOD_console_get_default_background(con or ffi.NULL))
+    """Return this consoles default background color."""
+    return Color.from_cdata(lib.TCOD_console_get_default_background(_cdata(con)))
 
 def console_get_default_foreground(con):
-    return Color.from_cdata(lib.TCOD_console_get_default_foreground(con or ffi.NULL))
+    """Return this consoles default foreground color."""
+    return Color.from_cdata(lib.TCOD_console_get_default_foreground(_cdata(con)))
 
 def console_get_char_background(con, x, y):
-    return Color.from_cdata(lib.TCOD_console_get_char_background(con or ffi.NULL, x, y))
+    """Return the background color at the x,y of this console."""
+    return Color.from_cdata(lib.TCOD_console_get_char_background(_cdata(con), x, y))
 
 def console_get_char_foreground(con, x, y):
-    return Color.from_cdata(lib.TCOD_console_get_char_foreground(con or ffi.NULL, x, y))
+    """Return the foreground color at the x,y of this console."""
+    return Color.from_cdata(lib.TCOD_console_get_char_foreground(_cdata(con), x, y))
 
 def console_get_char(con, x, y):
-    return lib.TCOD_console_get_char(con or ffi.NULL, x, y)
+    """Return the character at the x,y of this console."""
+    return lib.TCOD_console_get_char(_cdata(con), x, y)
 
 def console_set_fade(fade, fadingColor):
     lib.TCOD_console_set_fade(fade, fadingColor)
@@ -474,6 +620,12 @@ def console_get_fading_color():
 
 # handling keyboard input
 def console_wait_for_keypress(flush):
+    """Block until the user presses a key, then returns a :any:Key instance.
+
+    :param bool flush: If True then the event queue is cleared before waiting
+                       for the next event.
+    :rtype: Key
+    """
     k=Key()
     lib.TCOD_console_wait_for_keypress_wrapper(k.cdata, flush)
     return k
@@ -494,19 +646,22 @@ def console_disable_keyboard_repeat():
 
 # using offscreen consoles
 def console_new(w, h):
+    """Return an offscreen console of size: w,h."""
     return ffi.gc(lib.TCOD_console_new(w, h), lib.TCOD_console_delete)
 def console_from_file(filename):
     return lib.TCOD_console_from_file(_bytes(filename))
 
 def console_blit(src, x, y, w, h, dst, xdst, ydst, ffade=1.0,bfade=1.0):
-    lib.TCOD_console_blit(src or ffi.NULL, x, y, w, h, dst or ffi.NULL,
-                           xdst, ydst, ffade, bfade)
+    """Blit the console src from x,y,w,h to console dst at xdst,ydst."""
+    lib.TCOD_console_blit(_cdata(src), x, y, w, h,
+                          _cdata(dst), xdst, ydst, ffade, bfade)
 
 def console_set_key_color(con, col):
-    lib.TCOD_console_set_key_color(con or ffi.NULL, col)
+    """Set a consoles blit transparent color."""
+    lib.TCOD_console_set_key_color(_cdata(con), _color(col))
 
 def console_delete(con):
-    con = con or ffi.NULL
+    con = _cdata(con)
     if con == ffi.NULL:
         lib.TCOD_console_delete(con)
 
@@ -529,7 +684,7 @@ def console_fill_foreground(con,r,g,b):
         cg = ffi.new('int[]', g)
         cb = ffi.new('int[]', b)
 
-    lib.TCOD_console_fill_foreground(con or ffi.NULL, cr, cg, cb)
+    lib.TCOD_console_fill_foreground(_cdata(con), cr, cg, cb)
 
 def console_fill_background(con,r,g,b):
     if len(r) != len(g) or len(r) != len(b):
@@ -549,7 +704,7 @@ def console_fill_background(con,r,g,b):
         cg = ffi.new('int[]', g)
         cb = ffi.new('int[]', b)
 
-    lib.TCOD_console_fill_background(con or ffi.NULL, cr, cg, cb)
+    lib.TCOD_console_fill_background(_cdata(con), cr, cg, cb)
 
 def console_fill_char(con,arr):
     if (_numpy_available() and isinstance(arr, _numpy.ndarray) ):
@@ -560,19 +715,19 @@ def console_fill_char(con,arr):
         #otherwise convert using the ffi module
         carr = ffi.new('int[]', arr)
 
-    lib.TCOD_console_fill_char(con or ffi.NULL, carr)
+    lib.TCOD_console_fill_char(_cdata(con), carr)
 
 def console_load_asc(con, filename):
-    return lib.TCOD_console_load_asc(con or ffi.NULL, _bytes(filename))
+    return lib.TCOD_console_load_asc(_cdata(con), _bytes(filename))
 
 def console_save_asc(con, filename):
-    lib.TCOD_console_save_asc(con or ffi.NULL,_bytes(filename))
+    lib.TCOD_console_save_asc(_cdata(con),_bytes(filename))
 
 def console_load_apf(con, filename):
-    return lib.TCOD_console_load_apf(con or ffi.NULL,_bytes(filename))
+    return lib.TCOD_console_load_apf(_cdata(con),_bytes(filename))
 
 def console_save_apf(con, filename):
-    lib.TCOD_console_save_apf(con or ffi.NULL,_bytes(filename))
+    lib.TCOD_console_save_apf(_cdata(con),_bytes(filename))
 
 def dijkstra_new(m, dcost=1.41):
     return (ffi.gc(lib.TCOD_dijkstra_new(m, dcost),
@@ -857,6 +1012,7 @@ def image_save(image, filename):
 
 def image_delete(image):
     pass
+
 def line_init(xo, yo, xd, yd):
     """Initilize a line whose points will be returned by `line_step`.
 
@@ -884,7 +1040,7 @@ def line_step():
     :rtype: tuple(x, y)
 
     .. deprecated:: 2.0
-       Use `line_iter` instead
+       Use `line_iter` instead.
     """
     x = ffi.new('int *')
     y = ffi.new('int *')
