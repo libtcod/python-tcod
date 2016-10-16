@@ -299,9 +299,7 @@ def color_set_hsv(c, h, s, v):
     :param Color c: Must be a :any:`Color` instance.
     """
     # TODO: this may not work as expected, need to fix colors in general
-    tcod_color = ffi.new('TCOD_color_t *', c)
-    lib.TCOD_color_set_HSV(tcod_color, h, s, v)
-    c[0:3] = tcod_color.r, tcod_color.g, tcod_color.b
+    lib.TCOD_color_set_HSV(_cdata(c), h, s, v)
 
 def color_get_hsv(c):
     """Return the (hue, saturation, value) of a color.
@@ -312,7 +310,7 @@ def color_get_hsv(c):
     h = ffi.new('float *')
     s = ffi.new('float *')
     v = ffi.new('float *')
-    lib.TCOD_color_get_HSV(c, h, s, v)
+    lib.TCOD_color_get_HSV(_color(c), h, s, v)
     return h[0], s[0], v[0]
 
 def color_scale_HSV(c, scoef, vcoef):
@@ -322,9 +320,7 @@ def color_scale_HSV(c, scoef, vcoef):
     :param float scoef: saturation multiplier, use 1 to keep current saturation
     :param float vcoef: value multiplier, use 1 to keep current value
     """
-    tcod_color = ffi.new('TCOD_color_t *', c)
-    lib.TCOD_color_scale_HSV(tcod_color, scoef, vcoef)
-    c[0:3] = tcod_color.r, tcod_color.g, tcod_color.b
+    lib.TCOD_color_scale_HSV(_cdata(c), scoef, vcoef)
 
 def color_gen_map(colors, indexes):
     """Return a smoothly defined scale of colors.
@@ -729,52 +725,6 @@ def console_load_apf(con, filename):
 def console_save_apf(con, filename):
     lib.TCOD_console_save_apf(_cdata(con),_bytes(filename))
 
-def dijkstra_new(m, dcost=1.41):
-    return (ffi.gc(lib.TCOD_dijkstra_new(m, dcost),
-                    lib.TCOD_dijkstra_delete), _PropagateException())
-
-def dijkstra_new_using_function(w, h, func, userData=0, dcost=1.41):
-    propagator = _PropagateException()
-    handle = ffi.new_handle((func, propagator, (userData,)))
-    return (ffi.gc(lib.TCOD_dijkstra_new_using_function(w, h,
-                    lib._pycall_path_func, handle, dcost),
-                    lib.TCOD_dijkstra_delete), propagator, handle)
-
-def dijkstra_compute(p, ox, oy):
-    with p[1]:
-        lib.TCOD_dijkstra_compute(p[0], ox, oy)
-
-def dijkstra_path_set(p, x, y):
-    return lib.TCOD_dijkstra_path_set(p[0], x, y)
-
-def dijkstra_get_distance(p, x, y):
-    return lib.TCOD_dijkstra_get_distance(p[0], x, y)
-
-def dijkstra_size(p):
-    return lib.TCOD_dijkstra_size(p[0])
-
-def dijkstra_reverse(p):
-    lib.TCOD_dijkstra_reverse(p[0])
-
-def dijkstra_get(p, idx):
-    x = ffi.new('int *')
-    y = ffi.new('int *')
-    lib.TCOD_dijkstra_get(p[0], idx, x, y)
-    return x[0], y[0]
-
-def dijkstra_is_empty(p):
-    return lib.TCOD_dijkstra_is_empty(p[0])
-
-def dijkstra_path_walk(p):
-    x = ffi.new('int *')
-    y = ffi.new('int *')
-    if lib.TCOD_dijkstra_path_walk(p[0], x, y):
-        return x[0], y[0]
-    return None,None
-
-def dijkstra_delete(p):
-    pass
-
 @ffi.def_extern()
 def _pycall_path_func(x1, y1, x2, y2, handle):
     '''static float _pycall_path_func( int xFrom, int yFrom, int xTo, int yTo, void *user_data );
@@ -836,6 +786,52 @@ def path_walk(p, recompute):
     return None,None
 
 def path_delete(p):
+    pass
+
+def dijkstra_new(m, dcost=1.41):
+    return (ffi.gc(lib.TCOD_dijkstra_new(m, dcost),
+                    lib.TCOD_dijkstra_delete), _PropagateException())
+
+def dijkstra_new_using_function(w, h, func, userData=0, dcost=1.41):
+    propagator = _PropagateException()
+    handle = ffi.new_handle((func, propagator, (userData,)))
+    return (ffi.gc(lib.TCOD_dijkstra_new_using_function(w, h,
+                    lib._pycall_path_func, handle, dcost),
+                    lib.TCOD_dijkstra_delete), propagator, handle)
+
+def dijkstra_compute(p, ox, oy):
+    with p[1]:
+        lib.TCOD_dijkstra_compute(p[0], ox, oy)
+
+def dijkstra_path_set(p, x, y):
+    return lib.TCOD_dijkstra_path_set(p[0], x, y)
+
+def dijkstra_get_distance(p, x, y):
+    return lib.TCOD_dijkstra_get_distance(p[0], x, y)
+
+def dijkstra_size(p):
+    return lib.TCOD_dijkstra_size(p[0])
+
+def dijkstra_reverse(p):
+    lib.TCOD_dijkstra_reverse(p[0])
+
+def dijkstra_get(p, idx):
+    x = ffi.new('int *')
+    y = ffi.new('int *')
+    lib.TCOD_dijkstra_get(p[0], idx, x, y)
+    return x[0], y[0]
+
+def dijkstra_is_empty(p):
+    return lib.TCOD_dijkstra_is_empty(p[0])
+
+def dijkstra_path_walk(p):
+    x = ffi.new('int *')
+    y = ffi.new('int *')
+    if lib.TCOD_dijkstra_path_walk(p[0], x, y):
+        return x[0], y[0]
+    return None,None
+
+def dijkstra_delete(p):
     pass
 
 def heightmap_new(w, h):

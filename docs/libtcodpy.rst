@@ -27,10 +27,10 @@ bsp
 color
 -----
 
-.. autoclass:: tcod.Color
+.. autoclass:: tcod.Color(r, g, b)
    :members:
 
-.. autoclass:: tcod.FrozenColor
+.. autoclass:: tcod.FrozenColor(r, g, b)
    :members:
 
 .. autofunction:: tcod.color_lerp

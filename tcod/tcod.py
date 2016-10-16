@@ -33,7 +33,13 @@ def _cdata(cdata):
     return cdata
 
 def _color(color):
-    return color
+    """convert value to a TCOD_colot_t compatible type"""
+    try:
+        if len(color) == 3:
+            return color
+    except TypeError:
+        pass
+    return tuple(Color(color))
 
 if _sys.version_info[0] == 2: # Python 2
     def _bytes(string):
@@ -409,106 +415,86 @@ class HeightMap(_CDataWrapper):
                              lib.TCOD_heightmap_delete)
 
 
-class Color(list):
+class Color(_CDataWrapper):
     """list-like behaviour could change in the future"""
 
-    def __init__(self, *rgb):
-        if len(rgb) < 3:
-            rgb += (0,) * (3 - len(rgb))
-        self[:] = rgb
+    def __init__(self, *args, **kargs):
+        super(Color, self).__init__(*args, **kargs)
+        if not self.cdata:
+            try:
+                self._init_from_color(*args, **kargs)
+            except TypeError:
+                self._init(*args, **kargs)
+
+    def _init_from_color(self, color):
+        try:
+            self._init(color.r, color.g, color.b)
+        except AttributeError:
+            raise TypeError()
+
+    def _init(self, r=0, g=0, b=0):
+        self.cdata = ffi.new('TCOD_color_t*', (r, g, b))
 
     @classmethod
     def from_cdata(cls, tcod_color):
         """new in libtcod-cffi"""
         return cls(tcod_color.r, tcod_color.g, tcod_color.b)
 
+
     @classmethod
     def from_int(cls, integer):
         """a TDL int color: 0xRRGGBB
 
         new in libtcod-cffi"""
-        return cls.from_cdata(lib.TDL_color_from_int(integer))
+        return cls(lib.TDL_color_from_int(integer))
 
     def __eq__(self, other):
-        return (isinstance(other, (Color, FrozenColor)) and
-                lib.TCOD_color_equals(self, other))
+        return (isinstance(other, (Color)) and
+                lib.TCOD_color_equals(_color(self), _color(other)))
 
     def __mul__(self, other):
-        if isinstance(other,(list, tuple)):
-            return Color.from_cdata(lib.TCOD_color_multiply(self, other))
+        if isinstance(other, (Color, list, tuple)):
+            return Color(lib.TCOD_color_multiply(_color(self),
+                                                 _color(other)))
         else:
-            return Color.from_cdata(lib.TCOD_color_multiply_scalar(self, other))
+            return Color(lib.TCOD_color_multiply_scalar(_color(self),
+                                                        _color(other)))
 
     def __add__(self, other):
-        return Color.from_cdata(lib.TCOD_color_add(self, other))
+        return Color(lib.TCOD_color_add(_color(self), _color(other)))
 
     def __sub__(self, other):
-        return Color.from_cdata(lib.TCOD_color_subtract(self, other))
+        return Color(lib.TCOD_color_subtract(_color(self), _color(other)))
+
+    def __iter__(self):
+        return iter((self.r, self.g, self.b))
 
     def __repr__(self):
-        return "<%s%s>" % (self.__class__.__name__, list.__repr__(self))
+        return "<%s(%i,%i,%i)>" % (self.__class__.__name__,
+                                   self.r, self.g, self.b)
 
-    def _get_r(self):
-        return self[0]
-
-    def _set_r(self, val):
-        self[0] = val & 0xff
-
-    def _get_g(self):
-        return self[1]
-
-    def _set_g(self, val):
-        self[1] = val & 0xff
-
-    def _get_b(self):
-        return self[2]
-
-    def _set_b(self, val):
-        self[2] = val & 0xff
-
-    r = property(_get_r, _set_r)
-    g = property(_get_g, _set_g)
-    b = property(_get_b, _set_b)
+    def __iter__(self):
+        return iter((self.cdata.r, self.cdata.g, self.cdata.b))
 
     def __int__(self):
         # new in libtcod-cffi
         return lib.TDL_color_RGB(*self)
 
 
-class FrozenColor(tuple):
+class FrozenColor(Color):
     """new in libtcod-cffi"""
-    def __new__(cls, *rgb):
-        if len(rgb) < 3:
-            rgb += (0,) * (3 - len(rgb))
-        return tuple.__new__(cls, (rgb))
 
     @classmethod
     def from_cdata(cls, tcod_color):
+        return cls(tcod_color)
         return cls(tcod_color.r, tcod_color.g, tcod_color.b)
 
     @classmethod
     def from_int(cls, integer):
         return cls.from_cdata(lib.TDL_color_from_int(integer))
 
-    __mul__ = Color.__mul__
-    __add__ = Color.__add__
-    __sub__ = Color.__sub__
-
-    def __repr__(self):
-        return "<%s%s>" % (self.__class__.__name__, tuple.__repr__(self))
-
-    _get_r = Color._get_r
-    _get_g = Color._get_g
-    _get_b = Color._get_b
-    def _set_rgb(self):
-        raise TypleError('can not assign colors directally to %s' %
-                         (self.__class__))
-
-    r = property(_get_r, _set_rgb)
-    g = property(_get_g, _set_rgb)
-    b = property(_get_b, _set_rgb)
-
-    __int__ = Color.__int__
+    def __hash__(self):
+        return hash(tuple(self))
 
 class Key(_CDataWrapper):
     """Key Event instance
