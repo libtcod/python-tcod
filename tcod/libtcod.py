@@ -44,13 +44,15 @@ def BKGND_ALPHA(a):
 def BKGND_ADDALPHA(a):
     return BKGND_ADDA | (int(a * 255) << 8)
 
+class _MockFFI(object):
+    def def_extern(self):
+        return lambda func:func
+
 if _os.environ.get('READTHEDOCS'):
     # Mock the lib and ffi objects needed to compile docs for readthedocs.io
     # Allows an import without building the cffi module first.
-    import cffi as _cffi
     lib = object()
-    ffi = _cffi.FFI()
-    ffi.def_extern = lambda:lambda x:x
+    ffi = _MockFFI()
     RENDERER_SDL = 2
     FONT_LAYOUT_ASCII_INCOL = 1
     BKGND_SET = 1
