@@ -15,7 +15,6 @@ if _sys.platform == 'win32':
     _os.environ['PATH'] += (';' +
         _os.path.join(__path__[0], 'x86/' if _bits == '32bit' else 'x64'))
 
-from tcod._libtcod import lib, ffi
 
 def _import_library_functions(lib):
     # imports libtcod namespace into thie module
@@ -45,8 +44,23 @@ def BKGND_ALPHA(a):
 def BKGND_ADDALPHA(a):
     return BKGND_ADDA | (int(a * 255) << 8)
 
-from tcod.tcod import FrozenColor as _FrozenColor
+if _os.environ.get('READTHEDOCS'):
+    # Mock the lib and ffi objects needed to compile docs for readthedocs.io
+    # Allows an import without building the cffi module first.
+    import cffi as _cffi
+    lib = object()
+    ffi = _cffi.FFI()
+    ffi.def_extern = lambda:lambda x:x
+    RENDERER_SDL = 2
+    FONT_LAYOUT_ASCII_INCOL = 1
+    BKGND_SET = 1
+    BKGND_DEFAULT = 13
+    KEY_RELEASED = 2
+    NOISE_DEFAULT = 0
+else:
+    from tcod._libtcod import lib, ffi
 
+from tcod.tcod import FrozenColor as _FrozenColor
 _import_library_functions(lib)
 
 __all__ = [_name for _name in list(globals()) if _name[0] != '_']

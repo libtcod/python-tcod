@@ -301,5 +301,5 @@ struct
 other
 -----
 
-.. autoclass: tcod.Dice
+.. autoclass:: tcod.Dice
    :members:

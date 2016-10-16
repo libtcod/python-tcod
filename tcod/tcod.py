@@ -466,9 +466,6 @@ class Color(_CDataWrapper):
     def __sub__(self, other):
         return Color(lib.TCOD_color_subtract(_color(self), _color(other)))
 
-    def __iter__(self):
-        return iter((self.r, self.g, self.b))
-
     def __repr__(self):
         return "<%s(%i,%i,%i)>" % (self.__class__.__name__,
                                    self.r, self.g, self.b)
