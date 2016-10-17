@@ -1,7 +1,23 @@
 ===========
  Changelog
 ===========
-2.0a
+2.0a1
+ * Realising how dumb it'd be to remote it,
+   the userData parameter has been added back.
+   Functions which use it are marked depreciated.
+ * Python exceptions will now propagate out of libtcod callbacks.
+ * Some libtcod object oriented functions now have Python class methods
+   associated with them (only BSP for now, more will be added later.)
+ * Regression tests were added.
+   Focusing on backwards compatibilty with libtcodpy.
+   Several neglected functions were fixed during this.
+ * All libtcod allocations are handled by the Python garbage collector.
+   You'll no longer have to call the delete functions on each object.
+ * Now generates documentation for Read the Docs.
+   You can find the latest documentation for libtcod-cffi
+   `here <https://libtcod-cffi.readthedocs.io/en/latest/>`_.
+
+2.0a0
  * updated to compile with libtcod-1.6.2 and SDL-2.0.4
 
 1.0

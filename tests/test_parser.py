@@ -4,8 +4,6 @@ import os
 
 import tcod as libtcod
 
-curdir = os.path.dirname(__file__)
-
 def test_parser():
     print ('***** File Parser test *****')
     parser=libtcod.parser_new()
@@ -36,7 +34,7 @@ def test_parser():
 
     # default listener
     print ('***** Default listener *****')
-    libtcod.parser_run(parser, os.path.join(curdir, 'data', 'cfg', 'sample.cfg'))
+    libtcod.parser_run(parser, os.path.join('libtcod', 'data', 'cfg', 'sample.cfg'))
     print ('bool_field : ', \
           libtcod.parser_get_bool_property(parser, b'myStruct.bool_field'))
     print ('char_field : ', \
@@ -99,7 +97,7 @@ def test_parser():
         def error(self,msg):
             print ('error : ', msg)
             return True
-    libtcod.parser_run(parser, os.path.join(curdir,'data','cfg','sample.cfg'), MyListener())
+    libtcod.parser_run(parser, os.path.join('libtcod','data','cfg','sample.cfg'), MyListener())
 
 if __name__ == '__main__':
     test_parser()
