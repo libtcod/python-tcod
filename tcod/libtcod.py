@@ -24,7 +24,7 @@ def _import_library_functions(lib):
         if name[:5] == 'TCOD_':
             if (isinstance(getattr(lib, name), ffi.CData) and
                 ffi.typeof(getattr(lib, name)) == ffi.typeof('TCOD_color_t')):
-                g[name[5:]] = _FrozenColor.from_cdata(getattr(lib, name))
+                g[name[5:]] = _Color.from_cdata(getattr(lib, name))
             elif name.isupper():
                 g[name[5:]] = getattr(lib, name) # const names
             #else:
@@ -62,7 +62,7 @@ if _os.environ.get('READTHEDOCS'):
 else:
     from tcod._libtcod import lib, ffi
 
-from tcod.tcod import FrozenColor as _FrozenColor
+from tcod.tcod import Color as _Color
 _import_library_functions(lib)
 
 __all__ = [_name for _name in list(globals()) if _name[0] != '_']

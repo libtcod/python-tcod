@@ -7,7 +7,7 @@ import threading as _threading
 
 from tcod.libtcod import *
 
-from tcod.tcod import _int, _cdata, _color, _bytes, _unicode, _unpack_char_p
+from tcod.tcod import _int, _cdata, _bytes, _unicode, _unpack_char_p
 from tcod.tcod import _CDataWrapper
 from tcod.tcod import _PropagateException
 from tcod.tcod import BSP as Bsp
@@ -298,8 +298,11 @@ def color_set_hsv(c, h, s, v):
 
     :param Color c: Must be a :any:`Color` instance.
     """
-    # TODO: this may not work as expected, need to fix colors in general
-    lib.TCOD_color_set_HSV(_cdata(c), h, s, v)
+    new_color = ffi.new('TCOD_color_t*')
+    lib.TCOD_color_set_HSV(new_color, h, s, v)
+    c.r = new_color.r
+    c.g = new_color.g
+    c.b = new_color.b
 
 def color_get_hsv(c):
     """Return the (hue, saturation, value) of a color.
@@ -310,7 +313,7 @@ def color_get_hsv(c):
     h = ffi.new('float *')
     s = ffi.new('float *')
     v = ffi.new('float *')
-    lib.TCOD_color_get_HSV(_color(c), h, s, v)
+    lib.TCOD_color_get_HSV(c, h, s, v)
     return h[0], s[0], v[0]
 
 def color_scale_HSV(c, scoef, vcoef):
@@ -448,11 +451,11 @@ def console_flush():
 # drawing on a console
 def console_set_default_background(con, col):
     """Change the default background color for this console."""
-    lib.TCOD_console_set_default_background(_cdata(con), _color(col))
+    lib.TCOD_console_set_default_background(_cdata(con), col)
 
 def console_set_default_foreground(con, col):
     """Change the default foreround color for this console."""
-    lib.TCOD_console_set_default_foreground(_cdata(con), _color(col))
+    lib.TCOD_console_set_default_foreground(_cdata(con), col)
 
 def console_clear(con):
     """Reset this console to its default colors and the space character."""
@@ -475,15 +478,15 @@ def console_put_char(con, x, y, c, flag=BKGND_DEFAULT):
 def console_put_char_ex(con, x, y, c, fore, back):
     """Draw the character c at x,y using the colors fore and back."""
     lib.TCOD_console_put_char_ex(_cdata(con), x, y,
-                                 _int(c), _color(fore), _color(back))
+                                 _int(c), fore, back)
 
 def console_set_char_background(con, x, y, col, flag=BKGND_SET):
     """Change the background color of x,y to col using a blend mode."""
-    lib.TCOD_console_set_char_background(_cdata(con), x, y, _color(col), flag)
+    lib.TCOD_console_set_char_background(_cdata(con), x, y, col, flag)
 
 def console_set_char_foreground(con, x, y, col):
     """Change the foreground color of x,y to col."""
-    lib.TCOD_console_set_char_foreground(_cdata(con), x, y, _color(col))
+    lib.TCOD_console_set_char_foreground(_cdata(con), x, y, col)
 
 def console_set_char(con, x, y, c):
     """Change the character at x,y to c, keeping the current colors."""
@@ -654,7 +657,7 @@ def console_blit(src, x, y, w, h, dst, xdst, ydst, ffade=1.0,bfade=1.0):
 
 def console_set_key_color(con, col):
     """Set a consoles blit transparent color."""
-    lib.TCOD_console_set_key_color(_cdata(con), _color(col))
+    lib.TCOD_console_set_key_color(_cdata(con), col)
 
 def console_delete(con):
     con = _cdata(con)
@@ -958,7 +961,7 @@ def image_scale(image, neww, newh):
     lib.TCOD_image_scale(image, neww, newh)
 
 def image_set_key_color(image,col):
-    lib.TCOD_image_set_key_color(image,col)
+    lib.TCOD_image_set_key_color(image, col)
 
 def image_get_alpha(image,x,y):
     return lib.TCOD_image_get_alpha(image, x, y)
