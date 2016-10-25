@@ -11,7 +11,7 @@ from tcod.tcod import _int, _cdata, _bytes, _unicode, _unpack_char_p
 from tcod.tcod import _CDataWrapper
 from tcod.tcod import _PropagateException
 from tcod.tcod import BSP as Bsp
-from tcod.tcod import Color, Key, Mouse, HeightMap
+from tcod.tcod import Key, Mouse, HeightMap
 
 class ConsoleBuffer(object):
     """Simple console that allows direct (fast) access to cells. simplifies
@@ -323,7 +323,10 @@ def color_scale_HSV(c, scoef, vcoef):
     :param float scoef: saturation multiplier, use 1 to keep current saturation
     :param float vcoef: value multiplier, use 1 to keep current value
     """
-    lib.TCOD_color_scale_HSV(_cdata(c), scoef, vcoef)
+    color_p = ffi.new('TCOD_color_t*')
+    color_p.r, color_p.g, color_p.b = c.r, c.g, c.b
+    lib.TCOD_color_scale_HSV(color_p, scoef, vcoef)
+    c.r, c.g, c.b = color_p.r, color_p.g, color_p.b
 
 def color_gen_map(colors, indexes):
     """Return a smoothly defined scale of colors.

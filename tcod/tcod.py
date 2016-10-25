@@ -9,6 +9,8 @@ import platform as _platform
 import weakref as _weakref
 import functools as _functools
 
+from tcod.libtcod import lib, ffi
+
 def _unpack_char_p(char_p):
     if char_p == ffi.NULL:
         return ''
@@ -408,62 +410,6 @@ class HeightMap(_CDataWrapper):
                              lib.TCOD_heightmap_delete)
 
 
-class Color(dict):
-    """list-like behaviour could change in the future"""
-
-    def __init__(self, r=0, g=0, b=0):
-        self['r'] = r
-        self['g'] = g
-        self['b'] = b
-
-    def __getattr__(self, attr):
-        return self.__getitem__(attr)
-
-    def __setattr__(self, attr, value):
-        self.__setitem__(attr, value)
-
-    @classmethod
-    def from_cdata(cls, tcod_color):
-        """new in libtcod-cffi"""
-        return cls(tcod_color.r, tcod_color.g, tcod_color.b)
-
-
-    @classmethod
-    def from_int(cls, integer):
-        """a TDL int color: 0xRRGGBB
-
-        new in libtcod-cffi"""
-        return cls(lib.TDL_color_from_int(integer))
-
-    def __eq__(self, other):
-        return (isinstance(other, (Color)) and
-                lib.TCOD_color_equals(self, other))
-
-    def __mul__(self, other):
-        if isinstance(other, (Color, list, tuple)):
-            return Color.from_cdata(lib.TCOD_color_multiply(self,
-                                                 other))
-        else:
-            return Color.from_cdata(lib.TCOD_color_multiply_scalar(self,
-                                                        other))
-
-    def __add__(self, other):
-        return Color.from_cdata(lib.TCOD_color_add(self, other))
-
-    def __sub__(self, other):
-        return Color.from_cdata(lib.TCOD_color_subtract(self, other))
-
-    def __repr__(self):
-        return "<%s(%i,%i,%i)>" % (self.__class__.__name__,
-                                   self.r, self.g, self.b)
-
-    def __iter__(self):
-        return iter((self.r, self.g, self.b))
-
-    def __int__(self):
-        # new in libtcod-cffi
-        return lib.TDL_color_RGB(*self)
-
 class Key(_CDataWrapper):
     """Key Event instance
     """
@@ -502,8 +448,6 @@ def clipboard_get():
     .. versionadded:: 2.0
     """
     return _unpack_char_p(lib.TCOD_sys_clipboard_get())
-
-from tcod.libtcod import *
 
 @ffi.def_extern()
 def _pycall_bsp_callback(node, handle):

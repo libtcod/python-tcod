@@ -24,7 +24,7 @@ def _import_library_functions(lib):
         if name[:5] == 'TCOD_':
             if (isinstance(getattr(lib, name), ffi.CData) and
                 ffi.typeof(getattr(lib, name)) == ffi.typeof('TCOD_color_t')):
-                g[name[5:]] = _Color.from_cdata(getattr(lib, name))
+                g[name[5:]] = Color.from_cdata(getattr(lib, name))
             elif name.isupper():
                 g[name[5:]] = getattr(lib, name) # const names
             #else:
@@ -62,7 +62,76 @@ if _os.environ.get('READTHEDOCS'):
 else:
     from tcod._libtcod import lib, ffi
 
-from tcod.tcod import Color as _Color
+class Color(list):
+    """
+    
+    """
+
+    def __init__(self, r=0, g=0, b=0):
+        self[:] = (r, g, b)
+
+    def _get_r(self):
+        return self[0]
+    def _set_r(self, value):
+        self[0] = value
+
+    def _get_g(self):
+        return self[1]
+    def _set_g(self, value):
+        self[1] = value
+
+    def _get_b(self):
+        return self[2]
+    def _set_b(self, value):
+        self[2] = value
+
+    r = property(_get_r, _set_r)
+    g = property(_get_g, _set_g)
+    b = property(_get_b, _set_b)
+
+    @classmethod
+    def from_cdata(cls, tcod_color_t):
+        """new in libtcod-cffi"""
+        return cls(tcod_color_t.r, tcod_color_t.g, tcod_color_t.b)
+
+
+    @classmethod
+    def from_int(cls, integer):
+        """a TDL int color: 0xRRGGBB
+
+        new in libtcod-cffi"""
+        return cls(lib.TDL_color_from_int(integer))
+
+    def __eq__(self, other):
+        return (isinstance(other, (Color)) and
+                lib.TCOD_color_equals(self, other))
+
+    def __mul__(self, other):
+        if isinstance(other, (Color, list, tuple)):
+            return Color.from_cdata(lib.TCOD_color_multiply(self,
+                                                 other))
+        else:
+            return Color.from_cdata(lib.TCOD_color_multiply_scalar(self,
+                                                        other))
+
+    def __add__(self, other):
+        return Color.from_cdata(lib.TCOD_color_add(self, other))
+
+    def __sub__(self, other):
+        return Color.from_cdata(lib.TCOD_color_subtract(self, other))
+
+    def __repr__(self):
+        return "<%s(%i,%i,%i)>" % (self.__class__.__name__,
+                                   self.r, self.g, self.b)
+
+    def __iter__(self):
+        return iter((self.r, self.g, self.b))
+
+    def __int__(self):
+        # new in libtcod-cffi
+        return lib.TDL_color_RGB(*self)
+
+
 _import_library_functions(lib)
 
 __all__ = [_name for _name in list(globals()) if _name[0] != '_']
