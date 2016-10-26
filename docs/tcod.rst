@@ -3,6 +3,12 @@
 libtcod-cffi
 ============
 
+Console
+-------
+
+.. autoclass:: tcod.Console(width, height)
+    :members:
+
 BSP
 ---
 
@@ -14,6 +20,12 @@ HeightMap
 
 .. autoclass:: tcod.HeightMap(x, y)
    :members:
+
+Image
+-----
+
+.. autoclass:: tcod.Image(width, height)
+    :members:
 
 Event
 -----

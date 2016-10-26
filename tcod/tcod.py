@@ -407,7 +407,7 @@ class HeightMap(_CDataWrapper):
 
     def _init(self, width, height):
         self.cdata = ffi.gc(lib.TCOD_heightmap_new(width, height),
-                             lib.TCOD_heightmap_delete)
+                            lib.TCOD_heightmap_delete)
 
 
 class Key(_CDataWrapper):
@@ -434,6 +434,35 @@ class Mouse(_CDataWrapper):
         if self.cdata == ffi.NULL:
             self.cdata = ffi.new('TCOD_mouse_t*')
 
+
+class Console(_CDataWrapper):
+    """
+
+    .. versionadded:: 2.0
+    """
+
+    def __init__(self, *args, **kargs):
+        self.cdata = self._get_cdata_from_args(*args, **kargs)
+        if self.cdata is None:
+            self._init(*args, **kargs)
+
+    def _init(self, width, height):
+        self.cdata = ffi.gc(lib.TCOD_console_new(width, height),
+                            lib.TCOD_console_delete)
+
+class Image(_CDataWrapper):
+    """
+
+    .. versionadded:: 2.0
+    """
+    def __init__(self, *args, **kargs):
+        super(Console, self).__init__(*args, **kargs)
+        if not self.cdata:
+            self._init(*args, **kargs)
+
+    def _init(self, width, height):
+        self.cdata = ffi.gc(lib.TCOD_image_new(width, height),
+                            lib.TCOD_image_delete)
 
 def clipboard_set(string):
     """Set the clipboard contents to string.

@@ -64,23 +64,30 @@ else:
 
 class Color(list):
     """
-    
+
+    Args:
+        r (int): Red value, from 0 to 255.
+        g (int): Green value, from 0 to 255.
+        b (int): Blue value, from 0 to 255.
     """
 
     def __init__(self, r=0, g=0, b=0):
         self[:] = (r, g, b)
 
     def _get_r(self):
+        """Red value."""
         return self[0]
     def _set_r(self, value):
         self[0] = value
 
     def _get_g(self):
+        """Green value."""
         return self[1]
     def _set_g(self, value):
         self[1] = value
 
     def _get_b(self):
+        """Blue value."""
         return self[2]
     def _set_b(self, value):
         self[2] = value

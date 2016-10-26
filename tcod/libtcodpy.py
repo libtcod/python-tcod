@@ -11,7 +11,7 @@ from tcod.tcod import _int, _cdata, _bytes, _unicode, _unpack_char_p
 from tcod.tcod import _CDataWrapper
 from tcod.tcod import _PropagateException
 from tcod.tcod import BSP as Bsp
-from tcod.tcod import Key, Mouse, HeightMap
+from tcod.tcod import Key, Mouse, HeightMap, Console, Image
 
 class ConsoleBuffer(object):
     """Simple console that allows direct (fast) access to cells. simplifies
@@ -81,6 +81,7 @@ class ConsoleBuffer(object):
 
     def blit(self, dest, fill_fore=True, fill_back=True):
         """use libtcod's "fill" functions to write the buffer to a console."""
+        dest = _cdata(dest)
         if (console_get_width(dest) != self.width or
             console_get_height(dest) != self.height):
             raise ValueError('ConsoleBuffer.blit: Destination console has an incorrect size.')
@@ -285,18 +286,28 @@ def bsp_delete(node):
 def color_lerp(c1, c2, a):
     """Return the linear interpolation between two colors.
 
-    :param c1: The first color like object.
-    :param c2: The second color like object.
-    :param float a: The interpolation value,
-                    with 0 returing c1, 1 returning c2, and 0.5 returing a
-                    color halfway between both.
+    Args:
+        c1 (Tuple[int,int,int]): The first color like object.
+        c2 (Tuple[int,int,int]): The second color like object.
+        a (float): The interpolation value,
+                   with 0 returing c1, 1 returning c2, and 0.5 returing a
+                   color halfway between both.
+
+    Returns:
+        Color: The interpolated Color.
     """
     return Color.from_cdata(lib.TCOD_color_lerp(c1, c2, a))
 
 def color_set_hsv(c, h, s, v):
     """Set a color using: hue, saturation, and value parameters.
 
-    :param Color c: Must be a :any:`Color` instance.
+    Does not return a new Color.  Instead the provided color is modified.
+
+    Args:
+        c (Color): Must be a color instance.
+        h (float): Hue, from 0 to 1.
+        s (float): Saturation, from 0 to 1.
+        v (float): Value, from 0 to 1.
     """
     new_color = ffi.new('TCOD_color_t*')
     lib.TCOD_color_set_HSV(new_color, h, s, v)
@@ -307,8 +318,12 @@ def color_set_hsv(c, h, s, v):
 def color_get_hsv(c):
     """Return the (hue, saturation, value) of a color.
 
-    :param c: Can be any color like object.
-    :returns: Returns 3-item tuple of :any:float (hue, saturation, value)
+    Args:
+        c (Tuple[int,int,int]): Can be any color like object.
+
+    Returns:
+        Tuple[float,float,float]:
+            A tuple with (hue, saturation, value) values from 0 to 1.
     """
     h = ffi.new('float *')
     s = ffi.new('float *')
@@ -319,9 +334,14 @@ def color_get_hsv(c):
 def color_scale_HSV(c, scoef, vcoef):
     """Scale a color's saturation and value.
 
-    :param c: Must be a :any:`Color` instance.
-    :param float scoef: saturation multiplier, use 1 to keep current saturation
-    :param float vcoef: value multiplier, use 1 to keep current value
+    Does not return a new Color.  Instead the provided color is modified.
+
+    Args:
+        c (Color): Must be a Color instance.
+        scoef (float): Saturation multiplier, from 0 to 1.
+                       Use 1 to keep current saturation.
+        vcoef (float): Value multiplier, from 0 to 1.
+                       Use 1 to keep current value.
     """
     color_p = ffi.new('TCOD_color_t*')
     color_p.r, color_p.g, color_p.b = c.r, c.g, c.b
@@ -331,15 +351,22 @@ def color_scale_HSV(c, scoef, vcoef):
 def color_gen_map(colors, indexes):
     """Return a smoothly defined scale of colors.
 
-    For example::
+    If indexes is [0, 3, 9] for example, the first provided color will
+    be returned at 0, the 2nd will be at 3, and the 3rd will be
+    at 9.  All in-betweens will be filled with a gradient.
 
-        tcod.color_gen_map([(0, 0, 0), (255, 255, 255)], [0, 8])
+    Example:
+        >>> tcod.color_gen_map([(0, 0, 0), (255, 128, 0)], [0, 5])
+        [<Color(0,0,0)>, <Color(51,25,0)>, <Color(102,51,0)>, \
+<Color(153,76,0)>, <Color(204,102,0)>, <Color(255,128,0)>])
 
-    Will return a smooth grey-scale, from black to white, with a length of 8.
+    Args:
+        colors (Iterable[Tuple[int,int,int], ...]):
+            Array of colors to be sampled.
+        indexes (Iterable[int, ...]): A list of indexes.
 
-    :param colors: Array of colors to be sampled.
-    :param indexes:
-
+    Returns:
+        Sequence[Color, ...]: A sequence of Color instances.
     """
     ccolors = ffi.new('TCOD_color_t[]', colors)
     cindexes = ffi.new('int[]', indexes)
@@ -367,15 +394,19 @@ def console_init_root(w, h, title, fullscreen=False,
     .. note:: Currently only the SDL renderer is supported at the moment.
               Do not attempt to change it.
 
-    :param int w: Width in character tiles for the root console.
-    :param int h: Height in character tiles for the root console.
-    :param unicode title: A Unicode or system encoded string.
-                          This string will be displayed on the created windows
-                          title bar.
-    :param renderer: Rendering mode for libtcod to use.
+    Args:
+        w (int): Width in character tiles for the root console.
+        h (int): Height in character tiles for the root console.
+        title (AnyStr):
+            This string will be displayed on the created windows title bar.
+        renderer: Rendering mode for libtcod to use.
+
+    Returns:
+        Console:
+            Returns a special Console object representing the root console.
     """
     lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
-    return None # root console is None
+    return Console(ffi.NULL) # root console is null
 
 
 def console_set_custom_font(fontFile, flags=FONT_LAYOUT_ASCII_INCOL,
@@ -392,22 +423,36 @@ def console_set_custom_font(fontFile, flags=FONT_LAYOUT_ASCII_INCOL,
     * tcod.FONT_TYPE_GRAYSCALE
     * tcod.FONT_LAYOUT_TCOD
 
-    :param str fontFile: Path to a font file.
-    :param flags:
-    :param int nb_char_horiz:
-    :param int nb_char_vertic:
-
+    Args:
+        fontFile (AnyStr): Path to a font file.
+        flags (int):
+        nb_char_horiz (int):
+        nb_char_vertic (int):
     """
     lib.TCOD_console_set_custom_font(_bytes(fontFile), flags,
                                      nb_char_horiz, nb_char_vertic)
 
 
 def console_get_width(con):
-    """Return the width of a console."""
+    """Return the width of a console.
+
+    Args:
+        con (Console): Any Console object.
+
+    Returns:
+        int: The width of this Console.
+    """
     return lib.TCOD_console_get_width(_cdata(con))
 
 def console_get_height(con):
-    """Return the height of a console."""
+    """Return the height of a console.
+
+    Args:
+        con (Console): Any Console object.
+
+    Returns:
+        int: The height of this Console.
+    """
     return lib.TCOD_console_get_height(_cdata(con))
 
 def console_map_ascii_code_to_font(asciiCode, fontCharX, fontCharY):
@@ -461,20 +506,22 @@ def console_set_default_foreground(con, col):
     lib.TCOD_console_set_default_foreground(_cdata(con), col)
 
 def console_clear(con):
-    """Reset this console to its default colors and the space character."""
+    """Reset this console to its default colors and the space character.
+
+    .. seealso::
+       :any:`console_set_default_background`
+       :any:`console_set_default_foreground`
+    """
     return lib.TCOD_console_clear(_cdata(con))
 
 def console_put_char(con, x, y, c, flag=BKGND_DEFAULT):
     """Draw the character c at x,y using the default colors and a blend mode.
 
-    :param int x: Character position from the left.
-    :param int y: Character position from the top.
-    :param c: Character to draw, can be an integer or string.
-    :param flag: Blending mode to use.
-
-    .. seealso::
-       :any:`console_set_default_background`
-       :any:`console_set_default_foreground`
+    Args:
+        x (int): Character position from the left.
+        y (int): Character position from the top.
+        c (Union[AnyStr, int]): Character to draw, can be an integer or string.
+        flag (int): Blending mode to use.
     """
     lib.TCOD_console_put_char(_cdata(con), x, y, _int(c), flag)
 
@@ -977,11 +1024,11 @@ def image_load(filename):
                    lib.TCOD_image_delete)
 
 def image_from_console(console):
-    return ffi.gc(lib.TCOD_image_from_console(console or ffi.NULL),
+    return ffi.gc(lib.TCOD_image_from_console(_cdata(console)),
                    lib.TCOD_image_delete)
 
 def image_refresh_console(image, console):
-    lib.TCOD_image_refresh_console(image, console or ffi.NULL)
+    lib.TCOD_image_refresh_console(image, _cdata(console))
 
 def image_get_size(image):
     w = ffi.new('int *')
@@ -1000,14 +1047,14 @@ def image_put_pixel(image, x, y, col):
     ##lib.TCOD_image_put_pixel_wrapper(image, x, y, col)
 
 def image_blit(image, console, x, y, bkgnd_flag, scalex, scaley, angle):
-    lib.TCOD_image_blit(image, console or ffi.NULL, x, y, bkgnd_flag,
+    lib.TCOD_image_blit(image, _cdata(console), x, y, bkgnd_flag,
                          scalex, scaley, angle)
 
 def image_blit_rect(image, console, x, y, w, h, bkgnd_flag):
-    lib.TCOD_image_blit_rect(image, console or ffi.NULL, x, y, w, h, bkgnd_flag)
+    lib.TCOD_image_blit_rect(image, _cdata(console), x, y, w, h, bkgnd_flag)
 
 def image_blit_2x(image, console, dx, dy, sx=0, sy=0, w=-1, h=-1):
-    lib.TCOD_image_blit_2x(image, console or ffi.NULL, dx,dy,sx,sy,w,h)
+    lib.TCOD_image_blit_2x(image, _cdata(console), dx,dy,sx,sy,w,h)
 
 def image_save(image, filename):
     lib.TCOD_image_save(image, _bytes(filename))
