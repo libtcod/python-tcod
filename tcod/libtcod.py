@@ -72,25 +72,25 @@ class Color(list):
     """
 
     def __init__(self, r=0, g=0, b=0):
-        self[:] = (r, g, b)
+        self[:] = (r & 0xff, g & 0xff, b & 0xff)
 
     def _get_r(self):
-        """Red value."""
+        """int: Red value, always normalised to 0-255."""
         return self[0]
     def _set_r(self, value):
-        self[0] = value
+        self[0] = value & 0xff
 
     def _get_g(self):
-        """Green value."""
+        """int: Green value, always normalised to 0-255."""
         return self[1]
     def _set_g(self, value):
-        self[1] = value
+        self[1] = value & 0xff
 
     def _get_b(self):
-        """Blue value."""
+        """int: Blue value, always normalised to 0-255."""
         return self[2]
     def _set_b(self, value):
-        self[2] = value
+        self[2] = value & 0xff
 
     r = property(_get_r, _set_r)
     g = property(_get_g, _set_g)
@@ -128,8 +128,8 @@ class Color(list):
         return Color.from_cdata(lib.TCOD_color_subtract(self, other))
 
     def __repr__(self):
-        return "<%s(%i,%i,%i)>" % (self.__class__.__name__,
-                                   self.r, self.g, self.b)
+        return "%s(%i,%i,%i)" % (self.__class__.__name__,
+                                 self.r, self.g, self.b)
 
     def __iter__(self):
         return iter((self.r, self.g, self.b))

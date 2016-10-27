@@ -16,6 +16,17 @@ from tcod.tcod import Key, Mouse, HeightMap, Console, Image
 class ConsoleBuffer(object):
     """Simple console that allows direct (fast) access to cells. simplifies
     use of the "fill" functions.
+
+    Args:
+        width (int): Width of the new ConsoleBuffer.
+        height (int): Height of the new ConsoleBuffer.
+        back_r (int): Red background color, from 0 to 255.
+        back_g (int): Green background color, from 0 to 255.
+        back_b (int): Blue background color, from 0 to 255.
+        fore_r (int): Red foreground color, from 0 to 255.
+        fore_g (int): Green foreground color, from 0 to 255.
+        fore_b (int): Blue foreground color, from 0 to 255.
+        char (AnyStr): A single character str or bytes object.
     """
     def __init__(self, width, height, back_r=0, back_g=0, back_b=0, fore_r=0, fore_g=0, fore_b=0, char=' '):
         """initialize with given width and height. values to fill the buffer
@@ -27,8 +38,17 @@ class ConsoleBuffer(object):
         self.clear(back_r, back_g, back_b, fore_r, fore_g, fore_b, char)
 
     def clear(self, back_r=0, back_g=0, back_b=0, fore_r=0, fore_g=0, fore_b=0, char=' '):
-        """clears the console. values to fill it with are optional, defaults
+        """Clears the console.  Values to fill it with are optional, defaults
         to black with no characters.
+
+        Args:
+            back_r (int): Red background color, from 0 to 255.
+            back_g (int): Green background color, from 0 to 255.
+            back_b (int): Blue background color, from 0 to 255.
+            fore_r (int): Red foreground color, from 0 to 255.
+            fore_g (int): Green foreground color, from 0 to 255.
+            fore_b (int): Blue foreground color, from 0 to 255.
+            char (AnyStr): A single character str or bytes object.
         """
         n = self.width * self.height
         self.back_r = [back_r] * n
@@ -40,7 +60,11 @@ class ConsoleBuffer(object):
         self.char = [ord(char)] * n
 
     def copy(self):
-        """returns a copy of this ConsoleBuffer."""
+        """Returns a copy of this ConsoleBuffer.
+
+        Returns:
+            ConsoleBuffer: A new ConsoleBuffer copy.
+        """
         other = ConsoleBuffer(0, 0)
         other.width = self.width
         other.height = self.height
@@ -54,7 +78,16 @@ class ConsoleBuffer(object):
         return other
 
     def set_fore(self, x, y, r, g, b, char):
-        """set the character and foreground color of one cell."""
+        """Set the character and foreground color of one cell.
+
+        Args:
+            x (int): X position to change.
+            y (int): Y position to change.
+            r (int): Red foreground color, from 0 to 255.
+            g (int): Green foreground color, from 0 to 255.
+            b (int): Blue foreground color, from 0 to 255.
+            char (AnyStr): A single character str or bytes object.
+        """
         i = self.width * y + x
         self.fore_r[i] = r
         self.fore_g[i] = g
@@ -62,14 +95,35 @@ class ConsoleBuffer(object):
         self.char[i] = ord(char)
 
     def set_back(self, x, y, r, g, b):
-        """set the background color of one cell."""
+        """Set the background color of one cell.
+
+        Args:
+            x (int): X position to change.
+            y (int): Y position to change.
+            r (int): Red background color, from 0 to 255.
+            g (int): Green background color, from 0 to 255.
+            b (int): Blue background color, from 0 to 255.
+            char (AnyStr): A single character str or bytes object.
+        """
         i = self.width * y + x
         self.back_r[i] = r
         self.back_g[i] = g
         self.back_b[i] = b
 
     def set(self, x, y, back_r, back_g, back_b, fore_r, fore_g, fore_b, char):
-        """set the background color, foreground color and character of one cell."""
+        """Set the background color, foreground color and character of one cell.
+
+        Args:
+            x (int): X position to change.
+            y (int): Y position to change.
+            back_r (int): Red background color, from 0 to 255.
+            back_g (int): Green background color, from 0 to 255.
+            back_b (int): Blue background color, from 0 to 255.
+            fore_r (int): Red foreground color, from 0 to 255.
+            fore_g (int): Green foreground color, from 0 to 255.
+            fore_b (int): Blue foreground color, from 0 to 255.
+            char (AnyStr): A single character str or bytes object.
+        """
         i = self.width * y + x
         self.back_r[i] = back_r
         self.back_g[i] = back_g
@@ -80,7 +134,15 @@ class ConsoleBuffer(object):
         self.char[i] = ord(char)
 
     def blit(self, dest, fill_fore=True, fill_back=True):
-        """use libtcod's "fill" functions to write the buffer to a console."""
+        """Use libtcod's "fill" functions to write the buffer to a console.
+
+        Args:
+            dest (Console): Console object to modify.
+            fill_fore (bool):
+                If True, fill the foreground color and characters.
+            fill_back (bool):
+                If True, fill the background color.
+        """
         dest = _cdata(dest)
         if (console_get_width(dest) != self.width or
             console_get_height(dest) != self.height):
@@ -102,9 +164,19 @@ class ConsoleBuffer(object):
 class Dice(_CDataWrapper):
     """
 
+    Args:
+        nb_dices (int): Number of dice.
+        nb_faces (int): Number of sides on a die.
+        multiplier (float): Multiplier.
+        addsub (float): Addition.
+
     .. versionchanged:: 2.0
-       This class has been standardized to behave like other CData wrapped
-       classes.  This claas no longer acts like a list.
+        This class now acts like the other CData wrapped classes
+        and no longer acts like a list.
+
+    .. deprecated:: 2.0
+        You should make your own dice functions instead of using this class
+        which is tied to a CData object.
     """
 
     def __init__(self, *args, **kargs):
@@ -112,39 +184,43 @@ class Dice(_CDataWrapper):
         if self.cdata == ffi.NULL:
             self._init(*args, **kargs)
 
-    def _init(self, nb_dices, nb_faces, multiplier, addsub):
+    def _init(self, nb_dices=0, nb_faces=0, multiplier=0, addsub=0):
         self.cdata = ffi.new('TCOD_dice_t*')
         self.nb_dices = nb_dices
         self.nb_faces = nb_faces
         self.multiplier = multiplier
         self.addsub = addsub
 
-    def __getattr__(self, attr):
-        if attr == 'nb_dices':
-            attr = 'nb_faces'
-        return super(Dice, self).__getattr__(attr)
+    def _get_nb_dices(self):
+        return self.nb_rolls
+    def _set_nb_dices(self, value):
+        self.nb_rolls = value
+    nb_dices = property(_get_nb_dices, _set_nb_dices)
 
-    def __setattr__(self, attr, value):
-        if attr == 'nb_dices':
-            attr = 'nb_faces'
-        return super(Dice, self).__setattr__(attr, value)
+    def __str__(self):
+        add = '+(%s)' % self.addsub if self.addsub != 0 else ''
+        return '%id%ix%s%s' % (self.nb_dices, self.nb_faces,
+                               self.multiplier, add)
 
     def __repr__(self):
-        return "<%s(%id%ix%s+(%s))>" % (self.__class__.__name__,
-                                        self.nb_dices, self.nb_faces,
-                                        self.multiplier, self.addsub)
+        return ('%s(nb_dices=%r,nb_faces=%r,multiplier=%r,addsub=%r)' %
+                (self.__class__.__name__, self.nb_dices, self.nb_faces,
+                 self.multiplier, self.addsub))
 
 def bsp_new_with_size(x, y, w, h):
-    """Create a new :any:`BSP` instance with the given rectangle.
+    """Create a new BSP instance with the given rectangle.
 
-    :param int x: rectangle left coordinate
-    :param int y: rectangle top coordinate
-    :param int w: rectangle width
-    :param int h: rectangle height
-    :rtype: BSP
+    Args:
+        x (int): Rectangle left coordinate.
+        y (int): Rectangle top coordinate.
+        w (int): Rectangle width.
+        h (int): Rectangle height.
+
+    Returns:
+        BSP: A new BSP instance.
 
     .. deprecated:: 2.0
-       Calling the :any:`BSP` class instead.
+       Call the :any:`BSP` class instead.
     """
     return Bsp(x, y, w, h)
 
@@ -286,12 +362,15 @@ def bsp_delete(node):
 def color_lerp(c1, c2, a):
     """Return the linear interpolation between two colors.
 
+    ``a`` is the interpolation value, with 0 returing ``c1``,
+    1 returning ``c2``, and 0.5 returing a color halfway between both.
+
     Args:
-        c1 (Tuple[int,int,int]): The first color like object.
-        c2 (Tuple[int,int,int]): The second color like object.
+        c1 (Union[Tuple[int, int, int], Sequence[int]]):
+            The first color.  At a=0.
+        c2 (Union[Tuple[int, int, int], Sequence[int]]):
+            The second color.  At a=1.
         a (float): The interpolation value,
-                   with 0 returing c1, 1 returning c2, and 0.5 returing a
-                   color halfway between both.
 
     Returns:
         Color: The interpolated Color.
@@ -319,11 +398,12 @@ def color_get_hsv(c):
     """Return the (hue, saturation, value) of a color.
 
     Args:
-        c (Tuple[int,int,int]): Can be any color like object.
+        c (Union[Tuple[int, int, int], Sequence[int]]):
+            An (r, g, b) sequence or Color instance.
 
     Returns:
-        Tuple[float,float,float]:
-            A tuple with (hue, saturation, value) values from 0 to 1.
+        Tuple[float, float, float]:
+            A tuple with (hue, saturation, value) values, from 0 to 1.
     """
     h = ffi.new('float *')
     s = ffi.new('float *')
@@ -351,22 +431,22 @@ def color_scale_HSV(c, scoef, vcoef):
 def color_gen_map(colors, indexes):
     """Return a smoothly defined scale of colors.
 
-    If indexes is [0, 3, 9] for example, the first provided color will
-    be returned at 0, the 2nd will be at 3, and the 3rd will be
-    at 9.  All in-betweens will be filled with a gradient.
+    If ``indexes`` is [0, 3, 9] for example, the first color from ``colors``
+    will be returned at 0, the 2nd will be at 3, and the 3rd will be at 9.
+    All in-betweens will be filled with a gradient.
+
+    Args:
+        colors (Iterable[Union[Tuple[int, int, int], Sequence[int]]]):
+            Array of colors to be sampled.
+        indexes (Iterable[int]): A list of indexes.
+
+    Returns:
+        List[Color]: A list of Color instances.
 
     Example:
         >>> tcod.color_gen_map([(0, 0, 0), (255, 128, 0)], [0, 5])
-        [<Color(0,0,0)>, <Color(51,25,0)>, <Color(102,51,0)>, \
-<Color(153,76,0)>, <Color(204,102,0)>, <Color(255,128,0)>])
-
-    Args:
-        colors (Iterable[Tuple[int,int,int], ...]):
-            Array of colors to be sampled.
-        indexes (Iterable[int, ...]): A list of indexes.
-
-    Returns:
-        Sequence[Color, ...]: A sequence of Color instances.
+        [Color(0,0,0), Color(51,25,0), Color(102,51,0), Color(153,76,0), \
+Color(204,102,0), Color(255,128,0)]
     """
     ccolors = ffi.new('TCOD_color_t[]', colors)
     cindexes = ffi.new('int[]', indexes)
@@ -391,8 +471,9 @@ def console_init_root(w, h, title, fullscreen=False,
                       renderer=RENDERER_SDL):
     """Set up the primary display and return the root console.
 
-    .. note:: Currently only the SDL renderer is supported at the moment.
-              Do not attempt to change it.
+    Note:
+        Currently only the SDL renderer is supported at the moment.
+        Do not attempt to change it.
 
     Args:
         w (int): Width in character tiles for the root console.
@@ -403,7 +484,7 @@ def console_init_root(w, h, title, fullscreen=False,
 
     Returns:
         Console:
-            Returns a special Console object representing the root console.
+            Returns a special Console instance representing the root console.
     """
     lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
     return Console(ffi.NULL) # root console is null
@@ -437,7 +518,7 @@ def console_get_width(con):
     """Return the width of a console.
 
     Args:
-        con (Console): Any Console object.
+        con (Console): Any Console instance.
 
     Returns:
         int: The width of this Console.
@@ -448,7 +529,7 @@ def console_get_height(con):
     """Return the height of a console.
 
     Args:
-        con (Console): Any Console object.
+        con (Console): Any Console instance.
 
     Returns:
         int: The height of this Console.
@@ -468,11 +549,20 @@ def console_map_string_to_font(s, fontCharX, fontCharY):
     lib.TCOD_console_map_string_to_font_utf(_unicode(s), fontCharX, fontCharY)
 
 def console_is_fullscreen():
-    """Returns True if the display is fullscreen, otherwise False."""
-    return lib.TCOD_console_is_fullscreen()
+    """Returns True if the display is fullscreen.
+
+    Returns:
+        bool: True if the display is fullscreen, otherwise False.
+    """
+    return bool(lib.TCOD_console_is_fullscreen())
 
 def console_set_fullscreen(fullscreen):
-    """Change the display to be fullscreen or windowed."""
+    """Change the display to be fullscreen or windowed.
+
+    Args:
+        fullscreen (bool): Use True to change to fullscreen.
+                           Use False to change to windowed.
+    """
     lib.TCOD_console_set_fullscreen(fullscreen)
 
 def console_is_window_closed():
@@ -480,7 +570,11 @@ def console_is_window_closed():
     return lib.TCOD_console_is_window_closed()
 
 def console_set_window_title(title):
-    """Change the current title bar string."""
+    """Change the current title bar string.
+
+    Args:
+        title (AnyStr): A string to change the title bar to.
+    """
     lib.TCOD_console_set_window_title(_bytes(title))
 
 def console_credits():
@@ -498,15 +592,30 @@ def console_flush():
 
 # drawing on a console
 def console_set_default_background(con, col):
-    """Change the default background color for this console."""
+    """Change the default background color for this console.
+
+    Args:
+        con (Console): Any Console instance.
+        col (Union[Tuple[int, int, int], Sequence[int]]):
+            An (r, g, b) sequence or Color instance.
+    """
     lib.TCOD_console_set_default_background(_cdata(con), col)
 
 def console_set_default_foreground(con, col):
-    """Change the default foreround color for this console."""
+    """Change the default foreround color for this console.
+
+    Args:
+        con (Console): Any Console instance.
+        col (Union[Tuple[int, int, int], Sequence[int]]):
+            An (r, g, b) sequence or Color instance.
+    """
     lib.TCOD_console_set_default_foreground(_cdata(con), col)
 
 def console_clear(con):
     """Reset this console to its default colors and the space character.
+
+    Args:
+        con (Console): Any Console instance.
 
     .. seealso::
        :any:`console_set_default_background`
@@ -518,9 +627,9 @@ def console_put_char(con, x, y, c, flag=BKGND_DEFAULT):
     """Draw the character c at x,y using the default colors and a blend mode.
 
     Args:
-        x (int): Character position from the left.
-        y (int): Character position from the top.
-        c (Union[AnyStr, int]): Character to draw, can be an integer or string.
+        x (int): Character x position from the left.
+        y (int): Character y position from the top.
+        c (Union[int, AnyStr]): Character to draw, can be an integer or string.
         flag (int): Blending mode to use.
     """
     lib.TCOD_console_put_char(_cdata(con), x, y, _int(c), flag)
@@ -579,8 +688,8 @@ def console_print_rect(con, x, y, w, h, fmt):
     the string is truncated. If h = 0,
     the string is only truncated if it reaches the bottom of the console.
 
-    :returns: Returns the number of lines of the text once word-wrapped.
-    :rtype: int
+    Returns:
+        int: The number of lines of text once word-wrapped.
     """
     return lib.TCOD_console_print_rect_utf(_cdata(con), x, y, w, h,
                                             _unicode(fmt))
@@ -588,8 +697,8 @@ def console_print_rect(con, x, y, w, h, fmt):
 def console_print_rect_ex(con, x, y, w, h, flag, alignment, fmt):
     """Print a string constrained to a rectangle with blend and alignment.
 
-    :returns: Returns the number of lines of the text once word-wrapped.
-    :rtype: int
+    Returns:
+        int: The number of lines of text once word-wrapped.
     """
     return lib.TCOD_console_print_rect_ex_utf(_cdata(con), x, y, w, h,
                                                flag, alignment, _unicode(fmt))
@@ -597,8 +706,8 @@ def console_print_rect_ex(con, x, y, w, h, flag, alignment, fmt):
 def console_get_height_rect(con, x, y, w, h, fmt):
     """Return the height of this text once word-wrapped into this rectangle.
 
-    :returns: Returns the number of lines of the text once word-wrapped.
-    :rtype: int
+    Returns:
+        int: The number of lines of text once word-wrapped.
     """
     return lib.TCOD_console_get_height_rect_utf(_cdata(con), x, y, w, h,
                                                  _unicode(fmt))
@@ -669,11 +778,14 @@ def console_get_fading_color():
 
 # handling keyboard input
 def console_wait_for_keypress(flush):
-    """Block until the user presses a key, then returns a :any:Key instance.
+    """Block until the user presses a key, then returns a new Key.
 
-    :param bool flush: If True then the event queue is cleared before waiting
-                       for the next event.
-    :rtype: Key
+    Args:
+        flush bool: If True then the event queue is cleared before waiting
+                    for the next event.
+
+    Returns:
+        Key: A new Key instance.
     """
     k=Key()
     lib.TCOD_console_wait_for_keypress_wrapper(k.cdata, flush)
@@ -1069,10 +1181,11 @@ def line_init(xo, yo, xd, yd):
 
     Does not include the origin point.
 
-    :param int xo: x origin
-    :param int yo: y origin
-    :param int xd: x destination
-    :param int yd: y destination
+    Args:
+        xo (int): X starting point.
+        yo (int): Y starting point.
+        xd (int): X destination point.
+        yd (int): Y destination point.
 
     .. deprecated:: 2.0
        Use `line_iter` instead.
@@ -1080,13 +1193,14 @@ def line_init(xo, yo, xd, yd):
     lib.TCOD_line_init(xo, yo, xd, yd)
 
 def line_step():
-    """After calling `line_init` returns (x, y) points of the line.
+    """After calling line_init returns (x, y) points of the line.
 
     Once all points are exhausted this function will return (None, None)
 
-    :return: next (x, y) point of the line setup by `line_init`,
-             or (None, None) if there are no more points.
-    :rtype: tuple(x, y)
+    Returns:
+        Union[Tuple[int, int], Tuple[None, None]]:
+            The next (x, y) point of the line setup by line_init,
+            or (None, None) if there are no more points.
 
     .. deprecated:: 2.0
        Use `line_iter` instead.
@@ -1108,15 +1222,17 @@ def line(xo, yo, xd, yd, py_callback):
 
     This function includes both the start and end points.
 
-    :param int xo: x origin
-    :param int yo: y origin
-    :param int xd: x destination
-    :param int yd: y destination
-    :param function py_callback: Callback that takes x and y parameters and
-                                 returns bool.
-    :return: Returns False if the callback cancels the line interation by
-             returning False or None, otherwise True.
-    :rtype: bool
+    Args:
+        xo (int): X starting point.
+        yo (int): Y starting point.
+        xd (int): X destination point.
+        yd (int): Y destination point.
+        py_callback (Callable[[int, int], bool]):
+            A callback which takes x and y parameters and returns bool.
+
+    Returns:
+        bool: False if the callback cancels the line interation by
+              returning False or None, otherwise True.
 
     .. deprecated:: 2.0
        Use `line_iter` instead.
@@ -1134,12 +1250,14 @@ def line_iter(xo, yo, xd, yd):
 
     This iterator does not include the origin point.
 
-    :param int xo: x origin
-    :param int yo: y origin
-    :param int xd: x destination
-    :param int yd: y destination
+    Args:
+        xo (int): X starting point.
+        yo (int): Y starting point.
+        xd (int): X destination point.
+        yd (int): Y destination point.
 
-    :return: iterator of (x,y) points
+    Returns:
+        Iterator[Tuple[int,int]]: An iterator of (x,y) points.
     """
     data = ffi.new('TCOD_bresenham_data_t *')
     lib.TCOD_line_init_mt(xo, yo, xd, yd, data)
@@ -1451,7 +1569,8 @@ def sys_set_fps(fps):
 
     You can disable the frame limit again by setting fps to 0.
 
-    :param int fps: A frame rate limit (i.e. 60)
+    Args:
+        fps (int): A frame rate limit (i.e. 60)
     """
     lib.TCOD_sys_set_fps(fps)
 
@@ -1463,21 +1582,24 @@ def sys_get_fps():
 
     This number is updated every second.
 
-    :rtype: int
+    Returns:
+        int: The currently measured frame rate.
     """
     return lib.TCOD_sys_get_fps()
 
 def sys_get_last_frame_length():
     """Return the delta time of the last rendered frame in seconds.
 
-    :rtype: float
+    Returns:
+        float: The delta time of the last rendered frame.
     """
     return lib.TCOD_sys_get_last_frame_length()
 
 def sys_sleep_milli(val):
     """Sleep for 'val' milliseconds.
 
-    :param int val: Time to sleep for in milliseconds.
+    Args:
+        val (int): Time to sleep for in milliseconds.
 
     .. deprecated:: 2.0
        Use :any:`time.sleep` instead.
@@ -1487,7 +1609,8 @@ def sys_sleep_milli(val):
 def sys_elapsed_milli():
     """Get number of milliseconds since the start of the program.
 
-    :rtype: int
+    Returns:
+        int: Time since the progeam has started in milliseconds.
 
     .. deprecated:: 2.0
        Use :any:`time.clock` instead.
@@ -1497,7 +1620,8 @@ def sys_elapsed_milli():
 def sys_elapsed_seconds():
     """Get number of seconds since the start of the program.
 
-    :rtype: float
+    Returns:
+        float: Time since the progeam has started in seconds.
 
     .. deprecated:: 2.0
        Use :any:`time.clock` instead.
@@ -1528,8 +1652,8 @@ def sys_save_screenshot(name=None):
     The automatic names are formatted as screenshotNNN.png.  For example:
     screenshot000.png, screenshot001.png, etc.  Whichever is available first.
 
-    :param str file: File path to save screenshot.
-
+    Args:
+        file Optional[AnyStr]: File path to save screenshot.
     """
     if name is not None:
         name = _bytes(name)
@@ -1545,18 +1669,30 @@ def sys_force_fullscreen_resolution(width, height):
       resolution width >= root console width * font char width
     * resolution height >= height and
       resolution height >= root console height * font char height
+
+    Args:
+        width (int): The desired resolution width.
+        height (int): The desired resolution height.
     """
     lib.TCOD_sys_force_fullscreen_resolution(width, height)
 
 def sys_get_current_resolution():
-    """Return the current resolution as (width, height)"""
+    """Return the current resolution as (width, height)
+
+    Returns:
+        Tuple[int,int]: The current resolution.
+    """
     w = ffi.new('int *')
     h = ffi.new('int *')
     lib.TCOD_sys_get_current_resolution(w, h)
     return w[0], h[0]
 
 def sys_get_char_size():
-    """Return the current fonts character size as (width, height)"""
+    """Return the current fonts character size as (width, height)
+
+    Returns:
+        Tuple[int,int]: The current font glyph size in (width, height)
+    """
     w = ffi.new('int *')
     h = ffi.new('int *')
     lib.TCOD_sys_get_char_size(w, h)
@@ -1569,14 +1705,15 @@ def sys_update_char(asciiCode, fontx, fonty, img, x, y):
     All cells using this asciiCode will be updated
     at the next call to :any:`tcod.console_flush`.
 
-    :param int asciiCode: Ascii code corresponding to the character to update.
-    :param int fontx: Left coordinate of the character
-                      in the bitmap font (in tiles)
-    :param int fonty: Top coordinate of the character
-                      in the bitmap font (in tiles)
-    :param img: An image containing the new character bitmap.
-    :param int x: Left pixel of the character in the image.
-    :param int y: Top pixel of the character in the image.
+    Args:
+        asciiCode (int): Ascii code corresponding to the character to update.
+        fontx (int): Left coordinate of the character
+                     in the bitmap font (in tiles)
+        fonty (int): Top coordinate of the character
+                     in the bitmap font (in tiles)
+        img: An image containing the new character bitmap.
+        x (int): Left pixel of the character in the image.
+        y (int): Top pixel of the character in the image.
     """
     lib.TCOD_sys_update_char(_int(asciiCode), fontx, fonty, img, x, y)
 
@@ -1588,7 +1725,8 @@ def sys_register_SDL_renderer(callback):
 
     The callback is called on every call to :any:`tcod.console_flush`.
 
-    :param callable callback: A function which takes a single argument.
+    Args:
+        callback Callable[CData]: A function which takes a single argument.
     """
     with _PropagateException() as propagate:
         @ffi.def_extern(onerror=propagate)
@@ -1615,12 +1753,12 @@ def sys_check_for_event(mask, k, m):
     * tcod.EVENT_FINGER
     * tcod.EVENT_ANY
 
-    :param mask: Event types to wait for.
-    :param Key k: :any:`tcod.Key` instance which might be updated with
-                  an event.  Can be None.
-
-    :param Mouse m: :any:`tcod.Mouse` instance which might be updated
-                    with an event.  Can be None.
+    Args:
+        mask (int): Event types to wait for.
+        k (Optional[Key]): A tcod.Key instance which might be updated with
+                           an event.  Can be None.
+        m (Optional[Mouse]): A tcod.Mouse instance which might be updated
+                             with an event.  Can be None.
     """
     return lib.TCOD_sys_check_for_event(mask, _cdata(k), _cdata(m))
 
@@ -1646,14 +1784,13 @@ def sys_wait_for_event(mask, k, m, flush):
     If flush is True then the buffer will be cleared before waiting. Otherwise
     each available event will be returned in the order they're recieved.
 
-    :param mask: Event types to wait for.
-    :param Key k: :any:`tcod.Key` instance which might be updated with
-                  an event.  Can be None.
-
-    :param Mouse m: :any:`tcod.Mouse` instance which might be updated
-                    with an event.  Can be None.
-
-    :param bool flush: Clear the buffer before waiting.
+    Args:
+        mask (int): Event types to wait for.
+        k (Optional[Key]): A tcod.Key instance which might be updated with
+                           an event.  Can be None.
+        m (Optional[Mouse]): A tcod.Mouse instance which might be updated
+                             with an event.  Can be None.
+        flush (bool): Clear the buffer before waiting.
     """
     return lib.TCOD_sys_wait_for_event(mask, _cdata(k), _cdata(m), flush)
 

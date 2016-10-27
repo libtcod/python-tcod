@@ -298,5 +298,8 @@ struct
 other
 -----
 
-.. autoclass:: tcod.Dice
+.. autoclass:: tcod.ConsoleBuffer
+    :members:
+
+.. autoclass:: tcod.Dice(nb_dices=0, nb_faces=0, multiplier=0, addsub=0)
    :members:

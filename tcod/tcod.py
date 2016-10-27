@@ -151,20 +151,22 @@ def _assert_cdata_is_not_null(func):
 class BSP(_CDataWrapper):
     """
 
-    .. attribute:: x
-    .. attribute:: y
-    .. attribute:: w
-    .. attribute:: h
 
-    :param int x: rectangle left coordinate
-    :param int y: rectangle top coordinate
-    :param int w: rectangle width
-    :param int h: rectangle height
+    Attributes:
+        x (int): Rectangle left coordinate.
+        y (int): Rectangle top coordinate.
+        w (int): Rectangle width.
+        h (int): Rectangle height.
+
+    Args:
+        x (int): Rectangle left coordinate.
+        y (int): Rectangle top coordinate.
+        w (int): Rectangle width.
+        h (int): Rectangle height.
 
     .. versionchanged:: 2.0
        You can create BSP's with this class contructor instead of using
        :any:`bsp_new_with_size`.
-
     """
 
     def __init__(self, *args, **kargs):
@@ -191,7 +193,7 @@ class BSP(_CDataWrapper):
             child.cdata = ffi.NULL
         self._children.clear()
 
-    def __repr__(self):
+    def __str__(self):
         """Provide a useful readout when printed."""
         if not self.cdata:
             return '<%s NULL!>' % self.__class__.__name__
@@ -208,7 +210,8 @@ class BSP(_CDataWrapper):
     def get_depth(self):
         """Return the depth of this node.
 
-        :rtype: int
+        Returns:
+            int: This nodes depth.
 
         .. versionadded:: 2.0
         """
@@ -217,7 +220,8 @@ class BSP(_CDataWrapper):
     def get_division(self):
         """Return the point where this node was divided into parts.
 
-        :rtype: :any:`int` or :any:`None`
+        Returns:
+            Optional[int]: The integer of where the node was split or None.
 
         .. versionadded:: 2.0
         """
@@ -226,14 +230,15 @@ class BSP(_CDataWrapper):
         return self.cdata.position
 
     def get_orientation(self):
-        """
+        """Return this nodes split orientation.
 
-        :rtype: str
+        Returns:
+            Optional[Text]: 'horizontal', 'vertical', or None
 
         .. versionadded:: 2.0
         """
         if self.is_leaf():
-            return ''
+            return None
         elif self.cdata.horizontal:
             return 'horizontal'
         else:
@@ -242,8 +247,6 @@ class BSP(_CDataWrapper):
     @_assert_cdata_is_not_null
     def split_once(self, orientation, position):
         """
-
-        :rtype: tuple
 
         .. versionadded:: 2.0
         """
@@ -255,30 +258,27 @@ class BSP(_CDataWrapper):
         else:
             raise ValueError("orientation must be 'horizontal' or 'vertical'"
                              "\nNot %r" % orientation)
-        return self.get_children()
 
     @_assert_cdata_is_not_null
     def split_recursive(self, depth, min_width, min_height,
                         max_horz_ratio, max_vert_raito, random=None):
         """
 
-        :rtype: iter
-
         .. versionadded:: 2.0
         """
         lib.TCOD_bsp_split_recursive(self.cdata, random or ffi.NULL,
                                       depth, min_width, min_height,
                                       max_horz_ratio, max_vert_raito)
-        return self.walk()
 
     @_assert_cdata_is_not_null
     def resize(self, x, y, w, h):
         """Resize this BSP to the provided rectangle.
 
-        :param int x: rectangle left coordinate
-        :param int y: rectangle top coordinate
-        :param int w: rectangle width
-        :param int h: rectangle height
+        Args:
+            x (int): Rectangle left coordinate.
+            y (int): Rectangle top coordinate.
+            w (int): Rectangle width.
+            h (int): Rectangle height.
 
         .. versionadded:: 2.0
         """
@@ -290,8 +290,8 @@ class BSP(_CDataWrapper):
 
         Returns None if this BSP is a leaf node.
 
-        :return: BSP's left/top child or None.
-        :rtype: :any:`BSP` or :any:`None`
+        Returns:
+            Optional[BSP]: This nodes left/top child or None.
 
         .. versionadded:: 2.0
         """
@@ -305,8 +305,8 @@ class BSP(_CDataWrapper):
 
         Returns None if this BSP is a leaf node.
 
-        :return: BSP's right/bottom child or None.
-        :rtype: :any:`BSP` or :any:`None`
+        Returns:
+            Optional[BSP]: This nodes right/bottom child or None.
 
         .. versionadded:: 2.0
         """
@@ -318,9 +318,9 @@ class BSP(_CDataWrapper):
     def get_parent(self):
         """Return this BSP's parent node.
 
-        :return: Returns the parent node as a BSP instance.
-                 Returns None if this BSP has no parent.
-        :rtype: :any:`BSP` or :any:`None`
+        Returns:
+            Optional[BSP]: Returns the parent node as a BSP instance.
+                           Returns None if this BSP has no parent.
 
         .. versionadded:: 2.0
         """
@@ -331,16 +331,17 @@ class BSP(_CDataWrapper):
 
     @_assert_cdata_is_not_null
     def get_children(self):
-        """Return as a tuple, this instances immediate children, if any.
+        """Return this instances immediate children, if any.
 
-        :return: Returns a tuple of (left, right) BSP instances.
-                 The returned tuple is empty if this BSP has no children.
-        :rtype: tuple
+        Returns:
+            Optional[Tuple[BSP, BSP]]:
+                Returns a tuple of (left, right) BSP instances.
+                Returns None if this BSP has no children.
 
         .. versionadded:: 2.0
         """
         if self.is_leaf():
-            return ()
+            return None
         return (BSP(lib.TCOD_bsp_left(self.cdata))._pass_reference(self),
                 BSP(lib.TCOD_bsp_right(self.cdata))._pass_reference(self))
 
@@ -352,21 +353,25 @@ class BSP(_CDataWrapper):
         It will traverse its own children and grandchildren, in no particular
         order.
 
-        :return: Returns an iterator of BSP instances.
-        :rtype: iter
+        Returns:
+            Iterator[BSP]: An iterator of BSP nodes.
 
         .. versionadded:: 2.0
         """
-        for child in self.get_children():
+        children = self.get_children() or ()
+        for child in children:
             for grandchild in child.walk():
                 yield grandchild
         yield self
 
     @_assert_cdata_is_not_null
     def is_leaf(self):
-        """Returns True if this node is a leaf.  False when this node has children.
+        """Returns True if this node is a leaf.
 
-        :rtype: bool
+        Returns:
+            bool:
+                True if this node is a leaf.
+                False when this node has children.
 
         .. versionadded:: 2.0
         """
@@ -376,7 +381,13 @@ class BSP(_CDataWrapper):
     def contains(self, x, y):
         """Returns True if this node contains these coordinates.
 
-        :rtype: bool
+        Args:
+            x (int): X position to check.
+            y (int): Y position to check.
+
+        Returns:
+            bool: True if this node contains these coordinates.
+                  Otherwise False.
 
         .. versionadded:: 2.0
         """
@@ -386,7 +397,8 @@ class BSP(_CDataWrapper):
     def find_node(self, x, y):
         """Return the deepest node which contains these coordinates.
 
-        :rtype: :any:`BSP` or :any:`None`
+        Returns:
+            Optional[BSP]: BSP object or None.
 
         .. versionadded:: 2.0
         """
@@ -412,31 +424,71 @@ class HeightMap(_CDataWrapper):
 
 class Key(_CDataWrapper):
     """Key Event instance
+
+    Attributes:
+        vk (int): TCOD_keycode_t key code
+        c (int): character if vk == TCODK_CHAR else 0
+        text (Text): text[TCOD_KEY_TEXT_SIZE]; text if vk == TCODK_TEXT else text[0] == '\0'
+        pressed (bool): does this correspond to a key press or key release event ?
+        lalt (bool): True when left alt is held.
+        lctrl (bool): True when left control is held.
+        lmeta (bool): True when left meta key is held.
+        ralt (bool): True when right alt is held.
+        rctrl (bool): True when right control is held.
+        rmeta (bool): True when right meta key is held.
+        shift (bool): True when any shift is held.
     """
 
-    def __init__(self, *args):
-        super(Key, self).__init__(*args)
+    _BOOL_ATTRIBUTES = ('lalt', 'lctrl', 'lmeta',
+                        'ralt', 'rctrl', 'rmeta', 'pressed', 'shift')
+
+    def __init__(self, *args, **kargs):
+        super(Key, self).__init__(*args, **kargs)
         if self.cdata == ffi.NULL:
             self.cdata = ffi.new('TCOD_key_t*')
 
     def __getattr__(self, attr):
+        if attr in self._BOOL_ATTRIBUTES:
+            return bool(getattr(self.cdata, attr))
         if attr == 'c':
             return ord(getattr(self.cdata, attr))
-        else:
-            return super(Key, self).__getattr__(attr)
+        if attr == 'text':
+            return _unpack_char_p(getattr(self.cdata, attr))
+        return super(Key, self).__getattr__(attr)
 
 class Mouse(_CDataWrapper):
     """Mouse event instance
+
+    Attributes:
+        x (int): Absolute mouse position at pixel x.
+        y (int):
+        dx (int): Movement since last update in pixels.
+        dy (int):
+        cx (int): Cell coordinates in the root console.
+        cy (int):
+        dcx (int): Movement since last update in console cells.
+        dcy (int):
+        lbutton (bool): Left button status.
+        rbutton (bool): Right button status.
+        mbutton (bool): Middle button status.
+        lbutton_pressed (bool): Left button pressed event.
+        rbutton_pressed (bool): Right button pressed event.
+        mbutton_pressed (bool): Middle button pressed event.
+        wheel_up (bool): Wheel up event.
+        wheel_down (bool): Wheel down event.
     """
 
-    def __init__(self, *args):
-        super(Mouse, self).__init__(*args)
+    def __init__(self, *args, **kargs):
+        super(Mouse, self).__init__(*args, **kargs)
         if self.cdata == ffi.NULL:
             self.cdata = ffi.new('TCOD_mouse_t*')
 
 
 class Console(_CDataWrapper):
     """
+    Args:
+        width (int): Width of the new Console.
+        height (int): Height of the new Console.
 
     .. versionadded:: 2.0
     """
@@ -452,6 +504,9 @@ class Console(_CDataWrapper):
 
 class Image(_CDataWrapper):
     """
+    Args:
+        width (int): Width of the new Image.
+        height (int): Height of the new Image.
 
     .. versionadded:: 2.0
     """
@@ -467,12 +522,18 @@ class Image(_CDataWrapper):
 def clipboard_set(string):
     """Set the clipboard contents to string.
 
+    Args:
+        string (AnyStr): The string to set the clipboard to.
+
     .. versionadded:: 2.0
     """
     lib.TCOD_sys_clipboard_set(_bytes(string))
 
 def clipboard_get():
     """Return the current contents of the clipboard.
+
+    Returns:
+        Text: The clipboards current contents.
 
     .. versionadded:: 2.0
     """
