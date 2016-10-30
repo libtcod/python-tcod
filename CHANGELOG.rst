@@ -1,9 +1,18 @@
 ===========
  Changelog
 ===========
+2.0a2
+ * FrozenColor class removed.
+ * Color class now uses a properly set up __repr__ method.
+ * Functions which take the fmt parameter will now escape the '%' symbol before
+   sending the string to a C printf call.
+ * Now using Google-Style docstrings.
+ * Console class has most of its relevant methods.
+ * Added the Console.fill function which needs only 3 numpy arrays instead of
+   the usual 7 to cover all Console data.
+
 2.0a1
- * Realising how dumb it'd be to remote it,
-   the userData parameter has been added back.
+ * The userData parameter was added back.
    Functions which use it are marked depreciated.
  * Python exceptions will now propagate out of libtcod callbacks.
  * Some libtcod object oriented functions now have Python class methods
