@@ -86,7 +86,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '/epilog.rst']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -355,8 +355,11 @@ napoleon_use_ivar = False
 napoleon_use_param = True
 napoleon_use_rtype = True
 
+rst_epilog = ".. include:: /epilog.rst"
+
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
                        'https://docs.python.org/2/': None,
                        'https://cffi.readthedocs.io/en/latest/': None,
+                       'https://docs.scipy.org/doc/numpy/': None,
                        }

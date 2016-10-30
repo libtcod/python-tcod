@@ -18,6 +18,7 @@ Hello World
    :maxdepth: 2
 
    api_ref
+   glossary
 
 Indices and tables
 ==================
