@@ -522,7 +522,10 @@ def console_get_width(con):
         con (Console): Any Console instance.
 
     Returns:
-        int: The width of this Console.
+        int: The width of a Console.
+
+    .. deprecated:: 2.0
+        Use `Console.get_width` instead.
     """
     return lib.TCOD_console_get_width(_cdata(con))
 
@@ -533,7 +536,10 @@ def console_get_height(con):
         con (Console): Any Console instance.
 
     Returns:
-        int: The height of this Console.
+        int: The height of a Console.
+
+    .. deprecated:: 2.0
+        Use `Console.get_hright` instead.
     """
     return lib.TCOD_console_get_height(_cdata(con))
 
@@ -593,7 +599,7 @@ def console_flush():
 
 # drawing on a console
 def console_set_default_background(con, col):
-    """Change the default background color for this console.
+    """Change the default background color for a console.
 
     Args:
         con (Console): Any Console instance.
@@ -603,7 +609,7 @@ def console_set_default_background(con, col):
     lib.TCOD_console_set_default_background(_cdata(con), col)
 
 def console_set_default_foreground(con, col):
-    """Change the default foreround color for this console.
+    """Change the default foreground color for a console.
 
     Args:
         con (Console): Any Console instance.
@@ -613,7 +619,7 @@ def console_set_default_foreground(con, col):
     lib.TCOD_console_set_default_foreground(_cdata(con), col)
 
 def console_clear(con):
-    """Reset this console to its default colors and the space character.
+    """Reset a console to its default colors and the space character.
 
     Args:
         con (Console): Any Console instance.
@@ -727,12 +733,13 @@ def console_get_alignment(con):
     return lib.TCOD_console_get_alignment(_cdata(con))
 
 def console_print(con, x, y, fmt):
-    """Print a string on a console.
+    """Print a color formatted string on a console.
 
     Args:
         con (Console): Any Console instance.
         x (int): Character x position from the left.
         y (int): Character y position from the top.
+        fmt (AnyStr): A unicode or bytes string optionaly using color codes.
     """
     lib.TCOD_console_print_utf(_cdata(con), x, y, _fmt_unicode(fmt))
 
@@ -814,6 +821,15 @@ def console_print_frame(con, x, y, w, h, clear=True, flag=BKGND_DEFAULT, fmt=b''
                                   _fmt_bytes(fmt))
 
 def console_set_color_control(con, fore, back):
+    """Configure color control codes.
+
+    Args:
+        con (int): Color control constant to modify.
+        fore (Union[Tuple[int, int, int], Sequence[int]]):
+            An (r, g, b) sequence or Color instance.
+        back (Union[Tuple[int, int, int], Sequence[int]]):
+            An (r, g, b) sequence or Color instance.
+    """
     lib.TCOD_console_set_color_control(_cdata(con), fore, back)
 
 def console_get_default_background(con):
@@ -877,9 +893,9 @@ def console_disable_keyboard_repeat():
 # using offscreen consoles
 def console_new(w, h):
     """Return an offscreen console of size: w,h."""
-    return ffi.gc(lib.TCOD_console_new(w, h), lib.TCOD_console_delete)
+    return Console(ffi.gc(lib.TCOD_console_new(w, h), lib.TCOD_console_delete))
 def console_from_file(filename):
-    return lib.TCOD_console_from_file(_bytes(filename))
+    return Console(lib.TCOD_console_from_file(_bytes(filename)))
 
 def console_blit(src, x, y, w, h, dst, xdst, ydst, ffade=1.0,bfade=1.0):
     """Blit the console src from x,y,w,h to console dst at xdst,ydst."""
@@ -896,7 +912,15 @@ def console_delete(con):
         lib.TCOD_console_delete(con)
 
 # fast color filling
-def console_fill_foreground(con,r,g,b):
+def console_fill_foreground(con, r, g, b):
+    """Fill the foregound of a console with r,g,b.
+
+    Args:
+        con (Console): Any Console instance.
+        r (Sequence[int]): An array of integers with a length of width*height.
+        g (Sequence[int]): An array of integers with a length of width*height.
+        b (Sequence[int]): An array of integers with a length of width*height.
+    """
     if len(r) != len(g) or len(r) != len(b):
         raise TypeError('R, G and B must all have the same size.')
     if (_numpy_available() and isinstance(r, _numpy.ndarray) and
@@ -916,7 +940,15 @@ def console_fill_foreground(con,r,g,b):
 
     lib.TCOD_console_fill_foreground(_cdata(con), cr, cg, cb)
 
-def console_fill_background(con,r,g,b):
+def console_fill_background(con, r, g, b):
+    """Fill the backgound of a console with r,g,b.
+
+    Args:
+        con (Console): Any Console instance.
+        r (Sequence[int]): An array of integers with a length of width*height.
+        g (Sequence[int]): An array of integers with a length of width*height.
+        b (Sequence[int]): An array of integers with a length of width*height.
+    """
     if len(r) != len(g) or len(r) != len(b):
         raise TypeError('R, G and B must all have the same size.')
     if (_numpy_available() and isinstance(r, _numpy.ndarray) and
@@ -937,6 +969,12 @@ def console_fill_background(con,r,g,b):
     lib.TCOD_console_fill_background(_cdata(con), cr, cg, cb)
 
 def console_fill_char(con,arr):
+    """Fill the character tiles of a console with an array.
+
+    Args:
+        con (Console): Any Console instance.
+        arr (Sequence[int]): An array of integers with a length of width*height.
+    """
     if (_numpy_available() and isinstance(arr, _numpy.ndarray) ):
         #numpy arrays, use numpy's ctypes functions
         arr = _numpy.ascontiguousarray(arr, dtype=_numpy.intc)
