@@ -58,6 +58,12 @@ else: # Python 3
             return string.decode()
         return string
 
+def _fmt_bytes(string):
+    return _bytes(string).replace(b'%', b'%%')
+
+def _fmt_unicode(string):
+    return _unicode(string).replace(u'%', u'%%')
+
 class _PropagateException():
     """ context manager designed to propagate exceptions outside of a cffi
     callback context.  normally cffi suppresses the exception

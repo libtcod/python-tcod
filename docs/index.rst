@@ -17,8 +17,7 @@ Hello World
 .. toctree::
    :maxdepth: 2
 
-   tcod
-   libtcodpy
+   api_ref
 
 Indices and tables
 ==================

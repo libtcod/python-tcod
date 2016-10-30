@@ -7,7 +7,8 @@ import threading as _threading
 
 from tcod.libtcod import *
 
-from tcod.tcod import _int, _cdata, _bytes, _unicode, _unpack_char_p
+from tcod.tcod import _int, _cdata, _unpack_char_p
+from tcod.tcod import _bytes, _unicode, _fmt_bytes, _fmt_unicode
 from tcod.tcod import _CDataWrapper
 from tcod.tcod import _PropagateException
 from tcod.tcod import BSP as Bsp
@@ -627,36 +628,81 @@ def console_put_char(con, x, y, c, flag=BKGND_DEFAULT):
     """Draw the character c at x,y using the default colors and a blend mode.
 
     Args:
+        con (Console): Any Console instance.
         x (int): Character x position from the left.
         y (int): Character y position from the top.
         c (Union[int, AnyStr]): Character to draw, can be an integer or string.
-        flag (int): Blending mode to use.
+        flag (int): Blending mode to use, defaults to BKGND_DEFAULT.
     """
     lib.TCOD_console_put_char(_cdata(con), x, y, _int(c), flag)
 
 def console_put_char_ex(con, x, y, c, fore, back):
-    """Draw the character c at x,y using the colors fore and back."""
+    """Draw the character c at x,y using the colors fore and back.
+
+    Args:
+        con (Console): Any Console instance.
+        x (int): Character x position from the left.
+        y (int): Character y position from the top.
+        c (Union[int, AnyStr]): Character to draw, can be an integer or string.
+        fore (Union[Tuple[int, int, int], Sequence[int]]):
+            An (r, g, b) sequence or Color instance.
+        back (Union[Tuple[int, int, int], Sequence[int]]):
+            An (r, g, b) sequence or Color instance.
+    """
     lib.TCOD_console_put_char_ex(_cdata(con), x, y,
                                  _int(c), fore, back)
 
 def console_set_char_background(con, x, y, col, flag=BKGND_SET):
-    """Change the background color of x,y to col using a blend mode."""
+    """Change the background color of x,y to col using a blend mode.
+
+    Args:
+        con (Console): Any Console instance.
+        x (int): Character x position from the left.
+        y (int): Character y position from the top.
+        col (Union[Tuple[int, int, int], Sequence[int]]):
+            An (r, g, b) sequence or Color instance.
+        flag (int): Blending mode to use, defaults to BKGND_SET.
+    """
     lib.TCOD_console_set_char_background(_cdata(con), x, y, col, flag)
 
 def console_set_char_foreground(con, x, y, col):
-    """Change the foreground color of x,y to col."""
+    """Change the foreground color of x,y to col.
+
+    Args:
+        con (Console): Any Console instance.
+        x (int): Character x position from the left.
+        y (int): Character y position from the top.
+        col (Union[Tuple[int, int, int], Sequence[int]]):
+            An (r, g, b) sequence or Color instance.
+    """
     lib.TCOD_console_set_char_foreground(_cdata(con), x, y, col)
 
 def console_set_char(con, x, y, c):
-    """Change the character at x,y to c, keeping the current colors."""
+    """Change the character at x,y to c, keeping the current colors.
+
+    Args:
+        con (Console): Any Console instance.
+        x (int): Character x position from the left.
+        y (int): Character y position from the top.
+        c (Union[int, AnyStr]): Character to draw, can be an integer or string.
+    """
     lib.TCOD_console_set_char(_cdata(con), x, y, _int(c))
 
 def console_set_background_flag(con, flag):
-    """Change the default blend mode for this console."""
+    """Change the default blend mode for this console.
+
+    Args:
+        con (Console): Any Console instance.
+        flag (int): Blend mode to use by default.
+    """
     lib.TCOD_console_set_background_flag(_cdata(con), flag)
 
 def console_get_background_flag(con):
-    """Return this consoles current blend mode."""
+    """Return this consoles current blend mode.
+
+    Args:
+        con (Console): Any Console instance.
+    """
     return lib.TCOD_console_get_background_flag(_cdata(con))
 
 def console_set_alignment(con, alignment):
@@ -665,21 +711,41 @@ def console_set_alignment(con, alignment):
     * tcod.LEFT
     * tcod.CENTER
     * tcod.RIGHT
+
+    Args:
+        con (Console): Any Console instance.
+        alignment (int):
     """
     lib.TCOD_console_set_alignment(_cdata(con), alignment)
 
 def console_get_alignment(con):
-    """Return this consoles current alignment mode."""
+    """Return this consoles current alignment mode.
+
+    Args:
+        con (Console): Any Console instance.
+    """
     return lib.TCOD_console_get_alignment(_cdata(con))
 
 def console_print(con, x, y, fmt):
-    """Print a string on a console."""
-    lib.TCOD_console_print_utf(_cdata(con), x, y, _unicode(fmt))
+    """Print a string on a console.
+
+    Args:
+        con (Console): Any Console instance.
+        x (int): Character x position from the left.
+        y (int): Character y position from the top.
+    """
+    lib.TCOD_console_print_utf(_cdata(con), x, y, _fmt_unicode(fmt))
 
 def console_print_ex(con, x, y, flag, alignment, fmt):
-    """Print a string on a console using a blend mode and alignment mode."""
+    """Print a string on a console using a blend mode and alignment mode.
+
+    Args:
+        con (Console): Any Console instance.
+        x (int): Character x position from the left.
+        y (int): Character y position from the top.
+    """
     lib.TCOD_console_print_ex_utf(_cdata(con), x, y,
-                                   flag, alignment, _unicode(fmt))
+                                   flag, alignment, _fmt_unicode(fmt))
 
 def console_print_rect(con, x, y, w, h, fmt):
     """Print a string constrained to a rectangle.
@@ -688,11 +754,13 @@ def console_print_rect(con, x, y, w, h, fmt):
     the string is truncated. If h = 0,
     the string is only truncated if it reaches the bottom of the console.
 
+
+
     Returns:
         int: The number of lines of text once word-wrapped.
     """
     return lib.TCOD_console_print_rect_utf(_cdata(con), x, y, w, h,
-                                            _unicode(fmt))
+                                            _fmt_unicode(fmt))
 
 def console_print_rect_ex(con, x, y, w, h, flag, alignment, fmt):
     """Print a string constrained to a rectangle with blend and alignment.
@@ -701,7 +769,8 @@ def console_print_rect_ex(con, x, y, w, h, flag, alignment, fmt):
         int: The number of lines of text once word-wrapped.
     """
     return lib.TCOD_console_print_rect_ex_utf(_cdata(con), x, y, w, h,
-                                               flag, alignment, _unicode(fmt))
+                                              flag, alignment,
+                                              _fmt_unicode(fmt))
 
 def console_get_height_rect(con, x, y, w, h, fmt):
     """Return the height of this text once word-wrapped into this rectangle.
@@ -710,7 +779,7 @@ def console_get_height_rect(con, x, y, w, h, fmt):
         int: The number of lines of text once word-wrapped.
     """
     return lib.TCOD_console_get_height_rect_utf(_cdata(con), x, y, w, h,
-                                                 _unicode(fmt))
+                                                 _fmt_unicode(fmt))
 
 def console_rect(con, x, y, w, h, clr, flag=BKGND_DEFAULT):
     """Draw a the background color on a rect optionally clearing the text.
@@ -742,7 +811,7 @@ def console_print_frame(con, x, y, w, h, clear=True, flag=BKGND_DEFAULT, fmt=b''
     fmt will be printed on the inside of the rectangle, word-wrapped.
     """
     lib.TCOD_console_print_frame(_cdata(con), x, y, w, h, clear, flag,
-                                  _bytes(fmt))
+                                  _fmt_bytes(fmt))
 
 def console_set_color_control(con, fore, back):
     lib.TCOD_console_set_color_control(_cdata(con), fore, back)
@@ -1711,7 +1780,7 @@ def sys_update_char(asciiCode, fontx, fonty, img, x, y):
                      in the bitmap font (in tiles)
         fonty (int): Top coordinate of the character
                      in the bitmap font (in tiles)
-        img: An image containing the new character bitmap.
+        img (Image): An image containing the new character bitmap.
         x (int): Left pixel of the character in the image.
         y (int): Top pixel of the character in the image.
     """
@@ -1726,7 +1795,8 @@ def sys_register_SDL_renderer(callback):
     The callback is called on every call to :any:`tcod.console_flush`.
 
     Args:
-        callback Callable[CData]: A function which takes a single argument.
+        callback Callable[[CData], None]:
+            A function which takes a single argument.
     """
     with _PropagateException() as propagate:
         @ffi.def_extern(onerror=propagate)
@@ -1790,7 +1860,7 @@ def sys_wait_for_event(mask, k, m, flush):
                            an event.  Can be None.
         m (Optional[Mouse]): A tcod.Mouse instance which might be updated
                              with an event.  Can be None.
-        flush (bool): Clear the buffer before waiting.
+        flush (bool): Clear the event buffer before waiting.
     """
     return lib.TCOD_sys_wait_for_event(mask, _cdata(k), _cdata(m), flush)
 
