@@ -723,22 +723,22 @@ class Console(_CDataWrapper):
 
     def get_default_bg(self):
         """Return this consoles default background color."""
-        return Color.from_cdata(
+        return Color._new_from_cdata(
             lib.TCOD_console_get_default_background(self.cdata))
 
     def get_default_fg(self):
         """Return this consoles default foreground color."""
-        return Color.from_cdata(
+        return Color._new_from_cdata(
             lib.TCOD_console_get_default_foreground(self.cdata))
 
     def get_char_bg(self, x, y):
         """Return the background color at the x,y of this console."""
-        return Color.from_cdata(
+        return Color._new_from_cdata(
             lib.TCOD_console_get_char_background(self.cdata, x, y))
 
     def get_char_fg(self, x, y):
         """Return the foreground color at the x,y of this console."""
-        return Color.from_cdata(
+        return Color._new_from_cdata(
             lib.TCOD_console_get_char_foreground(self.cdata, x, y))
 
     def get_char(self, x, y):

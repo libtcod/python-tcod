@@ -376,7 +376,7 @@ def color_lerp(c1, c2, a):
     Returns:
         Color: The interpolated Color.
     """
-    return Color.from_cdata(lib.TCOD_color_lerp(c1, c2, a))
+    return Color._new_from_cdata(lib.TCOD_color_lerp(c1, c2, a))
 
 def color_set_hsv(c, h, s, v):
     """Set a color using: hue, saturation, and value parameters.
@@ -453,7 +453,7 @@ Color(204,102,0), Color(255,128,0)]
     cindexes = ffi.new('int[]', indexes)
     cres = ffi.new('TCOD_color_t[]', max(indexes) + 1)
     lib.TCOD_color_gen_map(cres, len(colors), ccolors, cindexes)
-    return [Color.from_cdata(cdata) for cdata in cres]
+    return [Color._new_from_cdata(cdata) for cdata in cres]
 
 _numpy = None
 
@@ -834,19 +834,23 @@ def console_set_color_control(con, fore, back):
 
 def console_get_default_background(con):
     """Return this consoles default background color."""
-    return Color.from_cdata(lib.TCOD_console_get_default_background(_cdata(con)))
+    return Color._new_from_cdata(
+        lib.TCOD_console_get_default_background(_cdata(con)))
 
 def console_get_default_foreground(con):
     """Return this consoles default foreground color."""
-    return Color.from_cdata(lib.TCOD_console_get_default_foreground(_cdata(con)))
+    return Color._new_from_cdata(
+        lib.TCOD_console_get_default_foreground(_cdata(con)))
 
 def console_get_char_background(con, x, y):
     """Return the background color at the x,y of this console."""
-    return Color.from_cdata(lib.TCOD_console_get_char_background(_cdata(con), x, y))
+    return Color._new_from_cdata(
+        lib.TCOD_console_get_char_background(_cdata(con), x, y))
 
 def console_get_char_foreground(con, x, y):
     """Return the foreground color at the x,y of this console."""
-    return Color.from_cdata(lib.TCOD_console_get_char_foreground(_cdata(con), x, y))
+    return Color._new_from_cdata(
+        lib.TCOD_console_get_char_foreground(_cdata(con), x, y))
 
 def console_get_char(con, x, y):
     """Return the character at the x,y of this console."""
@@ -859,7 +863,7 @@ def console_get_fade():
     return lib.TCOD_console_get_fade()
 
 def console_get_fading_color():
-    return Color.from_cdata(lib.TCOD_console_get_fading_color())
+    return Color._new_from_cdata(lib.TCOD_console_get_fading_color())
 
 # handling keyboard input
 def console_wait_for_keypress(flush):
@@ -1511,7 +1515,7 @@ def _unpack_union(type, union):
          lib.TCOD_TYPE_VALUELIST15 >= type >= lib.TCOD_TYPE_VALUELIST00):
          return _unpack_char_p(union.s)
     elif type == lib.TCOD_TYPE_COLOR:
-        return Color.from_cdata(union.col)
+        return Color._new_from_cdata(union.col)
     elif type == lib.TCOD_TYPE_DICE:
         return Dice(union.dice)
     elif type & lib.TCOD_TYPE_LIST:
@@ -1589,10 +1593,12 @@ def parser_get_float_property(parser, name):
     return lib.TCOD_parser_get_float_property(parser, _bytes(name))
 
 def parser_get_string_property(parser, name):
-    return _unpack_char_p(lib.TCOD_parser_get_string_property(parser, _bytes(name)))
+    return _unpack_char_p(
+        lib.TCOD_parser_get_string_property(parser, _bytes(name)))
 
 def parser_get_color_property(parser, name):
-    return Color.from_cdata(lib.TCOD_parser_get_color_property(parser, _bytes(name)))
+    return Color._new_from_cdata(
+        lib.TCOD_parser_get_color_property(parser, _bytes(name)))
 
 def parser_get_dice_property(parser, name):
     d = ffi.new('TCOD_dice_t *')

@@ -101,6 +101,7 @@ color
 -----
 
 .. autoclass:: tcod.Color
+   :member-order: bysource
    :members:
 
 .. autofunction:: tcod.color_lerp
