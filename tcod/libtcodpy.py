@@ -821,10 +821,10 @@ def console_print_frame(con, x, y, w, h, clear=True, flag=BKGND_DEFAULT, fmt=b''
                                   _fmt_bytes(fmt))
 
 def console_set_color_control(con, fore, back):
-    """Configure color control codes.
+    """Configure :any:`color controls`.
 
     Args:
-        con (int): Color control constant to modify.
+        con (int): :any:`Color control` constant to modify.
         fore (Union[Tuple[int, int, int], Sequence[int]]):
             An (r, g, b) sequence or Color instance.
         back (Union[Tuple[int, int, int], Sequence[int]]):
@@ -1209,74 +1209,86 @@ def heightmap_delete(hm):
     pass
 
 def image_new(width, height):
-    return ffi.gc(lib.TCOD_image_new(width, height), lib.TCOD_image_delete)
+    return Image(width, height)
 
-def image_clear(image,col):
-    lib.TCOD_image_clear(image,col)
+def image_clear(image, col):
+    lib.TCOD_image_clear(_cdata(image), col)
 
 def image_invert(image):
-    lib.TCOD_image_invert(image)
+    lib.TCOD_image_invert(_cdata(image))
 
 def image_hflip(image):
-    lib.TCOD_image_hflip(image)
+    lib.TCOD_image_hflip(_cdata(image))
 
 def image_rotate90(image, num=1):
-    lib.TCOD_image_rotate90(image,num)
+    lib.TCOD_image_rotate90(_cdata(image), num)
 
 def image_vflip(image):
-    lib.TCOD_image_vflip(image)
+    lib.TCOD_image_vflip(_cdata(image))
 
 def image_scale(image, neww, newh):
-    lib.TCOD_image_scale(image, neww, newh)
+    lib.TCOD_image_scale(_cdata(image), neww, newh)
 
-def image_set_key_color(image,col):
-    lib.TCOD_image_set_key_color(image, col)
+def image_set_key_color(image, col):
+    lib.TCOD_image_set_key_color(_cdata(image), col)
 
-def image_get_alpha(image,x,y):
-    return lib.TCOD_image_get_alpha(image, x, y)
+def image_get_alpha(image, x, y):
+    return lib.TCOD_image_get_alpha(_cdata(image), x, y)
 
-def image_is_pixel_transparent(image,x,y):
-    return lib.TCOD_image_is_pixel_transparent(image, x, y)
+def image_is_pixel_transparent(image, x, y):
+    return lib.TCOD_image_is_pixel_transparent(_cdata(image), x, y)
 
 def image_load(filename):
-    return ffi.gc(lib.TCOD_image_load(_bytes(filename)),
-                   lib.TCOD_image_delete)
+    """Load an image file into an Image instance and return it.
+
+    Args:
+        filename (AnyStr): Path to a .bmp or .png image file.
+    """
+    return Image(ffi.gc(lib.TCOD_image_load(_bytes(filename)),
+                        lib.TCOD_image_delete))
 
 def image_from_console(console):
-    return ffi.gc(lib.TCOD_image_from_console(_cdata(console)),
-                   lib.TCOD_image_delete)
+    """Return an Image with a Consoles pixel data.
+
+    This effectively takes a screen-shot of the Console.
+
+    Args:
+        console (Console): Any Console instance.
+    """
+    return Image(ffi.gc(lib.TCOD_image_from_console(_cdata(console)),
+                        lib.TCOD_image_delete))
 
 def image_refresh_console(image, console):
-    lib.TCOD_image_refresh_console(image, _cdata(console))
+    lib.TCOD_image_refresh_console(_cdata(image), _cdata(console))
 
 def image_get_size(image):
     w = ffi.new('int *')
     h = ffi.new('int *')
-    lib.TCOD_image_get_size(image, w, h)
+    lib.TCOD_image_get_size(_cdata(image), w, h)
     return w[0], h[0]
 
 def image_get_pixel(image, x, y):
-    return lib.TCOD_image_get_pixel(image, x, y)
+    return lib.TCOD_image_get_pixel(_cdata(image), x, y)
 
 def image_get_mipmap_pixel(image, x0, y0, x1, y1):
-    return lib.TCOD_image_get_mipmap_pixel(image, x0, y0, x1, y1)
+    return lib.TCOD_image_get_mipmap_pixel(_cdata(image), x0, y0, x1, y1)
 
 def image_put_pixel(image, x, y, col):
-    lib.TCOD_image_put_pixel(image, x, y, col)
-    ##lib.TCOD_image_put_pixel_wrapper(image, x, y, col)
+    lib.TCOD_image_put_pixel(_cdata(image), x, y, col)
 
 def image_blit(image, console, x, y, bkgnd_flag, scalex, scaley, angle):
-    lib.TCOD_image_blit(image, _cdata(console), x, y, bkgnd_flag,
+    lib.TCOD_image_blit(_cdata(image), _cdata(console), x, y, bkgnd_flag,
                          scalex, scaley, angle)
 
 def image_blit_rect(image, console, x, y, w, h, bkgnd_flag):
-    lib.TCOD_image_blit_rect(image, _cdata(console), x, y, w, h, bkgnd_flag)
+    lib.TCOD_image_blit_rect(_cdata(image), _cdata(console),
+                             x, y, w, h, bkgnd_flag)
 
 def image_blit_2x(image, console, dx, dy, sx=0, sy=0, w=-1, h=-1):
-    lib.TCOD_image_blit_2x(image, _cdata(console), dx,dy,sx,sy,w,h)
+    lib.TCOD_image_blit_2x(_cdata(image), _cdata(console), dx,dy,sx,sy,w,h)
 
 def image_save(image, filename):
-    lib.TCOD_image_save(image, _bytes(filename))
+    lib.TCOD_image_save(_cdata(image), _bytes(filename))
 
 def image_delete(image):
     pass
@@ -1843,26 +1855,10 @@ def sys_register_SDL_renderer(callback):
         lib.TCOD_sys_register_SDL_renderer(lib._pycall_sdl_hook)
 
 def sys_check_for_event(mask, k, m):
-    """Check for events.
-
-    mask can be any of the following:
-
-    * tcod.EVENT_NONE
-    * tcod.EVENT_KEY_PRESS
-    * tcod.EVENT_KEY_RELEASE
-    * tcod.EVENT_KEY
-    * tcod.EVENT_MOUSE_MOVE
-    * tcod.EVENT_MOUSE_PRESS
-    * tcod.EVENT_MOUSE_RELEASE
-    * tcod.EVENT_MOUSE
-    * tcod.EVENT_FINGER_MOVE
-    * tcod.EVENT_FINGER_PRESS
-    * tcod.EVENT_FINGER_RELEASE
-    * tcod.EVENT_FINGER
-    * tcod.EVENT_ANY
+    """Check for and return an event.
 
     Args:
-        mask (int): Event types to wait for.
+        mask (int): :any:`Event types` to wait for.
         k (Optional[Key]): A tcod.Key instance which might be updated with
                            an event.  Can be None.
         m (Optional[Mouse]): A tcod.Mouse instance which might be updated
@@ -1871,29 +1867,13 @@ def sys_check_for_event(mask, k, m):
     return lib.TCOD_sys_check_for_event(mask, _cdata(k), _cdata(m))
 
 def sys_wait_for_event(mask, k, m, flush):
-    """Wait for events.
-
-    mask can be any of the following:
-
-    * tcod.EVENT_NONE
-    * tcod.EVENT_KEY_PRESS
-    * tcod.EVENT_KEY_RELEASE
-    * tcod.EVENT_KEY
-    * tcod.EVENT_MOUSE_MOVE
-    * tcod.EVENT_MOUSE_PRESS
-    * tcod.EVENT_MOUSE_RELEASE
-    * tcod.EVENT_MOUSE
-    * tcod.EVENT_FINGER_MOVE
-    * tcod.EVENT_FINGER_PRESS
-    * tcod.EVENT_FINGER_RELEASE
-    * tcod.EVENT_FINGER
-    * tcod.EVENT_ANY
+    """Wait for an event then return.
 
     If flush is True then the buffer will be cleared before waiting. Otherwise
     each available event will be returned in the order they're recieved.
 
     Args:
-        mask (int): Event types to wait for.
+        mask (int): :any:`Event types` to wait for.
         k (Optional[Key]): A tcod.Key instance which might be updated with
                            an event.  Can be None.
         m (Optional[Mouse]): A tcod.Mouse instance which might be updated

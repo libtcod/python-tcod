@@ -5,8 +5,13 @@ API Reference
 Console
 -------
 
+.. autofunction:: tcod.console_set_custom_font
+.. autofunction:: tcod.console_init_root
+.. autofunction:: tcod.console_flush
+
 .. autoclass:: tcod.Console(width, height)
     :members:
+
 
 BSP
 ---
@@ -26,6 +31,9 @@ Image
 .. autoclass:: tcod.Image(width, height)
     :members:
 
+.. autofunction:: tcod.image_load
+.. autofunction:: tcod.image_from_console
+
 Event
 -----
 
@@ -37,6 +45,36 @@ Event
 
 .. autofunction:: tcod.clipboard_set
 .. autofunction:: tcod.clipboard_get
+
+.. _event types:
+
+Event Types
+~~~~~~~~~~~
+
+.. data:: tcod.EVENT_NONE
+.. data:: tcod.EVENT_KEY_PRESS
+.. data:: tcod.EVENT_KEY_RELEASE
+.. data:: tcod.EVENT_KEY
+
+    Same as ``tcod.EVENT_KEY_PRESS | tcod.EVENT_KEY_RELEASE``
+
+.. data:: tcod.EVENT_MOUSE_MOVE
+.. data:: tcod.EVENT_MOUSE_PRESS
+.. data:: tcod.EVENT_MOUSE_RELEASE
+.. data:: tcod.EVENT_MOUSE
+
+    Same as ``tcod.EVENT_MOUSE_MOVE | tcod.EVENT_MOUSE_PRESS | tcod.EVENT_MOUSE_RELEASE``
+
+.. data:: tcod.EVENT_FINGER_MOVE
+.. data:: tcod.EVENT_FINGER_PRESS
+.. data:: tcod.EVENT_FINGER_RELEASE
+.. data:: tcod.EVENT_FINGER
+
+    Same as ``tcod.EVENT_FINGER_MOVE | tcod.EVENT_FINGER_PRESS | tcod.EVENT_FINGER_RELEASE``
+
+.. data:: tcod.EVENT_ANY
+
+    Same as ``tcod.EVENT_KEY | tcod.EVENT_MOUSE | tcod.EVENT_FINGER``
 
 bsp
 ---
@@ -88,7 +126,6 @@ console
 .. autofunction:: tcod.console_fill_background
 .. autofunction:: tcod.console_fill_char
 .. autofunction:: tcod.console_fill_foreground
-.. autofunction:: tcod.console_flush
 .. autofunction:: tcod.console_from_file
 .. autofunction:: tcod.console_get_alignment
 .. autofunction:: tcod.console_get_background_flag
@@ -103,7 +140,6 @@ console
 .. autofunction:: tcod.console_get_height_rect
 .. autofunction:: tcod.console_get_width
 .. autofunction:: tcod.console_hline
-.. autofunction:: tcod.console_init_root
 .. autofunction:: tcod.console_is_fullscreen
 .. autofunction:: tcod.console_is_key_pressed
 .. autofunction:: tcod.console_is_window_closed
@@ -129,7 +165,6 @@ console
 .. autofunction:: tcod.console_set_char_background
 .. autofunction:: tcod.console_set_char_foreground
 .. autofunction:: tcod.console_set_color_control
-.. autofunction:: tcod.console_set_custom_font
 .. autofunction:: tcod.console_set_default_background
 .. autofunction:: tcod.console_set_default_foreground
 .. autofunction:: tcod.console_set_fade
@@ -226,7 +261,6 @@ image
 .. autofunction:: tcod.image_blit_rect
 .. autofunction:: tcod.image_clear
 .. autofunction:: tcod.image_delete
-.. autofunction:: tcod.image_from_console
 .. autofunction:: tcod.image_get_alpha
 .. autofunction:: tcod.image_get_mipmap_pixel
 .. autofunction:: tcod.image_get_pixel
@@ -234,7 +268,6 @@ image
 .. autofunction:: tcod.image_hflip
 .. autofunction:: tcod.image_invert
 .. autofunction:: tcod.image_is_pixel_transparent
-.. autofunction:: tcod.image_load
 .. autofunction:: tcod.image_new
 .. autofunction:: tcod.image_put_pixel
 .. autofunction:: tcod.image_refresh_console

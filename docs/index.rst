@@ -12,8 +12,6 @@ Welcome to libtcod-cffi's documentation!
 
 Contents:
 
-Hello World
-
 .. toctree::
    :maxdepth: 2
 
