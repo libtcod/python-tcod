@@ -76,6 +76,12 @@ Event Types
 
     Same as ``tcod.EVENT_KEY | tcod.EVENT_MOUSE | tcod.EVENT_FINGER``
 
+Random
+------
+
+.. autoclass:: tcod.Random(seed, algorithm)
+   :members:
+
 bsp
 ---
 
