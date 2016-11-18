@@ -566,7 +566,8 @@ class _BaseConsole(object):
         self.draw_rect(x + width - 1, y, 1, height, char, fg, bg)
         self.draw_rect(x, y + height - 1, width, 1, char, fg, bg)
 
-    def blit(self, source, x=0, y=0, width=None, height=None, srcX=0, srcY=0):
+    def blit(self, source, x=0, y=0, width=None, height=None, srcX=0, srcY=0,
+             fg_alpha=1.0, bg_alpha=1.0):
         """Blit another console or Window onto the current console.
 
         By default it blits the entire source to the topleft corner.
@@ -595,10 +596,6 @@ class _BaseConsole(object):
         @type srcY: int
         @param srcY: The source consoles y coordinate to blit from.
         """
-        # hardcode alpha settings for now
-        fgalpha=1.0
-        bgalpha=1.0
-
         assert isinstance(source, (Console, Window)), "source muse be a Window or Console instance"
 
         # handle negative indexes and rects
@@ -620,13 +617,13 @@ class _BaseConsole(object):
             tmp = Console(width, height)
             _lib.TCOD_console_blit(source.tcod_console,
                                    srcX, srcY, width, height,
-                                   tmp.tcod_console, 0, 0, fgalpha, bgalpha)
+                                   tmp.tcod_console, 0, 0, fg_alpha, bg_alpha)
             _lib.TCOD_console_blit(tmp.tcod_console, 0, 0, width, height,
-                                   self.tcod_console, x, y, fgalpha, bgalpha)
+                                   self.tcod_console, x, y, fg_alpha, bg_alpha)
         else:
             _lib.TCOD_console_blit(source.tcod_console,
                                    srcX, srcY, width, height,
-                                   self.tcod_console, x, y, fgalpha, bgalpha)
+                                   self.tcod_console, x, y, fg_alpha, bg_alpha)
 
     def get_cursor(self):
         """Return the virtual cursor position.
