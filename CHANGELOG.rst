@@ -1,6 +1,9 @@
 ===========
  Changelog
 ===========
+1.6.0
+ * Console.blit methods can now take fg_alpha and bg_alpha parameters.
+
 1.5.3
  * set_font no longer crashes when loading a file without the implied font size in its name
 
