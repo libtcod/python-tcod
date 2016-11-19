@@ -28,6 +28,7 @@ before_script:
  - pip install nose2 cov-core
 script:
  - python -c "import tdl"
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then nose2; fi
 after_success:
  - pip install -U wheel twine
  - python setup.py sdist bdist_wheel
