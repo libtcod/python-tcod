@@ -23,12 +23,11 @@ before_install:
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi'
 install:
  - pip install -U pip
- - python setup.py install
+ - pip install .
 before_script:
  - pip install nose2 cov-core
 script:
- - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then nose2; fi
- - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python -c "import tdl"; fi
+ - python -c "import tdl"
 after_success:
  - pip install -U wheel
  - python setup.py sdist bdist_wheel
