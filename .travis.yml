@@ -23,13 +23,14 @@ before_install:
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi'
 install:
  - pip install -U pip
- - pip install .
+ - pip install -e .
 before_script:
  - pip install nose2 cov-core
 script:
  - python -c "import tdl"
  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then nose2; fi
 after_success:
- - pip install -U wheel twine
+ - pip install -U python-coveralls wheel twine
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then coveralls; fi
  - python setup.py sdist bdist_wheel
  - if [[ -n "$TRAVIS_TAG" ]]; then twine upload -u $pypi_user -p $pypi_pass --skip-existing dist/*; fi
