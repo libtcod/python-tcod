@@ -29,6 +29,6 @@ before_script:
 script:
  - python -c "import tdl"
 after_success:
- - pip install -U wheel
+ - pip install -U wheel twine
  - python setup.py sdist bdist_wheel
- - if [[ -n "$TRAVIS_TAG" ]]; then python -m twine upload -u $pypi_user -p $pypi_pass --skip-existing dist/*; fi
+ - if [[ -n "$TRAVIS_TAG" ]]; then twine upload -u $pypi_user -p $pypi_pass --skip-existing dist/*; fi
