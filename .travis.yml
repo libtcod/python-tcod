@@ -31,4 +31,4 @@ script:
 after_success:
  - pip install -U wheel
  - python setup.py sdist bdist_wheel
- - $DEPLOY
+ - if [[ -n "$TRAVIS_TAG" ]]; then python -m twine upload -u $pypi_user -p $pypi_pass --skip-existing dist/*; fi
