@@ -59,6 +59,7 @@ if _os.environ.get('READTHEDOCS'):
     BKGND_DEFAULT = 13
     KEY_RELEASED = 2
     NOISE_DEFAULT = 0
+    NOISE_SIMPLEX = 2
 else:
     from tcod._libtcod import lib, ffi
 

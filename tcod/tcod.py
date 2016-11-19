@@ -1133,6 +1133,101 @@ class Random(_CDataWrapper):
     #def restore(self, backup):
     #    lib.TCOD_random_restore(self.cdata, backup)
 
+class Noise(_CDataWrapper):
+    """
+    .. versionadded:: 2.0
+
+    Args:
+        dimentions (int): Must be from 1 to 4.
+        noise_type (int): Defaults to NOISE_SIMPLEX
+        hurst (float):
+        lacunarity (float):
+        rand (Optional[Random]):
+    """
+    def __init__(self, *args, **kargs):
+        self.octants = 4
+        self._index_ctype = 'float[4]'
+        self._cdata_random = None # keep alive the random cdata instance
+        self._noise_type = None
+        self._dimentions = None
+        self._hurst = None
+        self._lacunarity = None
+        super(Noise, self).__init__(*args, **kargs)
+        if not self.cdata:
+            self._init(*args, **kargs)
+
+    def _init(self, dimentions, noise_type=2,
+              hurst=0.5, lacunarity=2.0,
+              octants=4, rand=None):
+        self._cdata_random = _cdata(rand)
+        self._noise_type = noise_type
+        self._dimentions = dimentions
+        self._hurst = hurst
+        self._lacunarity = lacunarity
+        self.octants = octants
+        self._index_ctype = 'float[%i]' % dimentions
+        self._regenerate_noise()
+
+    def _regenerate_noise(self):
+        self.cdata = ffi.gc(lib.TCOD_noise_new(self._dimentions, self._hurst,
+                                               self._lacunarity,
+                                               self._cdata_random),
+                            lib.TCOD_noise_delete)
+
+    @property
+    def noise_type(self):
+        return self._noise_type
+    @noise_type.setter
+    def noise_type(self, value):
+        self._noise_type = value
+        lib.TCOD_noise_set_type(self.cdata, value)
+
+    @property
+    def dimentions(self):
+        return self._dimentions
+    @dimentions.setter
+    def dimentions(self, value):
+        self._dimentions = value
+        self._index_ctype = 'float[%i]' % value
+        self._regenerate_noise()
+
+    @property
+    def hurst(self):
+        return self._hurst
+    @hurst.setter
+    def hurst(self, value):
+        self._hurst = value
+        self._regenerate_noise()
+
+    @property
+    def lacunarity(self):
+        return self._lacunarity
+    @hurst.setter
+    def lacunarity(self, value):
+        self._lacunarity = value
+        self._regenerate_noise()
+
+    def get_noise(self, *xyzw):
+        """Return the noise value at the xyzw point.
+
+        Args:
+            xyzw (float):
+        """
+        return lib.TCOD_noise_get(self.cdata, ffi.new(self._index_ctype, xyzw))
+
+    def get_fbm(self, *xyzw):
+        """Returh the fractional Brownian motion at the xyzw point.
+        """
+        return lib.TCOD_noise_get_fbm(self.cdata,
+                                      ffi.new(self._index_ctype, xyzw),
+                                      self.octants)
+
+    def get_turbulence(self, *xyzw):
+        """Return the turbulence value at the xyzw point.
+        """
+        return lib.TCOD_noise_get_turbulence(self.cdata,
+                                             ffi.new(self._index_ctype, xyzw),
+                                             self.octants)
 
 def clipboard_set(string):
     """Set the clipboard contents to string.
