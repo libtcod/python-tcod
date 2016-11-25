@@ -30,7 +30,9 @@ script:
  - python -c "import tdl"
  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then nose2; fi
 after_success:
- - pip install -U python-coveralls wheel twine
+ - pip install -U codacy-coverage python-coveralls wheel twine
  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then coveralls; fi
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then coverage xml; fi
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then python-codacy-coverage -r coverage.xml; fi
  - python setup.py sdist bdist_wheel
  - if [[ -n "$TRAVIS_TAG" ]]; then twine upload -u $pypi_user -p $pypi_pass --skip-existing dist/*; fi
