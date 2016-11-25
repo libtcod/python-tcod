@@ -133,11 +133,11 @@ class Noise(object):
 
     def __copy__(self):
         # using the pickle method is a convenient way to clone this object
-        self.__class__(self.__getstate__())
+        return self.__class__(*self.__getstate__())
 
     def __getstate__(self):
         return (self._algorithm, self._mode,
-                self._hurst.value, self._lacunarity.value, self._octaves.value,
+                self._hurst, self._lacunarity, self._octaves,
                 self._seed, self._dimensions)
 
     def __setstate__(self, state):
