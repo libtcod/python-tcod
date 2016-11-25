@@ -1,6 +1,13 @@
 .. contents::
    :backlinks: top
 
+========
+ Status
+========
+|VersionsBadge| |ImplementationBadge| |LicenseBadge|
+
+|PyPI| |RTD| |Travis| |Coveralls|
+
 ==============
  Installation
 ==============
@@ -46,3 +53,26 @@ http://roguecentral.org/doryen/libtcod/
 =========
 python-tdl is distributed under the Simplified 2-clause FreeBSD license.
 Read LICENSE.txt for more details.
+
+.. |VersionsBadge| image:: https://img.shields.io/pypi/pyversions/tdl.svg?maxAge=2592000
+    :target: https://pypi.python.org/pypi/tdl
+
+.. |ImplementationBadge| image:: https://img.shields.io/pypi/implementation/tdl.svg?maxAge=2592000
+    :target: https://pypi.python.org/pypi/tdl
+
+.. |LicenseBadge| image:: https://img.shields.io/pypi/l/tdl.svg?maxAge=2592000
+    :target: https://github.com/HexDecimal/tdl/blob/master/LICENSE.txt
+
+
+.. |PyPI| image:: https://img.shields.io/pypi/v/tdl.svg?maxAge=10800
+    :target: https://pypi.python.org/pypi/tdl
+
+.. |RTD| image:: https://readthedocs.org/projects/python-tdl/badge/?version=latest
+    :target: http://python-tdl.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
+.. |Travis| image:: https://travis-ci.org/HexDecimal/python-tdl.svg?branch=master
+    :target: https://travis-ci.org/HexDecimal/python-tdl
+
+.. |Coveralls| image:: https://coveralls.io/repos/github/HexDecimal/python-tdl/badge.svg?branch=master
+    :target: https://coveralls.io/github/HexDecimal/python-tdl?branch=master
