@@ -4,6 +4,7 @@
 #include <libtcod.h>
 #include <wrappers.h>
 
+void SDL_main(void){};
 void CustomSDLMain(void){}; /* CustomSDLMain stub for Mac build */
 
 TCOD_value_t TDL_list_get_union(TCOD_list_t l,int idx){
@@ -157,7 +158,7 @@ void TDL_map_data_from_buffer(TCOD_map_t map, uint8 *buffer){
     int height=TCOD_map_get_height(map);
     int x;
     int y;
-    
+
     int i = width*height-1;
     int16 data;
     for(y=height-1;y>=0;y--){
@@ -190,7 +191,7 @@ void TDL_map_fov_to_buffer(TCOD_map_t map, uint8 *buffer,
 }
 
 // set functions are called conditionally for ch/fg/bg (-1 is ignored)/
-// colors are converted to TCOD_color_t types in C and is much faster than in 
+// colors are converted to TCOD_color_t types in C and is much faster than in
 // Python.
 // Also Python indexing is used, negative x/y will index to (width-x, etc.)
 int TDL_console_put_char_ex(TCOD_console_t console, int x, int y,
@@ -198,15 +199,15 @@ int TDL_console_put_char_ex(TCOD_console_t console, int x, int y,
     int width=TCOD_console_get_width(console);
     int height=TCOD_console_get_height(console);
     TCOD_color_t color;
-    
+
     if(x < -width || x >= width || y < -height || y >= height){
         return -1; // outside of console
     }
-    
+
     // normalize x, y
     if(x<0){x += width;};
     if(y<0){y += height;};
-    
+
     if(ch != -1){
         TCOD_console_set_char(console, x, y, ch);
     }

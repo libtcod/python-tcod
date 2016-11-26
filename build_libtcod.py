@@ -3,9 +3,10 @@
 import os
 import sys
 
+from cffi import FFI
+import subprocess
 import platform
 from pycparser import c_parser, c_ast, parse_file, c_generator
-from cffi import FFI
 
 BITSIZE, LINKAGE = platform.architecture()
 
@@ -24,13 +25,13 @@ def find_sources(directory):
 module_name = 'tcod._libtcod'
 include_dirs = [
                 'tcod/',
-                'Release/tcod/',
                 'libtcod/include/',
                 'libtcod/src/png/',
                 'libtcod/src/zlib/',
                 '/usr/include/SDL2/',
                 ]
 
+extra_parse_args = []
 extra_compile_args = []
 extra_link_args = []
 sources = []
@@ -75,6 +76,15 @@ if sys.platform in ['win32', 'darwin']:
 if sys.platform in ['win32', 'darwin']:
     include_dirs += ['libtcod/src/zlib/']
 
+if sys.platform != 'win32':
+    extra_parse_args += subprocess.check_output(['sdl2-config', '--cflags'],
+                                              universal_newlines=True
+                                              ).strip().split()
+    extra_compile_args += extra_parse_args
+    extra_link_args += subprocess.check_output(['sdl2-config', '--libs'],
+                                               universal_newlines=True
+                                               ).strip().split()
+
 class CustomPostParser(c_ast.NodeVisitor):
 
     def __init__(self):
@@ -90,28 +100,42 @@ class CustomPostParser(c_ast.NodeVisitor):
     def visit_Typedef(self, node):
         start_node = node
         if node.name in ['wchar_t', 'size_t']:
-            self.ast.ext.remove(node) # remove wchar_t placeholder
+            # remove fake typedef placeholders
+            self.ast.ext.remove(node)
         else:
             self.generic_visit(node)
             if node.name in self.typedefs:
-                print('%s redefined' % node.name)
+                print('warning: %s redefined' % node.name)
+                self.ast.ext.remove(node)
             self.typedefs.append(node.name)
 
     def visit_EnumeratorList(self, node):
-        """Replace enumerator expressions with stubs."""
+        """Replace enumerator expressions with '...' stubs."""
         for type, enum in node.children():
             if enum.value is None:
                 pass
-            elif isinstance(enum.value, c_ast.BinaryOp):
+            elif isinstance(enum.value, (c_ast.BinaryOp, c_ast.UnaryOp)):
                 enum.value = c_ast.Constant('int', '...')
-            else:
+            elif hasattr(enum.value, 'type'):
                 enum.value = c_ast.Constant(enum.value.type, '...')
 
-    def visit_FuncDecl(self, node):
-        pass
+    def visit_Decl(self, node):
+        if node.name is None:
+            self.generic_visit(node)
+        elif (node.name and 'vsprint' in node.name or
+              node.name in ['SDL_vsscanf',
+                            'SDL_vsnprintf',
+                            'SDL_LogMessageV']):
+            # exclude va_list related functions
+            self.ast.ext.remove(node)
+        elif node.name in ['screen']:
+            # exclude outdated 'extern SDL_Surface* screen;' line
+            self.ast.ext.remove(node)
+        else:
+            self.generic_visit(node)
 
     def visit_FuncDef(self, node):
-        """Remvoe function definitions."""
+        """Exclude function definitions.  Should be declarations only."""
         self.ast.ext.remove(node)
 
 def get_cdef():
@@ -119,14 +143,12 @@ def get_cdef():
     return generator.visit(get_ast())
 
 def get_ast():
+    global extra_parse_args
     if 'win32' in sys.platform:
-        sdl_include = r'-Idependencies/SDL2-2.0.4/include'
-    else:
-        sdl_include = r'-I/usr/include/SDL2'
+        extra_parse_args += [r'-Idependencies/SDL2-2.0.4/include']
     ast = parse_file(filename='tcod/tcod.h', use_cpp=True,
                      cpp_args=[r'-Idependencies/fake_libc_include',
                                r'-Ilibtcod/include',
-                               sdl_include,
                                r'-DDECLSPEC=',
                                r'-DSDLCALL=',
                                r'-DTCODLIB_API=',
@@ -135,31 +157,16 @@ def get_ast():
                                r'-DNO_OPENGL',
                                r'-DSDL_FORCE_INLINE=',
                                r'-U__GNUC__',
+                               r'-D_SDL_assert_h',
                                r'-D_SDL_thread_h',
                                r'-DDOXYGEN_SHOULD_IGNORE_THIS',
-                               r'-DSDL_MAIN_HANDLED',
-                               ])
-    return CustomPostParser().parse(ast)
-
-def resolve_ast(ast, consts):
-    if isinstance(ast, c_ast.Constant):
-        return int(ast.value)
-    elif isinstance(ast, c_ast.ID):
-        return consts[ast.name]
-    elif isinstance(ast, c_ast.BinaryOp):
-        return resolve_ast(ast.left, consts) | resolve_ast(ast.right, consts)
-    else:
-        raise RuntimeError('Unexpected ast node: %r' % ast)
-
+                               r'-DMAC_OS_X_VERSION_MIN_REQUIRED=9999',
+                               ] + extra_parse_args)
+    ast = CustomPostParser().parse(ast)
+    return ast
 
 ffi = FFI()
-try:
-    ffi.cdef(get_cdef())
-except Exception as exc:
-    #print(dir(exc.args[1]))
-    #print(exc.args[1].children()[0][1].name)
-    #print(exc.args[1].show())
-    raise
+ffi.cdef(get_cdef())
 ffi.cdef('''
 extern "Python" {
     static bool pycall_parser_new_struct(TCOD_parser_struct_t str,const char *name);

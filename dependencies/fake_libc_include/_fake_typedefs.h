@@ -112,7 +112,6 @@ typedef int siginfo_t;
 typedef int z_stream;
 
 /* C99 exact-width integer types */
-/*
 typedef int int8_t;
 typedef int uint8_t;
 typedef int int16_t;
@@ -121,7 +120,7 @@ typedef int int32_t;
 typedef int uint32_t;
 typedef int int64_t;
 typedef int uint64_t;
-*/
+
 
 /* C99 minimum-width integer types */
 typedef int int_least8_t;
