@@ -1,7 +1,9 @@
 #ifndef _FAKE_DEFINES_H
 #define _FAKE_DEFINES_H
 
+#ifndef NULL
 #define	NULL	0
+#endif
 #define	BUFSIZ		1024
 #define	FOPEN_MAX	20
 #define	FILENAME_MAX	1024

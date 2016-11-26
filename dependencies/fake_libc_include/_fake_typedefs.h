@@ -4,6 +4,7 @@
 typedef int size_t;
 typedef int __builtin_va_list;
 typedef int __gnuc_va_list;
+/*
 typedef int __int8_t;
 typedef int __uint8_t;
 typedef int __int16_t;
@@ -14,6 +15,7 @@ typedef int __int32_t;
 typedef int __uint32_t;
 typedef int __int64_t;
 typedef int __uint64_t;
+*/
 typedef int __int_least32_t;
 typedef int __uint_least32_t;
 typedef int __s8;
@@ -110,6 +112,7 @@ typedef int siginfo_t;
 typedef int z_stream;
 
 /* C99 exact-width integer types */
+/*
 typedef int int8_t;
 typedef int uint8_t;
 typedef int int16_t;
@@ -118,6 +121,7 @@ typedef int int32_t;
 typedef int uint32_t;
 typedef int int64_t;
 typedef int uint64_t;
+*/
 
 /* C99 minimum-width integer types */
 typedef int int_least8_t;
@@ -141,12 +145,16 @@ typedef int uint_fast64_t;
 
 /* C99 integer types capable of holding object pointers */
 typedef int intptr_t;
+/*
 typedef int uintptr_t;
+*/
 
 /* C99 greatest-width integer types */
 typedef int intmax_t;
 typedef int uintmax_t;
 
+/*
 typedef int va_list;
+*/
 
 #endif

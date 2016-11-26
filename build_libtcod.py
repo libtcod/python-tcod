@@ -46,6 +46,7 @@ define_macros = [('LIBTCOD_EXPORTS', None),
                  ('TCOD_SDL2', None),
                  ('NO_OPENGL', None),
                  ('TCOD_NO_MACOSX_SDL_MAIN', None),
+                 ('_CRT_SECURE_NO_WARNINGS', None),
                  ]
 
 sources += find_sources('tcod/')
@@ -74,40 +75,71 @@ if sys.platform in ['win32', 'darwin']:
 if sys.platform in ['win32', 'darwin']:
     include_dirs += ['libtcod/src/zlib/']
 
+class CustomPostParser(c_ast.NodeVisitor):
+
+    def __init__(self):
+        self.ast = None
+        self.typedefs = None
+
+    def parse(self, ast):
+        self.ast = ast
+        self.typedefs = []
+        self.visit(ast)
+        return ast
+
+    def visit_Typedef(self, node):
+        start_node = node
+        if node.name in ['wchar_t', 'size_t']:
+            self.ast.ext.remove(node) # remove wchar_t placeholder
+        else:
+            self.generic_visit(node)
+            if node.name in self.typedefs:
+                print('%s redefined' % node.name)
+            self.typedefs.append(node.name)
+
+    def visit_EnumeratorList(self, node):
+        """Replace enumerator expressions with stubs."""
+        for type, enum in node.children():
+            if enum.value is None:
+                pass
+            elif isinstance(enum.value, c_ast.BinaryOp):
+                enum.value = c_ast.Constant('int', '...')
+            else:
+                enum.value = c_ast.Constant(enum.value.type, '...')
+
+    def visit_FuncDecl(self, node):
+        pass
+
+    def visit_FuncDef(self, node):
+        """Remvoe function definitions."""
+        self.ast.ext.remove(node)
+
 def get_cdef():
     generator = c_generator.CGenerator()
     return generator.visit(get_ast())
 
 def get_ast():
+    if 'win32' in sys.platform:
+        sdl_include = r'-Idependencies/SDL2-2.0.4/include'
+    else:
+        sdl_include = r'-I/usr/include/SDL2'
     ast = parse_file(filename='tcod/tcod.h', use_cpp=True,
                      cpp_args=[r'-Idependencies/fake_libc_include',
                                r'-Ilibtcod/include',
+                               sdl_include,
                                r'-DDECLSPEC=',
                                r'-DSDLCALL=',
                                r'-DTCODLIB_API=',
                                r'-DTCOD_NO_MACOSX_SDL_MAIN=',
                                r'-DTCOD_SDL2=',
                                r'-DNO_OPENGL',
+                               r'-DSDL_FORCE_INLINE=',
+                               r'-U__GNUC__',
+                               r'-D_SDL_thread_h',
+                               r'-DDOXYGEN_SHOULD_IGNORE_THIS',
+                               r'-DSDL_MAIN_HANDLED',
                                ])
-    for node in list(ast.ext):
-        # resolve binary ops in TCOD_event_t enum
-        if not isinstance(node, c_ast.Typedef):
-            continue
-        if node.name in ['wchar_t', 'size_t']:
-            ast.ext.remove(node) # remove wchar_t placeholder
-        if node.name != 'TCOD_event_t':
-            continue
-
-        # get to enumerator list node
-        (type, node), = node.children()
-        (type, node), = node.children()
-        (type, node), = node.children()
-
-        consts = {}
-        for type, enum in node.children():
-            consts[enum.name] = value = resolve_ast(enum.value, consts)
-            enum.value = c_ast.Constant('int', str(value))
-    return ast
+    return CustomPostParser().parse(ast)
 
 def resolve_ast(ast, consts):
     if isinstance(ast, c_ast.Constant):
@@ -121,7 +153,13 @@ def resolve_ast(ast, consts):
 
 
 ffi = FFI()
-ffi.cdef(get_cdef())
+try:
+    ffi.cdef(get_cdef())
+except Exception as exc:
+    #print(dir(exc.args[1]))
+    #print(exc.args[1].children()[0][1].name)
+    #print(exc.args[1].show())
+    raise
 ffi.cdef('''
 extern "Python" {
     static bool pycall_parser_new_struct(TCOD_parser_struct_t str,const char *name);
