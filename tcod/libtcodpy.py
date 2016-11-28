@@ -12,7 +12,7 @@ from tcod.tcod import _bytes, _unicode, _fmt_bytes, _fmt_unicode
 from tcod.tcod import _CDataWrapper
 from tcod.tcod import _PropagateException
 from tcod.tcod import BSP as Bsp
-from tcod.tcod import Key, Mouse, HeightMap, Console, Image
+from tcod.tcod import Key, Mouse, HeightMap, Console, Image, Map
 
 class ConsoleBuffer(object):
     """Simple console that allows direct (fast) access to cells. simplifies
@@ -1013,7 +1013,7 @@ def _pycall_path_func(x1, y1, x2, y2, handle):
         return None
 
 def path_new_using_map(m, dcost=1.41):
-    return (ffi.gc(lib.TCOD_path_new_using_map(m, dcost),
+    return (ffi.gc(lib.TCOD_path_new_using_map(_cdata(m), dcost),
                     lib.TCOD_path_delete), _PropagateException())
 
 def path_new_using_function(w, h, func, userData=0, dcost=1.41):
@@ -1065,7 +1065,7 @@ def path_delete(p):
     pass
 
 def dijkstra_new(m, dcost=1.41):
-    return (ffi.gc(lib.TCOD_dijkstra_new(m, dcost),
+    return (ffi.gc(lib.TCOD_dijkstra_new(_cdata(m), dcost),
                     lib.TCOD_dijkstra_delete), _PropagateException())
 
 def dijkstra_new_using_function(w, h, func, userData=0, dcost=1.41):
@@ -1406,37 +1406,39 @@ FOV_RESTRICTIVE = 12
 NB_FOV_ALGORITHMS = 13
 
 def map_new(w, h):
-    return ffi.gc(lib.TCOD_map_new(w, h), lib.TCOD_map_delete)
+    return Map(w, h)
 
 def map_copy(source, dest):
-    return lib.TCOD_map_copy(source, dest)
+    return lib.TCOD_map_copy(_cdata(source), _cdata(dest))
 
 def map_set_properties(m, x, y, isTrans, isWalk):
-    lib.TCOD_map_set_properties(m, x, y, isTrans, isWalk)
+    lib.TCOD_map_set_properties(_cdata(m), x, y, isTrans, isWalk)
 
 def map_clear(m,walkable=False,transparent=False):
-    lib.TCOD_map_clear(m, walkable, transparent)
+    # walkable/transparent looks incorrectly ordered here.
+    # TODO: needs test.
+    lib.TCOD_map_clear(_cdata(m), walkable, transparent)
 
 def map_compute_fov(m, x, y, radius=0, light_walls=True, algo=FOV_RESTRICTIVE ):
-    lib.TCOD_map_compute_fov(m, x, y, radius, light_walls, algo)
+    lib.TCOD_map_compute_fov(_cdata(m), x, y, radius, light_walls, algo)
 
 def map_is_in_fov(m, x, y):
-    return lib.TCOD_map_is_in_fov(m, x, y)
+    return lib.TCOD_map_is_in_fov(_cdata(m), x, y)
 
 def map_is_transparent(m, x, y):
-    return lib.TCOD_map_is_transparent(m, x, y)
+    return lib.TCOD_map_is_transparent(_cdata(m), x, y)
 
 def map_is_walkable(m, x, y):
-    return lib.TCOD_map_is_walkable(m, x, y)
+    return lib.TCOD_map_is_walkable(_cdata(m), x, y)
 
 def map_delete(m):
     pass
 
 def map_get_width(map):
-    return lib.TCOD_map_get_width(map)
+    return map.width
 
 def map_get_height(map):
-    return lib.TCOD_map_get_height(map)
+    return map.height
 
 def mouse_show_cursor(visible):
     lib.TCOD_mouse_show_cursor(visible)
