@@ -4,7 +4,6 @@ python:
  - "3.3"
  - "3.4"
  - "3.5"
- - "3.5-dev"
  - "3.6-dev"
 matrix:
   include:
@@ -12,22 +11,21 @@ matrix:
     language: generic
     python: "2"
     env: PYTHON=python
-  - os: osx
-    language: generic
-    python: "3"
-    env: PYTHON=python3
 
   allow_failures:
-  - os: osx
-    python: pypy
-  - os: osx
-    python: pypy3
-  - os: linux
-    python: pypy
-  - os: linux
-    python: pypy3
-  - python: "3.5-dev"
   - python: "3.6-dev"
+  - os: osx
+    python: pypy
+  - os: osx
+    python: pypy3
+  - os: linux
+    python: pypy
+  - os: linux
+    python: pypy3
+  - os: osx
+    language: generic
+    python: "2"
+    env: PYTHON=python
 
   fast_finish: true
 
