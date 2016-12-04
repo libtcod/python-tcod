@@ -1013,47 +1013,134 @@ def _pycall_path_func(x1, y1, x2, y2, handle):
         return None
 
 def path_new_using_map(m, dcost=1.41):
+    """Return a new AStar using the given Map.
+
+    Args:
+        m (Map): A Map instance.
+        dcost (float): The path-finding cost of diagonal movement.
+                       Can be set to 0 to disable diagonal movement.
+    Returns:
+        AStar: A new AStar instance.
+    """
     return (ffi.gc(lib.TCOD_path_new_using_map(_cdata(m), dcost),
                     lib.TCOD_path_delete), _PropagateException())
 
 def path_new_using_function(w, h, func, userData=0, dcost=1.41):
+    """Return a new AStar using the given callable function.
+
+    Args:
+        w (int): Clipping width.
+        h (int): Clipping height.
+        func (Callable[[int, int, int, int, Any], float]):
+        userData (Any):
+        dcost (float): A multiplier for the cost of diagonal movement.
+                       Can be set to 0 to disable diagonal movement.
+    Returns:
+        AStar: A new AStar instance.
+    """
     propagator = _PropagateException()
     handle = ffi.new_handle((func, propagator, (userData,)))
     return (ffi.gc(lib.TCOD_path_new_using_function(w, h, lib._pycall_path_func,
             handle, dcost), lib.TCOD_path_delete), propagator, handle)
 
 def path_compute(p, ox, oy, dx, dy):
+    """Find a path from (ox, oy) to (dx, dy).  Return True if path is found.
+
+    Args:
+        p (AStar): An AStar instance.
+        ox (int): Starting x position.
+        oy (int): Starting y position.
+        dx (int): Destination x position.
+        dy (int): Destination y position.
+    Returns:
+        bool: True if a valid path was found.  Otherwise False.
+    """
     with p[1]:
         return lib.TCOD_path_compute(p[0], ox, oy, dx, dy)
 
 def path_get_origin(p):
+    """Get the current origin position.
+
+    This point will moves as the :any:`path_walk` iterator is exhausted.
+
+    Args:
+        p (AStar): An AStar instance.
+    Returns:
+        Tuple[int, int]: An (x, y) point.
+    """
     x = ffi.new('int *')
     y = ffi.new('int *')
     lib.TCOD_path_get_origin(p[0], x, y)
     return x[0], y[0]
 
 def path_get_destination(p):
+    """Get the current destination position.
+
+    Args:
+        p (AStar): An AStar instance.
+    Returns:
+        Tuple[int, int]: An (x, y) point.
+    """
     x = ffi.new('int *')
     y = ffi.new('int *')
     lib.TCOD_path_get_destination(p[0], x, y)
     return x[0], y[0]
 
 def path_size(p):
+    """Return the current length of the computed path.
+
+    Args:
+        p (AStar): An AStar instance.
+    Returns:
+        int: Length of the path.
+    """
     return lib.TCOD_path_size(p[0])
 
 def path_reverse(p):
+    """Reverse the direction of a path.
+
+    This effectively swaps the origin and destination points.
+
+    Args:
+        p (AStar): An AStar instance.
+    """
     lib.TCOD_path_reverse(p[0])
 
 def path_get(p, idx):
+    """Get a point on a path.
+
+    Args:
+        p (AStar): An AStar instance.
+        idx (int): Should be in range: 0 <= inx < :any:`path_size`
+    """
     x = ffi.new('int *')
     y = ffi.new('int *')
     lib.TCOD_path_get(p[0], idx, x, y)
     return x[0], y[0]
 
 def path_is_empty(p):
+    """Return True if a path is empty.
+
+    Args:
+        p (AStar): An AStar instance.
+    Returns:
+        bool: True if a path is empty.  Otherwise False.
+    """
     return lib.TCOD_path_is_empty(p[0])
 
 def path_walk(p, recompute):
+    """Return the next (x, y) point in a path, or (None, None) if it's empty.
+
+    When ``recompute`` is True and a previously valid path reaches a point
+    where it is now blocked, a new path will automatically be found.
+
+    Args:
+        p (AStar): An AStar instance.
+        recompute (bool): Recompute the path automatically.
+    Returns:
+        Union[Tuple[int, int], Tuple[None, None]]:
+            A single (x, y) point, or (None, None)
+    """
     x = ffi.new('int *')
     y = ffi.new('int *')
     with p[1]:
@@ -1062,6 +1149,7 @@ def path_walk(p, recompute):
     return None,None
 
 def path_delete(p):
+    """Does nothing."""
     pass
 
 def dijkstra_new(m, dcost=1.41):
