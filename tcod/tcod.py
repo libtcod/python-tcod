@@ -1283,12 +1283,13 @@ class Map(_CDataWrapper):
     def is_walkable(self, x, y):
         return lib.TCOD_map_is_walkable(self.cdata, x, y)
 
-class AStar(object):
+
+class _PathFinder(object):
     """
     .. versionadded:: 2.0
     """
 
-    def _init(self, map_data, diagonal_cost=1.41):
+    def __init__(self, map_data, diagonal_cost=1.41):
         self._cdata = None
         self._map_data = map_data
         self._diagonal_cost = diagonal_cost
@@ -1298,31 +1299,40 @@ class AStar(object):
         self._width = None
         self._height = None
 
+    _path_new_using_map = lib.TCOD_path_new_using_map
+    _path_new_using_function = lib.TCOD_path_new_using_function
+    _path_delete = lib.TCOD_path_delete
+
     @property
     def cdata(self):
-        if self._cdata:
+        if self._cdata is None:
             self._cdata = self._init_cdata()
         return self._cdata
 
     def _init_cdata(self):
-        if callable(self.map_data):
-            self._handle = ffi.new_handle((self._map_data, self._propagator,
-                                           self._callback_args))
-            return ffi.gc(lib.TCOD_path_new_using_function(
+        if callable(self._map_data):
+            self._handle = ffi.new_handle(self)
+            return ffi.gc(self._path_new_using_function(
                               self._width, self._height,
                               lib._pycall_path_func, self._handle,
                               self._diagonal_cost),
-                          lib.TCOD_path_delete)
+                          self._path_delete)
 
-        if isinstance(self.map_data, Map):
-            self._width = self.map_data.width
-            self._height = self.map_data.height
-            return ffi.gc(lib.TCOD_path_new_using_map(self._map_data.cdata,
-                                                      diagonal_cost),
-                          lib.TCOD_path_delete)
+        if isinstance(self._map_data, Map):
+            self._width = self._map_data.width
+            self._height = self._map_data.height
+            return ffi.gc(self._path_new_using_map(self._map_data.cdata,
+                                                   self._diagonal_cost),
+                          self._path_delete)
 
         raise RuntimeError('map_data must be a callable/Map, not %r' %
-                           (self.map_data,))
+                           (self._map_data,))
+
+
+class AStar(_PathFinder):
+    """
+    .. versionadded:: 2.0
+    """
 
     def get_path(self, start_x, start_y, goal_x, goal_y):
         """Return a list of (x, y) steps to reach the goal point, if possible.
@@ -1338,11 +1348,22 @@ class AStar(object):
         """
         lib.TCOD_path_compute(self.cdata, start_x, start_y, goal_x, goal_y)
         path = []
-        xy = ffi.new('int *'), ffi.new('int *')
+        x, y = ffi.new('int *'), ffi.new('int *')
         with self._propagator:
             while lib.TCOD_path_walk(self.cdata, x, y, False):
                 path.append((x[0], y[0]))
         return path
+
+
+class Dijkstra(_PathFinder):
+    """
+    .. versionadded:: 2.0
+    """
+
+    _path_new_using_map = lib.TCOD_dijkstra_new
+    _path_new_using_function = lib.TCOD_dijkstra_new_using_function
+    _path_delete = lib.TCOD_dijkstra_delete
+
 
 def clipboard_set(string):
     """Set the clipboard contents to string.

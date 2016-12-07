@@ -12,7 +12,7 @@ from tcod.tcod import _bytes, _unicode, _fmt_bytes, _fmt_unicode
 from tcod.tcod import _CDataWrapper
 from tcod.tcod import _PropagateException
 from tcod.tcod import BSP as Bsp
-from tcod.tcod import Key, Mouse, HeightMap, Console, Image, Map
+from tcod.tcod import Key, Mouse, HeightMap, Console, Image, Map, AStar, Dijkstra
 
 class ConsoleBuffer(object):
     """Simple console that allows direct (fast) access to cells. simplifies
@@ -1005,11 +1005,11 @@ def console_save_apf(con, filename):
 def _pycall_path_func(x1, y1, x2, y2, handle):
     '''static float _pycall_path_func( int xFrom, int yFrom, int xTo, int yTo, void *user_data );
     '''
-    func, propagate_manager, user_data = ffi.from_handle(handle)
+    pathfinder = ffi.from_handle(handle)
     try:
-        return func(x1, y1, x2, y2, *user_data)
+        return pathfinder._map_data(x1, y1, x2, y2, *pathfinder._callback_args)
     except BaseException:
-        propagate_manager.propagate(*_sys.exc_info())
+        pathfinder._propagator.propagate(*_sys.exc_info())
         return None
 
 def path_new_using_map(m, dcost=1.41):
@@ -1022,8 +1022,7 @@ def path_new_using_map(m, dcost=1.41):
     Returns:
         AStar: A new AStar instance.
     """
-    return (ffi.gc(lib.TCOD_path_new_using_map(_cdata(m), dcost),
-                    lib.TCOD_path_delete), _PropagateException())
+    return AStar(m, dcost)
 
 def path_new_using_function(w, h, func, userData=0, dcost=1.41):
     """Return a new AStar using the given callable function.
@@ -1038,10 +1037,11 @@ def path_new_using_function(w, h, func, userData=0, dcost=1.41):
     Returns:
         AStar: A new AStar instance.
     """
-    propagator = _PropagateException()
-    handle = ffi.new_handle((func, propagator, (userData,)))
-    return (ffi.gc(lib.TCOD_path_new_using_function(w, h, lib._pycall_path_func,
-            handle, dcost), lib.TCOD_path_delete), propagator, handle)
+    pathfinder = AStar(func, dcost)
+    pathfinder._callback_args = (userData,)
+    pathfinder._height = h
+    pathfinder._width = w
+    return pathfinder
 
 def path_compute(p, ox, oy, dx, dy):
     """Find a path from (ox, oy) to (dx, dy).  Return True if path is found.
@@ -1055,13 +1055,13 @@ def path_compute(p, ox, oy, dx, dy):
     Returns:
         bool: True if a valid path was found.  Otherwise False.
     """
-    with p[1]:
-        return lib.TCOD_path_compute(p[0], ox, oy, dx, dy)
+    with p._propagator:
+        return lib.TCOD_path_compute(p.cdata, ox, oy, dx, dy)
 
 def path_get_origin(p):
     """Get the current origin position.
 
-    This point will moves as the :any:`path_walk` iterator is exhausted.
+    This point moves when :any:`path_walk` returns the next x,y step.
 
     Args:
         p (AStar): An AStar instance.
@@ -1070,7 +1070,7 @@ def path_get_origin(p):
     """
     x = ffi.new('int *')
     y = ffi.new('int *')
-    lib.TCOD_path_get_origin(p[0], x, y)
+    lib.TCOD_path_get_origin(p.cdata, x, y)
     return x[0], y[0]
 
 def path_get_destination(p):
@@ -1083,7 +1083,7 @@ def path_get_destination(p):
     """
     x = ffi.new('int *')
     y = ffi.new('int *')
-    lib.TCOD_path_get_destination(p[0], x, y)
+    lib.TCOD_path_get_destination(p.cdata, x, y)
     return x[0], y[0]
 
 def path_size(p):
@@ -1094,7 +1094,7 @@ def path_size(p):
     Returns:
         int: Length of the path.
     """
-    return lib.TCOD_path_size(p[0])
+    return lib.TCOD_path_size(p.cdata)
 
 def path_reverse(p):
     """Reverse the direction of a path.
@@ -1104,7 +1104,7 @@ def path_reverse(p):
     Args:
         p (AStar): An AStar instance.
     """
-    lib.TCOD_path_reverse(p[0])
+    lib.TCOD_path_reverse(p.cdata)
 
 def path_get(p, idx):
     """Get a point on a path.
@@ -1115,7 +1115,7 @@ def path_get(p, idx):
     """
     x = ffi.new('int *')
     y = ffi.new('int *')
-    lib.TCOD_path_get(p[0], idx, x, y)
+    lib.TCOD_path_get(p.cdata, idx, x, y)
     return x[0], y[0]
 
 def path_is_empty(p):
@@ -1126,7 +1126,7 @@ def path_is_empty(p):
     Returns:
         bool: True if a path is empty.  Otherwise False.
     """
-    return lib.TCOD_path_is_empty(p[0])
+    return lib.TCOD_path_is_empty(p.cdata)
 
 def path_walk(p, recompute):
     """Return the next (x, y) point in a path, or (None, None) if it's empty.
@@ -1143,8 +1143,8 @@ def path_walk(p, recompute):
     """
     x = ffi.new('int *')
     y = ffi.new('int *')
-    with p[1]:
-        if lib.TCOD_path_walk(p[0], x, y, recompute):
+    with p._propagator:
+        if lib.TCOD_path_walk(p.cdata, x, y, recompute):
             return x[0], y[0]
     return None,None
 
@@ -1153,46 +1153,53 @@ def path_delete(p):
     pass
 
 def dijkstra_new(m, dcost=1.41):
-    return (ffi.gc(lib.TCOD_dijkstra_new(_cdata(m), dcost),
-                    lib.TCOD_dijkstra_delete), _PropagateException())
+    return Dijkstra(m, dcost)
+    #return (ffi.gc(lib.TCOD_dijkstra_new(_cdata(m), dcost),
+    #                lib.TCOD_dijkstra_delete), _PropagateException())
 
 def dijkstra_new_using_function(w, h, func, userData=0, dcost=1.41):
-    propagator = _PropagateException()
-    handle = ffi.new_handle((func, propagator, (userData,)))
-    return (ffi.gc(lib.TCOD_dijkstra_new_using_function(w, h,
-                    lib._pycall_path_func, handle, dcost),
-                    lib.TCOD_dijkstra_delete), propagator, handle)
+    pathfinder = Dijkstra(func, dcost)
+    pathfinder._callback_args = (userData,)
+    pathfinder._height = h
+    pathfinder._width = w
+    return pathfinder
+    #propagator = _PropagateException()
+    #handle = ffi.new_handle((func, propagator, (userData,)))
+    #return (ffi.gc(lib.TCOD_dijkstra_new_using_function(w, h,
+    #                lib._pycall_path_func, handle, dcost),
+    #                lib.TCOD_dijkstra_delete), propagator, handle)
 
 def dijkstra_compute(p, ox, oy):
-    with p[1]:
-        lib.TCOD_dijkstra_compute(p[0], ox, oy)
+    with p._propagator:
+        lib.TCOD_dijkstra_compute(p.cdata, ox, oy)
 
 def dijkstra_path_set(p, x, y):
-    return lib.TCOD_dijkstra_path_set(p[0], x, y)
+    return lib.TCOD_dijkstra_path_set(p.cdata, x, y)
 
 def dijkstra_get_distance(p, x, y):
-    return lib.TCOD_dijkstra_get_distance(p[0], x, y)
+    return lib.TCOD_dijkstra_get_distance(p.cdata, x, y)
 
 def dijkstra_size(p):
-    return lib.TCOD_dijkstra_size(p[0])
+    return lib.TCOD_dijkstra_size(p.cdata)
 
 def dijkstra_reverse(p):
-    lib.TCOD_dijkstra_reverse(p[0])
+    lib.TCOD_dijkstra_reverse(p.cdata)
 
 def dijkstra_get(p, idx):
     x = ffi.new('int *')
     y = ffi.new('int *')
-    lib.TCOD_dijkstra_get(p[0], idx, x, y)
+    lib.TCOD_dijkstra_get(p.cdata, idx, x, y)
     return x[0], y[0]
 
 def dijkstra_is_empty(p):
-    return lib.TCOD_dijkstra_is_empty(p[0])
+    return lib.TCOD_dijkstra_is_empty(p.cdata)
 
 def dijkstra_path_walk(p):
     x = ffi.new('int *')
     y = ffi.new('int *')
-    if lib.TCOD_dijkstra_path_walk(p[0], x, y):
-        return x[0], y[0]
+    with p._propagator:
+        if lib.TCOD_dijkstra_path_walk(p.cdata, x, y):
+            return x[0], y[0]
     return None,None
 
 def dijkstra_delete(p):
