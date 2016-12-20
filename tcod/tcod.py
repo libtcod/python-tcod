@@ -154,204 +154,116 @@ def _assert_cdata_is_not_null(func):
             return func(*args, **kargs)
     return func
 
-class BSP(_CDataWrapper):
+class BSP(object):
     """
 
 
     Attributes:
         x (int): Rectangle left coordinate.
         y (int): Rectangle top coordinate.
-        w (int): Rectangle width.
-        h (int): Rectangle height.
+        width (int): Rectangle width.
+        height (int): Rectangle height.
+        level (int): This nodes depth.
+        position (int): The integer of where the node was split.
+        horizontal (bool): This nodes split orientation.
+        parent (Optional[BSP]): This nodes parent or None
+        children (Optional[Tuple[BSP, BSP]]):
+            A tuple of (left, right) BSP instances, or
+            None if this BSP has no children.
 
     Args:
         x (int): Rectangle left coordinate.
         y (int): Rectangle top coordinate.
-        w (int): Rectangle width.
-        h (int): Rectangle height.
+        width (int): Rectangle width.
+        height (int): Rectangle height.
 
     .. versionchanged:: 2.0
        You can create BSP's with this class contructor instead of using
        :any:`bsp_new_with_size`.
     """
 
-    def __init__(self, *args, **kargs):
-        self._reference = None # to prevent garbage collection
-        self._children = _weakref.WeakSet() # used by _invalidate_children
-        super(BSP, self).__init__(*args, **kargs)
-        if self._get_cdata_from_args(*args, **kargs) is None:
-            self._init(*args, **kargs)
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
 
-    def _init(self, x, y, w, h):
-        self.cdata = ffi.gc(lib.TCOD_bsp_new_with_size(x, y, w, h),
-                             lib.TCOD_bsp_delete)
+        self.level = 0
+        self.position = 0
+        self.horizontal = False
 
-    def _pass_reference(self, reference):
-        self._reference = reference
-        self._reference._children.add(self)
-        return self
+        self.parent = None
+        self.children = ()
 
-    def _invalidate_children(self):
-        """Invalidates BSP instances known to be based off of this one."""
-        for child in self._children:
-            child._reference = None
-            child._invalidate_children()
-            child.cdata = ffi.NULL
-        self._children.clear()
+    @property
+    def w(self):
+        return self.width
+    @w.setter
+    def w(self, value):
+        self.width = value
+
+    @property
+    def h(self):
+        return self.height
+    @h.setter
+    def h(self, value):
+        self.height = value
+
+    def _as_cdata(self):
+        cdata = ffi.gc(lib.TCOD_bsp_new_with_size(self.x, self.y,
+                                                  self.width, self.height),
+                       lib.TCOD_bsp_delete)
+        cdata.level = self.level
+        return cdata
 
     def __str__(self):
         """Provide a useful readout when printed."""
-        if not self.cdata:
-            return '<%s NULL!>' % self.__class__.__name__
-
         status = 'leaf'
-        if not self.is_leaf():
-            status = ('split at dicision=%i,orientation=%r' %
-                      (self.get_division(), self.get_orientation()))
+        if self.children:
+            status = ('split at position=%i,horizontal=%r' %
+                      (self.position, self.horizontal))
 
-        return ('<%s(x=%i,y=%i,w=%i,h=%i)depth=%i,%s>' %
+        return ('<%s(x=%i,y=%i,width=%i,height=%i)level=%i,%s>' %
                 (self.__class__.__name__,
-                 self.x, self.y, self.w, self.h, self.get_depth(), status))
+                 self.x, self.y, self.width, self.height, self.level, status))
 
-    def get_depth(self):
-        """Return the depth of this node.
+    def _unpack_bsp_tree(self, cdata):
+        self.x = cdata.x
+        self.y = cdata.y
+        self.width = cdata.w
+        self.height = cdata.h
+        self.level = cdata.level
+        self.position = cdata.position
+        self.horizontal = bool(cdata.horizontal)
+        if lib.TCOD_bsp_is_leaf(cdata):
+            return
+        self.children = (BSP(0, 0, 0, 0), BSP(0, 0, 0, 0))
+        self.children[0].parent = self
+        self.children[0]._unpack_bsp_tree(lib.TCOD_bsp_left(cdata))
+        self.children[1].parent = self
+        self.children[1]._unpack_bsp_tree(lib.TCOD_bsp_right(cdata))
 
-        Returns:
-            int: This nodes depth.
-
-        .. versionadded:: 2.0
-        """
-        return self.cdata.level
-
-    def get_division(self):
-        """Return the point where this node was divided into parts.
-
-        Returns:
-            Optional[int]: The integer of where the node was split or None.
-
-        .. versionadded:: 2.0
-        """
-        if self.is_leaf():
-            return None
-        return self.cdata.position
-
-    def get_orientation(self):
-        """Return this nodes split orientation.
-
-        Returns:
-            Optional[Text]: 'horizontal', 'vertical', or None
-
-        .. versionadded:: 2.0
-        """
-        if self.is_leaf():
-            return None
-        elif self.cdata.horizontal:
-            return 'horizontal'
-        else:
-            return 'vertical'
-
-    @_assert_cdata_is_not_null
-    def split_once(self, orientation, position):
+    def split_once(self, horizontal, position):
         """
 
         .. versionadded:: 2.0
         """
-        # orientation = horz
-        if orientation[:1].lower() == 'h':
-            lib.TCOD_bsp_split_once(self.cdata, True, position)
-        elif orientation[:1].lower() == 'v':
-            lib.TCOD_bsp_split_once(self.cdata, False, position)
-        else:
-            raise ValueError("orientation must be 'horizontal' or 'vertical'"
-                             "\nNot %r" % orientation)
+        cdata = self._as_cdata()
+        lib.TCOD_bsp_split_once(cdata, horizontal, position)
+        self._unpack_bsp_tree(cdata)
 
-    @_assert_cdata_is_not_null
     def split_recursive(self, depth, min_width, min_height,
-                        max_horz_ratio, max_vert_raito, random=None):
+                        max_horizontal_ratio, max_vertical_raito, random=None):
         """
 
         .. versionadded:: 2.0
         """
-        lib.TCOD_bsp_split_recursive(self.cdata, random or ffi.NULL,
+        cdata = self._as_cdata()
+        lib.TCOD_bsp_split_recursive(cdata, random or ffi.NULL,
                                       depth, min_width, min_height,
-                                      max_horz_ratio, max_vert_raito)
+                                      max_horizontal_ratio, max_vertical_raito)
+        self._unpack_bsp_tree(cdata)
 
-    @_assert_cdata_is_not_null
-    def resize(self, x, y, w, h):
-        """Resize this BSP to the provided rectangle.
-
-        Args:
-            x (int): Rectangle left coordinate.
-            y (int): Rectangle top coordinate.
-            w (int): Rectangle width.
-            h (int): Rectangle height.
-
-        .. versionadded:: 2.0
-        """
-        lib.TCOD_bsp_resize(self.cdata, x, y, w, h)
-
-    @_assert_cdata_is_not_null
-    def get_left(self):
-        """Return this BSP's 'left' child.
-
-        Returns None if this BSP is a leaf node.
-
-        Returns:
-            Optional[BSP]: This nodes left/top child or None.
-
-        .. versionadded:: 2.0
-        """
-        if self.is_leaf():
-            return None
-        return BSP(lib.TCOD_bsp_left(self.cdata))._pass_reference(self)
-
-    @_assert_cdata_is_not_null
-    def get_right(self):
-        """Return this BSP's 'right' child.
-
-        Returns None if this BSP is a leaf node.
-
-        Returns:
-            Optional[BSP]: This nodes right/bottom child or None.
-
-        .. versionadded:: 2.0
-        """
-        if self.is_leaf():
-            return None
-        return BSP(lib.TCOD_bsp_right(self.cdata))._pass_reference(self)
-
-    @_assert_cdata_is_not_null
-    def get_parent(self):
-        """Return this BSP's parent node.
-
-        Returns:
-            Optional[BSP]: Returns the parent node as a BSP instance.
-                           Returns None if this BSP has no parent.
-
-        .. versionadded:: 2.0
-        """
-        node = BSP(lib.TCOD_bsp_father(self.cdata))._pass_reference(self)
-        if node.cdata == ffi.NULL:
-            return None
-        return node
-
-    @_assert_cdata_is_not_null
-    def get_children(self):
-        """Return this instances immediate children, if any.
-
-        Returns:
-            Optional[Tuple[BSP, BSP]]:
-                Returns a tuple of (left, right) BSP instances.
-                Returns None if this BSP has no children.
-
-        .. versionadded:: 2.0
-        """
-        if self.is_leaf():
-            return None
-        return (BSP(lib.TCOD_bsp_left(self.cdata))._pass_reference(self),
-                BSP(lib.TCOD_bsp_right(self.cdata))._pass_reference(self))
-
-    @_assert_cdata_is_not_null
     def walk(self):
         """Iterate over this BSP's hieracrhy.
 
@@ -364,26 +276,36 @@ class BSP(_CDataWrapper):
 
         .. versionadded:: 2.0
         """
-        children = self.get_children() or ()
-        for child in children:
-            for grandchild in child.walk():
+        return self._iter_post_order()
+
+    def _iter_pre_order(self):
+        yield self
+        for child in self.children:
+            for grandchild in child._iter_pre_order():
+                yield grandchild
+
+    def _iter_in_order(self):
+        if self.children:
+            for grandchild in self.children[0]._iter_in_order():
+                yield grandchild
+            yield self
+            for grandchild in self.children[1]._iter_in_order():
+                yield grandchild
+        else:
+            yield self
+
+    def _iter_post_order(self):
+        for child in self.children:
+            for grandchild in child._iter_post_order():
                 yield grandchild
         yield self
 
-    @_assert_cdata_is_not_null
-    def is_leaf(self):
-        """Returns True if this node is a leaf.
+    def _iter_level_order(self):
+        return sorted(self._iter_pre_order(), key=lambda n:n.level)
 
-        Returns:
-            bool:
-                True if this node is a leaf.
-                False when this node has children.
+    def _iter_inverted_level_order(self):
+        return reversed(self._iter_level_order())
 
-        .. versionadded:: 2.0
-        """
-        return bool(lib.TCOD_bsp_is_leaf(self.cdata))
-
-    @_assert_cdata_is_not_null
     def contains(self, x, y):
         """Returns True if this node contains these coordinates.
 
@@ -397,9 +319,9 @@ class BSP(_CDataWrapper):
 
         .. versionadded:: 2.0
         """
-        return bool(lib.TCOD_bsp_contains(self.cdata, x, y))
+        return (self.x <= x < self.x + self.width and
+                self.y <= y < self.y + self.height)
 
-    @_assert_cdata_is_not_null
     def find_node(self, x, y):
         """Return the deepest node which contains these coordinates.
 
@@ -408,11 +330,13 @@ class BSP(_CDataWrapper):
 
         .. versionadded:: 2.0
         """
-        node = BSP(lib.TCOD_bsp_find_node(self.cdata,
-                                           x, y))._pass_reference(self)
-        if node.cdata == ffi.NULL:
-            node = None
-        return node
+        if not self.contains(x, y):
+            return None
+        for child in self.children:
+            found = child.find_node(x, y)
+            if found:
+                return found
+        return self
 
 class HeightMap(_CDataWrapper):
     """libtcod HeightMap instance

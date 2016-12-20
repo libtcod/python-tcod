@@ -230,47 +230,54 @@ def bsp_split_once(node, horizontal, position):
     .. deprecated:: 2.0
        Use :any:`BSP.split_once` instead.
     """
-    node.split_once('h' if horizontal else 'v', position)
+    node.split_once(horizontal, position)
 
 def bsp_split_recursive(node, randomizer, nb, minHSize, minVSize, maxHRatio,
                         maxVRatio):
+    """
+    .. deprecated:: 2.0
+       Use :any:`BSP.split_recursive` instead.
+    """
     node.split_recursive(nb, minHSize, minVSize,
                          maxHRatio, maxVRatio, randomizer)
 
 def bsp_resize(node, x, y, w, h):
     """
     .. deprecated:: 2.0
-       Use :any:`BSP.resize` instead.
+        Assign directly to :any:`BSP` attributes instead.
     """
-    node.resize(x, y, w, h)
+    node.x = x
+    node.y = y
+    node.width = w
+    node.height = h
 
 def bsp_left(node):
     """
     .. deprecated:: 2.0
-       Use :any:`BSP.get_left` instead.
+       Use :any:`BSP.children` instead.
     """
-    return node.get_left()
+    return None if not node.children else node.children[0]
 
 def bsp_right(node):
     """
     .. deprecated:: 2.0
-       Use :any:`BSP.get_right` instead.
+       Use :any:`BSP.children` instead.
     """
-    return node.get_right()
+    return None if not node.children else node.children[1]
 
 def bsp_father(node):
     """
     .. deprecated:: 2.0
-       Use :any:`BSP.get_parent` instead.
+       Use :any:`BSP.parent` instead.
     """
-    return node.get_parent()
+    return node.parent
 
 def bsp_is_leaf(node):
     """
     .. deprecated:: 2.0
-       Use :any:`BSP.is_leaf` instead.
+       Use :any:`BSP.children` instead.
     """
-    return node.is_leaf()
+    return not node.children
 
 def bsp_contains(node, cx, cy):
     """
@@ -286,13 +293,12 @@ def bsp_find_node(node, cx, cy):
     """
     return node.find_node(cx, cy)
 
-def _bsp_traverse(node, func, callback, userData):
+def _bsp_traverse(node_iter, callback, userData):
     """pack callback into a handle for use with the callback
     _pycall_bsp_callback
     """
-    with _PropagateException() as propagate:
-        handle = ffi.new_handle((callback, userData, propagate))
-        func(node.cdata, lib._pycall_bsp_callback, handle)
+    for node in node_iter:
+        callback(node, userData)
 
 def bsp_traverse_pre_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
@@ -300,7 +306,7 @@ def bsp_traverse_pre_order(node, callback, userData=0):
     .. deprecated:: 2.0
        Use :any:`BSP.walk` instead.
     """
-    _bsp_traverse(node, lib.TCOD_bsp_traverse_pre_order, callback, userData)
+    _bsp_traverse(node._iter_pre_order(), callback, userData)
 
 def bsp_traverse_in_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
@@ -308,7 +314,7 @@ def bsp_traverse_in_order(node, callback, userData=0):
     .. deprecated:: 2.0
        Use :any:`BSP.walk` instead.
     """
-    _bsp_traverse(node, lib.TCOD_bsp_traverse_in_order, callback, userData)
+    _bsp_traverse(node._iter_in_order(), callback, userData)
 
 def bsp_traverse_post_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
@@ -316,7 +322,7 @@ def bsp_traverse_post_order(node, callback, userData=0):
     .. deprecated:: 2.0
        Use :any:`BSP.walk` instead.
     """
-    _bsp_traverse(node, lib.TCOD_bsp_traverse_post_order, callback, userData)
+    _bsp_traverse(node._iter_post_order(), callback, userData)
 
 def bsp_traverse_level_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
@@ -324,7 +330,7 @@ def bsp_traverse_level_order(node, callback, userData=0):
     .. deprecated:: 2.0
        Use :any:`BSP.walk` instead.
     """
-    _bsp_traverse(node, lib.TCOD_bsp_traverse_level_order, callback, userData)
+    _bsp_traverse(node._iter_level_order(), callback, userData)
 
 def bsp_traverse_inverted_level_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
@@ -332,8 +338,7 @@ def bsp_traverse_inverted_level_order(node, callback, userData=0):
     .. deprecated:: 2.0
        Use :any:`BSP.walk` instead.
     """
-    _bsp_traverse(node, lib.TCOD_bsp_traverse_inverted_level_order,
-                  callback, userData)
+    _bsp_traverse(node._iter_inverted_level_order(), callback, userData)
 
 def bsp_remove_sons(node):
     """Delete all children of a given node.  Not recommended.
@@ -345,8 +350,7 @@ def bsp_remove_sons(node):
     .. deprecated:: 2.0
        BSP deletion is automatic.
     """
-    node._invalidate_children()
-    lib.TCOD_bsp_remove_sons(node.cdata)
+    node.children = ()
 
 def bsp_delete(node):
     """Exists for backward compatibility.  Does nothing.

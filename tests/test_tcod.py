@@ -21,20 +21,22 @@ class TestLibtcodpy(unittest.TestCase):
         """
         test tcod additions to BSP
         """
-        bsp = tcod.BSP(0, 0, 16, 16)
+        bsp = tcod.BSP(0, 0, 32, 32)
 
-        self.assertEquals(bsp.get_depth(), 0)
-        self.assertFalse(bsp.get_orientation())
-        self.assertFalse(bsp.get_children())
+        self.assertEqual(bsp.level, 0)
+        self.assertFalse(bsp.horizontal)
+        self.assertFalse(bsp.children)
 
         with self.assertRaises(Exception):
             tcod.bsp_traverse_pre_order(bsp, raise_Exception)
 
-        with self.assertRaises(ValueError):
-            bsp.split_once('', 4)
-
-        bsp.split_recursive(3, 2, 2, 1, 1)
+        bsp.split_recursive(3, 4, 4, 1, 1)
         for node in bsp.walk():
             self.assertIsInstance(node, tcod.BSP)
 
         self.assertFalse(bsp == 'asd')
+
+        # test that operations on deep BSP nodes preserve depth
+        sub_bsp = bsp.children[0]
+        sub_bsp.split_recursive(3, 2, 2, 1, 1)
+        self.assertEqual(sub_bsp.children[0].level, 2)
