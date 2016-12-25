@@ -25,6 +25,18 @@ def get_package_data():
             files += ['x64/SDL2.dll']
     return {'tcod': files}
 
+install_requires = ['cffi>=1.8.1,<2',
+                    'numpy']
+dependency_links = []
+
+try:
+    import __pypy__
+except ImportError:
+    pass
+else:
+    install_requires.remove('numpy')
+    dependency_links.append('git+https://bitbucket.org/pypy/numpy.git')
+
 setup(
     name='libtcod-cffi',
     version=version,
@@ -39,7 +51,8 @@ setup(
     package_data=get_package_data(),
     setup_requires=["cffi>=1.8.1,<2", "pycparser>=2.14,<3"],
     cffi_modules=["build_libtcod.py:ffi"],
-    install_requires=["cffi>=1.8.1,<2"],
+    install_requires=install_requires,
+    dependency_links=dependency_links,
     classifiers=['Development Status :: 5 - Production/Stable',
                'Environment :: Win32 (MS Windows)',
                'Environment :: MacOS X',

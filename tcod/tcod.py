@@ -338,20 +338,6 @@ class BSP(object):
                 return found
         return self
 
-class HeightMap(_CDataWrapper):
-    """libtcod HeightMap instance
-    """
-
-    def __init__(self, *args, **kargs):
-        super(HeightMap, self).__init__(*args, **kargs)
-        if not self.cdata:
-            self._init(*args, **kargs)
-
-    def _init(self, width, height):
-        self.cdata = ffi.gc(lib.TCOD_heightmap_new(width, height),
-                            lib.TCOD_heightmap_delete)
-
-
 class Key(_CDataWrapper):
     """Key Event instance
 
