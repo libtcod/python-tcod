@@ -26,16 +26,11 @@ def get_package_data():
     return {'tcod': files}
 
 install_requires = ['cffi>=1.8.1,<2',
-                    'numpy']
-dependency_links = []
+                    'numpy<2']
 
-try:
-    import __pypy__
-except ImportError:
-    pass
-else:
-    install_requires.remove('numpy')
-    dependency_links.append('git+https://bitbucket.org/pypy/numpy.git')
+# newer numpy versions dropped Python 3.3 support.
+if sys.version_info[:2] == (3, 3):
+    install_requires.append('numpy<1.12')
 
 setup(
     name='libtcod-cffi',
@@ -52,7 +47,6 @@ setup(
     setup_requires=["cffi>=1.8.1,<2", "pycparser>=2.14,<3"],
     cffi_modules=["build_libtcod.py:ffi"],
     install_requires=install_requires,
-    dependency_links=dependency_links,
     classifiers=['Development Status :: 5 - Production/Stable',
                'Environment :: Win32 (MS Windows)',
                'Environment :: MacOS X',

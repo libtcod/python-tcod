@@ -10,15 +10,9 @@ environment:
   CODACY_PROJECT_TOKEN:
     secure: Fdt5ClRgYNTWeL05pVaxoEfUMlF+M26+bqY1fgZKJca7NP7mtclMN81ZCNNVCsJ4
   matrix:
-  - PYPY: pypy2-v5.4.1-win32
-    platform: Any CPU
   - PYTHON: C:\Python27\python.exe
     platform: Any CPU
   - PYTHON: C:\Python27-x64\python.exe
-    platform: x64
-  - PYTHON: C:\Python33\python.exe
-    platform: Any CPU
-  - PYTHON: C:\Python33-x64\python.exe
     platform: x64
   - PYTHON: C:\Python34\python.exe
     platform: Any CPU
@@ -27,6 +21,12 @@ environment:
   - PYTHON: C:\Python35\python.exe
     platform: Any CPU
   - PYTHON: C:\Python35-x64\python.exe
+    platform: x64
+  - PYPY: pypy2-v5.4.1-win32
+    platform: Any CPU
+  - PYTHON: C:\Python33\python.exe
+    platform: Any CPU
+  - PYTHON: C:\Python33-x64\python.exe
     platform: x64
 
 clone_depth: 20
@@ -47,8 +47,10 @@ install:
     }
 - cmd: "set PATH=%PATH%;C:\\MinGW\\bin"
 - cmd: echo "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 > "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64/vcvars64.bat"
-- cmd: "%PYTHON% -m pip install --upgrade pip"
-- cmd: "%PYTHON% setup.py develop"
+- cmd: "%PYTHON% -m pip install --upgrade pip setuptools wheel"
+- cmd: "if defined PYPY %PYTHON% -m pip -v install git+https://bitbucket.org/pypy/numpy.git"
+- cmd: "%PYTHON% -m pip install --requirement requirements.txt"
+- cmd: "%PYTHON% setup.py sdist develop bdist_wheel"
 build: off
 test_script:
 - cmd: "%PYTHON% -m pip install nose2 cov-core"
@@ -64,6 +66,5 @@ on_success:
 - python-codacy-coverage -r coverage.xml
 
 deploy_script:
-- "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% -m pip install wheel twine"
-- "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% setup.py sdist bdist_wheel bdist_egg"
+- "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% -m pip install twine"
 - "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% -m twine upload -u %pypi_user% -p %pypi_pass% --skip-existing dist/*"
