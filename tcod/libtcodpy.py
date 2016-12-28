@@ -21,6 +21,7 @@ from tcod.tcod import Image
 from tcod.tcod import Key
 from tcod.tcod import Map
 from tcod.tcod import Mouse
+from tcod.tcod import Noise
 
 class ConsoleBuffer(object):
     """Simple console that allows direct (fast) access to cells. simplifies
@@ -1912,22 +1913,77 @@ def namegen_destroy():
 
 def noise_new(dim, h=NOISE_DEFAULT_HURST, l=NOISE_DEFAULT_LACUNARITY,
         random=None):
-    return ffi.gc(lib.TCOD_noise_new(dim, h, l, random or ffi.NULL),
-                   lib.TCOD_noise_delete)
+    """Return a new Noise instance.
+
+    Args:
+        dim (int): Number of dimentions.  From 1 to 4.
+        h (float): The hurst exponent.  Should be in the 0.0-1.0 range.
+        l (float): The noise lacunarity.
+        random (Optional[Random]): A Random instance, or None.
+
+    Returns:
+        Noise: The new Noise instance.
+    """
+    return Noise(dim, hurst=h, lacunarity=l, rand=random)
 
 def noise_set_type(n, typ):
-    lib.TCOD_noise_set_type(n,typ)
+    """Set a Noise objects default noise algorithm.
+
+    Args:
+        typ (int): Any NOISE_* constant.
+    """
+    n.algorithm = typ
 
 def noise_get(n, f, typ=NOISE_DEFAULT):
-    return lib.TCOD_noise_get_ex(n, ffi.new('float[]', f), typ)
+    """Return the noise value sampled from the ``f`` coordinate.
+
+    ``f`` should be a tuple or list with a length matching
+    :any:`Noise.dimentions`.
+    If ``f`` is shoerter than :any:`Noise.dimentions` the missing coordinates
+    will be filled with zeros.
+
+    Args:
+        n (Noise): A Noise instance.
+        f (Sequence[float]): The point to sample the noise from.
+        typ (int): The noise algorithm to use.
+
+    Returns:
+        float: The sampled noise value.
+    """
+    return lib.TCOD_noise_get_ex(_cdata(n), ffi.new('float[4]', f), typ)
 
 def noise_get_fbm(n, f, oc, typ=NOISE_DEFAULT):
-    return lib.TCOD_noise_get_fbm_ex(n, ffi.new('float[]', f), oc, typ)
+    """Return the fractal Brownian motion sampled from the ``f`` coordinate.
+
+    Args:
+        n (Noise): A Noise instance.
+        f (Sequence[float]): The point to sample the noise from.
+        typ (int): The noise algorithm to use.
+        octaves (float): The level of level.  Should be more than 1.
+
+    Returns:
+        float: The sampled noise value.
+    """
+    return lib.TCOD_noise_get_fbm_ex(_cdata(n), ffi.new('float[4]', f),
+                                     oc, typ)
 
 def noise_get_turbulence(n, f, oc, typ=NOISE_DEFAULT):
-    return lib.TCOD_noise_get_turbulence_ex(n, ffi.new('float[]', f), oc, typ)
+    """Return the turbulence noise sampled from the ``f`` coordinate.
+
+    Args:
+        n (Noise): A Noise instance.
+        f (Sequence[float]): The point to sample the noise from.
+        typ (int): The noise algorithm to use.
+        octaves (float): The level of level.  Should be more than 1.
+
+    Returns:
+        float: The sampled noise value.
+    """
+    return lib.TCOD_noise_get_turbulence_ex(_cdata(n), ffi.new('float[4]', f),
+                                            oc, typ)
 
 def noise_delete(n):
+    """Does nothing."""
     pass
 
 _chr = chr

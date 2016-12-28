@@ -1065,10 +1065,12 @@ class Noise(_CDataWrapper):
         implementation (int): Defaults to NOISE_IMP_SIMPLE
         hurst (float): The hurst exponent.  Should be in the 0.0-1.0 range.
         lacunarity (float): The noise lacunarity.
+        octaves (float): The level of detail on fBm and turbulence
+                         implementations.
         rand (Optional[Random]): A Random instance, or None.
     """
     def __init__(self, *args, **kargs):
-        self.octants = 4
+        self.octaves = 4
         self.implementation = NOISE_IMP_SIMPLE
         self._cdata_random = None # keep alive the random cdata instance
         self._algorithm = None
@@ -1080,18 +1082,18 @@ class Noise(_CDataWrapper):
             self._init(*args, **kargs)
 
     def _init(self, dimentions, algorithm=2, implementation=NOISE_IMP_SIMPLE,
-              hurst=0.5, lacunarity=2.0, octants=4, rand=None):
+              hurst=0.5, lacunarity=2.0, octaves=4, rand=None):
         self._cdata_random = _cdata(rand)
-        self._algorithm = algorithm
         self.implementation = implementation
         self._dimentions = dimentions
         self._hurst = hurst
         self._lacunarity = lacunarity
-        self.octants = octants
+        self.octaves = octaves
         self.cdata = ffi.gc(lib.TCOD_noise_new(self._dimentions, self._hurst,
                                                self._lacunarity,
                                                self._cdata_random),
                             lib.TCOD_noise_delete)
+        self.algorithm = algorithm
 
     @property
     def algorithm(self):
@@ -1126,10 +1128,10 @@ class Noise(_CDataWrapper):
             return lib.TCOD_noise_get(self.cdata, (x, y, z, w))
         elif self.implementation == NOISE_IMP_FBM:
             return lib.TCOD_noise_get_fbm(self.cdata, (x, y, z, w),
-                                          self.octants)
+                                          self.octaves)
         elif self.implementation == NOISE_IMP_TURBULENCE:
             return lib.TCOD_noise_get_turbulence(self.cdata, (x, y, z, w),
-                                                 self.octants)
+                                                 self.octaves)
         raise RuntimeError('implementation must be one of tcod.NOISE_IMP_*')
 
 class Map(_CDataWrapper):
