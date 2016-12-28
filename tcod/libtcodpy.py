@@ -900,12 +900,6 @@ def console_check_for_keypress(flags=KEY_RELEASED):
 def console_is_key_pressed(key):
     return lib.TCOD_console_is_key_pressed(key)
 
-def console_set_keyboard_repeat(initial_delay, interval):
-    lib.TCOD_console_set_keyboard_repeat(initial_delay, interval)
-
-def console_disable_keyboard_repeat():
-    lib.TCOD_console_disable_keyboard_repeat()
-
 # using offscreen consoles
 def console_new(w, h):
     """Return an offscreen console of size: w,h."""

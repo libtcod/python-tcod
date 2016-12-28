@@ -160,9 +160,6 @@ class TestLibtcodpyConsole(unittest.TestCase):
         self.assertIsInstance(tcod.console_check_for_keypress(), tcod.Key)
         tcod.console_is_key_pressed(tcod.KEY_ENTER)
 
-        tcod.console_set_keyboard_repeat(100, 10)
-        tcod.console_disable_keyboard_repeat()
-
     def test_console_fill_errors(self):
         with self.assertRaises(TypeError):
             tcod.console_fill_background(self.console, [0], [], [])
