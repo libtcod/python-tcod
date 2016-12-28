@@ -920,7 +920,8 @@ class Random(_CDataWrapper):
     that you use the :any:`random` module from the Python standard library.
 
     Args:
-        seed (int): The RNG seed, should be a 32-bit integer.
+        seed (Hashable): The RNG seed.  Should be a 32-bit integer, but any
+                         hashable object is accepted.
         algorithm (int): The algorithm to use.
     """
     def __init__(self, *args, **kargs):
@@ -929,7 +930,8 @@ class Random(_CDataWrapper):
             self._init(*args, **kargs)
 
     def _init(self, seed, algorithm):
-        self.cdata = ffi.gc(lib.TCOD_random_new_from_seed(algorithm, seed),
+        self.cdata = ffi.gc(lib.TCOD_random_new_from_seed(algorithm,
+                                                          hash(seed)),
                             lib.TCOD_random_delete)
 
 

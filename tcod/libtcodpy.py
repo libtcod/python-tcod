@@ -22,6 +22,7 @@ from tcod.tcod import Key
 from tcod.tcod import Map
 from tcod.tcod import Mouse
 from tcod.tcod import Noise
+from tcod.tcod import Random
 
 class ConsoleBuffer(object):
     """Simple console that allows direct (fast) access to cells. simplifies
@@ -2112,44 +2113,151 @@ DISTRIBUTION_GAUSSIAN_INVERSE = 3
 DISTRIBUTION_GAUSSIAN_RANGE_INVERSE = 4
 
 def random_get_instance():
-    return lib.TCOD_random_get_instance()
+    """Return the default Random instance.
+
+    Returns:
+        Random: A Random instance using the default random number generator.
+    """
+    return Random(lib.TCOD_random_get_instance())
 
 def random_new(algo=RNG_CMWC):
-    return ffi.gc(lib.TCOD_random_new(algo), lib.TCOD_random_delete)
+    """Return a new Random instance.  Using ``algo``.
+
+    Args:
+        algo (int): The random number algorithm to use.
+
+    Returns:
+        Random: A new Random instance using the given algorithm.
+    """
+    return Random(ffi.gc(lib.TCOD_random_new(algo), lib.TCOD_random_delete))
 
 def random_new_from_seed(seed, algo=RNG_CMWC):
-    return ffi.gc(lib.TCOD_random_new_from_seed(algo, seed),
-                   lib.TCOD_random_delete)
+    """Return a new Random instance.  Using the given ``seed`` and ``algo``.
+
+    Args:
+        seed (Hashable): The RNG seed.  Should be a 32-bit integer, but any
+                         hashable object is accepted.
+        algo (int): The random number algorithm to use.
+
+    Returns:
+        Random: A new Random instance using the given algorithm.
+    """
+    return Random(seed, algo)
 
 def random_set_distribution(rnd, dist):
-	lib.TCOD_random_set_distribution(rnd or ffi.NULL, dist)
+    """Change the distribution mode of a random number generator.
+
+    Args:
+        rnd (Optional[Random]): A Random instance, or None to use the default.
+        dist (int): The distribution mode to use.  Should be DISTRIBUTION_*.
+    """
+    lib.TCOD_random_set_distribution(_cdata(rnd), dist)
 
 def random_get_int(rnd, mi, ma):
-    return lib.TCOD_random_get_int(rnd or ffi.NULL, mi, ma)
+    """Return a random integer in the range: ``mi`` <= n <= ``ma``.
+
+    The result is affacted by calls to :any:`random_set_distribution`.
+
+    Args:
+        rnd (Optional[Random]): A Random instance, or None to use the default.
+        low (int): The lower bound of the random range, inclusive.
+        high (int): The upper bound of the random range, inclusive.
+
+    Returns:
+        int: A random integer in the range ``mi`` <= n <= ``ma``.
+    """
+    return lib.TCOD_random_get_int(_cdata(rnd), mi, ma)
 
 def random_get_float(rnd, mi, ma):
-    return lib.TCOD_random_get_float(rnd or ffi.NULL, mi, ma)
+    """Return a random float in the range: ``mi`` <= n <= ``ma``.
+
+    The result is affacted by calls to :any:`random_set_distribution`.
+
+    Args:
+        rnd (Optional[Random]): A Random instance, or None to use the default.
+        low (float): The lower bound of the random range, inclusive.
+        high (float): The upper bound of the random range, inclusive.
+
+    Returns:
+        float: A random double precision float
+               in the range ``mi`` <= n <= ``ma``.
+    """
+    return lib.TCOD_random_get_double(_cdata(rnd), mi, ma)
 
 def random_get_double(rnd, mi, ma):
-    return lib.TCOD_random_get_double(rnd or ffi.NULL, mi, ma)
+    """Return a random float in the range: ``mi`` <= n <= ``ma``.
+
+    .. deprecated:: 2.0
+        Use :any:`random_get_float` instead.
+        Both funtions return a double precision float.
+    """
+    return lib.TCOD_random_get_double(_cdata(rnd), mi, ma)
 
 def random_get_int_mean(rnd, mi, ma, mean):
-    return lib.TCOD_random_get_int_mean(rnd or ffi.NULL, mi, ma, mean)
+    """Return a random weighted integer in the range: ``mi`` <= n <= ``ma``.
+
+    The result is affacted by calls to :any:`random_set_distribution`.
+
+    Args:
+        rnd (Optional[Random]): A Random instance, or None to use the default.
+        low (int): The lower bound of the random range, inclusive.
+        high (int): The upper bound of the random range, inclusive.
+        mean (int): The mean return value.
+
+    Returns:
+        int: A random weighted integer in the range ``mi`` <= n <= ``ma``.
+    """
+    return lib.TCOD_random_get_int_mean(_cdata(rnd), mi, ma, mean)
 
 def random_get_float_mean(rnd, mi, ma, mean):
-    return lib.TCOD_random_get_float_mean(rnd or ffi.NULL, mi, ma, mean)
+    """Return a random weighted float in the range: ``mi`` <= n <= ``ma``.
+
+    The result is affacted by calls to :any:`random_set_distribution`.
+
+    Args:
+        rnd (Optional[Random]): A Random instance, or None to use the default.
+        low (float): The lower bound of the random range, inclusive.
+        high (float): The upper bound of the random range, inclusive.
+        mean (float): The mean return value.
+
+    Returns:
+        float: A random weighted double precision float
+               in the range ``mi`` <= n <= ``ma``.
+    """
+    return lib.TCOD_random_get_double_mean(_cdata(rnd), mi, ma, mean)
 
 def random_get_double_mean(rnd, mi, ma, mean):
-    return lib.TCOD_random_get_double_mean(rnd or ffi.NULL, mi, ma, mean)
+    """Return a random weighted float in the range: ``mi`` <= n <= ``ma``.
+
+    .. deprecated:: 2.0
+        Use :any:`random_get_float_mean` instead.
+        Both funtions return a double precision float.
+    """
+    return lib.TCOD_random_get_double_mean(_cdata(rnd), mi, ma, mean)
 
 def random_save(rnd):
-    return ffi.gc(lib.TCOD_random_save(rnd or ffi.NULL),
-                   lib.TCOD_random_delete)
+    """Return a copy of a random number generator.
+
+    Args:
+        rnd (Optional[Random]): A Random instance, or None to use the default.
+
+    Returns:
+        Random: A Random instance with a copy of the random generator.
+    """
+    return Random(ffi.gc(lib.TCOD_random_save(_cdata(rnd)),
+                         lib.TCOD_random_delete))
 
 def random_restore(rnd, backup):
-    lib.TCOD_random_restore(rnd or ffi.NULL, backup)
+    """Restore a random number generator from a backed up copy.
+
+    Args:
+        rnd (Optional[Random]): A Random instance, or None to use the default.
+        backup (Random): The Random instance which was used as a backup.
+    """
+    lib.TCOD_random_restore(_cdata(rnd), _cdata(backup))
 
 def random_delete(rnd):
+    """Does nothing."""
     pass
 
 def struct_add_flag(struct, name):
