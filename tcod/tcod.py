@@ -1043,22 +1043,35 @@ class Random(_CDataWrapper):
     #def restore(self, backup):
     #    lib.TCOD_random_restore(self.cdata, backup)
 
+NOISE_IMP_SIMPLE = 0
+NOISE_IMP_FBM = 1
+NOISE_IMP_TURBULENCE = 2
+
 class Noise(_CDataWrapper):
     """
     .. versionadded:: 2.0
 
+    The ``hurst`` exponent describes the raggedness of the resultant noise,
+    with a higher value leading to a smoother noise.
+    Not used with NOISE_IMP_SIMPLE.
+
+    ``lacunarity`` is a multiplier that determines how fast the noise
+    frequency increases for each successive octave.
+    Not used with NOISE_IMP_SIMPLE.
+
     Args:
         dimentions (int): Must be from 1 to 4.
-        noise_type (int): Defaults to NOISE_SIMPLEX
-        hurst (float):
-        lacunarity (float):
-        rand (Optional[Random]):
+        algorithm (int): Defaults to NOISE_SIMPLEX
+        implementation (int): Defaults to NOISE_IMP_SIMPLE
+        hurst (float): The hurst exponent.  Should be in the 0.0-1.0 range.
+        lacunarity (float): The noise lacunarity.
+        rand (Optional[Random]): A Random instance, or None.
     """
     def __init__(self, *args, **kargs):
         self.octants = 4
-        self._index_ctype = 'float[4]'
+        self.implementation = NOISE_IMP_SIMPLE
         self._cdata_random = None # keep alive the random cdata instance
-        self._noise_type = None
+        self._algorithm = None
         self._dimentions = None
         self._hurst = None
         self._lacunarity = None
@@ -1066,78 +1079,58 @@ class Noise(_CDataWrapper):
         if not self.cdata:
             self._init(*args, **kargs)
 
-    def _init(self, dimentions, noise_type=2,
-              hurst=0.5, lacunarity=2.0,
-              octants=4, rand=None):
+    def _init(self, dimentions, algorithm=2, implementation=NOISE_IMP_SIMPLE,
+              hurst=0.5, lacunarity=2.0, octants=4, rand=None):
         self._cdata_random = _cdata(rand)
-        self._noise_type = noise_type
+        self._algorithm = algorithm
+        self.implementation = implementation
         self._dimentions = dimentions
         self._hurst = hurst
         self._lacunarity = lacunarity
         self.octants = octants
-        self._index_ctype = 'float[%i]' % dimentions
-        self._regenerate_noise()
-
-    def _regenerate_noise(self):
         self.cdata = ffi.gc(lib.TCOD_noise_new(self._dimentions, self._hurst,
                                                self._lacunarity,
                                                self._cdata_random),
                             lib.TCOD_noise_delete)
 
     @property
-    def noise_type(self):
-        return self._noise_type
-    @noise_type.setter
-    def noise_type(self, value):
-        self._noise_type = value
+    def algorithm(self):
+        return self._algorithm
+    @algorithm.setter
+    def algorithm(self, value):
+        self._algorithm = value
         lib.TCOD_noise_set_type(self.cdata, value)
 
     @property
     def dimentions(self):
         return self._dimentions
-    @dimentions.setter
-    def dimentions(self, value):
-        self._dimentions = value
-        self._index_ctype = 'float[%i]' % value
-        self._regenerate_noise()
 
     @property
     def hurst(self):
         return self._hurst
-    @hurst.setter
-    def hurst(self, value):
-        self._hurst = value
-        self._regenerate_noise()
 
     @property
     def lacunarity(self):
         return self._lacunarity
-    @hurst.setter
-    def lacunarity(self, value):
-        self._lacunarity = value
-        self._regenerate_noise()
 
-    def get_noise(self, *xyzw):
-        """Return the noise value at the xyzw point.
+    def get_point(self, x=0, y=0, z=0, w=0):
+        """Return the noise value at the (x, y, z, w) point.
 
         Args:
-            xyzw (float):
+            x (float): The position on the 1st axis.
+            y (float): The position on the 2nd axis.
+            z (float): The position on the 3rd axis.
+            w (float): The position on the 4th axis.
         """
-        return lib.TCOD_noise_get(self.cdata, ffi.new(self._index_ctype, xyzw))
-
-    def get_fbm(self, *xyzw):
-        """Returh the fractional Brownian motion at the xyzw point.
-        """
-        return lib.TCOD_noise_get_fbm(self.cdata,
-                                      ffi.new(self._index_ctype, xyzw),
-                                      self.octants)
-
-    def get_turbulence(self, *xyzw):
-        """Return the turbulence value at the xyzw point.
-        """
-        return lib.TCOD_noise_get_turbulence(self.cdata,
-                                             ffi.new(self._index_ctype, xyzw),
-                                             self.octants)
+        if self.implementation == NOISE_IMP_SIMPLE:
+            return lib.TCOD_noise_get(self.cdata, (x, y, z, w))
+        elif self.implementation == NOISE_IMP_FBM:
+            return lib.TCOD_noise_get_fbm(self.cdata, (x, y, z, w),
+                                          self.octants)
+        elif self.implementation == NOISE_IMP_TURBULENCE:
+            return lib.TCOD_noise_get_turbulence(self.cdata, (x, y, z, w),
+                                                 self.octants)
+        raise RuntimeError('implementation must be one of tcod.NOISE_IMP_*')
 
 class Map(_CDataWrapper):
     """
