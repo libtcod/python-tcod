@@ -17,7 +17,7 @@ console = tdl.init(20, 16)
 
 # draw the string "Hello World" at the top left corner using the default colors:
 # a white forground on a black background.
-console.drawStr(0, 0, 'Hello World')
+console.draw_str(0, 0, 'Hello World')
 
 # display the changes to the console with flush.
 # if you forget this part the screen will stay black emptiness forever.
