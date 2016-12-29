@@ -58,7 +58,7 @@ while True: # Continue in an infinite game loop.
     # Using "(x, y) in console" we can quickly check if a position is inside of
     # a console.  And skip a draw operation that would otherwise fail.
     if (playerX, playerY) in console:
-        console.drawChar(playerX, playerY, '@')
+        console.draw_char(playerX, playerY, '@')
 
     tdl.flush() # Update the window.
 

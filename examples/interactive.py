@@ -51,10 +51,10 @@ def main():
     banner = sys.ps1
     cursor = 0
     while 1:
-        console.drawRect(0, HEIGHT-1, None, 1, ' ', (255, 255, 255), (0, 0, 0))
-        console.drawStr(0, HEIGHT-1, banner + buffer)
+        console.draw_rect(0, HEIGHT-1, None, 1, ' ', (255, 255, 255), (0, 0, 0))
+        console.draw_str(0, HEIGHT-1, banner + buffer)
         try:
-            console.drawChar(len(banner) + cursor, HEIGHT-1, None, None, (0, 255, 255))
+            console.draw_char(len(banner) + cursor, HEIGHT-1, None, None, (0, 255, 255))
         except tdl.TDLError:
             pass
         tdl.flush()
@@ -66,7 +66,7 @@ def main():
                 if event.key == 'ENTER' or event.key == 'KPENTER':
                     sys.stderr = newerr
                     try:
-                        console.drawRect(0, HEIGHT-1, None, 1, None, (255, 255, 255), (0, 0, 0))
+                        console.draw_rect(0, HEIGHT-1, None, 1, None, (255, 255, 255), (0, 0, 0))
                         console.scroll(0, -1)
                         if interpeter.push(buffer):
                             banner = sys.ps2

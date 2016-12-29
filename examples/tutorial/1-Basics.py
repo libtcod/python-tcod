@@ -32,7 +32,7 @@ while True:
     console.clear()
 
     # Now draw out 'Hello World' starting at an x,y of 1,2.
-    console.drawStr(1, 2, 'Hello World')
+    console.draw_str(1, 2, 'Hello World')
 
     # Now to update the image on the window we make sure to call tdl.flush
     # in every loop.
