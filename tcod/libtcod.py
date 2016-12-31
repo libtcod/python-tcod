@@ -44,15 +44,9 @@ def BKGND_ALPHA(a):
 def BKGND_ADDALPHA(a):
     return BKGND_ADDA | (int(a * 255) << 8)
 
-class _MockFFI(object):
-    def def_extern(self):
-        return lambda func:func
+class _Mock(object):
+    """Mock object needed for ReadTheDocs."""
 
-if _os.environ.get('READTHEDOCS'):
-    # Mock the lib and ffi objects needed to compile docs for readthedocs.io
-    # Allows an import without building the cffi module first.
-    lib = object()
-    ffi = _MockFFI()
     RENDERER_SDL = 2
     FONT_LAYOUT_ASCII_INCOL = 1
     BKGND_SET = 1
@@ -60,6 +54,25 @@ if _os.environ.get('READTHEDOCS'):
     KEY_RELEASED = 2
     NOISE_DEFAULT = 0
     NOISE_SIMPLEX = 2
+    FOV_RESTRICTIVE = 12
+
+    def def_extern(self):
+        """Pass def_extern call silently."""
+        return lambda func:func
+
+    def __getattr__(self, attr):
+        """This object pretends to have everything."""
+        return self
+
+    def __str__(self):
+        """Just have ? in case anything leaks as a parameter default."""
+        return '?'
+
+
+if _os.environ.get('READTHEDOCS'):
+    # Mock the lib and ffi objects needed to compile docs for readthedocs.io
+    # Allows an import without building the cffi module first.
+    lib = ffi = _Mock()
 else:
     from tcod._libtcod import lib, ffi
 
