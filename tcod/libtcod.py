@@ -27,8 +27,8 @@ def _import_library_functions(lib):
                 g[name[5:]] = Color._new_from_cdata(getattr(lib, name))
             elif name.isupper():
                 g[name[5:]] = getattr(lib, name) # const names
-            #else:
-            #    g[name[5:]] = getattr(lib, name) # function names
+        elif name.startswith('FOV'):
+            g[name] = getattr(lib, name) # fov const names
         elif name[:6] == 'TCODK_': # key name
             g['KEY_' + name[6:]] = getattr(lib, name)
 
@@ -47,15 +47,17 @@ def BKGND_ADDALPHA(a):
 class _Mock(object):
     """Mock object needed for ReadTheDocs."""
 
-    RENDERER_SDL = 2
-    FONT_LAYOUT_ASCII_INCOL = 1
-    BKGND_SET = 1
-    BKGND_DEFAULT = 13
-    KEY_RELEASED = 2
-    NOISE_DEFAULT = 0
-    NOISE_SIMPLEX = 2
+    TCOD_RENDERER_SDL = 2
+    TCOD_FONT_LAYOUT_ASCII_INCOL = 1
+    TCOD_BKGND_SET = 1
+    TCOD_BKGND_DEFAULT = 13
+    TCOD_KEY_RELEASED = 2
+    TCOD_NOISE_DEFAULT = 0
+    TCOD_NOISE_SIMPLEX = 2
     FOV_RESTRICTIVE = 12
 
+    CData = () # This gets passed to an isinstance call.
+    
     def def_extern(self):
         """Pass def_extern call silently."""
         return lambda func:func
