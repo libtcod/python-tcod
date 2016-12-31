@@ -1253,12 +1253,13 @@ class AStar(_PathFinder):
             List[Tuple[int, int]]:
                 A list of points, or an empty list if there is no valid path.
         """
-        lib.TCOD_path_compute(self.cdata, start_x, start_y, goal_x, goal_y)
-        path = []
-        x, y = ffi.new('int *'), ffi.new('int *')
         with self._propagator:
-            while lib.TCOD_path_walk(self.cdata, x, y, False):
-                path.append((x[0], y[0]))
+            lib.TCOD_path_compute(self.cdata, start_x, start_y, goal_x, goal_y)
+        path = []
+        x = ffi.new('int[2]')
+        y = x + 1
+        while lib.TCOD_path_walk(self.cdata, x, y, False):
+            path.append((x[0], y[0]))
         return path
 
 
@@ -1271,6 +1272,22 @@ class Dijkstra(_PathFinder):
     _path_new_using_function = lib.TCOD_dijkstra_new_using_function
     _path_delete = lib.TCOD_dijkstra_delete
 
+    def set_goal(self, x, y):
+        """Set the goal point and recompute the Dijkstra path-finder.
+        """
+        with self._propagator:
+            lib.TCOD_dijkstra_compute(self.cdata, x, y)
+
+    def get_path(self, x, y):
+        """Return a list of (x, y) steps to reach the goal point, if possible.
+        """
+        lib.TCOD_dijkstra_path_set(self.cdata, x, y)
+        path = []
+        pointer_x = ffi.new('int[2]')
+        pointer_y = x + 1
+        while lib.TCOD_dijkstra_path_walk(self.cdata, pointer_x, pointer_y):
+            path.append(pointer_x[0], pointer_y[0])
+        return path
 
 def clipboard_set(string):
     """Set the clipboard contents to string.

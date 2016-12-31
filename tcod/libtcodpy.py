@@ -1205,9 +1205,8 @@ def dijkstra_is_empty(p):
 def dijkstra_path_walk(p):
     x = ffi.new('int *')
     y = ffi.new('int *')
-    with p._propagator:
-        if lib.TCOD_dijkstra_path_walk(p.cdata, x, y):
-            return x[0], y[0]
+    if lib.TCOD_dijkstra_path_walk(p.cdata, x, y):
+        return x[0], y[0]
     return None,None
 
 def dijkstra_delete(p):
