@@ -64,6 +64,7 @@ on_success:
 #- coveralls
 - coverage xml
 - python-codacy-coverage -r coverage.xml
+- bash <(curl -s https://codecov.io/bash)
 
 deploy_script:
 - "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% -m pip install twine"
