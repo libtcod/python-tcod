@@ -25,8 +25,10 @@ def get_package_data():
             files += ['x64/SDL2.dll']
     return {'tcod': files}
 
-install_requires = ['cffi>=1.8.1,<2',
-                    'numpy<2']
+install_requires = [
+    'cffi>=1.8.1,<2',
+    'numpy<2',
+    ]
 
 # newer numpy versions dropped Python 3.3 support.
 if sys.version_info[:2] == (3, 3):
@@ -44,33 +46,43 @@ setup(
     download_url='https://pypi.python.org/pypi/libtcod-cffi',
     packages=['tcod'],
     package_data=get_package_data(),
-    setup_requires=["cffi>=1.8.1,<2", "pycparser>=2.14,<3"],
-    cffi_modules=["build_libtcod.py:ffi"],
+    setup_requires=[
+        'cffi>=1.8.1,<2',
+        'pycparser>=2.14,<3',
+        ],
+    cffi_modules=['build_libtcod.py:ffi'],
     install_requires=install_requires,
-    classifiers=['Development Status :: 5 - Production/Stable',
-               'Environment :: Win32 (MS Windows)',
-               'Environment :: MacOS X',
-               'Environment :: X11 Applications',
-               'Intended Audience :: Developers',
-               'License :: OSI Approved :: BSD License',
-               'Natural Language :: English',
-               'Operating System :: POSIX',
-               'Operating System :: MacOS :: MacOS X',
-               'Operating System :: Microsoft :: Windows',
-               'Programming Language :: Python :: 2',
-               'Programming Language :: Python :: 2.7',
-               'Programming Language :: Python :: 3',
-               'Programming Language :: Python :: 3.3',
-               'Programming Language :: Python :: 3.4',
-               'Programming Language :: Python :: 3.5',
-               'Programming Language :: Python :: Implementation :: CPython',
-               'Programming Language :: Python :: Implementation :: PyPy',
-               'Topic :: Games/Entertainment',
-               'Topic :: Multimedia :: Graphics',
-               'Topic :: Software Development :: Libraries :: Python Modules',
-               ],
-    keywords = 'roguelike roguelikes cffi ASCII ANSI Unicode libtcod noise fov heightmap namegen',
-    platforms = ['Windows', 'Mac OS X', 'Linux'],
-    license = 'Simplified BSD License',
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Environment :: Win32 (MS Windows)',
+        'Environment :: MacOS X',
+        'Environment :: X11 Applications',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Natural Language :: English',
+        'Operating System :: POSIX',
+        'Operating System :: MacOS :: MacOS X',
+        'Operating System :: Microsoft :: Windows',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy',
+        'Topic :: Games/Entertainment',
+        'Topic :: Multimedia :: Graphics',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        ],
+    keywords='roguelike cffi ASCII ANSI Unicode libtcod noise fov'
+             ' heightmap namegen tdl',
+    platforms=[
+        'Windows',
+        'Mac OS X',
+        'Linux',
+        ],
+    license='Simplified BSD License',
     test_suite='nose2.collector.collector',
     )

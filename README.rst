@@ -53,7 +53,8 @@ Guides and Tutorials for the original library should also work with this one.
 ==============
 * Python 2.7+, Python 3.3+, or PyPy 5.4+
 * Windows, Linux, or Mac OS X
-* Python cffi_ module must be version 1.8 or higher
+* The cffi_ Python module must be version 1.8 or higher
+* The numpy_ Python module should be 1.11 or higher.
 
 Extra requirements when installing directly from source
 -------------------------------------------------------
@@ -77,6 +78,8 @@ Read LICENSE.txt_ for more details.
 .. _python-tdl: https://github.com/HexDecimal/python-tdl/
 
 .. _cffi: https://cffi.readthedocs.io/en/latest/
+
+.. _numpy: https://docs.scipy.org/doc/numpy/user/index.html
 
 .. _libtcod: https://bitbucket.org/libtcod/libtcod/
 

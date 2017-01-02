@@ -1,6 +1,24 @@
 ===========
  Changelog
 ===========
+2.0a3
+ * The numpy module is now required as a dependency.
+ * The SDL.h and libtcod_int.h headers are now included in the cffi back-end.
+ * Added the AStar and Dijkstra classes with simplified behaviour.
+ * Added the BSP class which better represents bsp data attributes.
+ * Added the Image class with methods mimicking libtcodpy behaviour.
+ * Added the Map class with methods mimicking libtcodpy behaviour.
+ * Added the Noise class.
+   This class behaves similar to the tdl Noise class.
+ * Added the Random class.
+   This class provides a large variety of methods instead of being state based
+   like in libtcodpy.
+ * Color objects can new be converted into a 3 byte string used in libtcod
+   color control operations.
+ * heightmap functions can now accept carefully formatted numpy arrays.
+ * Removed the keyboard repeat functions:
+   console_set_keyboard_repeat and console_disable_keyboard_repeat.
+
 2.0a2
  * FrozenColor class removed.
  * Color class now uses a properly set up __repr__ method.
