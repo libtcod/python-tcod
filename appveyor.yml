@@ -22,6 +22,10 @@ environment:
     platform: Any CPU
   - PYTHON: C:\Python35-x64\python.exe
     platform: x64
+  - PYTHON: C:\Python36\python.exe
+    platform: Any CPU
+  - PYTHON: C:\Python36-x64\python.exe
+    platform: x64
   - PYPY: pypy2-v5.4.1-win32
     platform: Any CPU
   - PYTHON: C:\Python33\python.exe
