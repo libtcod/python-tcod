@@ -2,7 +2,7 @@ environment:
   pypi_user:
     secure: 6EhNSnUl0yOO26EeQ5WG1pQx8v/vp99/u24NRpZvF0k=
   pypi_pass:
-    secure: YhPdxLme3DzBgwQBteEZ6u0GxLHmDkBmBMMka78rNIw=
+    secure: PwPzzV8DPqw/+5M66FJQ5tbiF7rlOIK+bQIl8dFdF34=
   COVERALLS_REPO_TOKEN:
     secure: RfPO0w4cXW1mq0QzexFhqm/A63BjsAcIagiGcgXgxzDTcLqEsGHaVGH6OOa1kMyz
   COVERALLS_PARALLEL: true
