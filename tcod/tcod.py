@@ -9,6 +9,8 @@ import platform as _platform
 import weakref as _weakref
 import functools as _functools
 
+import numpy as _np
+
 from tcod.libtcod import lib, ffi, BKGND_DEFAULT, BKGND_SET
 
 def _unpack_char_p(char_p):
@@ -413,44 +415,120 @@ class Console(_CDataWrapper):
         self.cdata = self._get_cdata_from_args(*args, **kargs)
         if self.cdata is None:
             self._init(*args, **kargs)
+        self._init_setup_console_data()
 
     def _init(self, width, height):
         self.cdata = ffi.gc(lib.TCOD_console_new(width, height),
                             lib.TCOD_console_delete)
 
-    def get_width(self):
-        """Return the width of this console.
+    def _init_setup_console_data(self):
+        """Setup numpy arrays over libtcod data buffers."""
+        import numpy
+        if self.cdata == ffi.NULL:
+            self._console_data = lib.TCOD_ctx.root
+        else:
+            self._console_data = ffi.cast('TCOD_console_data_t *', self.cdata)
 
-        Returns:
-            int: The width of a Console.
-        """
+        def unpack_color(image_cdata):
+            """return a (height, width, 3) shaped array from an image struct"""
+            color_data = lib.TCOD_image_get_colors(image_cdata)
+            color_buffer = ffi.buffer(color_data[0:self.width * self.height])
+            array = _np.frombuffer(color_buffer, _np.uint8)
+            return array.reshape((self.height, self.width, 3))
+
+        self._fg = unpack_color(self._console_data.state.fg_colors)
+        self._bg = unpack_color(self._console_data.state.bg_colors)
+
+        buf = self._console_data.state.buf
+        buf = ffi.buffer(buf[0:self.width * self.height])
+        if ffi.sizeof('char_t') != 12:
+            # I'm expecting some compiler to have this at 9.
+            raise RuntimeError("Expected ffi.sizeof('char_t') to be 12. "
+                               "Got %i instead." % ffi.sizeof('char_t'))
+        buf = _np.frombuffer(buf, [('c', _np.intc),
+                                   ('cf', _np.intc),
+                                   ('dirty', _np.intc)])
+        self._buf = buf.reshape((self.height, self.width))
+        self._ch = self._buf['c']
+        self._cf = self._buf['cf']
+        self._dirty = self._buf['dirty']
+
+    def _fix_cf(self):
+        """Needs to be called sometime after self._ch is changed."""
+        ch_table_len = int(self._ch.max()) + 1
+        ch_table = ffi.buffer(lib.TCOD_ctx.ascii_to_tcod[0:ch_table_len])
+        ch_table = _np.frombuffer(ch_table, _np.intc)
+        self._cf[...] = ch_table[self._ch.ravel()].reshape(self._cf.shape)
+
+    @property
+    def width(self):
+        """int: The width of this Console. (read-only)"""
         return lib.TCOD_console_get_width(self.cdata)
 
-    def get_height(self):
-        """Return the height of this console.
-
-        Returns:
-            int: The height of a Console.
-        """
+    @property
+    def height(self):
+        """int: The height of this Console. (read-only)"""
         return lib.TCOD_console_get_height(self.cdata)
 
-    def set_default_bg(self, color):
-        """Change the default backround color for this console.
+    @property
+    def bg(self):
+        """A numpy array with the shape (height, width, 3).
 
-        Args:
-            color (Union[Tuple[int, int, int], Sequence[int]]):
-                An (r, g, b) sequence or Color instance.
+        You can change the background color by using this array.
+
+        Index this array with ``console.bg[y, x, ch]``
         """
-        lib.TCOD_console_set_default_background(self.cdata, color)
+        return self._bg
+    @bg.setter
+    def bg(self, value):
+        self._bg[...] = value
 
-    def set_default_fg(self, color):
-        """Change the default foreground color for this console.
+    @property
+    def fg(self):
+        """A numpy array with the shape (height, width, 3).
 
-        Args:
-            color (Union[Tuple[int, int, int], Sequence[int]]):
-                An (r, g, b) sequence or Color instance.
+        You can change the foreground color by using this array.
+
+        Index this array with ``console.fg[y, x, ch]``
         """
-        lib.TCOD_console_set_default_foreground(self.cdata, color)
+        return self._fg
+    @fg.setter
+    def fg(self, value):
+        self._fg[...] = value
+
+    @property
+    def default_bg(self):
+        """Tuple[int, int, int]: The default background color."""
+        color = self._console_data.back
+        return color.r, color.g, color.b
+    @default_bg.setter
+    def default_bg(self, color):
+        self._console_data.back = color
+
+    @property
+    def default_fg(self):
+        """Tuple[int, int, int]: The default foreground color."""
+        color = self._console_data.fore
+        return color.r, color.g, color.b
+    @default_fg.setter
+    def default_fg(self, color):
+        self._console_data.fore = color
+
+    @property
+    def default_blend(self):
+        """int: The default blending mode."""
+        return self._console_data.bkgnd_flag
+    @default_blend.setter
+    def default_blend(self, value):
+        self._console_data.bkgnd_flag = value
+
+    @property
+    def default_alignment(self):
+        """int: The default text alignment."""
+        return self._console_data.alignment
+    @default_alignment.setter
+    def default_alignment(self, value):
+        self._console_data.alignment = value
 
     def clear(self):
         """Reset this console to its default colors and the space character.
@@ -515,36 +593,6 @@ class Console(_CDataWrapper):
             c (Union[int, AnyStr]): Character to draw, can be an integer or string.
         """
         lib.TCOD_console_set_char(self.cdata, x, y, _int(ch))
-
-    def set_default_bg_blend(self, flag):
-        """Change the default blend mode for this console.
-
-        Args:
-            flag (int): Blend mode to use by default.
-        """
-        lib.TCOD_console_set_background_flag(self.cdata, flag)
-
-    def get_default_bg_blend(self):
-        """Return this consoles current blend mode.
-        """
-        return lib.TCOD_console_get_background_flag(self.cdata)
-
-    def set_alignment(self, alignment):
-        """Change this consoles current alignment mode.
-
-        * tcod.LEFT
-        * tcod.CENTER
-        * tcod.RIGHT
-
-        Args:
-            alignment (int):
-        """
-        lib.TCOD_console_set_alignment(self.cdata, alignment)
-
-    def get_alignment(self):
-        """Return this consoles current alignment mode.
-        """
-        return lib.TCOD_console_get_alignment(self.cdata)
 
     def print_str(self, x, y, fmt):
         """Print a color formatted string on a console.
@@ -630,16 +678,6 @@ class Console(_CDataWrapper):
         """
         lib.TCOD_console_print_frame(self.cdata, x, y, w, h, clear, flag,
                                   _fmt_bytes(fmt))
-
-    def get_default_bg(self):
-        """Return this consoles default background color."""
-        return Color._new_from_cdata(
-            lib.TCOD_console_get_default_background(self.cdata))
-
-    def get_default_fg(self):
-        """Return this consoles default foreground color."""
-        return Color._new_from_cdata(
-            lib.TCOD_console_get_default_foreground(self.cdata))
 
     def get_char_bg(self, x, y):
         """Return the background color at the x,y of this console."""
