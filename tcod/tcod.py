@@ -401,6 +401,52 @@ class Mouse(_CDataWrapper):
         if self.cdata == ffi.NULL:
             self.cdata = ffi.new('TCOD_mouse_t*')
 
+class _ChBufferArray(_np.ndarray):
+    """Numpy subclass designed to access libtcod's character buffer.
+
+    This class needs to modify the char_t.cf attribute as a side effect so that
+    libtcod will select the correct characters on flush.
+    """
+
+    def __new__(cls, ch_array, cf_array):
+        self = ch_array.view(cls)
+        self._cf_array = cf_array
+        return self
+
+    def __array_finalize__(self, obj):
+        if obj is None:
+            return
+        self._cf_array = None
+
+    def __repr__(self):
+        return repr(self.view(_np.ndarray))
+
+    def __getitem__(self, index):
+        """Slicing this array also slices its _cf_array attribute."""
+        array = _np.ndarray.__getitem__(self, index)
+        if self._cf_array is None or array.size == 1:
+            return array.view(_np.ndarray)
+        array._cf_array = self._cf_array[index]
+        return array
+
+    def _covert_ch_to_cf(self, index, ch_arr):
+        """Apply a set of Unicode variables to libtcod's special format.
+
+        _cf_array should be the same shape as ch_arr after being sliced by
+        index.
+        """
+        if lib.TCOD_ctx.max_font_chars == 0:
+            return # libtcod not initialized
+        ch_table = ffi.buffer(
+            lib.TCOD_ctx.ascii_to_tcod[0:lib.TCOD_ctx.max_font_chars])
+        ch_table = _np.frombuffer(ch_table, _np.intc)
+        self._cf_array[index] = ch_table[ch_arr.ravel()].reshape(ch_arr.shape)
+
+    def __setitem__(self, index, value):
+        """Properly set up the char_t.cf variables as a side effect."""
+        _np.ndarray.__setitem__(self, index, value)
+        if self._cf_array is not None:
+            self._covert_ch_to_cf(index, self[index])
 
 class Console(_CDataWrapper):
     """
@@ -449,16 +495,7 @@ class Console(_CDataWrapper):
                                    ('cf', _np.intc),
                                    ('dirty', _np.intc)])
         self._buf = buf.reshape((self.height, self.width))
-        self._ch = self._buf['c']
-        self._cf = self._buf['cf']
-        self._dirty = self._buf['dirty']
-
-    def _fix_cf(self):
-        """Needs to be called sometime after self._ch is changed."""
-        ch_table_len = int(self._ch.max()) + 1
-        ch_table = ffi.buffer(lib.TCOD_ctx.ascii_to_tcod[0:ch_table_len])
-        ch_table = _np.frombuffer(ch_table, _np.intc)
-        self._cf[...] = ch_table[self._ch.ravel()].reshape(self._cf.shape)
+        self._ch = _ChBufferArray(self._buf['c'], self._buf['cf'])
 
     @property
     def width(self):
@@ -476,7 +513,7 @@ class Console(_CDataWrapper):
 
         You can change the background color by using this array.
 
-        Index this array with ``console.bg[y, x, ch]``
+        Index this array with ``console.bg[y, x, channel]``
         """
         return self._bg
     @bg.setter
@@ -489,12 +526,25 @@ class Console(_CDataWrapper):
 
         You can change the foreground color by using this array.
 
-        Index this array with ``console.fg[y, x, ch]``
+        Index this array with ``console.fg[y, x, channel]``
         """
         return self._fg
     @fg.setter
     def fg(self, value):
         self._fg[...] = value
+
+    @property
+    def ch(self):
+        """A numpy array with the shape (height, width).
+
+        You can change the character tiles by using this array.
+
+        Index this array with ``console.ch[y, x]``
+        """
+        return self._ch
+    @ch.setter
+    def ch(self, value):
+        self._ch[...] = value
 
     @property
     def default_bg(self):
