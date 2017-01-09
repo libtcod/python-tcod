@@ -720,20 +720,6 @@ class Console(_CDataWrapper):
         lib.TCOD_console_print_frame(self.cdata, x, y, w, h, clear, flag,
                                   _fmt_bytes(fmt))
 
-    def get_char_bg(self, x, y):
-        """Return the background color at the x,y of this console."""
-        return Color._new_from_cdata(
-            lib.TCOD_console_get_char_background(self.cdata, x, y))
-
-    def get_char_fg(self, x, y):
-        """Return the foreground color at the x,y of this console."""
-        return Color._new_from_cdata(
-            lib.TCOD_console_get_char_foreground(self.cdata, x, y))
-
-    def get_char(self, x, y):
-        """Return the character at the x,y of this console."""
-        return lib.TCOD_console_get_char(self.cdata, x, y)
-
     def blit(self, x, y, w, h,
              dest, dest_x, dest_y, fg_alpha=1, bg_alpha=1):
         """Blit this console from x,y,w,h to the console dst at xdst,ydst."""
@@ -743,39 +729,6 @@ class Console(_CDataWrapper):
     def set_key_color(self, color):
         """Set a consoles blit transparent color."""
         lib.TCOD_console_set_key_color(self.cdata, color)
-
-    def fill(self, ch=None, fg=None, bg=None):
-        """Fill this console with the given numpy array values.
-
-        Args:
-            ch (Optional[:any:`numpy.ndarray`]):
-                A numpy integer array with a shape of (width, height)
-            fg (Optional[:any:`numpy.ndarray`]):
-                A numpy integer array with a shape of (width, height, 3)
-            bg (Optional[:any:`numpy.ndarray`]):
-                A numpy integer array with a shape of (width, height, 3)
-        """
-        import numpy
-        if ch:
-            ch = numpy.ascontiguousarray(ch, dtype=numpy.intc)
-            ch_array = ffi.cast('int *', ch.ctypes.data)
-            lib.TCOD_console_fill_char(self.cdata, ch_array)
-        if fg:
-            r = numpy.ascontiguousarray(fg[:,:,0], dtype=numpy.intc)
-            g = numpy.ascontiguousarray(fg[:,:,1], dtype=numpy.intc)
-            b = numpy.ascontiguousarray(fg[:,:,2], dtype=numpy.intc)
-            cr = ffi.cast('int *', r.ctypes.data)
-            cg = ffi.cast('int *', g.ctypes.data)
-            cb = ffi.cast('int *', b.ctypes.data)
-            lib.TCOD_console_fill_foreground(self.cdata, cr, cg, cb)
-        if bg:
-            r = numpy.ascontiguousarray(bg[:,:,0], dtype=numpy.intc)
-            g = numpy.ascontiguousarray(bg[:,:,1], dtype=numpy.intc)
-            b = numpy.ascontiguousarray(bg[:,:,2], dtype=numpy.intc)
-            cr = ffi.cast('int *', r.ctypes.data)
-            cg = ffi.cast('int *', g.ctypes.data)
-            cb = ffi.cast('int *', b.ctypes.data)
-            lib.TCOD_console_fill_background(self.cdata, cr, cg, cb)
 
 
 class Image(_CDataWrapper):
@@ -1387,15 +1340,5 @@ def clipboard_get():
     .. versionadded:: 2.0
     """
     return _unpack_char_p(lib.TCOD_sys_clipboard_get())
-
-@ffi.def_extern()
-def _pycall_bsp_callback(node, handle):
-    """static bool _pycall_bsp_callback(TCOD_bsp_t *node, void *userData);"""
-    func, userData, propagate = ffi.from_handle(handle)
-    try:
-        return func(BSP(node), userData)
-    except BaseException:
-        propagate(*_sys.exc_info())
-        return False
 
 __all__ = [_name for _name in list(globals()) if _name[0] != '_']
