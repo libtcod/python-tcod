@@ -57,7 +57,7 @@ class _Mock(object):
     FOV_RESTRICTIVE = 12
 
     CData = () # This gets passed to an isinstance call.
-    
+
     def def_extern(self):
         """Pass def_extern call silently."""
         return lambda func:func
@@ -148,14 +148,6 @@ class Color(list):
         else:
             return Color._new_from_cdata(
                 lib.TCOD_color_multiply_scalar(self, other))
-
-    def __bytes__(self):
-        """Return this color in a format suited for color control."""
-        return b'%c%c%c' % tuple(self)
-
-    def __str__(self):
-        """Return this color in a format suited for color control."""
-        return '%c%c%c' % tuple(self)
 
     def __repr__(self):
         """Return a printable representation of the current color."""
