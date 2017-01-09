@@ -1228,44 +1228,62 @@ class _PathFinder(object):
     .. versionadded:: 2.0
     """
 
-    def __init__(self, map_data, diagonal_cost=1.41):
-        self._cdata = None
-        self._map_data = map_data
-        self._diagonal_cost = diagonal_cost
-        self._handle = None
-        self._callback_args = ()
-        self._propagator = _PropagateException()
-        self._width = None
-        self._height = None
+    def __init__(self):
+        self.width = None
+        self.height = None
+        self.diagonal_cost = None
+        self.cdata = None
+        self.handle = None
+        self.map_obj = None
+
+    @classmethod
+    def new_with_map(cls, tcod_map, diagonal_cost=1.41):
+        self = cls()
+        self.width = tcod_map.width
+        self.height = tcod_map.height
+        self.diagonal_cost = diagonal_cost
+
+        self.map_obj = tcod_map
+        self.cdata = ffi.gc(
+            self._path_new_using_map(tcod_map.cdata, diagonal_cost),
+            self._path_delete)
+        return self
+
+    @classmethod
+    def new_with_callback(cls, width, height, callback, diagonal_cost=1.41):
+        self = cls()
+        self.width = width
+        self.height = height
+        self.diagonal_cost = diagonal_cost
+
+        self.handle = ffi.new_handle(callback)
+        self.cdata = ffi.gc(
+            self._path_new_using_function(
+                width, height, lib._pycall_path_simple,
+                self.handle, diagonal_cost),
+            self._path_delete)
+        return self
+
+    @classmethod
+    def _new_with_callback_old(cls, width, height, callback, diagonal_cost,
+                               userData):
+        self = cls()
+        self.width = width
+        self.height = height
+        self.diagonal_cost = diagonal_cost
+
+        self.handle = ffi.new_handle((callback, userData))
+        self.cdata = ffi.gc(
+            self._path_new_using_function(
+                width, height, lib._pycall_path_old,
+                self.handle, diagonal_cost),
+            self._path_delete)
+        return self
+
 
     _path_new_using_map = lib.TCOD_path_new_using_map
     _path_new_using_function = lib.TCOD_path_new_using_function
     _path_delete = lib.TCOD_path_delete
-
-    @property
-    def cdata(self):
-        if self._cdata is None:
-            self._cdata = self._init_cdata()
-        return self._cdata
-
-    def _init_cdata(self):
-        if callable(self._map_data):
-            self._handle = ffi.new_handle(self)
-            return ffi.gc(self._path_new_using_function(
-                              self._width, self._height,
-                              lib._pycall_path_func, self._handle,
-                              self._diagonal_cost),
-                          self._path_delete)
-
-        if isinstance(self._map_data, Map):
-            self._width = self._map_data.width
-            self._height = self._map_data.height
-            return ffi.gc(self._path_new_using_map(self._map_data.cdata,
-                                                   self._diagonal_cost),
-                          self._path_delete)
-
-        raise RuntimeError('map_data must be a callable/Map, not %r' %
-                           (self._map_data,))
 
 
 class AStar(_PathFinder):
@@ -1285,8 +1303,7 @@ class AStar(_PathFinder):
             List[Tuple[int, int]]:
                 A list of points, or an empty list if there is no valid path.
         """
-        with self._propagator:
-            lib.TCOD_path_compute(self.cdata, start_x, start_y, goal_x, goal_y)
+        lib.TCOD_path_compute(self.cdata, start_x, start_y, goal_x, goal_y)
         path = []
         x = ffi.new('int[2]')
         y = x + 1
@@ -1307,8 +1324,7 @@ class Dijkstra(_PathFinder):
     def set_goal(self, x, y):
         """Set the goal point and recompute the Dijkstra path-finder.
         """
-        with self._propagator:
-            lib.TCOD_dijkstra_compute(self.cdata, x, y)
+        lib.TCOD_dijkstra_compute(self.cdata, x, y)
 
     def get_path(self, x, y):
         """Return a list of (x, y) steps to reach the goal point, if possible.
@@ -1316,10 +1332,11 @@ class Dijkstra(_PathFinder):
         lib.TCOD_dijkstra_path_set(self.cdata, x, y)
         path = []
         pointer_x = ffi.new('int[2]')
-        pointer_y = x + 1
+        pointer_y = pointer_x + 1
         while lib.TCOD_dijkstra_path_walk(self.cdata, pointer_x, pointer_y):
             path.append(pointer_x[0], pointer_y[0])
         return path
+
 
 def clipboard_set(string):
     """Set the clipboard contents to string.

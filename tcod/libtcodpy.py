@@ -1010,15 +1010,15 @@ def console_save_apf(con, filename):
     lib.TCOD_console_save_apf(_cdata(con),_bytes(filename))
 
 @ffi.def_extern()
-def _pycall_path_func(x1, y1, x2, y2, handle):
-    '''static float _pycall_path_func( int xFrom, int yFrom, int xTo, int yTo, void *user_data );
-    '''
-    pathfinder = ffi.from_handle(handle)
-    try:
-        return pathfinder._map_data(x1, y1, x2, y2, *pathfinder._callback_args)
-    except BaseException:
-        pathfinder._propagator.propagate(*_sys.exc_info())
-        return None
+def _pycall_path_old(x1, y1, x2, y2, handle):
+    """libtcod style callback, needs to preserve the old userData issue."""
+    func, userData = ffi.from_handle(handle)
+    return func(x1, y1, x2, y2, userData)
+
+@ffi.def_extern()
+def _pycall_path_simple(x1, y1, x2, y2, handle):
+    """Does less and should run faster, just calls the handle function."""
+    return ffi.from_handle(handle)(x1, y1, x2, y2)
 
 def path_new_using_map(m, dcost=1.41):
     """Return a new AStar using the given Map.
@@ -1030,7 +1030,7 @@ def path_new_using_map(m, dcost=1.41):
     Returns:
         AStar: A new AStar instance.
     """
-    return AStar(m, dcost)
+    return AStar.new_with_map(m, dcost)
 
 def path_new_using_function(w, h, func, userData=0, dcost=1.41):
     """Return a new AStar using the given callable function.
@@ -1045,11 +1045,7 @@ def path_new_using_function(w, h, func, userData=0, dcost=1.41):
     Returns:
         AStar: A new AStar instance.
     """
-    pathfinder = AStar(func, dcost)
-    pathfinder._callback_args = (userData,)
-    pathfinder._height = h
-    pathfinder._width = w
-    return pathfinder
+    return AStar._new_with_callback_old(w, h, func, dcost, userData)
 
 def path_compute(p, ox, oy, dx, dy):
     """Find a path from (ox, oy) to (dx, dy).  Return True if path is found.
@@ -1063,8 +1059,7 @@ def path_compute(p, ox, oy, dx, dy):
     Returns:
         bool: True if a valid path was found.  Otherwise False.
     """
-    with p._propagator:
-        return lib.TCOD_path_compute(p.cdata, ox, oy, dx, dy)
+    return lib.TCOD_path_compute(p.cdata, ox, oy, dx, dy)
 
 def path_get_origin(p):
     """Get the current origin position.
@@ -1151,9 +1146,8 @@ def path_walk(p, recompute):
     """
     x = ffi.new('int *')
     y = ffi.new('int *')
-    with p._propagator:
-        if lib.TCOD_path_walk(p.cdata, x, y, recompute):
-            return x[0], y[0]
+    if lib.TCOD_path_walk(p.cdata, x, y, recompute):
+        return x[0], y[0]
     return None,None
 
 def path_delete(p):
@@ -1161,25 +1155,13 @@ def path_delete(p):
     pass
 
 def dijkstra_new(m, dcost=1.41):
-    return Dijkstra(m, dcost)
-    #return (ffi.gc(lib.TCOD_dijkstra_new(_cdata(m), dcost),
-    #                lib.TCOD_dijkstra_delete), _PropagateException())
+    return Dijkstra.new_with_map(m, dcost)
 
 def dijkstra_new_using_function(w, h, func, userData=0, dcost=1.41):
-    pathfinder = Dijkstra(func, dcost)
-    pathfinder._callback_args = (userData,)
-    pathfinder._height = h
-    pathfinder._width = w
-    return pathfinder
-    #propagator = _PropagateException()
-    #handle = ffi.new_handle((func, propagator, (userData,)))
-    #return (ffi.gc(lib.TCOD_dijkstra_new_using_function(w, h,
-    #                lib._pycall_path_func, handle, dcost),
-    #                lib.TCOD_dijkstra_delete), propagator, handle)
+    return Dijkstra._new_with_callback_old(w, h, func, dcost, userData)
 
 def dijkstra_compute(p, ox, oy):
-    with p._propagator:
-        lib.TCOD_dijkstra_compute(p.cdata, ox, oy)
+    lib.TCOD_dijkstra_compute(p.cdata, ox, oy)
 
 def dijkstra_path_set(p, x, y):
     return lib.TCOD_dijkstra_path_set(p.cdata, x, y)
