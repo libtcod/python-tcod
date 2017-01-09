@@ -516,9 +516,6 @@ class Console(_CDataWrapper):
         Index this array with ``console.bg[y, x, channel]``
         """
         return self._bg
-    @bg.setter
-    def bg(self, value):
-        self._bg[...] = value
 
     @property
     def fg(self):
@@ -529,9 +526,6 @@ class Console(_CDataWrapper):
         Index this array with ``console.fg[y, x, channel]``
         """
         return self._fg
-    @fg.setter
-    def fg(self, value):
-        self._fg[...] = value
 
     @property
     def ch(self):
@@ -542,9 +536,6 @@ class Console(_CDataWrapper):
         Index this array with ``console.ch[y, x]``
         """
         return self._ch
-    @ch.setter
-    def ch(self, value):
-        self._ch[...] = value
 
     @property
     def default_bg(self):
