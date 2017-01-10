@@ -29,5 +29,3 @@ with open(_os.path.join(__path__[0], 'version.txt'), 'r') as _f:
     # exclude the git commit number (PEP 396)
     __version__ = _re.match(r'([0-9]+)\.([0-9]+).*?', _f.read()).groups()
     assert __version__, 'version.txt parse error'
-
-__all__ = [name for name in list(globals()) if name[0] != '_']

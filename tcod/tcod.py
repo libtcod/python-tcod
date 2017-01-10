@@ -1242,5 +1242,3 @@ def clipboard_get():
     .. versionadded:: 2.0
     """
     return _unpack_char_p(lib.TCOD_sys_clipboard_get())
-
-__all__ = [_name for _name in list(globals()) if _name[0] != '_']

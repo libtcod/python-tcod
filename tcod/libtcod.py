@@ -160,5 +160,3 @@ class Color(list):
 
 
 _import_library_functions(lib)
-
-__all__ = [_name for _name in list(globals()) if _name[0] != '_']

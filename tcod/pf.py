@@ -140,8 +140,3 @@ class Dijkstra(_PathFinder):
         while lib.TCOD_dijkstra_path_walk(self.cdata, pointer_x, pointer_y):
             path.append(pointer_x[0], pointer_y[0])
         return path
-
-__all__ = [
-           AStar,
-           Dijkstra,
-           ]

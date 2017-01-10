@@ -2458,5 +2458,3 @@ def sys_wait_for_event(mask, k, m, flush):
         flush (bool): Clear the event buffer before waiting.
     """
     return lib.TCOD_sys_wait_for_event(mask, _cdata(k), _cdata(m), flush)
-
-__all__ = [_name for _name in list(globals()) if _name[0] != '_']
