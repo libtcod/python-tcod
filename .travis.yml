@@ -37,6 +37,8 @@ addons:
       - mesa-common-dev
 
 before_install:
+- 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi'
+- 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi'
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install sdl2; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" && "$PYTHON" == "python3" ]]; then brew install $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv venv -p $PYTHON; fi
@@ -46,9 +48,6 @@ install:
 - 'if [[ "$TRAVIS_PYTHON_VERSION" == pypy* ]]; then pip install git+https://bitbucket.org/pypy/numpy.git; fi'
 - python setup.py develop
 before_script:
- - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi'
- - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi'
- - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sleep 3; fi' # give xvfb some time to start
  - pip install nose2 cov-core
 script:
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then python -m nose2; fi'
