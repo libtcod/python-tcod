@@ -1,4 +1,4 @@
-#include <SDL_config.h>
+#include <SDL_stdinc.h>
 
 #include "tdl_path.h"
 
