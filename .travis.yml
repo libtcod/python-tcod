@@ -43,6 +43,7 @@ before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
 - pip install --upgrade pip
 install:
+- 'if [[ "$TRAVIS_PYTHON_VERSION" == pypy* ]]; then pip install git+https://bitbucket.org/pypy/numpy.git; fi'
 - python setup.py develop
 before_script:
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi'
