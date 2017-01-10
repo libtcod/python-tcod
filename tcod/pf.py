@@ -1,4 +1,6 @@
 
+from __future__ import absolute_import as _
+
 from tcod.libtcod import lib, ffi
 
 
