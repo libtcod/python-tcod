@@ -35,6 +35,9 @@ environment:
 
 clone_depth: 20
 
+cache:
+  - '%localappdata%\pip\cache -> setup.py'
+
 install:
 - cmd: "git submodule update --init --recursive"
 - ps: |
@@ -68,7 +71,6 @@ on_success:
 #- coveralls
 - coverage xml
 - python-codacy-coverage -r coverage.xml
-- bash <(curl -s https://codecov.io/bash)
 
 deploy_script:
 - "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% -m pip install twine"
