@@ -9,14 +9,14 @@ import numpy as _np
 
 from tcod.libtcod import *
 
+from tcod.pf import AStar
+from tcod.pf import Dijkstra
 from tcod.tcod import _int, _cdata, _unpack_char_p
 from tcod.tcod import _bytes, _unicode, _fmt_bytes, _fmt_unicode
 from tcod.tcod import _CDataWrapper
 from tcod.tcod import _PropagateException
-from tcod.tcod import AStar
 from tcod.tcod import BSP as Bsp
 from tcod.tcod import Console
-from tcod.tcod import Dijkstra
 from tcod.tcod import Image
 from tcod.tcod import Key
 from tcod.tcod import Map
@@ -1008,17 +1008,6 @@ def console_load_apf(con, filename):
 
 def console_save_apf(con, filename):
     lib.TCOD_console_save_apf(_cdata(con),_bytes(filename))
-
-@ffi.def_extern()
-def _pycall_path_old(x1, y1, x2, y2, handle):
-    """libtcod style callback, needs to preserve the old userData issue."""
-    func, userData = ffi.from_handle(handle)
-    return func(x1, y1, x2, y2, userData)
-
-@ffi.def_extern()
-def _pycall_path_simple(x1, y1, x2, y2, handle):
-    """Does less and should run faster, just calls the handle function."""
-    return ffi.from_handle(handle)(x1, y1, x2, y2)
 
 def path_new_using_map(m, dcost=1.41):
     """Return a new AStar using the given Map.

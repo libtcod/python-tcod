@@ -23,6 +23,7 @@ import re as _re
 
 from tcod.libtcodpy import *
 from tcod.tcod import *
+from tcod import pf
 
 with open(_os.path.join(__path__[0], 'version.txt'), 'r') as _f:
     # exclude the git commit number (PEP 396)

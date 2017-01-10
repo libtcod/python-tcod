@@ -1,3 +1,7 @@
+#ifndef _TDL_H_
+#define _TDL_H_
+
+#include "tdl_path.h"
 
 /* TDL FUNCTONS ----------------------------------------------------------- */
 
@@ -47,3 +51,5 @@ int TDL_console_get_fg(TCOD_console_t console, int x, int y);
 void TDL_console_set_bg(TCOD_console_t console, int x, int y, int color,
                         TCOD_bkgnd_flag_t flag);
 void TDL_console_set_fg(TCOD_console_t console, int x, int y, int color);
+
+#endif
