@@ -395,19 +395,17 @@ def color_lerp(c1, c2, a):
 def color_set_hsv(c, h, s, v):
     """Set a color using: hue, saturation, and value parameters.
 
-    Does not return a new Color.  Instead the provided color is modified.
+    Does not return a new Color.  ``c`` is modified inplace.
 
     Args:
-        c (Color): Must be a color instance.
-        h (float): Hue, from 0 to 1.
+        c (Union[Color, List[Any]]): A Color instance, or a list of any kind.
+        h (float): Hue, from 0 to 360.
         s (float): Saturation, from 0 to 1.
         v (float): Value, from 0 to 1.
     """
     new_color = ffi.new('TCOD_color_t*')
     lib.TCOD_color_set_HSV(new_color, h, s, v)
-    c.r = new_color.r
-    c.g = new_color.g
-    c.b = new_color.b
+    c[:] = new_color.r, new_color.g, new_color.b
 
 def color_get_hsv(c):
     """Return the (hue, saturation, value) of a color.
@@ -420,19 +418,17 @@ def color_get_hsv(c):
         Tuple[float, float, float]:
             A tuple with (hue, saturation, value) values, from 0 to 1.
     """
-    h = ffi.new('float *')
-    s = ffi.new('float *')
-    v = ffi.new('float *')
-    lib.TCOD_color_get_HSV(c, h, s, v)
-    return h[0], s[0], v[0]
+    hsv = ffi.new('float [3]')
+    lib.TCOD_color_get_HSV(c, hsv, hsv + 1, hsv + 2)
+    return hsv[0], hsv[1], hsv[2]
 
 def color_scale_HSV(c, scoef, vcoef):
     """Scale a color's saturation and value.
 
-    Does not return a new Color.  Instead the provided color is modified.
+    Does not return a new Color.  ``c`` is modified inplace.
 
     Args:
-        c (Color): Must be a Color instance.
+        c (Union[Color, List[int]]): A Color instance, or an [r, g, b] list.
         scoef (float): Saturation multiplier, from 0 to 1.
                        Use 1 to keep current saturation.
         vcoef (float): Value multiplier, from 0 to 1.
@@ -441,7 +437,7 @@ def color_scale_HSV(c, scoef, vcoef):
     color_p = ffi.new('TCOD_color_t*')
     color_p.r, color_p.g, color_p.b = c.r, c.g, c.b
     lib.TCOD_color_scale_HSV(color_p, scoef, vcoef)
-    c.r, c.g, c.b = color_p.r, color_p.g, color_p.b
+    c[:] = color_p.r, color_p.g, color_p.b
 
 def color_gen_map(colors, indexes):
     """Return a smoothly defined scale of colors.
