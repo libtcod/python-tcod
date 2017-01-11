@@ -1015,7 +1015,7 @@ def path_new_using_map(m, dcost=1.41):
     Returns:
         AStar: A new AStar instance.
     """
-    return AStar.new_with_map(m, dcost)
+    return AStar(m, dcost)
 
 def path_new_using_function(w, h, func, userData=0, dcost=1.41):
     """Return a new AStar using the given callable function.
@@ -1030,7 +1030,7 @@ def path_new_using_function(w, h, func, userData=0, dcost=1.41):
     Returns:
         AStar: A new AStar instance.
     """
-    return AStar._new_with_callback_old(w, h, func, dcost, userData)
+    return AStar((func, userData), dcost, w, h)
 
 def path_compute(p, ox, oy, dx, dy):
     """Find a path from (ox, oy) to (dx, dy).  Return True if path is found.
@@ -1140,10 +1140,10 @@ def path_delete(p):
     pass
 
 def dijkstra_new(m, dcost=1.41):
-    return Dijkstra.new_with_map(m, dcost)
+    return Dijkstra(m, dcost)
 
 def dijkstra_new_using_function(w, h, func, userData=0, dcost=1.41):
-    return Dijkstra._new_with_callback_old(w, h, func, dcost, userData)
+    return Dijkstra((func, userData), dcost, w, h)
 
 def dijkstra_compute(p, ox, oy):
     lib.TCOD_dijkstra_compute(p.cdata, ox, oy)

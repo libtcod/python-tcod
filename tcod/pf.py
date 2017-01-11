@@ -1,8 +1,11 @@
 
 from __future__ import absolute_import as _
 
-from tcod.libtcod import lib, ffi
+import numpy as np
 
+import tcod.map
+
+from tcod.libtcod import lib, ffi
 
 @ffi.def_extern()
 def _pycall_path_old(x1, y1, x2, y2, handle):
@@ -34,58 +37,83 @@ class _PathFinder(object):
     .. versionadded:: 2.0
     """
 
-    def __init__(self):
-        self.width = None
-        self.height = None
-        self.diagonal_cost = None
+    _C_ARRAY_CALLBACKS = {
+        np.float32: ('float*', lib.PathCostArrayFloat32),
+        np.bool_: ('int8_t*', lib.PathCostArrayInt8),
+        np.int8: ('int8_t*', lib.PathCostArrayInt8),
+        np.uint8: ('uint8_t*', lib.PathCostArrayUInt8),
+        np.int16: ('int16_t*', lib.PathCostArrayInt16),
+        np.uint16: ('uint16_t*', lib.PathCostArrayUInt16),
+        np.int32: ('int32_t*', lib.PathCostArrayInt32),
+        np.uint32: ('uint32_t*', lib.PathCostArrayUInt32),
+        }
+
+    def __init__(self, cost, diagonal=1.41,
+                 width=None, height=None):
+        """
+
+        Args:
+            cost (Union[tcod.map.Map,
+                        Callable[float, int, int, int, int],
+                        numpy.ndarray]):
+            diagonal (float): Multiplier for diagonal movement.
+                            A value of 0 disables diagonal movement entirely.
+            width (int): The clipping width of this pathfinder.
+                         Only needed if ``cost`` is a function call.
+            height (int): The clipping height of this pathfinder.
+                          Only needed if ``cost`` is a function call.
+        """
+        self.cost = cost
+        self.width = width
+        self.height = height
+        self.diagonal = diagonal
         self.cdata = None
         self.handle = None
-        self.map_obj = None
 
-    @classmethod
-    def new_with_map(cls, tcod_map, diagonal_cost=1.41):
-        self = cls()
-        self.width = tcod_map.width
-        self.height = tcod_map.height
-        self.diagonal_cost = diagonal_cost
+        if isinstance(cost, tcod.map.Map):
+            self._setup_map(cost)
+        elif callable(cost):
+            self._setup_callback(lib._pycall_path_simple, cost)
+        elif isinstance(cost, tuple) and len(cost) == 2 and callable(cost[0]):
+            # hacked in support for old libtcodpy functions, don't abuse this!
+            self._setup_callback(lib._pycall_path_old, cost)
+        elif isinstance(cost, np.ndarray):
+            self._setup_ndarray(cost)
+        else:
+            raise TypeError('cost must be a Map, function, or numpy array, '
+                            'got %r' % (cost,))
 
-        self.map_obj = tcod_map
+    def _setup_map(self, cost):
+        """Setup this pathfinder using libtcod's path_new_using_map."""
+        self.width = cost.width
+        self.height = cost.height
         self.cdata = ffi.gc(
-            self._path_new_using_map(tcod_map.cdata, diagonal_cost),
+            self._path_new_using_map(cost.cdata, self.diagonal),
             self._path_delete)
-        return self
 
-    @classmethod
-    def new_with_callback(cls, width, height, callback, diagonal_cost=1.41):
-        self = cls()
-        self.width = width
-        self.height = height
-        self.diagonal_cost = diagonal_cost
+    def _setup_callback(self, c_call, args):
+        """Setup this pathfinder using libtcod's path_new_using_function.
 
-        self.handle = ffi.new_handle(callback)
+        The c_call will be called with (x1,y1,x2,y2,args).
+        """
+        self.handle = ffi.new_handle(args)
         self.cdata = ffi.gc(
-            self._path_new_using_function(
-                width, height, lib._pycall_path_simple,
-                self.handle, diagonal_cost),
-            self._path_delete)
-        return self
+                self._path_new_using_function(
+                    self.width, self.height, c_call,
+                    self.handle, self.diagonal),
+                self._path_delete)
 
-    @classmethod
-    def _new_with_callback_old(cls, width, height, callback, diagonal_cost,
-                               userData):
-        self = cls()
-        self.width = width
-        self.height = height
-        self.diagonal_cost = diagonal_cost
-
-        self.handle = ffi.new_handle((callback, userData))
-        self.cdata = ffi.gc(
-            self._path_new_using_function(
-                width, height, lib._pycall_path_old,
-                self.handle, diagonal_cost),
-            self._path_delete)
-        return self
-
+    def _setup_ndarray(self, cost):
+        """Validate a numpy array and setup a C callback."""
+        self.height, self.width = cost.shape # must be a 2d array
+        if cost.dtype not in self._C_ARRAY_CALLBACKS:
+            raise ValueError('dtype must be one of %r, dtype is %r' %
+                             (self._C_ARRAY_CALLBACKS.keys(), cost.dtype))
+        self.cost = cost = np.ascontiguousarray(cost)
+        array_type, c_callback = self._C_ARRAY_CALLBACKS[cost.dtype]
+        cost = ffi.cast(array_type, cost.ctypes.data)
+        self._setup_callback(c_callback,
+                             ffi.new('PathCostArray*', (self.width, cost)))
 
     _path_new_using_map = lib.TCOD_path_new_using_map
     _path_new_using_function = lib.TCOD_path_new_using_function
