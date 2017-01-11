@@ -1,6 +1,6 @@
 #include <SDL_stdinc.h>
 
-#include "tdl_path.h"
+#include "path.h"
 
 float PathCostArrayFloat32(const int x1, const int y1,
                            const int x2, const int y2,

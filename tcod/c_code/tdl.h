@@ -1,7 +1,5 @@
-#ifndef _TDL_H_
-#define _TDL_H_
-
-#include "tdl_path.h"
+#ifndef _TCOD_C_CODE_TDL_H_
+#define _TCOD_C_CODE_TDL_H_
 
 /* TDL FUNCTONS ----------------------------------------------------------- */
 

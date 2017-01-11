@@ -1,5 +1,5 @@
-#ifndef _TDL_PATH_H_
-#define _TDL_PATH_H_
+#ifndef _TCOD_C_CODE_PATH_H_
+#define _TCOD_C_CODE_PATH_H_
 
 typedef struct {
     int width;

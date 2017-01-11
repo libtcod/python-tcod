@@ -8,6 +8,10 @@ import subprocess
 import platform
 from pycparser import c_parser, c_ast, parse_file, c_generator
 
+TCOD_C_PATH = 'tcod/c_code'
+CFFI_HEADER = os.path.join(TCOD_C_PATH, 'cffi.h')
+CFFI_EXTRA_CDEFS = os.path.join(TCOD_C_PATH, 'cdef.h')
+
 BITSIZE, LINKAGE = platform.architecture()
 
 def walk_sources(directory):
@@ -24,7 +28,7 @@ def find_sources(directory):
 
 module_name = 'tcod._libtcod'
 include_dirs = [
-                'tcod/',
+                TCOD_C_PATH,
                 'libtcod/include/',
                 'libtcod/src/png/',
                 'libtcod/src/zlib/',
@@ -50,7 +54,7 @@ define_macros = [('LIBTCOD_EXPORTS', None),
                  ('_CRT_SECURE_NO_WARNINGS', None),
                  ]
 
-sources += find_sources('tcod/')
+sources += walk_sources(TCOD_C_PATH)
 
 if sys.platform == 'win32':
     libraries += ['User32', 'OpenGL32']
@@ -146,7 +150,7 @@ def get_ast():
     global extra_parse_args
     if 'win32' in sys.platform:
         extra_parse_args += [r'-Idependencies/SDL2-2.0.4/include']
-    ast = parse_file(filename='tcod/tcod.h', use_cpp=True,
+    ast = parse_file(filename=CFFI_HEADER, use_cpp=True,
                      cpp_args=[r'-Idependencies/fake_libc_include',
                                r'-Ilibtcod/include',
                                r'-DDECLSPEC=',
@@ -167,9 +171,9 @@ def get_ast():
 
 ffi = FFI()
 ffi.cdef(get_cdef())
-ffi.cdef(open('tcod/tdl_python.h', 'r').read())
+ffi.cdef(open(CFFI_EXTRA_CDEFS, 'r').read())
 ffi.set_source(
-    module_name, '#include <tcod.h>',
+    module_name, '#include <cffi.h>',
     include_dirs=include_dirs,
     library_dirs=library_dirs,
     sources=sources,
