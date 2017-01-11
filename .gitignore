@@ -59,3 +59,4 @@ target/
 Release/
 tcod/_*.c
 tcod/_*.pyd
+.benchmarks

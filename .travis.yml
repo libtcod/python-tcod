@@ -49,10 +49,10 @@ before_install:
 install:
 - python setup.py develop
 before_script:
- - pip install nose2 cov-core
+ - pip install pytest pytest-cov pytest-benchmark
 script:
- - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then python -m nose2; fi'
- - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python -c "import tcod"; fi'
+ - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pytest; fi'
+ - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pytest --no-window; fi'
 after_success:
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip install codacy-coverage python-coveralls; fi'
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then coveralls; fi'

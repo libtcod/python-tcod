@@ -25,7 +25,8 @@ def get_package_data():
             files += ['x64/SDL2.dll']
     return {'tcod': files}
 
-
+needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
+pytest_runner = ['pytest-runner'] if needs_pytest else []
 
 setup(
     name='libtcod-cffi',
@@ -42,7 +43,7 @@ setup(
     setup_requires=[
         'cffi>=1.8.1,<2',
         'pycparser>=2.14,<3',
-        ],
+        ] + pytest_runner,
     cffi_modules=['build_libtcod.py:ffi'],
     install_requires=[
         'cffi>=1.8.1,<2',
@@ -51,6 +52,11 @@ setup(
     extras_require={
         ':python_version=="3.3"': ['numpy<1.12'],
         },
+    tests_require=[
+        'pytest',
+        'pytest-cov',
+        'pytest-benchmark',
+        ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Win32 (MS Windows)',
@@ -83,5 +89,4 @@ setup(
         'Linux',
         ],
     license='Simplified BSD License',
-    test_suite='nose2.collector.collector',
     )

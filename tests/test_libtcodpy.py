@@ -10,7 +10,9 @@ except ImportError:
     numpy = None
 
 from common import tcod
+from common import needs_window
 
+@needs_window
 class TestLibtcodpyConsole(unittest.TestCase):
 
     FONT_FILE = 'libtcod/terminal.png'
