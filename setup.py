@@ -25,14 +25,7 @@ def get_package_data():
             files += ['x64/SDL2.dll']
     return {'tcod': files}
 
-install_requires = [
-    'cffi>=1.8.1,<2',
-    'numpy<2',
-    ]
 
-# newer numpy versions dropped Python 3.3 support.
-if sys.version_info[:2] == (3, 3):
-    install_requires.append('numpy<1.12')
 
 setup(
     name='libtcod-cffi',
@@ -51,7 +44,13 @@ setup(
         'pycparser>=2.14,<3',
         ],
     cffi_modules=['build_libtcod.py:ffi'],
-    install_requires=install_requires,
+    install_requires=[
+        'cffi>=1.8.1,<2',
+        'numpy<2',
+        ],
+    extras_require={
+        ':python_version=="3.3"': ['numpy<1.12'],
+        },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Win32 (MS Windows)',
