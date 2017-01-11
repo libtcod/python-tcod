@@ -10,8 +10,8 @@ import numpy as _np
 from tcod.libtcod import *
 
 from tcod.map import Map
-from tcod.pf import AStar
-from tcod.pf import Dijkstra
+from tcod.path import AStar
+from tcod.path import Dijkstra
 from tcod.tcod import _int, _cdata, _unpack_char_p
 from tcod.tcod import _bytes, _unicode, _fmt_bytes, _fmt_unicode
 from tcod.tcod import _CDataWrapper
