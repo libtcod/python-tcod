@@ -10,6 +10,7 @@ import numpy as _np
 from tcod.libtcod import *
 
 from tcod.bsp import BSP as Bsp
+from tcod.console import Console
 from tcod.image import Image
 from tcod.map import Map
 from tcod.noise import Noise
@@ -20,7 +21,6 @@ from tcod.tcod import _int, _cdata, _unpack_char_p
 from tcod.tcod import _bytes, _unicode, _fmt_bytes, _fmt_unicode
 from tcod.tcod import _CDataWrapper
 from tcod.tcod import _PropagateException
-from tcod.tcod import Console
 from tcod.tcod import Key
 from tcod.tcod import Mouse
 
