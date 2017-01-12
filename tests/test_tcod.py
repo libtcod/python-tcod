@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
+import copy
+import pickle
+
+import numpy as np
 import pytest
-import unittest
 
 from common import tcod, raise_Exception
 
@@ -107,3 +110,15 @@ def test_tcod_map_set_bits(benchmark):
 def test_tcod_map_get_bits(benchmark):
     map_ = tcod.map.Map(2,2)
     benchmark(map_.transparent.__getitem__, 0)
+
+def test_tcod_map_copy(benchmark):
+    map_ = tcod.map.Map(3, 3)
+    map_.transparent[:] = True
+    assert (map_.buffer[:].tolist() == copy.copy(map_).buffer[:].tolist())
+    benchmark(copy.copy, map_)
+
+def test_tcod_map_pickle():
+    map_ = tcod.map.Map(3, 3)
+    map_.transparent[:] = True
+    assert (map_.buffer[:].tolist() ==
+            pickle.loads(pickle.dumps(copy.copy(map_))).buffer[:].tolist())

@@ -34,15 +34,15 @@ class Map(object):
     """
 
     def __init__(self, width, height):
-        self.width = width
-        self.height = height
-        self.cdata = ffi.gc(ffi.cast('map_t*',
-                                     lib.TCOD_map_new(width, height)),
-                            lib.TCOD_map_delete)
-
         assert ffi.sizeof('cell_t') == 1 # assert buffer alignment
-        buffer = ffi.buffer(self.cdata.cells[0:self.cdata.nbcells])
-        self.buffer = np.frombuffer(buffer, np.uint8).reshape((height, width))
+        self.buffer = np.zeros((height, width), dtype=np.uint8)
+
+        self.cdata = ffi.new('map_t*')
+        self.cdata.width = self.width = width
+        self.cdata.height = self.height = height
+        self.cdata.nbcells = width * height
+        self.cdata.cells = ffi.cast('cell_t*', self.buffer.ctypes.data)
+
         self.transparent = BufferBitProxy(self.buffer, 0x01)
         self.walkable = BufferBitProxy(self.buffer, 0x02)
         self.fov = BufferBitProxy(self.buffer, 0x04)
@@ -60,3 +60,16 @@ class Map(object):
         """
         lib.TCOD_map_compute_fov(self.cdata, x, y, radius, light_walls,
                                  algorithm)
+
+    def __getstate__(self):
+        """Return this objects state.
+
+        This method allows the usage of the :any:`copy` and :any:`pickle`
+        modules with this class.
+        """
+        return {'size': (self.width, self.height), 'buffer': self.buffer}
+
+    def __setstate__(self, state):
+        """Unpack this object from a saved state.  A new buffer is used."""
+        self.__init__(*state['size'])
+        self.buffer[...] = state['buffer']
