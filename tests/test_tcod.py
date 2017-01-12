@@ -85,3 +85,25 @@ def test_console_defaults(console):
 
     console.default_alignment = tcod.RIGHT
     assert console.default_alignment == tcod.RIGHT
+
+
+def test_tcod_map_set_bits(benchmark):
+    map_ = tcod.map.Map(2,2)
+
+    assert map_.transparent[:].any() == False
+    assert map_.walkable[:].any() == False
+    assert map_.fov[:].any() == False
+
+    map_.transparent[1, 0] = True
+    assert tcod.map_is_transparent(map_, 0, 1) == True
+    map_.walkable[1, 0] = True
+    assert tcod.map_is_walkable(map_, 0, 1) == True
+    map_.fov[1, 0] = True
+    assert tcod.map_is_in_fov(map_, 0, 1) == True
+
+    benchmark(map_.transparent.__setitem__, 0, 0)
+
+
+def test_tcod_map_get_bits(benchmark):
+    map_ = tcod.map.Map(2,2)
+    benchmark(map_.transparent.__getitem__, 0)

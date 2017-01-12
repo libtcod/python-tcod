@@ -1,10 +1,26 @@
 
 from __future__ import absolute_import as _
 
-from tcod.libtcod import lib, ffi
-from tcod.tcod import _CDataWrapper
+import numpy as np
 
-class Map(_CDataWrapper):
+from tcod.libtcod import lib, ffi
+
+
+class BufferBitProxy(object):
+
+    def __init__(self, buffer, bitmask):
+        self.buffer = buffer
+        self.bitmask = bitmask
+
+    def __getitem__(self, index):
+        return (self.buffer[index] & self.bitmask) != 0
+
+    def __setitem__(self, index, values):
+        self.buffer[index] &= 0xff ^ self.bitmask
+        self.buffer[index] |= self.bitmask * np.asarray(values, bool)
+
+
+class Map(object):
     """
     .. versionadded:: 2.0
 
@@ -17,23 +33,19 @@ class Map(_CDataWrapper):
         height (int): Read only height of this Map.
     """
 
-    def __init__(self, *args, **kargs):
-        super(Map, self).__init__(*args, **kargs)
-        if not self.cdata:
-            self._init(*args, **kargs)
-
-        self.width = lib.TCOD_map_get_width(self.cdata)
-        self.height = lib.TCOD_map_get_width(self.cdata)
-
-    def _init(self, width, height):
-        self.cdata = ffi.gc(lib.TCOD_map_new(width, height),
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+        self.cdata = ffi.gc(ffi.cast('map_t*',
+                                     lib.TCOD_map_new(width, height)),
                             lib.TCOD_map_delete)
 
-    def set_properties(self, x, y, transparent, walkable):
-        lib.TCOD_map_set_properties(self.cdata, x, y, transparent, walkable)
-
-    def clear(self, transparent, walkable):
-        lib.TCOD_map_clear(self.cdata, transparent, walkable)
+        assert ffi.sizeof('cell_t') == 1 # assert buffer alignment
+        buffer = ffi.buffer(self.cdata.cells[0:self.cdata.nbcells])
+        self.buffer = np.frombuffer(buffer, np.uint8).reshape((height, width))
+        self.transparent = BufferBitProxy(self.buffer, 0x01)
+        self.walkable = BufferBitProxy(self.buffer, 0x02)
+        self.fov = BufferBitProxy(self.buffer, 0x04)
 
     def compute_fov(self, x, y, radius=0, light_walls=True,
                     algorithm=lib.FOV_RESTRICTIVE):
@@ -48,12 +60,3 @@ class Map(_CDataWrapper):
         """
         lib.TCOD_map_compute_fov(self.cdata, x, y, radius, light_walls,
                                  algorithm)
-
-    def is_fov(self, x, y):
-        return lib.TCOD_map_is_in_fov(self.cdata, x, y)
-
-    def is_transparent(self, x, y):
-        return lib.TCOD_map_is_transparent(self.cdata, x, y)
-
-    def is_walkable(self, x, y):
-        return lib.TCOD_map_is_walkable(self.cdata, x, y)
