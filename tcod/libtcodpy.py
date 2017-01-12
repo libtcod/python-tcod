@@ -2086,7 +2086,8 @@ def random_get_instance():
     Returns:
         Random: A Random instance using the default random number generator.
     """
-    return Random(lib.TCOD_random_get_instance())
+    return Random._new_from_cdata(
+        ffi.cast('mersenne_data_t*', lib.TCOD_random_get_instance()))
 
 def random_new(algo=RNG_CMWC):
     """Return a new Random instance.  Using ``algo``.
@@ -2097,7 +2098,7 @@ def random_new(algo=RNG_CMWC):
     Returns:
         Random: A new Random instance using the given algorithm.
     """
-    return Random(ffi.gc(lib.TCOD_random_new(algo), lib.TCOD_random_delete))
+    return Random(algo)
 
 def random_new_from_seed(seed, algo=RNG_CMWC):
     """Return a new Random instance.  Using the given ``seed`` and ``algo``.
@@ -2110,7 +2111,7 @@ def random_new_from_seed(seed, algo=RNG_CMWC):
     Returns:
         Random: A new Random instance using the given algorithm.
     """
-    return Random(seed, algo)
+    return Random(algo, seed)
 
 def random_set_distribution(rnd, dist):
     """Change the distribution mode of a random number generator.
@@ -2212,8 +2213,9 @@ def random_save(rnd):
     Returns:
         Random: A Random instance with a copy of the random generator.
     """
-    return Random(ffi.gc(lib.TCOD_random_save(_cdata(rnd)),
-                         lib.TCOD_random_delete))
+    return Random._new_from_cdata(
+        ffi.gc(ffi.cast('mersenne_data_t*', lib.TCOD_random_save(rnd.cdata)),
+               lib.TCOD_random_delete))
 
 def random_restore(rnd, backup):
     """Restore a random number generator from a backed up copy.
@@ -2222,7 +2224,7 @@ def random_restore(rnd, backup):
         rnd (Optional[Random]): A Random instance, or None to use the default.
         backup (Random): The Random instance which was used as a backup.
     """
-    lib.TCOD_random_restore(_cdata(rnd), _cdata(backup))
+    lib.TCOD_random_restore(_cdata(rnd), backup.cdata)
 
 def random_delete(rnd):
     """Does nothing."""

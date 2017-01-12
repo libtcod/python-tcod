@@ -1,132 +1,102 @@
+"""
+    Random module docs.
+"""
 
 from __future__ import absolute_import as _
 
-from tcod.tcod import _CDataWrapper
+import array
+import time
+
 from tcod.libtcod import ffi, lib
 
+from tcod.libtcod import RNG_MT as MERSENNE_TWISTER
+from tcod.libtcod import RNG_CMWC as COMPLEMENTARY_MULTIPLY_WITH_CARRY
 
-class Random(_CDataWrapper):
-    """
+class Random(object):
+    """The libtcod random number generator.
     .. versionadded:: 2.0
 
     If all you need is a random number generator then it's recommended
     that you use the :any:`random` module from the Python standard library.
 
+    If ``seed`` is None then a random seed will be generated.
+
     Args:
-        seed (Hashable): The RNG seed.  Should be a 32-bit integer, but any
-                         hashable object is accepted.
         algorithm (int): The algorithm to use.
+        seed (Optional[Hashable]):
+            Could be a 32-bit integer, but any hashable object is accepted.
     """
-    def __init__(self, *args, **kargs):
-        super(Random, self).__init__(*args, **kargs)
-        if not self.cdata:
-            self._init(*args, **kargs)
+    def __init__(self, algorithm, seed=None):
+        """Create a new instance using this algorithm and seed."""
+        if seed is None:
+            seed = time.time() + time.clock()
+        self.cdata = ffi.gc(
+            ffi.cast('mersenne_data_t*',
+                     lib.TCOD_random_new_from_seed(algorithm,
+                                                   hash(seed) % (1 << 32))),
+            lib.TCOD_random_delete)
 
-    def _init(self, seed, algorithm):
-        self.cdata = ffi.gc(lib.TCOD_random_new_from_seed(algorithm,
-                                                          hash(seed)),
-                            lib.TCOD_random_delete)
+    @classmethod
+    def _new_from_cdata(cls, cdata):
+        """Return a new instance encapsulating this cdata."""
+        self = object.__new__(cls)
+        self.cdata = cdata
+        return self
 
-
-    def random_int(self, low, high, mean=None):
-        """Return a random integer from a linear or triangular range.
+    def randint(self, low, high):
+        """Return a random integer within the linear range: low <= n <= high.
 
         Args:
-            low (int): The lower bound of the random range, inclusive.
-            high (int): The upper bound of the random range, inclusive.
-            mean (Optional[int]): The mean return value, or None.
+            low (int): The lower bound of the random range.
+            high (int): The upper bound of the random range.
 
         Returns:
-            int: A random number from the given range: low <= n <= high.
+            int: A random integer.
         """
-        lib.TCOD_random_set_distribution(self.cdata,
-                                         lib.TCOD_DISTRIBUTION_LINEAR)
-        if mean is None:
-            return lib.TCOD_random_get_int(self.cdata, low, high)
-        return lib.TCOD_random_get_int_mean(self.cdata, low, high, mean)
+        return lib.TCOD_random_get_i(self.cdata, low, high)
 
-
-    def random_float(self, low, high, mean=None):
-        """Return a random float from a linear or triangular range.
+    def uniform(self, low, high):
+        """Return a random floating number in the range: low <= n <= high.
 
         Args:
-            low (float): The lower bound of the random range.
-            high (float): The upper bound of the random range.
-            mean (Optional[float]): The mean return value, or None.
+            low (int): The lower bound of the random range.
+            high (int): The upper bound of the random range.
 
         Returns:
-            float: A random number from the given range: low <= n <= high.
+            float: A random float.
         """
-        lib.TCOD_random_set_distribution(self.cdata,
-                                         lib.TCOD_DISTRIBUTION_LINEAR)
-        if mean is None:
-            return lib.TCOD_random_get_double(self.cdata, low, high)
-        return lib.TCOD_random_get_double_mean(self.cdata, low, high, mean)
+        return lib.TCOD_random_get_double(self.cdata, low, high)
 
-    def gaussian(self, mu, sigma):
-        """Return a number from a random gaussian distribution.
+    def guass(self, mu, sigma):
+        """Return a random number using Gaussian distribution.
 
         Args:
-            mu (float): The mean returned value.
+            mu (float): The median returned value.
             sigma (float): The standard deviation.
 
         Returns:
-            float: A random number derived from the given parameters.
+            float: A random float.
         """
-        lib.TCOD_random_set_distribution(self.cdata,
-                                         lib.TCOD_DISTRIBUTION_GAUSSIAN)
-        return lib.TCOD_random_get_double(self.cdata, mu, sigma)
+        return lib.TCOD_random_get_gaussian_double(self.cdata, mu, sigma)
 
-    def inverse_gaussian(self, mu, sigma):
-        """Return a number from a random inverse gaussian distribution.
+    def inverse_guass(self, mu, sigma):
+        """Return a random Gaussian number using the Box-Muller transform.
 
         Args:
-            mu (float): The mean returned value.
+            mu (float): The median returned value.
             sigma (float): The standard deviation.
 
         Returns:
-            float: A random number derived from the given parameters.
+            float: A random float.
         """
-        lib.TCOD_random_set_distribution(self.cdata,
-            lib.TCOD_DISTRIBUTION_GAUSSIAN_INVERSE)
-        return lib.TCOD_random_get_double(self.cdata, mu, sigma)
+        return lib.TCOD_random_get_gaussian_double_inv(self.cdata, mu, sigma)
 
-    def gaussian_range(self, low, high, mean=None):
-        """Return a random gaussian number clamped to a range.
+    def __getstate__(self):
+        """Pack the self.cdata attribute into a portable state."""
+        return {'cdata': (self.cdata.algo, self.cdata.distribution,
+                          list(self.cdata.mt), self.cdata.cur_mt,
+                          list(self.cdata.Q), self.cdata.c, self.cdata.cur)}
 
-        When ``mean`` is None it will be automatically determined
-        from the ``low`` and ``high`` parameters.
-
-        Args:
-            low (float): The lower bound of the random range.
-            high (float): The upper bound of the random range.
-            mean (Optional[float]): The mean return value, or None.
-
-        Returns:
-            float: A clamped gaussian number.
-        """
-        lib.TCOD_random_set_distribution(self.cdata,
-            lib.TCOD_DISTRIBUTION_GAUSSIAN_RANGE)
-        if mean is None:
-            return lib.TCOD_random_get_double(self.cdata, low, high)
-        return lib.TCOD_random_get_double_mean(self.cdata, low, high, mean)
-
-    def inverse_gaussian_range(self, low, high, mean=None):
-        """Return a random inverted gaussian number clamped to a range.
-
-        When ``mean`` is None it will be automatically determined
-        from the ``low`` and ``high`` parameters.
-
-        Args:
-            low (float): The lower bound of the random range.
-            high (float): The upper bound of the random range.
-            mean (Optional[float]): The mean return value, or None.
-
-        Returns:
-            float: A clamped inverse gaussian number.
-        """
-        lib.TCOD_random_set_distribution(self.cdata,
-            lib.TCOD_DISTRIBUTION_GAUSSIAN_RANGE_INVERSE)
-        if mean is None:
-            return lib.TCOD_random_get_double(self.cdata, low, high)
-        return lib.TCOD_random_get_double_mean(self.cdata, low, high, mean)
+    def __setstate__(self, state):
+        """Create a new cdata object with the stored paramaters."""
+        self.cdata = ffi.new('mersenne_data_t*', state['cdata'])
