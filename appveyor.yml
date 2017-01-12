@@ -9,34 +9,47 @@ environment:
   COVERALLS_SERVICE_NAME: AppVeyor
   CODACY_PROJECT_TOKEN:
     secure: Fdt5ClRgYNTWeL05pVaxoEfUMlF+M26+bqY1fgZKJca7NP7mtclMN81ZCNNVCsJ4
+  DEPLOY_ONLY: false
   matrix:
   - PYTHON: C:\Python27\python.exe
     platform: Any CPU
+  - PYTHON: C:\Python33\python.exe
+    platform: Any CPU
+  - PYPY: pypy2-v5.4.1-win32
+    platform: Any CPU
   - PYTHON: C:\Python27-x64\python.exe
+    platform: x64
+  - PYTHON: C:\Python33-x64\python.exe
     platform: x64
   - PYTHON: C:\Python34\python.exe
     platform: Any CPU
+    DEPLOY_ONLY: true
   - PYTHON: C:\Python34-x64\python.exe
     platform: x64
+    DEPLOY_ONLY: true
   - PYTHON: C:\Python35\python.exe
     platform: Any CPU
+    DEPLOY_ONLY: true
   - PYTHON: C:\Python35-x64\python.exe
     platform: x64
+    DEPLOY_ONLY: true
   - PYTHON: C:\Python36\python.exe
     platform: Any CPU
+    DEPLOY_ONLY: true
   - PYTHON: C:\Python36-x64\python.exe
     platform: x64
-  - PYPY: pypy2-v5.4.1-win32
-    platform: Any CPU
-  - PYTHON: C:\Python33\python.exe
-    platform: Any CPU
-  - PYTHON: C:\Python33-x64\python.exe
-    platform: x64
+    DEPLOY_ONLY: true
 
+matrix:
+  allow_failures:
+    - DEPLOY_ONLY: true
 clone_depth: 20
 
 cache:
   - '%localappdata%\pip\cache -> setup.py'
+
+init:
+- cmd: "if %APPVEYOR_REPO_TAG%==false if %DEPLOY_ONLY%==true exit /b 1"
 
 install:
 - cmd: "git submodule update --init --recursive"
