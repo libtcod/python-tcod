@@ -9,6 +9,7 @@ import numpy as _np
 
 from tcod.libtcod import *
 
+from tcod.image import Image
 from tcod.map import Map
 from tcod.path import AStar
 from tcod.path import Dijkstra
@@ -18,7 +19,6 @@ from tcod.tcod import _CDataWrapper
 from tcod.tcod import _PropagateException
 from tcod.tcod import BSP as Bsp
 from tcod.tcod import Console
-from tcod.tcod import Image
 from tcod.tcod import Key
 from tcod.tcod import Mouse
 from tcod.tcod import Noise
