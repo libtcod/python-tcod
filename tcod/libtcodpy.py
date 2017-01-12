@@ -9,6 +9,7 @@ import numpy as _np
 
 from tcod.libtcod import *
 
+from tcod.bsp import BSP as Bsp
 from tcod.image import Image
 from tcod.map import Map
 from tcod.path import AStar
@@ -17,12 +18,13 @@ from tcod.tcod import _int, _cdata, _unpack_char_p
 from tcod.tcod import _bytes, _unicode, _fmt_bytes, _fmt_unicode
 from tcod.tcod import _CDataWrapper
 from tcod.tcod import _PropagateException
-from tcod.tcod import BSP as Bsp
 from tcod.tcod import Console
 from tcod.tcod import Key
 from tcod.tcod import Mouse
 from tcod.tcod import Noise
 from tcod.tcod import Random
+
+BSP = Bsp
 
 class ConsoleBuffer(object):
     """Simple console that allows direct (fast) access to cells. simplifies
