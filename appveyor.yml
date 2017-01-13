@@ -68,8 +68,8 @@ install:
 - cmd: "set PATH=%PATH%;C:\\MinGW\\bin"
 - cmd: echo "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 > "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64/vcvars64.bat"
 - cmd: "%PYTHON% -m pip install --upgrade pip setuptools wheel"
-- cmd: "%PYTHON% -m pip install --requirement requirements.txt"
 - cmd: "if defined PYPY %PYTHON% -m pip -v install git+https://bitbucket.org/pypy/numpy.git"
+- cmd: "%PYTHON% -m pip install --requirement requirements.txt"
 - cmd: "%PYTHON% setup.py sdist develop bdist_wheel"
 build: off
 before_test:

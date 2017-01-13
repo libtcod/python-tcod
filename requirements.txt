@@ -1,4 +1,4 @@
 cffi>=1.8.1,<2
-numpy>=1.11,<2; python_version != '3.3'
+numpy>=1.10,<2; python_version != '3.3'
 numpy==1.11.3; python_version == '3.3' # pyup: < 1.12
 pycparser>=2.14,<3
