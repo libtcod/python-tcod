@@ -51,8 +51,8 @@ install:
 before_script:
  - pip install pytest pytest-cov pytest-benchmark
 script:
- - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pytest; fi'
- - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pytest --no-window; fi'
+ - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pytest --benchmark-disable; fi'
+ - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pytest --benchmark-disable --no-window; fi'
 after_success:
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip install codacy-coverage python-coveralls; fi'
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then coveralls; fi'
