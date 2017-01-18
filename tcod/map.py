@@ -64,7 +64,7 @@ class Map(object):
     def __getstate__(self):
         """Return this objects state.
 
-        This method allows the usage of the :any:`copy` and :any:`pickle`
+        This method allows the usage of the :mod:`copy` and :mod:`pickle`
         modules with this class.
         """
         return {'size': (self.width, self.height), 'buffer': self.buffer}

@@ -1,38 +1,6 @@
 
-API Reference
-=============
-
-Console
--------
-
-.. autofunction:: tcod.console_set_custom_font
-.. autofunction:: tcod.console_init_root
-.. autofunction:: tcod.console_flush
-
-.. autoclass:: tcod.Console(width, height)
-    :members:
-
-
-BSP
----
-
-.. autoclass:: tcod.BSP(x, y, w, h)
-   :members:
-
-HeightMap
----------
-
-.. autoclass:: tcod.HeightMap(x, y)
-   :members:
-
-Image
------
-
-.. autoclass:: tcod.Image(width, height)
-    :members:
-
-.. autofunction:: tcod.image_load
-.. autofunction:: tcod.image_from_console
+libtcodpy Reference
+===================
 
 Event
 -----
@@ -75,12 +43,6 @@ Event Types
 .. data:: tcod.EVENT_ANY
 
     Same as ``tcod.EVENT_KEY | tcod.EVENT_MOUSE | tcod.EVENT_FINGER``
-
-Random
-------
-
-.. autoclass:: tcod.Random(seed, algorithm)
-   :members:
 
 bsp
 ---
@@ -129,7 +91,6 @@ console
 .. autofunction:: tcod.console_credits_render
 .. autofunction:: tcod.console_credits_reset
 .. autofunction:: tcod.console_delete
-.. autofunction:: tcod.console_disable_keyboard_repeat
 .. autofunction:: tcod.console_fill_background
 .. autofunction:: tcod.console_fill_char
 .. autofunction:: tcod.console_fill_foreground
@@ -177,7 +138,6 @@ console
 .. autofunction:: tcod.console_set_fade
 .. autofunction:: tcod.console_set_fullscreen
 .. autofunction:: tcod.console_set_key_color
-.. autofunction:: tcod.console_set_keyboard_repeat
 .. autofunction:: tcod.console_set_window_title
 .. autofunction:: tcod.console_vline
 .. autofunction:: tcod.console_wait_for_keypress
