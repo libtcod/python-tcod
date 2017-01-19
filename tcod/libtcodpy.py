@@ -10,6 +10,7 @@ import numpy as _np
 from tcod.libtcod import *
 
 from tcod.bsp import BSP as Bsp
+from tcod.color import *
 from tcod.console import Console
 from tcod.image import Image
 from tcod.map import Map

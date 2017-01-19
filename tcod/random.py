@@ -8,9 +8,9 @@ import array
 import time
 
 from tcod.libtcod import ffi, lib
-
 from tcod.libtcod import RNG_MT as MERSENNE_TWISTER
 from tcod.libtcod import RNG_CMWC as COMPLEMENTARY_MULTIPLY_WITH_CARRY
+
 
 class Random(object):
     """The libtcod random number generator.
