@@ -4,9 +4,17 @@ import os
 import sys
 
 from cffi import FFI
+import shutil
 import subprocess
 import platform
 from pycparser import c_parser, c_ast, parse_file, c_generator
+try:
+    from urllib import urlretrieve
+except ImportError:
+    from urllib.request import urlretrieve
+import zipfile
+
+SDL2_VERSION = '2.0.4'
 
 TCOD_C_PATH = 'tcod/c_code'
 CFFI_HEADER = os.path.join(TCOD_C_PATH, 'cffi.h')
@@ -25,6 +33,39 @@ def find_sources(directory):
     return [os.path.join(directory, source)
             for source in os.listdir(directory)
             if source.endswith('.c')]
+
+def get_sdl2_file(version):
+    if sys.platform == 'win32':
+        sdl2_file = 'SDL2-devel-%s-VC.zip' % (version,)
+    else:
+        assert sys.platform == 'darwin'
+        sdl2_file = 'SDL2-%s.dmg' % (version,)
+    sdl2_local_file = os.path.join('dependencies', sdl2_file)
+    sdl2_remote_file = 'https://www.libsdl.org/release/%s' % sdl2_file
+    if not os.path.exists(sdl2_local_file):
+        print('Downloading %s' % sdl2_remote_file)
+        urlretrieve(sdl2_remote_file, sdl2_local_file)
+    return sdl2_local_file
+
+def unpack_sdl2(version):
+    sdl2_path = 'dependencies/SDL2-%s' % (version,)
+    if sys.platform == 'darwin':
+        sdl2_dir = sdl2_path
+        sdl2_path += '/SDL2.framework'
+    if os.path.exists(sdl2_path):
+        return sdl2_path
+    sdl2_arc = get_sdl2_file(version)
+    print('Extracting %s' % sdl2_arc)
+    if sdl2_arc.endswith('.zip'):
+        with zipfile.ZipFile(sdl2_arc) as zf:
+            zf.extractall('dependencies/')
+    else:
+        assert sdl2_arc.endswith('.dmg')
+        subprocess.check_call(['hdiutil', 'mount', sdl2_arc])
+        subprocess.check_call(['cp', '-r', '/Volumes/SDL2/SDL2.framework',
+                                           sdl2_dir])
+        subprocess.check_call(['hdiutil', 'unmount', '/Volumes/SDL2'])
+    return sdl2_path
 
 module_name = 'tcod._libtcod'
 include_dirs = [
@@ -64,23 +105,45 @@ if 'linux' in sys.platform:
 
 if sys.platform == 'darwin':
     extra_link_args += ['-framework', 'OpenGL']
-
-libraries += ['SDL2']
+    extra_link_args += ['-framework', 'SDL2']
+else:
+    libraries += ['SDL2']
 
 # included SDL headers are for whatever OS's don't easily come with them
 
 if sys.platform in ['win32', 'darwin']:
-    include_dirs += ['dependencies/SDL2-2.0.4/include']
+    SDL2_PATH = unpack_sdl2(SDL2_VERSION)
+    include_dirs.append('libtcod/src/zlib/')
 
-    if BITSIZE == '32bit':
-        library_dirs += [os.path.realpath('dependencies/SDL2-2.0.4/lib/x86')]
-    else:
-        library_dirs += [os.path.realpath('dependencies/SDL2-2.0.4/lib/x64')]
+if sys.platform == 'win32':
+    include_dirs.append(os.path.join(SDL2_PATH, 'include'))
+    ARCH_MAPPING = {'32bit': 'x86', '64bit': 'x64'}
+    library_dirs.append(os.path.join(SDL2_PATH, 'lib/', ARCH_MAPPING[BITSIZE]))
 
-if sys.platform in ['win32', 'darwin']:
-    include_dirs += ['libtcod/src/zlib/']
+def fix_header(filepath):
+    """Removes leading whitespace from a header file.
 
-if sys.platform != 'win32':
+    This whitespace is causing issues with directives on some platforms.
+    """
+    with open(filepath, 'r+U') as f:
+        current = f.read()
+        fixed = '\n'.join(line.strip() for line in current.split('\n'))
+        if current == fixed:
+            return
+        f.seek(0)
+        f.truncate()
+        f.write(fixed)
+
+if sys.platform == 'darwin':
+    HEADER_DIR = os.path.join(SDL2_PATH, 'Headers')
+    fix_header(os.path.join(HEADER_DIR, 'SDL_assert.h'))
+    fix_header(os.path.join(HEADER_DIR, 'SDL_config_macosx.h'))
+    include_dirs.append(HEADER_DIR)
+    shutil.copytree(SDL2_PATH, 'tcod/SDL2.framework')
+    extra_link_args += ['-F%s/..' % SDL2_PATH]
+    extra_link_args += ['-rpath', '@loader_path/']
+
+if sys.platform not in ['win32', 'darwin']:
     extra_parse_args += subprocess.check_output(['sdl2-config', '--cflags'],
                                               universal_newlines=True
                                               ).strip().split()
@@ -149,7 +212,10 @@ def get_cdef():
 def get_ast():
     global extra_parse_args
     if 'win32' in sys.platform:
-        extra_parse_args += [r'-Idependencies/SDL2-2.0.4/include']
+        extra_parse_args += [r'-I%s/include' % SDL2_PATH]
+    if 'darwin' in sys.platform:
+        extra_parse_args += [r'-I%s/Headers' % SDL2_PATH]
+
     ast = parse_file(filename=CFFI_HEADER, use_cpp=True,
                      cpp_args=[r'-Idependencies/fake_libc_include',
                                r'-Ilibtcod/include',
@@ -161,10 +227,11 @@ def get_ast():
                                r'-DNO_OPENGL',
                                r'-DSDL_FORCE_INLINE=',
                                r'-U__GNUC__',
-                               r'-D_SDL_assert_h',
+                               #r'-D_SDL_assert_h',
                                r'-D_SDL_thread_h',
                                r'-DDOXYGEN_SHOULD_IGNORE_THIS',
                                r'-DMAC_OS_X_VERSION_MIN_REQUIRED=9999',
+                               r'-D__attribute__(x)='
                                ] + extra_parse_args)
     ast = CustomPostParser().parse(ast)
     return ast

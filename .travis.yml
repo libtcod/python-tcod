@@ -10,20 +10,6 @@ matrix:
     python: "2"
     env: PYTHON=python
 
-  allow_failures:
-  - os: osx
-    python: pypy
-  - os: osx
-    python: pypy3
-  - os: linux
-    python: pypy
-  - os: linux
-    python: pypy3
-  - os: osx
-    language: generic
-    python: "2"
-    env: PYTHON=python
-
   fast_finish: true
 
 sudo: required
@@ -39,23 +25,25 @@ addons:
 before_install:
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi'
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install sdl2; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" && "$PYTHON" == "python3" ]]; then brew install $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv venv -p $PYTHON; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
-- pip install --upgrade pip setuptools
+- pip install --upgrade pip setuptools wheel
 - 'if [[ "$TRAVIS_PYTHON_VERSION" == pypy* ]]; then pip install git+https://bitbucket.org/pypy/numpy.git; fi'
 - pip install --requirement requirements.txt
 install:
-- python setup.py develop
+- python setup.py develop bdist_wheel
 before_script:
  - pip install pytest pytest-cov pytest-benchmark
 script:
- - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pytest --benchmark-disable; fi'
- - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pytest --benchmark-disable --no-window; fi'
+ - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pytest -v --benchmark-disable; fi'
+ - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pytest -v --benchmark-disable --no-window; fi'
 after_success:
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip install codacy-coverage python-coveralls; fi'
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then coveralls; fi'
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then coverage xml; fi'
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then python-codacy-coverage -r coverage.xml; fi'
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then bash <(curl -s https://codecov.io/bash); fi'
+ - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python -m pip install delocate; fi'
+ - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-wheel -v dist/*.whl; fi'
+ - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-listdeps --all dist/*.whl; fi'

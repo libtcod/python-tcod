@@ -23,6 +23,8 @@ def get_package_data():
             files += ['x86/SDL2.dll']
         else:
             files += ['x64/SDL2.dll']
+    if sys.platform == 'darwin':
+        files += ['SDL2.framework/Versions/A/SDL2']
     return {'tcod': files}
 
 needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
