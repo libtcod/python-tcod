@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import sys
+
 import copy
 import pickle
 
@@ -17,8 +19,12 @@ def test_line_error():
         tcod.line(*LINE_ARGS, py_callback=raise_Exception)
 
 
-def test_clipboard():
+def test_clipboard_set():
     tcod.clipboard_set('')
+
+@pytest.mark.skipif(sys.platform == 'darwin',
+                    reason="Known crash on Mac OS/X")
+def test_clipboard_get():
     tcod.clipboard_get()
 
 
