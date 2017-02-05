@@ -60,3 +60,4 @@ Release/
 tcod/_*.c
 tcod/_*.pyd
 .benchmarks
+dependencies/SDL2*
