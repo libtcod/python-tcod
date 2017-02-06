@@ -9,23 +9,22 @@ import numpy as _np
 
 from tcod.libtcod import *
 
-from tcod.bsp import BSP as Bsp
-from tcod.color import *
-from tcod.console import Console
-from tcod.image import Image
-from tcod.map import Map
-from tcod.noise import Noise
-from tcod.path import AStar
-from tcod.path import Dijkstra
-from tcod.random import Random
 from tcod.tcod import _int, _cdata, _unpack_char_p
 from tcod.tcod import _bytes, _unicode, _fmt_bytes, _fmt_unicode
 from tcod.tcod import _CDataWrapper
 from tcod.tcod import _PropagateException
-from tcod.tcod import Key
-from tcod.tcod import Mouse
 
-BSP = Bsp
+import tcod.bsp
+from tcod.color import *
+import tcod.console
+import tcod.image
+import tcod.map
+import tcod.noise
+import tcod.path
+import tcod.random
+
+Bsp = tcod.bsp.BSP
+
 
 class ConsoleBuffer(object):
     """Simple console that allows direct (fast) access to cells. simplifies
@@ -175,6 +174,7 @@ class ConsoleBuffer(object):
             lib.TCOD_console_fill_char(dest or ffi.NULL,
                                         ffi.new('int[]', self.char))
 
+
 class Dice(_CDataWrapper):
     """
 
@@ -220,6 +220,70 @@ class Dice(_CDataWrapper):
         return ('%s(nb_dices=%r,nb_faces=%r,multiplier=%r,addsub=%r)' %
                 (self.__class__.__name__, self.nb_dices, self.nb_faces,
                  self.multiplier, self.addsub))
+
+
+class Key(_CDataWrapper):
+    """Key Event instance
+
+    Attributes:
+        vk (int): TCOD_keycode_t key code
+        c (int): character if vk == TCODK_CHAR else 0
+        text (Text): text[TCOD_KEY_TEXT_SIZE]; text if vk == TCODK_TEXT else text[0] == '\0'
+        pressed (bool): does this correspond to a key press or key release event ?
+        lalt (bool): True when left alt is held.
+        lctrl (bool): True when left control is held.
+        lmeta (bool): True when left meta key is held.
+        ralt (bool): True when right alt is held.
+        rctrl (bool): True when right control is held.
+        rmeta (bool): True when right meta key is held.
+        shift (bool): True when any shift is held.
+    """
+
+    _BOOL_ATTRIBUTES = ('lalt', 'lctrl', 'lmeta',
+                        'ralt', 'rctrl', 'rmeta', 'pressed', 'shift')
+
+    def __init__(self, *args, **kargs):
+        super(Key, self).__init__(*args, **kargs)
+        if self.cdata == ffi.NULL:
+            self.cdata = ffi.new('TCOD_key_t*')
+
+    def __getattr__(self, attr):
+        if attr in self._BOOL_ATTRIBUTES:
+            return bool(getattr(self.cdata, attr))
+        if attr == 'c':
+            return ord(getattr(self.cdata, attr))
+        if attr == 'text':
+            return _unpack_char_p(getattr(self.cdata, attr))
+        return super(Key, self).__getattr__(attr)
+
+
+class Mouse(_CDataWrapper):
+    """Mouse event instance
+
+    Attributes:
+        x (int): Absolute mouse position at pixel x.
+        y (int):
+        dx (int): Movement since last update in pixels.
+        dy (int):
+        cx (int): Cell coordinates in the root console.
+        cy (int):
+        dcx (int): Movement since last update in console cells.
+        dcy (int):
+        lbutton (bool): Left button status.
+        rbutton (bool): Right button status.
+        mbutton (bool): Middle button status.
+        lbutton_pressed (bool): Left button pressed event.
+        rbutton_pressed (bool): Right button pressed event.
+        mbutton_pressed (bool): Middle button pressed event.
+        wheel_up (bool): Wheel up event.
+        wheel_down (bool): Wheel down event.
+    """
+
+    def __init__(self, *args, **kargs):
+        super(Mouse, self).__init__(*args, **kargs)
+        if self.cdata == ffi.NULL:
+            self.cdata = ffi.new('TCOD_mouse_t*')
+
 
 def bsp_new_with_size(x, y, w, h):
     """Create a new BSP instance with the given rectangle.
@@ -501,7 +565,7 @@ def console_init_root(w, h, title, fullscreen=False,
             Returns a special Console instance representing the root console.
     """
     lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
-    return Console(ffi.NULL) # root console is null
+    return tcod.console.Console(ffi.NULL) # root console is null
 
 
 def console_set_custom_font(fontFile, flags=FONT_LAYOUT_ASCII_INCOL,
@@ -904,9 +968,9 @@ def console_is_key_pressed(key):
 # using offscreen consoles
 def console_new(w, h):
     """Return an offscreen console of size: w,h."""
-    return Console(ffi.gc(lib.TCOD_console_new(w, h), lib.TCOD_console_delete))
+    return tcod.console.Console(w, h)
 def console_from_file(filename):
-    return Console(lib.TCOD_console_from_file(_bytes(filename)))
+    return tcod.console.Console(lib.TCOD_console_from_file(_bytes(filename)))
 
 def console_blit(src, x, y, w, h, dst, xdst, ydst, ffade=1.0,bfade=1.0):
     """Blit the console src from x,y,w,h to console dst at xdst,ydst."""
@@ -1018,7 +1082,7 @@ def path_new_using_map(m, dcost=1.41):
     Returns:
         AStar: A new AStar instance.
     """
-    return AStar(m, dcost)
+    return tcod.path.AStar(m, dcost)
 
 def path_new_using_function(w, h, func, userData=0, dcost=1.41):
     """Return a new AStar using the given callable function.
@@ -1033,7 +1097,7 @@ def path_new_using_function(w, h, func, userData=0, dcost=1.41):
     Returns:
         AStar: A new AStar instance.
     """
-    return AStar((func, userData), dcost, w, h)
+    return tcod.path.AStar((func, userData), dcost, w, h)
 
 def path_compute(p, ox, oy, dx, dy):
     """Find a path from (ox, oy) to (dx, dy).  Return True if path is found.
@@ -1143,10 +1207,10 @@ def path_delete(p):
     pass
 
 def dijkstra_new(m, dcost=1.41):
-    return Dijkstra(m, dcost)
+    return tcod.path.Dijkstra(m, dcost)
 
 def dijkstra_new_using_function(w, h, func, userData=0, dcost=1.41):
-    return Dijkstra((func, userData), dcost, w, h)
+    return tcod.path.Dijkstra((func, userData), dcost, w, h)
 
 def dijkstra_compute(p, ox, oy):
     lib.TCOD_dijkstra_compute(p.cdata, ox, oy)
@@ -1619,7 +1683,7 @@ def heightmap_delete(hm):
     pass
 
 def image_new(width, height):
-    return Image(width, height)
+    return tcod.image.Image(width, height)
 
 def image_clear(image, col):
     lib.TCOD_image_clear(_cdata(image), col)
@@ -1654,8 +1718,8 @@ def image_load(filename):
     Args:
         filename (AnyStr): Path to a .bmp or .png image file.
     """
-    return Image(ffi.gc(lib.TCOD_image_load(_bytes(filename)),
-                        lib.TCOD_image_delete))
+    return tcod.image.Image(ffi.gc(lib.TCOD_image_load(_bytes(filename)),
+                            lib.TCOD_image_delete))
 
 def image_from_console(console):
     """Return an Image with a Consoles pixel data.
@@ -1665,8 +1729,10 @@ def image_from_console(console):
     Args:
         console (Console): Any Console instance.
     """
-    return Image(ffi.gc(lib.TCOD_image_from_console(_cdata(console)),
-                        lib.TCOD_image_delete))
+    return tcod.image.Image(
+        ffi.gc(lib.TCOD_image_from_console(_cdata(console)),
+               lib.TCOD_image_delete)
+        )
 
 def image_refresh_console(image, console):
     lib.TCOD_image_refresh_console(_cdata(image), _cdata(console))
@@ -1812,30 +1878,30 @@ FOV_RESTRICTIVE = 12
 NB_FOV_ALGORITHMS = 13
 
 def map_new(w, h):
-    return Map(w, h)
+    return tcod.map.Map(w, h)
 
 def map_copy(source, dest):
-    return lib.TCOD_map_copy(_cdata(source), _cdata(dest))
+    return lib.TCOD_map_copy(source.cdata, dest.cdata)
 
 def map_set_properties(m, x, y, isTrans, isWalk):
-    lib.TCOD_map_set_properties(_cdata(m), x, y, isTrans, isWalk)
+    lib.TCOD_map_set_properties(m.cdata, x, y, isTrans, isWalk)
 
 def map_clear(m,walkable=False,transparent=False):
     # walkable/transparent looks incorrectly ordered here.
     # TODO: needs test.
-    lib.TCOD_map_clear(_cdata(m), walkable, transparent)
+    lib.TCOD_map_clear(m.cdata, walkable, transparent)
 
 def map_compute_fov(m, x, y, radius=0, light_walls=True, algo=FOV_RESTRICTIVE ):
-    lib.TCOD_map_compute_fov(_cdata(m), x, y, radius, light_walls, algo)
+    lib.TCOD_map_compute_fov(m.cdata, x, y, radius, light_walls, algo)
 
 def map_is_in_fov(m, x, y):
-    return lib.TCOD_map_is_in_fov(_cdata(m), x, y)
+    return lib.TCOD_map_is_in_fov(m.cdata, x, y)
 
 def map_is_transparent(m, x, y):
-    return lib.TCOD_map_is_transparent(_cdata(m), x, y)
+    return lib.TCOD_map_is_transparent(m.cdata, x, y)
 
 def map_is_walkable(m, x, y):
-    return lib.TCOD_map_is_walkable(_cdata(m), x, y)
+    return lib.TCOD_map_is_walkable(m.cdata, x, y)
 
 def map_delete(m):
     pass
@@ -1894,7 +1960,7 @@ def noise_new(dim, h=NOISE_DEFAULT_HURST, l=NOISE_DEFAULT_LACUNARITY,
     Returns:
         Noise: The new Noise instance.
     """
-    return Noise(dim, hurst=h, lacunarity=l, rand=random)
+    return tcod.noise.Noise(dim, hurst=h, lacunarity=l, rand=random)
 
 def noise_set_type(n, typ):
     """Set a Noise objects default noise algorithm.
@@ -1920,7 +1986,7 @@ def noise_get(n, f, typ=NOISE_DEFAULT):
     Returns:
         float: The sampled noise value.
     """
-    return lib.TCOD_noise_get_ex(_cdata(n), ffi.new('float[4]', f), typ)
+    return lib.TCOD_noise_get_ex(n.cdata, ffi.new('float[4]', f), typ)
 
 def noise_get_fbm(n, f, oc, typ=NOISE_DEFAULT):
     """Return the fractal Brownian motion sampled from the ``f`` coordinate.
@@ -1934,7 +2000,7 @@ def noise_get_fbm(n, f, oc, typ=NOISE_DEFAULT):
     Returns:
         float: The sampled noise value.
     """
-    return lib.TCOD_noise_get_fbm_ex(_cdata(n), ffi.new('float[4]', f),
+    return lib.TCOD_noise_get_fbm_ex(n.cdata, ffi.new('float[4]', f),
                                      oc, typ)
 
 def noise_get_turbulence(n, f, oc, typ=NOISE_DEFAULT):
@@ -1949,7 +2015,7 @@ def noise_get_turbulence(n, f, oc, typ=NOISE_DEFAULT):
     Returns:
         float: The sampled noise value.
     """
-    return lib.TCOD_noise_get_turbulence_ex(_cdata(n), ffi.new('float[4]', f),
+    return lib.TCOD_noise_get_turbulence_ex(n.cdata, ffi.new('float[4]', f),
                                             oc, typ)
 
 def noise_delete(n):
@@ -2087,7 +2153,7 @@ def random_get_instance():
     Returns:
         Random: A Random instance using the default random number generator.
     """
-    return Random._new_from_cdata(
+    return tcod.random.Random._new_from_cdata(
         ffi.cast('mersenne_data_t*', lib.TCOD_random_get_instance()))
 
 def random_new(algo=RNG_CMWC):
@@ -2099,7 +2165,7 @@ def random_new(algo=RNG_CMWC):
     Returns:
         Random: A new Random instance using the given algorithm.
     """
-    return Random(algo)
+    return tcod.random.Random(algo)
 
 def random_new_from_seed(seed, algo=RNG_CMWC):
     """Return a new Random instance.  Using the given ``seed`` and ``algo``.
@@ -2112,7 +2178,7 @@ def random_new_from_seed(seed, algo=RNG_CMWC):
     Returns:
         Random: A new Random instance using the given algorithm.
     """
-    return Random(algo, seed)
+    return tcod.random.Random(algo, seed)
 
 def random_set_distribution(rnd, dist):
     """Change the distribution mode of a random number generator.
@@ -2214,7 +2280,7 @@ def random_save(rnd):
     Returns:
         Random: A Random instance with a copy of the random generator.
     """
-    return Random._new_from_cdata(
+    return tcod.random.Random._new_from_cdata(
         ffi.gc(ffi.cast('mersenne_data_t*', lib.TCOD_random_save(rnd.cdata)),
                lib.TCOD_random_delete))
 

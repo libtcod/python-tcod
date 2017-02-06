@@ -156,67 +156,6 @@ def _assert_cdata_is_not_null(func):
             return func(*args, **kargs)
     return func
 
-class Key(_CDataWrapper):
-    """Key Event instance
-
-    Attributes:
-        vk (int): TCOD_keycode_t key code
-        c (int): character if vk == TCODK_CHAR else 0
-        text (Text): text[TCOD_KEY_TEXT_SIZE]; text if vk == TCODK_TEXT else text[0] == '\0'
-        pressed (bool): does this correspond to a key press or key release event ?
-        lalt (bool): True when left alt is held.
-        lctrl (bool): True when left control is held.
-        lmeta (bool): True when left meta key is held.
-        ralt (bool): True when right alt is held.
-        rctrl (bool): True when right control is held.
-        rmeta (bool): True when right meta key is held.
-        shift (bool): True when any shift is held.
-    """
-
-    _BOOL_ATTRIBUTES = ('lalt', 'lctrl', 'lmeta',
-                        'ralt', 'rctrl', 'rmeta', 'pressed', 'shift')
-
-    def __init__(self, *args, **kargs):
-        super(Key, self).__init__(*args, **kargs)
-        if self.cdata == ffi.NULL:
-            self.cdata = ffi.new('TCOD_key_t*')
-
-    def __getattr__(self, attr):
-        if attr in self._BOOL_ATTRIBUTES:
-            return bool(getattr(self.cdata, attr))
-        if attr == 'c':
-            return ord(getattr(self.cdata, attr))
-        if attr == 'text':
-            return _unpack_char_p(getattr(self.cdata, attr))
-        return super(Key, self).__getattr__(attr)
-
-class Mouse(_CDataWrapper):
-    """Mouse event instance
-
-    Attributes:
-        x (int): Absolute mouse position at pixel x.
-        y (int):
-        dx (int): Movement since last update in pixels.
-        dy (int):
-        cx (int): Cell coordinates in the root console.
-        cy (int):
-        dcx (int): Movement since last update in console cells.
-        dcy (int):
-        lbutton (bool): Left button status.
-        rbutton (bool): Right button status.
-        mbutton (bool): Middle button status.
-        lbutton_pressed (bool): Left button pressed event.
-        rbutton_pressed (bool): Right button pressed event.
-        mbutton_pressed (bool): Middle button pressed event.
-        wheel_up (bool): Wheel up event.
-        wheel_down (bool): Wheel down event.
-    """
-
-    def __init__(self, *args, **kargs):
-        super(Mouse, self).__init__(*args, **kargs)
-        if self.cdata == ffi.NULL:
-            self.cdata = ffi.new('TCOD_mouse_t*')
-
 
 def clipboard_set(string):
     """Set the clipboard contents to string.

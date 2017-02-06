@@ -32,7 +32,7 @@ def test_tcod_bsp():
     """
     test tcod additions to BSP
     """
-    bsp = tcod.BSP(0, 0, 32, 32)
+    bsp = tcod.bsp.BSP(0, 0, 32, 32)
 
     assert bsp.level == 0
     assert not bsp.horizontal
@@ -43,7 +43,7 @@ def test_tcod_bsp():
 
     bsp.split_recursive(3, 4, 4, 1, 1)
     for node in bsp.walk():
-        assert isinstance(node, tcod.BSP)
+        assert isinstance(node, tcod.bsp.BSP)
 
     assert bsp != 'asd'
 
