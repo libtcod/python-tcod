@@ -12,7 +12,7 @@ Then run the PyInstaller script with this command::
 
 The finished build will be placed at ``dist/hello_world``.
 
-You also also build to one file with the command::
+You can also build to one file with the command::
 
     PyInstaller hello_world.py --additional-hooks-dir=. -F
 
