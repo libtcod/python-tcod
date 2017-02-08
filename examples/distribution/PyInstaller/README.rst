@@ -8,10 +8,12 @@ On Windows you must also install the ``pywin32`` package
 
 Then run the PyInstaller script with this command::
 
-    PyInstaller --additional-hooks-dir=. hello_world.py
+    PyInstaller hello_world.py --additional-hooks-dir=.
 
 The finished build will be placed at ``dist/hello_world``.
-    
-libtcod-cffi/tdl does not support one-file mode at this time.
+
+You also also build to one file with the command::
+
+    PyInstaller hello_world.py --additional-hooks-dir=. -F
 
 The PyInstaller manual can be found at: https://pythonhosted.org/PyInstaller/
