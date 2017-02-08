@@ -242,7 +242,7 @@ class Console(_CDataWrapper):
         """
         lib.TCOD_console_set_char(self.cdata, x, y, _int(ch))
 
-    def print_str(self, x, y, fmt):
+    def print_(self, x, y, fmt):
         """Print a color formatted string on a console.
 
         Args:
