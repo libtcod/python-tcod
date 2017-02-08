@@ -1,7 +1,7 @@
 PyInstaller Example
 ===================
 
-First, install the packages: ``tdl``, ``libtcod-cffi``, ``PyInstaller``.
+First, install the packages: ``tdl``, ``libtcod-cffi``, and ``PyInstaller``.
 
 On Windows you must also install the ``pywin32`` package
 (named ``pypiwin32`` if you're using pip install.)
@@ -13,3 +13,5 @@ Then run the PyInstaller script with this command::
 The finished build will be placed at ``dist/hello_world``.
     
 libtcod-cffi/tdl does not support one-file mode at this time.
+
+The PyInstaller manual can be found at: https://pythonhosted.org/PyInstaller/
