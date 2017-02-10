@@ -53,7 +53,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'libtcod-cffi'
-copyright = u'2016, Kyle Stewart'
+copyright = u'2017, Kyle Stewart'
 author = u'Kyle Stewart'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -119,6 +119,8 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
+
+autodoc_member_order = 'groupwise'
 
 # -- Options for HTML output ----------------------------------------------
 
