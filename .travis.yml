@@ -7,8 +7,16 @@ matrix:
   include:
   - os: osx
     language: generic
-    python: "2"
-    env: PYTHON=python
+    env: MB_PYTHON_VERSION=2.7.13
+  - os: osx
+    language: generic
+    env: MB_PYTHON_VERSION=3.4.4
+  - os: osx
+    language: generic
+    env: PYPY_VERSION=5.4.1
+  - os: osx
+    language: generic
+    env: PYPY_VERSION=5.6.0
 
   fast_finish: true
 
@@ -25,9 +33,7 @@ addons:
 before_install:
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi'
-- if [[ "$TRAVIS_OS_NAME" == "osx" && "$PYTHON" == "python3" ]]; then brew install $PYTHON; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv venv -p $PYTHON; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
+- source .travis/install_python.sh
 - pip install --upgrade pip setuptools wheel
 - 'if [[ "$TRAVIS_PYTHON_VERSION" == pypy* ]]; then pip install git+https://bitbucket.org/pypy/numpy.git; fi'
 - pip install --requirement requirements.txt
