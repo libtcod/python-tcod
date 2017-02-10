@@ -34,7 +34,9 @@ before_install:
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi'
 - source .travis/install_python.sh
-- pip install --upgrade pip setuptools wheel
+- 'echo "[bdist_wheel]" >> setup.cfg'
+- 'echo "py-limited-api = cp33" >> setup.cfg'
+- pip install --upgrade pip setuptools "wheel>=0.30.0a0"
 - 'if [[ "$TRAVIS_PYTHON_VERSION" == pypy* ]]; then pip install git+https://bitbucket.org/pypy/numpy.git; fi'
 - pip install --requirement requirements.txt
 install:
@@ -53,3 +55,5 @@ after_success:
  - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python -m pip install delocate; fi'
  - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-wheel -v dist/*.whl; fi'
  - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-listdeps --all dist/*.whl; fi'
+ - if [[ -n "$TRAVIS_TAG" ]]; then pip install twine; fi
+ - if [[ -n "$TRAVIS_TAG" && "$TRAVIS_OS_NAME" == "osx" ]]; then twine upload -u $PYPI_USER -p $PYPI_PASS --skip-existing dist/*; fi
