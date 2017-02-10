@@ -81,8 +81,9 @@ color
 console
 -------
 
-.. autoclass: tcod.ConsoleBuffer
-   :members:
+.. autofunction:: tcod.console_set_custom_font
+.. autofunction:: tcod.console_init_root
+.. autofunction:: tcod.console_flush
 
 .. autofunction:: tcod.console_blit
 .. autofunction:: tcod.console_check_for_keypress
@@ -141,6 +142,9 @@ console
 .. autofunction:: tcod.console_set_window_title
 .. autofunction:: tcod.console_vline
 .. autofunction:: tcod.console_wait_for_keypress
+
+.. autoclass: tcod.ConsoleBuffer
+   :members:
 
 sys
 ---
@@ -222,6 +226,9 @@ heightmap
 
 image
 -----
+
+.. autofunction:: tcod.image_load
+.. autofunction:: tcod.image_from_console
 
 .. autofunction:: tcod.image_blit
 .. autofunction:: tcod.image_blit_2x
