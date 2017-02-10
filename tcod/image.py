@@ -1,11 +1,37 @@
 
-from __future__ import absolute_import as _
+from __future__ import absolute_import
 
-from tcod.tcod import _CDataWrapper
+import numpy as np
+
 from tcod.libtcod import ffi, lib
 
 
-class Image(_CDataWrapper):
+class _ImageBufferArray(np.ndarray):
+
+    def __new__(cls, image):
+        size = image.height * image.width
+        self = np.frombuffer(ffi.buffer(lib.TCOD_image_get_colors()[size]),
+                             np.uint8)
+        self = self.reshape((image.height, image.width, 3)).view(cls)
+        self._image_c = image.cdata
+        return self
+
+    def __array_finalize__(self, obj):
+        if obj is None:
+            return
+        self._image_c = getattr(obj, '_image_c', None)
+
+    def __repr__(self):
+        return repr(self.view(np.ndarray))
+
+    def __setitem__(self, index, value):
+        """Must invalidate mipmaps on any write."""
+        np.ndarray.__setitem__(self, index, value)
+        if self._image_c is not None:
+            lib.TCOD_image_invalidate_mipmaps(self._image_c)
+
+
+class Image(object):
     """
     .. versionadded:: 2.0
 
@@ -17,15 +43,17 @@ class Image(_CDataWrapper):
         width (int): Read only width of this Image.
         height (int): Read only height of this Image.
     """
-    def __init__(self, *args, **kargs):
-        super(Image, self).__init__(*args, **kargs)
-        if not self.cdata:
-            self._init(*args, **kargs)
-        self.width, self.height = self._get_size()
+    def __init__(self, width, height):
+        self.width, self.height = width, height
+        self.image_c = ffi.gc(lib.TCOD_image_new(width, height),
+                              lib.TCOD_image_delete)
 
-    def _init(self, width, height):
-        self.cdata = ffi.gc(lib.TCOD_image_new(width, height),
-                            lib.TCOD_image_delete)
+    @classmethod
+    def _from_cdata(cls, cdata):
+        self = object.__new__(cls)
+        self.image_c = cdata
+        self.width, self.height = self._get_size()
+        return self
 
     def clear(self, color):
         """Fill this entire Image with color.
@@ -34,15 +62,15 @@ class Image(_CDataWrapper):
             color (Union[Tuple[int, int, int], Sequence[int]]):
                 An (r, g, b) sequence or Color instance.
         """
-        lib.TCOD_image_clear(self.cdata, color)
+        lib.TCOD_image_clear(self.image_c, color)
 
     def invert(self):
         """Invert all colors in this Image."""
-        lib.TCOD_image_invert(self.cdata)
+        lib.TCOD_image_invert(self.image_c)
 
     def hflip(self):
         """Horizontally flip this Image."""
-        lib.TCOD_image_hflip(self.cdata)
+        lib.TCOD_image_hflip(self.image_c)
 
     def rotate90(self, rotations=1):
         """Rotate this Image clockwise in 90 degree steps.
@@ -50,11 +78,11 @@ class Image(_CDataWrapper):
         Args:
             rotations (int): Number of 90 degree clockwise rotations.
         """
-        lib.TCOD_image_rotate90(self.cdata, rotations)
+        lib.TCOD_image_rotate90(self.image_c, rotations)
 
     def vflip(self):
         """Vertically flip this Image."""
-        lib.TCOD_image_vflip(self.cdata)
+        lib.TCOD_image_vflip(self.image_c)
 
     def scale(self, width, height):
         """Scale this Image to the new width and height.
@@ -63,7 +91,7 @@ class Image(_CDataWrapper):
             width (int): The new width of the Image after scaling.
             height (int): The new height of the Image after scaling.
         """
-        lib.TCOD_image_scale(self.cdata, width, height)
+        lib.TCOD_image_scale(self.image_c, width, height)
         self.width, self.height = width, height
 
     def set_key_color(self, color):
@@ -73,7 +101,7 @@ class Image(_CDataWrapper):
             color (Union[Tuple[int, int, int], Sequence[int]]):
                 An (r, g, b) sequence or Color instance.
         """
-        lib.TCOD_image_set_key_color(self.cdata, color)
+        lib.TCOD_image_set_key_color(self.image_c, color)
 
     def get_alpha(self, x, y):
         """Get the Image alpha of the pixel at x, y.
@@ -86,7 +114,7 @@ class Image(_CDataWrapper):
             int: The alpha value of the pixel.
             With 0 being fully transparent and 255 being fully opaque.
         """
-        return lib.TCOD_image_get_alpha(self.cdata, x, y)
+        return lib.TCOD_image_get_alpha(self.image_c, x, y)
 
     def refresh_console(self, console):
         """Update an Image created with :any:`tcod.image_from_console`.
@@ -100,7 +128,7 @@ class Image(_CDataWrapper):
             console (Console): A Console with a pixel width and height
                                matching this Image.
         """
-        lib.TCOD_image_refresh_console(self.cdata, _cdata(console))
+        lib.TCOD_image_refresh_console(self.image_c, _cdata(console))
 
     def _get_size(self):
         """Return the (width, height) for this Image.
@@ -110,7 +138,7 @@ class Image(_CDataWrapper):
         """
         w = ffi.new('int *')
         h = ffi.new('int *')
-        lib.TCOD_image_get_size(self.cdata, w, h)
+        lib.TCOD_image_get_size(self.image_c, w, h)
         return w[0], h[0]
 
     def get_pixel(self, x, y):
@@ -125,7 +153,7 @@ class Image(_CDataWrapper):
                 An (r, g, b) tuple containing the pixels color value.
                 Values are in a 0 to 255 range.
         """
-        return lib.TCOD_image_get_pixel(self.cdata, x, y)
+        return lib.TCOD_image_get_pixel(self.image_c, x, y)
 
     def get_mipmap_pixel(self, left, top, right, bottom):
         """Get the average color of a rectangle in this Image.
@@ -145,7 +173,7 @@ class Image(_CDataWrapper):
                 An (r, g, b) tuple containing the averaged color value.
                 Values are in a 0 to 255 range.
         """
-        color = lib.TCOD_image_get_mipmap_pixel(self.cdata,
+        color = lib.TCOD_image_get_mipmap_pixel(self.image_c,
                                                 left, top, right, bottom)
         return (color.r, color.g, color.b)
 
@@ -158,7 +186,7 @@ class Image(_CDataWrapper):
             color (Union[Tuple[int, int, int], Sequence[int]]):
                 An (r, g, b) sequence or Color instance.
         """
-        lib.TCOD_image_put_pixel(self.cdata, x, y, color)
+        lib.TCOD_image_put_pixel(self.image_c, x, y, color)
 
     def blit(self, console, x, y, bg_blend, scale_x, scale_y, angle):
         """Blit onto a Console using scaling and rotation.
@@ -175,7 +203,7 @@ class Image(_CDataWrapper):
                              Set to 1 for no scaling.  Must be over 0.
             angle (float): Rotation angle in radians. (Clockwise?)
         """
-        lib.TCOD_image_blit(self.cdata, _cdata(console), x, y, bg_blend,
+        lib.TCOD_image_blit(self.image_c, _cdata(console), x, y, bg_blend,
                             scale_x, scale_y, angle)
 
     def blit_rect(self, console, x, y, width, height, bg_blend):
@@ -189,7 +217,7 @@ class Image(_CDataWrapper):
             height (int): Use -1 for Image height.
             bg_blend (int): Background blending mode to use.
         """
-        lib.TCOD_image_blit_rect(self.cdata, _cdata(console),
+        lib.TCOD_image_blit_rect(self.image_c, _cdata(console),
                                  x, y, width, height, bg_blend)
 
     def blit_2x(self, console, dest_x, dest_y,
@@ -207,13 +235,13 @@ class Image(_CDataWrapper):
             img_height (int): Height of the Image to blit.
                               Use -1 for the full Image height.
         """
-        lib.TCOD_image_blit_2x(self.cdata, _cdata(console), dest_x, dest_y,
+        lib.TCOD_image_blit_2x(self.image_c, _cdata(console), dest_x, dest_y,
                                img_x, img_y, img_width, img_height)
 
     def save_as(self, filename):
         """Save the Image to a 32-bit .bmp or .png file.
 
         Args:
-            filename (AnyStr): File path to same this Image.
+            filename (Text): File path to same this Image.
         """
-        lib.TCOD_image_save(self.cdata, _bytes(filename))
+        lib.TCOD_image_save(self.image_c, _bytes(filename))
