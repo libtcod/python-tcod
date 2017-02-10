@@ -4,9 +4,14 @@ from __future__ import absolute_import as _
 import numpy as np
 
 from tcod.tcod import _CDataWrapper
-from tcod.tcod import _int, _fmt_bytes, _fmt_unicode
 from tcod.libtcod import ffi, lib
 from tcod.libtcod import BKGND_DEFAULT, BKGND_SET
+
+
+def _fmt(string):
+    """Return a string that escapes 'C printf' side effects."""
+    return string.replace('%', '%%')
+
 
 class _ChBufferArray(np.ndarray):
     """Numpy subclass designed to access libtcod's character buffer.
@@ -54,6 +59,7 @@ class _ChBufferArray(np.ndarray):
         np.ndarray.__setitem__(self, index, value)
         if self._cf_array is not None:
             self._covert_ch_to_cf(index, self[index])
+
 
 class Console(_CDataWrapper):
     """
@@ -116,9 +122,9 @@ class Console(_CDataWrapper):
 
     @property
     def bg(self):
-        """A numpy array with the shape (height, width, 3).
+        """A numpy uint8 array with the shape (height, width, 3).
 
-        You can change the background color by using this array.
+        You can change the consoles background colors by using this array.
 
         Index this array with ``console.bg[y, x, channel]``
         """
@@ -126,9 +132,9 @@ class Console(_CDataWrapper):
 
     @property
     def fg(self):
-        """A numpy array with the shape (height, width, 3).
+        """A numpy uint8 array with the shape (height, width, 3).
 
-        You can change the foreground color by using this array.
+        You can change the consoles foreground colors by using this array.
 
         Index this array with ``console.fg[y, x, channel]``
         """
@@ -136,9 +142,9 @@ class Console(_CDataWrapper):
 
     @property
     def ch(self):
-        """A numpy array with the shape (height, width).
+        """A numpy int array with the shape (height, width).
 
-        You can change the character tiles by using this array.
+        You can change the consoles character codes by using this array.
 
         Index this array with ``console.ch[y, x]``
         """
@@ -163,11 +169,11 @@ class Console(_CDataWrapper):
         self._console_data.fore = color
 
     @property
-    def default_blend(self):
+    def default_bg_blend(self):
         """int: The default blending mode."""
         return self._console_data.bkgnd_flag
-    @default_blend.setter
-    def default_blend(self, value):
+    @default_bg_blend.setter
+    def default_bg_blend(self, value):
         self._console_data.bkgnd_flag = value
 
     @property
@@ -183,154 +189,92 @@ class Console(_CDataWrapper):
         """
         lib.TCOD_console_clear(self.cdata)
 
-    def put_char(self, x, y, ch, flag=BKGND_DEFAULT):
+    def put_char(self, x, y, ch, bg_blend=BKGND_DEFAULT):
         """Draw the character c at x,y using the default colors and a blend mode.
 
         Args:
             x (int): Character x position from the left.
             y (int): Character y position from the top.
-            c (Union[int, AnyStr]): Character to draw, can be an integer or string.
-            flag (int): Blending mode to use, defaults to BKGND_DEFAULT.
+            ch (int): Character code to draw.  Must be in integer form.
+            bg_blend (int): Blending mode to use, defaults to BKGND_DEFAULT.
         """
-        lib.TCOD_console_put_char(self.cdata, x, y, _int(ch), flag)
+        lib.TCOD_console_put_char(self.cdata, x, y, ch, bg_blend)
 
-    def put_char_ex(self, x, y, ch, fore, back):
-        """Draw the character c at x,y using the colors fore and back.
-
-        Args:
-            x (int): Character x position from the left.
-            y (int): Character y position from the top.
-            c (Union[int, AnyStr]): Character to draw, can be an integer or string.
-            fore (Union[Tuple[int, int, int], Sequence[int]]):
-                An (r, g, b) sequence or Color instance.
-            back (Union[Tuple[int, int, int], Sequence[int]]):
-                An (r, g, b) sequence or Color instance.
-        """
-        lib.TCOD_console_put_char_ex(self.cdata, x, y,
-                                 _int(ch), fore, back)
-
-    def set_char_bg(self, x, y, col, flag=BKGND_SET):
-        """Change the background color of x,y to col using a blend mode.
-
-        Args:
-            x (int): Character x position from the left.
-            y (int): Character y position from the top.
-            col (Union[Tuple[int, int, int], Sequence[int]]):
-                An (r, g, b) sequence or Color instance.
-            flag (int): Blending mode to use, defaults to BKGND_SET.
-        """
-        lib.TCOD_console_set_char_background(self.cdata, x, y, col, flag)
-
-    def set_char_fg(self, x, y, color):
-        """Change the foreground color of x,y to col.
-
-        Args:
-            x (int): Character x position from the left.
-            y (int): Character y position from the top.
-            color (Union[Tuple[int, int, int], Sequence[int]]):
-                An (r, g, b) sequence or Color instance.
-        """
-        lib.TCOD_console_set_char_foreground(self.cdata, x, y, col)
-
-    def set_char(self, x, y, ch):
-        """Change the character at x,y to c, keeping the current colors.
-
-        Args:
-            x (int): Character x position from the left.
-            y (int): Character y position from the top.
-            c (Union[int, AnyStr]): Character to draw, can be an integer or string.
-        """
-        lib.TCOD_console_set_char(self.cdata, x, y, _int(ch))
-
-    def print_(self, x, y, fmt):
+    def print_(self, x, y, string, bg_blend=BKGND_DEFAULT, alignment=None):
         """Print a color formatted string on a console.
 
         Args:
             x (int): Character x position from the left.
             y (int): Character y position from the top.
-            fmt (AnyStr): A unicode or bytes string optionaly using color codes.
+            string (Text): A unicode string optionaly using color codes.
         """
-        lib.TCOD_console_print_utf(self.cdata, x, y, _fmt_unicode(fmt))
+        alignment = self.default_alignment if alignment is None else alignment
 
-    def print_ex(self, x, y, flag, alignment, fmt):
-        """Print a string on a console using a blend mode and alignment mode.
-
-        Args:
-            x (int): Character x position from the left.
-            y (int): Character y position from the top.
-        """
         lib.TCOD_console_print_ex_utf(self.cdata, x, y,
-                                      flag, alignment, _fmt_unicode(fmt))
+                                      bg_blend, alignment, _fmt(string))
 
-    def print_rect(self, x, y, w, h, fmt):
+    def print_rect(self, x, y, width, height, string,
+                   bg_blend=BKGND_DEFAULT, alignment=None):
         """Print a string constrained to a rectangle.
 
         If h > 0 and the bottom of the rectangle is reached,
         the string is truncated. If h = 0,
         the string is only truncated if it reaches the bottom of the console.
 
-
-
         Returns:
             int: The number of lines of text once word-wrapped.
         """
-        return lib.TCOD_console_print_rect_utf(
-            self.cdata, x, y, width, height, _fmt_unicode(fmt))
-
-    def print_rect_ex(self, x, y, w, h, flag, alignment, fmt):
-        """Print a string constrained to a rectangle with blend and alignment.
-
-        Returns:
-            int: The number of lines of text once word-wrapped.
-        """
+        alignment = self.default_alignment if alignment is None else alignment
         return lib.TCOD_console_print_rect_ex_utf(self.cdata,
-            x, y, width, height, flag, alignment, _fmt_unicode(fmt))
+            x, y, width, height, bg_blend, alignment, _fmt(string))
 
-    def get_height_rect(self, x, y, width, height, fmt):
+    def get_height_rect(self, x, y, width, height, string):
         """Return the height of this text once word-wrapped into this rectangle.
 
         Returns:
             int: The number of lines of text once word-wrapped.
         """
         return lib.TCOD_console_get_height_rect_utf(
-            self.cdata, x, y, width, height, _fmt_unicode(fmt))
+            self.cdata, x, y, width, height, _fmt(string))
 
-    def rect(self, x, y, w, h, clr, flag=BKGND_DEFAULT):
+    def rect(self, x, y, width, height, clear, bg_blend=BKGND_DEFAULT):
         """Draw a the background color on a rect optionally clearing the text.
 
         If clr is True the affected tiles are changed to space character.
         """
-        lib.TCOD_console_rect(self.cdata, x, y, w, h, clr, flag)
+        lib.TCOD_console_rect(self.cdata, x, y, width, height, clear, bg_blend)
 
-    def hline(self, x, y, width, flag=BKGND_DEFAULT):
+    def hline(self, x, y, width, bg_blend=BKGND_DEFAULT):
         """Draw a horizontal line on the console.
 
         This always uses the character 196, the horizontal line character.
         """
-        lib.TCOD_console_hline(self.cdata, x, y, width, flag)
+        lib.TCOD_console_hline(self.cdata, x, y, width, bg_blend)
 
-    def vline(self, x, y, height, flag=BKGND_DEFAULT):
+    def vline(self, x, y, height, bg_blend=BKGND_DEFAULT):
         """Draw a vertical line on the console.
 
         This always uses the character 179, the vertical line character.
         """
-        lib.TCOD_console_vline(self.cdata, x, y, height, flag)
+        lib.TCOD_console_vline(self.cdata, x, y, height, blend)
 
-    def print_frame(self, x, y, w, h, clear=True, flag=BKGND_DEFAULT, fmt=b''):
+    def print_frame(self, x, y, width, height, string='',
+                    clear=True, bg_blend=BKGND_DEFAULT):
         """Draw a framed rectangle with optinal text.
 
         This uses the default background color and blend mode to fill the
         rectangle and the default foreground to draw the outline.
 
-        fmt will be printed on the inside of the rectangle, word-wrapped.
+        string will be printed on the inside of the rectangle, word-wrapped.
         """
-        lib.TCOD_console_print_frame(self.cdata, x, y, w, h, clear, flag,
-                                  _fmt_bytes(fmt))
+        lib.TCOD_console_print_frame(self.cdata, x, y, width, height,
+                                     clear, bg_blend, b'')
+        self.print_rect(x + 1, y + 1, width - 2, height - 2, string, bg_blend)
 
-    def blit(self, x, y, w, h,
-             dest, dest_x, dest_y, fg_alpha=1, bg_alpha=1):
+    def blit(self, x, y, width, height,
+             dest, dest_x, dest_y, fg_alpha=1.0, bg_alpha=1.0):
         """Blit this console from x,y,w,h to the console dst at xdst,ydst."""
-        lib.TCOD_console_blit(self.cdata, x, y, w, h,
+        lib.TCOD_console_blit(self.cdata, x, y, width, height,
                               _cdata(dst), dest_x, dest_y, fg_alpha, bg_alpha)
 
     def set_key_color(self, color):
