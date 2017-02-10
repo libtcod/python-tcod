@@ -1686,31 +1686,31 @@ def image_new(width, height):
     return tcod.image.Image(width, height)
 
 def image_clear(image, col):
-    lib.TCOD_image_clear(image.image_c, col)
+    image.clear(col)
 
 def image_invert(image):
-    lib.TCOD_image_invert(image.image_c)
+    image.invert()
 
 def image_hflip(image):
-    lib.TCOD_image_hflip(image.image_c)
+    image.hflip()
 
 def image_rotate90(image, num=1):
-    lib.TCOD_image_rotate90(image.image_c, num)
+    image.rotate90(num)
 
 def image_vflip(image):
-    lib.TCOD_image_vflip(image.image_c)
+    image.vflip()
 
 def image_scale(image, neww, newh):
-    lib.TCOD_image_scale(image.image_c, neww, newh)
+    image.scale(neww, newh)
 
 def image_set_key_color(image, col):
-    lib.TCOD_image_set_key_color(image.image_c, col)
+    image.set_key_color(col)
 
 def image_get_alpha(image, x, y):
-    return lib.TCOD_image_get_alpha(image.image_c, x, y)
+    image.get_alpha(x, y)
 
 def image_is_pixel_transparent(image, x, y):
-    return lib.TCOD_image_is_pixel_transparent(image.image_c, x, y)
+    lib.TCOD_image_is_pixel_transparent(image.image_c, x, y)
 
 def image_load(filename):
     """Load an image file into an Image instance and return it.
@@ -1737,36 +1737,31 @@ def image_from_console(console):
         )
 
 def image_refresh_console(image, console):
-    lib.TCOD_image_refresh_console(image.image_c, _cdata(console))
+    image.refresh_console(console)
 
 def image_get_size(image):
-    w = ffi.new('int *')
-    h = ffi.new('int *')
-    lib.TCOD_image_get_size(image.image_c, w, h)
-    return w[0], h[0]
+    return image.width, image.height
 
 def image_get_pixel(image, x, y):
-    return lib.TCOD_image_get_pixel(image.image_c, x, y)
+    return image.get_pixel(x, y)
 
 def image_get_mipmap_pixel(image, x0, y0, x1, y1):
-    return lib.TCOD_image_get_mipmap_pixel(image.image_c, x0, y0, x1, y1)
+    return image.get_mipmap_pixel(x0, y0, x1, y1)
 
 def image_put_pixel(image, x, y, col):
-    lib.TCOD_image_put_pixel(image.image_c, x, y, col)
+    image.put_pixel(x, y, col)
 
 def image_blit(image, console, x, y, bkgnd_flag, scalex, scaley, angle):
-    lib.TCOD_image_blit(image.image_c, _cdata(console), x, y, bkgnd_flag,
-                         scalex, scaley, angle)
+    image.blit(console, x, y, bkgnd_flag, scalex, scaley, angle)
 
 def image_blit_rect(image, console, x, y, w, h, bkgnd_flag):
-    lib.TCOD_image_blit_rect(image.image_c, _cdata(console),
-                             x, y, w, h, bkgnd_flag)
+    image.blit_rect(console, x, y, w, h, bkgnd_flag)
 
 def image_blit_2x(image, console, dx, dy, sx=0, sy=0, w=-1, h=-1):
-    lib.TCOD_image_blit_2x(image.image_c, _cdata(console), dx,dy,sx,sy,w,h)
+    image.blit_2x(console, dx, dy, sx, sy, w, h)
 
 def image_save(image, filename):
-    lib.TCOD_image_save(image.image_c, _bytes(filename))
+    image.save_as(filename)
 
 def image_delete(image):
     pass

@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import numpy as np
 
+from tcod.tcod import _cdata
 from tcod.libtcod import ffi, lib
 
 
@@ -244,4 +245,4 @@ class Image(object):
         Args:
             filename (Text): File path to same this Image.
         """
-        lib.TCOD_image_save(self.image_c, _bytes(filename))
+        lib.TCOD_image_save(self.image_c, filename.encode('utf-8'))
