@@ -39,6 +39,9 @@ environment:
   - PYTHON: C:\Python36-x64\python.exe
     platform: x64
     DEPLOY_ONLY: true
+  - PYPY: pypy2-v5.6.0-win32
+    platform: Any CPU
+    DEPLOY_ONLY: true
 
 matrix:
   allow_failures:
