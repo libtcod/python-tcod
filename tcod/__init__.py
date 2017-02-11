@@ -15,9 +15,7 @@
     Bring any issues or requests to GitHub:
     https://github.com/HexDecimal/libtcod-cffi
 """
-from __future__ import absolute_import as _
+from __future__ import absolute_import
 
 from tcod.libtcodpy import *
-from tcod.tcod import *
-from tcod import path
 from tcod.version import __version__
