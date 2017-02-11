@@ -31,6 +31,10 @@ def _pycall_path_dest_only(x1, y1, x2, y2, handle):
     """A TDL function which samples the dest coordinate only."""
     return ffi.from_handle(handle)(x2, y2)
 
+def _get_pathcost_callback(name):
+    """Return a properly cast PathCostArray callback."""
+    return ffi.cast('TCOD_path_func_t', ffi.addressof(lib, name))
+
 
 class _PathFinder(object):
     """
@@ -38,14 +42,14 @@ class _PathFinder(object):
     """
 
     _C_ARRAY_CALLBACKS = {
-        np.float32: ('float*', lib.PathCostArrayFloat32),
-        np.bool_: ('int8_t*', lib.PathCostArrayInt8),
-        np.int8: ('int8_t*', lib.PathCostArrayInt8),
-        np.uint8: ('uint8_t*', lib.PathCostArrayUInt8),
-        np.int16: ('int16_t*', lib.PathCostArrayInt16),
-        np.uint16: ('uint16_t*', lib.PathCostArrayUInt16),
-        np.int32: ('int32_t*', lib.PathCostArrayInt32),
-        np.uint32: ('uint32_t*', lib.PathCostArrayUInt32),
+        np.float32: ('float*', _get_pathcost_callback('PathCostArrayFloat32')),
+        np.bool_: ('int8_t*', _get_pathcost_callback('PathCostArrayInt8')),
+        np.int8: ('int8_t*', _get_pathcost_callback('PathCostArrayInt8')),
+        np.uint8: ('uint8_t*', _get_pathcost_callback('PathCostArrayUInt8')),
+        np.int16: ('int16_t*', _get_pathcost_callback('PathCostArrayInt16')),
+        np.uint16: ('uint16_t*', _get_pathcost_callback('PathCostArrayUInt16')),
+        np.int32: ('int32_t*', _get_pathcost_callback('PathCostArrayInt32')),
+        np.uint32: ('uint32_t*', _get_pathcost_callback('PathCostArrayUInt32')),
         }
 
     def __init__(self, cost, diagonal=1.41,
@@ -106,14 +110,20 @@ class _PathFinder(object):
     def _setup_ndarray(self, cost):
         """Validate a numpy array and setup a C callback."""
         self.height, self.width = cost.shape # must be a 2d array
-        if cost.dtype not in self._C_ARRAY_CALLBACKS:
+        if cost.dtype.type not in self._C_ARRAY_CALLBACKS:
             raise ValueError('dtype must be one of %r, dtype is %r' %
-                             (self._C_ARRAY_CALLBACKS.keys(), cost.dtype))
+                             (self._C_ARRAY_CALLBACKS.keys(), cost.dtype.type))
         self.cost = cost = np.ascontiguousarray(cost)
-        array_type, c_callback = self._C_ARRAY_CALLBACKS[cost.dtype]
+        array_type, c_callback = self._C_ARRAY_CALLBACKS[cost.dtype.type]
         cost = ffi.cast(array_type, cost.ctypes.data)
-        self._setup_callback(c_callback,
-                             ffi.new('PathCostArray*', (self.width, cost)))
+        self.handle = ffi.new('PathCostArray*', (self.width, cost))
+        self.cdata = ffi.gc(
+                self._path_new_using_function(
+                    self.width, self.height,
+                    c_callback,
+                    self.handle,
+                    self.diagonal),
+                self._path_delete)
 
     _path_new_using_map = lib.TCOD_path_new_using_map
     _path_new_using_function = lib.TCOD_path_new_using_function
@@ -168,5 +178,5 @@ class Dijkstra(_PathFinder):
         pointer_x = ffi.new('int[2]')
         pointer_y = pointer_x + 1
         while lib.TCOD_dijkstra_path_walk(self.cdata, pointer_x, pointer_y):
-            path.append(pointer_x[0], pointer_y[0])
+            path.append((pointer_x[0], pointer_y[0]))
         return path
