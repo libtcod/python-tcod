@@ -8,6 +8,8 @@
 
 |PyPI| |RTD| |Appveyor| |Travis| |Coveralls| |Codacy| |Scrutinizer|
 
+|Requires| |Pyup|
+
 =======
  About
 =======
@@ -39,7 +41,7 @@ See the requirements section if you're building from source.
 =======
  Usage
 =======
-This module was designed to be backwards compatible with the original libtcod
+This module was designed to be backward compatible with the original libtcod
 module that is distributed with libtcod.
 If you had code that runs on the original module you can use this library as a
 drop-in replacement like this::
@@ -53,19 +55,16 @@ Guides and Tutorials for the original library should also work with this one.
 ==============
 * Python 2.7+, Python 3.3+, or PyPy 5.4+
 * Windows, Linux, or Mac OS X
-* The cffi_ Python module must be version 1.8 or higher
-* The numpy_ Python module should be 1.11 or higher.
+* Linux requires the libsdl2 package
 
 Extra requirements when installing directly from source
 -------------------------------------------------------
 
-* Python pycparser module must be 2.14 or higher
-* MinGW_ gcc.exe must be on Windows path for use with pycparser.
-  An equivalent program must be installed on other OS's
-* Mac OS X requires sdl2, which can be installed
-  using the homebrew_ command: "brew install sdl2"
+* MinGW_ must be on Windows path for use with pycparser.
+  An equivalent C parser must be installed on other OS's
 * Linux requires the packages:
   libsdl2-dev, libffi-dev, and python-dev
+* SDL2 is installed automatically on Windows and Mac OS X
 
 =========
  License
@@ -122,3 +121,10 @@ Read LICENSE.txt_ for more details.
 
 .. |Scrutinizer| image:: https://scrutinizer-ci.com/g/HexDecimal/libtcod-cffi/badges/quality-score.png?b=master
     :target: https://scrutinizer-ci.com/g/HexDecimal/libtcod-cffi/
+
+.. |Requires| image:: https://requires.io/github/HexDecimal/libtcod-cffi/requirements.svg?branch=master
+    :target: https://requires.io/github/HexDecimal/libtcod-cffi/requirements/?branch=master
+    :alt: Requirements Status
+
+.. |Pyup| image:: https://pyup.io/repos/github/hexdecimal/libtcod-cffi/shield.svg
+     :target: https://pyup.io/repos/github/hexdecimal/libtcod-cffi/
