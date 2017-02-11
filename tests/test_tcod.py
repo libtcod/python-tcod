@@ -9,7 +9,8 @@ import numpy as np
 import pytest
 
 from common import tcod, raise_Exception
-
+import tcod.noise
+import tcod.path
 
 def test_line_error():
     """
@@ -90,12 +91,23 @@ def test_console_defaults(console):
     console.default_fg = (4, 5, 6)
     assert console.default_fg == (4, 5, 6)
 
-    console.default_blend = tcod.BKGND_ADD
-    assert console.default_blend == tcod.BKGND_ADD
+    console.default_bg_blend = tcod.BKGND_ADD
+    assert console.default_bg_blend == tcod.BKGND_ADD
 
     console.default_alignment = tcod.RIGHT
     assert console.default_alignment == tcod.RIGHT
 
+def test_console_methods(console):
+    console.put_char(0, 0, ord('@'))
+    console.print_(0, 0, 'Test')
+    console.print_rect(0, 0, 2, 8, 'a b c d e f')
+    console.get_height_rect(0, 0, 2, 8, 'a b c d e f')
+    console.rect(0, 0, 2, 2, True)
+    console.hline(0, 1, 10)
+    console.vline(1, 0, 10)
+    console.print_frame(0, 0, 8, 8, 'Frame')
+    console.blit(0, 0, 0, 0, console, 0, 0)
+    console.set_key_color((254, 0, 254))
 
 def test_tcod_map_set_bits(benchmark):
     map_ = tcod.map.Map(2,2)
@@ -129,3 +141,59 @@ def test_tcod_map_pickle():
     map_.transparent[:] = True
     assert (map_.buffer[:].tolist() ==
             pickle.loads(pickle.dumps(copy.copy(map_))).buffer[:].tolist())
+
+def test_noise_class():
+    noise = tcod.noise.Noise(2)
+    # cover attributes
+    assert noise.dimentions == 2
+    noise.algorithm = noise.algorithm
+    noise.hurst
+    noise.lacunarity
+
+    # cover implementations
+    for implementation in [tcod.noise.SIMPLE,
+                           tcod.noise.FBM,
+                           tcod.noise.TURBULENCE]:
+        noise.implementation = implementation
+        noise.get_point(0, 0)
+
+    # cover exception
+    noise.implementation = -1
+    with pytest.raises(RuntimeError):
+        noise.get_point(0, 0)
+
+def test_color_class():
+    assert tcod.black == tcod.black
+    assert tcod.black == (0, 0, 0)
+    assert tcod.black == [0, 0, 0]
+    assert tcod.black != tcod.white
+    assert tcod.white * 1 == tcod.white
+    assert tcod.white * tcod.black == tcod.black
+    assert tcod.white - tcod.white == tcod.black
+    assert tcod.black + (2, 2, 2) - (1, 1, 1) == (1, 1, 1)
+    assert not tcod.black == None
+
+    color = tcod.Color()
+    color.r = 1
+    color.g = 2
+    color.b = 3
+    assert color == (1, 2, 3)
+
+@pytest.mark.parametrize('dtype', [np.int8, np.int16, np.int32,
+                                   np.uint8, np.uint16, np.uint32, np.float32])
+def test_path_numpy(dtype):
+    map_np = np.ones((6, 6), dtype=dtype)
+    map_np[1:4, 1:4] = 0
+
+    astar = tcod.path.AStar(map_np, 0)
+    assert len(astar.get_path(0, 0, 5, 5)) == 10
+
+    dijkstra = tcod.path.Dijkstra(map_np, 0)
+    dijkstra.set_goal(0, 0)
+    assert len(dijkstra.get_path(5, 5)) == 10
+
+def test_path_callback():
+    def path_cost(this_x, this_y, dest_x, dest_y):
+        return 1
+    astar = tcod.path.AStar(path_cost, width=10, height=10)
+    assert len(astar.get_path(0, 0, 9, 9)) == 9
