@@ -1,16 +1,24 @@
 
-from __future__ import absolute_import as _
+from __future__ import absolute_import
+
+import sys
 
 import numpy as np
 
-from tcod.tcod import _CDataWrapper
+from tcod.tcod import _CDataWrapper, _cdata
 from tcod.libtcod import ffi, lib
 from tcod.libtcod import BKGND_DEFAULT, BKGND_SET
 
 
-def _fmt(string):
-    """Return a string that escapes 'C printf' side effects."""
-    return string.replace('%', '%%')
+if sys.version_info[0] == 2: # Python 2
+    def _fmt(string):
+        if not isinstance(string, unicode):
+            string = string.decode('latin-1')
+        return string.replace(u'%', u'%%')
+else:
+    def _fmt(string):
+        """Return a string that escapes 'C printf' side effects."""
+        return string.replace('%', '%%')
 
 
 class _ChBufferArray(np.ndarray):
@@ -256,7 +264,7 @@ class Console(_CDataWrapper):
 
         This always uses the character 179, the vertical line character.
         """
-        lib.TCOD_console_vline(self.cdata, x, y, height, blend)
+        lib.TCOD_console_vline(self.cdata, x, y, height, bg_blend)
 
     def print_frame(self, x, y, width, height, string='',
                     clear=True, bg_blend=BKGND_DEFAULT):
@@ -275,7 +283,7 @@ class Console(_CDataWrapper):
              dest, dest_x, dest_y, fg_alpha=1.0, bg_alpha=1.0):
         """Blit this console from x,y,w,h to the console dst at xdst,ydst."""
         lib.TCOD_console_blit(self.cdata, x, y, width, height,
-                              _cdata(dst), dest_x, dest_y, fg_alpha, bg_alpha)
+                              _cdata(dest), dest_x, dest_y, fg_alpha, bg_alpha)
 
     def set_key_color(self, color):
         """Set a consoles blit transparent color."""

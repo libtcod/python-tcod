@@ -46,7 +46,7 @@ if _sys.version_info[0] == 2: # Python 2
 
     def _unicode(string):
         if not isinstance(string, unicode):
-            return string.decode()
+            return string.decode('latin-1')
         return string
 
 else: # Python 3
@@ -57,7 +57,7 @@ else: # Python 3
 
     def _unicode(string):
         if isinstance(string, bytes):
-            return string.decode()
+            return string.decode('latin-1')
         return string
 
 def _fmt_bytes(string):
