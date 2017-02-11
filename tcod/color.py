@@ -58,9 +58,14 @@ class Color(list):
         return cls(lib.TDL_color_from_int(integer))
 
     def __eq__(self, other):
-        """Compare equality between colors."""
-        return (isinstance(other, (Color)) and
-                lib.TCOD_color_equals(self, other))
+        """Compare equality between colors.
+        
+        Also compares with standard sequences such as 3-item tuples or lists.
+        """
+        try:
+            return bool(lib.TCOD_color_equals(self, other))
+        except TypeError:
+            return False
 
     def __add__(self, other):
         """Add two colors together."""
@@ -100,8 +105,6 @@ def _import_colors(lib):
         if ffi.typeof(value) != ffi.typeof('TCOD_color_t'):
             continue
         g[name[5:]] = Color._new_from_cdata(value)
-        __all__.append(name[5:])
 
 
-__all__ = ['Color']
 _import_colors(lib)
