@@ -17,15 +17,7 @@
 """
 from __future__ import absolute_import as _
 
-import os as _os
-
-import re as _re
-
 from tcod.libtcodpy import *
 from tcod.tcod import *
 from tcod import path
-
-with open(_os.path.join(__path__[0], 'version.txt'), 'r') as _f:
-    # exclude the git commit number (PEP 396)
-    __version__ = _re.match(r'([0-9]+)\.([0-9]+).*?', _f.read()).groups()
-    assert __version__, 'version.txt parse error'
+from tcod.version import __version__

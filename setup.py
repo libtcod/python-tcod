@@ -8,13 +8,12 @@ import subprocess
 
 from setuptools import setup, Command
 
-with open('tcod/version.txt', 'r') as f:
-    version = f.read()
+exec(open('tcod/version.py').read()) # get __version__
 
 def get_package_data():
     '''get data files which will be included in the main tcod/ directory'''
     BITSIZE, LINKAGE = platform.architecture()
-    files = ['version.txt',
+    files = [
              'lib/LIBTCOD-CREDITS.txt',
              'lib/LIBTCOD-LICENSE.txt',
              'lib/README-SDL.txt']
@@ -32,7 +31,7 @@ pytest_runner = ['pytest-runner'] if needs_pytest else []
 
 setup(
     name='libtcod-cffi',
-    version=version,
+    version=__version__,
     author='Kyle Stewart',
     author_email='4B796C65+tcod@gmail.com',
     description='A Python cffi port of libtcod.',
