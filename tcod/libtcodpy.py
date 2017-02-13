@@ -2522,3 +2522,9 @@ def sys_wait_for_event(mask, k, m, flush):
         flush (bool): Clear the event buffer before waiting.
     """
     return lib.TCOD_sys_wait_for_event(mask, _cdata(k), _cdata(m), flush)
+
+def sys_clipboard_set(text):
+    return lib.TCOD_sys_clipboard_set(text.encode('utf-8'))
+
+def sys_clipboard_get():
+    return ffi.string(lib.TCOD_sys_clipboard_get()).decode('utf-8')
