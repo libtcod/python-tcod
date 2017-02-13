@@ -565,3 +565,12 @@ class TestLibtcodpyMap(unittest.TestCase):
                                                 self.path_callback)
         tcod.dijkstra_compute(path, *self.POINT_A)
         tcod.dijkstra_delete(path)
+
+def test_clipboard(console):
+    saved = tcod.sys_clipboard_get()
+    try:
+        sample = u'\u2603' # Unicode snowman
+        tcod.sys_clipboard_set(sample)
+        assert tcod.sys_clipboard_get() == sample
+    finally:
+        tcod.sys_clipboard_set(saved)
