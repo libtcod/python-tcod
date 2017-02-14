@@ -18,9 +18,8 @@ def session_console():
     FULLSCREEN = False
 
     tcod.console_set_custom_font(FONT_FILE)
-    con = tcod.console_init_root(WIDTH, HEIGHT, TITLE, FULLSCREEN)
-    yield con
-    tcod.console_delete(con)
+    with tcod.console_init_root(WIDTH, HEIGHT, TITLE, FULLSCREEN) as con:
+        yield con
 
 @pytest.fixture(scope="function")
 def console(session_console):

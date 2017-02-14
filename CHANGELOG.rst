@@ -1,6 +1,11 @@
 ===========
  Changelog
 ===========
+2.1.0
+Added
+ * The root `Console` instance can now be used as a context manager.  Closing
+   the graphical window when the context exits.
+
 2.0.0 - 2017-02-11
 ------------------
 Added

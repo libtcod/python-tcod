@@ -288,3 +288,23 @@ class Console(_CDataWrapper):
     def set_key_color(self, color):
         """Set a consoles blit transparent color."""
         lib.TCOD_console_set_key_color(self.cdata, color)
+
+    def __enter__(self):
+        """Context manage the root console.
+
+        When the root console is used in a context, the grapical window will
+        close once the context is left as if :any:`tcod.console_delete` was
+        called on it.
+
+        This is useful for some Python IDE's, such as IDLE.
+        """
+        if self.cdata != ffi.NULL:
+            raise NotImplementedError('Only the root console has a context.')
+        return self
+
+    def __exit__(self, *args):
+        """Closes the graphical window on exit.
+
+        Some tcod functions may have undefined behaviour after this point.
+        """
+        lib.TCOD_console_delete(self.cdata)
