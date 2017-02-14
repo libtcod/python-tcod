@@ -5,6 +5,7 @@
 Added
  * The root `Console` instance can now be used as a context manager.  Closing
    the graphical window when the context exits.
+ * Ported libtcod functions: `sys_clipboard_get` and `sys_clipboard_set`.
 
 2.0.0 - 2017-02-11
 ------------------
