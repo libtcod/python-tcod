@@ -61,3 +61,6 @@ tcod/_*.c
 tcod/_*.pyd
 .benchmarks
 dependencies/SDL2*
+tcod/x86
+tcod/x64
+tcod/SDL2.framework
