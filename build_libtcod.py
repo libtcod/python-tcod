@@ -62,6 +62,7 @@ def unpack_sdl2(version):
     else:
         assert sdl2_arc.endswith('.dmg')
         subprocess.check_call(['hdiutil', 'mount', sdl2_arc])
+        subprocess.check_call(['mkdir', '-p', sdl2_dir])
         subprocess.check_call(['cp', '-r', '/Volumes/SDL2/SDL2.framework',
                                            sdl2_dir])
         subprocess.check_call(['hdiutil', 'unmount', '/Volumes/SDL2'])
@@ -91,7 +92,6 @@ library_dirs = []
 define_macros = [('LIBTCOD_EXPORTS', None),
                  ('TCOD_SDL2', None),
                  ('NO_OPENGL', None),
-                 ('TCOD_NO_MACOSX_SDL_MAIN', None),
                  ('_CRT_SECURE_NO_WARNINGS', None),
                  ]
 
@@ -118,14 +118,19 @@ if sys.platform in ['win32', 'darwin']:
 if sys.platform == 'win32':
     include_dirs.append(os.path.join(SDL2_PATH, 'include'))
     ARCH_MAPPING = {'32bit': 'x86', '64bit': 'x64'}
-    library_dirs.append(os.path.join(SDL2_PATH, 'lib/', ARCH_MAPPING[BITSIZE]))
+    SDL2_LIB_DIR = os.path.join(SDL2_PATH, 'lib/', ARCH_MAPPING[BITSIZE])
+    library_dirs.append(SDL2_LIB_DIR)
+    SDL2_LIB_DEST = os.path.join('tcod', ARCH_MAPPING[BITSIZE])
+    if not os.path.exists(SDL2_LIB_DEST):
+        os.mkdir(SDL2_LIB_DEST)
+    shutil.copy(os.path.join(SDL2_LIB_DIR, 'SDL2.dll'), SDL2_LIB_DEST)
 
 def fix_header(filepath):
-    """Removes leading whitespace from a header file.
+    """Removes leading whitespace from a MacOS header file.
 
     This whitespace is causing issues with directives on some platforms.
     """
-    with open(filepath, 'r+U') as f:
+    with open(filepath, 'r+') as f:
         current = f.read()
         fixed = '\n'.join(line.strip() for line in current.split('\n'))
         if current == fixed:
@@ -222,19 +227,23 @@ def get_ast():
                                r'-DDECLSPEC=',
                                r'-DSDLCALL=',
                                r'-DTCODLIB_API=',
-                               r'-DTCOD_NO_MACOSX_SDL_MAIN=',
                                r'-DTCOD_SDL2=',
                                r'-DNO_OPENGL',
                                r'-DSDL_FORCE_INLINE=',
                                r'-U__GNUC__',
-                               #r'-D_SDL_assert_h',
                                r'-D_SDL_thread_h',
                                r'-DDOXYGEN_SHOULD_IGNORE_THIS',
-                               r'-DMAC_OS_X_VERSION_MIN_REQUIRED=9999',
+                               r'-DMAC_OS_X_VERSION_MIN_REQUIRED=1060',
                                r'-D__attribute__(x)='
                                ] + extra_parse_args)
     ast = CustomPostParser().parse(ast)
     return ast
+
+if sys.platform == 'win32':
+    extra_compile_args.extend(['/GL', '/Os'])
+else:
+    extra_compile_args.extend(['-flto', '-Os'])
+    extra_link_args.extend(['-flto', '-Os'])
 
 ffi = FFI()
 ffi.cdef(get_cdef())
