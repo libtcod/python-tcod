@@ -78,6 +78,7 @@ from tcod import lib as _lib
 
 from . import event, map, noise
 from . import style as _style
+from tdl.version import __version__
 
 
 _IS_PYTHON3 = (_sys.version_info[0] == 3)
@@ -1406,4 +1407,3 @@ __license__ = "Simplified BSD License"
 __author__ = 'Kyle Stewart'
 __contact__ = "4b796c65+pythonTDL@gmail.com"
 __email__ = "4b796c65+pythonTDL@gmail.com"
-__version__ = open(_os.path.join(__path__[0], 'version.txt'), 'r').read()

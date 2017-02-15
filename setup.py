@@ -2,9 +2,11 @@
 
 from setuptools import setup
 
+exec(open('tdl/version.py').read()) # get __version__
+
 setup(
     name='tdl',
-    version=open('tdl/version.txt', 'r').read(),
+    version=__version__,
     author='Kyle Stewart',
     author_email='4B796C65+tdl@gmail.com',
     description='Pythonic cffi port of libtcod.',
@@ -14,7 +16,7 @@ setup(
     download_url='https://pypi.python.org/pypi/tdl',
     packages=['tdl'],
     package_data={'tdl': ['*.txt', '*.rst', '*.bmp', '*.png']},
-    install_requires=["libtcod-cffi>=0.2.8,<2"],
+    install_requires=["libtcod-cffi>=2.0.0,<3"],
     classifiers=['Development Status :: 5 - Production/Stable',
                'Environment :: Win32 (MS Windows)',
                'Environment :: MacOS X',

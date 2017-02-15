@@ -1,6 +1,16 @@
 ===========
  Changelog
 ===========
+2.0.0 - 2017-02-15
+------------------
+Changed
+ * Dependencies updated, tdl now requires libtcod-cffi 2.x.x
+ * Some event behaviours have changed with SDL2, event keys might be different
+   than what you expect.
+Removed
+ * Key repeat functions were removed from SDL2.
+   `set_key_repeat` is now stubbed, and does nothing.
+
 1.6.0
  * Console.blit methods can now take fg_alpha and bg_alpha parameters.
 
