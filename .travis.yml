@@ -34,9 +34,8 @@ before_install:
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi'
 - source .travis/install_python.sh
-- 'echo "[bdist_wheel]" >> setup.cfg'
-- 'echo "py-limited-api = cp33" >> setup.cfg'
-- pip install --upgrade pip setuptools "wheel>=0.30.0a0"
+- pip install --upgrade pip setuptools
+- 'pip install -U hg+https://bitbucket.org/HexDecimal/wheel@abi3-windows-fix#egg=wheel'
 - 'if [[ "$TRAVIS_PYTHON_VERSION" == pypy* ]]; then pip install git+https://bitbucket.org/pypy/numpy.git; fi'
 - pip install --requirement requirements.txt
 install:
