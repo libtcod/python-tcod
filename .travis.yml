@@ -28,6 +28,7 @@ before_install:
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi'
 install:
  - pip install --upgrade pip setuptools
+ - pip install -r requirements.txt
  - python setup.py develop sdist bdist_wheel
 before_script:
  - pip install nose2 cov-core
