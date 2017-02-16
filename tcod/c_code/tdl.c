@@ -1,11 +1,10 @@
-
-// extra functions provided for the python-tdl library
+/* extra functions provided for the python-tdl library */
+#include "tdl.h"
 
 #include <libtcod.h>
 #include <wrappers.h>
 
 void SDL_main(void){};
-void CustomSDLMain(void){}; /* CustomSDLMain stub for Mac build */
 
 TCOD_value_t TDL_list_get_union(TCOD_list_t l,int idx){
     TCOD_value_t item;
@@ -42,7 +41,7 @@ TCOD_dice_t TDL_list_get_dice(TCOD_list_t l,int idx){
 }
 
 
-// get a TCOD color type from a 0xRRGGBB formatted integer
+/* get a TCOD color type from a 0xRRGGBB formatted integer */
 TCOD_color_t TDL_color_from_int(int color){
     TCOD_color_t tcod_color={(color >> 16) & 0xff,
                              (color >> 8) & 0xff,
@@ -152,77 +151,74 @@ int TDL_color_scale_HSV(int color, float scoef, float vcoef){
 #define WALKABLE_BIT 2
 #define FOV_BIT 4
 
-// set map transparent and walkable flags from a buffer
-void TDL_map_data_from_buffer(TCOD_map_t map, uint8 *buffer){
-    int width=TCOD_map_get_width(map);
-    int height=TCOD_map_get_height(map);
-    int x;
-    int y;
-
-    int i = width*height-1;
-    int16 data;
-    for(y=height-1;y>=0;y--){
-        for(x=width-1;x>=0;x--){
-            data = *(buffer + i--);
-            TCOD_map_set_properties(map, x, y, (data & TRANSPARENT_BIT) != 0,
-                                               (data & WALKABLE_BIT) != 0);
-        }
+/* set map transparent and walkable flags from a buffer */
+void TDL_map_data_from_buffer(TCOD_map_t map, uint8 *buffer) {
+  int width=TCOD_map_get_width(map);
+  int height=TCOD_map_get_height(map);
+  int x;
+  int y;
+  for (y = 0; y < height; y++){
+    for (x = 0; x < width; x++){
+      int i = y * width + x;
+      TCOD_map_set_properties(map, x, y,
+                              (buffer[i] & TRANSPARENT_BIT) != 0,
+                              (buffer[i] & WALKABLE_BIT) != 0);
     }
+  }
 }
 
-// get fov from tcod map
-void TDL_map_fov_to_buffer(TCOD_map_t map, uint8 *buffer,
-                                  bool cumulative){
-    int width=TCOD_map_get_width(map);
-    int height=TCOD_map_get_height(map);
-    int x;
-    int y;
-    int i = width*height;
-    for(y=height-1;y>=0;y--){
-        for(x=width-1;x>=0;x--){
-            i--;
-            if(TCOD_map_is_in_fov(map, x, y)){
-                *(buffer + i) |= FOV_BIT;
-            }else if(!cumulative){
-                *(buffer + i) &= ~FOV_BIT;
-            }
-        }
+/* get fov from tcod map */
+void TDL_map_fov_to_buffer(TCOD_map_t map, uint8 *buffer, bool cumulative) {
+  int width=TCOD_map_get_width(map);
+  int height=TCOD_map_get_height(map);
+  int x;
+  int y;
+  for (y = 0; y < height; y++){
+    for (x = 0; x < width; x++){
+      int i = y * width + x;
+      if (!cumulative) {
+        buffer[i] &= ~FOV_BIT;
+      }
+      if (TCOD_map_is_in_fov(map, x, y)) {
+        buffer[i] |= FOV_BIT;
+      }
     }
+  }
 }
 
-// set functions are called conditionally for ch/fg/bg (-1 is ignored)/
-// colors are converted to TCOD_color_t types in C and is much faster than in
-// Python.
-// Also Python indexing is used, negative x/y will index to (width-x, etc.)
+/* set functions are called conditionally for ch/fg/bg (-1 is ignored)
+   colors are converted to TCOD_color_t types in C and is much faster than in
+   Python.
+   Also Python indexing is used, negative x/y will index to (width-x, etc.) */
 int TDL_console_put_char_ex(TCOD_console_t console, int x, int y,
-                            int ch, int fg, int bg, TCOD_bkgnd_flag_t blend){
-    int width=TCOD_console_get_width(console);
-    int height=TCOD_console_get_height(console);
-    TCOD_color_t color;
+                            int ch, int fg, int bg, TCOD_bkgnd_flag_t blend) {
+  int width=TCOD_console_get_width(console);
+  int height=TCOD_console_get_height(console);
+  TCOD_color_t color;
 
-    if(x < -width || x >= width || y < -height || y >= height){
-        return -1; // outside of console
-    }
+  if (x < -width || x >= width || y < -height || y >= height) {
+    return -1; /* outside of console */
+  }
 
-    // normalize x, y
-    if(x<0){x += width;};
-    if(y<0){y += height;};
+  /* normalize x, y */
+  if (x < 0) { x += width; };
+  if (y < 0) { y += height; };
 
-    if(ch != -1){
-        TCOD_console_set_char(console, x, y, ch);
-    }
-    if(fg != -1){
-        color = TDL_color_from_int(fg);
-        TCOD_console_set_char_foreground(console, x, y, color);
-    }
-    if(bg != -1){
-        color = TDL_color_from_int(bg);
-        TCOD_console_set_char_background(console, x, y, color, blend);
-    }
-    return 0;
+  if (ch != -1) {
+    TCOD_console_set_char(console, x, y, ch);
+  }
+  if (fg != -1) {
+    color = TDL_color_from_int(fg);
+    TCOD_console_set_char_foreground(console, x, y, color);
+  }
+  if (bg != -1) {
+    color = TDL_color_from_int(bg);
+    TCOD_console_set_char_background(console, x, y, color, blend);
+  }
+  return 0;
 }
 
-int TDL_console_get_bg(TCOD_console_t console, int x, int y){
+int TDL_console_get_bg(TCOD_console_t console, int x, int y) {
     TCOD_color_t tcod_color=TCOD_console_get_char_background(console, x, y);
     return TDL_color_to_int(&tcod_color);
 }

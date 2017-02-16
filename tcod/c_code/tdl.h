@@ -1,6 +1,8 @@
 #ifndef _TCOD_C_CODE_TDL_H_
 #define _TCOD_C_CODE_TDL_H_
 
+#include <libtcod.h>
+
 /* TDL FUNCTONS ----------------------------------------------------------- */
 
 TCOD_value_t TDL_list_get_union(TCOD_list_t l,int idx);
