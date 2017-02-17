@@ -67,6 +67,10 @@ class _Mock(object):
         """This object pretends to have everything."""
         return self
 
+    def __call__(self, *args, **kargs):
+        """Suppress any other calls"""
+        return self
+
     def __str__(self):
         """Just have ? in case anything leaks as a parameter default."""
         return '?'
