@@ -239,11 +239,30 @@ def get_ast():
     ast = CustomPostParser().parse(ast)
     return ast
 
-if sys.platform == 'win32':
+# Can force the use of OpenMP with this variable.
+try:
+    USE_OPENMP = eval(os.environ.get('USE_OPENMP', 'None').title())
+except Exception:
+    USE_OPENMP = None
+print(sys.argv)
+if sys.platform == 'win32' and '--compiler=mingw32' not in sys.argv:
     extra_compile_args.extend(['/GL', '/Os'])
+    extra_link_args.extend(['/LTCG'])
+
+    if USE_OPENMP is None:
+        USE_OPENMP = sys.version_info[:2] >= (3, 5)
+
+    if USE_OPENMP:
+        extra_compile_args.append('/openmp')
 else:
-    extra_compile_args.extend(['-flto', '-Os'])
+    extra_compile_args.extend(['-flto'])
     extra_link_args.extend(['-flto', '-Os'])
+    if USE_OPENMP is None:
+        USE_OPENMP = sys.platform != 'darwin'
+
+    if USE_OPENMP:
+        extra_compile_args.append('-fopenmp')
+        extra_link_args.append('-fopenmp')
 
 ffi = FFI()
 ffi.cdef(get_cdef())

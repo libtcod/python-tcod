@@ -1531,7 +1531,8 @@ def heightmap_add_fbm(hm, noise, mulx, muly, addx, addy, octaves, delta, scale):
         delta (float): The value added to all heightmap cells.
         scale (float): The noise value is scaled with this parameter.
     """
-    lib.TCOD_heightmap_add_fbm(_heightmap_cdata(hm), _cdata(noise),
+    noise = noise.noise_c if noise is not None else ffi.NULL
+    lib.TCOD_heightmap_add_fbm(_heightmap_cdata(hm), noise,
                                mulx, muly, addx, addy, octaves, delta, scale)
 
 def heightmap_scale_fbm(hm, noise, mulx, muly, addx, addy, octaves, delta,
@@ -1549,7 +1550,8 @@ def heightmap_scale_fbm(hm, noise, mulx, muly, addx, addy, octaves, delta,
         delta (float): The value added to all heightmap cells.
         scale (float): The noise value is scaled with this parameter.
     """
-    lib.TCOD_heightmap_scale_fbm(_heightmap_cdata(hm), _cdata(noise),
+    noise = noise.noise_c if noise is not None else ffi.NULL
+    lib.TCOD_heightmap_scale_fbm(_heightmap_cdata(hm), noise,
                                  mulx, muly, addx, addy, octaves, delta, scale)
 
 def heightmap_dig_bezier(hm, px, py, startRadius, startDepth, endRadius,
@@ -1949,7 +1951,7 @@ def noise_new(dim, h=NOISE_DEFAULT_HURST, l=NOISE_DEFAULT_LACUNARITY,
     """Return a new Noise instance.
 
     Args:
-        dim (int): Number of dimentions.  From 1 to 4.
+        dim (int): Number of dimensions.  From 1 to 4.
         h (float): The hurst exponent.  Should be in the 0.0-1.0 range.
         l (float): The noise lacunarity.
         random (Optional[Random]): A Random instance, or None.
@@ -1971,8 +1973,8 @@ def noise_get(n, f, typ=NOISE_DEFAULT):
     """Return the noise value sampled from the ``f`` coordinate.
 
     ``f`` should be a tuple or list with a length matching
-    :any:`Noise.dimentions`.
-    If ``f`` is shoerter than :any:`Noise.dimentions` the missing coordinates
+    :any:`Noise.dimensions`.
+    If ``f`` is shoerter than :any:`Noise.dimensions` the missing coordinates
     will be filled with zeros.
 
     Args:
@@ -1983,7 +1985,7 @@ def noise_get(n, f, typ=NOISE_DEFAULT):
     Returns:
         float: The sampled noise value.
     """
-    return lib.TCOD_noise_get_ex(n.cdata, ffi.new('float[4]', f), typ)
+    return lib.TCOD_noise_get_ex(n.noise_c, ffi.new('float[4]', f), typ)
 
 def noise_get_fbm(n, f, oc, typ=NOISE_DEFAULT):
     """Return the fractal Brownian motion sampled from the ``f`` coordinate.
@@ -1997,7 +1999,7 @@ def noise_get_fbm(n, f, oc, typ=NOISE_DEFAULT):
     Returns:
         float: The sampled noise value.
     """
-    return lib.TCOD_noise_get_fbm_ex(n.cdata, ffi.new('float[4]', f),
+    return lib.TCOD_noise_get_fbm_ex(n.noise_c, ffi.new('float[4]', f),
                                      oc, typ)
 
 def noise_get_turbulence(n, f, oc, typ=NOISE_DEFAULT):
@@ -2012,7 +2014,7 @@ def noise_get_turbulence(n, f, oc, typ=NOISE_DEFAULT):
     Returns:
         float: The sampled noise value.
     """
-    return lib.TCOD_noise_get_turbulence_ex(n.cdata, ffi.new('float[4]', f),
+    return lib.TCOD_noise_get_turbulence_ex(n.noise_c, ffi.new('float[4]', f),
                                             oc, typ)
 
 def noise_delete(n):

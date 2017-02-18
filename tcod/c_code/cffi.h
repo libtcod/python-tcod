@@ -7,6 +7,7 @@
 #include <libtcod_int.h>
 #include <wrappers.h>
 
+#include "noise.h"
 #include "path.h"
 #include "random.h"
 #include "tdl.h"

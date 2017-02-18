@@ -142,25 +142,33 @@ def test_tcod_map_pickle():
     assert (map_.buffer[:].tolist() ==
             pickle.loads(pickle.dumps(copy.copy(map_))).buffer[:].tolist())
 
-def test_noise_class():
-    noise = tcod.noise.Noise(2)
+@pytest.mark.parametrize('implementation', [tcod.noise.SIMPLE,
+                                            tcod.noise.FBM,
+                                            tcod.noise.TURBULENCE])
+def test_noise_class(implementation):
+    noise = tcod.noise.Noise(2, tcod.NOISE_SIMPLEX, implementation)
     # cover attributes
-    assert noise.dimentions == 2
+    assert noise.dimensions == 2
     noise.algorithm = noise.algorithm
+    noise.implementation = noise.implementation
+    noise.octaves = noise.octaves
     noise.hurst
     noise.lacunarity
 
-    # cover implementations
-    for implementation in [tcod.noise.SIMPLE,
-                           tcod.noise.FBM,
-                           tcod.noise.TURBULENCE]:
-        noise.implementation = implementation
-        noise.get_point(0, 0)
+    noise.get_point(0, 0)
+    noise.sample_mgrid(np.mgrid[:2,:3])
+    noise.sample_ogrid(np.ogrid[:2,:3])
 
-    # cover exception
-    noise.implementation = -1
-    with pytest.raises(RuntimeError):
-        noise.get_point(0, 0)
+def test_noise_errors():
+    with pytest.raises(ValueError):
+        tcod.noise.Noise(0)
+    with pytest.raises(ValueError):
+        tcod.noise.Noise(1, implementation=-1)
+    noise = tcod.noise.Noise(2)
+    with pytest.raises(ValueError):
+        noise.sample_mgrid(np.mgrid[:2,:2,:2])
+    with pytest.raises(ValueError):
+        noise.sample_ogrid(np.ogrid[:2,:2,:2])
 
 def test_color_class():
     assert tcod.black == tcod.black

@@ -11,16 +11,19 @@ environment:
     secure: Fdt5ClRgYNTWeL05pVaxoEfUMlF+M26+bqY1fgZKJca7NP7mtclMN81ZCNNVCsJ4
   DEPLOY_ONLY: false
   matrix:
-  - PYTHON: C:\Python27\python.exe
-    platform: Any CPU
+  - PYTHON: C:\Python33-x64\python.exe
+    platform: x64
   - PYTHON: C:\Python33\python.exe
+    platform: Any CPU
+  - PYTHON: C:\Python27\python.exe
     platform: Any CPU
   - PYPY: pypy2-v5.4.1-win32
     platform: Any CPU
+  - PYTHON: C:\Python36-x64\python.exe
+    platform: x64
   - PYTHON: C:\Python27-x64\python.exe
     platform: x64
-  - PYTHON: C:\Python33-x64\python.exe
-    platform: x64
+    DEPLOY_ONLY: true
   - PYTHON: C:\Python34\python.exe
     platform: Any CPU
     DEPLOY_ONLY: true
@@ -35,9 +38,6 @@ environment:
     DEPLOY_ONLY: true
   - PYTHON: C:\Python36\python.exe
     platform: Any CPU
-    DEPLOY_ONLY: true
-  - PYTHON: C:\Python36-x64\python.exe
-    platform: x64
     DEPLOY_ONLY: true
   - PYPY: pypy2-v5.6.0-win32
     platform: Any CPU
@@ -74,7 +74,7 @@ install:
 - cmd: "if defined PYPY %PYTHON% -m pip -v install git+https://bitbucket.org/pypy/numpy.git"
 - '%PYTHON% -m pip install -e hg+https://bitbucket.org/HexDecimal/wheel@abi3-windows-fix#egg=wheel'
 - cmd: "%PYTHON% -m pip install --requirement requirements.txt"
-- cmd: "%PYTHON% setup.py sdist develop bdist_wheel"
+- cmd: "%PYTHON% setup.py build sdist develop bdist_wheel"
 build: off
 before_test:
 - cmd: "%PYTHON% -m pip install pytest pytest-cov pytest-benchmark"
