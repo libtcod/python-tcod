@@ -9,32 +9,33 @@ from tcod.tcod import _cdata
 from tcod.libtcod import ffi, lib
 import tcod.libtcod
 
-# Noise implementation constants
+"""Noise implementation constants"""
 SIMPLE = 0
 FBM = 1
 TURBULENCE = 2
 
 class Noise(object):
     """
-    .. versionadded:: 2.0
 
     The ``hurst`` exponent describes the raggedness of the resultant noise,
     with a higher value leading to a smoother noise.
-    Not used with NOISE_IMP_SIMPLE.
+    Not used with tcod.noise.SIMPLE.
 
     ``lacunarity`` is a multiplier that determines how fast the noise
     frequency increases for each successive octave.
-    Not used with NOISE_IMP_SIMPLE.
+    Not used with tcod.noise.SIMPLE.
 
     Args:
         dimensions (int): Must be from 1 to 4.
         algorithm (int): Defaults to NOISE_SIMPLEX
-        implementation (int): Defaults to NOISE_IMP_SIMPLE
+        implementation (int): Defaults to tcod.noise.SIMPLE
         hurst (float): The hurst exponent.  Should be in the 0.0-1.0 range.
         lacunarity (float): The noise lacunarity.
         octaves (float): The level of detail on fBm and turbulence
                          implementations.
         rand (Optional[Random]): A Random instance, or None.
+
+    .. versionadded:: 2.0
     """
 
     def __init__(self, dimensions, algorithm=2, implementation=SIMPLE,
@@ -111,12 +112,17 @@ class Noise(object):
     def sample_mgrid(self, mgrid):
         """Sample a mesh-grid array and return the result.
 
+        The :any:`sample_ogrid` method performs better as there is a lot of
+        overhead when working with large mesh-grids.
+
         Args:
             mgrid (numpy.ndarray): A mesh-grid array of points to sample.
+                A contiguous array of type :any:`numpy.float32` is preferred.
 
         Returns:
-            numpy.ndarray: A float32 array of sampled points
+            numpy.ndarray: An array of sampled points
                            with the shape: ``mgrid.shape[:-1]``.
+                           The ``dtype`` is :any:`numpy.float32`.
 
         .. versionadded:: 2.2
         """
@@ -140,8 +146,9 @@ class Noise(object):
             ogrid (Sequence[numpy.ndarray]): An open mesh-grid.
 
         Returns:
-            numpy.ndarray:  A float32 array of sampled points.  Shape is based
-                            on the lengths of the open mesh-grid arrays.
+            numpy.ndarray: An array of sampled points.  The ``shape`` is based
+                           on the lengths of the open mesh-grid arrays.
+                           The ``dtype`` is :any:`numpy.float32`.
 
         .. versionadded:: 2.2
         """

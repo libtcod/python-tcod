@@ -1,7 +1,7 @@
 ===========
  Changelog
 ===========
-2.2.0 - TBA
+2.2.0 - 2017-02-18
 Added
  * You can now sample very large noise arrays using the `Noise.sample_mgrid`
    and `Noise.sample_ogrid` methods.
