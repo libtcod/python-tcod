@@ -5,6 +5,7 @@
 Added
  * You can now sample very large noise arrays using the `Noise.sample_mgrid`
    and `Noise.sample_ogrid` methods.
+ * `Noise` class now supports `pickle` and `copy` modules.
 
 2.1.0 - 2017-02-16
 ------------------

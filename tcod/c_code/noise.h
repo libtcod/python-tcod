@@ -1,5 +1,21 @@
 
 #include <libtcod.h>
+#include <noise_defaults.h>
+
+/* Copied from libtcod's noise.c, needs to be kept up-to-date! */
+typedef struct {
+	int ndim;
+	unsigned char map[256]; /* Randomized map of indexes into buffer */
+	float buffer[256][TCOD_NOISE_MAX_DIMENSIONS]; 	/* Random 256 x ndim buffer */
+	/* fractal stuff */
+	float H;
+	float lacunarity;
+	float exponent[TCOD_NOISE_MAX_OCTAVES];
+	float *waveletTileData;
+	TCOD_random_t rand;
+	/* noise type */
+	TCOD_noise_type_t noise_type;
+} perlin_data_t;
 
 typedef enum NoiseImplementation {
 	kNoiseImplementationSimple,

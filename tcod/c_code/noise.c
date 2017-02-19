@@ -1,6 +1,7 @@
 #include "noise.h"
 
 #include <libtcod.h>
+#include <noise_defaults.h>
 
 float NoiseGetSample(TDLNoise *noise, float *xyzw) {
   switch (noise->implementation) {
@@ -23,7 +24,7 @@ void NoiseSampleMeshGrid(
 #   pragma omp for schedule(static)
     for (i = 0; i < len; ++i) {
       int axis;
-      float xyzw[4];
+      float xyzw[TCOD_NOISE_MAX_DIMENSIONS];
       for (axis = 0; axis < noise->dimensions; ++axis) {
         xyzw[axis] = in[axis * len + i];
       }
@@ -43,8 +44,8 @@ static float GetOpenMeshGridValue(
     TDLNoise *noise, const int ndim, const long *shape,
     const float **ogrid_in, const long index) {
   int axis;
-  long xyzw_indexes[4];
-  float xyzw_values[4];
+  long xyzw_indexes[TCOD_NOISE_MAX_DIMENSIONS];
+  float xyzw_values[TCOD_NOISE_MAX_DIMENSIONS];
   /* Convert index -> xyzw_indexes -> xyzw_values */
   xyzw_indexes[0] = index;
   for (axis = 0; axis < ndim - 1; ++axis){

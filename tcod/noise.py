@@ -7,6 +7,7 @@ import numpy as np
 
 from tcod.tcod import _cdata
 from tcod.libtcod import ffi, lib
+import tcod.libtcod
 
 # Noise implementation constants
 SIMPLE = 0
@@ -44,10 +45,12 @@ class Noise(object):
         self._random = rand
         self._random_c = _cdata(rand)
         self._algorithm = algorithm
-        self._hurst = hurst
-        self._lacunarity = lacunarity
         self.noise_c = ffi.gc(
-            lib.TCOD_noise_new(dimensions, hurst, lacunarity, self._random_c),
+            ffi.cast(
+                'perlin_data_t*',
+                lib.TCOD_noise_new(dimensions, hurst, lacunarity,
+                                   self._random_c),
+                ),
             lib.TCOD_noise_delete)
         self._tdl_noise_c = ffi.new('TDLNoise*', (self.noise_c,
                                                   dimensions,
@@ -60,11 +63,14 @@ class Noise(object):
         return self._tdl_noise_c.dimensions
 
     @property
+    def dimentions(self): # deprecated
+        return self.dimensions
+
+    @property
     def algorithm(self):
-        return self._algorithm
+        return self.noise_c.noise_type
     @algorithm.setter
     def algorithm(self, value):
-        self._algorithm = value
         lib.TCOD_noise_set_type(self.noise_c, value)
 
     @property
@@ -78,11 +84,11 @@ class Noise(object):
 
     @property
     def hurst(self):
-        return self._hurst
+        return self.noise_c.H
 
     @property
     def lacunarity(self):
-        return self._lacunarity
+        return self.noise_c.lacunarity
 
     @property
     def octaves(self):
@@ -152,3 +158,48 @@ class Noise(object):
             ffi.cast('float*', out.ctypes.data),
             )
         return out
+
+    def __getstate__(self):
+        if self.dimensions < 4 and self.noise_c.waveletTileData == ffi.NULL:
+            # Trigger a side effect of wavelet, so that copies will be synced.
+            saved_algo = self.algorithm
+            self.algorithm = tcod.libtcod.NOISE_WAVELET
+            self.get_point()
+            self.algorithm = saved_algo
+
+        waveletTileData = None
+        if self.noise_c.waveletTileData != ffi.NULL:
+            waveletTileData = ffi.buffer(
+                self.noise_c.waveletTileData[0:32*32*32])[:]
+        return (
+            self._random,
+            self.implementation,
+            self.octaves,
+            self.noise_c.ndim,
+            ffi.buffer(self.noise_c.map)[:],
+            ffi.buffer(self.noise_c.buffer)[:],
+            self.noise_c.H,
+            self.noise_c.lacunarity,
+            ffi.buffer(self.noise_c.exponent)[:],
+            waveletTileData,
+            self.noise_c.noise_type,
+            )
+
+    def __setstate__(self, state):
+        self._random = state[0]
+        self._random_c = _cdata(self._random)
+        self.noise_c = ffi.new('perlin_data_t*')
+        self.noise_c.ndim = state[3]
+        ffi.buffer(self.noise_c.map)[:] = state[4]
+        ffi.buffer(self.noise_c.buffer)[:] = state[5]
+        self.noise_c.H = state[6]
+        self.noise_c.lacunarity = state[7]
+        ffi.buffer(self.noise_c.exponent)[:] = state[8]
+        if state[9]:
+            # high change of this being prematurely garbage collected!
+            self.__waveletTileData = ffi.new('float[]', 32*32*32)
+            ffi.buffer(self.__waveletTileData)[:] = state[9]
+        self.noise_c.noise_type = state[10]
+        self._tdl_noise_c = ffi.new('TDLNoise*',
+                                    (self.noise_c, self.noise_c.ndim,
+                                     state[1], state[2]))
