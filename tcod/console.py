@@ -274,10 +274,12 @@ class Console(_CDataWrapper):
         rectangle and the default foreground to draw the outline.
 
         string will be printed on the inside of the rectangle, word-wrapped.
+
+        Note:
+            This method does not support Unicode outside of the 0-255 range.
         """
         lib.TCOD_console_print_frame(self.cdata, x, y, width, height,
-                                     clear, bg_blend, b'')
-        self.print_rect(x + 1, y + 1, width - 2, height - 2, string, bg_blend)
+                                     clear, bg_blend, string.encode('latin-1'))
 
     def blit(self, x, y, width, height,
              dest, dest_x, dest_y, fg_alpha=1.0, bg_alpha=1.0):
