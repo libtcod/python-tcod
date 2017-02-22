@@ -565,7 +565,7 @@ def console_init_root(w, h, title, fullscreen=False,
             Returns a special Console instance representing the root console.
     """
     lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
-    return tcod.console.Console(ffi.NULL) # root console is null
+    return tcod.console.Console._from_cdata(ffi.NULL) # root console is null
 
 
 def console_set_custom_font(fontFile, flags=FONT_LAYOUT_ASCII_INCOL,
@@ -970,7 +970,8 @@ def console_new(w, h):
     """Return an offscreen console of size: w,h."""
     return tcod.console.Console(w, h)
 def console_from_file(filename):
-    return tcod.console.Console(lib.TCOD_console_from_file(_bytes(filename)))
+    return tcod.console.Console._from_cdata(
+        lib.TCOD_console_from_file(_bytes(filename)))
 
 def console_blit(src, x, y, w, h, dst, xdst, ydst, ffade=1.0,bfade=1.0):
     """Blit the console src from x,y,w,h to console dst at xdst,ydst."""

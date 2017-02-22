@@ -5,7 +5,7 @@ import sys
 
 import numpy as np
 
-from tcod.tcod import _CDataWrapper, _cdata
+from tcod.tcod import _cdata
 from tcod.libtcod import ffi, lib
 from tcod.libtcod import BKGND_DEFAULT, BKGND_SET
 
@@ -69,7 +69,7 @@ class _ChBufferArray(np.ndarray):
             self._covert_ch_to_cf(index, self[index])
 
 
-class Console(_CDataWrapper):
+class Console(object):
     """
     Args:
         width (int): Width of the new Console.
@@ -78,15 +78,19 @@ class Console(_CDataWrapper):
     .. versionadded:: 2.0
     """
 
-    def __init__(self, *args, **kargs):
-        self.cdata = self._get_cdata_from_args(*args, **kargs)
-        if self.cdata is None:
-            self._init(*args, **kargs)
-        self._init_setup_console_data()
-
-    def _init(self, width, height):
+    def __init__(self, width, height):
         self.cdata = ffi.gc(lib.TCOD_console_new(width, height),
                             lib.TCOD_console_delete)
+        self._init_setup_console_data()
+
+    @classmethod
+    def _from_cdata(cls, cdata):
+        if isinstance(cdata, cls):
+            return cdata
+        self = object.__new__(cls)
+        self.cdata = cdata
+        self._init_setup_console_data()
+        return self
 
     def _init_setup_console_data(self):
         """Setup numpy arrays over libtcod data buffers."""
