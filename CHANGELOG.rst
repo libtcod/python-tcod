@@ -1,6 +1,12 @@
 ===========
  Changelog
 ===========
+2.0.1 - 2017-02-22
+------------------
+Fixed
+ * `tdl.init` renderer was defaulted to OpenGL which is not supported in the
+   current version of libtcod.
+
 2.0.0 - 2017-02-15
 ------------------
 Changed

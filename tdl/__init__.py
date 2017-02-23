@@ -1062,7 +1062,7 @@ class Window(_BaseConsole):
                                                           self.height)
 
 
-def init(width, height, title=None, fullscreen=False, renderer='OPENGL'):
+def init(width, height, title=None, fullscreen=False, renderer='SDL'):
     """Start the main console with the given width and height and return the
     root console.
 
