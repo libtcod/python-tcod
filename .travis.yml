@@ -26,6 +26,10 @@ matrix:
   allow_failures:
   - os: osx
     env: PYPY_VERSION=5.4.1
+  - os: osx
+    env: USE_OPENMP=true
+  - os: osx
+    env: USE_OPENMP=true BREW_PYTHON3=true
 
   fast_finish: true
 
