@@ -1,6 +1,6 @@
 include *.py *.cfg *.txt *.rst
 
-recursive-include tcod *.py *.c *.h *.txt *.dll
+recursive-include tcod *.py *.c *.h
 
 recursive-include tests *.py
 recursive-include libtcod/data *.cfg *.png *.txt

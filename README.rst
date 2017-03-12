@@ -54,17 +54,17 @@ Guides and Tutorials for the original library should also work with this one.
  Requirements
 ==============
 * Python 2.7+, Python 3.3+, or PyPy 5.4+
-* Windows, Linux, or Mac OS X
-* Linux requires the libsdl2 package
+* Windows, Linux, or MacOS.
+* Linux requires the libsdl2 package and must be installed from source.
 
 Extra requirements when installing directly from source
 -------------------------------------------------------
 
-* MinGW_ must be on Windows path for use with pycparser.
-  An equivalent C parser must be installed on other OS's
+* MinGW_ must be on the Windows path for use with pycparser.
+  An equivalent C parser (such as `gcc`) must be installed on other OS's.
 * Linux requires the packages:
-  libsdl2-dev, libffi-dev, and python-dev
-* SDL2 is installed automatically on Windows and Mac OS X
+  `gcc` `libsdl2-dev` `libffi-dev` `python-dev`
+* SDL2 is installed automatically on Windows and MacOS
 
 =========
  License

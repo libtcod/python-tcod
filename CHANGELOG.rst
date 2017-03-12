@@ -1,10 +1,12 @@
 ===========
  Changelog
 ===========
-TBA
+2.2.1 - 2017-03-12
 ------------------
 Fixed
  * Fixed `Console.print_frame` not printing anything.
+ * Fixed Noise.sample_ogrid alignment issue.
+ * MacOS builds should work even if the system installed SDL2 library is old.
 
 2.2.0 - 2017-02-18
 ------------------
