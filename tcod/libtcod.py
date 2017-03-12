@@ -10,12 +10,15 @@ import platform as _platform
 
 from tcod import __path__
 
-# add Windows dll's to PATH
 if _sys.platform == 'win32':
+    # add Windows dll's to PATH
     _bits, _linkage = _platform.architecture()
     _os.environ['PATH'] += (';' +
         _os.path.join(__path__[0], 'x86/' if _bits == '32bit' else 'x64'))
-
+elif _sys.platform == 'darwin':
+    # force bundled SDL2 symbols to be loaded on MacOS
+    import ctypes as _ctypes
+    _ctypes.CDLL(_os.path.join(__path__[0], 'SDL2.framework/Versions/A/SDL2'))
 
 def _import_library_functions(lib):
     # imports libtcod namespace into thie module

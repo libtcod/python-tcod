@@ -48,7 +48,7 @@ setup(
     cffi_modules=['build_libtcod.py:ffi'],
     install_requires=[
         'cffi>=1.8.1,<2',
-        'numpy<2',
+        'numpy>=1.10,<2',
         ],
     extras_require={
         ':python_version=="3.3"': ['numpy<1.12'],
@@ -86,7 +86,7 @@ setup(
              ' heightmap namegen tdl',
     platforms=[
         'Windows',
-        'Mac OS X',
+        'MacOS',
         'Linux',
         ],
     license='Simplified BSD License',
