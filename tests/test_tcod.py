@@ -159,6 +159,13 @@ def test_noise_class(implementation):
     noise.sample_mgrid(np.mgrid[:2,:3])
     noise.sample_ogrid(np.ogrid[:2,:3])
 
+def test_noise_samples():
+    noise = tcod.noise.Noise(2, tcod.NOISE_SIMPLEX, tcod.noise.SIMPLE)
+    np.testing.assert_equal(
+        noise.sample_mgrid(np.mgrid[:32,:24]),
+        noise.sample_ogrid(np.ogrid[:32,:24]),
+        )
+
 def test_noise_errors():
     with pytest.raises(ValueError):
         tcod.noise.Noise(0)

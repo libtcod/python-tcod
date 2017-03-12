@@ -43,16 +43,16 @@ static long GetSizeFromShape(const int ndim, const long *shape){
 static float GetOpenMeshGridValue(
     TDLNoise *noise, const int ndim, const long *shape,
     const float **ogrid_in, const long index) {
-  int axis;
+  int axis=ndim - 1;
   long xyzw_indexes[TCOD_NOISE_MAX_DIMENSIONS];
   float xyzw_values[TCOD_NOISE_MAX_DIMENSIONS];
   /* Convert index -> xyzw_indexes -> xyzw_values */
-  xyzw_indexes[0] = index;
-  for (axis = 0; axis < ndim - 1; ++axis){
-    xyzw_indexes[axis + 1] = xyzw_indexes[axis] / shape[axis];
+  xyzw_indexes[axis] = index;
+  xyzw_values[axis] = ogrid_in[axis][xyzw_indexes[axis] % shape[axis]];
+  while (--axis >= 0) {
+    xyzw_indexes[axis] = xyzw_indexes[axis + 1] / shape[axis + 1];
     xyzw_values[axis] = ogrid_in[axis][xyzw_indexes[axis] % shape[axis]];
   }
-  xyzw_values[ndim - 1] = ogrid_in[axis][xyzw_indexes[ndim - 1]];
   return NoiseGetSample(noise, xyzw_values);
 }
 void NoiseSampleOpenMeshGrid(TDLNoise *noise, const int ndim_in,
