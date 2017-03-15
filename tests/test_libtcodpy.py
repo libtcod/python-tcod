@@ -89,12 +89,15 @@ def test_console_printing(console, fg, bg):
 
     libtcodpy.console_set_color_control(libtcodpy.COLCTRL_1, fg, bg)
 
-def test_console_printing_advanced(console):
-    libtcodpy.console_rect(console, 0, 0, 4, 4, False,
-                           libtcodpy.BKGND_SET)
+def test_console_rect(console):
+    libtcodpy.console_rect(console, 0, 0, 4, 4, False, libtcodpy.BKGND_SET)
+
+def test_console_lines(console):
     libtcodpy.console_hline(console, 0, 0, 4)
     libtcodpy.console_vline(console, 0, 0, 4)
-    libtcodpy.console_print_frame(console, 0, 0, 11, 11)
+
+def test_console_print_frame(console):
+    libtcodpy.console_print_frame(console, 0, 0, 9, 9)
 
 def test_console_fade(console):
     libtcodpy.console_set_fade(0, libtcodpy.Color(0, 0, 0))
@@ -134,7 +137,7 @@ def test_console_apf_read_write(console, offscreen, tmpdir):
     assertConsolesEqual(console, offscreen)
 
 def test_console_rexpaint_load_test_file(console):
-    xp_console = libtcodpy.console_from_xp('../libtcod/data/rexpaint/test.xp')
+    xp_console = libtcodpy.console_from_xp('libtcod/data/rexpaint/test.xp')
     assert xp_console
     assert libtcodpy.console_get_char(xp_console, 0, 0) == ord('T')
     assert libtcodpy.console_get_char(xp_console, 1, 0) == ord('e')
@@ -301,7 +304,7 @@ def test_image(console, tmpdir):
     libtcodpy.image_refresh_console(img, console)
     libtcodpy.image_delete(img)
 
-    libtcodpy.image_delete(libtcodpy.image_load('../libtcod/data/img/circle.png'))
+    libtcodpy.image_delete(libtcodpy.image_load('libtcod/data/img/circle.png'))
 
 @pytest.mark.parametrize('sample', ['@', u'\u2603']) # Unicode snowman
 def test_clipboard(console, sample):
@@ -468,7 +471,7 @@ def test_color_gen_map():
     assert colors[-1] == libtcodpy.Color(255, 255, 255)
 
 def test_namegen_parse():
-    libtcodpy.namegen_parse('../libtcod/data/namegen/jice_celtic.cfg')
+    libtcodpy.namegen_parse('libtcod/data/namegen/jice_celtic.cfg')
     assert libtcodpy.namegen_generate('Celtic female')
     assert libtcodpy.namegen_get_sets()
     libtcodpy.namegen_destroy()

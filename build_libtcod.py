@@ -146,6 +146,7 @@ if sys.platform == 'darwin':
     shutil.copytree(SDL2_PATH, 'tcod/SDL2.framework')
     extra_link_args += ['-F%s/..' % SDL2_PATH]
     extra_link_args += ['-rpath', '@loader_path/']
+    extra_link_args += ['-rpath', '/usr/local/opt/llvm/lib']
 
 if sys.platform not in ['win32', 'darwin']:
     extra_parse_args += subprocess.check_output(['sdl2-config', '--cflags'],
@@ -233,7 +234,8 @@ def get_ast():
                                r'-D_SDL_thread_h',
                                r'-DDOXYGEN_SHOULD_IGNORE_THIS',
                                r'-DMAC_OS_X_VERSION_MIN_REQUIRED=1060',
-                               r'-D__attribute__(x)='
+                               r'-D__attribute__(x)=',
+                               r'-D_PSTDINT_H_INCLUDED',
                                ] + extra_parse_args)
     ast = CustomPostParser().parse(ast)
     return ast

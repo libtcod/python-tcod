@@ -56,7 +56,8 @@ before_install:
 - 'if [[ "$TRAVIS_PYTHON_VERSION" == pypy* ]]; then pip install git+https://bitbucket.org/pypy/numpy.git; fi'
 - pip install --requirement requirements.txt
 install:
-- python setup.py develop bdist_wheel
+- if [[ -z "$TRAVIS_TAG" ]]; then export BUILD_FLAGS="-g"; fi
+- python setup.py build $BUILD_FLAGS develop bdist_wheel
 before_script:
  - pip install pytest pytest-cov pytest-benchmark
 script:

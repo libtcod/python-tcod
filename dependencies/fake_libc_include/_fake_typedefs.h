@@ -112,14 +112,14 @@ typedef int siginfo_t;
 typedef int z_stream;
 
 /* C99 exact-width integer types */
-typedef int int8_t;
-typedef int uint8_t;
-typedef int int16_t;
-typedef int uint16_t;
-typedef int int32_t;
-typedef int uint32_t;
-typedef int int64_t;
-typedef int uint64_t;
+typedef signed char int8_t;
+typedef unsigned char uint8_t;
+typedef signed short int16_t;
+typedef unsigned short uint16_t;
+typedef signed int int32_t;
+typedef unsigned int uint32_t;
+typedef signed long int64_t;
+typedef unsigned long uint64_t;
 
 
 /* C99 minimum-width integer types */
@@ -149,11 +149,11 @@ typedef int uintptr_t;
 */
 
 /* C99 greatest-width integer types */
-typedef int intmax_t;
-typedef int uintmax_t;
+typedef long long intmax_t;
+typedef unsigned long long uintmax_t;
 
 /*
 typedef int va_list;
 */
-typedef unsigned char bool;
+#define bool _Bool
 #endif

@@ -1,7 +1,7 @@
 ===========
  Changelog
 ===========
-2.3.0 - 2017-03-14
+2.3.0 - 2017-03-15
 ------------------
 Added
  * Added support for loading/saving REXPaint files.
