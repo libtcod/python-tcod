@@ -57,9 +57,21 @@ class Color(list):
         new in libtcod-cffi"""
         return cls(lib.TDL_color_from_int(integer))
 
+    def __getitem__(self, index):
+        try:
+            return list.__getitem__(self, index)
+        except TypeError:
+            return list.__getitem__(self, 'rgb'.index(index))
+
+    def __setitem__(self, index, value):
+        try:
+            list.__setitem__(self, index, value)
+        except TypeError:
+            list.__setitem__(self, 'rgb'.index(index), value)
+
     def __eq__(self, other):
         """Compare equality between colors.
-        
+
         Also compares with standard sequences such as 3-item tuples or lists.
         """
         try:

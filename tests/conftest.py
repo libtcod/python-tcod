@@ -1,4 +1,8 @@
 
+import sys
+
+import random
+
 import pytest
 
 import tcod
@@ -31,3 +35,56 @@ def console(session_console):
     console.default_alignment = tcod.LEFT
     console.clear()
     return console
+
+@pytest.fixture()
+def offscreen(console):
+    """Return an off-screen console with the same size as the root console."""
+    return tcod.console.Console(console.width, console.height)
+
+@pytest.fixture()
+def fg():
+    return tcod.Color(random.randint(0, 255), random.randint(0, 255),
+                      random.randint(0, 255))
+
+@pytest.fixture()
+def bg():
+    return tcod.Color(random.randint(0, 255), random.randint(0, 255),
+                      random.randint(0, 255))
+
+try:
+    unichr
+except NameError:
+    unichr = chr
+
+def ch_ascii_int():
+    return random.randint(0x21, 0x7f)
+
+def ch_ascii_str():
+    return chr(ch_ascii_int())
+
+def ch_latin1_int():
+    return random.randint(0x80, 0xff)
+
+def ch_latin1_str():
+    return chr(ch_latin1_int())
+
+def ch_bmp_int():
+    # Basic Multilingual Plane, before surrogates
+    return random.randint(0x100, 0xd7ff)
+
+def ch_bmp_str():
+    return unichr(ch_bmp_int())
+
+def ch_smp_int():
+    return random.randint(0x10000, 0x1f9ff)
+
+def ch_smp_str():
+    return unichr(ch_bmp_int())
+
+@pytest.fixture(params=['ascii_int', 'ascii_str',
+                        'latin1_int', 'latin1_str',
+                        #'bmp_int', 'bmp_str', # causes crashes
+                        ])
+def ch(request):
+    """Test with multiple types of ascii/latin1 characters"""
+    return globals()['ch_%s' % request.param]()

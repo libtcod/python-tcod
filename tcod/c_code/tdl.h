@@ -41,8 +41,8 @@ int TDL_color_scale_HSV(int color, float scoef, float vcoef);
  * 2 = is_walkable
  * 4 = in_fov
  */
-void TDL_map_data_from_buffer(TCOD_map_t map, uint8 *buffer);
-void TDL_map_fov_to_buffer(TCOD_map_t map, uint8 *buffer, bool cumulative);
+void TDL_map_data_from_buffer(TCOD_map_t map, uint8_t *buffer);
+void TDL_map_fov_to_buffer(TCOD_map_t map, uint8_t *buffer, bool cumulative);
 
 int TDL_console_put_char_ex(TCOD_console_t console, int x, int y,
                             int ch, int fg, int bg, TCOD_bkgnd_flag_t flag);

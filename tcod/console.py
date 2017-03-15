@@ -107,20 +107,13 @@ class Console(object):
             array = np.frombuffer(color_buffer, np.uint8)
             return array.reshape((self.height, self.width, 3))
 
-        self._fg = unpack_color(self._console_data.state.fg_colors)
-        self._bg = unpack_color(self._console_data.state.bg_colors)
+        self._fg = unpack_color(self._console_data.fg_colors)
+        self._bg = unpack_color(self._console_data.bg_colors)
 
-        buf = self._console_data.state.buf
+        buf = self._console_data.ch_array
         buf = ffi.buffer(buf[0:self.width * self.height])
-        if ffi.sizeof('char_t') != 12:
-            # I'm expecting some compiler to have this at 9.
-            raise RuntimeError("Expected ffi.sizeof('char_t') to be 12. "
-                               "Got %i instead." % ffi.sizeof('char_t'))
-        buf = np.frombuffer(buf, [('c', np.intc),
-                                   ('cf', np.intc),
-                                   ('dirty', np.intc)])
-        self._buf = buf.reshape((self.height, self.width))
-        self._ch = _ChBufferArray(self._buf['c'], self._buf['cf'])
+        self._ch = np.frombuffer(buf, np.intc).reshape((self.height,
+                                                        self.width))
 
     @property
     def width(self):
@@ -314,3 +307,9 @@ class Console(object):
         Some tcod functions may have undefined behaviour after this point.
         """
         lib.TCOD_console_delete(self.cdata)
+
+    def __bool__(self):
+        """Mimic libtcod behavior."""
+        return self.cdata != ffi.NULL
+
+    __nonzero__ = __bool__

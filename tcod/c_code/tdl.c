@@ -152,7 +152,7 @@ int TDL_color_scale_HSV(int color, float scoef, float vcoef){
 #define FOV_BIT 4
 
 /* set map transparent and walkable flags from a buffer */
-void TDL_map_data_from_buffer(TCOD_map_t map, uint8 *buffer) {
+void TDL_map_data_from_buffer(TCOD_map_t map, uint8_t *buffer) {
   int width=TCOD_map_get_width(map);
   int height=TCOD_map_get_height(map);
   int x;
@@ -168,7 +168,7 @@ void TDL_map_data_from_buffer(TCOD_map_t map, uint8 *buffer) {
 }
 
 /* get fov from tcod map */
-void TDL_map_fov_to_buffer(TCOD_map_t map, uint8 *buffer, bool cumulative) {
+void TDL_map_fov_to_buffer(TCOD_map_t map, uint8_t *buffer, bool cumulative) {
   int width=TCOD_map_get_width(map);
   int height=TCOD_map_get_height(map);
   int x;

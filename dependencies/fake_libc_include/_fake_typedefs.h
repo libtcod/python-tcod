@@ -155,5 +155,5 @@ typedef int uintmax_t;
 /*
 typedef int va_list;
 */
-
+typedef unsigned char bool;
 #endif

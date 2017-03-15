@@ -1,6 +1,17 @@
 ===========
  Changelog
 ===========
+2.3.0 - 2017-03-14
+------------------
+Added
+ * Added support for loading/saving REXPaint files.
+Fixed
+ * Console methods should be safe to use before a root console is initialized.
+ * Fixed simplex noise artifacts when using negative coordinates.
+ * Fixed backward compatible API inconsistencies with color indexes, console
+   truth values, and line_iter missing the starting point.
+ * The SDL callback should always receive an SDL_Surface.
+
 2.2.1 - 2017-03-12
 ------------------
 Fixed

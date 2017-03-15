@@ -1,42 +1,42 @@
 
-Console
-=======
+tcod.console
+============
 
 .. automodule:: tcod.console
     :members:
 
-Map
-===
+tcod.map
+========
 
 .. automodule:: tcod.map
     :members:
 
-BSP
-===
+tcod.bsp
+=========
 
 .. automodule:: tcod.bsp
     :members:
 
-Path-finding
-============
+tcod.path
+=========
 
 .. automodule:: tcod.path
     :members:
 
-Image
-=====
+tcod.image
+==========
 
 .. automodule:: tcod.image
     :members:
 
-Random
-======
+tcod.random
+===========
 
 .. automodule:: tcod.random
     :members:
 
-Noisemap
-========
+tcod.noise
+==========
 
 .. automodule:: tcod.noise
     :members:

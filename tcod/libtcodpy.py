@@ -969,9 +969,20 @@ def console_is_key_pressed(key):
 def console_new(w, h):
     """Return an offscreen console of size: w,h."""
     return tcod.console.Console(w, h)
+
 def console_from_file(filename):
+    """Return a new console object from a filename.
+
+    The file format is automactially determined.  This can load REXPaint `.xp`,
+    ASCII Paint `.apf`, or Non-delimited ASCII `.asc` files.
+
+    Args:
+        filename (Text): The path to the file, as a string.
+
+    Returns: A new :any`Console` instance.
+    """
     return tcod.console.Console._from_cdata(
-        lib.TCOD_console_from_file(_bytes(filename)))
+        lib.TCOD_console_from_file(filename.encode('utf-8')))
 
 def console_blit(src, x, y, w, h, dst, xdst, ydst, ffade=1.0,bfade=1.0):
     """Blit the console src from x,y,w,h to console dst at xdst,ydst."""
@@ -1062,16 +1073,62 @@ def console_fill_char(con,arr):
     lib.TCOD_console_fill_char(_cdata(con), carr)
 
 def console_load_asc(con, filename):
+    """Update a console from a non-delimited ASCII `.asc` file."""
     return lib.TCOD_console_load_asc(_cdata(con), _bytes(filename))
 
 def console_save_asc(con, filename):
-    lib.TCOD_console_save_asc(_cdata(con),_bytes(filename))
+    """Save a console to a non-delimited ASCII `.asc` file."""
+    return lib.TCOD_console_save_asc(_cdata(con),_bytes(filename))
 
 def console_load_apf(con, filename):
+    """Update a console from an ASCII Paint `.apf` file."""
     return lib.TCOD_console_load_apf(_cdata(con),_bytes(filename))
 
 def console_save_apf(con, filename):
-    lib.TCOD_console_save_apf(_cdata(con),_bytes(filename))
+    """Save a console to an ASCII Paint `.apf` file."""
+    return lib.TCOD_console_save_apf(_cdata(con),_bytes(filename))
+
+def console_load_xp(con, filename):
+    """Update a console from a REXPaint `.xp` file."""
+    return lib.TCOD_console_load_xp(_cdata(con), filename.encode('utf-8'))
+
+def console_save_xp(con, filename, compress_level=9):
+    """Save a console to a REXPaint `.xp` file."""
+    return lib.TCOD_console_save_xp(
+        _cdata(con), filename.encode('utf-8'), compress_level)
+
+def console_from_xp(filename):
+    """Return a single console from a REXPaint `.xp` file."""
+    return tcod.console.Console._from_cdata(
+        lib.TCOD_console_from_xp(filename.encode('utf-8')))
+
+def console_list_load_xp(filename):
+    """Return a list of consoles from a REXPaint `.xp` file."""
+    tcod_list = lib.TCOD_console_list_from_xp(filename.encode('utf-8'))
+    if tcod_list == ffi.NULL:
+        return None
+    try:
+        python_list = []
+        lib.TCOD_list_reverse(tcod_list)
+        while not lib.TCOD_list_is_empty(tcod_list):
+            python_list.append(
+                tcod.console.Console._from_cdata(lib.TCOD_list_pop(tcod_list)),
+                )
+        return python_list
+    finally:
+        lib.TCOD_list_delete(tcod_list)
+
+def console_list_save_xp(console_list, filename, compress_level=9):
+    """Save a list of consoles to a REXPaint `.xp` file."""
+    tcod_list = lib.TCOD_list_new()
+    try:
+        for console in console_list:
+            lib.TCOD_list_push(tcod_list, _cdata(console))
+        return lib.TCOD_console_list_save_xp(
+            tcod_list, filename.encode('utf-8'), compress_level
+            )
+    finally:
+        lib.TCOD_list_delete(tcod_list)
 
 def path_new_using_map(m, dcost=1.41):
     """Return a new AStar using the given Map.
@@ -1858,7 +1915,7 @@ def line_iter(xo, yo, xd, yd):
     lib.TCOD_line_init_mt(xo, yo, xd, yd, data)
     x = ffi.new('int *')
     y = ffi.new('int *')
-    done = False
+    yield xo, yo
     while not lib.TCOD_line_step_mt(x, y, data):
         yield (x[0], y[0])
 
