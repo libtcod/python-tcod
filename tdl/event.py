@@ -94,7 +94,10 @@ class Quit(Event):
 
 class KeyEvent(Event):
 
-    def __init__(self, key, char, lalt, lctrl, ralt, rctrl, shift):
+    def __init__(self, key='', char='', text='', shift=False,
+                 left_alt=False, right_alt=False,
+                 left_control=False, right_control=False,
+                 left_meta=False, right_meta=False):
         # Convert keycodes into string, but use string if passed
         self.key = key if isinstance(key, str) else _keyNames[key]
         """Human readable names of the key pressed.
@@ -112,7 +115,6 @@ class KeyEvent(Event):
 
         For the actual character instead of 'CHAR' use L{keychar}.
         @type: string"""
-        char = char if isinstance(char, str) else char.decode()
         self.char = char.replace('\x00', '') # change null to empty string
         """A single character string of the letter or symbol pressed.
 
@@ -129,23 +131,39 @@ class KeyEvent(Event):
         be used for key-mappings or anywhere where a narrower sample of keys
         isn't needed.
         """
-        self.leftAlt = bool(lalt)
+        self.text = text
+
+        self.left_alt = self.leftAlt = bool(left_alt)
         """@type: boolean"""
-        self.rightAlt = bool(ralt)
+        self.right_alt = self.rightAlt = bool(right_alt)
         """@type: boolean"""
-        self.leftCtrl = bool(lctrl)
+        self.left_control = self.leftCtrl = bool(left_control)
         """@type: boolean"""
-        self.rightCtrl = bool(rctrl)
+        self.right_control = self.rightCtrl = bool(right_control)
         """@type: boolean"""
         self.shift = bool(shift)
         """True if shift was held down during this event.
         @type: boolean"""
-        self.alt = bool(lalt or ralt)
+        self.alt = self.left_alt or self.right_alt
         """True if alt was held down during this event.
         @type: boolean"""
-        self.control = bool(lctrl or rctrl)
+        self.control = self.left_control or self.right_control
         """True if control was held down during this event.
         @type: boolean"""
+        self.left_meta = bool(left_meta)
+        self.right_meta = bool(right_meta)
+        self.meta = self.left_meta or self.right_meta
+
+    def __repr__(self):
+        parameters = []
+        for attr in ('key', 'char', 'text', 'shift',
+                     'left_alt', 'right_alt',
+                     'left_control', 'right_control',
+                     'left_meta', 'right_meta'):
+            value = getattr(self, attr)
+            if value:
+                parameters.append('%s=%r' % (attr, value))
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(parameters))
 
 class KeyDown(KeyEvent):
     """Fired when the user presses a key on the keyboard or a key repeats.
@@ -360,9 +378,20 @@ def _processEvents():
             keyevent = KeyDown
         else:
             keyevent = KeyUp
-        events.append(keyevent(libkey.vk, libkey.c,
-                               libkey.lalt, libkey.lctrl,
-                               libkey.ralt, libkey.rctrl, libkey.shift))
+        events.append(
+            keyevent(
+                libkey.vk,
+                libkey.c.decode('ascii', errors='ignore'),
+                _ffi.string(libkey.text).decode('utf-8'),
+                libkey.shift,
+                libkey.lalt,
+                libkey.ralt,
+                libkey.lctrl,
+                libkey.rctrl,
+                libkey.lmeta,
+                libkey.rmeta,
+                )
+            )
 
     if _lib.TCOD_console_is_window_closed():
         events.append(Quit())
