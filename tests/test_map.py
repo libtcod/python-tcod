@@ -68,7 +68,6 @@ class MapTests(unittest.TestCase):
         for x,y in self.map:
             self.assertTrue((x, y) in self.map)
         self.assertFalse((-1, -1) in self.map)
-        tdl.map.Map(self.WIDTH, self.HEIGHT).__del__()
 
     def test_quick_fov(self):
         fov = tdl.map.quick_fov(self.POINT_B[0], self.POINT_B[1],

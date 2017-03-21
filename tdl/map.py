@@ -94,17 +94,12 @@ class Map(object):
         self._map_cdata = _lib.TCOD_map_new(width, height)
         # cast array into cdata format: uint8[y][x]
         # for quick Python access
-        self._array_cdata = _ffi.new('uint8[%i][%i]' % (height, width))
+        self._array_cdata = _ffi.new('uint8_t[%i][%i]' % (height, width))
         # flat array to pass to TDL's C helpers
-        self._array_cdata_flat = _ffi.cast('uint8 *', self._array_cdata)
+        self._array_cdata_flat = _ffi.cast('uint8_t *', self._array_cdata)
         self.transparent = self._MapAttribute(self, 0)
         self.walkable = self._MapAttribute(self, 1)
         self.fov = self._MapAttribute(self, 2)
-
-    def __del__(self):
-        if self._map_cdata:
-            _lib.TCOD_map_delete(self._map_cdata)
-            self._map_cdata = None
 
     def compute_fov(self, x, y, fov='PERMISSIVE', radius=None, light_walls=True,
                     sphere=True, cumulative=False):

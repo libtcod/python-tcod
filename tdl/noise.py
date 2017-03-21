@@ -163,14 +163,6 @@ class Noise(object):
             return (self._noiseFunc(self._noise, array, self._octaves) + 1) * 0.5
         return (self._noiseFunc(self._noise, array) + 1) * 0.5
 
-    def __del__(self):
-        # dealloc only once
-        if self._random:
-            _lib.TCOD_random_delete(self._random)
-            self._random = None
-        if self._noise:
-            _lib.TCOD_noise_delete(self._noise)
-            self._noise = None
 
 __all__ = [_var for _var in locals().keys() if _var[0] != '_']
 
