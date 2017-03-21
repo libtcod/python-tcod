@@ -1,6 +1,20 @@
 ===========
  Changelog
 ===========
+3.0.0 - 2017-03-21
+------------------
+Added
+ * `KeyEvent` supports libtcod text and meta keys.
+Changed
+ * `KeyEvent` parameters have been moved.
+ * This version requires `libtcod-cffi>=2.3.0`.
+Deprecated
+ * `KeyEvent` camel capped attribute names are deprecated.
+Fixed
+ * Crashes with key-codes undefined by libtcod.
+ * `tdl.map` typedef issues with libtcod-cffi.
+
+
 2.0.1 - 2017-02-22
 ------------------
 Fixed
