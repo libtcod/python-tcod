@@ -1,6 +1,13 @@
 ===========
  Changelog
 ===========
+3.0.1 - 2017-03-22
+------------------
+Changed
+ * `KeyEvent`'s with `text` now have all their modifier keys set to False.
+Fixed
+ * Undefined behaviour in text events caused crashes on 32-bit builds.
+
 3.0.0 - 2017-03-21
 ------------------
 Added
