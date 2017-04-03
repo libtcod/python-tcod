@@ -19,17 +19,6 @@ def test_line_error():
     with pytest.raises(Exception):
         tcod.line(*LINE_ARGS, py_callback=raise_Exception)
 
-@pytest.mark.skip(reason="Clipboard functions are up in the air")
-def test_clipboard_set():
-    tcod.clipboard_set('')
-
-@pytest.mark.skip(reason="Clipboard functions are up in the air")
-@pytest.mark.skipif(sys.platform == 'darwin',
-                    reason="Known crash on Mac OS/X")
-def test_clipboard_get():
-    tcod.clipboard_get()
-
-
 def test_tcod_bsp():
     """
     test tcod additions to BSP

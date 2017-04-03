@@ -90,7 +90,6 @@ libraries = []
 library_dirs = []
 define_macros = [('LIBTCOD_EXPORTS', None),
                  ('TCOD_SDL2', None),
-                 ('NO_OPENGL', None),
                  ('_CRT_SECURE_NO_WARNINGS', None),
                  ]
 
@@ -228,7 +227,6 @@ def get_ast():
                                r'-DSDLCALL=',
                                r'-DTCODLIB_API=',
                                r'-DTCOD_SDL2=',
-                               r'-DNO_OPENGL',
                                r'-DSDL_FORCE_INLINE=',
                                r'-U__GNUC__',
                                r'-D_SDL_thread_h',
@@ -247,7 +245,7 @@ except Exception:
     USE_OPENMP = None
 print(sys.argv)
 if sys.platform == 'win32' and '--compiler=mingw32' not in sys.argv:
-    extra_compile_args.extend(['/GL', '/Os'])
+    extra_compile_args.extend(['/GL', '/O2', '/GS-'])
     extra_link_args.extend(['/LTCG'])
 
     if USE_OPENMP is None:
@@ -257,7 +255,7 @@ if sys.platform == 'win32' and '--compiler=mingw32' not in sys.argv:
         extra_compile_args.append('/openmp')
 else:
     extra_compile_args.extend(['-flto'])
-    extra_link_args.extend(['-flto', '-Os'])
+    extra_link_args.extend(['-flto', '-O3'])
     if USE_OPENMP is None:
         USE_OPENMP = sys.platform != 'darwin'
 

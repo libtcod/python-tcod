@@ -11,8 +11,8 @@ def pytest_addoption(parser):
     parser.addoption("--no-window", action="store_true",
         help="Skip tests which need a rendering context.")
 
-@pytest.fixture(scope="module")
-def session_console():
+@pytest.fixture(scope="session", params=['SDL', 'OPENGL', 'GLSL'])
+def session_console(request):
     if(pytest.config.getoption("--no-window")):
         pytest.skip("This test needs a rendering context.")
     FONT_FILE = 'libtcod/terminal.png'
@@ -20,9 +20,11 @@ def session_console():
     HEIGHT = 10
     TITLE = 'libtcod-cffi tests'
     FULLSCREEN = False
+    RENDERER = getattr(tcod, 'RENDERER_' + request.param)
 
     tcod.console_set_custom_font(FONT_FILE)
-    with tcod.console_init_root(WIDTH, HEIGHT, TITLE, FULLSCREEN) as con:
+    with tcod.console_init_root(WIDTH, HEIGHT,
+                                TITLE, FULLSCREEN, RENDERER) as con:
         yield con
 
 @pytest.fixture(scope="function")

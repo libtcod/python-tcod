@@ -546,12 +546,8 @@ def _numpy_available():
 
 # initializing the console
 def console_init_root(w, h, title, fullscreen=False,
-                      renderer=RENDERER_SDL):
+                      renderer=RENDERER_GLSL):
     """Set up the primary display and return the root console.
-
-    Note:
-        Currently only the SDL renderer is supported at the moment.
-        Do not attempt to change it.
 
     Args:
         w (int): Width in character tiles for the root console.
@@ -2539,6 +2535,9 @@ def sys_update_char(asciiCode, fontx, fonty, img, x, y):
 
 def sys_register_SDL_renderer(callback):
     """Register a custom randering function with libtcod.
+
+    Note:
+        This callback will only be called by the SDL renderer.
 
     The callack will receive a :any:`CData <ffi-cdata>` void* to an
     SDL_Surface* struct.

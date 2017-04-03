@@ -11,9 +11,6 @@ Event
 .. autoclass:: tcod.Mouse()
    :members:
 
-.. autofunction:: tcod.clipboard_set
-.. autofunction:: tcod.clipboard_get
-
 .. _event types:
 
 Event Types

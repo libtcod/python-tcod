@@ -1,6 +1,15 @@
 ===========
  Changelog
 ===========
+2.4.0 - 2017-04-03
+------------------
+Added
+ * Renderer regressions fixed, OpenGL and GLSL renderer's are available again.
+Changed
+ * The default renderer is now GLSL.
+Removed
+ * `tcod` clipboard functions which were never fully implemented removed.
+
 2.3.0 - 2017-03-15
 ------------------
 Added

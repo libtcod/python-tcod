@@ -269,6 +269,9 @@ def test_sys_screenshot(console, tmpdir):
     libtcodpy.sys_save_screenshot(tmpdir.join('test.png').strpath)
 
 def test_sys_custom_render(console):
+    if libtcodpy.sys_get_renderer() != libtcodpy.RENDERER_SDL:
+        pytest.xfail(reason='Only supports SDL')
+
     escape = []
     def sdl_callback(sdl_surface):
         escape.append(True)
