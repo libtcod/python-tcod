@@ -68,7 +68,7 @@ after_success:
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then coverage xml; fi'
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then python-codacy-coverage -r coverage.xml; fi'
  - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then bash <(curl -s https://codecov.io/bash); fi'
- - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python -m pip install delocate; fi'
+ - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python -m pip install git+git://github.com/HexDecimal/delocate.git@delocate-rpath; fi'
  - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-wheel -v dist/*.whl; fi'
  - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-listdeps --all dist/*.whl; fi'
  - if [[ -n "$TRAVIS_TAG" ]]; then pip install twine; fi

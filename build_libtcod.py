@@ -142,10 +142,9 @@ if sys.platform == 'darwin':
     fix_header(os.path.join(HEADER_DIR, 'SDL_assert.h'))
     fix_header(os.path.join(HEADER_DIR, 'SDL_config_macosx.h'))
     include_dirs.append(HEADER_DIR)
-    shutil.copytree(SDL2_PATH, 'tcod/SDL2.framework')
     extra_link_args += ['-F%s/..' % SDL2_PATH]
-    extra_link_args += ['-rpath', '@loader_path/']
-    extra_link_args += ['-rpath', '/usr/local/opt/llvm/lib']
+    extra_link_args += ['-rpath', os.path.realpath('%s/..' % SDL2_PATH)]
+    extra_link_args += ['-rpath', '/usr/local/opt/llvm/lib/']
 
 if sys.platform not in ['win32', 'darwin']:
     extra_parse_args += subprocess.check_output(['sdl2-config', '--cflags'],
