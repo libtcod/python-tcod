@@ -1,6 +1,11 @@
 ===========
  Changelog
 ===========
+2.4.1 - 2017-04-07
+------------------
+Fixed
+ * Made sure MacOS dependencies are bundled correctly.
+
 2.4.0 - 2017-04-03
 ------------------
 Added
