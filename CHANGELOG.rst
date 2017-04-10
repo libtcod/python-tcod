@@ -1,6 +1,13 @@
 ===========
  Changelog
 ===========
+2.4.2 - 2017-04-10
+------------------
+Fixed
+ * Fixed signatures for MacOS builds.
+Removed
+ * Dropped support for Python3.3
+
 2.4.1 - 2017-04-07
 ------------------
 Fixed
