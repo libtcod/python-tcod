@@ -53,7 +53,7 @@ Guides and Tutorials for the original library should also work with this one.
 ==============
  Requirements
 ==============
-* Python 2.7+, Python 3.3+, or PyPy 5.4+
+* Python 2.7+, Python 3.4+, or PyPy 5.4+
 * Windows, Linux, or MacOS.
 * Linux requires the libsdl2 package and must be installed from source.
 

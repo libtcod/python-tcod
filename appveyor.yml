@@ -11,9 +11,9 @@ environment:
     secure: Fdt5ClRgYNTWeL05pVaxoEfUMlF+M26+bqY1fgZKJca7NP7mtclMN81ZCNNVCsJ4
   DEPLOY_ONLY: false
   matrix:
-  - PYTHON: C:\Python33-x64\python.exe
+  - PYTHON: C:\Python34-x64\python.exe
     platform: x64
-  - PYTHON: C:\Python33\python.exe
+  - PYTHON: C:\Python34\python.exe
     platform: Any CPU
   - PYTHON: C:\Python27\python.exe
     platform: Any CPU
@@ -22,12 +22,6 @@ environment:
   - PYTHON: C:\Python36-x64\python.exe
     platform: x64
   - PYTHON: C:\Python27-x64\python.exe
-    platform: x64
-    DEPLOY_ONLY: true
-  - PYTHON: C:\Python34\python.exe
-    platform: Any CPU
-    DEPLOY_ONLY: true
-  - PYTHON: C:\Python34-x64\python.exe
     platform: x64
     DEPLOY_ONLY: true
   - PYTHON: C:\Python35\python.exe
