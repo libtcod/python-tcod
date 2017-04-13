@@ -3,8 +3,13 @@
 ===========
 Unreleased
 ------------------
+Changed
+ * Dependencies updated: `libtcod-cffi>=2.4.3,<3`
 Removed
  * Dropped support for Python 3.3
+Fixed
+ * Resolved issues with MacOS builds.
+ * 'OpenGL' and 'GLSL' renderers work again.
 
 3.0.1 - 2017-03-22
 ------------------

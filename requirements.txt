@@ -1,1 +1,1 @@
-libtcod-cffi>=2.3.0<3
+libtcod-cffi>=2.4.3<3
