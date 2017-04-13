@@ -5,6 +5,7 @@ Unreleased
 ------------------
 Changed
  * Dependencies updated: `libtcod-cffi>=2.4.3,<3`
+ * You can now create Console instances before a call to `tdl.init`.
 Removed
  * Dropped support for Python 3.3
 Fixed

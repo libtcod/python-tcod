@@ -817,8 +817,6 @@ class Console(_BaseConsole):
         @param height: Height of the console in tiles
         """
         _BaseConsole.__init__(self)
-        if not _rootinitialized:
-            raise TDLError('Can not create Console instances before a call to tdl.init')
         self.tcod_console = _lib.TCOD_console_new(width, height)
         self.console = self
         self.width = width
