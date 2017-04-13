@@ -1,6 +1,11 @@
 ===========
  Changelog
 ===========
+Unreleased
+------------------
+Removed
+ * Dropped support for Python 3.3
+
 3.0.1 - 2017-03-22
 ------------------
 Changed

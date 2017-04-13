@@ -1,7 +1,7 @@
 language: python
 python:
  - "2.7"
- - "3.3"
+ - "3.4"
 matrix:
   include:
   - os: osx
@@ -27,17 +27,16 @@ before_install:
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi'
 install:
- - pip install --upgrade pip setuptools
- - pip install -r requirements.txt
- - python setup.py develop sdist bdist_wheel
+- pip install --upgrade pip setuptools
+- pip install -r requirements.txt
+- python setup.py develop sdist bdist_wheel
 before_script:
- - pip install nose2 cov-core
+- pip install nose2 cov-core
 script:
- - python -c "import tdl"
- - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then nose2; fi
+- nose2
 after_success:
- - pip install -U codacy-coverage python-coveralls wheel twine
- - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then coveralls; fi
- - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then coverage xml; fi
- - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then python-codacy-coverage -r coverage.xml; fi
- - if [[ -n "$TRAVIS_TAG" ]]; then twine upload -u $pypi_user -p $pypi_pass --skip-existing dist/*; fi
+- pip install --upgrade codacy-coverage python-coveralls wheel twine
+- coveralls
+- coverage xml
+- python-codacy-coverage -r coverage.xml
+- if [[ -n "$TRAVIS_TAG" ]]; then twine upload --skip-existing dist/*; fi
