@@ -1,7 +1,7 @@
 ===========
  Changelog
 ===========
-Unreleased
+3.0.2 - 2017-04-13
 ------------------
 Changed
  * Dependencies updated: `libtcod-cffi>=2.4.3,<3`
