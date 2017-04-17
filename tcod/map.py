@@ -10,14 +10,14 @@ class BufferBitProxy(object):
 
     def __init__(self, buffer, bitmask):
         self.buffer = buffer
-        self.bitmask = bitmask
+        self.bitmask = np.asarray(bitmask, dtype=np.uint8)
 
     def __getitem__(self, index):
         return (self.buffer[index] & self.bitmask) != 0
 
     def __setitem__(self, index, values):
         self.buffer[index] &= 0xff ^ self.bitmask
-        self.buffer[index] |= self.bitmask * np.asarray(values, bool)
+        self.buffer[index] |= self.bitmask * np.asarray(values, dtype=bool)
 
 
 class Map(object):
