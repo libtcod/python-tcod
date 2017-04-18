@@ -217,3 +217,18 @@ def test_path_callback():
         return 1
     astar = tcod.path.AStar(path_cost, width=10, height=10)
     assert len(astar.get_path(0, 0, 9, 9)) == 9
+
+def test_key_repr():
+    Key = tcod.Key
+    key = Key(vk=1, c=2, shift=True)
+    key_copy = eval(repr(key))
+    assert key.vk == key_copy.vk
+    assert key.c == key_copy.c
+    assert key.shift == key_copy.shift
+
+def test_mouse_repr():
+    Mouse = tcod.Mouse
+    mouse = Mouse(x=1, lbutton=True)
+    mouse_copy = eval(repr(mouse))
+    assert mouse.x == mouse_copy.x
+    assert mouse.lbutton == mouse_copy.lbutton

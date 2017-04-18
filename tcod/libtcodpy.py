@@ -256,6 +256,17 @@ class Key(_CDataWrapper):
             return _unpack_char_p(getattr(self.cdata, attr))
         return super(Key, self).__getattr__(attr)
 
+    def __repr__(self):
+        """Return a representation of this Key object."""
+        params = []
+        params.append('vk=%r, c=%r, text=%r, pressed=%r' %
+                      (self.vk, self.c, self.text, self.pressed))
+        for attr in ['shift', 'lalt', 'lctrl', 'lmeta',
+                     'ralt', 'rctrl', 'rmeta']:
+            if getattr(self, attr):
+                params.append('%s=%r' % (attr, getattr(self, attr)))
+        return ('%s(%s)' % (self.__class__.__name__, ', '.join(params)))
+
 
 class Mouse(_CDataWrapper):
     """Mouse event instance
@@ -283,6 +294,18 @@ class Mouse(_CDataWrapper):
         super(Mouse, self).__init__(*args, **kargs)
         if self.cdata == ffi.NULL:
             self.cdata = ffi.new('TCOD_mouse_t*')
+
+    def __repr__(self):
+        """Return a representation of this Mouse object."""
+        params = []
+        for attr in ['x', 'y', 'dx', 'dy', 'cx', 'cy', 'dcx', 'dcy']:
+            params.append('%s=%r' % (attr, getattr(self, attr)))
+        for attr in ['lbutton', 'rbutton', 'mbutton',
+                     'lbutton_pressed', 'rbutton_pressed', 'mbutton_pressed',
+                     'wheel_up', 'wheel_down']:
+            if getattr(self, attr):
+                params.append('%s=%r' % (attr, getattr(self, attr)))
+        return ('%s(%s)' % (self.__class__.__name__, ', '.join(params)))
 
 
 def bsp_new_with_size(x, y, w, h):
