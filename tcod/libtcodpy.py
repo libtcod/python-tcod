@@ -926,7 +926,7 @@ def console_set_color_control(con, fore, back):
         back (Union[Tuple[int, int, int], Sequence[int]]):
             An (r, g, b) sequence or Color instance.
     """
-    lib.TCOD_console_set_color_control(_cdata(con), fore, back)
+    lib.TCOD_console_set_color_control(con, fore, back)
 
 def console_get_default_background(con):
     """Return this consoles default background color."""
