@@ -44,6 +44,8 @@ def BKGND_ADDALPHA(a):
 class _Mock(object):
     """Mock object needed for ReadTheDocs."""
 
+    TCOD_RENDERER_GLSL = 0
+    TCOD_RENDERER_OPENGL = 1
     TCOD_RENDERER_SDL = 2
     TCOD_FONT_LAYOUT_ASCII_INCOL = 1
     TCOD_BKGND_SET = 1
