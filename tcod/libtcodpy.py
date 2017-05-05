@@ -567,7 +567,6 @@ def _numpy_available():
             _numpy = False
     return _numpy
 
-# initializing the console
 def console_init_root(w, h, title, fullscreen=False,
                       renderer=RENDERER_GLSL):
     """Set up the primary display and return the root console.

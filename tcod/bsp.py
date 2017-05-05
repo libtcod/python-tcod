@@ -1,4 +1,40 @@
+"""
+The following example shows how to travrse the BSP tree using Python.  This
+assumes `create_room` and `connect_rooms` will be replaced by custom code.
 
+Example:
+    import tcod.bsp
+
+    def create_room(node):
+        \"""Initialize the room at this current node.\"""
+        print('Create a room for %s.' % node)
+
+    def connect_rooms(node):
+        \"""Connect two fully initialized rooms.\"""
+        node1, node2 = node.children
+        print('Connect the rooms:\n%s\n%s' % (node1, node2))
+
+    def traverse(node):
+        \"""Traverse a BSP tree dispatching nodes to the correct calls.\"""
+        # Note that not all nodes will have children.
+        for child in node.children:
+            traverse(child)
+
+        if node.children:
+            connect_rooms(node)
+        else:
+            create_room(node)
+
+    bsp = tcod.bsp.BSP(x=0, y=0, width=80, height=60)
+    bsp.split_recursive(
+        depth=5,
+        min_width=3,
+        min_height=3,
+        max_horizontal_ratio=1.5,
+        max_vertical_raito=1.5,
+        )
+    traverse(bsp)
+"""
 from __future__ import absolute_import as _
 
 from tcod.libtcod import lib, ffi
@@ -94,7 +130,11 @@ class BSP(object):
         self.children[1]._unpack_bsp_tree(lib.TCOD_bsp_right(cdata))
 
     def split_once(self, horizontal, position):
-        """
+        """Split this partition into 2 sub-partitions.
+
+        Args:
+            horizontal (bool):
+            position (int):
 
         .. versionadded:: 2.0
         """
@@ -104,7 +144,18 @@ class BSP(object):
 
     def split_recursive(self, depth, min_width, min_height,
                         max_horizontal_ratio, max_vertical_raito, random=None):
-        """
+        """Divide this partition recursively.
+
+        Args:
+            depth (int): The maximum depth to divide this object recursively.
+            min_width (int): The minimum width of any individual partition.
+            min_height (int): The minimum height of any individual partition.
+            max_horizontal_ratio (float):
+                Prevent creating a horizontal ratio more extreme than this.
+            max_vertical_raito (float):
+                Prevent creating a vertical ratio more extreme than this.
+            random (Optional[tcod.random.Random]):
+                The random number generator to use.
 
         .. versionadded:: 2.0
         """

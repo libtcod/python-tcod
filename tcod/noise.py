@@ -1,4 +1,37 @@
+"""
+The :any:`Noise.sample_mgrid` and :any:`Noise.sample_ogrid` methods are
+multi-threaded operations when the Python runtime supports OpenMP.
+Even when single threaded these methods will perform much better than
+multiple calls to :any:`Noise.get_point`.
 
+Example:
+    import numpy as np
+    import tcod
+    import tcod.noise
+
+    noise = tcod.noise.Noise(
+        dimensions=2,
+        algorithm=tcod.NOISE_SIMPLEX,
+        implementation=tcod.noise.TURBULENCE,
+        hurst=0.5,
+        lacunarity=2.0,
+        octaves=4,
+        rand=None,
+        )
+
+    # Create a 5x5 open multi-dimensional mesh-grid.
+    ogrid = [np.arange(5, dtype=np.float32),
+             np.arange(5, dtype=np.float32)]
+    print(ogrid)
+
+    # Scale the grid.
+    ogrid[0] *= 0.25
+    ogrid[1] *= 0.25
+
+    # Return the sampled noise from this grid of points.
+    samples = noise.sample_ogrid(ogrid)
+    print(samples)
+"""
 from __future__ import absolute_import
 
 import operator
@@ -120,9 +153,10 @@ class Noise(object):
                 A contiguous array of type :any:`numpy.float32` is preferred.
 
         Returns:
-            numpy.ndarray: An array of sampled points
-                           with the shape: ``mgrid.shape[:-1]``.
-                           The ``dtype`` is :any:`numpy.float32`.
+            numpy.ndarray: An array of sampled points.
+
+                This array has the shape: ``mgrid.shape[:-1]``.
+                The ``dtype`` is :any:`numpy.float32`.
 
         .. versionadded:: 2.2
         """
@@ -143,12 +177,14 @@ class Noise(object):
         """Sample an open mesh-grid array and return the result.
 
         Args
-            ogrid (Sequence[numpy.ndarray]): An open mesh-grid.
+            ogrid (Sequence[Sequence[float]]): An open mesh-grid.
 
         Returns:
-            numpy.ndarray: An array of sampled points.  The ``shape`` is based
-                           on the lengths of the open mesh-grid arrays.
-                           The ``dtype`` is :any:`numpy.float32`.
+            numpy.ndarray: An array of sampled points.
+
+                The ``shape`` is based on the lengths of the open mesh-grid
+                arrays.
+                The ``dtype`` is :any:`numpy.float32`.
 
         .. versionadded:: 2.2
         """
