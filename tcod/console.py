@@ -3,7 +3,8 @@ libtcod works with a special 'root' console.  You create this console using
 the :any:`tcod.console_init_root` function.  Usually after setting the font
 with :any:`console_set_custom_font` first.
 
-Example:
+Example::
+
     # Make sure 'arial10x10.png' is in the same directory as this script.
     import time
 
@@ -150,7 +151,7 @@ class Console(object):
 
     @property
     def bg(self):
-        """numpy.ndarray: A uint8 array with the shape: (height, width, 3).
+        """A uint8 array with the shape (height, width, 3).
 
         You can change the consoles background colors by using this array.
 
@@ -160,7 +161,7 @@ class Console(object):
 
     @property
     def fg(self):
-        """numpy.ndarray: A uint8 array with the shape: (height, width, 3).
+        """A uint8 array with the shape (height, width, 3).
 
         You can change the consoles foreground colors by using this array.
 
@@ -170,7 +171,7 @@ class Console(object):
 
     @property
     def ch(self):
-        """numpy.ndarray: An intc array with the shape: (height, width).
+        """An integer array with the shape (height, width).
 
         You can change the consoles character codes by using this array.
 

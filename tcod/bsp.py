@@ -2,7 +2,8 @@
 The following example shows how to travrse the BSP tree using Python.  This
 assumes `create_room` and `connect_rooms` will be replaced by custom code.
 
-Example:
+Example::
+
     import tcod.bsp
 
     def create_room(node):
@@ -12,7 +13,7 @@ Example:
     def connect_rooms(node):
         \"""Connect two fully initialized rooms.\"""
         node1, node2 = node.children
-        print('Connect the rooms:\n%s\n%s' % (node1, node2))
+        print('Connect the rooms:\\n%s\\n%s' % (node1, node2))
 
     def traverse(node):
         \"""Traverse a BSP tree dispatching nodes to the correct calls.\"""

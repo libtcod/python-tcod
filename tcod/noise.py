@@ -4,7 +4,8 @@ multi-threaded operations when the Python runtime supports OpenMP.
 Even when single threaded these methods will perform much better than
 multiple calls to :any:`Noise.get_point`.
 
-Example:
+Example::
+
     import numpy as np
     import tcod
     import tcod.noise
@@ -150,13 +151,13 @@ class Noise(object):
 
         Args:
             mgrid (numpy.ndarray): A mesh-grid array of points to sample.
-                A contiguous array of type :any:`numpy.float32` is preferred.
+                A contiguous array of type `numpy.float32` is preferred.
 
         Returns:
             numpy.ndarray: An array of sampled points.
 
                 This array has the shape: ``mgrid.shape[:-1]``.
-                The ``dtype`` is :any:`numpy.float32`.
+                The ``dtype`` is `numpy.float32`.
 
         .. versionadded:: 2.2
         """
@@ -184,7 +185,7 @@ class Noise(object):
 
                 The ``shape`` is based on the lengths of the open mesh-grid
                 arrays.
-                The ``dtype`` is :any:`numpy.float32`.
+                The ``dtype`` is `numpy.float32`.
 
         .. versionadded:: 2.2
         """
