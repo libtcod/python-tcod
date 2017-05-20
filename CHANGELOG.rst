@@ -1,6 +1,11 @@
 ===========
  Changelog
 ===========
+Unreleased
+------------------
+Fixed
+ * Fixed crashes when exiting on some systems.
+
 2.4.3 - 2017-04-10
 ------------------
 Fixed
