@@ -17,7 +17,7 @@ Example::
 
     def traverse(node):
         \"""Traverse a BSP tree dispatching nodes to the correct calls.\"""
-        # Note that not all nodes will have children.
+        # For nodes without children, node.children is an empty tuple.
         for child in node.children:
             traverse(child)
 
@@ -42,8 +42,8 @@ from tcod.libtcod import lib, ffi
 
 
 class BSP(object):
-    """
-
+    """A binary space partitioning tree which can be used for simple dungeon
+    generation.
 
     Attributes:
         x (int): Rectangle left coordinate.
@@ -177,6 +177,9 @@ class BSP(object):
             Iterator[BSP]: An iterator of BSP nodes.
 
         .. versionadded:: 2.0
+
+        .. deprecated:: 2.3
+            See the module example for how to iterate over a BSP tree.
         """
         return self._iter_post_order()
 

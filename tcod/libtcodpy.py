@@ -639,15 +639,54 @@ def console_get_height(con):
     return lib.TCOD_console_get_height(_cdata(con))
 
 def console_map_ascii_code_to_font(asciiCode, fontCharX, fontCharY):
+    """Set a character code to new coordinates on the tile-set.
+
+    `asciiCode` must be within the bounds created during the initialization of
+    the loaded tile-set.  For example, you can't use 255 here unless you have a
+    256 tile tile-set loaded.  This applies to all functions in this group.
+
+    Args:
+        asciiCode (int): The character code to change.
+        fontCharX (int): The X tile coordinate on the loaded tileset.
+                         0 is the leftmost tile.
+        fontCharY (int): The Y tile coordinate on the loaded tileset.
+                         0 is the topmost tile.
+    """
     lib.TCOD_console_map_ascii_code_to_font(_int(asciiCode), fontCharX,
                                                               fontCharY)
 
 def console_map_ascii_codes_to_font(firstAsciiCode, nbCodes, fontCharX,
                                     fontCharY):
+    """Remap a contiguous set of codes to a contiguous set of tiles.
+
+    Both the tile-set and character codes must be contiguous to use this
+    function.  If this is not the case you may want to use
+    :any:`console_map_ascii_code_to_font`.
+
+    Args:
+        firstAsciiCode (int): The starting character code.
+        nbCodes (int): The length of the contiguous set.
+        fontCharX (int): The starting X tile coordinate on the loaded tileset.
+                         0 is the leftmost tile.
+        fontCharY (int): The starting Y tile coordinate on the loaded tileset.
+                         0 is the topmost tile.
+
+    """
     lib.TCOD_console_map_ascii_codes_to_font(_int(firstAsciiCode), nbCodes,
                                               fontCharX, fontCharY)
 
 def console_map_string_to_font(s, fontCharX, fontCharY):
+    """Remap a string of codes to a contiguous set of tiles.
+
+    Args:
+        s (AnyStr): A string of character codes to map to new values.
+                    The null character `'\x00'` will prematurely end this
+                    function.
+        fontCharX (int): The starting X tile coordinate on the loaded tileset.
+                         0 is the leftmost tile.
+        fontCharY (int): The starting Y tile coordinate on the loaded tileset.
+                         0 is the topmost tile.
+    """
     lib.TCOD_console_map_string_to_font_utf(_unicode(s), fontCharX, fontCharY)
 
 def console_is_fullscreen():
