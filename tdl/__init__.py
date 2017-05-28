@@ -787,7 +787,7 @@ class _BaseConsole(object):
         x, y = position
         return (0 <= x < self.width) and (0 <= y < self.height)
 
-    def blit_image(self, image, x, y, subcell_res=False):
+    def image_blit(self, image, x, y, subcell_res=False):
         """Blits a rectangular part of an image onto a console, with or without
            subcell resultion.
 
