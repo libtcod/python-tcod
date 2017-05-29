@@ -37,12 +37,15 @@ class Map(object):
         assert ffi.sizeof('cell_t') == 1 # assert buffer alignment
         self.buffer = np.zeros((height, width), dtype=np.uint8)
 
-        self.cdata = ffi.new('map_t*')
-        self.cdata.width = self.width = width
-        self.cdata.height = self.height = height
-        self.cdata.nbcells = width * height
-        self.cdata.cells = ffi.cast('cell_t*', self.buffer.ctypes.data)
+        self.map_c = ffi.new('map_t*')
+        self.map_c.width = self.width = width
+        self.map_c.height = self.height = height
+        self.map_c.nbcells = width * height
+        self.map_c.cells = ffi.cast('cell_t*', self.buffer.ctypes.data)
 
+        self._init_proxies()
+
+    def _init_proxies(self):
         self.transparent = BufferBitProxy(self.buffer, 0x01)
         self.walkable = BufferBitProxy(self.buffer, 0x02)
         self.fov = BufferBitProxy(self.buffer, 0x04)
@@ -58,7 +61,7 @@ class Map(object):
             light_walls (bool):
             algorithm (int): Defaults to FOV_RESTRICTIVE
         """
-        lib.TCOD_map_compute_fov(self.cdata, x, y, radius, light_walls,
+        lib.TCOD_map_compute_fov(self.map_c, x, y, radius, light_walls,
                                  algorithm)
 
     def __getstate__(self):
@@ -67,9 +70,27 @@ class Map(object):
         This method allows the usage of the :mod:`copy` and :mod:`pickle`
         modules with this class.
         """
+        state = self.__dict__.copy()
+        del state['map_c']
+        return state
         return {'size': (self.width, self.height), 'buffer': self.buffer}
 
     def __setstate__(self, state):
         """Unpack this object from a saved state.  A new buffer is used."""
-        self.__init__(*state['size'])
-        self.buffer[...] = state['buffer']
+        if 'width' not in state or 'height' not in state:
+            state['width'], state['height'] = state['size']
+            del state['size']
+
+        self.__dict__.update(state)
+
+        self.map_c = ffi.new(
+            'map_t *',
+            (
+                self.width,
+                self.height,
+                self.width * self.height,
+                ffi.cast('cell_t*', self.buffer.ctypes.data),
+            )
+        )
+
+        self._init_proxies()

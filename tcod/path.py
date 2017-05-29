@@ -74,7 +74,7 @@ class _PathFinder(object):
         self.cdata = None
         self.handle = None
 
-        if isinstance(cost, tcod.map.Map):
+        if hasattr(cost, 'map_c'):
             self._setup_map(cost)
         elif callable(cost):
             self._setup_callback(lib._pycall_path_simple, cost)
@@ -92,7 +92,7 @@ class _PathFinder(object):
         self.width = cost.width
         self.height = cost.height
         self.cdata = ffi.gc(
-            self._path_new_using_map(cost.cdata, self.diagonal),
+            self._path_new_using_map(cost.map_c, self.diagonal),
             self._path_delete)
 
     def _setup_callback(self, c_call, args):

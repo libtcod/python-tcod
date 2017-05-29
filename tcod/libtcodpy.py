@@ -2027,27 +2027,27 @@ def map_new(w, h):
     return tcod.map.Map(w, h)
 
 def map_copy(source, dest):
-    return lib.TCOD_map_copy(source.cdata, dest.cdata)
+    return lib.TCOD_map_copy(source.map_c, dest.map_c)
 
 def map_set_properties(m, x, y, isTrans, isWalk):
-    lib.TCOD_map_set_properties(m.cdata, x, y, isTrans, isWalk)
+    lib.TCOD_map_set_properties(m.map_c, x, y, isTrans, isWalk)
 
 def map_clear(m,walkable=False,transparent=False):
     # walkable/transparent looks incorrectly ordered here.
     # TODO: needs test.
-    lib.TCOD_map_clear(m.cdata, walkable, transparent)
+    lib.TCOD_map_clear(m.map_c, walkable, transparent)
 
 def map_compute_fov(m, x, y, radius=0, light_walls=True, algo=FOV_RESTRICTIVE ):
-    lib.TCOD_map_compute_fov(m.cdata, x, y, radius, light_walls, algo)
+    lib.TCOD_map_compute_fov(m.map_c, x, y, radius, light_walls, algo)
 
 def map_is_in_fov(m, x, y):
-    return lib.TCOD_map_is_in_fov(m.cdata, x, y)
+    return lib.TCOD_map_is_in_fov(m.map_c, x, y)
 
 def map_is_transparent(m, x, y):
-    return lib.TCOD_map_is_transparent(m.cdata, x, y)
+    return lib.TCOD_map_is_transparent(m.map_c, x, y)
 
 def map_is_walkable(m, x, y):
-    return lib.TCOD_map_is_walkable(m.cdata, x, y)
+    return lib.TCOD_map_is_walkable(m.map_c, x, y)
 
 def map_delete(m):
     pass
