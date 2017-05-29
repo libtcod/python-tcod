@@ -63,26 +63,32 @@ Removed
  * Key repeat functions were removed from SDL2.
    `set_key_repeat` is now stubbed, and does nothing.
 
-1.6.0
+1.6.0 - 2016-11-18
+------------------
  * Console.blit methods can now take fg_alpha and bg_alpha parameters.
 
-1.5.3
+1.5.3 - 2016-06-04
+------------------
  * set_font no longer crashes when loading a file without the implied font size in its name
 
-1.5.2
+1.5.2 - 2016-03-11
+------------------
  * fixed non-square Map instances
 
-1.5.1
+1.5.1 - 2015-12-20
+------------------
  * fixed errors with Unicode and non-Unicode literals on Python 2
  * fixed attribute error in compute_fov
 
-1.5.0
+1.5.0 - 2015-07-13
+------------------
  * python-tdl distributions are now universal builds
  * new Map class
  * map.bresenham now returns a list
  * this release will require libtcod-cffi v0.2.3 or later
 
-1.4.0
+1.4.0 - 2015-06-22
+------------------
  * The DLL's have been moved into another library which you can find at https://github.com/HexDecimal/libtcod-cffi
    You can use this library to have some raw access to libtcod if you want.
    Plus it can be used alongside TDL.
@@ -90,14 +96,17 @@ Removed
  * Added tdl.event.wait function.  This function can called with a timeout and
    can automatically call tdl.flush.
 
-1.3.1
+1.3.1 - 2015-06-19
+------------------
  * Fixed pathfinding regressions.
 
-1.3.0
+1.3.0 - 2015-06-19
+------------------
  * Updated backend to use python-cffi instead of ctypes.  This gives decent
    boost to speed in CPython and a drastic to boost in speed in PyPy.
 
-1.2.0
+1.2.0 - 2015-06-06
+------------------
  * The set_colors method now changes the default colors used by the draw_*
    methods.  You can use Python's Ellipsis to explicitly select default colors
    this way.
