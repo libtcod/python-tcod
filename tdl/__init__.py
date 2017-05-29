@@ -787,6 +787,32 @@ class _BaseConsole(object):
         x, y = position
         return (0 <= x < self.width) and (0 <= y < self.height)
 
+    def image_blit(self, image, x, y, subcell_res=False):
+        """Blits a rectangular part of an image onto a console, with or without
+           subcell resultion.
+
+        @type image: str
+        @param image: string indicating name of image file in working directory.
+
+        @type x: int
+        @param x: X coordinate in the console of the upper-left corner of the image.
+        @type y: int
+        @param y: Y coordinate in the console of the upper-left corner of the image.
+
+        @type subcell_res: boolean
+        @param subcell_res: Can be set to True to double the console resolution 
+                             using the libtcod blitting function image_blit_2x.
+        """
+
+        tdl_image = _lib.TCOD_image_load(_encodeString(image))
+
+        if subcell_res:
+            _lib.TCOD_image_blit_2x(tdl_image, self.tcod_console, x, y, 0, 0, -1, -1)
+
+        else:
+            _lib.TCOD_image_blit_rect(tdl_image, self.tcod_console, x, y, -1, -1,
+                                      _lib.TCOD_BKGND_SET)
+
 class Console(_BaseConsole):
     """Contains character and color data and can be drawn to.
 
