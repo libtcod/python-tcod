@@ -9,7 +9,7 @@ import numpy as _np
 
 from tcod.libtcod import *
 
-from tcod.tcod import _int, _cdata, _unpack_char_p
+from tcod.tcod import _int, _unpack_char_p
 from tcod.tcod import _bytes, _unicode, _fmt_bytes, _fmt_unicode
 from tcod.tcod import _CDataWrapper
 from tcod.tcod import _PropagateException
@@ -156,7 +156,7 @@ class ConsoleBuffer(object):
             fill_back (bool):
                 If True, fill the background color.
         """
-        dest = _cdata(dest)
+        dest = dest.console_c if dest else ffi.NULL
         if (console_get_width(dest) != self.width or
             console_get_height(dest) != self.height):
             raise ValueError('ConsoleBuffer.blit: Destination console has an incorrect size.')
@@ -622,7 +622,7 @@ def console_get_width(con):
     .. deprecated:: 2.0
         Use `Console.get_width` instead.
     """
-    return lib.TCOD_console_get_width(_cdata(con))
+    return lib.TCOD_console_get_width(con.console_c if con else ffi.NULL)
 
 def console_get_height(con):
     """Return the height of a console.
@@ -636,7 +636,7 @@ def console_get_height(con):
     .. deprecated:: 2.0
         Use `Console.get_hright` instead.
     """
-    return lib.TCOD_console_get_height(_cdata(con))
+    return lib.TCOD_console_get_height(con.console_c if con else ffi.NULL)
 
 def console_map_ascii_code_to_font(asciiCode, fontCharX, fontCharY):
     """Set a character code to new coordinates on the tile-set.
@@ -740,7 +740,8 @@ def console_set_default_background(con, col):
         col (Union[Tuple[int, int, int], Sequence[int]]):
             An (r, g, b) sequence or Color instance.
     """
-    lib.TCOD_console_set_default_background(_cdata(con), col)
+    lib.TCOD_console_set_default_background(
+        con.console_c if con else ffi.NULL, col)
 
 def console_set_default_foreground(con, col):
     """Change the default foreground color for a console.
@@ -750,7 +751,8 @@ def console_set_default_foreground(con, col):
         col (Union[Tuple[int, int, int], Sequence[int]]):
             An (r, g, b) sequence or Color instance.
     """
-    lib.TCOD_console_set_default_foreground(_cdata(con), col)
+    lib.TCOD_console_set_default_foreground(
+        con.console_c if con else ffi.NULL, col)
 
 def console_clear(con):
     """Reset a console to its default colors and the space character.
@@ -762,7 +764,7 @@ def console_clear(con):
        :any:`console_set_default_background`
        :any:`console_set_default_foreground`
     """
-    return lib.TCOD_console_clear(_cdata(con))
+    return lib.TCOD_console_clear(con.console_c if con else ffi.NULL)
 
 def console_put_char(con, x, y, c, flag=BKGND_DEFAULT):
     """Draw the character c at x,y using the default colors and a blend mode.
@@ -774,7 +776,8 @@ def console_put_char(con, x, y, c, flag=BKGND_DEFAULT):
         c (Union[int, AnyStr]): Character to draw, can be an integer or string.
         flag (int): Blending mode to use, defaults to BKGND_DEFAULT.
     """
-    lib.TCOD_console_put_char(_cdata(con), x, y, _int(c), flag)
+    lib.TCOD_console_put_char(
+        con.console_c if con else ffi.NULL, x, y, _int(c), flag)
 
 def console_put_char_ex(con, x, y, c, fore, back):
     """Draw the character c at x,y using the colors fore and back.
@@ -789,7 +792,7 @@ def console_put_char_ex(con, x, y, c, fore, back):
         back (Union[Tuple[int, int, int], Sequence[int]]):
             An (r, g, b) sequence or Color instance.
     """
-    lib.TCOD_console_put_char_ex(_cdata(con), x, y,
+    lib.TCOD_console_put_char_ex(con.console_c if con else ffi.NULL, x, y,
                                  _int(c), fore, back)
 
 def console_set_char_background(con, x, y, col, flag=BKGND_SET):
@@ -803,7 +806,8 @@ def console_set_char_background(con, x, y, col, flag=BKGND_SET):
             An (r, g, b) sequence or Color instance.
         flag (int): Blending mode to use, defaults to BKGND_SET.
     """
-    lib.TCOD_console_set_char_background(_cdata(con), x, y, col, flag)
+    lib.TCOD_console_set_char_background(
+        con.console_c if con else ffi.NULL, x, y, col, flag)
 
 def console_set_char_foreground(con, x, y, col):
     """Change the foreground color of x,y to col.
@@ -815,7 +819,8 @@ def console_set_char_foreground(con, x, y, col):
         col (Union[Tuple[int, int, int], Sequence[int]]):
             An (r, g, b) sequence or Color instance.
     """
-    lib.TCOD_console_set_char_foreground(_cdata(con), x, y, col)
+    lib.TCOD_console_set_char_foreground(
+        con.console_c if con else ffi.NULL, x, y, col)
 
 def console_set_char(con, x, y, c):
     """Change the character at x,y to c, keeping the current colors.
@@ -826,7 +831,8 @@ def console_set_char(con, x, y, c):
         y (int): Character y position from the top.
         c (Union[int, AnyStr]): Character to draw, can be an integer or string.
     """
-    lib.TCOD_console_set_char(_cdata(con), x, y, _int(c))
+    lib.TCOD_console_set_char(
+        con.console_c if con else ffi.NULL, x, y, _int(c))
 
 def console_set_background_flag(con, flag):
     """Change the default blend mode for this console.
@@ -835,7 +841,8 @@ def console_set_background_flag(con, flag):
         con (Console): Any Console instance.
         flag (int): Blend mode to use by default.
     """
-    lib.TCOD_console_set_background_flag(_cdata(con), flag)
+    lib.TCOD_console_set_background_flag(
+        con.console_c if con else ffi.NULL, flag)
 
 def console_get_background_flag(con):
     """Return this consoles current blend mode.
@@ -843,7 +850,8 @@ def console_get_background_flag(con):
     Args:
         con (Console): Any Console instance.
     """
-    return lib.TCOD_console_get_background_flag(_cdata(con))
+    return lib.TCOD_console_get_background_flag(
+        con.console_c if con else ffi.NULL)
 
 def console_set_alignment(con, alignment):
     """Change this consoles current alignment mode.
@@ -856,7 +864,8 @@ def console_set_alignment(con, alignment):
         con (Console): Any Console instance.
         alignment (int):
     """
-    lib.TCOD_console_set_alignment(_cdata(con), alignment)
+    lib.TCOD_console_set_alignment(
+        con.console_c if con else ffi.NULL, alignment)
 
 def console_get_alignment(con):
     """Return this consoles current alignment mode.
@@ -864,7 +873,7 @@ def console_get_alignment(con):
     Args:
         con (Console): Any Console instance.
     """
-    return lib.TCOD_console_get_alignment(_cdata(con))
+    return lib.TCOD_console_get_alignment(con.console_c if con else ffi.NULL)
 
 def console_print(con, x, y, fmt):
     """Print a color formatted string on a console.
@@ -875,7 +884,8 @@ def console_print(con, x, y, fmt):
         y (int): Character y position from the top.
         fmt (AnyStr): A unicode or bytes string optionaly using color codes.
     """
-    lib.TCOD_console_print_utf(_cdata(con), x, y, _fmt_unicode(fmt))
+    lib.TCOD_console_print_utf(
+        con.console_c if con else ffi.NULL, x, y, _fmt_unicode(fmt))
 
 def console_print_ex(con, x, y, flag, alignment, fmt):
     """Print a string on a console using a blend mode and alignment mode.
@@ -885,8 +895,8 @@ def console_print_ex(con, x, y, flag, alignment, fmt):
         x (int): Character x position from the left.
         y (int): Character y position from the top.
     """
-    lib.TCOD_console_print_ex_utf(_cdata(con), x, y,
-                                   flag, alignment, _fmt_unicode(fmt))
+    lib.TCOD_console_print_ex_utf(con.console_c if con else ffi.NULL,
+                                  x, y, flag, alignment, _fmt_unicode(fmt))
 
 def console_print_rect(con, x, y, w, h, fmt):
     """Print a string constrained to a rectangle.
@@ -900,8 +910,8 @@ def console_print_rect(con, x, y, w, h, fmt):
     Returns:
         int: The number of lines of text once word-wrapped.
     """
-    return lib.TCOD_console_print_rect_utf(_cdata(con), x, y, w, h,
-                                            _fmt_unicode(fmt))
+    return lib.TCOD_console_print_rect_utf(
+        con.console_c if con else ffi.NULL, x, y, w, h, _fmt_unicode(fmt))
 
 def console_print_rect_ex(con, x, y, w, h, flag, alignment, fmt):
     """Print a string constrained to a rectangle with blend and alignment.
@@ -909,9 +919,9 @@ def console_print_rect_ex(con, x, y, w, h, flag, alignment, fmt):
     Returns:
         int: The number of lines of text once word-wrapped.
     """
-    return lib.TCOD_console_print_rect_ex_utf(_cdata(con), x, y, w, h,
-                                              flag, alignment,
-                                              _fmt_unicode(fmt))
+    return lib.TCOD_console_print_rect_ex_utf(
+        con.console_c if con else ffi.NULL,
+        x, y, w, h, flag, alignment, _fmt_unicode(fmt))
 
 def console_get_height_rect(con, x, y, w, h, fmt):
     """Return the height of this text once word-wrapped into this rectangle.
@@ -919,29 +929,30 @@ def console_get_height_rect(con, x, y, w, h, fmt):
     Returns:
         int: The number of lines of text once word-wrapped.
     """
-    return lib.TCOD_console_get_height_rect_utf(_cdata(con), x, y, w, h,
-                                                 _fmt_unicode(fmt))
+    return lib.TCOD_console_get_height_rect_utf(
+        con.console_c if con else ffi.NULL, x, y, w, h, _fmt_unicode(fmt))
 
 def console_rect(con, x, y, w, h, clr, flag=BKGND_DEFAULT):
     """Draw a the background color on a rect optionally clearing the text.
 
     If clr is True the affected tiles are changed to space character.
     """
-    lib.TCOD_console_rect(_cdata(con), x, y, w, h, clr, flag)
+    lib.TCOD_console_rect(
+        con.console_c if con else ffi.NULL, x, y, w, h, clr, flag)
 
 def console_hline(con, x, y, l, flag=BKGND_DEFAULT):
     """Draw a horizontal line on the console.
 
     This always uses the character 196, the horizontal line character.
     """
-    lib.TCOD_console_hline(_cdata(con), x, y, l, flag)
+    lib.TCOD_console_hline(con.console_c if con else ffi.NULL, x, y, l, flag)
 
 def console_vline(con, x, y, l, flag=BKGND_DEFAULT):
     """Draw a vertical line on the console.
 
     This always uses the character 179, the vertical line character.
     """
-    lib.TCOD_console_vline(_cdata(con), x, y, l, flag)
+    lib.TCOD_console_vline(con.console_c if con else ffi.NULL, x, y, l, flag)
 
 def console_print_frame(con, x, y, w, h, clear=True, flag=BKGND_DEFAULT, fmt=b''):
     """Draw a framed rectangle with optinal text.
@@ -951,8 +962,9 @@ def console_print_frame(con, x, y, w, h, clear=True, flag=BKGND_DEFAULT, fmt=b''
 
     fmt will be printed on the inside of the rectangle, word-wrapped.
     """
-    lib.TCOD_console_print_frame(_cdata(con), x, y, w, h, clear, flag,
-                                  _fmt_bytes(fmt))
+    lib.TCOD_console_print_frame(
+        con.console_c if con else ffi.NULL,
+        x, y, w, h, clear, flag, _fmt_bytes(fmt))
 
 def console_set_color_control(con, fore, back):
     """Configure :any:`color controls`.
@@ -969,26 +981,30 @@ def console_set_color_control(con, fore, back):
 def console_get_default_background(con):
     """Return this consoles default background color."""
     return Color._new_from_cdata(
-        lib.TCOD_console_get_default_background(_cdata(con)))
+        lib.TCOD_console_get_default_background(
+            con.console_c if con else ffi.NULL))
 
 def console_get_default_foreground(con):
     """Return this consoles default foreground color."""
     return Color._new_from_cdata(
-        lib.TCOD_console_get_default_foreground(_cdata(con)))
+        lib.TCOD_console_get_default_foreground(
+            con.console_c if con else ffi.NULL))
 
 def console_get_char_background(con, x, y):
     """Return the background color at the x,y of this console."""
     return Color._new_from_cdata(
-        lib.TCOD_console_get_char_background(_cdata(con), x, y))
+        lib.TCOD_console_get_char_background(
+            con.console_c if con else ffi.NULL, x, y))
 
 def console_get_char_foreground(con, x, y):
     """Return the foreground color at the x,y of this console."""
     return Color._new_from_cdata(
-        lib.TCOD_console_get_char_foreground(_cdata(con), x, y))
+        lib.TCOD_console_get_char_foreground(
+            con.console_c if con else ffi.NULL, x, y))
 
 def console_get_char(con, x, y):
     """Return the character at the x,y of this console."""
-    return lib.TCOD_console_get_char(_cdata(con), x, y)
+    return lib.TCOD_console_get_char(con.console_c if con else ffi.NULL, x, y)
 
 def console_set_fade(fade, fadingColor):
     lib.TCOD_console_set_fade(fade, fadingColor)
@@ -1043,15 +1059,16 @@ def console_from_file(filename):
 
 def console_blit(src, x, y, w, h, dst, xdst, ydst, ffade=1.0,bfade=1.0):
     """Blit the console src from x,y,w,h to console dst at xdst,ydst."""
-    lib.TCOD_console_blit(_cdata(src), x, y, w, h,
-                          _cdata(dst), xdst, ydst, ffade, bfade)
+    lib.TCOD_console_blit(
+        src.console_c if src else ffi.NULL, x, y, w, h,
+        dst.console_c if dst else ffi.NULL, xdst, ydst, ffade, bfade)
 
 def console_set_key_color(con, col):
     """Set a consoles blit transparent color."""
-    lib.TCOD_console_set_key_color(_cdata(con), col)
+    lib.TCOD_console_set_key_color(con.console_c if con else ffi.NULL, col)
 
 def console_delete(con):
-    con = _cdata(con)
+    con = con.console_c if con else ffi.NULL
     if con == ffi.NULL:
         lib.TCOD_console_delete(con)
 
@@ -1082,7 +1099,8 @@ def console_fill_foreground(con, r, g, b):
         cg = ffi.new('int[]', g)
         cb = ffi.new('int[]', b)
 
-    lib.TCOD_console_fill_foreground(_cdata(con), cr, cg, cb)
+    lib.TCOD_console_fill_foreground(con.console_c if con else ffi.NULL,
+                                     cr, cg, cb)
 
 def console_fill_background(con, r, g, b):
     """Fill the backgound of a console with r,g,b.
@@ -1110,7 +1128,8 @@ def console_fill_background(con, r, g, b):
         cg = ffi.new('int[]', g)
         cb = ffi.new('int[]', b)
 
-    lib.TCOD_console_fill_background(_cdata(con), cr, cg, cb)
+    lib.TCOD_console_fill_background(con.console_c if con else ffi.NULL,
+                                     cr, cg, cb)
 
 def console_fill_char(con,arr):
     """Fill the character tiles of a console with an array.
@@ -1127,32 +1146,40 @@ def console_fill_char(con,arr):
         #otherwise convert using the ffi module
         carr = ffi.new('int[]', arr)
 
-    lib.TCOD_console_fill_char(_cdata(con), carr)
+    lib.TCOD_console_fill_char(con.console_c if con else ffi.NULL, carr)
 
 def console_load_asc(con, filename):
     """Update a console from a non-delimited ASCII `.asc` file."""
-    return lib.TCOD_console_load_asc(_cdata(con), _bytes(filename))
+    return lib.TCOD_console_load_asc(
+        con.console_c if con else ffi.NULL, filename.encode('utf-8'))
 
 def console_save_asc(con, filename):
     """Save a console to a non-delimited ASCII `.asc` file."""
-    return lib.TCOD_console_save_asc(_cdata(con),_bytes(filename))
+    return lib.TCOD_console_save_asc(
+        con.console_c if con else ffi.NULL, filename.encode('utf-8'))
 
 def console_load_apf(con, filename):
     """Update a console from an ASCII Paint `.apf` file."""
-    return lib.TCOD_console_load_apf(_cdata(con),_bytes(filename))
+    return lib.TCOD_console_load_apf(
+        con.console_c if con else ffi.NULL, filename.encode('utf-8'))
 
 def console_save_apf(con, filename):
     """Save a console to an ASCII Paint `.apf` file."""
-    return lib.TCOD_console_save_apf(_cdata(con),_bytes(filename))
+    return lib.TCOD_console_save_apf(
+        con.console_c if con else ffi.NULL, filename.encode('utf-8'))
 
 def console_load_xp(con, filename):
     """Update a console from a REXPaint `.xp` file."""
-    return lib.TCOD_console_load_xp(_cdata(con), filename.encode('utf-8'))
+    return lib.TCOD_console_load_xp(
+        con.console_c if con else ffi.NULL, filename.encode('utf-8'))
 
 def console_save_xp(con, filename, compress_level=9):
     """Save a console to a REXPaint `.xp` file."""
     return lib.TCOD_console_save_xp(
-        _cdata(con), filename.encode('utf-8'), compress_level)
+        con.console_c if con else ffi.NULL,
+        filename.encode('utf-8'),
+        compress_level,
+        )
 
 def console_from_xp(filename):
     """Return a single console from a REXPaint `.xp` file."""
@@ -1180,7 +1207,8 @@ def console_list_save_xp(console_list, filename, compress_level=9):
     tcod_list = lib.TCOD_list_new()
     try:
         for console in console_list:
-            lib.TCOD_list_push(tcod_list, _cdata(console))
+            lib.TCOD_list_push(tcod_list,
+                               console.console_c if console else ffi.NULL)
         return lib.TCOD_console_list_save_xp(
             tcod_list, filename.encode('utf-8'), compress_level
             )
@@ -1562,7 +1590,7 @@ def heightmap_rain_erosion(hm, nbDrops, erosionCoef, sedimentationCoef, rnd=None
         rnd (Optional[Random]): A tcod.Random instance, or None.
     """
     lib.TCOD_heightmap_rain_erosion(_heightmap_cdata(hm), nbDrops, erosionCoef,
-                                    sedimentationCoef, _cdata(rnd))
+                                    sedimentationCoef, rnd.random_c if rnd else ffi.NULL)
 
 def heightmap_kernel_transform(hm, kernelsize, dx, dy, weight, minLevel,
                                maxLevel):
@@ -1625,7 +1653,7 @@ def heightmap_add_voronoi(hm, nbPoints, nbCoef, coef, rnd=None):
     nbPoints = len(coef)
     ccoef = ffi.new('float[]', coef)
     lib.TCOD_heightmap_add_voronoi(_heightmap_cdata(hm), nbPoints,
-                                   nbCoef, ccoef, _cdata(rnd))
+                                   nbCoef, ccoef, rnd.random_c if rnd else ffi.NULL)
 
 def heightmap_add_fbm(hm, noise, mulx, muly, addx, addy, octaves, delta, scale):
     """Add FBM noise to the heightmap.
@@ -1849,8 +1877,12 @@ def image_from_console(console):
         console (Console): Any Console instance.
     """
     return tcod.image.Image._from_cdata(
-        ffi.gc(lib.TCOD_image_from_console(_cdata(console)),
-               lib.TCOD_image_delete)
+        ffi.gc(
+            lib.TCOD_image_from_console(
+                console.console_c if console else ffi.NULL
+                ),
+            lib.TCOD_image_delete,
+            )
         )
 
 def image_refresh_console(image, console):
@@ -2301,7 +2333,7 @@ def random_set_distribution(rnd, dist):
         rnd (Optional[Random]): A Random instance, or None to use the default.
         dist (int): The distribution mode to use.  Should be DISTRIBUTION_*.
     """
-    lib.TCOD_random_set_distribution(_cdata(rnd), dist)
+    lib.TCOD_random_set_distribution(rnd.random_c if rnd else ffi.NULL, dist)
 
 def random_get_int(rnd, mi, ma):
     """Return a random integer in the range: ``mi`` <= n <= ``ma``.
@@ -2316,7 +2348,7 @@ def random_get_int(rnd, mi, ma):
     Returns:
         int: A random integer in the range ``mi`` <= n <= ``ma``.
     """
-    return lib.TCOD_random_get_int(_cdata(rnd), mi, ma)
+    return lib.TCOD_random_get_int(rnd.random_c if rnd else ffi.NULL, mi, ma)
 
 def random_get_float(rnd, mi, ma):
     """Return a random float in the range: ``mi`` <= n <= ``ma``.
@@ -2332,7 +2364,8 @@ def random_get_float(rnd, mi, ma):
         float: A random double precision float
                in the range ``mi`` <= n <= ``ma``.
     """
-    return lib.TCOD_random_get_double(_cdata(rnd), mi, ma)
+    return lib.TCOD_random_get_double(
+        rnd.random_c if rnd else ffi.NULL, mi, ma)
 
 def random_get_double(rnd, mi, ma):
     """Return a random float in the range: ``mi`` <= n <= ``ma``.
@@ -2341,7 +2374,8 @@ def random_get_double(rnd, mi, ma):
         Use :any:`random_get_float` instead.
         Both funtions return a double precision float.
     """
-    return lib.TCOD_random_get_double(_cdata(rnd), mi, ma)
+    return lib.TCOD_random_get_double(
+        rnd.random_c if rnd else ffi.NULL, mi, ma)
 
 def random_get_int_mean(rnd, mi, ma, mean):
     """Return a random weighted integer in the range: ``mi`` <= n <= ``ma``.
@@ -2357,7 +2391,8 @@ def random_get_int_mean(rnd, mi, ma, mean):
     Returns:
         int: A random weighted integer in the range ``mi`` <= n <= ``ma``.
     """
-    return lib.TCOD_random_get_int_mean(_cdata(rnd), mi, ma, mean)
+    return lib.TCOD_random_get_int_mean(
+        rnd.random_c if rnd else ffi.NULL, mi, ma, mean)
 
 def random_get_float_mean(rnd, mi, ma, mean):
     """Return a random weighted float in the range: ``mi`` <= n <= ``ma``.
@@ -2374,7 +2409,8 @@ def random_get_float_mean(rnd, mi, ma, mean):
         float: A random weighted double precision float
                in the range ``mi`` <= n <= ``ma``.
     """
-    return lib.TCOD_random_get_double_mean(_cdata(rnd), mi, ma, mean)
+    return lib.TCOD_random_get_double_mean(
+        rnd.random_c if rnd else ffi.NULL, mi, ma, mean)
 
 def random_get_double_mean(rnd, mi, ma, mean):
     """Return a random weighted float in the range: ``mi`` <= n <= ``ma``.
@@ -2383,7 +2419,8 @@ def random_get_double_mean(rnd, mi, ma, mean):
         Use :any:`random_get_float_mean` instead.
         Both funtions return a double precision float.
     """
-    return lib.TCOD_random_get_double_mean(_cdata(rnd), mi, ma, mean)
+    return lib.TCOD_random_get_double_mean(
+        rnd.random_c if rnd else ffi.NULL, mi, ma, mean)
 
 def random_save(rnd):
     """Return a copy of a random number generator.
@@ -2395,8 +2432,11 @@ def random_save(rnd):
         Random: A Random instance with a copy of the random generator.
     """
     return tcod.random.Random._new_from_cdata(
-        ffi.gc(ffi.cast('mersenne_data_t*', lib.TCOD_random_save(rnd.cdata)),
-               lib.TCOD_random_delete))
+        ffi.gc(
+            ffi.cast('mersenne_data_t*',
+                     lib.TCOD_random_save(rnd.random_c if rnd else ffi.NULL)),
+            lib.TCOD_random_delete),
+        )
 
 def random_restore(rnd, backup):
     """Restore a random number generator from a backed up copy.
@@ -2405,7 +2445,8 @@ def random_restore(rnd, backup):
         rnd (Optional[Random]): A Random instance, or None to use the default.
         backup (Random): The Random instance which was used as a backup.
     """
-    lib.TCOD_random_restore(_cdata(rnd), backup.cdata)
+    lib.TCOD_random_restore(rnd.random_c if rnd else ffi.NULL,
+                            backup.random_c)
 
 def random_delete(rnd):
     """Does nothing."""
@@ -2625,7 +2666,8 @@ def sys_check_for_event(mask, k, m):
         m (Optional[Mouse]): A tcod.Mouse instance which might be updated
                              with an event.  Can be None.
     """
-    return lib.TCOD_sys_check_for_event(mask, _cdata(k), _cdata(m))
+    return lib.TCOD_sys_check_for_event(
+        mask, k.cdata if k else ffi.NULL, m.cdata if m else ffi.NULL)
 
 def sys_wait_for_event(mask, k, m, flush):
     """Wait for an event then return.
@@ -2641,7 +2683,8 @@ def sys_wait_for_event(mask, k, m, flush):
                              with an event.  Can be None.
         flush (bool): Clear the event buffer before waiting.
     """
-    return lib.TCOD_sys_wait_for_event(mask, _cdata(k), _cdata(m), flush)
+    return lib.TCOD_sys_wait_for_event(
+        mask, k.cdata if k else ffi.NULL, m.cdata if m else ffi.NULL, flush)
 
 def sys_clipboard_set(text):
     return lib.TCOD_sys_clipboard_set(text.encode('utf-8'))

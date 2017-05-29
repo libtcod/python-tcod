@@ -30,7 +30,7 @@ class Random(object):
         """Create a new instance using this algorithm and seed."""
         if seed is None:
             seed = time.time() + time.clock()
-        self.cdata = ffi.gc(
+        self.random_c = ffi.gc(
             ffi.cast('mersenne_data_t*',
                      lib.TCOD_random_new_from_seed(algorithm,
                                                    hash(seed) % (1 << 32))),
@@ -40,7 +40,7 @@ class Random(object):
     def _new_from_cdata(cls, cdata):
         """Return a new instance encapsulating this cdata."""
         self = object.__new__(cls)
-        self.cdata = cdata
+        self.random_c = cdata
         return self
 
     def randint(self, low, high):
@@ -53,7 +53,7 @@ class Random(object):
         Returns:
             int: A random integer.
         """
-        return lib.TCOD_random_get_i(self.cdata, low, high)
+        return lib.TCOD_random_get_i(self.random_c, low, high)
 
     def uniform(self, low, high):
         """Return a random floating number in the range: low <= n <= high.
@@ -65,7 +65,7 @@ class Random(object):
         Returns:
             float: A random float.
         """
-        return lib.TCOD_random_get_double(self.cdata, low, high)
+        return lib.TCOD_random_get_double(self.random_c, low, high)
 
     def guass(self, mu, sigma):
         """Return a random number using Gaussian distribution.
@@ -77,7 +77,7 @@ class Random(object):
         Returns:
             float: A random float.
         """
-        return lib.TCOD_random_get_gaussian_double(self.cdata, mu, sigma)
+        return lib.TCOD_random_get_gaussian_double(self.random_c, mu, sigma)
 
     def inverse_guass(self, mu, sigma):
         """Return a random Gaussian number using the Box-Muller transform.
@@ -89,14 +89,28 @@ class Random(object):
         Returns:
             float: A random float.
         """
-        return lib.TCOD_random_get_gaussian_double_inv(self.cdata, mu, sigma)
+        return lib.TCOD_random_get_gaussian_double_inv(self.random_c, mu, sigma)
 
     def __getstate__(self):
-        """Pack the self.cdata attribute into a portable state."""
-        return {'cdata': (self.cdata.algo, self.cdata.distribution,
-                          list(self.cdata.mt), self.cdata.cur_mt,
-                          list(self.cdata.Q), self.cdata.c, self.cdata.cur)}
+        """Pack the self.random_c attribute into a portable state."""
+        state = self.__dict__.copy()
+        state['random_c'] = {
+            'algo': self.random_c.algo,
+            'distribution': self.random_c.distribution,
+            'mt': list(self.random_c.mt),
+            'cur_mt': self.random_c.cur_mt,
+            'Q': list(self.random_c.Q),
+            'c': self.random_c.c,
+            'cur': self.random_c.cur,
+            }
+        return state
 
     def __setstate__(self, state):
         """Create a new cdata object with the stored paramaters."""
-        self.cdata = ffi.new('mersenne_data_t*', state['cdata'])
+        try:
+            cdata = state['random_c']
+        except KeyError: # old/deprecated format
+            cdata = state['cdata']
+            del state['cdata']
+        state['random_c'] = ffi.new('mersenne_data_t*', cdata)
+        self.__dict__.update(state)

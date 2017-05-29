@@ -3,7 +3,6 @@ from __future__ import absolute_import
 
 import numpy as np
 
-from tcod.tcod import _cdata
 from tcod.libtcod import ffi, lib
 
 
@@ -129,7 +128,7 @@ class Image(object):
             console (Console): A Console with a pixel width and height
                                matching this Image.
         """
-        lib.TCOD_image_refresh_console(self.image_c, _cdata(console))
+        lib.TCOD_image_refresh_console(self.image_c, console.console_c)
 
     def _get_size(self):
         """Return the (width, height) for this Image.
@@ -204,8 +203,9 @@ class Image(object):
                              Set to 1 for no scaling.  Must be over 0.
             angle (float): Rotation angle in radians. (Clockwise?)
         """
-        lib.TCOD_image_blit(self.image_c, _cdata(console), x, y, bg_blend,
-                            scale_x, scale_y, angle)
+        lib.TCOD_image_blit(
+            self.image_c, console.console_c,
+            x, y, bg_blend, scale_x, scale_y, angle)
 
     def blit_rect(self, console, x, y, width, height, bg_blend):
         """Blit onto a Console without scaling or rotation.
@@ -218,8 +218,8 @@ class Image(object):
             height (int): Use -1 for Image height.
             bg_blend (int): Background blending mode to use.
         """
-        lib.TCOD_image_blit_rect(self.image_c, _cdata(console),
-                                 x, y, width, height, bg_blend)
+        lib.TCOD_image_blit_rect(
+            self.image_c, console.console_c, x, y, width, height, bg_blend)
 
     def blit_2x(self, console, dest_x, dest_y,
                 img_x=0, img_y=0, img_width=-1, img_height=-1):
@@ -236,8 +236,9 @@ class Image(object):
             img_height (int): Height of the Image to blit.
                               Use -1 for the full Image height.
         """
-        lib.TCOD_image_blit_2x(self.image_c, _cdata(console), dest_x, dest_y,
-                               img_x, img_y, img_width, img_height)
+        lib.TCOD_image_blit_2x(
+            self.image_c, console.console_c,
+            dest_x, dest_y, img_x, img_y, img_width, img_height)
 
     def save_as(self, filename):
         """Save the Image to a 32-bit .bmp or .png file.
