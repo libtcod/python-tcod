@@ -1,6 +1,20 @@
 ===========
  Changelog
 ===========
+3.1.0 - 2017-05-28
+------------------
+Added
+ * You can now pass tdl Console instances as parameters to libtcod-cffi
+   functions expecting a tcod Console.
+Changed
+ * Dependencies updated: `libtcod-cffi>=2.5.0,<3`
+ * The `Console.tcod_console` attribute is being renamed to
+   `Console.console_c`.
+Deprecated
+ * The tdl.noise and tdl.map modules will be deprecated in the future.
+Fixed
+ * Resolved crash-on-exit issues for Windows platforms.
+
 3.0.2 - 2017-04-13
 ------------------
 Changed
