@@ -92,6 +92,12 @@ class Quit(Event):
     __slots__ = ()
     type = 'QUIT'
 
+    def __eq__(self, other):
+        """Grants eqaulity between any two instances of Quit.
+        Useful for `event.Quit() in tdl.event.get() kinds of comparisions.`
+        """
+        return isinstance(other, Quit)
+
 class KeyEvent(Event):
 
     def __init__(self, key='', char='', text='', shift=False,
@@ -515,4 +521,3 @@ App.runOnce = _style.backport(App.run_once)
 keyWait = _style.backport(key_wait)
 setKeyRepeat = _style.backport(set_key_repeat)
 isWindowClosed = _style.backport(is_window_closed)
-
