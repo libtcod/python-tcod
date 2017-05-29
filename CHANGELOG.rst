@@ -1,6 +1,13 @@
 ===========
  Changelog
 ===========
+2.5.0 - 2017-05-28
+------------------
+Changed
+  * Pickle-able objects will have any subclasses pickled correctly now.
+    The new objects can not be unpickled on older versions of libtcod-cffi.
+  * Updated cdata attribute names in Map, Console, and Random.
+
 2.4.4 - 2017-05-20
 ------------------
 Fixed

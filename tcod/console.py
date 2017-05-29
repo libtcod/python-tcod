@@ -98,6 +98,10 @@ class Console(object):
         width (int): Width of the new Console.
         height (int): Height of the new Console.
 
+    Attributes:
+        console_c (CData): A cffi pointer to a TCOD_console_t object.
+            .. versionadded:: 2.5
+
     .. versionadded:: 2.0
     """
 

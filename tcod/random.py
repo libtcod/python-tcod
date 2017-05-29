@@ -25,6 +25,10 @@ class Random(object):
         algorithm (int): The algorithm to use.
         seed (Optional[Hashable]):
             Could be a 32-bit integer, but any hashable object is accepted.
+
+    Attributes:
+        random_c (CData): A cffi pointer to a TCOD_random_t object.
+            .. versionadded:: 2.5
     """
     def __init__(self, algorithm, seed=None):
         """Create a new instance using this algorithm and seed."""

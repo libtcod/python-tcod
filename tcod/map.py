@@ -31,6 +31,8 @@ class Map(object):
     Attributes:
         width (int): Read only width of this Map.
         height (int): Read only height of this Map.
+        map_c (CData): A cffi pointer to a TCOD_map_t object.
+            .. versionadded:: 2.5
     """
 
     def __init__(self, width, height):

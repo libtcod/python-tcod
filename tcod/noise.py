@@ -69,6 +69,10 @@ class Noise(object):
                          implementations.
         rand (Optional[Random]): A Random instance, or None.
 
+    Attributes:
+        noise_c (CData): A cffi pointer to a TCOD_noise_t object.
+            .. versionadded:: 2.5
+
     .. versionadded:: 2.0
     """
 
