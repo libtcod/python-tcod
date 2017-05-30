@@ -63,7 +63,7 @@ Extra requirements when installing directly from source
 * MinGW_ must be on the Windows path for use with pycparser.
   An equivalent C parser (such as `gcc`) must be installed on other OS's.
 * Linux requires the packages:
-  `gcc` `libsdl2-dev` `libffi-dev` `python-dev`
+  `gcc` `libsdl2-dev` `libffi-dev` `python-dev` `libomp-dev`
 * SDL2 is installed automatically on Windows and MacOS
 
 =========
