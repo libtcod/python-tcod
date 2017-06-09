@@ -1,6 +1,13 @@
 ===========
  Changelog
 ===========
+Unreleased
+------------------
+Added
+- PyPy v5.7/v5.8 wheels added to PyPi.
+Fixed
+- Fixed an issue preventing the deployment of PyPy wheels on MacOS.
+
 2.5.0 - 2017-05-28
 ------------------
 Changed

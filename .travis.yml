@@ -20,12 +20,15 @@ matrix:
   - os: osx
     language: generic
     env: PYPY_VERSION=5.4.1
-#  - os: osx
-#    language: generic
-#    env: PYPY_VERSION=5.6.0
-  allow_failures:
   - os: osx
-    env: PYPY_VERSION=5.4.1
+    language: generic
+    env: PYPY_VERSION=5.6.0
+  - os: osx
+    language: generic
+    env: PYPY_VERSION=5.7.1
+  - os: osx
+    language: generic
+    env: PYPY_VERSION=5.8.0
 
   fast_finish: true
 
@@ -49,7 +52,7 @@ before_install:
 - source .travis/install_python.sh
 - pip install --upgrade pip setuptools
 - 'pip install -U hg+https://bitbucket.org/HexDecimal/wheel@abi3-windows-fix#egg=wheel'
-- 'if [[ "$TRAVIS_PYTHON_VERSION" == pypy* ]]; then pip install git+https://bitbucket.org/pypy/numpy.git; fi'
+- 'if [[ "$TRAVIS_PYTHON_VERSION" == pypy* || -n "$PYPY_VERSION" ]]; then pip install git+https://bitbucket.org/pypy/numpy.git; fi'
 - pip install --requirement requirements.txt
 install:
 - if [[ -z "$TRAVIS_TAG" ]]; then export BUILD_FLAGS="-g"; fi
