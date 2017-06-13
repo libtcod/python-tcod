@@ -6,7 +6,7 @@
 ========
 |VersionsBadge| |ImplementationBadge| |LicenseBadge|
 
-|PyPI| |RTD| |Appveyor| |Travis| |Coveralls| |Codacy| |Scrutinizer|
+|PyPI| |RTD| |Appveyor| |Travis| |Coveralls| |Codecov| |Codacy| |Scrutinizer|
 
 |Requires| |Pyup|
 
@@ -96,6 +96,9 @@ Read LICENSE.txt_ for more details.
 
 .. |Coveralls| image:: https://coveralls.io/repos/github/HexDecimal/libtcod-cffi/badge.svg?branch=master
     :target: https://coveralls.io/github/HexDecimal/libtcod-cffi?branch=master
+
+.. |Codecov| image:: https://codecov.io/gh/HexDecimal/libtcod-cffi/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/HexDecimal/libtcod-cffi
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/libtcod-cffi.svg?maxAge=10800
     :target: https://pypi.python.org/pypi/libtcod-cffi

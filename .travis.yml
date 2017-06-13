@@ -64,14 +64,15 @@ before_script:
  - pip install pytest pytest-cov pytest-benchmark
 script:
 - pytest -v --benchmark-disable
-- pip install -U dist/*.whl
-- cd / || python -c "import tcod"
+- cd dist
+- pip install --no-dependencies -U *.whl
+- python -c "import tcod"
 - cd -
 after_success:
- - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip install codacy-coverage python-coveralls; fi'
- - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then coveralls; fi'
- - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then coverage xml; fi'
- - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then python-codacy-coverage -r coverage.xml; fi'
- - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then bash <(curl -s https://codecov.io/bash); fi'
- - if [[ -n "$TRAVIS_TAG" ]]; then pip install twine; fi
- - if [[ -n "$TRAVIS_TAG" && "$TRAVIS_OS_NAME" == "osx" ]]; then twine upload -u $PYPI_USER -p $PYPI_PASS --skip-existing dist/*; fi
+- pip install codacy-coverage python-coveralls codecov
+- codecov
+- coveralls
+- coverage xml
+- python-codacy-coverage -r coverage.xml
+- if [[ -n "$TRAVIS_TAG" ]]; then pip install twine; fi
+- if [[ -n "$TRAVIS_TAG" && "$TRAVIS_OS_NAME" == "osx" ]]; then twine upload --skip-existing dist/*; fi
