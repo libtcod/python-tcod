@@ -13,10 +13,12 @@ import numpy as _np
 
 from tcod.libtcod import lib, ffi, BKGND_DEFAULT, BKGND_SET
 
+
 def _unpack_char_p(char_p):
     if char_p == ffi.NULL:
         return ''
     return ffi.string(char_p).decode()
+
 
 def _int(int_or_str):
     'return an integer where a single character string may be expected'
@@ -26,17 +28,6 @@ def _int(int_or_str):
         return int_or_str[0]
     return int(int_or_str) # check for __count__
 
-def _cdata(cdata):
-    """covert value into a cffi.CData instance"""
-    try: # first check for _CDataWrapper
-        cdata = cdata.cdata
-    except AttributeError: # assume cdata is valid
-        pass
-    except KeyError:
-        pass
-    if cdata is None or cdata == 0: # convert None to NULL
-        cdata = ffi.NULL
-    return cdata
 
 if _sys.version_info[0] == 2: # Python 2
     def _bytes(string):
@@ -60,11 +51,13 @@ else: # Python 3
             return string.decode('latin-1')
         return string
 
+
 def _fmt_bytes(string):
     return _bytes(string).replace(b'%', b'%%')
 
 def _fmt_unicode(string):
     return _unicode(string).replace(u'%', u'%%')
+
 
 class _PropagateException():
     """ context manager designed to propagate exceptions outside of a cffi
@@ -110,6 +103,7 @@ class _PropagateException():
             exception.__traceback__ = traceback
             raise exception
 
+
 class _CDataWrapper(object):
 
     def __init__(self, *args, **kargs):
@@ -144,35 +138,3 @@ class _CDataWrapper(object):
             setattr(self.cdata, attr, value)
         else:
             super(_CDataWrapper, self).__setattr__(attr, value)
-
-def _assert_cdata_is_not_null(func):
-    """Any BSP methods which use a cdata object in a TCOD call need to have
-    a sanity check, otherwise it may end up passing a NULL pointer"""
-    if __debug__:
-        @_functools.wraps(func)
-        def check_sanity(*args, **kargs):
-            assert self.cdata != ffi.NULL and self.cdata is not None, \
-                   'cannot use function, cdata is %r' % self.cdata
-            return func(*args, **kargs)
-    return func
-
-
-def clipboard_set(string):
-    """Set the clipboard contents to string.
-
-    Args:
-        string (AnyStr): A Unicode or UTF-8 encoded string.
-
-    .. versionadded:: 2.0
-    """
-    lib.TCOD_sys_clipboard_set(_bytes(string))
-
-def clipboard_get():
-    """Return the current contents of the clipboard.
-
-    Returns:
-        Text: The clipboards current contents.
-
-    .. versionadded:: 2.0
-    """
-    return _unpack_char_p(lib.TCOD_sys_clipboard_get())

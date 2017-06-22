@@ -39,7 +39,6 @@ import operator
 
 import numpy as np
 
-from tcod.tcod import _cdata
 from tcod.libtcod import ffi, lib
 import tcod.libtcod
 

@@ -44,54 +44,6 @@ else:
         return string.replace('%', '%%')
 
 
-class _ChBufferArray(np.ndarray):
-    """Numpy subclass designed to access libtcod's character buffer.
-
-    This class needs to modify the char_t.cf attribute as a side effect so that
-    libtcod will select the correct characters on flush.
-    """
-
-    def __new__(cls, ch_array, cf_array):
-        self = ch_array.view(cls)
-        self._cf_array = cf_array
-        return self
-
-    def __array_finalize__(self, obj):
-        if obj is None:
-            return
-        self._cf_array = None
-
-    def __repr__(self):
-        return repr(self.view(np.ndarray))
-
-    def __getitem__(self, index):
-        """Slicing this array also slices its _cf_array attribute."""
-        array = np.ndarray.__getitem__(self, index)
-        if self._cf_array is None or array.size == 1:
-            return array.view(np.ndarray)
-        array._cf_array = self._cf_array[index]
-        return array
-
-    def _covert_ch_to_cf(self, index, ch_arr):
-        """Apply a set of Unicode variables to libtcod's special format.
-
-        _cf_array should be the same shape as ch_arr after being sliced by
-        index.
-        """
-        if lib.TCOD_ctx.max_font_chars == 0:
-            return # libtcod not initialized
-        ch_table = ffi.buffer(
-            lib.TCOD_ctx.ascii_to_tcod[0:lib.TCOD_ctx.max_font_chars])
-        ch_table = np.frombuffer(ch_table, np.intc)
-        self._cf_array[index] = ch_table[ch_arr.ravel()].reshape(ch_arr.shape)
-
-    def __setitem__(self, index, value):
-        """Properly set up the char_t.cf variables as a side effect."""
-        np.ndarray.__setitem__(self, index, value)
-        if self._cf_array is not None:
-            self._covert_ch_to_cf(index, self[index])
-
-
 class Console(object):
     """
     Args:
