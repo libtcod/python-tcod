@@ -65,7 +65,7 @@ before_script:
 script:
 - pytest -v --benchmark-disable
 - cd dist
-- pip install --no-dependencies -U *.whl
+- pip install --upgrade *.whl
 - python -c "import tcod"
 - cd -
 after_success:

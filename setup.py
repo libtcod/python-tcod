@@ -10,6 +10,8 @@ from setuptools import setup, Command
 
 exec(open('tcod/version.py').read()) # get __version__
 
+is_pypy = platform.python_implementation() == 'PyPy'
+
 def get_package_data():
     '''get data files which will be included in the main tcod/ directory'''
     BITSIZE, LINKAGE = platform.architecture()
@@ -48,7 +50,7 @@ setup(
     cffi_modules=['build_libtcod.py:ffi'],
     install_requires=[
         'cffi>=1.8.1,<2',
-        'numpy>=1.10,<2',
+        'numpy>=1.10,<2' if not is_pypy else '',
         ],
     tests_require=[
         'pytest',

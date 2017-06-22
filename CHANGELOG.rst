@@ -11,7 +11,7 @@ Changed
 - `AStar` and `Dijkstra` no longer take the `width` or `height` parameters.
   You now set these parameters via `EdgeCostCallback`.
 Fixed
-- Fixed an issue preventing the deployment of PyPy wheels on MacOS.
+- Resolved an issue where pip install would clobber NumPyPy.
 
 2.5.0 - 2017-05-28
 ------------------
