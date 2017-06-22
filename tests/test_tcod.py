@@ -12,12 +12,14 @@ from common import tcod, raise_Exception
 import tcod.noise
 import tcod.path
 
+
 def test_line_error():
     """
     test exception propagation
     """
     with pytest.raises(Exception):
         tcod.line(*LINE_ARGS, py_callback=raise_Exception)
+
 
 def test_tcod_bsp():
     """
@@ -86,6 +88,7 @@ def test_console_defaults(console):
     console.default_alignment = tcod.RIGHT
     assert console.default_alignment == tcod.RIGHT
 
+
 def test_console_methods(console):
     console.put_char(0, 0, ord('@'))
     console.print_(0, 0, 'Test')
@@ -97,6 +100,7 @@ def test_console_methods(console):
     console.print_frame(0, 0, 8, 8, 'Frame')
     console.blit(0, 0, 0, 0, console, 0, 0)
     console.set_key_color((254, 0, 254))
+
 
 def test_tcod_map_set_bits(benchmark):
     map_ = tcod.map.Map(2,2)
@@ -119,17 +123,20 @@ def test_tcod_map_get_bits(benchmark):
     map_ = tcod.map.Map(2,2)
     benchmark(map_.transparent.__getitem__, 0)
 
+
 def test_tcod_map_copy(benchmark):
     map_ = tcod.map.Map(3, 3)
     map_.transparent[:] = True
     assert (map_.buffer[:].tolist() == copy.copy(map_).buffer[:].tolist())
     benchmark(copy.copy, map_)
 
+
 def test_tcod_map_pickle():
     map_ = tcod.map.Map(3, 3)
     map_.transparent[:] = True
     assert (map_.buffer[:].tolist() ==
             pickle.loads(pickle.dumps(copy.copy(map_))).buffer[:].tolist())
+
 
 @pytest.mark.parametrize('implementation', [tcod.noise.SIMPLE,
                                             tcod.noise.FBM,
@@ -148,12 +155,14 @@ def test_noise_class(implementation):
     noise.sample_mgrid(np.mgrid[:2,:3])
     noise.sample_ogrid(np.ogrid[:2,:3])
 
+
 def test_noise_samples():
     noise = tcod.noise.Noise(2, tcod.NOISE_SIMPLEX, tcod.noise.SIMPLE)
     np.testing.assert_equal(
         noise.sample_mgrid(np.mgrid[:32,:24]),
         noise.sample_ogrid(np.ogrid[:32,:24]),
         )
+
 
 def test_noise_errors():
     with pytest.raises(ValueError):
@@ -166,6 +175,7 @@ def test_noise_errors():
     with pytest.raises(ValueError):
         noise.sample_ogrid(np.ogrid[:2,:2,:2])
 
+
 @pytest.mark.parametrize('implementation',
     [tcod.noise.SIMPLE, tcod.noise.FBM, tcod.noise.TURBULENCE])
 def test_noise_pickle(implementation):
@@ -175,12 +185,14 @@ def test_noise_pickle(implementation):
     assert (noise.sample_ogrid(np.ogrid[:3,:1]) ==
             noise2.sample_ogrid(np.ogrid[:3,:1])).all()
 
+
 def test_noise_copy():
     rand = tcod.random.Random(tcod.random.MERSENNE_TWISTER, 42)
     noise = tcod.noise.Noise(2, rand=rand)
     noise2 = pickle.loads(pickle.dumps(noise))
     assert (noise.sample_ogrid(np.ogrid[:3,:1]) ==
             noise2.sample_ogrid(np.ogrid[:3,:1])).all()
+
 
 def test_color_class():
     assert tcod.black == tcod.black
@@ -199,6 +211,7 @@ def test_color_class():
     color.b = 3
     assert color == (1, 2, 3)
 
+
 @pytest.mark.parametrize('dtype', [np.int8, np.int16, np.int32,
                                    np.uint8, np.uint16, np.uint32, np.float32])
 def test_path_numpy(dtype):
@@ -206,17 +219,33 @@ def test_path_numpy(dtype):
     map_np[1:4, 1:4] = 0
 
     astar = tcod.path.AStar(map_np, 0)
+    astar = pickle.loads(pickle.dumps(astar)) # test pickle
+    astar = tcod.path.AStar(astar.cost, 0) # use existing cost attribute
     assert len(astar.get_path(0, 0, 5, 5)) == 10
 
     dijkstra = tcod.path.Dijkstra(map_np, 0)
     dijkstra.set_goal(0, 0)
     assert len(dijkstra.get_path(5, 5)) == 10
+    repr(dijkstra) # cover __repr__ methods
+
+    # cover errors
+    with pytest.raises(ValueError):
+        tcod.path.AStar(np.ones((3, 3, 3), dtype=dtype))
+    with pytest.raises(ValueError):
+        tcod.path.AStar(np.ones((2, 2), dtype=np.float64))
+
+
+def path_cost(this_x, this_y, dest_x, dest_y):
+        return 1
 
 def test_path_callback():
-    def path_cost(this_x, this_y, dest_x, dest_y):
-        return 1
-    astar = tcod.path.AStar(path_cost, width=10, height=10)
+    astar = tcod.path.AStar(
+        tcod.path.EdgeCostCallback(path_cost, width=10, height=10)
+        )
+    astar = pickle.loads(pickle.dumps(astar))
     assert len(astar.get_path(0, 0, 9, 9)) == 9
+    repr(astar) # cover __repr__ methods
+
 
 def test_key_repr():
     Key = tcod.Key
@@ -225,6 +254,7 @@ def test_key_repr():
     assert key.vk == key_copy.vk
     assert key.c == key_copy.c
     assert key.shift == key_copy.shift
+
 
 def test_mouse_repr():
     Mouse = tcod.Mouse

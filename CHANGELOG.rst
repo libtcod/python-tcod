@@ -5,6 +5,11 @@ Unreleased
 ------------------
 Added
 - PyPy v5.7/v5.8 wheels added to PyPi.
+- Pickle support for tcod.path classes.
+- Added wrapper classes `EdgeCostCallback` and `NodeCostArray` to `tcod.path`
+Changed
+- `AStar` and `Dijkstra` no longer take the `width` or `height` parameters.
+  You now set these parameters via `EdgeCostCallback`.
 Fixed
 - Fixed an issue preventing the deployment of PyPy wheels on MacOS.
 
