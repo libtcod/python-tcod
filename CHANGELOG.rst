@@ -1,7 +1,7 @@
 ===========
  Changelog
 ===========
-Unreleased
+3.0.0 - 2017-06-24
 ------------------
 Added
 - PyPy v5.7/v5.8 wheels added to PyPi.
