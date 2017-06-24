@@ -49,14 +49,6 @@ class Color(list):
         """new in libtcod-cffi"""
         return cls(cdata.r, cdata.g, cdata.b)
 
-
-    @classmethod
-    def _new_from_int(cls, integer):
-        """a TDL int color: 0xRRGGBB
-
-        new in libtcod-cffi"""
-        return cls._new_from_cdata(lib.TDL_color_from_int(integer))
-
     def __getitem__(self, index):
         try:
             return list.__getitem__(self, index)
@@ -99,10 +91,6 @@ class Color(list):
         """Return a printable representation of the current color."""
         return "%s(%i,%i,%i)" % (self.__class__.__name__,
                                  self.r, self.g, self.b)
-
-    def __int__(self):
-        """Return this color as an integer in 0xRRGGBB format."""
-        return lib.TDL_color_RGB(*self)
 
 
 def _import_colors(lib):

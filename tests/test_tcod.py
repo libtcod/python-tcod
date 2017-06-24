@@ -216,11 +216,6 @@ def test_color_class():
     assert color == (1, 2, 3)
 
 
-def test_color_tdl():
-    # test old, could maybe be made deprecated, TDL behavior
-    color = tcod.Color(1, 2, 3)
-    assert color == tcod.Color._new_from_int(int(color))
-
 @pytest.mark.parametrize('dtype', [np.int8, np.int16, np.int32,
                                    np.uint8, np.uint16, np.uint32, np.float32])
 def test_path_numpy(dtype):

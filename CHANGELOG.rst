@@ -12,6 +12,8 @@ Changed
   You now set these parameters via `EdgeCostCallback`.
 Fixed
 - Resolved an issue where pip install would clobber NumPyPy.
+Removed
+- Removed broken tdl-style int/color conversions from Color.
 
 2.5.0 - 2017-05-28
 ------------------
