@@ -62,7 +62,7 @@ int* TDL_color_int_to_array(int color){
 }
 
 int TDL_color_RGB(int r, int g, int b){
-    return ((r << 16) & 0xff) | ((g << 8) & 0xff) | (b & 0xff);
+    return ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
 }
 
 int TDL_color_HSV(float h, float s, float v){

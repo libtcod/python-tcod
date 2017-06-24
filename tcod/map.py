@@ -75,7 +75,6 @@ class Map(object):
         state = self.__dict__.copy()
         del state['map_c']
         return state
-        return {'size': (self.width, self.height), 'buffer': self.buffer}
 
     def __setstate__(self, state):
         """Unpack this object from a saved state.  A new buffer is used."""

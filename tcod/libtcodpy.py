@@ -1631,10 +1631,14 @@ def heightmap_kernel_transform(hm, kernelsize, dx, dy, weight, minLevel,
     * The weight array will contain 0.33 for each cell.
 
     Example:
+        >>> import numpy as np
+        >>> heightmap = np.zeros((3, 3), dtype=np.float32)
+        >>> heightmap[:,1] = 1
         >>> dx = [-1, 1, 0]
         >>> dy = [0, 0, 0]
         >>> weight = [0.33, 0.33, 0.33]
-        >>> tcod.heightMap_kernel_transform(heightmap,3,dx,dy,weight,0.0,1.0)
+        >>> tcod.heightmap_kernel_transform(heightmap, 3, dx, dy, weight,
+        ...                                 0.0, 1.0)
     """
     cdx = ffi.new('int[]', dx)
     cdy = ffi.new('int[]', dy)

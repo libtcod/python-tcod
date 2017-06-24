@@ -45,6 +45,13 @@ def test_tcod_bsp():
     sub_bsp.split_recursive(3, 2, 2, 1, 1)
     assert sub_bsp.children[0].level == 2
 
+    # cover find_node method
+    assert bsp.find_node(0, 0)
+    assert bsp.find_node(-1, -1) is None
+
+    # cover __str__
+    str(bsp)
+
 
 def test_array_read_write(console):
     FG = (255, 254, 253)
@@ -211,6 +218,11 @@ def test_color_class():
     color.b = 3
     assert color == (1, 2, 3)
 
+
+def test_color_tdl():
+    # test old, could maybe be made deprecated, TDL behavior
+    color = tcod.Color(1, 2, 3)
+    assert color == tcod.Color._new_from_int(int(color))
 
 @pytest.mark.parametrize('dtype', [np.int8, np.int16, np.int32,
                                    np.uint8, np.uint16, np.uint32, np.float32])

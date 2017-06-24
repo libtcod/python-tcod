@@ -1,11 +1,51 @@
+"""
 
-from __future__ import absolute_import as _
+Example::
+
+    >>> import numpy as np
+    >>> import tcod.path
+    >>> dungeon = np.array(
+    ...     [
+    ...         [1, 0, 1, 1, 1],
+    ...         [1, 0, 1, 0, 1],
+    ...         [1, 1, 1, 0, 1],
+    ...     ],
+    ...     dtype=np.int8,
+    ...     )
+    ...
+    >>> height, width = dungeon.shape
+
+    # Create a pathfinder from a numpy array.
+    # This is the recommended way to use the tcod.path module.
+    >>> astar = tcod.path.AStar(dungeon)
+    >>> print(astar.get_path(0, 0, 4, 2))
+    [(0, 1), (1, 2), (2, 1), (3, 0), (4, 1), (4, 2)]
+    >>> astar.cost[0, 1] = 1 # You can access the map array via this attribute.
+    >>> print(astar.get_path(0, 0, 4, 2))
+    [(1, 0), (2, 0), (3, 0), (4, 1), (4, 2)]
+
+    # Create a pathfinder from an edge_cost function.
+    # Calling Python functions from C is known to be very slow.
+    >>> def edge_cost(my_x, my_y, dest_x, dest_y):
+    ...     return dungeon[dest_y, dest_x]
+    ...
+    >>> dijkstra = tcod.path.Dijkstra(
+    ...     tcod.path.EdgeCostCallback(edge_cost, width, height),
+    ...     )
+    ...
+    >>> dijkstra.set_goal(0, 0)
+    >>> print(dijkstra.get_path(4, 2))
+    [(1, 0), (2, 0), (3, 0), (4, 1), (4, 2)]
+"""
+
+from __future__ import absolute_import
 
 import numpy as np
 
 import tcod.map
 
 from tcod.libtcod import lib, ffi
+
 
 @ffi.def_extern()
 def _pycall_path_old(x1, y1, x2, y2, handle):
@@ -71,6 +111,7 @@ class _EdgeCostFunc(object):
 
     def __getstate__(self):
         state = self.__dict__.copy()
+        # _userdata_p can't be pickled.
         state['_userdata_p'] = None
         return state
 
@@ -141,23 +182,9 @@ class NodeCostArray(np.ndarray):
 
 
 class _PathFinder(object):
-    """
-    .. versionadded:: 2.0
-    """
+    """A class sharing methods used by AStar and Dijkstra."""
 
     def __init__(self, cost, diagonal=1.41):
-        """
-        .. versionchanged:: 3.0
-            Removed width and height parameters.
-
-            Callbacks must be wrapped in an :any:`tcod.path.EdgeCostCallback`
-            instance or similar.
-
-        Args:
-            cost (Union[tcod.map.Map, numpy.ndarray, Any]):
-            diagonal (float): Multiplier for diagonal movement.
-                A value of 0 will disable diagonal movement entirely.
-        """
         self.cost = cost
         self.diagonal = diagonal
         self._path_c = None
@@ -171,7 +198,7 @@ class _PathFinder(object):
 
         if not hasattr(self.cost, 'get_cffi_callback'):
             assert not callable(self.cost), \
-                "A callback alone is missing width&height information."
+                "Any callback alone is missing width&height information."
             self.cost = NodeCostArray(self.cost)
 
         callback, userdata = self.cost.get_cffi_callback()
@@ -207,6 +234,17 @@ class _PathFinder(object):
 class AStar(_PathFinder):
     """
     .. versionadded:: 2.0
+
+    .. versionchanged:: 3.0
+            Removed width and height parameters.
+
+            Callbacks must be wrapped in an :any:`tcod.path.EdgeCostCallback`
+            instance or similar.
+
+    Args:
+        cost (Union[tcod.map.Map, numpy.ndarray, Any]):
+        diagonal (float): Multiplier for diagonal movement.
+            A value of 0 will disable diagonal movement entirely.
     """
 
     def get_path(self, start_x, start_y, goal_x, goal_y):
@@ -233,6 +271,17 @@ class AStar(_PathFinder):
 class Dijkstra(_PathFinder):
     """
     .. versionadded:: 2.0
+
+    .. versionchanged:: 3.0
+            Removed width and height parameters.
+
+            Callbacks must be wrapped in an :any:`tcod.path.EdgeCostCallback`
+            instance or similar.
+
+    Args:
+        cost (Union[tcod.map.Map, numpy.ndarray, Any]):
+        diagonal (float): Multiplier for diagonal movement.
+            A value of 0 will disable diagonal movement entirely.
     """
 
     _path_new_using_map = lib.TCOD_dijkstra_new

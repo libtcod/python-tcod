@@ -1,4 +1,4 @@
-"""
+'''
 The following example shows how to travrse the BSP tree using Python.  This
 assumes `create_room` and `connect_rooms` will be replaced by custom code.
 
@@ -7,16 +7,16 @@ Example::
     import tcod.bsp
 
     def create_room(node):
-        \"""Initialize the room at this current node.\"""
+        """Initialize the room at this current node."""
         print('Create a room for %s.' % node)
 
     def connect_rooms(node):
-        \"""Connect two fully initialized rooms.\"""
+        """Connect two fully initialized rooms."""
         node1, node2 = node.children
         print('Connect the rooms:\\n%s\\n%s' % (node1, node2))
 
     def traverse(node):
-        \"""Traverse a BSP tree dispatching nodes to the correct calls.\"""
+        """Traverse a BSP tree dispatching nodes to the correct calls."""
         # For nodes without children, node.children is an empty tuple.
         for child in node.children:
             traverse(child)
@@ -35,7 +35,7 @@ Example::
         max_vertical_raito=1.5,
         )
     traverse(bsp)
-"""
+'''
 from __future__ import absolute_import as _
 
 from tcod.libtcod import lib, ffi

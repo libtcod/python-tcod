@@ -55,7 +55,7 @@ class Color(list):
         """a TDL int color: 0xRRGGBB
 
         new in libtcod-cffi"""
-        return cls(lib.TDL_color_from_int(integer))
+        return cls._new_from_cdata(lib.TDL_color_from_int(integer))
 
     def __getitem__(self, index):
         try:
