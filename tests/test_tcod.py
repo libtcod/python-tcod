@@ -109,7 +109,7 @@ def test_console_methods(console):
     console.set_key_color((254, 0, 254))
 
 
-def test_tcod_map_set_bits(benchmark):
+def test_tcod_map_set_bits():
     map_ = tcod.map.Map(2,2)
 
     assert map_.transparent[:].any() == False
@@ -123,19 +123,16 @@ def test_tcod_map_set_bits(benchmark):
     map_.fov[1, 0] = True
     assert tcod.map_is_in_fov(map_, 0, 1) == True
 
-    benchmark(map_.transparent.__setitem__, 0, 0)
 
-
-def test_tcod_map_get_bits(benchmark):
+def test_tcod_map_get_bits():
     map_ = tcod.map.Map(2,2)
-    benchmark(map_.transparent.__getitem__, 0)
+    map_.transparent[0]
 
 
-def test_tcod_map_copy(benchmark):
+def test_tcod_map_copy():
     map_ = tcod.map.Map(3, 3)
     map_.transparent[:] = True
     assert (map_.buffer[:].tolist() == copy.copy(map_).buffer[:].tolist())
-    benchmark(copy.copy, map_)
 
 
 def test_tcod_map_pickle():

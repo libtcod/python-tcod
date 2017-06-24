@@ -77,9 +77,9 @@ install:
 - cmd: "%PYTHON% setup.py build sdist develop bdist_wheel"
 build: off
 before_test:
-- cmd: "%PYTHON% -m pip install pytest pytest-cov pytest-benchmark"
+- cmd: "%PYTHON% -m pip install pytest pytest-cov"
 test_script:
-- cmd: "%PYTHON% -m pytest -v --benchmark-disable"
+- cmd: "%PYTHON% -m pytest -v"
 
 on_success:
 - "C:\\Python27\\python.exe -m virtualenv py27venv"

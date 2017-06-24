@@ -61,9 +61,9 @@ install:
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-wheel -v dist/*.whl; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-listdeps --all dist/*.whl; fi'
 before_script:
- - pip install pytest pytest-cov pytest-benchmark
+ - pip install pytest pytest-cov
 script:
-- pytest -v --benchmark-disable
+- pytest -v
 - cd dist
 - pip install --upgrade *.whl
 - python -c "import tcod"
