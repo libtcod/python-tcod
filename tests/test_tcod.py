@@ -106,7 +106,18 @@ def test_console_methods(console):
     console.vline(1, 0, 10)
     console.print_frame(0, 0, 8, 8, 'Frame')
     console.blit(0, 0, 0, 0, console, 0, 0)
+    console.blit(0, 0, 0, 0, console, 0, 0, key_color=(0, 0, 0))
     console.set_key_color((254, 0, 254))
+
+
+def test_console_pickle(console):
+    console.ch[...] = ord('.')
+    console.fg[...] = (10, 20, 30)
+    console.bg[...] = (1, 2, 3)
+    console2 = pickle.loads(pickle.dumps(console))
+    assert (console.ch == console2.ch).all()
+    assert (console.fg == console2.fg).all()
+    assert (console.bg == console2.bg).all()
 
 
 def test_tcod_map_set_bits():

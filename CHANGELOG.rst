@@ -1,6 +1,12 @@
 ===========
  Changelog
 ===========
+
+Unreleased
+------------------
+Added
+- Console instances can now be pickled.
+
 3.0.0 - 2017-06-24
 ------------------
 Added

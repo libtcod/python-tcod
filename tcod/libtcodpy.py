@@ -1066,6 +1066,8 @@ def console_blit(src, x, y, w, h, dst, xdst, ydst, ffade=1.0,bfade=1.0):
 def console_set_key_color(con, col):
     """Set a consoles blit transparent color."""
     lib.TCOD_console_set_key_color(con.console_c if con else ffi.NULL, col)
+    if hasattr(con, 'set_key_color'):
+        con.set_key_color(col)
 
 def console_delete(con):
     con = con.console_c if con else ffi.NULL

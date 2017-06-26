@@ -29,9 +29,8 @@ import sys
 
 import numpy as np
 
+import tcod.libtcod
 from tcod.libtcod import ffi, lib
-from tcod.libtcod import BKGND_DEFAULT, BKGND_SET
-
 
 if sys.version_info[0] == 2: # Python 2
     def _fmt(string):
@@ -58,9 +57,23 @@ class Console(object):
     """
 
     def __init__(self, width, height):
-        self.console_c = ffi.gc(lib.TCOD_console_new(width, height),
-                            lib.TCOD_console_delete)
-        self._init_setup_console_data()
+        self._key_color = None
+        self._ch = np.zeros((height, width), dtype=np.intc)
+        self._fg = np.zeros((height, width, 3), dtype=np.uint8)
+        self._bg = np.zeros((height, width, 3), dtype=np.uint8)
+        self._console_data = self.console_c = ffi.new(
+            'TCOD_console_data_t*',
+            {
+            'w': width, 'h': height,
+            'ch_array': ffi.cast('int*', self._ch.ctypes.data),
+            'fg_array': ffi.cast('TCOD_color_t*', self._fg.ctypes.data),
+            'bg_array': ffi.cast('TCOD_color_t*', self._bg.ctypes.data),
+            'bkgnd_flag': tcod.BKGND_SET,
+            'alignment': tcod.LEFT,
+            'fore': (255, 255, 255),
+            'back': (0, 0, 0),
+            },
+        )
 
     @classmethod
     def _from_cdata(cls, cdata):
@@ -73,21 +86,20 @@ class Console(object):
 
     def _init_setup_console_data(self):
         """Setup numpy arrays over libtcod data buffers."""
-        import numpy
+        self._key_color = None
         if self.console_c == ffi.NULL:
             self._console_data = lib.TCOD_ctx.root
         else:
             self._console_data = ffi.cast('TCOD_console_data_t *', self.console_c)
 
-        def unpack_color(image_cdata):
+        def unpack_color(color_data):
             """return a (height, width, 3) shaped array from an image struct"""
-            color_data = lib.TCOD_image_get_colors(image_cdata)
             color_buffer = ffi.buffer(color_data[0:self.width * self.height])
             array = np.frombuffer(color_buffer, np.uint8)
             return array.reshape((self.height, self.width, 3))
 
-        self._fg = unpack_color(self._console_data.fg_colors)
-        self._bg = unpack_color(self._console_data.bg_colors)
+        self._fg = unpack_color(self._console_data.fg_array)
+        self._bg = unpack_color(self._console_data.bg_array)
 
         buf = self._console_data.ch_array
         buf = ffi.buffer(buf[0:self.width * self.height])
@@ -173,7 +185,7 @@ class Console(object):
         """
         lib.TCOD_console_clear(self.console_c)
 
-    def put_char(self, x, y, ch, bg_blend=BKGND_DEFAULT):
+    def put_char(self, x, y, ch, bg_blend=tcod.libtcod.BKGND_DEFAULT):
         """Draw the character c at x,y using the default colors and a blend mode.
 
         Args:
@@ -184,7 +196,8 @@ class Console(object):
         """
         lib.TCOD_console_put_char(self.console_c, x, y, ch, bg_blend)
 
-    def print_(self, x, y, string, bg_blend=BKGND_DEFAULT, alignment=None):
+    def print_(self, x, y, string, bg_blend=tcod.libtcod.BKGND_DEFAULT,
+               alignment=None):
         """Print a color formatted string on a console.
 
         Args:
@@ -198,7 +211,7 @@ class Console(object):
                                       bg_blend, alignment, _fmt(string))
 
     def print_rect(self, x, y, width, height, string,
-                   bg_blend=BKGND_DEFAULT, alignment=None):
+                   bg_blend=tcod.libtcod.BKGND_DEFAULT, alignment=None):
         """Print a string constrained to a rectangle.
 
         If h > 0 and the bottom of the rectangle is reached,
@@ -237,7 +250,8 @@ class Console(object):
         return lib.TCOD_console_get_height_rect_utf(
             self.console_c, x, y, width, height, _fmt(string))
 
-    def rect(self, x, y, width, height, clear, bg_blend=BKGND_DEFAULT):
+    def rect(self, x, y, width, height, clear,
+             bg_blend=tcod.libtcod.BKGND_DEFAULT):
         """Draw a the background color on a rect optionally clearing the text.
 
         If clr is True the affected tiles are changed to space character.
@@ -251,9 +265,10 @@ class Console(object):
                           removed.
             bg_blend (int): Background blending flag.
         """
-        lib.TCOD_console_rect(self.console_c, x, y, width, height, clear, bg_blend)
+        lib.TCOD_console_rect(self.console_c, x, y, width, height, clear,
+                              bg_blend)
 
-    def hline(self, x, y, width, bg_blend=BKGND_DEFAULT):
+    def hline(self, x, y, width, bg_blend=tcod.libtcod.BKGND_DEFAULT):
         """Draw a horizontal line on the console.
 
         This always uses the character 196, the horizontal line character.
@@ -266,7 +281,7 @@ class Console(object):
         """
         lib.TCOD_console_hline(self.console_c, x, y, width, bg_blend)
 
-    def vline(self, x, y, height, bg_blend=BKGND_DEFAULT):
+    def vline(self, x, y, height, bg_blend=tcod.libtcod.BKGND_DEFAULT):
         """Draw a vertical line on the console.
 
         This always uses the character 179, the vertical line character.
@@ -280,7 +295,7 @@ class Console(object):
         lib.TCOD_console_vline(self.console_c, x, y, height, bg_blend)
 
     def print_frame(self, x, y, width, height, string='',
-                    clear=True, bg_blend=BKGND_DEFAULT):
+                    clear=True, bg_blend=tcod.libtcod.BKGND_DEFAULT):
         """Draw a framed rectangle with optinal text.
 
         This uses the default background color and blend mode to fill the
@@ -305,7 +320,7 @@ class Console(object):
                                      clear, bg_blend, string.encode('latin-1'))
 
     def blit(self, x, y, width, height,
-             dest, dest_x, dest_y, fg_alpha=1.0, bg_alpha=1.0):
+             dest, dest_x, dest_y, fg_alpha=1.0, bg_alpha=1.0, key_color=None):
         """Blit from this console onto the ``dest`` console.
 
         Args:
@@ -322,10 +337,20 @@ class Console(object):
             dest_y (int): Topmost coordinate of the destintaion console.
             fg_alpha (float): Foreground color alpha vaule.
             bg_alpha (float): Background color alpha vaule.
+            key_color (Optional[Tuple[int, int, int]]):
+                None, or a (red, green, blue) tuple with values of 0-255.
         """
-        lib.TCOD_console_blit(self.console_c, x, y, width, height,
-                              dest.console_c,
-                              dest_x, dest_y, fg_alpha, bg_alpha)
+        if key_color or self._key_color:
+            key_color = ffi.new('TCOD_color_t*', key_color)
+            lib.TCOD_console_blit_key_color(
+            self.console_c, x, y, width, height,
+            dest.console_c, dest_x, dest_y, fg_alpha, bg_alpha, key_color
+            )
+        else:
+            lib.TCOD_console_blit(
+                self.console_c, x, y, width, height,
+                dest.console_c, dest_x, dest_y, fg_alpha, bg_alpha
+            )
 
     def set_key_color(self, color):
         """Set a consoles blit transparent color.
@@ -333,7 +358,7 @@ class Console(object):
         Args:
             color (Tuple[int, int, int]):
         """
-        lib.TCOD_console_set_key_color(self.console_c, color)
+        self._key_color = color
 
     def __enter__(self):
         """Returns this console in a managed context.
@@ -364,3 +389,32 @@ class Console(object):
         return self.console_c != ffi.NULL
 
     __nonzero__ = __bool__
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['console_c']
+        state['_console_data'] = {
+            'w': self.width, 'h': self.height,
+            'bkgnd_flag': self.default_bg_blend,
+            'alignment': self.default_alignment,
+            'fore': self.default_fg,
+            'back': self.default_bg,
+        }
+        if self.console_c == ffi.NULL:
+            state['_ch'] = np.copy(self._ch)
+            state['_fg'] = np.copy(self._fg)
+            state['_bg'] = np.copy(self._bg)
+        return state
+
+    def __setstate__(self, state):
+        self._key_color = None
+        self.__dict__.update(state)
+        self._console_data.update(
+            {
+            'ch_array': ffi.cast('int*', self._ch.ctypes.data),
+            'fg_array': ffi.cast('TCOD_color_t*', self._fg.ctypes.data),
+            'bg_array': ffi.cast('TCOD_color_t*', self._bg.ctypes.data),
+            }
+        )
+        self._console_data = self.console_c = ffi.new(
+            'TCOD_console_data_t*', self._console_data)
