@@ -153,7 +153,8 @@ class Image(object):
                 An (r, g, b) tuple containing the pixels color value.
                 Values are in a 0 to 255 range.
         """
-        return lib.TCOD_image_get_pixel(self.image_c, x, y)
+        color = lib.TCOD_image_get_pixel(self.image_c, x, y)
+        return color.r, color.g, color.b
 
     def get_mipmap_pixel(self, left, top, right, bottom):
         """Get the average color of a rectangle in this Image.

@@ -6,6 +6,8 @@ Unreleased
 ------------------
 Added
 - Console instances can now be pickled.
+Fixed
+- `Image.get_pixel` now returns a tuple instead of a CData instance.
 
 3.0.0 - 2017-06-24
 ------------------
