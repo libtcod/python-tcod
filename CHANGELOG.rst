@@ -5,30 +5,30 @@
 Unreleased
 ------------------
 Added
-- Console instances can now be pickled.
+ - Console instances can now be pickled.
 Fixed
-- `Image.get_pixel` now returns a tuple instead of a CData instance.
+ - `Image.get_pixel` now returns a tuple instead of a CData instance.
 
 3.0.0 - 2017-06-24
 ------------------
 Added
-- PyPy v5.7/v5.8 wheels added to PyPi.
-- Pickle support for tcod.path classes.
-- Added wrapper classes `EdgeCostCallback` and `NodeCostArray` to `tcod.path`
+ - PyPy v5.7/v5.8 wheels added to PyPi.
+ - Pickle support for tcod.path classes.
+ - Added wrapper classes `EdgeCostCallback` and `NodeCostArray` to `tcod.path`
 Changed
-- `AStar` and `Dijkstra` no longer take the `width` or `height` parameters.
-  You now set these parameters via `EdgeCostCallback`.
+ - `AStar` and `Dijkstra` no longer take the `width` or `height` parameters.
+   You now set these parameters via `EdgeCostCallback`.
 Fixed
-- Resolved an issue where pip install would clobber NumPyPy.
+ - Resolved an issue where pip install would clobber NumPyPy.
 Removed
-- Removed broken tdl-style int/color conversions from Color.
+ - Removed broken tdl-style int/color conversions from Color.
 
 2.5.0 - 2017-05-28
 ------------------
 Changed
-  * Pickle-able objects will have any subclasses pickled correctly now.
-    The new objects can not be unpickled on older versions of libtcod-cffi.
-  * Updated cdata attribute names in Map, Console, and Random.
+ - Pickle-able objects will have any subclasses pickled correctly now.
+   The new objects can not be unpickled on older versions of libtcod-cffi.
+ - Updated cdata attribute names in Map, Console, and Random.
 
 2.4.4 - 2017-05-20
 ------------------
