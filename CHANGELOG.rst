@@ -6,6 +6,9 @@ Unreleased
 ------------------
 Added
  - Console instances can now be pickled.
+Changed
+ - `get_cffi_callback` renamed to `get_tcod_path_ffi` and must now return width
+   and height values.  All returned values will be kept alive by the caller.
 Fixed
  - `Image.get_pixel` now returns a tuple instead of a CData instance.
 

@@ -89,9 +89,8 @@ class _EdgeCostFunc(object):
         self._userdata = userdata
         self.width = width
         self.height = height
-        self._userdata_p = None
 
-    def get_cffi_callback(self):
+    def get_tcod_path_ffi(self):
         """
 
         Returns:
@@ -99,21 +98,14 @@ class _EdgeCostFunc(object):
 
 
         """
-        if self._userdata_p is None:
-            self._userdata_p = ffi.new_handle(self._userdata)
-        return self._CALLBACK_P, self._userdata_p
+        return (self._CALLBACK_P, ffi.new_handle(self._userdata),
+                self.width, self.height)
 
     def __repr__(self):
         return '%s(%r, width=%r, height=%r)' % (
             self.__class__.__name__,
             self._userdata, self.width, self.height,
             )
-
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        # _userdata_p can't be pickled.
-        state['_userdata_p'] = None
-        return state
 
 
 class EdgeCostCallback(_EdgeCostFunc):
@@ -161,10 +153,7 @@ class NodeCostArray(np.ndarray):
         return '%s(%r)' % (self.__class__.__name__,
                            repr(self.view(np.ndarray)))
 
-    def get_cffi_callback(self):
-        if hasattr(self, '_callback_p'):
-            return self._callback_p, self._userdata_p
-
+    def get_tcod_path_ffi(self):
         if len(self.shape) != 2:
             raise ValueError('Array must have a 2d shape, shape is %r' %
                              (self.shape,))
@@ -172,13 +161,13 @@ class NodeCostArray(np.ndarray):
             raise ValueError('dtype must be one of %r, dtype is %r' %
                              (self._C_ARRAY_CALLBACKS.keys(), self.dtype.type))
 
-        array_type, self._callback_p = \
+        array_type, callback = \
             self._C_ARRAY_CALLBACKS[self.dtype.type]
-        self._userdata_p = ffi.new(
+        userdata = ffi.new(
             'PathCostArray*',
             (self.width, ffi.cast(array_type, self.ctypes.data)),
         )
-        return self._callback_p, self._userdata_p
+        return callback, userdata, self.width, self.height
 
 
 class _PathFinder(object):
@@ -188,26 +177,30 @@ class _PathFinder(object):
         self.cost = cost
         self.diagonal = diagonal
         self._path_c = None
+        self._callback = self._userdata = None
 
         if hasattr(self.cost, 'map_c'):
+            self.width, self.height = self.cost.width, self.cost.height
             self._path_c = ffi.gc(
                 self._path_new_using_map(self.cost.map_c, diagonal),
                 self._path_delete,
                 )
             return
 
-        if not hasattr(self.cost, 'get_cffi_callback'):
+        if not hasattr(self.cost, 'get_tcod_path_ffi'):
             assert not callable(self.cost), \
-                "Any callback alone is missing width&height information."
+                "Any callback alone is missing width & height information. " \
+                "Wrap your callback in tcod.path.EdgeCostCallback"
             self.cost = NodeCostArray(self.cost)
 
-        callback, userdata = self.cost.get_cffi_callback()
+        self._callback, self._userdata, self.width, self.height = \
+            self.cost.get_tcod_path_ffi()
         self._path_c = ffi.gc(
             self._path_new_using_function(
-                self.cost.width,
-                self.cost.height,
-                callback,
-                userdata,
+                self.width,
+                self.height,
+                self._callback,
+                self._userdata,
                 diagonal
                 ),
             self._path_delete,
@@ -220,6 +213,10 @@ class _PathFinder(object):
     def __getstate__(self):
         state = self.__dict__.copy()
         del state['_path_c']
+        del state['width']
+        del state['height']
+        del state['_callback']
+        del state['_userdata']
         return state
 
     def __setstate__(self, state):
