@@ -11,6 +11,8 @@ Changed
    and height values.  All returned values will be kept alive by the caller.
 Fixed
  - `Image.get_pixel` now returns a tuple instead of a CData instance.
+ - SDL is now initilized lazily.  It should be easier to import BearLibTerminal
+   along side this library.
 
 3.0.0 - 2017-06-24
 ------------------
