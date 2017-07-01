@@ -117,7 +117,7 @@ class Map(object):
                     'BASIC', 'DIAMOND', 'SHADOW', 'RESTRICTIVE', 'PERMISSIVE',
                     'PERMISSIVE0', 'PERMISSIVE1', ..., 'PERMISSIVE8'
         @type radius: int
-        @param radius: Raduis of the field-of-view.
+        @param radius: Radius of the field-of-view.
         @type light_walls: boolean
         @param light_walls: Include or exclude wall tiles in the field-of-view.
         @type sphere: boolean
@@ -323,7 +323,7 @@ def quick_fov(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sph
                 'BASIC', 'DIAMOND', 'SHADOW', 'RESTRICTIVE', 'PERMISSIVE',
                 'PERMISSIVE0', 'PERMISSIVE1', ..., 'PERMISSIVE8'
     @type radius: float
-    @param radius: Raduis of the field-of-view.
+    @param radius: Radius of the field-of-view.
 
                    When sphere is True a floating point can be used to fine-tune
                    the range.  Otherwise the radius is just rounded up.
