@@ -1,6 +1,12 @@
 ===========
  Changelog
 ===========
+
+Unreleased
+------------------
+Changed
+ - Merged libtcod-cffi dependency with TDL.
+
 3.1.0 - 2017-05-28
 ------------------
 Added

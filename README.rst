@@ -6,53 +6,82 @@
 ========
 |VersionsBadge| |ImplementationBadge| |LicenseBadge|
 
-|PyPI| |RTD| |Travis| |Coveralls|
+|PyPI| |RTD| |Appveyor| |Travis| |Coveralls| |Codecov| |Codacy| |Scrutinizer|
+
+|Requires| |Pyup|
 
 ==============
  Installation
 ==============
 The recommended way to install is by using pip, make sure pip is up-to-date,
-old versions of pip may have issues installing libtcod-cffi.
+old versions of pip may have issues installing tdl.
 
 To install using pip, use the following command::
 
     python -m pip install tdl
 
-Wheels are missing for PyPy on Mac OS X and Linux, so you'll have to meet the
-additional dependencies of libtcod-cffi before running pip.
-
-* libtcod-cffi: https://pypi.python.org/pypi/libtcod-cffi
+Wheels are missing for Linux, so you'll have to meet additional requirements
+before running pip.
 
 =======
  About
 =======
-TDL is a port of the C library libtcod in an attempt to make it more "Pythonic"
+This is a Python cffi_ port of libtcod_.
 
-The library can be used for displaying tilesets (ANSI, Unicode, or graphical) in true color.
+This library is `hosted on GitHub <https://github.com/HexDecimal/python-tdl>`_.
 
-It also provides functionality to compute path-finding and field of view.
+Any issues you have with this module can be reported at the
+`GitHub issue tracker <https://github.com/HexDecimal/python-tdl/issues>`_.
 
-python-tdl is hosted on GitHub: https://github.com/HexDecimal/python-tdl
+python-tdl is distributed under the `Simplified 2-clause FreeBSD license
+<https://github.com/HexDecimal/python-tdl/blob/master/LICENSE.txt>`.
 
-Online Documentation: http://pythonhosted.org/tdl/
+=======
+ Usage
+=======
+This module was designed to be backward compatible with the original libtcod
+module that is distributed with libtcod.
+If you had code that runs on the original module you can use this library as a
+drop-in replacement like this::
 
-Issue Tracker: https://github.com/HexDecimal/python-tdl/issues
+    import tcod as libtcod
 
-python-tdl is a cffi port of "libtcod".  You can find more about libtcod at
-http://roguecentral.org/doryen/libtcod/
+Guides and Tutorials for libtcodpy should work with the tcod module.
+
+The latest documentation can be found
+`here <https://python-tdl.readthedocs.io/en/latest/>`_.
 
 ==============
  Requirements
 ==============
-* Python 2.7+, 3.3+, or PyPy
-* Windows, Linux, or Mac OS X
-* libtcod-cffi (automatically installed with pip)
+* Python 2.7+, Python 3.4+, or PyPy 5.4+
+* Windows, Linux, or MacOS.
+* Linux requires the libsdl2 package and must be installed from source.
 
-=========
- License
-=========
-python-tdl is distributed under the Simplified 2-clause FreeBSD license.
-Read LICENSE.txt for more details.
+Extra requirements when installing directly from source
+-------------------------------------------------------
+
+* MinGW_ must be on the Windows path for use with pycparser.
+  An equivalent C parser (such as `gcc`) must be installed on other OS's.
+* Linux requires the packages:
+  `gcc` `libsdl2-dev` `libffi-dev` `python-dev` `libomp-dev`
+* SDL2 is installed automatically on Windows and MacOS
+
+.. _LICENSE.txt: https://github.com/HexDecimal/python-tdl/blob/master/LICENSE.txt
+
+.. _python-tdl: https://github.com/HexDecimal/python-tdl/
+
+.. _cffi: https://cffi.readthedocs.io/en/latest/
+
+.. _numpy: https://docs.scipy.org/doc/numpy/user/index.html
+
+.. _libtcod: https://bitbucket.org/libtcod/libtcod/
+
+.. _pip: https://pip.pypa.io/en/stable/installing/
+
+.. _MinGW: http://www.mingw.org/
+
+.. _homebrew: http://brew.sh/
 
 .. |VersionsBadge| image:: https://img.shields.io/pypi/pyversions/tdl.svg?maxAge=2592000
     :target: https://pypi.python.org/pypi/tdl
@@ -63,7 +92,6 @@ Read LICENSE.txt for more details.
 .. |LicenseBadge| image:: https://img.shields.io/pypi/l/tdl.svg?maxAge=2592000
     :target: https://github.com/HexDecimal/tdl/blob/master/LICENSE.txt
 
-
 .. |PyPI| image:: https://img.shields.io/pypi/v/tdl.svg?maxAge=10800
     :target: https://pypi.python.org/pypi/tdl
 
@@ -71,8 +99,30 @@ Read LICENSE.txt for more details.
     :target: http://python-tdl.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
+.. |Appveyor| image:: https://ci.appveyor.com/api/projects/status/bb04bpankj0h1cpa/branch/master?svg=true
+    :target: https://ci.appveyor.com/project/HexDecimal/python-tdl/branch/master
+
 .. |Travis| image:: https://travis-ci.org/HexDecimal/python-tdl.svg?branch=master
     :target: https://travis-ci.org/HexDecimal/python-tdl
 
 .. |Coveralls| image:: https://coveralls.io/repos/github/HexDecimal/python-tdl/badge.svg?branch=master
     :target: https://coveralls.io/github/HexDecimal/python-tdl?branch=master
+
+.. |Codecov| image:: https://codecov.io/gh/HexDecimal/python-tdl/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/HexDecimal/python-tdl
+
+.. |Issues| image:: https://img.shields.io/github/issues/HexDecimal/python-tdl.svg?maxAge=3600
+    :target: https://github.com/HexDecimal/python-tdl/issues
+
+.. |Codacy| image:: https://img.shields.io/codacy/grade/6f3d153f1ccc435ca592633e4c35d9f5.svg?maxAge=10800
+    :target: https://www.codacy.com/app/4b796c65-github/python-tdl
+
+.. |Scrutinizer| image:: https://scrutinizer-ci.com/g/HexDecimal/python-tdl/badges/quality-score.png?b=master
+    :target: https://scrutinizer-ci.com/g/HexDecimal/python-tdl/
+
+.. |Requires| image:: https://requires.io/github/HexDecimal/python-tdl/requirements.svg?branch=master
+    :target: https://requires.io/github/HexDecimal/python-tdl/requirements/?branch=master
+    :alt: Requirements Status
+
+.. |Pyup| image:: https://pyup.io/repos/github/hexdecimal/python-tdl/shield.svg
+     :target: https://pyup.io/repos/github/hexdecimal/python-tdl/

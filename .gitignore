@@ -14,8 +14,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+#lib/
+#lib64/
 parts/
 sdist/
 var/
@@ -56,6 +56,11 @@ docs/_build/
 target/
 
 # Custom
-tdl-*/
 Release/
-tdl/_*.c
+tcod/_*.c
+tcod/_*.pyd
+.benchmarks
+dependencies/SDL2*
+tcod/x86
+tcod/x64
+tcod/SDL2.framework

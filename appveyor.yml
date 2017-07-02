@@ -1,0 +1,89 @@
+environment:
+  TWINE_USERNAME:
+    secure: 6EhNSnUl0yOO26EeQ5WG1pQx8v/vp99/u24NRpZvF0k=
+  TWINE_PASSWORD:
+    secure: PwPzzV8DPqw/+5M66FJQ5tbiF7rlOIK+bQIl8dFdF34=
+  CODACY_PROJECT_TOKEN:
+    secure: xprpiCGL823NKrs/K2Cps1UVBEmpezXReLxcfLyU1M43ZBBOK91xvjdIJamYKi8D
+  DEPLOY_ONLY: false
+  matrix:
+  - PYTHON: C:\Python34-x64\python.exe
+    platform: x64
+  - PYTHON: C:\Python34\python.exe
+    platform: Any CPU
+  - PYTHON: C:\Python27\python.exe
+    platform: Any CPU
+  - PYPY: pypy2-v5.4.1-win32
+    platform: Any CPU
+  - PYTHON: C:\Python36-x64\python.exe
+    platform: x64
+  - PYTHON: C:\Python27-x64\python.exe
+    platform: x64
+    DEPLOY_ONLY: true
+  - PYTHON: C:\Python35\python.exe
+    platform: Any CPU
+    DEPLOY_ONLY: true
+  - PYTHON: C:\Python35-x64\python.exe
+    platform: x64
+    DEPLOY_ONLY: true
+  - PYTHON: C:\Python36\python.exe
+    platform: Any CPU
+    DEPLOY_ONLY: true
+  - PYPY: pypy2-v5.6.0-win32
+    platform: Any CPU
+    DEPLOY_ONLY: true
+  - PYPY: pypy2-v5.7.1-win32
+    platform: Any CPU
+    DEPLOY_ONLY: true
+  - PYPY: pypy2-v5.8.0-win32
+    platform: Any CPU
+    DEPLOY_ONLY: true
+
+matrix:
+  allow_failures:
+    - DEPLOY_ONLY: true
+clone_depth: 20
+
+cache:
+  - '%localappdata%\pip\cache -> setup.py'
+
+init:
+- cmd: "if %APPVEYOR_REPO_TAG%==false if %DEPLOY_ONLY%==true exit /b 1"
+
+install:
+- cmd: "git submodule update --init --recursive"
+- ps: |
+    if ($env:PYPY){
+        $env:PYTHON = 'C:\' + $env:PYPY + '\pypy.exe'
+        $env:PATH += ';' + 'C:\' + $env:PYPY + '\'
+        $PYPY_DOWNLOAD = 'https://bitbucket.org/pypy/pypy/downloads/' + $env:PYPY + '.zip'
+        Invoke-WebRequest $PYPY_DOWNLOAD -OutFile C:\pypy.zip
+        & '7z' x C:\pypy.zip -oC:\
+        & $env:PYTHON -m ensurepip
+        & $env:PYTHON -m pip install --disable-pip-version-check -U pip
+        # manually install a version of wheel with pypy fixes
+        & $env:PYTHON -m pip install https://bitbucket.org/pypa/wheel/get/f4d5d07efa60.zip
+    }
+- cmd: "set PATH=%PATH%;C:\\MinGW\\bin"
+- cmd: echo "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 > "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64/vcvars64.bat"
+- cmd: "%PYTHON% -m pip install --upgrade pip setuptools"
+- cmd: "if defined PYPY %PYTHON% -m pip -v install git+https://bitbucket.org/pypy/numpy.git"
+- '%PYTHON% -m pip install -e hg+https://bitbucket.org/HexDecimal/wheel@abi3-windows-fix#egg=wheel'
+- cmd: "%PYTHON% -m pip install --requirement requirements.txt"
+- cmd: "%PYTHON% setup.py build sdist develop bdist_wheel"
+build: off
+before_test:
+- cmd: "%PYTHON% -m pip install pytest pytest-cov"
+test_script:
+- cmd: "%PYTHON% -m pytest -v"
+
+on_success:
+- "C:\\Python27\\python.exe -m virtualenv py27venv"
+- py27venv\Scripts\activate.bat
+- "pip install codacy-coverage python-coveralls"
+- coverage xml
+- python-codacy-coverage -r coverage.xml
+
+deploy_script:
+- "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% -m pip install twine"
+- "if defined APPVEYOR_REPO_TAG_NAME %PYTHON% -m twine upload --skip-existing dist/*"

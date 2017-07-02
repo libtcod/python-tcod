@@ -19,3 +19,6 @@
 # Custom for this project
 *.bat eol=crlf
 *.txt eol=crlf
+
+# Fix an issue with Python 2 on Linux
+tcod/libtcod_cdef.h eol=lf

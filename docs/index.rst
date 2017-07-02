@@ -3,23 +3,22 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to tdl's documentation!
-===============================
+Welcome to the libtcod-cffi/tdl documentation!
+==============================================
 
-**Current documentation is a work in progress.**
+.. module:: tcod
 
-It will still be a while for the docs to be ported from the old epydoc format.
-
-Until then you should be using the old docs found at:
-https://pythonhosted.org/tdl/
+.. currentmodule:: tcod
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
+   tcod_ref
    api_ref
-
+   libtcodpy
+   glossary
 
 Indices and tables
 ==================
