@@ -6,6 +6,8 @@ Unreleased
 ------------------
 Changed
  - Merged libtcod-cffi dependency with TDL.
+Fixed
+ - Fixed boolean related crashes with Key 'text' events.
 
 3.1.0 - 2017-05-28
 ------------------
