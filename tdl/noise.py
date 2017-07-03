@@ -111,14 +111,19 @@ class Noise(object):
 
         if seed is None:
             seed = _random.getrandbits(32)
-        else:
+        try:
+            seed = int(seed)
+        except TypeError:
             seed = hash(seed)
         self._seed = seed
         # convert values into ctypes to speed up later functions
         self._dimensions = min(_MAX_DIMENSIONS, int(dimensions))
         if self._algorithm == 'WAVELET':
             self._dimensions = min(self._dimensions, 3) # Wavelet only goes up to 3
-        self._random = _lib.TCOD_random_new_from_seed(_MERSENNE_TWISTER, self._seed)
+        self._random = _lib.TCOD_random_new_from_seed(
+            _MERSENNE_TWISTER,
+            _ffi.cast('uint32_t', self._seed),
+            )
         self._hurst = hurst
         self._lacunarity = lacunarity
         self._noise = _lib.TCOD_noise_new(self._dimensions, self._hurst,

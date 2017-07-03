@@ -11,7 +11,7 @@ class NoiseTests(unittest.TestCase):
     def test_noise(self):
         n = tdl.noise.Noise()
         self.assertIsInstance(n.get_point(0, 0), float)
-        n = tdl.noise.Noise('Wavelet', 'FBM')
+        n = tdl.noise.Noise('Wavelet', 'FBM', seed=-1)
         self.assertIsInstance(n.get_point(0, 0), float)
 
     def test_noise_exceptions(self):

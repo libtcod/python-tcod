@@ -8,6 +8,8 @@ Changed
  - Merged libtcod-cffi dependency with TDL.
 Fixed
  - Fixed boolean related crashes with Key 'text' events.
+ - `tdl.noise.Noise`: Fixed crash when given a negative seed.  As well as cases
+   where an instance may have a different seed after being unpickled.
 
 3.1.0 - 2017-05-28
 ------------------
