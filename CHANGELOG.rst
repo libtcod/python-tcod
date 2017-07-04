@@ -2,76 +2,76 @@
  Changelog
 ===========
 
-Unreleased
+3.2.0 - 2017-07-04
 ------------------
 Changed
  - Merged libtcod-cffi dependency with TDL.
 Fixed
  - Fixed boolean related crashes with Key 'text' events.
  - `tdl.noise.Noise`: Fixed crash when given a negative seed.  As well as cases
-   where an instance may have a different seed after being unpickled.
+   where an instance could lose its seed being pickled.
 
 3.1.0 - 2017-05-28
 ------------------
 Added
-- You can now pass tdl Console instances as parameters to libtcod-cffi
+ - You can now pass tdl Console instances as parameters to libtcod-cffi
    functions expecting a tcod Console.
 Changed
-- Dependencies updated: `libtcod-cffi>=2.5.0,<3`
-- The `Console.tcod_console` attribute is being renamed to
-  `Console.console_c`.
+ - Dependencies updated: `libtcod-cffi>=2.5.0,<3`
+ - The `Console.tcod_console` attribute is being renamed to
+   `Console.console_c`.
 Deprecated
-- The tdl.noise and tdl.map modules will be deprecated in the future.
+ - The tdl.noise and tdl.map modules will be deprecated in the future.
 Fixed
-- Resolved crash-on-exit issues for Windows platforms.
+ - Resolved crash-on-exit issues for Windows platforms.
 
 3.0.2 - 2017-04-13
 ------------------
 Changed
-- Dependencies updated: `libtcod-cffi>=2.4.3,<3`
-- You can now create Console instances before a call to `tdl.init`.
+ - Dependencies updated: `libtcod-cffi>=2.4.3,<3`
+ - You can now create Console instances before a call to `tdl.init`.
 Removed
-- Dropped support for Python 3.3
+ - Dropped support for Python 3.3
 Fixed
-- Resolved issues with MacOS builds.
-- 'OpenGL' and 'GLSL' renderers work again.
+ - Resolved issues with MacOS builds.
+ - 'OpenGL' and 'GLSL' renderers work again.
 
 3.0.1 - 2017-03-22
 ------------------
 Changed
-- `KeyEvent`'s with `text` now have all their modifier keys set to False.
+ - `KeyEvent`'s with `text` now have all their modifier keys set to False.
 Fixed
-- Undefined behaviour in text events caused crashes on 32-bit builds.
+ - Undefined behaviour in text events caused crashes on 32-bit builds.
 
 3.0.0 - 2017-03-21
 ------------------
 Added
-- `KeyEvent` supports libtcod text and meta keys.
+ - `KeyEvent` supports libtcod text and meta keys.
 Changed
-- `KeyEvent` parameters have been moved.
-- This version requires `libtcod-cffi>=2.3.0`.
+ - `KeyEvent` parameters have been moved.
+ - This version requires `libtcod-cffi>=2.3.0`.
 Deprecated
-- `KeyEvent` camel capped attribute names are deprecated.
+ - `KeyEvent` camel capped attribute names are deprecated.
 Fixed
-- Crashes with key-codes undefined by libtcod.
-- `tdl.map` typedef issues with libtcod-cffi.
+ - Crashes with key-codes undefined by libtcod.
+ - `tdl.map` typedef issues with libtcod-cffi.
 
 
 2.0.1 - 2017-02-22
 ------------------
 Fixed
-- `tdl.init` renderer was defaulted to OpenGL which is not supported in the
-  current version of libtcod.
+ - `tdl.init` renderer was defaulted to OpenGL which is not supported in the
+   current version of libtcod.
 
 2.0.0 - 2017-02-15
 ------------------
 Changed
-- Dependencies updated, tdl now requires libtcod-cffi 2.x.x
-- Some event behaviours have changed with SDL2, event keys might be different
-  than what you expect.
+ - Dependencies updated, tdl now requires libtcod-cffi 2.x.x
+ - Some event behaviours have changed with SDL2, event keys might be different
+   than what you expect.
 Removed
-- Key repeat functions were removed from SDL2.
-  `set_key_repeat` is now stubbed, and does nothing.
+ - Key repeat functions were removed from SDL2.
+   `set_key_repeat` is now stubbed, and does nothing.
 
 1.6.0 - 2016-11-18
 ------------------
