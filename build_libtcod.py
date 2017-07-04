@@ -242,7 +242,7 @@ try:
     USE_OPENMP = eval(os.environ.get('USE_OPENMP', 'None').title())
 except Exception:
     USE_OPENMP = None
-print(sys.argv)
+
 if sys.platform == 'win32' and '--compiler=mingw32' not in sys.argv:
     extra_compile_args.extend(['/GL', '/O2', '/GS-'])
     extra_link_args.extend(['/LTCG'])
