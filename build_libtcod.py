@@ -16,8 +16,8 @@ import zipfile
 
 SDL2_VERSION = '2.0.4'
 
-CFFI_HEADER = 'tcod/c_code/cffi.h'
-CFFI_EXTRA_CDEFS = 'tcod/c_code/cdef.h'
+CFFI_HEADER = 'tcod/cffi.h'
+CFFI_EXTRA_CDEFS = 'tcod/cdef.h'
 
 BITSIZE, LINKAGE = platform.architecture()
 
@@ -69,12 +69,12 @@ def unpack_sdl2(version):
 
 module_name = 'tcod._libtcod'
 include_dirs = [
-                'tcod/',
-                'libtcod/include/',
-                'libtcod/src/png/',
-                'libtcod/src/zlib/',
-                '/usr/include/SDL2/',
-                ]
+    '.',
+    'libtcod/include/',
+    'libtcod/src/png/',
+    'libtcod/src/zlib/',
+    '/usr/include/SDL2/',
+]
 
 extra_parse_args = []
 extra_compile_args = []
@@ -93,7 +93,8 @@ define_macros = [('LIBTCOD_EXPORTS', None),
                  ('_CRT_SECURE_NO_WARNINGS', None),
                  ]
 
-sources += walk_sources('tcod/c_code/')
+sources += walk_sources('tcod/')
+sources += walk_sources('tdl/')
 
 if sys.platform == 'win32':
     libraries += ['User32', 'OpenGL32']
@@ -266,7 +267,7 @@ ffi = FFI()
 ffi.cdef(get_cdef())
 ffi.cdef(open(CFFI_EXTRA_CDEFS, 'r').read())
 ffi.set_source(
-    module_name, '#include <c_code/cffi.h>',
+    module_name, '#include <tcod/cffi.h>',
     include_dirs=include_dirs,
     library_dirs=library_dirs,
     sources=sources,
