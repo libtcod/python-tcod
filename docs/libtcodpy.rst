@@ -1,44 +1,5 @@
-libtcodpy Reference
-===================
-
-Event
------
-
-.. autoclass:: tcod.Key()
-   :members:
-
-.. autoclass:: tcod.Mouse()
-   :members:
-
-.. _event types:
-
-Event Types
-~~~~~~~~~~~
-
-.. data:: tcod.EVENT_NONE
-.. data:: tcod.EVENT_KEY_PRESS
-.. data:: tcod.EVENT_KEY_RELEASE
-.. data:: tcod.EVENT_KEY
-
-    Same as ``tcod.EVENT_KEY_PRESS | tcod.EVENT_KEY_RELEASE``
-
-.. data:: tcod.EVENT_MOUSE_MOVE
-.. data:: tcod.EVENT_MOUSE_PRESS
-.. data:: tcod.EVENT_MOUSE_RELEASE
-.. data:: tcod.EVENT_MOUSE
-
-    Same as ``tcod.EVENT_MOUSE_MOVE | tcod.EVENT_MOUSE_PRESS | tcod.EVENT_MOUSE_RELEASE``
-
-.. data:: tcod.EVENT_FINGER_MOVE
-.. data:: tcod.EVENT_FINGER_PRESS
-.. data:: tcod.EVENT_FINGER_RELEASE
-.. data:: tcod.EVENT_FINGER
-
-    Same as ``tcod.EVENT_FINGER_MOVE | tcod.EVENT_FINGER_PRESS | tcod.EVENT_FINGER_RELEASE``
-
-.. data:: tcod.EVENT_ANY
-
-    Same as ``tcod.EVENT_KEY | tcod.EVENT_MOUSE | tcod.EVENT_FINGER``
+libtcodpy
+=========
 
 bsp
 ---
@@ -141,6 +102,45 @@ console
 
 .. autoclass: tcod.ConsoleBuffer
    :members:
+
+Event
+-----
+
+.. autoclass:: tcod.Key()
+   :members:
+
+.. autoclass:: tcod.Mouse()
+   :members:
+
+.. _event types:
+
+Event Types
+~~~~~~~~~~~
+
+.. data:: tcod.EVENT_NONE
+.. data:: tcod.EVENT_KEY_PRESS
+.. data:: tcod.EVENT_KEY_RELEASE
+.. data:: tcod.EVENT_KEY
+
+    Same as ``tcod.EVENT_KEY_PRESS | tcod.EVENT_KEY_RELEASE``
+
+.. data:: tcod.EVENT_MOUSE_MOVE
+.. data:: tcod.EVENT_MOUSE_PRESS
+.. data:: tcod.EVENT_MOUSE_RELEASE
+.. data:: tcod.EVENT_MOUSE
+
+    Same as ``tcod.EVENT_MOUSE_MOVE | tcod.EVENT_MOUSE_PRESS | tcod.EVENT_MOUSE_RELEASE``
+
+.. data:: tcod.EVENT_FINGER_MOVE
+.. data:: tcod.EVENT_FINGER_PRESS
+.. data:: tcod.EVENT_FINGER_RELEASE
+.. data:: tcod.EVENT_FINGER
+
+    Same as ``tcod.EVENT_FINGER_MOVE | tcod.EVENT_FINGER_PRESS | tcod.EVENT_FINGER_RELEASE``
+
+.. data:: tcod.EVENT_ANY
+
+    Same as ``tcod.EVENT_KEY | tcod.EVENT_MOUSE | tcod.EVENT_FINGER``
 
 sys
 ---

@@ -15,8 +15,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   tcod_ref
-   api_ref
+   tcod
+   tdl
    libtcodpy
    glossary
 
