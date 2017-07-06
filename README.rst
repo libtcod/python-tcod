@@ -13,15 +13,22 @@
 ==============
  Installation
 ==============
-The recommended way to install is by using pip, make sure pip is up-to-date,
-old versions of pip may have issues installing tdl.
+The recommended way to install is by using pip.  Older versions of pip will
+have issues installing tdl, so make sure it's up-to-date.
 
+Windows / MacOS
+---------------
 To install using pip, use the following command::
 
-    python -m pip install tdl
+    > python -m pip install tdl
 
-Wheels are missing for Linux, so you'll have to meet additional requirements
-before running pip.
+Linux
+-----
+On Linux, tdl will need to be built from source.  Assuming you have Python and
+pip, you run these commands to install tdl::
+
+    $ sudo apt-get install gcc libsdl2-dev libffi-dev python-dev libomp-dev
+    $ pip install tdl
 
 =======
  About
@@ -34,7 +41,7 @@ Any issues you have with this module can be reported at the
 `GitHub issue tracker <https://github.com/HexDecimal/python-tdl/issues>`_.
 
 python-tdl is distributed under the `Simplified 2-clause FreeBSD license
-<https://github.com/HexDecimal/python-tdl/blob/master/LICENSE.txt>`.
+<https://github.com/HexDecimal/python-tdl/blob/master/LICENSE.txt>`_.
 
 =======
  Usage

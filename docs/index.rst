@@ -14,11 +14,24 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
+   :caption: Readme
+
+   readme
+   changelog
+   glossary
+
+.. toctree::
+   :maxdepth: 2
+   :caption: libtcod-cffi API
 
    tcod
-   tdl
    libtcodpy
-   glossary
+
+.. toctree::
+   :maxdepth: 2
+   :caption: tdl API
+
+   tdl
 
 Indices and tables
 ==================
