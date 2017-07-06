@@ -2,13 +2,21 @@
  Changelog
 ===========
 
+Unreleased
+------------------
+Changed
+ - tcod.bsp: `BSP.split_recursive` parameter `random` is now `seed`.
+ - tcod.noise: `Noise.__init__` parameter `rand` is now named `seed`.
+Fixed
+ - tcod.bsp: Corrected spelling of max_vertical_ratio.
+
 3.2.0 - 2017-07-04
 ------------------
 Changed
  - Merged libtcod-cffi dependency with TDL.
 Fixed
  - Fixed boolean related crashes with Key 'text' events.
- - `tdl.noise.Noise`: Fixed crash when given a negative seed.  As well as cases
+ - tdl.noise: Fixed crash when given a negative seed.  As well as cases
    where an instance could lose its seed being pickled.
 
 3.1.0 - 2017-05-28

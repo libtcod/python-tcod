@@ -17,7 +17,7 @@ Example::
         hurst=0.5,
         lacunarity=2.0,
         octaves=4,
-        rand=None,
+        seed=None,
         )
 
     # Create a 5x5 open multi-dimensional mesh-grid.
@@ -66,7 +66,7 @@ class Noise(object):
         lacunarity (float): The noise lacunarity.
         octaves (float): The level of detail on fBm and turbulence
                          implementations.
-        rand (Optional[Random]): A Random instance, or None.
+        seed (Optional[Random]): A Random instance, or None.
 
     Attributes:
         noise_c (CData): A cffi pointer to a TCOD_noise_t object.
@@ -76,12 +76,12 @@ class Noise(object):
     """
 
     def __init__(self, dimensions, algorithm=2, implementation=SIMPLE,
-                 hurst=0.5, lacunarity=2.0, octaves=4, rand=None):
+                 hurst=0.5, lacunarity=2.0, octaves=4, seed=None):
         if not 0 < dimensions <= 4:
             raise ValueError('dimensions must be in range 0 < n <= 4, got %r' %
                              (dimensions,))
-        self._random = rand
-        _random_c = rand.random_c if rand else ffi.NULL
+        self._random = seed
+        _random_c = seed.random_c if seed else ffi.NULL
         self._algorithm = algorithm
         self.noise_c = ffi.gc(
             ffi.cast(

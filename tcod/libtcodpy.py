@@ -2118,7 +2118,7 @@ def noise_new(dim, h=NOISE_DEFAULT_HURST, l=NOISE_DEFAULT_LACUNARITY,
     Returns:
         Noise: The new Noise instance.
     """
-    return tcod.noise.Noise(dim, hurst=h, lacunarity=l, rand=random)
+    return tcod.noise.Noise(dim, hurst=h, lacunarity=l, seed=random)
 
 def noise_set_type(n, typ):
     """Set a Noise objects default noise algorithm.

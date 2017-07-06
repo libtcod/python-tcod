@@ -195,7 +195,7 @@ def test_noise_errors():
     [tcod.noise.SIMPLE, tcod.noise.FBM, tcod.noise.TURBULENCE])
 def test_noise_pickle(implementation):
     rand = tcod.random.Random(tcod.random.MERSENNE_TWISTER, 42)
-    noise = tcod.noise.Noise(2, implementation, rand=rand)
+    noise = tcod.noise.Noise(2, implementation, seed=rand)
     noise2 = copy.copy(noise)
     assert (noise.sample_ogrid(np.ogrid[:3,:1]) ==
             noise2.sample_ogrid(np.ogrid[:3,:1])).all()
@@ -203,7 +203,7 @@ def test_noise_pickle(implementation):
 
 def test_noise_copy():
     rand = tcod.random.Random(tcod.random.MERSENNE_TWISTER, 42)
-    noise = tcod.noise.Noise(2, rand=rand)
+    noise = tcod.noise.Noise(2, seed=rand)
     noise2 = pickle.loads(pickle.dumps(noise))
     assert (noise.sample_ogrid(np.ogrid[:3,:1]) ==
             noise2.sample_ogrid(np.ogrid[:3,:1])).all()

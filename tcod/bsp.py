@@ -32,7 +32,7 @@ Example::
         min_width=3,
         min_height=3,
         max_horizontal_ratio=1.5,
-        max_vertical_raito=1.5,
+        max_vertical_ratio=1.5,
         )
     traverse(bsp)
 '''
@@ -144,7 +144,7 @@ class BSP(object):
         self._unpack_bsp_tree(cdata)
 
     def split_recursive(self, depth, min_width, min_height,
-                        max_horizontal_ratio, max_vertical_raito, random=None):
+                        max_horizontal_ratio, max_vertical_ratio, seed=None):
         """Divide this partition recursively.
 
         Args:
@@ -153,17 +153,21 @@ class BSP(object):
             min_height (int): The minimum height of any individual partition.
             max_horizontal_ratio (float):
                 Prevent creating a horizontal ratio more extreme than this.
-            max_vertical_raito (float):
+            max_vertical_ratio (float):
                 Prevent creating a vertical ratio more extreme than this.
-            random (Optional[tcod.random.Random]):
+            seed (Optional[tcod.random.Random]):
                 The random number generator to use.
 
         .. versionadded:: 2.0
         """
         cdata = self._as_cdata()
-        lib.TCOD_bsp_split_recursive(cdata, random or ffi.NULL,
-                                      depth, min_width, min_height,
-                                      max_horizontal_ratio, max_vertical_raito)
+        lib.TCOD_bsp_split_recursive(
+            cdata,
+            seed or ffi.NULL,
+            depth,
+            min_width, min_height,
+            max_horizontal_ratio, max_vertical_ratio,
+        )
         self._unpack_bsp_tree(cdata)
 
     def walk(self):
