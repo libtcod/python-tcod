@@ -1,7 +1,12 @@
 """
     Rogue-like map utilitys such as line-of-sight, field-of-view, and path-finding.
 
+    .. deprecated:: 3.2
+        The features provided here are better realized in the
+        :any:`tcod.map` and :any:`tcod.path` modules.
 """
+
+from __future__ import absolute_import
 
 import itertools as _itertools
 import math as _math
@@ -27,42 +32,48 @@ def _get_fov_type(fov):
 class Map(object):
     """Fast field-of-view and path-finding on stored data.
 
+    .. deprecated:: 3.2
+        :any:`tcod.map.Map` should be used instead.
+
     Set map conditions with the walkable and transparency attributes, this
     object can be iterated and checked for containment similar to consoles.
 
     For example, you can set all tiles and transparent and walkable with the
-    following code::
+    following code:
 
-        map = tdl.map.Map(80, 60)
-        for x,y in map:
-            map.transparent[x,y] = true
-            map.walkable[x,y] = true
+    Example:
+        >>> import tdl.map
+        >>> map_ = tdl.map.Map(80, 60)
+        >>> for x,y in map_:
+        ...     map_.transparent[x,y] = True
+        ...     map_.walkable[x,y] = True
 
-    @ivar transparent: Map transparency, access this attribute with
-                       map.transparent[x,y]
+    Attributes:
+        transparent: Map transparency
 
-                       Set to True to allow field-of-view rays, False will
-                       block field-of-view.
+            Access this attribute with ``map.transparent[x,y]``
 
-                       Transparent tiles only affect field-of-view.
+            Set to True to allow field-of-view rays, False will
+            block field-of-view.
 
-    @ivar walkable: Map accessibility, access this attribute with
-                    map.walkable[x,y]
+            Transparent tiles only affect field-of-view.
+        walkable: Map accessibility
 
-                    Set to True to allow path-finding through that tile,
-                    False will block passage to that tile.
+            Access this attribute with ``map.walkable[x,y]``
 
-                    Walkable tiles only affect path-finding.
+            Set to True to allow path-finding through that tile,
+            False will block passage to that tile.
 
-    @ivar fov: Map tiles touched by a field-of-view computation,
-               access this attribute with map.fov[x,y]
+            Walkable tiles only affect path-finding.
 
-               Is True if a the tile is if view, otherwise False.
+        fov: Map tiles touched by a field-of-view computation.
 
-               You can set to this attribute if you want, but you'll typically
-               be using it to read the field-of-view of a L{compute_fov} call.
+            Access this attribute with ``map.fov[x,y]``
 
-    @since: 1.5.0
+            Is True if a the tile is if view, otherwise False.
+
+            You can set to this attribute if you want, but you'll typically
+            be using it to read the field-of-view of a :any:`compute_fov` call.
     """
 
     class _MapAttribute(object):
@@ -82,13 +93,7 @@ class Map(object):
                 )
 
     def __init__(self, width, height):
-        """Create a new Map with width and height.
-
-        @type width: int
-        @type height: int
-        @param width: Width of the new Map instance, in tiles.
-        @param width: Height of the new Map instance, in tiles.
-        """
+        """Create a new Map with width and height."""
         self.width = width
         self.height = height
         self._map_cdata = _lib.TCOD_map_new(width, height)
@@ -106,35 +111,33 @@ class Map(object):
         """Compute the field-of-view of this Map and return an iterator of the
         points touched.
 
-        @type x: int
-        @type y: int
+        Args:
+            x (int): Point of view, x-coordinate.
+            y (int): Point of view, y-coordinate.
+            fov (Text): The type of field-of-view to be used.
 
-        @param x: x center of the field-of-view
-        @param y: y center of the field-of-view
-        @type fov: string
-        @param fov: The type of field-of-view to be used.  Available types are:
+                Available types are:
+                'BASIC', 'DIAMOND', 'SHADOW', 'RESTRICTIVE', 'PERMISSIVE',
+                'PERMISSIVE0', 'PERMISSIVE1', ..., 'PERMISSIVE8'
+            radius (Optional[int]): Maximum view distance from the point of
+                view.
 
-                    'BASIC', 'DIAMOND', 'SHADOW', 'RESTRICTIVE', 'PERMISSIVE',
-                    'PERMISSIVE0', 'PERMISSIVE1', ..., 'PERMISSIVE8'
-        @type radius: int
-        @param radius: Radius of the field-of-view.
-        @type light_walls: boolean
-        @param light_walls: Include or exclude wall tiles in the field-of-view.
-        @type sphere: boolean
-        @param sphere: True for a spherical field-of-view.
-                       False for a square one.
-        @type cumulative: boolean
-        @param cumulative:
+                A value of 0 will give an infinite distance.
+            light_walls (bool): Light up walls, or only the floor.
+            sphere (bool): If True the lit area will be round instead of
+                square.
+            cumulative (bool): If True the lit cells will accumulate instead
+                of being cleared before the computation.
 
-        @rtype: iter((x, y), ...)
-        @return: An iterator of (x, y) points of tiles touched by the
-                 field-of-view.
+        Returns:
+            Iterator[Tuple[int, int]]: An iterator of (x, y) points of tiles
+                touched by the field-of-view.
 
-                 Unexpected behaviour can happen if you modify the Map while
-                 using the iterator.
+                Unexpected behaviour can happen if you modify the Map while
+                using the iterator.
 
-                 You can use the Map's fov attribute as an alternative to this
-                 iterator.
+                You can use the Map's fov attribute as an alternative to this
+                iterator.
         """
         # refresh cdata
         _lib.TDL_map_data_from_buffer(self._map_cdata,
@@ -159,16 +162,20 @@ class Map(object):
                      diagonal_cost=_math.sqrt(2)):
         """Get the shortest path between two points.
 
-        The start position is not included in the list.
+        Args:
+            start_x (int): Starting x-position.
+            start_y (int): Starting y-position.
+            dest_x (int): Destination x-position.
+            dest_y (int): Destination y-position.
+            diagonal_cost (float): Multiplier for diagonal movement.
 
-        @type diagnalCost: float
-        @param diagnalCost: Multiplier for diagonal movement.
+                Can be set to zero to disable diagonal movement entirely.
 
-                            Can be set to zero to disable diagonal movement
-                            entirely.
-        @rtype: [(x, y), ...]
-        @return: Returns a the shortest list of points to get to the destination
-                 position from the starting position
+        Returns:
+            List[Tuple[int, int]]: The shortest list of points to the
+                destination position from the starting position.
+
+            The start point is not included in this list.
         """
         # refresh cdata
         _lib.TDL_map_data_from_buffer(self._map_cdata,
@@ -197,58 +204,51 @@ class Map(object):
 
 
 class AStar(object):
-    """A* pathfinder
+    """An A* pathfinder using a callback.
 
-    Using this class requires a callback detailed in L{AStar.__init__}
+    .. deprecated:: 3.2
+        See :any:`tcod.path`.
 
-    @undocumented: getPath
+    Before crating this instance you should make one of two types of
+    callbacks:
+
+    - A function that returns the cost to move to (x, y)
+    - A function that returns the cost to move between
+      (destX, destY, sourceX, sourceY)
+
+    If path is blocked the function should return zero or None.
+    When using the second type of callback be sure to set advanced=True
+
+    Args:
+        width (int): Width of the pathfinding area (in tiles.)
+        height (int): Height of the pathfinding area (in tiles.)
+        callback (Union[Callable[[int, int], float],
+                        Callable[[int, int, int, int], float]]): A callback
+            returning the cost of a tile or edge.
+
+            A callback taking parameters depending on the setting
+            of 'advanced' and returning the cost of
+            movement for an open tile or zero for a
+            blocked tile.
+        diagnalCost (float): Multiplier for diagonal movement.
+
+            Can be set to zero to disable diagonal movement entirely.
+        advanced (bool): Give 2 additional parameters to the callback.
+
+            A simple callback with 2 positional parameters may not
+            provide enough information.  Setting this to True will
+            call the callback with 2 additional parameters giving
+            you both the destination and the source of movement.
+
+            When True the callback will need to accept
+            (destX, destY, sourceX, sourceY) as parameters.
+            Instead of just (destX, destY).
     """
 
     __slots__ = ('_as_parameter_', '_callback', '__weakref__')
 
-
-
     def __init__(self, width, height, callback,
                  diagnalCost=_math.sqrt(2), advanced=False):
-        """Create an A* pathfinder using a callback.
-
-        Before crating this instance you should make one of two types of
-        callbacks:
-         - A function that returns the cost to move to (x, y)
-        or
-         - A function that returns the cost to move between
-           (destX, destY, sourceX, sourceY)
-        If path is blocked the function should return zero or None.
-        When using the second type of callback be sure to set advanced=True
-
-        @type width: int
-        @param width: width of the pathfinding area in tiles
-        @type height: int
-        @param height: height of the pathfinding area in tiles
-
-        @type callback: function
-        @param callback: A callback taking parameters depending on the setting
-                         of 'advanced' and returning the cost of
-                         movement for an open tile or zero for a
-                         blocked tile.
-
-        @type diagnalCost: float
-        @param diagnalCost: Multiplier for diagonal movement.
-
-                            Can be set to zero to disable diagonal movement
-                            entirely.
-
-        @type advanced: boolean
-        @param advanced: A simple callback with 2 positional parameters may not
-                         provide enough information.  Setting this to True will
-                         call the callback with 2 additional parameters giving
-                         you both the destination and the source of movement.
-
-                         When True the callback will need to accept
-                         (destX, destY, sourceX, sourceY) as parameters.
-                         Instead of just (destX, destY).
-
-        """
         if not diagnalCost: # set None or False to zero
             diagnalCost = 0.0
         if advanced:
@@ -278,11 +278,13 @@ class AStar(object):
         """
         Get the shortest path from origXY to destXY.
 
-        @rtype: [(x, y), ...]
-        @return: Returns a list walking the path from origXY to destXY.
-                 This excludes the starting point and includes the destination.
+        Returns:
+            List[Tuple[int, int]]: Returns a list walking the path from orig
+                to dest.
 
-                 If no path is found then an empty list is returned.
+                This excludes the starting point and includes the destination.
+
+                If no path is found then an empty list is returned.
         """
         found = _lib.TCOD_path_compute(self._as_parameter_, origX, origY, destX, destY)
         if not found:
@@ -309,34 +311,33 @@ def quick_fov(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sph
     Always check if the index is in bounds both in the callback and in the
     returned values.  These values can go into the negatives as well.
 
-    @type x: int
-    @param x: x center of the field-of-view
-    @type y: int
-    @param y: y center of the field-of-view
-    @type callback: function
-    @param callback: This should be a function that takes two positional arguments x,y
-                     and returns True if the tile at that position is transparent
-                     or False if the tile blocks light or is out of bounds.
-    @type fov: string
-    @param fov: The type of field-of-view to be used.  Available types are:
+    Args:
+        x (int): x center of the field-of-view
+        y (int): y center of the field-of-view
+        callback (Callable[[int, int], bool]):
 
-                'BASIC', 'DIAMOND', 'SHADOW', 'RESTRICTIVE', 'PERMISSIVE',
-                'PERMISSIVE0', 'PERMISSIVE1', ..., 'PERMISSIVE8'
-    @type radius: float
-    @param radius: Radius of the field-of-view.
+            This should be a function that takes two positional arguments x,y
+            and returns True if the tile at that position is transparent
+            or False if the tile blocks light or is out of bounds.
+        fov (Text): The type of field-of-view to be used.
 
-                   When sphere is True a floating point can be used to fine-tune
-                   the range.  Otherwise the radius is just rounded up.
+            Available types are:
+            'BASIC', 'DIAMOND', 'SHADOW', 'RESTRICTIVE', 'PERMISSIVE',
+            'PERMISSIVE0', 'PERMISSIVE1', ..., 'PERMISSIVE8'
+        radius (float) Radius of the field-of-view.
 
-                   Be careful as a large radius has an exponential affect on
-                   how long this function takes.
-    @type lightWalls: boolean
-    @param lightWalls: Include or exclude wall tiles in the field-of-view.
-    @type sphere: boolean
-    @param sphere: True for a spherical field-of-view.  False for a square one.
+            When sphere is True a floating point can be used to fine-tune
+            the range.  Otherwise the radius is just rounded up.
 
-    @rtype: set((x, y), ...)
-    @return: Returns a set of (x, y) points that are within the field-of-view.
+            Be careful as a large radius has an exponential affect on
+            how long this function takes.
+        lightWalls (bool): Include or exclude wall tiles in the field-of-view.
+        sphere (bool): True for a spherical field-of-view.
+            False for a square one.
+
+    Returns:
+        Set[Tuple[int, int]]: A set of (x, y) points that are within the
+            field-of-view.
     """
     trueRadius = radius
     radius = int(_math.ceil(radius))
@@ -373,8 +374,9 @@ def bresenham(x1, y1, x2, y2):
 
     Implementation hastily copied from RogueBasin.
 
-    @return: Returns a list of (x, y) points, including both the start and
-             endpoints.
+    Returns:
+        List[Tuple[int, int]]: A list of (x, y) points,
+            including both the start and end-points.
     """
     points = []
     issteep = abs(y2-y1) > abs(x2-x1)

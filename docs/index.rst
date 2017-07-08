@@ -29,7 +29,7 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
-   :caption: tdl API
+   :caption: Legacy tdl API
 
    tdl
 

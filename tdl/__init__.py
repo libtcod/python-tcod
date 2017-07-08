@@ -1,21 +1,12 @@
 """
-    This is the official documentation for python-tdl.  A Pythonic port of
-    U{libtcod<http://roguecentral.org/doryen/libtcod/>}.
-
-    You can find the project page on GitHub
-    U{here<https://github.com/HexDecimal/python-tdl>}.
-
-    Report any bugs or issues to the GitHub issue tracker
-    U{here<https://github.com/HexDecimal/python-tdl/issues>}.
-
     Getting Started
     ===============
       Once the library is imported you can load the font you want to use with
-      L{tdl.set_font}.
+      :any:`tdl.set_font`.
       This is optional and when skipped will use a decent default font.
 
-      After that you call L{tdl.init} to set the size of the window and get the
-      root console in return.
+      After that you call :any:`tdl.init` to set the size of the window and
+      get the root console in return.
       This console is the canvas to what will appear on the screen.
 
     Indexing Consoles
@@ -29,22 +20,22 @@
       You may also iterate over a console using a for statement.  This returns
       every x,y coordinate available to draw on but it will be extremely slow
       to actually operate on every coordinate individualy.
-      Try to minimize draws by using an offscreen L{Console}, only drawing
-      what needs to be updated, and using L{Console.blit}.
+      Try to minimize draws by using an offscreen :any:`Console`, only drawing
+      what needs to be updated, and using :any:`Console.blit`.
 
     Drawing and Colors
     ==================
 
-      Once you have the root console from L{tdl.init} you can start drawing on
-      it using a method such as L{Console.draw_char}.
+      Once you have the root console from :any:`tdl.init` you can start drawing
+      on it using a method such as :any:`Console.draw_char`.
       When using this method you can have the char parameter be an integer or a
       single character string.
 
       The fg and bg parameters expect a variety of types.
       The parameters default to Ellipsis which will tell the function to
-      use the colors previously set by the L{Console.set_colors} method.
-      The colors set by L{Console.set_colors} are per each L{Console}/L{Window}
-      and default to white on black.
+      use the colors previously set by the :any:`Console.set_colors` method.
+      The colors set by :any`Console.set_colors` are per each
+      :any:`Console`/:any:`Window` and default to white on black.
       You can use a 3-item list/tuple of [red, green, blue] with integers in
       the 0-255 range with [0, 0, 0] being black and [255, 255, 255] being
       white.
@@ -53,10 +44,8 @@
       Using None in the place of any of the three parameters (char, fg, bg)
       will tell the function to not overwrite that color or character.
 
-      After the drawing functions are called a call to L{tdl.flush} will update
-      the screen.
-
-    @undocumented: style
+      After the drawing functions are called a call to :any:`tdl.flush` will
+      update the screen.
 """
 
 from __future__ import (absolute_import, division,
@@ -192,17 +181,8 @@ class TDLError(Exception):
     """
 
 class _BaseConsole(object):
-    """
-    Contains methods shared by both the L{Console} and L{Window} classes.
-
-    @undocumented: drawStr drawChar drawFrame drawRect
-                   getCursor getSize getChar printStr setColors setMode
-    @group Drawing Methods: draw_*, blit, clear
-    @group Printing Methods: print_*, move, set_colors, set_mode, write, get_cursor
-
-    @undocumented: console
-    @ivar width: The width of this console in tiles.  Do not overwrite this.
-    @ivar height: The height of this console in tiles.  Do not overwrite this.
+    """You will not use this class directly.  The methods in this class are
+    inherited by the :any:`tdl.Console` and :any:`tdl.Window` subclasses.
     """
     __slots__ = ('width', 'height', 'console', '_cursor', '_fg',
                  '_bg', '_blend', '__weakref__', '__dict__')
@@ -279,23 +259,24 @@ class _BaseConsole(object):
         """Configure how this console will react to the cursor writing past the
         end if the console.
 
-        This is for methods that use the virtual cursor, such as L{print_str}.
+        This is for methods that use the virtual cursor, such as
+        :any:`print_str`.
 
-        @type mode: string
-        @param mode: Possible settings are:
+        Args:
+            mode (Text): The mode to set.
 
-                      - 'error' - A TDLError will be raised once the cursor
-                        reaches the end of the console.  Everything up until
-                        the error will still be drawn.
+            Possible settings are:
 
-                        This is the default setting.
+           - 'error' - A TDLError will be raised once the cursor
+             reaches the end of the console.  Everything up until
+             the error will still be drawn.
+             This is the default setting.
+           - 'scroll' - The console will scroll up as stuff is
+             written to the end.
+             You can restrict the region with :any:`tdl.Window` when
+             doing this.
 
-                      - 'scroll' - The console will scroll up as stuff is
-                        written to the end.
-
-                        You can restrict the region with L{tdl.Window} when
-                        doing this.
-        @see: L{write}, L{print_str}
+        ..seealso:: :any:`write`, :any:`print_str`
         """
         MODES = ['error', 'scroll']
         if mode.lower() not in MODES:
@@ -307,11 +288,10 @@ class _BaseConsole(object):
 
         Values of None will only leave the current values unchanged.
 
-        @type fg: (r, g, b), int, Ellipsis, or None
-        @type bg: (r, g, b), int, Ellipsis, or None
-        @param fg: See Drawing and Colors at the L{module level docs<tdl>}
-        @param bg: See Drawing and Colors at the L{module level docs<tdl>}
-        @see: L{move}, L{print_str}
+        Args:
+            fg (Optional[Union[Tuple[int, int, int], int, Ellipsis]])
+            bg (Optional[Union[Tuple[int, int, int], int, Ellipsis]])
+        .. seealso:: :any:`move`, :any:`print_str`
         """
         if fg is not None:
             self._fg = _format_color(fg, self._fg)
@@ -323,15 +303,16 @@ class _BaseConsole(object):
 
         Handles special characters such as '\\n' and '\\r'.
         Printing past the bottom of the console will scroll everything upwards
-        if L{set_mode} is set to 'scroll'.
+        if :any:`set_mode` is set to 'scroll'.
 
-        Colors can be set with L{set_colors} and the virtual cursor can be moved
-        with L{move}.
+        Colors can be set with :any:`set_colors` and the virtual cursor can
+        be moved with :any:`move`.
 
-        @type string: string
-        @param string:
-        @see: L{draw_str}, L{move}, L{set_colors}, L{set_mode}, L{write},
-              L{Window}
+        Args:
+            string (Text): The text to print.
+
+        .. seealso:: :any:`draw_str`, :any:`move`, :any:`set_colors`,
+                     :any:`set_mode`, :any:`write`, :any:`Window`
         """
         x, y = self._cursor
         for char in string:
@@ -351,13 +332,15 @@ class _BaseConsole(object):
         """This method mimics basic file-like behaviour.
 
         Because of this method you can replace sys.stdout or sys.stderr with
-        a L{Console} or L{Window} instance.
+        a :any:`Console` or :any:`Window` instance.
 
         This is a convoluted process and behaviour seen now can be excepted to
         change on later versions.
 
-        @type string: string
-        @see: L{set_colors}, L{set_mode}, L{Window}
+        Args:
+            string (Text): The text to write out.
+
+        .. seealso:: :any:`set_colors`, :any:`set_mode`, :any:`Window`
         """
         # some 'basic' line buffer stuff.
         # there must be an easier way to do this.  The textwrap module didn't
@@ -384,27 +367,23 @@ class _BaseConsole(object):
     def draw_char(self, x, y, char, fg=Ellipsis, bg=Ellipsis):
         """Draws a single character.
 
-        @type x: int
-        @param x: X coordinate to draw at.
-        @type y: int
-        @param y: Y coordinate to draw at.
+        Args:
+            x (int): x-coordinate to draw on.
+            y (int): y-coordinate to draw on.
+            char (Optional[Union[int, Text]]): An integer, single character
+                string, or None.
 
-        @type char: int, string, or None
-        @param char: Should be an integer, single character string, or None.
+                You can set the char parameter as None if you only want to change
+                the colors of the tile.
+            fg (Optional[Union[Tuple[int, int, int], int, Ellipsis]])
+            bg (Optional[Union[Tuple[int, int, int], int, Ellipsis]])
 
-                     You can set the char parameter as None if you only want to change
-                     the colors of the tile.
+        Raises: AssertionError: Having x or y values that can't be placed
+            inside of the console will raise an AssertionError.
+            You can use always use ((x, y) in console) to
+            check if a tile is drawable.
 
-        @type fg: (r, g, b), int, Ellipsis, or None
-        @type bg: (r, g, b), int, Ellipsis, or None
-        @param fg: See Drawing and Colors at the L{module level docs<tdl>}
-        @param bg: See Drawing and Colors at the L{module level docs<tdl>}
-
-        @raise AssertionError: Having x or y values that can't be placed inside
-                               of the console will raise an AssertionError.
-                               You can use always use ((x, y) in console) to
-                               check if a tile is drawable.
-        @see: L{get_char}
+        .. seealso:: :any:`get_char`
         """
         #x, y = self._normalizePoint(x, y)
         _put_char_ex(self.console_c, x, y, _format_char(char),
@@ -414,39 +393,37 @@ class _BaseConsole(object):
         """Draws a string starting at x and y.
 
         A string that goes past the right side will wrap around.  A string
-        wrapping to below the console will raise a L{TDLError} but will still be
-        written out.  This means you can safely ignore the errors with a
-        try... except block if you're fine with partially written strings.
+        wrapping to below the console will raise :any:`tdl.TDLError` but will
+        still be written out.
+        This means you can safely ignore the errors with a
+        try..except block if you're fine with partially written strings.
 
         \\r and \\n are drawn on the console as normal character tiles.  No
         special encoding is done and any string will translate to the character
         table as is.
 
         For a string drawing operation that respects special characters see
-        L{print_str}.
+        :any:`print_str`.
 
-        @type x: int
-        @param x: X coordinate to draw at.
-        @type y: int
-        @param y: Y coordinate to draw at.
+        Args:
+            x (int): x-coordinate to start at.
+            y (int): y-coordinate to start at.
+            string (Union[Text, Iterable[int]]): A string or an iterable of
+                numbers.
 
-        @type string: string or iterable
-        @param string: Can be a string or an iterable of numbers.
+                Special characters are ignored and rendered as any other
+                character.
+            fg (Optional[Union[Tuple[int, int, int], int, Ellipsis]])
+            bg (Optional[Union[Tuple[int, int, int], int, Ellipsis]])
 
-                       Special characters are ignored and rendered as any other
-                       character.
+        Raises:
+            AssertionError: Having x or y values that can't be placed inside
+                            of the console will raise an AssertionError.
 
-        @type fg: (r, g, b), int, Ellipsis, or None
-        @type bg: (r, g, b), int, Ellipsis, or None
-        @param fg: See Drawing and Colors at the L{module level docs<tdl>}
-        @param bg: See Drawing and Colors at the L{module level docs<tdl>}
+                You can use always use ``((x, y) in console)`` to check if
+                a tile is drawable.
 
-        @raise AssertionError: Having x or y values that can't be placed inside
-                               of the console will raise an AssertionError.
-
-                               You can use always use ((x, y) in console) to
-                               check if a tile is drawable.
-        @see: L{print_str}
+        .. seealso:: :any:`print_str`
         """
 
         x, y = self._normalizePoint(x, y)
@@ -475,37 +452,30 @@ class _BaseConsole(object):
 
         If width or height are None then it will extend to the edge of the console.
 
-        @type x: int
-        @param x: x coordinate to draw at.
-        @type y: int
-        @param y: y coordinate to draw at.
+        Args:
+            x (int): x-coordinate for the top side of the rect.
+            y (int): y-coordinate for the left side of the rect.
+            width (Optional[int]): The width of the rectangle.
 
-        @type width: int or None
-        @param width: Width of the rectangle.
+                Can be None to extend to the bottom right of the
+                console or can be a negative number to be sized reltive
+                to the total size of the console.
+            height (Optional[int]): The height of the rectangle.
+            string (Optional[Union[Text, int]]): An integer, single character
+                string, or None.
 
-                      Can be None to extend to the bottom right of the
-                      console or can be a negative number to be sized reltive
-                      to the total size of the console.
-        @type height: int or None
-        @param height: Height of the rectangle.  See width.
+                You can set the string parameter as None if you only want
+                to change the colors of an area.
+            fg (Optional[Union[Tuple[int, int, int], int, Ellipsis]])
+            bg (Optional[Union[Tuple[int, int, int], int, Ellipsis]])
 
-        @type string: int, string, or None
-        @param string: Should be an integer, single character string, or None.
+        Raises:
+            AssertionError: Having x or y values that can't be placed inside
+                            of the console will raise an AssertionError.
 
-                       You can set the char parameter as None if you only want
-                       to change the colors of an area.
-
-        @type fg: (r, g, b), int, Ellipsis, or None
-        @type bg: (r, g, b), int, Ellipsis, or None
-        @param fg: See Drawing and Colors at the L{module level docs<tdl>}
-        @param bg: See Drawing and Colors at the L{module level docs<tdl>}
-
-        @raise AssertionError: Having x or y values that can't be placed inside
-                               of the console will raise an AssertionError.
-
-                               You can use always use ((x, y) in console) to
-                               check if a tile is drawable.
-        @see: L{clear}, L{draw_frame}
+            You can use always use ``((x, y) in console)`` to check if a tile
+            is drawable.
+        .. seealso:: :any:`clear`, :any:`draw_frame`
         """
         x, y, width, height = self._normalizeRect(x, y, width, height)
         fg, bg = _format_color(fg, self._fg), _format_color(bg, self._bg)
@@ -523,37 +493,30 @@ class _BaseConsole(object):
     def draw_frame(self, x, y, width, height, string, fg=Ellipsis, bg=Ellipsis):
         """Similar to L{draw_rect} but only draws the outline of the rectangle.
 
-        @type x: int
-        @param x: x coordinate to draw at.
-        @type y: int
-        @param y: y coordinate to draw at.
+        `width or `height` can be None to extend to the bottom right of the
+        console or can be a negative number to be sized reltive
+        to the total size of the console.
 
-        @type width: int or None
-        @param width: Width of the rectangle.
+        Args:
+            x (int): The x-coordinate to start on.
+            y (int): The y-coordinate to start on.
+            width (Optional[int]): Width of the rectangle.
+            height (Optional[int]): Height of the rectangle.
+            string (Optional[Union[Text, int]]): An integer, single character
+                string, or None.
 
-                      Can be None to extend to the bottom right of the
-                      console or can be a negative number to be sized reltive
-                      to the total size of the console.
-        @type height: int or None
-        @param height: Height of the rectangle.  See width.
+                You can set this parameter as None if you only want
+                to change the colors of an area.
+            fg (Optional[Union[Tuple[int, int, int], int, Ellipsis]])
+            bg (Optional[Union[Tuple[int, int, int], int, Ellipsis]])
 
-        @type string: int, string, or None
-        @param string: Should be an integer, single character string, or None.
+        Raises:
+            AssertionError: Having x or y values that can't be placed inside
+                             of the console will raise an AssertionError.
 
-                       You can set the char parameter as None if you only want
-                       to change the colors of an area.
-
-        @type fg: (r, g, b), int, Ellipsis, or None
-        @type bg: (r, g, b), int, Ellipsis, or None
-        @param fg: See Drawing and Colors at the L{module level docs<tdl>}
-        @param bg: See Drawing and Colors at the L{module level docs<tdl>}
-
-        @raise AssertionError: Having x or y values that can't be placed inside
-                               of the console will raise an AssertionError.
-
-                               You can use always use ((x, y) in console) to
-                               check if a tile is drawable.
-        @see: L{draw_rect}, L{Window}
+             You can use always use ``((x, y) in console)`` to check if a tile
+             is drawable.
+        .. seealso:: :any:`draw_rect`, :any:`Window`
         """
         x, y, width, height = self._normalizeRect(x, y, width, height)
         fg, bg = _format_color(fg, self._fg), _format_color(bg, self._bg)
@@ -573,29 +536,21 @@ class _BaseConsole(object):
 
         By default it blits the entire source to the topleft corner.
 
-        @type source: L{Console} or L{Window}
-        @param source: Source window can be a L{Console} or L{Window} instance.
-                       It can even blit to itself without any problems.
+        Args:
+            source (Union[tdl.Console, tdl.Window]): The blitting source.
+                A console can blit to itself without any problems.
+            x (int): x-coordinate of this console to blit on.
+            y (int): y-coordinate of this console to blit on.
+            width (Optional[int]): Width of the rectangle.
 
-        @type x: int
-        @param x: X coordinate to blit to.
-        @type y: int
-        @param y: Y coordinate to blit to.
-
-        @type width: int or None
-        @param width: Width of the rectangle.
-
-                      Can be None to extend as far as possible to the
-                      bottom right corner of the blit area or can be a negative
-                      number to be sized reltive to the total size of the
-                      B{destination} console.
-        @type height: int or None
-        @param height: Height of the rectangle.  See width.
-
-        @type srcX: int
-        @param srcX: The source consoles x coordinate to blit from.
-        @type srcY: int
-        @param srcY: The source consoles y coordinate to blit from.
+                Can be None to extend as far as possible to the
+                bottom right corner of the blit area or can be a negative
+                number to be sized reltive to the total size of the
+                B{destination} console.
+            height (Optional[int]): Height of the rectangle.
+            srcX (int):  x-coordinate of the source region to blit.
+            srcY (int):  y-coordinate of the source region to blit.
+            fg_alpha (float): The foreground alpha.
         """
         assert isinstance(source, (Console, Window)), "source muse be a Window or Console instance"
 
@@ -629,12 +584,13 @@ class _BaseConsole(object):
     def get_cursor(self):
         """Return the virtual cursor position.
 
-        @rtype: (x, y)
-        @return: Returns (x, y), a 2-integer tuple containing where the next
-                 L{print_str} call will start at.
+        The cursor can be moved with the :any:`move` method.
 
-                 This can be changed with the L{move} method.
-        @see: L{move}
+        Returns:
+            Tuple[int, int]: The (x, y) coordinate of where :any:`print_str`
+                will continue from.
+
+        .. seealso:: :any:move`
         """
         x, y = self._cursor
         width, height = self.parent.get_size()
@@ -648,7 +604,8 @@ class _BaseConsole(object):
     def get_size(self):
         """Return the size of the console as (width, height)
 
-        @rtype: (width, height)
+        Returns:
+            Tuple[int, int]: A (width, height) tuple.
         """
         return self.width, self.height
 
@@ -657,18 +614,20 @@ class _BaseConsole(object):
 
         It goes without saying that working on the console this way is a
         slow process, especially for Python, and should be minimized.
-        @rtype: iter((x, y), ...)
+
+        Returns:
+            Iterator[Tuple[int, int]]: An ((x, y), ...) iterator.
         """
         return _itertools.product(range(self.width), range(self.height))
 
     def move(self, x, y):
         """Move the virtual cursor.
 
-        @type x: int
-        @param x: X position to place the cursor.
-        @type y: int
-        @param y: Y position to place the cursor.
-        @see: L{get_cursor}, L{print_str}, L{write}
+        Args:
+            x (int): x-coordinate to place the cursor.
+            y (int): y-coordinate to place the cursor.
+
+        .. seealso:: :any:`get_cursor`, :any:`print_str`, :any:`write`
         """
         self._cursor = self._normalizePoint(x, y)
 
@@ -677,13 +636,16 @@ class _BaseConsole(object):
 
         Uncovered areas will be cleared to the default background color.
         Does not move the virutal cursor.
-        @type x: int
-        @param x: Distance to scroll along x-axis
-        @type y: int
-        @param y: Distance to scroll along y-axis
-        @rtype: iter((x, y), ...)
-        @return: Iterates over the (x, y) of any tile uncovered after scrolling.
-        @see: L{set_colors}
+
+        Args:
+            x (int): Distance to scroll along the x-axis.
+            y (int): Distance to scroll along the y-axis.
+
+        Returns:
+            Iterator[Tuple[int, int]]: An iterator over the (x, y) coordinates
+            of any tile uncovered after scrolling.
+
+        .. seealso:: :any:`set_colors`
         """
         assert isinstance(x, _INTTYPES), "x must be an integer, got %s" % repr(x)
         assert isinstance(y, _INTTYPES), "y must be an integer, got %s" % repr(x)
@@ -747,23 +709,11 @@ class _BaseConsole(object):
 
         Unlike other drawing functions, fg and bg can not be None.
 
-        @type fg: (r, g, b), int, or Ellipsis
-        @type bg: (r, g, b), int, or Ellipsis
-        @param fg: Can not be None.
-                   See Drawing and Colors at the L{module level docs<tdl>}
-        @param bg: See fg
+        Args:
+            fg (Union[Tuple[int, int, int], int, Ellipsis])
+            bg (Union[Tuple[int, int, int], int, Ellipsis])
 
-
-        @type fg: (r, g, b)
-        @param fg: Foreground color.
-
-                   Must be a 3-item list with integers that range 0-255.
-
-                   Unlike most other operations you cannot use None here.
-                   To clear only the foreground or background use L{draw_rect}.
-        @type bg: (r, g, b)
-        @param bg: Background color.  See fg.
-        @see: L{draw_rect}
+        .. seealso:: :any:`draw_rect`
         """
         raise NotImplementedError('this method is overwritten by subclasses')
 
@@ -773,16 +723,25 @@ class _BaseConsole(object):
         This method runs very slowly as is not recommended to be called
         frequently.
 
-        @rtype: (int, (r, g, b), (r, g, b))
-        @returns: Returns a 3-item tuple.  The first item is an integer of the
-                  character at the position (x, y) the second and third are the
-                  foreground and background colors respectfully.
-        @see: L{draw_char}
+        Args:
+            x (int): The x-coordinate to pick.
+            y (int): The y-coordinate to pick.
+
+        Returns:
+            Tuple[int, Tuple[int, int, int], Tuple[int, int, int]]: A 3-item
+                tuple: `(int, fg, bg)`
+
+                The first item is an integer of the
+                character at the position (x, y) the second and third are the
+                foreground and background colors respectfully.
+
+        .. seealso:: :any:`draw_char`
         """
         raise NotImplementedError('Method here only exists for the docstring')
 
     def __contains__(self, position):
-        """Use ((x, y) in console) to check if a position is drawable on this console.
+        """Use ``((x, y) in console)`` to check if a position is drawable on
+        this console.
         """
         x, y = position
         return (0 <= x < self.width) and (0 <= y < self.height)
@@ -790,30 +749,18 @@ class _BaseConsole(object):
 class Console(_BaseConsole):
     """Contains character and color data and can be drawn to.
 
-    The console created by the L{tdl.init} function is the root console and is the
-    console that is rendered to the screen with L{flush}.
+    The console created by the :any:`tdl.init` function is the root console
+    and is the console that is rendered to the screen with :any:`flush`.
 
     Any console created from the Console class is an off-screen console that
-    can be drawn on before being L{blit} to the root console.
+    can be drawn on before being :any:`blit` to the root console.
 
-    @undocumented: getChar
-
-    @ivar tcod_console: Public interface to the cffi TCOD_console_t object
-                        of this instance.
-
-                        Feel free to pass this variable to libtcod-cffi calls
-                        but keep in mind that as soon as Console instance is
-                        garbage collected the tcod_console will be deleted.
+    Args:
+        width (int): Width of the new console in tiles
+        height (int): Height of the new console in tiles
     """
 
     def __init__(self, width, height):
-        """Create a new offscreen console.
-
-        @type width: int
-        @param width: Width of the console in tiles
-        @type height: int
-        @param height: Height of the console in tiles
-        """
         _BaseConsole.__init__(self)
         self.console_c = _lib.TCOD_console_new(width, height)
         self.console = self
@@ -944,53 +891,41 @@ class Console(_BaseConsole):
         fg = _lib.TCOD_console_get_char_foreground(self.console_c, x, y)
         return char, (fg.r, fg.g, fg.b), (bg.r, bg.g, bg.b)
 
+    # Copy docstrings for Sphinx
+    clear.__doc__ = _BaseConsole.clear.__doc__
+    get_char.__doc__ = _BaseConsole.get_char.__doc__
+
     def __repr__(self):
         return "<Console (Width=%i Height=%i)>" % (self.width, self.height)
 
 
 class Window(_BaseConsole):
-    """A Window contains a small isolated part of a Console.
+    """Isolate part of a :any:`Console` or :any:`Window` instance.
 
-    Drawing on the Window draws on the Console.
+    This classes methods are the same as :any:`tdl.Console`
 
     Making a Window and setting its width or height to None will extend it to
     the edge of the console.
 
-    @undocumented: getChar
+    This follows the normal rules for indexing so you can use a
+    negative integer to place the Window relative to the bottom
+    right of the parent Console instance.
+
+    `width` or `height` can be set to None to extend as far as possible
+    to the bottom right corner of the parent Console or can be a
+    negative number to be sized reltive to the Consoles total size.
+
+    Args:
+        console (Union(tdl.Console, tdl.Window)): The parent object.
+        x (int): x-coordinate to place the Window.
+        y (int): y-coordinate to place the Window.
+        width (Optional[int]): Width of the Window.
+        height (Optional[int]): Height of the Window.
     """
 
     __slots__ = ('parent', 'x', 'y')
 
     def __init__(self, console, x, y, width, height):
-        """Isolate part of a L{Console} or L{Window} instance.
-
-        @type console: L{Console} or L{Window}
-        @param console: The parent object which can be a L{Console} or another
-                        L{Window} instance.
-
-        @type x: int
-        @param x: X coordinate to place the Window.
-
-                  This follows the normal rules for indexing so you can use a
-                  negative integer to place the Window relative to the bottom
-                  right of the parent Console instance.
-        @type y: int
-        @param y: Y coordinate to place the Window.
-
-                  See x.
-
-        @type width: int or None
-        @param width: Width of the Window.
-
-                      Can be None to extend as far as possible to the
-                      bottom right corner of the parent Console or can be a
-                      negative number to be sized reltive to the Consoles total
-                      size.
-        @type height: int or None
-        @param height: Height of the Window.
-
-                       See width.
-        """
         _BaseConsole.__init__(self)
         assert isinstance(console, (Console, Window)), 'console parameter must be a Console or Window instance, got %s' % repr(console)
         self.parent = console
@@ -1072,34 +1007,31 @@ def init(width, height, title=None, fullscreen=False, renderer='SDL'):
     Call the consoles drawing functions.  Then remember to use L{tdl.flush} to
     make what's drawn visible on the console.
 
-    @type width: int
-    @param width: width of the root console (in tiles)
+    Args:
+        width (int): width of the root console (in tiles)
+        height (int): height of the root console (in tiles)
+        title (Optiona[Text]):
+            Text to display as the window title.
 
-    @type height: int
-    @param height: height of the root console (in tiles)
+            If left None it defaults to the running scripts filename.
+        fullscreen (bool): Can be set to True to start in fullscreen mode.
+        renderer (Text): Can be one of 'GLSL', 'OPENGL', or 'SDL'.
 
-    @type title: string
-    @param title: Text to display as the window title.
+        Due to way Python works you're unlikely to see much of an
+        improvement by using 'GLSL' over 'OPENGL' as most of the
+        time Python is slow interacting with the console and the
+        rendering itself is pretty fast even on 'SDL'.
 
-                  If left None it defaults to the running scripts filename.
+    Returns:
+        tdl.Console: The root console.
 
-    @type fullscreen: boolean
-    @param fullscreen: Can be set to True to start in fullscreen mode.
+            Only what is drawn on the root console is
+            what's visible after a call to :any:`tdl.flush`.
+            After the root console is garbage collected, the window made by
+            this function will close.
 
-    @type renderer: string
-    @param renderer: Can be one of 'GLSL', 'OPENGL', or 'SDL'.
-
-                     Due to way Python works you're unlikely to see much of an
-                     improvement by using 'GLSL' over 'OPENGL' as most of the
-                     time Python is slow interacting with the console and the
-                     rendering itself is pretty fast even on 'SDL'.
-
-    @rtype: L{Console}
-    @return: The root console.  Only what is drawn on the root console is
-             what's visible after a call to L{tdl.flush}.
-             After the root console is garbage collected, the window made by
-             this function will close.
-    @see: L{Console}, L{set_font}
+    .. seealso::
+        :any:`Console` :any:`set_font`
     """
     RENDERERS = {'GLSL': 0, 'OPENGL': 1, 'SDL': 2}
     global _rootinitialized, _rootConsoleRef
@@ -1140,9 +1072,9 @@ def flush():
     """Make all changes visible and update the screen.
 
     Remember to call this function after drawing operations.
-    Calls to flush will enfore the frame rate limit set by L{tdl.set_fps}.
+    Calls to flush will enfore the frame rate limit set by :any:`tdl.set_fps`.
 
-    This function can only be called after L{tdl.init}
+    This function can only be called after :any:`tdl.init`
     """
     if not _rootinitialized:
         raise TDLError('Cannot flush without first initializing with tdl.init')
@@ -1153,7 +1085,7 @@ def flush():
 def set_font(path, columns=None, rows=None, columnFirst=False,
              greyscale=False, altLayout=False):
     """Changes the font to be used for this session.
-    This should be called before L{tdl.init}
+    This should be called before :any:`tdl.init`
 
     If the font specifies its size in its filename (i.e. font_NxN.png) then this
     function can auto-detect the tileset formatting and the parameters columns
@@ -1162,49 +1094,38 @@ def set_font(path, columns=None, rows=None, columnFirst=False,
     While it's possible you can change the font mid program it can sometimes
     break in rare circumstances.  So use caution when doing this.
 
-    @type path: string
-    @param path: Must be a string filepath where a bmp or png file is found.
+    Args:
+        path (Text): A file path to a `.bmp` or `.png` file.
+        columns (int):
+            Number of columns in the tileset.
 
-    @type columns: int
-    @param columns: Number of columns in the tileset.
+            Can be left None for auto-detection.
+        rows (int):
+            Number of rows in the tileset.
 
-                    Can be left None for auto-detection.
+            Can be left None for auto-detection.
+        columnFirst (bool):
+            Defines if the characer order goes along the rows or colomns.
 
-    @type rows: int
-    @param rows: Number of rows in the tileset.
+            It should be True if the charater codes 0-15 are in the
+            first column, and should be False if the characters 0-15
+            are in the first row.
+        greyscale (bool):
+            Creates an anti-aliased font from a greyscale bitmap.
+            Otherwise it uses the alpha channel for anti-aliasing.
 
-                 Can be left None for auto-detection.
+            Unless you actually need anti-aliasing from a font you
+            know uses a smooth greyscale channel you should leave
+            this on False.
+        altLayout (bool)
+            An alternative layout with space in the upper left corner.
+            The colomn parameter is ignored if this is True,
+            find examples of this layout in the `font/libtcod/`
+            directory included with the python-tdl source.
 
-    @type columnFirst: boolean
-    @param columnFirst: Defines if the characer order goes along the rows or
-                        colomns.
-                        It should be True if the charater codes 0-15 are in the
-                        first column.
-                        And should be False if the characters 0-15
-                        are in the first row.
-
-    @type greyscale: boolean
-    @param greyscale: Creates an anti-aliased font from a greyscale bitmap.
-                      Otherwise it uses the alpha channel for anti-aliasing.
-
-                      Unless you actually need anti-aliasing from a font you
-                      know uses a smooth greyscale channel you should leave
-                      this on False.
-
-    @type altLayout: boolean
-    @param altLayout: An alternative layout with space in the upper left
-                      corner.
-                      The colomn parameter is ignored if this is True,
-                      find examples of this layout in the font/libtcod/
-                      directory included with the python-tdl source.
-
-    @raise TDLError: Will be raised if no file is found at path or if auto-
-                     detection fails.
-
-    @note: A png file that's been optimized can fail to load correctly on
-           MAC OS X creating a garbled mess when rendering.
-           Don't use a program like optipng or just use bmp files instead if
-           you want your program to work on macs.
+    Raises:
+        TDLError: Will be raised if no file is found at path or if auto-
+                  detection fails.
     """
     # put up some constants that are only used here
     FONT_LAYOUT_ASCII_INCOL = 1
@@ -1280,9 +1201,9 @@ def set_font(path, columns=None, rows=None, columnFirst=False,
 def get_fullscreen():
     """Returns True if program is fullscreen.
 
-    @rtype: boolean
-    @return: Returns True if the window is in fullscreen mode.
-             Otherwise returns False.
+    Returns:
+        bool:  Returns True if the application is in full-screen mode.
+               Otherwise returns False.
     """
     if not _rootinitialized:
         raise TDLError('Initialize first with tdl.init')
@@ -1291,7 +1212,8 @@ def get_fullscreen():
 def set_fullscreen(fullscreen):
     """Changes the fullscreen state.
 
-    @type fullscreen: boolean
+    Args:
+        fullscreen (bool): True for full-screen, False for windowed mode.
     """
     if not _rootinitialized:
         raise TDLError('Initialize first with tdl.init')
@@ -1300,21 +1222,22 @@ def set_fullscreen(fullscreen):
 def set_title(title):
     """Change the window title.
 
-    @type title: string
+    Args:
+        title (Text): The new title text.
     """
     if not _rootinitialized:
         raise TDLError('Not initilized.  Set title with tdl.init')
     _lib.TCOD_console_set_window_title(_encodeString(title))
 
 def screenshot(path=None):
-    """Capture the screen and save it as a png file
+    """Capture the screen and save it as a png file.
 
-    @type path: string
-    @param path: The filepath to save the screenshot.
+    If path is None then the image will be placed in the current
+    folder with the names:
+    ``screenshot001.png, screenshot002.png, ...``
 
-                 If path is None then the image will be placed in the current
-                 folder with the names:
-                 screenshot001.png, screenshot002.png, ...
+    Args:
+        path (Optional[Text]): The file path to save the screenshot.
     """
     if not _rootinitialized:
         raise TDLError('Initialize first with tdl.init')
@@ -1338,36 +1261,34 @@ def screenshot(path=None):
     #else:
     #    raise TypeError('path is an invalid type: %s' % type(path))
 
-def set_fps(frameRate):
+def set_fps(fps):
     """Set the maximum frame rate.
 
-    @type frameRate: int
-    @param frameRate: Further calls to L{tdl.flush} will limit the speed of
-                      the program to run at <frameRate> frames per second. Can
-                      also be set to 0 to run without a limit.
+    Further calls to :any:`tdl.flush` will limit the speed of
+    the program to run at `fps` frames per second. This can
+    also be set to None to remove the frame rate limit.
 
-                      Defaults to None.
+    Args:
+        fps (optional[int]): The frames per second limit, or None.
     """
-    if frameRate is None:
-        frameRate = 0
-    assert isinstance(frameRate, _INTTYPES), 'frameRate must be an integer or None, got: %s' % repr(frameRate)
-    _lib.TCOD_sys_set_fps(frameRate)
+    _lib.TCOD_sys_set_fps(framerate or 0)
 
 def get_fps():
     """Return the current frames per second of the running program set by
-    L{set_fps}
+    :any:`set_fps`
 
-    @rtype: int
-    @return: Returns the frameRate set by set_fps.
-             If set to no limit, this will return 0.
+    Returns:
+        int: The frame rate set by :any:`set_fps`.
+             If there is no current limit, this will return 0.
     """
     return _lib.TCOD_sys_get_fps()
 
 def force_resolution(width, height):
-    """Change the fullscreen resoulution
+    """Change the fullscreen resoulution.
 
-    @type width: int
-    @type height: int
+    Args:
+        width (int): Width in pixels.
+        height (int): Height in pixels.
     """
     _lib.TCOD_sys_force_fullscreen_resolution(width, height)
 
@@ -1405,8 +1326,3 @@ setTitle = _style.backport(set_title)
 setFPS = _style.backport(set_fps)
 getFPS = _style.backport(get_fps)
 forceResolution = _style.backport(force_resolution)
-
-__license__ = "Simplified BSD License"
-__author__ = 'Kyle Stewart'
-__contact__ = "4b796c65+pythonTDL@gmail.com"
-__email__ = "4b796c65+pythonTDL@gmail.com"

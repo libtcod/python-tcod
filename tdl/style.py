@@ -25,10 +25,7 @@ def backport(func):
         _warnings.warn('This function name is deprecated',
                        DeprecationWarning, 2)
         return func(*args, **kargs)
-    deprecated_function.__doc__ = """
-        Deprecated version of the function L{%s}, you should prefer calling
-        that function instead of this one.
-    """ % (func.__name__)
+    deprecated_function.__doc__ = None
     return deprecated_function
 
 __all__ = []

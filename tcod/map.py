@@ -1,5 +1,5 @@
 
-from __future__ import absolute_import as _
+from __future__ import absolute_import
 
 import numpy as np
 
@@ -22,7 +22,6 @@ class BufferBitProxy(object):
 
 class Map(object):
     """
-    .. versionadded:: 2.0
 
     Args:
         width (int): Width of the new Map.
@@ -32,7 +31,9 @@ class Map(object):
         width (int): Read only width of this Map.
         height (int): Read only height of this Map.
         map_c (CData): A cffi pointer to a TCOD_map_t object.
-            .. versionadded:: 2.5
+        transparent: A writable boolean array of transparent cells.
+        walkable: A writable boolean array of walkable cells.
+        fov: A writable boolean array of the cells lit by :any:'compute_fov'.
     """
 
     def __init__(self, width, height):
@@ -54,13 +55,15 @@ class Map(object):
 
     def compute_fov(self, x, y, radius=0, light_walls=True,
                     algorithm=lib.FOV_RESTRICTIVE):
-        """
+        """Compute a field-of-view on the current instance.
 
         Args:
-            x (int):
-            y (int):
-            radius (int):
-            light_walls (bool):
+            x (int): Point of view, x-coordinate.
+            y (int): Point of view, y-coordinate.
+            radius (int): Maximum view distance from the point of view.
+
+                A value of `0` will give an infinite distance.
+            light_walls (bool): Light up walls, or only the floor.
             algorithm (int): Defaults to FOV_RESTRICTIVE
         """
         lib.TCOD_map_compute_fov(self.map_c, x, y, radius, light_walls,

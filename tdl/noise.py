@@ -5,8 +5,8 @@
     cloud/mist/smoke effects among other things.
 
     You can see examples of the available noise algorithms in the libtcod
-    documentation
-    U{here<http://doryen.eptalys.net/data/libtcod/doc/1.5.1/html2/noise.html>}.
+    documentation `here
+    <http://doryen.eptalys.net/data/libtcod/doc/1.5.1/html2/noise.html>`_.
 """
 
 
@@ -31,76 +31,69 @@ _NOISE_MODES = {'FLAT': _lib.TCOD_noise_get,
 
 class Noise(object):
     """An advanced noise generator.
+
+    .. deprecated:: 3.2
+        This class has been replaced by :any:`tcod.noise.Noise`.
+
+    Args:
+        algorithm (Text): The primary noise algorithm to be used.
+
+            Can be one of 'PERLIN', 'SIMPLEX', 'WAVELET'
+
+            - 'PERLIN' -
+              A popular noise generator.
+            - 'SIMPLEX' -
+              In theory this is a slightly faster generator with
+              less noticeable directional artifacts.
+            - 'WAVELET' -
+              A noise generator designed to reduce aliasing and
+              not lose detail when summed into a fractal
+              (as with the 'FBM' and 'TURBULENCE' modes.)
+              This works faster at higher dimensions.
+
+        mode (Text): A secondary parameter to determine how noise is generated.
+
+            Can be one of 'FLAT', 'FBM', 'TURBULENCE'
+
+            - 'FLAT' -
+              Generates the simplest form of noise.
+              This mode does not use the hurst, lacunarity,
+              and octaves parameters.
+            - 'FBM' -
+              Generates fractal brownian motion.
+            - 'TURBULENCE' -
+              Generates detailed noise with smoother and more
+              natural transitions.
+
+        hurst (float): The hurst exponent.
+
+            This describes the raggedness of the resultant noise,
+            with a higher value leading to a smoother noise.
+            It should be in the 0.0-1.0 range.
+
+            This is only used in 'FBM' and 'TURBULENCE' modes.
+
+        lacunarity (float): A multiplier that determines how quickly the
+            frequency increases for each successive octave.
+
+            The frequency of each successive octave is equal to
+            the product of the previous octave's frequency and
+            the lacunarity value.
+
+            This is only used in 'FBM' and 'TURBULENCE' modes.
+
+        octaves (float): Controls the amount of detail in the noise.
+
+            This is only used in 'FBM' and 'TURBULENCE' modes.
+
+        seed (Hashable): You can use any hashable object to be a seed for the
+            noise generator.
+
+            If None is used then a random seed will be generated.
     """
 
     def __init__(self, algorithm='PERLIN', mode='FLAT',
                  hurst=0.5, lacunarity=2.0, octaves=4.0, seed=None, dimensions=4):
-        """Create a new noise generator specifying a noise algorithm and how
-        it's used.
-
-        @type algorithm: string
-        @param algorithm: The primary noise algorithm to be used.
-
-                          Can be one of 'PERLIN', 'SIMPLEX', 'WAVELET'
-                           - 'PERLIN' -
-                             A popular noise generator.
-
-                           - 'SIMPLEX' -
-                             In theory this is a slightly faster generator with
-                             less noticeable directional artifacts.
-
-                           - 'WAVELET'
-                             A noise generator designed to reduce aliasing and
-                             not lose detail when summed into a fractal
-                             (as with the 'FBM' and 'TURBULENCE' modes.)
-
-                             This works faster at higher dimensions.
-
-        @type mode: string
-        @param mode: A secondary parameter to determine how noise is generated.
-
-                     Can be one of 'FLAT', 'FBM', 'TURBULENCE'
-                      - 'FLAT' -
-                        Generates the simplest form of noise.
-                        This mode does not use the hurst, lacunarity,
-                        and octaves parameters.
-
-                      - 'FBM' -
-                        Generates fractal brownian motion.
-
-                      - 'TURBULENCE' -
-                        Generates detailed noise with smoother and more
-                        natural transitions.
-
-        @type hurst: float
-        @param hurst: The hurst exponent describes the raggedness of the
-                      resultant noise, with a higher value leading to a
-                      smoother noise.
-                      It should be in the 0.0-1.0 range.
-
-                      This is only used in 'FBM' and 'TURBULENCE' modes.
-
-        @type lacunarity: float
-        @param lacunarity: A multiplier that determines how quickly the
-                           frequency increases for each successive octave.
-
-                           The frequency of each successive octave is equal to
-                           the product of the previous octave's frequency and
-                           the lacunarity value.
-
-                           This is only used in 'FBM' and 'TURBULENCE' modes.
-
-        @type octaves: float
-        @param octaves: Controls the amount of detail in the noise.
-
-                        This is only used in 'FBM' and 'TURBULENCE' modes.
-
-        @type seed: object
-        @param seed: You can use any hashable object to be a seed for the
-                     noise generator.
-
-                     If None is used then a random seed will be generated.
-        """
         if algorithm.upper() not in _NOISE_TYPES:
             raise _tdl.TDLError('No such noise algorithm as %s' % algorithm)
         self._algorithm = algorithm.upper()
@@ -152,12 +145,14 @@ class Noise(object):
         """Return the noise value of a specific position.
 
         Example usage: value = noise.getPoint(x, y, z)
-        @type position: floats
-        @param position:
 
-        @rtype: float
-        @return: Returns the noise value at position.
-                 This will be a floating point in the 0.0-1.0 range.
+        Args:
+            position (Tuple[float, ...]): The point to sample at.
+
+        Returns:
+            float: The noise value at position.
+
+                This will be a floating point in the 0.0-1.0 range.
         """
         #array = self._array
         #for d, pos in enumerate(position):

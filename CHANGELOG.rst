@@ -9,6 +9,7 @@ Changed
  - tcod.console: `Console.blit` parameters have been rearranged.
                  Most of the parameters are now optional.
  - tcod.noise: `Noise.__init__` parameter `rand` is now named `seed`.
+ - tdl: Changed `set_fps` paramter name to `fps`.
 Fixed
  - tcod.bsp: Corrected spelling of max_vertical_ratio.
 
