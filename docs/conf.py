@@ -55,7 +55,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'tdl'
+project = u'libtcod-cffi/tdl'
 copyright = u'2017, Kyle Stewart'
 author = u'Kyle Stewart'
 
