@@ -6,6 +6,8 @@ Unreleased
 ------------------
 Changed
  - tcod.bsp: `BSP.split_recursive` parameter `random` is now `seed`.
+ - tcod.console: `Console.blit` parameters have been rearranged.
+                 Most of the parameters are now optional.
  - tcod.noise: `Noise.__init__` parameter `rand` is now named `seed`.
 Fixed
  - tcod.bsp: Corrected spelling of max_vertical_ratio.

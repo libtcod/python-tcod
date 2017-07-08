@@ -27,6 +27,8 @@ from __future__ import absolute_import
 
 import sys
 
+import warnings
+
 import numpy as np
 
 import tcod.libtcod
@@ -51,9 +53,6 @@ class Console(object):
 
     Attributes:
         console_c (CData): A cffi pointer to a TCOD_console_t object.
-            .. versionadded:: 2.5
-
-    .. versionadded:: 2.0
     """
 
     def __init__(self, width, height):
@@ -319,36 +318,52 @@ class Console(object):
         lib.TCOD_console_print_frame(self.console_c, x, y, width, height,
                                      clear, bg_blend, string.encode('latin-1'))
 
-    def blit(self, x, y, width, height,
-             dest, dest_x, dest_y, fg_alpha=1.0, bg_alpha=1.0, key_color=None):
+    def blit(self, dest, dest_x=0, dest_y=0,
+             src_x=0, src_y=0, width=0, height=0,
+             fg_alpha=1.0, bg_alpha=1.0, key_color=None):
         """Blit from this console onto the ``dest`` console.
 
         Args:
-            x (int): X coordinate of this console to blit, from the left.
-            y (int): Y coordinate of this console to blit, from the top.
+            dest (Console): The destintaion console to blit onto.
+            dest_x (int): Leftmost coordinate of the destintaion console.
+            dest_y (int): Topmost coordinate of the destintaion console.
+            src_x (int): X coordinate from this console to blit, from the left.
+            src_y (int): Y coordinate from this console to blit, from the top.
             width (int): The width of the region to blit.
 
                 If this is 0 the maximum possible width will be used.
             height (int): The height of the region to blit.
 
                 If this is 0 the maximum possible height will be used.
-            dest (Console): The destintaion console to blit onto.
-            dest_x (int): Leftmost coordinate of the destintaion console.
-            dest_y (int): Topmost coordinate of the destintaion console.
             fg_alpha (float): Foreground color alpha vaule.
             bg_alpha (float): Background color alpha vaule.
             key_color (Optional[Tuple[int, int, int]]):
                 None, or a (red, green, blue) tuple with values of 0-255.
+
+        .. versionchanged:: 4.0
+            Parameters were rearraged and made optional.
+
+            Previously they were:
+            `(x, y, width, height, dest, dest_x, dest_y, *)`
         """
+        # The old syntax is easy to detect and correct.
+        if hasattr(src_y, 'console_c'):
+            src_x, src_y, width, height, dest, dest_x, dest_y = \
+                dest, dest_x, dest_y, src_x, src_y, width, height
+            warnings.warn(
+                "Parameter names have been moved around, see documentation.",
+                DeprecationWarning,
+                )
+
         if key_color or self._key_color:
             key_color = ffi.new('TCOD_color_t*', key_color)
             lib.TCOD_console_blit_key_color(
-            self.console_c, x, y, width, height,
+            self.console_c, src_x, src_y, width, height,
             dest.console_c, dest_x, dest_y, fg_alpha, bg_alpha, key_color
             )
         else:
             lib.TCOD_console_blit(
-                self.console_c, x, y, width, height,
+                self.console_c, src_x, src_y, width, height,
                 dest.console_c, dest_x, dest_y, fg_alpha, bg_alpha
             )
 
