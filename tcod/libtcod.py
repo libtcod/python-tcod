@@ -61,7 +61,8 @@ class _Mock(object):
 
     CData = () # This gets passed to an isinstance call.
 
-    def def_extern(self):
+    @staticmethod
+    def def_extern():
         """Pass def_extern call silently."""
         return lambda func:func
 

@@ -2,8 +2,6 @@
 import copy
 import pickle
 
-import pytest
-
 import tcod
 
 def test_tcod_random():

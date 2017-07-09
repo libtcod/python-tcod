@@ -77,8 +77,8 @@ class Map(object):
     """
 
     class _MapAttribute(object):
-        def __init__(self, map, bit_index):
-            self.map = map
+        def __init__(self, map_, bit_index):
+            self.map = map_
             self.bit_index = bit_index
             self.bit = 1 << bit_index
             self.bit_inverse = 0xFF ^ self.bit

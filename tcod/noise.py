@@ -35,8 +35,6 @@ Example::
 """
 from __future__ import absolute_import
 
-import operator
-
 import numpy as np
 
 from tcod.libtcod import ffi, lib

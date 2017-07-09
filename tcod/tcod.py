@@ -2,14 +2,7 @@
 """
 from __future__ import absolute_import as _
 
-import os as _os
 import sys as _sys
-
-import platform as _platform
-import weakref as _weakref
-import functools as _functools
-
-import numpy as _np
 
 from tcod.libtcod import lib, ffi, BKGND_DEFAULT, BKGND_SET
 
@@ -112,7 +105,8 @@ class _CDataWrapper(object):
             self.cdata = ffi.NULL
         super(_CDataWrapper, self).__init__()
 
-    def _get_cdata_from_args(self, *args, **kargs):
+    @staticmethod
+    def _get_cdata_from_args(*args, **kargs):
         if len(args) == 1 and isinstance(args[0], ffi.CData) and not kargs:
             return args[0]
         else:

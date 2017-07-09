@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-import sys
-
 import copy
 import pickle
 
@@ -163,8 +161,8 @@ def test_noise_class(implementation):
     noise.algorithm = noise.algorithm
     noise.implementation = noise.implementation
     noise.octaves = noise.octaves
-    noise.hurst
-    noise.lacunarity
+    assert noise.hurst
+    assert noise.lacunarity
 
     noise.get_point(0, 0)
     noise.sample_mgrid(np.mgrid[:2,:3])

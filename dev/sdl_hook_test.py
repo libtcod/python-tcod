@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-'''
+"""
     first draft example of libtcod's SDL hook
-    
+
     draws an animated checkerboard pattern
-'''
+"""
 
 import tcod
 import tdl

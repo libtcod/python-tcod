@@ -2,10 +2,6 @@
 
 import pytest
 
-import shutil
-import tempfile
-import unittest
-
 try:
     import numpy
 except ImportError:
@@ -203,7 +199,7 @@ def test_console_fill(console):
     assert fill == fg
     assert fill == ch
 
-@unittest.skipUnless(numpy, 'requires numpy module')
+@pytest.mark.skipif(not numpy, reason='requires numpy module')
 def test_console_fill_numpy(console):
     width = libtcodpy.console_get_width(console)
     height = libtcodpy.console_get_height(console)

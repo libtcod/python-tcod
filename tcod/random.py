@@ -4,7 +4,6 @@
 
 from __future__ import absolute_import as _
 
-import array
 import time
 
 from tcod.libtcod import ffi, lib

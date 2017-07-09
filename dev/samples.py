@@ -12,6 +12,7 @@ import random
 sys.path.insert(0, '../')
 import tdl
 
+sampleIndex = 0
 
 class SampleApp(tdl.event.App):
     name = ''
@@ -87,7 +88,6 @@ if __name__ == '__main__':
     samplewin = tdl.Window(console, *SAMPLE_WINDOW_RECT)
 
     samples = [cls() for cls in [TrueColorSample, NoiseSample]]
-    sampleIndex = 0
 
     while 1:
         console.clear()

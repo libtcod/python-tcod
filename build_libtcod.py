@@ -169,7 +169,6 @@ class CustomPostParser(c_ast.NodeVisitor):
         return ast
 
     def visit_Typedef(self, node):
-        start_node = node
         if node.name in ['wchar_t', 'size_t']:
             # remove fake typedef placeholders
             self.ast.ext.remove(node)

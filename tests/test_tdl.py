@@ -3,7 +3,6 @@ import sys
 import os
 
 import unittest
-import time
 import random
 import itertools
 import copy
@@ -121,22 +120,6 @@ class BasicTests(TDLTemplate):
         pickled = pickle.dumps(self.console)
         clone = pickle.loads(pickled)
         self.compare_consoles(self.console, clone, 'pickled console should match root console')
-
-    # This isn't really supported.
-    #def test_changeFonts(self):
-    #    "Fonts are changable on the fly... kind of"
-    #    FONT_DIR = '../fonts/X11'
-    #    for font in os.listdir(FONT_DIR):
-    #        if font[-4:] != '.png':
-    #            continue # skip all those other files
-    #        font = os.path.join(FONT_DIR, font)
-    #        tdl.setFont(font)
-    #        # only works at all in OPENGL
-    #        self.console = tdl.init(WIDTH, HEIGHT, title=font, renderer='OPENGL')
-    #        for x,y in self.get_drawables():
-    #            self.console.draw_char(x, y, *self.get_random_character())
-    #        self.flush()
-    #        time.sleep(.05)
 
 
 class DrawingTests(TDLTemplate):

@@ -45,7 +45,6 @@ class ConsoleBuffer(object):
         """initialize with given width and height. values to fill the buffer
         are optional, defaults to black with no characters.
         """
-        n = width * height
         self.width = width
         self.height = height
         self.clear(back_r, back_g, back_b, fore_r, fore_g, fore_b, char)
@@ -555,17 +554,6 @@ Color(204,102,0), Color(255,128,0)]
     lib.TCOD_color_gen_map(cres, len(colors), ccolors, cindexes)
     return [Color._new_from_cdata(cdata) for cdata in cres]
 
-_numpy = None
-
-def _numpy_available():
-    'check if numpy is available and lazily load it when needed'
-    global _numpy
-    if _numpy is None:
-        try:
-            import numpy as _numpy
-        except ImportError:
-            _numpy = False
-    return _numpy
 
 def console_init_root(w, h, title, fullscreen=False,
                       renderer=RENDERER_GLSL):
@@ -1086,12 +1074,12 @@ def console_fill_foreground(con, r, g, b):
     """
     if len(r) != len(g) or len(r) != len(b):
         raise TypeError('R, G and B must all have the same size.')
-    if (_numpy_available() and isinstance(r, _numpy.ndarray) and
-        isinstance(g, _numpy.ndarray) and isinstance(b, _numpy.ndarray)):
+    if (isinstance(r, _np.ndarray) and isinstance(g, _np.ndarray) and
+            isinstance(b, _np.ndarray)):
         #numpy arrays, use numpy's ctypes functions
-        r = _numpy.ascontiguousarray(r, dtype=_numpy.intc)
-        g = _numpy.ascontiguousarray(g, dtype=_numpy.intc)
-        b = _numpy.ascontiguousarray(b, dtype=_numpy.intc)
+        r = _np.ascontiguousarray(r, dtype=_np.intc)
+        g = _np.ascontiguousarray(g, dtype=_np.intc)
+        b = _np.ascontiguousarray(b, dtype=_np.intc)
         cr = ffi.cast('int *', r.ctypes.data)
         cg = ffi.cast('int *', g.ctypes.data)
         cb = ffi.cast('int *', b.ctypes.data)
@@ -1115,12 +1103,12 @@ def console_fill_background(con, r, g, b):
     """
     if len(r) != len(g) or len(r) != len(b):
         raise TypeError('R, G and B must all have the same size.')
-    if (_numpy_available() and isinstance(r, _numpy.ndarray) and
-        isinstance(g, _numpy.ndarray) and isinstance(b, _numpy.ndarray)):
+    if (isinstance(r, _np.ndarray) and isinstance(g, _np.ndarray) and
+            isinstance(b, _np.ndarray)):
         #numpy arrays, use numpy's ctypes functions
-        r = _numpy.ascontiguousarray(r, dtype=_numpy.intc)
-        g = _numpy.ascontiguousarray(g, dtype=_numpy.intc)
-        b = _numpy.ascontiguousarray(b, dtype=_numpy.intc)
+        r = _np.ascontiguousarray(r, dtype=_np.intc)
+        g = _np.ascontiguousarray(g, dtype=_np.intc)
+        b = _np.ascontiguousarray(b, dtype=_np.intc)
         cr = ffi.cast('int *', r.ctypes.data)
         cg = ffi.cast('int *', g.ctypes.data)
         cb = ffi.cast('int *', b.ctypes.data)
@@ -1140,9 +1128,9 @@ def console_fill_char(con,arr):
         con (Console): Any Console instance.
         arr (Sequence[int]): An array of integers with a length of width*height.
     """
-    if (_numpy_available() and isinstance(arr, _numpy.ndarray) ):
+    if isinstance(arr, _np.ndarray):
         #numpy arrays, use numpy's ctypes functions
-        arr = _numpy.ascontiguousarray(arr, dtype=_numpy.intc)
+        arr = _np.ascontiguousarray(arr, dtype=_np.intc)
         carr = ffi.cast('int *', arr.ctypes.data)
     else:
         #otherwise convert using the ffi module
@@ -2186,32 +2174,32 @@ try:
 except NameError:
     pass
 
-def _unpack_union(type, union):
+def _unpack_union(type_, union):
     '''
         unpack items from parser new_property (value_converter)
     '''
-    if type == lib.TCOD_TYPE_BOOL:
+    if type_ == lib.TCOD_TYPE_BOOL:
         return bool(union.b)
-    elif type == lib.TCOD_TYPE_CHAR:
+    elif type_ == lib.TCOD_TYPE_CHAR:
         return _unicode(union.c)
-    elif type == lib.TCOD_TYPE_INT:
+    elif type_ == lib.TCOD_TYPE_INT:
         return union.i
-    elif type == lib.TCOD_TYPE_FLOAT:
+    elif type_ == lib.TCOD_TYPE_FLOAT:
         return union.f
-    elif (type == lib.TCOD_TYPE_STRING or
-         lib.TCOD_TYPE_VALUELIST15 >= type >= lib.TCOD_TYPE_VALUELIST00):
+    elif (type_ == lib.TCOD_TYPE_STRING or
+         lib.TCOD_TYPE_VALUELIST15 >= type_ >= lib.TCOD_TYPE_VALUELIST00):
          return _unpack_char_p(union.s)
-    elif type == lib.TCOD_TYPE_COLOR:
+    elif type_ == lib.TCOD_TYPE_COLOR:
         return Color._new_from_cdata(union.col)
-    elif type == lib.TCOD_TYPE_DICE:
+    elif type_ == lib.TCOD_TYPE_DICE:
         return Dice(union.dice)
-    elif type & lib.TCOD_TYPE_LIST:
-        return _convert_TCODList(union.list, type & 0xFF)
+    elif type_ & lib.TCOD_TYPE_LIST:
+        return _convert_TCODList(union.list, type_ & 0xFF)
     else:
-        raise RuntimeError('Unknown libtcod type: %i' % type)
+        raise RuntimeError('Unknown libtcod type: %i' % type_)
 
-def _convert_TCODList(clist, type):
-    return [_unpack_union(type, lib.TDL_list_get_union(clist, i))
+def _convert_TCODList(clist, type_):
+    return [_unpack_union(type_, lib.TDL_list_get_union(clist, i))
             for i in range(lib.TCOD_list_size(clist))]
 
 def parser_new():
@@ -2222,8 +2210,31 @@ def parser_new_struct(parser, name):
 
 # prevent multiple threads from messing with def_extern callbacks
 _parser_callback_lock = _threading.Lock()
+_parser_listener = None # temporary global pointer to a listener instance
+
+@ffi.def_extern()
+def _pycall_parser_new_struct(struct, name):
+    return _parser_listener.end_struct(struct, _unpack_char_p(name))
+
+@ffi.def_extern()
+def _pycall_parser_new_flag(name):
+    return _parser_listener.new_flag(_unpack_char_p(name))
+
+@ffi.def_extern()
+def _pycall_parser_new_property(propname, type, value):
+    return _parser_listener.new_property(_unpack_char_p(propname), type,
+                                 _unpack_union(type, value))
+
+@ffi.def_extern()
+def _pycall_parser_end_struct(struct, name):
+    return _parser_listener.end_struct(struct, _unpack_char_p(name))
+
+@ffi.def_extern()
+def _pycall_parser_error(msg):
+    _parser_listener.error(_unpack_char_p(msg))
 
 def parser_run(parser, filename, listener=None):
+    global _parser_listener
     if not listener:
         lib.TCOD_parser_run(parser, _bytes(filename), ffi.NULL)
         return
@@ -2231,38 +2242,21 @@ def parser_run(parser, filename, listener=None):
     propagate_manager = _PropagateException()
     propagate = propagate_manager.propagate
 
+    clistener = ffi.new(
+        'TCOD_parser_listener_t *',
+        {
+            'new_struct': lib._pycall_parser_new_struct,
+            'new_flag': lib._pycall_parser_new_flag,
+            'new_property': lib._pycall_parser_new_property,
+            'end_struct': lib._pycall_parser_end_struct,
+            'error': lib._pycall_parser_error,
+        },
+    )
+
     with _parser_callback_lock:
-        clistener = ffi.new('TCOD_parser_listener_t *')
-
-        @ffi.def_extern(onerror=propagate)
-        def pycall_parser_new_struct(struct, name):
-            return listener.end_struct(struct, _unpack_char_p(name))
-
-        @ffi.def_extern(onerror=propagate)
-        def pycall_parser_new_flag(name):
-            return listener.new_flag(_unpack_char_p(name))
-
-        @ffi.def_extern(onerror=propagate)
-        def pycall_parser_new_property(propname, type, value):
-            return listener.new_property(_unpack_char_p(propname), type,
-                                         _unpack_union(type, value))
-
-        @ffi.def_extern(onerror=propagate)
-        def pycall_parser_end_struct(struct, name):
-            return listener.end_struct(struct, _unpack_char_p(name))
-
-        @ffi.def_extern(onerror=propagate)
-        def pycall_parser_error(msg):
-            listener.error(_unpack_char_p(msg))
-
-        clistener.new_struct = lib.pycall_parser_new_struct
-        clistener.new_flag = lib.pycall_parser_new_flag
-        clistener.new_property = lib.pycall_parser_new_property
-        clistener.end_struct = lib.pycall_parser_end_struct
-        clistener.error = lib.pycall_parser_error
-
+        _parser_listener = listener
         with propagate_manager:
-            lib.TCOD_parser_run(parser, _bytes(filename), clistener)
+            lib.TCOD_parser_run(parser, filename.encode('utf-8'), clistener)
 
 def parser_delete(parser):
     pass
@@ -2473,8 +2467,8 @@ def struct_add_property(struct, name, typ, mandatory):
 def struct_add_value_list(struct, name, value_list, mandatory):
     CARRAY = c_char_p * (len(value_list) + 1)
     cvalue_list = CARRAY()
-    for i in range(len(value_list)):
-        cvalue_list[i] = cast(value_list[i], c_char_p)
+    for i, value in enumerate(value_list):
+        cvalue_list[i] = cast(value, c_char_p)
     cvalue_list[len(value_list)] = 0
     lib.TCOD_struct_add_value_list(struct, name, cvalue_list, mandatory)
 

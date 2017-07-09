@@ -8,10 +8,6 @@
     Eventually these will be optimized to work better.
 """
 import sys
-import os
-
-import cProfile as profile
-import pstats
 
 import itertools
 import random
@@ -169,15 +165,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    #pr = profile.Profile()
-    #try:
-    #    pr.runcall(main)
-    #finally:
-    #    pr.dump_stats('profile.prof')
-    #    stats = pstats.Stats('profile.prof')
-    #    stats.strip_dirs()
-    #    stats.sort_stats('time')
-    #    stats.reverse_order()
-    #    stats.print_stats()
-    #    os.remove('profile.prof')
-

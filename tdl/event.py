@@ -40,6 +40,7 @@ from . import style as _style
 
 _eventQueue = []
 _pushedEvents = []
+_eventsflushed = False
 
 _mousel = 0
 _mousem = 0

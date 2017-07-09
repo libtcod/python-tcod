@@ -65,8 +65,10 @@ import warnings as _warnings
 from tcod import ffi as _ffi
 from tcod import lib as _lib
 
-from . import event, map, noise
-from . import style as _style
+import tdl.event
+import tdl.noise
+import tdl.map
+import tdl.style as _style
 from tdl.version import __version__
 
 
@@ -429,7 +431,6 @@ class _BaseConsole(object):
         x, y = self._normalizePoint(x, y)
         fg, bg = _format_color(fg, self._fg), _format_color(bg, self._bg)
         width, height = self.get_size()
-        batch = [] # prepare a batch operation
         def _drawStrGen(x=x, y=y, string=string, width=width, height=height):
             """Generator for draw_str
 
@@ -439,7 +440,6 @@ class _BaseConsole(object):
             for char in _format_str(string):
                 if y == height:
                     raise TDLError('End of console reached.')
-                #batch.append(((x, y), _format_char(char))) # ((x, y), ch)
                 yield((x, y), char)
                 x += 1 # advance cursor
                 if x == width: # line break
@@ -839,7 +839,8 @@ class Console(_BaseConsole):
                                                       range(height)), data):
             self.draw_char(x, y, *graphic)
 
-    def _translate(self, x, y):
+    @staticmethod
+    def _translate(x, y):
         """Convertion x and y to their position on the root Console for this Window
 
         Because this is a Console instead of a Window we return the paramaters

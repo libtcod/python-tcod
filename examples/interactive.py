@@ -4,7 +4,6 @@
 """
 import sys
 import code
-import textwrap
 import io
 import time
 import traceback
