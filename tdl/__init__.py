@@ -1272,7 +1272,7 @@ def set_fps(fps):
     Args:
         fps (optional[int]): The frames per second limit, or None.
     """
-    _lib.TCOD_sys_set_fps(framerate or 0)
+    _lib.TCOD_sys_set_fps(fps or 0)
 
 def get_fps():
     """Return the current frames per second of the running program set by
