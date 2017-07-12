@@ -293,6 +293,10 @@ class DrawingTests(TDLTemplate):
                     self.assertEqual(self.console.get_char(x, y), DEFAULT_CHAR, 'scrolled away positions should be clear')
 
 
+def test_fps():
+    tdl.set_fps(0)
+    tdl.get_fps()
+
 def suite():
     loader = unittest.TestLoader()
     load = loader.loadTestsFromTestCase

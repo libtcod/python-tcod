@@ -2,6 +2,11 @@
  Changelog
 ===========
 
+4.0.1 - 2017-07-12
+------------------
+Fixed
+ - tdl: Fixed NameError in `set_fps`.
+
 4.0.0 - 2017-07-08
 ------------------
 Changed
