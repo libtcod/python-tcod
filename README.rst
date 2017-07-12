@@ -27,7 +27,7 @@ Linux
 On Linux, tdl will need to be built from source.  Assuming you have Python and
 pip, you run these commands to install tdl::
 
-    $ sudo apt-get install gcc libsdl2-dev libffi-dev python-dev libomp-dev
+    $ sudo apt install gcc libsdl2-dev libffi-dev python-dev libomp-dev
     $ pip install tdl
 
 =======
@@ -65,15 +65,6 @@ The latest documentation can be found
 * Windows, Linux, or MacOS.
 * Linux requires the libsdl2 package and must be installed from source.
 
-Extra requirements when installing directly from source
--------------------------------------------------------
-
-* MinGW_ must be on the Windows path for use with pycparser.
-  An equivalent C parser (such as `gcc`) must be installed on other OS's.
-* Linux requires the packages:
-  `gcc` `libsdl2-dev` `libffi-dev` `python-dev` `libomp-dev`
-* SDL2 is installed automatically on Windows and MacOS
-
 .. _LICENSE.txt: https://github.com/HexDecimal/python-tdl/blob/master/LICENSE.txt
 
 .. _python-tdl: https://github.com/HexDecimal/python-tdl/
@@ -85,10 +76,6 @@ Extra requirements when installing directly from source
 .. _libtcod: https://bitbucket.org/libtcod/libtcod/
 
 .. _pip: https://pip.pypa.io/en/stable/installing/
-
-.. _MinGW: http://www.mingw.org/
-
-.. _homebrew: http://brew.sh/
 
 .. |VersionsBadge| image:: https://img.shields.io/pypi/pyversions/tdl.svg?maxAge=2592000
     :target: https://pypi.python.org/pypi/tdl
