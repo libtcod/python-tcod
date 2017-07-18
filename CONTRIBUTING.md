@@ -3,46 +3,41 @@
 
 # Building tdl
 
-
+To work with the tdl source, your environment must be set up to build
+Python C extensions.  You'll also need `cpp` installed for
+use with pycparser.
 
 ## Windows
 
-Building Python binaries on Windows requires
-[Microsoft Visual Studio](https://www.visualstudio.com/vs/community/)
-with the Python development tools installed.
-
-Due to how tdl handles C parsing, you also need to install
-[MinGW](http://www.mingw.org/).
-You must make sure that the folder conatining `gcc.exe` is on your
-Windows %PATH%.
-
-Now open a command prompt and navigate to `setup.py`, then run the
-following commands:
-
-    > git submodule update --init
-    > py -m pip install --editable . --verbose
-
-This will download dependencies and build tdl in-place.
+- Install [Microsoft Visual Studio](https://www.visualstudio.com/vs/community/)
+-- When asked, choose to install the Python development tools.
+- Install [MinGW](http://www.mingw.org/).
+-- Installer is [here](https://sourceforge.net/projects/mingw/files/latest/download).
+-- Add the binary folder (default folder is `C:\MinGW\bin`) to your user
+   environment PATH variable.
+- Open a command prompt in the cloned git directory.
+- Make sure the libtcod submodule is downloaded with this command:
+  `git submodule update --init`
+- Install an editable version of tdl with this command:
+  `py -m pip install --editable . --verbose`
 
 ## MacOS
 
-To build Python binaries you'll need the Xcode command line tools.
-You can install them with this command:
-
-    $ xcode-select --install
-
-Now navigate to `setup.py` and run the following:
-
-    $ git submodule update --init
-    $ pip install --editable . --verbose
+- Open a command prompt in the cloned git directory.
+- Install the Xcode command line tools with this command:
+  `xcode-select --install`
+- Make sure the libtcod submodule is downloaded with this command:
+  `git submodule update --init`
+- Install an editable version of tdl with this command:
+  `pip install --editable . --verbose`
 
 ## Linux
 
-The dependancies for Linux can be installed using apt:
-
-    $ sudo apt install gcc python-dev libsdl2-dev libffi-dev libomp-dev
-
-Now navigate to `setup.py` and run the following:
-
-    $ git submodule update --init
-    $ pip install --editable . --verbose
+- Open a command prompt in the cloned git directory.
+- Assuming a Debian based distribution of Linux.
+  Install tdl's dependancies with this command:
+  `sudo apt install gcc python-dev libsdl2-dev libffi-dev libomp-dev`
+- Make sure the libtcod submodule is downloaded with this command:
+  `git submodule update --init`
+- Install an editable version of tdl with this command:
+  `pip install --editable . --verbose`
