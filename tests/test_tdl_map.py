@@ -89,3 +89,14 @@ class MapTests(unittest.TestCase):
         self.assertTrue(pathfinder.get_path(*self.POINTS_AB))
         self.assertFalse(pathfinder.get_path(*self.POINTS_AC),
                          'invalid path should return an empty list')
+
+
+def test_map_fov_cumulative():
+    map_ = tdl.map.Map(3, 3)
+    map_.transparent[::2,:] = True # Add map with small divider.
+    assert not map_.fov.any()
+    map_.compute_fov(1, 0, cumulative=True) # Light left side.
+    assert map_.fov.any()
+    assert not map_.fov.all()
+    map_.compute_fov(1, 2, cumulative=True) # Light both sides.
+    assert map_.fov.all()

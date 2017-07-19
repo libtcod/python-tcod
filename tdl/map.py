@@ -11,13 +11,19 @@ from __future__ import absolute_import
 import itertools as _itertools
 import math as _math
 
+import numpy as np
+
 from tcod import ffi as _ffi
 from tcod import lib as _lib
+from tcod import ffi, lib
 
+import tcod.map
+import tcod.path
 import tdl as _tdl
 from . import style as _style
 
-_FOVTYPES = {'BASIC' : 0, 'DIAMOND': 1, 'SHADOW': 2, 'RESTRICTIVE': 12, 'PERMISSIVE': 11}
+_FOVTYPES = {'BASIC' : 0, 'DIAMOND': 1, 'SHADOW': 2, 'RESTRICTIVE': 12,
+             'PERMISSIVE': 11}
 
 def _get_fov_type(fov):
     "Return a FOV from a string"
@@ -29,8 +35,11 @@ def _get_fov_type(fov):
         return 4 + int(fov[10])
     raise _tdl.TDLError('No such fov option as %s' % oldFOV)
 
-class Map(object):
-    """Fast field-of-view and path-finding on stored data.
+class Map(tcod.map.Map):
+    """Field-of-view and path-finding on stored data.
+
+    .. versionchanged:: 4.1
+        `transparent`, `walkable`, and `fov` are now numpy boolean arrays.
 
     .. deprecated:: 3.2
         :any:`tcod.map.Map` should be used instead.
@@ -44,9 +53,8 @@ class Map(object):
     Example:
         >>> import tdl.map
         >>> map_ = tdl.map.Map(80, 60)
-        >>> for x,y in map_:
-        ...     map_.transparent[x,y] = True
-        ...     map_.walkable[x,y] = True
+        >>> map_.transparent[:] = True
+        >>> map_.walkable[:] = True
 
     Attributes:
         transparent: Map transparency
@@ -76,38 +84,20 @@ class Map(object):
             be using it to read the field-of-view of a :any:`compute_fov` call.
     """
 
-    class _MapAttribute(object):
-        def __init__(self, map_, bit_index):
-            self.map = map_
-            self.bit_index = bit_index
-            self.bit = 1 << bit_index
-            self.bit_inverse = 0xFF ^ self.bit
+    @property
+    def transparent(self):
+        return self._Map__buffer[:,:,0].transpose()
 
-        def __getitem__(self, key):
-            return bool(self.map._array_cdata[key[1]][key[0]] & self.bit)
+    @property
+    def walkable(self):
+        return self._Map__buffer[:,:,1].transpose()
 
-        def __setitem__(self, key, value):
-            self.map._array_cdata[key[1]][key[0]] = (
-                (self.map._array_cdata[key[1]][key[0]] & self.bit_inverse) |
-                (self.bit * bool(value))
-                )
+    @property
+    def fov(self):
+        return self._Map__buffer[:,:,2].transpose()
 
-    def __init__(self, width, height):
-        """Create a new Map with width and height."""
-        self.width = width
-        self.height = height
-        self._map_cdata = _lib.TCOD_map_new(width, height)
-        # cast array into cdata format: uint8[y][x]
-        # for quick Python access
-        self._array_cdata = _ffi.new('uint8_t[%i][%i]' % (height, width))
-        # flat array to pass to TDL's C helpers
-        self._array_cdata_flat = _ffi.cast('uint8_t *', self._array_cdata)
-        self.transparent = self._MapAttribute(self, 0)
-        self.walkable = self._MapAttribute(self, 1)
-        self.fov = self._MapAttribute(self, 2)
-
-    def compute_fov(self, x, y, fov='PERMISSIVE', radius=None, light_walls=True,
-                    sphere=True, cumulative=False):
+    def compute_fov(self, x, y, fov='PERMISSIVE', radius=None,
+                    light_walls=True, sphere=True, cumulative=False):
         """Compute the field-of-view of this Map and return an iterator of the
         points touched.
 
@@ -132,30 +122,17 @@ class Map(object):
         Returns:
             Iterator[Tuple[int, int]]: An iterator of (x, y) points of tiles
                 touched by the field-of-view.
-
-                Unexpected behaviour can happen if you modify the Map while
-                using the iterator.
-
-                You can use the Map's fov attribute as an alternative to this
-                iterator.
         """
         # refresh cdata
-        _lib.TDL_map_data_from_buffer(self._map_cdata,
-                                      self._array_cdata_flat)
         if radius is None: # infinite radius
-            radius = max(self.width, self.height)
-        _lib.TCOD_map_compute_fov(self._map_cdata, x, y, radius, light_walls,
-                                  _get_fov_type(fov))
-        _lib.TDL_map_fov_to_buffer(self._map_cdata,
-                                   self._array_cdata_flat, cumulative)
-        def iterate_fov():
-            _array_cdata = self._array_cdata
-            for y in range(self.height):
-                for x in range(self.width):
-                    if(_array_cdata[y][x] & 4):
-                        yield (x, y)
-        return iterate_fov()
-
+            radius = 0
+        if cumulative:
+            fov_copy = self.fov.copy()
+        lib.TCOD_map_compute_fov(
+            self.map_c, x, y, radius, light_walls, _get_fov_type(fov))
+        if cumulative:
+            self.fov[:] |= fov_copy
+        return zip(*np.where(self.fov))
 
 
     def compute_path(self, start_x, start_y, dest_x, dest_y,
@@ -177,22 +154,8 @@ class Map(object):
 
             The start point is not included in this list.
         """
-        # refresh cdata
-        _lib.TDL_map_data_from_buffer(self._map_cdata,
-                                      self._array_cdata_flat)
-        path_cdata = _lib.TCOD_path_new_using_map(self._map_cdata, diagonal_cost)
-        try:
-            _lib.TCOD_path_compute(path_cdata, start_x, start_y, dest_x, dest_y)
-            x = _ffi.new('int *')
-            y = _ffi.new('int *')
-            length = _lib.TCOD_path_size(path_cdata)
-            path = [None] * length
-            for i in range(length):
-                _lib.TCOD_path_get(path_cdata, i, x, y)
-                path[i] = ((x[0], y[0]))
-        finally:
-            _lib.TCOD_path_delete(path_cdata)
-        return path
+        return tcod.path.AStar(self, diagonal_cost).get_path(start_x, start_y,
+                                                             dest_x, dest_y)
 
     def __iter__(self):
         return _itertools.product(range(self.width), range(self.height))
@@ -203,7 +166,7 @@ class Map(object):
 
 
 
-class AStar(object):
+class AStar(tcod.path.AStar):
     """An A* pathfinder using a callback.
 
     .. deprecated:: 3.2
@@ -245,34 +208,19 @@ class AStar(object):
             Instead of just (destX, destY).
     """
 
-    __slots__ = ('_as_parameter_', '_callback', '__weakref__')
+    class __DeprecatedEdgeCost(tcod.path.EdgeCostCallback):
+        _CALLBACK_P = lib._pycall_path_swap_src_dest
+
+    class __DeprecatedNodeCost(tcod.path.EdgeCostCallback):
+        _CALLBACK_P = lib._pycall_path_dest_only
 
     def __init__(self, width, height, callback,
                  diagnalCost=_math.sqrt(2), advanced=False):
-        if not diagnalCost: # set None or False to zero
-            diagnalCost = 0.0
         if advanced:
-            def newCallback(sourceX, sourceY, destX, destY, null):
-                pathCost = callback(destX, destY, sourceX, sourceY)
-                if pathCost:
-                    return pathCost
-                return 0.0
+            cost = self.__DeprecatedEdgeCost(callback, width, height)
         else:
-            def newCallback(sourceX, sourceY, destX, destY, null):
-                pathCost = callback(destX, destY) # expecting a float or 0
-                if pathCost:
-                    return pathCost
-                return 0.0
-        # float(int, int, int, int, void*)
-        self._callback = _ffi.callback('TCOD_path_func_t')(newCallback)
-
-        self._as_parameter_ = _lib.TCOD_path_new_using_function(width, height,
-                                     self._callback, _ffi.NULL, diagnalCost)
-
-    def __del__(self):
-        if self._as_parameter_:
-            _lib.TCOD_path_delete(self._as_parameter_)
-            self._as_parameter_ = None
+            cost = self.__DeprecatedNodeCost(callback, width, height)
+        super(AStar, self).__init__(cost, diagnalCost or 0.0)
 
     def get_path(self, origX, origY, destX, destY):
         """
@@ -286,17 +234,10 @@ class AStar(object):
 
                 If no path is found then an empty list is returned.
         """
-        found = _lib.TCOD_path_compute(self._as_parameter_, origX, origY, destX, destY)
-        if not found:
-            return [] # path not found
-        x, y = _ffi.new('int *'), _ffi.new('int *')
-        recalculate = True
-        path = []
-        while _lib.TCOD_path_walk(self._as_parameter_, x, y, recalculate):
-            path.append((x[0], y[0]))
-        return path
+        return super(AStar, self).get_path(origX, origY, destX, destY)
 
-def quick_fov(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True, sphere=True):
+def quick_fov(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True,
+              sphere=True):
     """All field-of-view functionality in one call.
 
     Before using this call be sure to make a function, lambda, or method that takes 2
@@ -411,8 +352,6 @@ def bresenham(x1, y1, x2, y2):
         points.reverse()
     return points
 
-
-__all__ = [_var for _var in locals().keys() if _var[0] != '_']
 
 quickFOV = _style.backport(quick_fov)
 AStar.getPath = _style.backport(AStar.get_path)

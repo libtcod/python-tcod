@@ -141,14 +141,14 @@ def test_tcod_map_get_bits():
 def test_tcod_map_copy():
     map_ = tcod.map.Map(3, 3)
     map_.transparent[:] = True
-    assert (map_.buffer[:].tolist() == copy.copy(map_).buffer[:].tolist())
+    assert (map_.transparent.tolist() == copy.copy(map_).transparent.tolist())
 
 
 def test_tcod_map_pickle():
     map_ = tcod.map.Map(3, 3)
     map_.transparent[:] = True
-    assert (map_.buffer[:].tolist() ==
-            pickle.loads(pickle.dumps(copy.copy(map_))).buffer[:].tolist())
+    assert (map_.transparent[:].tolist() ==
+           pickle.loads(pickle.dumps(copy.copy(map_))).transparent[:].tolist())
 
 
 @pytest.mark.parametrize('implementation', [tcod.noise.SIMPLE,

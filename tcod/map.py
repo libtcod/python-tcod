@@ -1,3 +1,35 @@
+"""libtcod map attributes and field-of-view functions.
+
+Example::
+
+    >>> import tcod.map
+    >>> m = tcod.map.Map(width=3, height=4)
+    >>> m.walkable
+    array([[False, False, False],
+           [False, False, False],
+           [False, False, False],
+           [False, False, False]], dtype=bool)
+
+    # Like the rest of the tcod modules, all arrays here are
+    # in row-major order and are addressed with [y,x]
+    >>> m.transparent[:] = True # Sets all to True.
+    >>> m.transparent[1:3,0] = False # Sets (1, 0) and (2, 0) to False.
+    >>> m.transparent
+    array([[ True,  True,  True],
+           [False,  True,  True],
+           [False,  True,  True],
+           [ True,  True,  True]], dtype=bool)
+
+    >>> m.compute_fov(0, 0)
+    >>> m.fov
+    array([[ True,  True,  True],
+           [ True,  True,  True],
+           [False,  True,  True],
+           [False, False,  True]], dtype=bool)
+    >>> m.fov[3,1]
+    False
+
+"""
 
 from __future__ import absolute_import
 
@@ -6,22 +38,11 @@ import numpy as np
 from tcod.libtcod import lib, ffi
 
 
-class BufferBitProxy(object):
-
-    def __init__(self, buffer, bitmask):
-        self.buffer = buffer
-        self.bitmask = np.asarray(bitmask, dtype=np.uint8)
-
-    def __getitem__(self, index):
-        return (self.buffer[index] & self.bitmask) != 0
-
-    def __setitem__(self, index, values):
-        self.buffer[index] &= 0xff ^ self.bitmask
-        self.buffer[index] |= self.bitmask * np.asarray(values, dtype=bool)
-
-
 class Map(object):
-    """
+    """A map containing libtcod attributes.
+
+    .. versionchanged:: 4.1
+        `transparent`, `walkable`, and `fov` are now numpy boolean arrays.
 
     Args:
         width (int): Width of the new Map.
@@ -30,28 +51,42 @@ class Map(object):
     Attributes:
         width (int): Read only width of this Map.
         height (int): Read only height of this Map.
-        map_c (CData): A cffi pointer to a TCOD_map_t object.
-        transparent: A writable boolean array of transparent cells.
-        walkable: A writable boolean array of walkable cells.
-        fov: A writable boolean array of the cells lit by :any:'compute_fov'.
+        transparent: A boolean array of transparent cells.
+        walkable: A boolean array of walkable cells.
+        fov: A boolean array of the cells lit by :any:'compute_fov'.
+
     """
 
     def __init__(self, width, height):
-        assert ffi.sizeof('cell_t') == 1 # assert buffer alignment
-        self.buffer = np.zeros((height, width), dtype=np.uint8)
+        assert ffi.sizeof('cell_t') == 3 # assert buffer alignment
+        self.width = width
+        self.height = height
 
-        self.map_c = ffi.new('map_t*')
-        self.map_c.width = self.width = width
-        self.map_c.height = self.height = height
-        self.map_c.nbcells = width * height
-        self.map_c.cells = ffi.cast('cell_t*', self.buffer.ctypes.data)
+        self.__buffer = np.zeros((height, width, 3), dtype=np.bool_)
+        self.map_c = self.__as_cdata()
 
-        self._init_proxies()
+    def __as_cdata(self):
+        return ffi.new(
+            'map_t *',
+            (
+                self.width,
+                self.height,
+                self.width * self.height,
+                ffi.cast('cell_t*', self.__buffer.ctypes.data),
+            )
+        )
 
-    def _init_proxies(self):
-        self.transparent = BufferBitProxy(self.buffer, 0x01)
-        self.walkable = BufferBitProxy(self.buffer, 0x02)
-        self.fov = BufferBitProxy(self.buffer, 0x04)
+    @property
+    def transparent(self):
+        return self.__buffer[:,:,0]
+
+    @property
+    def walkable(self):
+        return self.__buffer[:,:,1]
+
+    @property
+    def fov(self):
+        return self.__buffer[:,:,2]
 
     def compute_fov(self, x, y, radius=0, light_walls=True,
                     algorithm=lib.FOV_RESTRICTIVE):
@@ -64,37 +99,23 @@ class Map(object):
 
                 A value of `0` will give an infinite distance.
             light_walls (bool): Light up walls, or only the floor.
-            algorithm (int): Defaults to FOV_RESTRICTIVE
+            algorithm (int): Defaults to tcod.FOV_RESTRICTIVE
         """
-        lib.TCOD_map_compute_fov(self.map_c, x, y, radius, light_walls,
-                                 algorithm)
+        lib.TCOD_map_compute_fov(
+            self.map_c, x, y, radius, light_walls, algorithm)
+
+    def __setstate__(self, state):
+        if '_Map__buffer' not in state: # deprecated
+            self.__buffer = np.zeros((state['height'], state['width'], 3),
+                              dtype=np.bool_)
+            self.__buffer[:,:,0] = state['buffer'] & 0x01
+            self.__buffer[:,:,1] = state['buffer'] & 0x02
+            self.__buffer[:,:,2] = state['buffer'] & 0x04
+            del state['buffer']
+        self.__dict__.update(state)
+        self.map_c = self.__as_cdata()
 
     def __getstate__(self):
-        """Return this objects state.
-
-        This method allows the usage of the :mod:`copy` and :mod:`pickle`
-        modules with this class.
-        """
         state = self.__dict__.copy()
         del state['map_c']
         return state
-
-    def __setstate__(self, state):
-        """Unpack this object from a saved state.  A new buffer is used."""
-        if 'width' not in state or 'height' not in state:
-            state['width'], state['height'] = state['size']
-            del state['size']
-
-        self.__dict__.update(state)
-
-        self.map_c = ffi.new(
-            'map_t *',
-            (
-                self.width,
-                self.height,
-                self.width * self.height,
-                ffi.cast('cell_t*', self.buffer.ctypes.data),
-            )
-        )
-
-        self._init_proxies()

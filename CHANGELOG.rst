@@ -2,6 +2,14 @@
  Changelog
 ===========
 
+Unreleased
+------------------
+Changed
+ - Added protection to the `transparent`, `walkable`, and `fov`
+   attributes in tcod and tdl Map classes, to prevent them from being
+   accidentally overridden.
+ - tcod and tdl Map classes now use numpy arrays as their attributes.
+
 4.0.1 - 2017-07-12
 ------------------
 Fixed
