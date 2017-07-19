@@ -63,10 +63,6 @@ class BSP(object):
         y (int): Rectangle top coordinate.
         width (int): Rectangle width.
         height (int): Rectangle height.
-
-    .. versionchanged:: 2.0
-       You can create BSP's with this class contructor instead of using
-       :any:`bsp_new_with_size`.
     """
 
     def __init__(self, x, y, width, height):
@@ -136,8 +132,6 @@ class BSP(object):
         Args:
             horizontal (bool):
             position (int):
-
-        .. versionadded:: 2.0
         """
         cdata = self._as_cdata()
         lib.TCOD_bsp_split_once(cdata, horizontal, position)
@@ -157,8 +151,6 @@ class BSP(object):
                 Prevent creating a vertical ratio more extreme than this.
             seed (Optional[tcod.random.Random]):
                 The random number generator to use.
-
-        .. versionadded:: 2.0
         """
         cdata = self._as_cdata()
         lib.TCOD_bsp_split_recursive(
@@ -179,8 +171,6 @@ class BSP(object):
 
         Returns:
             Iterator[BSP]: An iterator of BSP nodes.
-
-        .. versionadded:: 2.0
 
         .. deprecated:: 2.3
             See the module example for how to iterate over a BSP tree.
@@ -225,8 +215,6 @@ class BSP(object):
         Returns:
             bool: True if this node contains these coordinates.
                   Otherwise False.
-
-        .. versionadded:: 2.0
         """
         return (self.x <= x < self.x + self.width and
                 self.y <= y < self.y + self.height)
@@ -236,8 +224,6 @@ class BSP(object):
 
         Returns:
             Optional[BSP]: BSP object or None.
-
-        .. versionadded:: 2.0
         """
         if not self.contains(x, y):
             return None

@@ -33,8 +33,6 @@ class _ImageBufferArray(np.ndarray):
 
 class Image(object):
     """
-    .. versionadded:: 2.0
-
     Args:
         width (int): Width of the new Image.
         height (int): Height of the new Image.

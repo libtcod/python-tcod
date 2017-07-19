@@ -183,10 +183,6 @@ class Dice(_CDataWrapper):
         multiplier (float): Multiplier.
         addsub (float): Addition.
 
-    .. versionchanged:: 2.0
-        This class now acts like the other CData wrapped classes
-        and no longer acts like a list.
-
     .. deprecated:: 2.0
         You should make your own dice functions instead of using this class
         which is tied to a CData object.

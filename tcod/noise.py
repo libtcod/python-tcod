@@ -68,9 +68,6 @@ class Noise(object):
 
     Attributes:
         noise_c (CData): A cffi pointer to a TCOD_noise_t object.
-            .. versionadded:: 2.5
-
-    .. versionadded:: 2.0
     """
 
     def __init__(self, dimensions, algorithm=2, implementation=SIMPLE,
@@ -159,8 +156,6 @@ class Noise(object):
 
                 This array has the shape: ``mgrid.shape[:-1]``.
                 The ``dtype`` is `numpy.float32`.
-
-        .. versionadded:: 2.2
         """
         mgrid = np.ascontiguousarray(mgrid, np.float32)
         if mgrid.shape[0] != self.dimensions:
@@ -187,8 +182,6 @@ class Noise(object):
                 The ``shape`` is based on the lengths of the open mesh-grid
                 arrays.
                 The ``dtype`` is `numpy.float32`.
-
-        .. versionadded:: 2.2
         """
         if len(ogrid) != self.dimensions:
             raise ValueError('len(ogrid) must equal self.dimensions, '

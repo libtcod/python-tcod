@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-Unreleased
+4.1.0 - 2017-07-19
 ------------------
 Changed
  - Added protection to the `transparent`, `walkable`, and `fov`

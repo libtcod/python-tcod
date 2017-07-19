@@ -13,7 +13,6 @@ from tcod.libtcod import RNG_CMWC as COMPLEMENTARY_MULTIPLY_WITH_CARRY
 
 class Random(object):
     """The libtcod random number generator.
-    .. versionadded:: 2.0
 
     If all you need is a random number generator then it's recommended
     that you use the :any:`random` module from the Python standard library.
@@ -27,7 +26,6 @@ class Random(object):
 
     Attributes:
         random_c (CData): A cffi pointer to a TCOD_random_t object.
-            .. versionadded:: 2.5
     """
     def __init__(self, algorithm, seed=None):
         """Create a new instance using this algorithm and seed."""

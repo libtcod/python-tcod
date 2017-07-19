@@ -75,15 +75,15 @@ def _get_pathcost_func(name):
 
 
 class _EdgeCostFunc(object):
+    """
+    Args:
+        userdata (Any): Custom userdata to send to the C call.
+        width (int): The maximum width of this callback.
+        height (int): The maximum height of this callback.
+    """
     _CALLBACK_P = lib._pycall_path_old
 
     def __init__(self, userdata, width, height):
-        """
-        Args:
-            userdata (Any): Custom userdata to send to the C call.
-            width (int): The maximum width of this callback.
-            height (int): The maximum height of this callback.
-        """
         self._userdata = userdata
         self.width = width
         self.height = height
@@ -107,21 +107,27 @@ class _EdgeCostFunc(object):
 
 
 class EdgeCostCallback(_EdgeCostFunc):
+    """Calculate cost from an edge-cost callback.
+
+    Args:
+        callback (Callable[[int, int, int, int], float]):
+            A callback which can handle the following parameters:
+            `(source_x:int, source_y:int, dest_x:int, dest_y:int) -> float`
+        width (int): The maximum width of this callback.
+        height (int): The maximum height of this callback.
+    """
     _CALLBACK_P = lib._pycall_path_simple
 
     def __init__(self, callback, width, height):
-        """
-        Args:
-            callback (Callable[[int, int, int, int], float]):
-                A callback which can handle the following parameters:
-                `(source_x:int, source_y:int, dest_x:int, dest_y:int) -> float`
-            width (int): The maximum width of this callback.
-            height (int): The maximum height of this callback.
-        """
         self.callback = callback
         super(EdgeCostCallback, self).__init__(callback, width, height)
 
 class NodeCostArray(np.ndarray):
+    """Calculate cost from a numpy array of nodes.
+
+    Args:
+        array (numpy.ndarray): A numpy array with the cost of each node.
+    """
 
     _C_ARRAY_CALLBACKS = {
         np.float32: ('float*', _get_pathcost_func('PathCostArrayFloat32')),
@@ -228,14 +234,6 @@ class _PathFinder(object):
 
 class AStar(_PathFinder):
     """
-    .. versionadded:: 2.0
-
-    .. versionchanged:: 3.0
-            Removed width and height parameters.
-
-            Callbacks must be wrapped in an :any:`tcod.path.EdgeCostCallback`
-            instance or similar.
-
     Args:
         cost (Union[tcod.map.Map, numpy.ndarray, Any]):
         diagonal (float): Multiplier for diagonal movement.
@@ -265,14 +263,6 @@ class AStar(_PathFinder):
 
 class Dijkstra(_PathFinder):
     """
-    .. versionadded:: 2.0
-
-    .. versionchanged:: 3.0
-            Removed width and height parameters.
-
-            Callbacks must be wrapped in an :any:`tcod.path.EdgeCostCallback`
-            instance or similar.
-
     Args:
         cost (Union[tcod.map.Map, numpy.ndarray, Any]):
         diagonal (float): Multiplier for diagonal movement.
