@@ -6,7 +6,7 @@
 ========
 |VersionsBadge| |ImplementationBadge| |LicenseBadge|
 
-|PyPI| |RTD| |Appveyor| |Travis| |Coveralls| |Codecov| |Codacy| |Scrutinizer|
+|PyPI| |RTD| |Appveyor| |Travis| |Coveralls| |Codecov| |Codacy| |Scrutinizer| |Landscape|
 
 |Requires| |Pyup|
 
@@ -113,6 +113,10 @@ The latest documentation can be found
 
 .. |Scrutinizer| image:: https://scrutinizer-ci.com/g/HexDecimal/python-tdl/badges/quality-score.png?b=master
     :target: https://scrutinizer-ci.com/g/HexDecimal/python-tdl/
+
+.. |Landscape| image:: https://landscape.io/github/HexDecimal/python-tdl/dev/landscape.svg?style=flat
+    :target: https://landscape.io/github/HexDecimal/python-tdl/dev
+    :alt: Code Health
 
 .. |Requires| image:: https://requires.io/github/HexDecimal/python-tdl/requirements.svg?branch=master
     :target: https://requires.io/github/HexDecimal/python-tdl/requirements/?branch=master
