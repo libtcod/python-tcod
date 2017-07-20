@@ -10,6 +10,31 @@
 
 |Requires| |Pyup|
 
+=======
+ About
+=======
+This is a Python cffi_ port of libtcod_.
+
+This library is `hosted on GitHub <https://github.com/HexDecimal/python-tdl>`_.
+
+Any issues you have with this module can be reported at the
+`GitHub issue tracker <https://github.com/HexDecimal/python-tdl/issues>`_.
+
+=======
+ Usage
+=======
+This module was designed to be backward compatible with the original libtcodpy
+module distributed with libtcod.
+If you had code that runs on libtcodpy then you can use this library as a
+drop-in replacement::
+
+    import tcod as libtcod
+
+Guides and Tutorials for libtcodpy should work with the tcod module.
+
+The latest documentation can be found
+`here <https://python-tdl.readthedocs.io/en/latest/>`_.
+
 ==============
  Installation
 ==============
@@ -30,40 +55,18 @@ pip, you run these commands to install tdl::
     $ sudo apt install gcc libsdl2-dev libffi-dev python-dev libomp-dev
     $ pip install tdl
 
-=======
- About
-=======
-This is a Python cffi_ port of libtcod_.
-
-This library is `hosted on GitHub <https://github.com/HexDecimal/python-tdl>`_.
-
-Any issues you have with this module can be reported at the
-`GitHub issue tracker <https://github.com/HexDecimal/python-tdl/issues>`_.
-
-python-tdl is distributed under the `Simplified 2-clause FreeBSD license
-<https://github.com/HexDecimal/python-tdl/blob/master/LICENSE.txt>`_.
-
-=======
- Usage
-=======
-This module was designed to be backward compatible with the original libtcod
-module that is distributed with libtcod.
-If you had code that runs on the original module you can use this library as a
-drop-in replacement like this::
-
-    import tcod as libtcod
-
-Guides and Tutorials for libtcodpy should work with the tcod module.
-
-The latest documentation can be found
-`here <https://python-tdl.readthedocs.io/en/latest/>`_.
-
 ==============
  Requirements
 ==============
 * Python 2.7+, Python 3.4+, or PyPy 5.4+
 * Windows, Linux, or MacOS.
 * Linux requires the libsdl2 package and must be installed from source.
+
+=========
+ License
+=========
+python-tdl is distributed under the `Simplified 2-clause FreeBSD license
+<https://github.com/HexDecimal/python-tdl/blob/master/LICENSE.txt>`_.
 
 .. _LICENSE.txt: https://github.com/HexDecimal/python-tdl/blob/master/LICENSE.txt
 
