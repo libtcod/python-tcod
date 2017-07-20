@@ -53,6 +53,7 @@ console
 .. autofunction:: tcod.console_fill_char
 .. autofunction:: tcod.console_fill_foreground
 .. autofunction:: tcod.console_from_file
+.. autofunction:: tcod.console_from_xp
 .. autofunction:: tcod.console_get_alignment
 .. autofunction:: tcod.console_get_background_flag
 .. autofunction:: tcod.console_get_char
@@ -71,6 +72,9 @@ console
 .. autofunction:: tcod.console_is_window_closed
 .. autofunction:: tcod.console_load_apf
 .. autofunction:: tcod.console_load_asc
+.. autofunction:: tcod.console_load_xp
+.. autofunction:: tcod.console_list_load_xp
+.. autofunction:: tcod.console_list_save_xp
 .. autofunction:: tcod.console_map_ascii_code_to_font
 .. autofunction:: tcod.console_map_ascii_codes_to_font
 .. autofunction:: tcod.console_map_string_to_font
@@ -85,6 +89,7 @@ console
 .. autofunction:: tcod.console_rect
 .. autofunction:: tcod.console_save_apf
 .. autofunction:: tcod.console_save_asc
+.. autofunction:: tcod.console_save_xp
 .. autofunction:: tcod.console_set_alignment
 .. autofunction:: tcod.console_set_background_flag
 .. autofunction:: tcod.console_set_char
@@ -246,6 +251,14 @@ image
 .. autofunction:: tcod.image_scale
 .. autofunction:: tcod.image_set_key_color
 .. autofunction:: tcod.image_vflip
+
+line
+----
+
+.. autofunction:: tcod.line_init
+.. autofunction:: tcod.line_step
+.. autofunction:: tcod.line
+.. autofunction:: tcod.line_iter
 
 map
 ---
