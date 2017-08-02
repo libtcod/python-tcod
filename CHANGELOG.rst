@@ -4,6 +4,8 @@
 
 4.1.0 - 2017-07-19
 ------------------
+Added
+ - tdl Map class can now be pickled.
 Changed
  - Added protection to the `transparent`, `walkable`, and `fov`
    attributes in tcod and tdl Map classes, to prevent them from being
