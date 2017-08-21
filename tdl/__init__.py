@@ -1145,7 +1145,7 @@ def set_font(path, columns=None, rows=None, columnFirst=False,
     if greyscale:
         flags |= FONT_TYPE_GREYSCALE
     if not _os.path.exists(path):
-        raise TDLError('no file exists at: "%s"' % path)
+        raise TDLError('Font %r not found.' % _os.path.abspath(path))
     path = _os.path.abspath(path)
 
     # and the rest is the auto-detect script
