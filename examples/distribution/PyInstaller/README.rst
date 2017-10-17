@@ -1,7 +1,7 @@
 PyInstaller Example
 ===================
 
-First, install the packages: ``tdl``, ``libtcod-cffi``, and ``PyInstaller``.
+First, install the packages: ``tdl`` and ``PyInstaller``.
 
 On Windows you must also install the ``pywin32`` package
 (named ``pypiwin32`` if you're using pip install.)
