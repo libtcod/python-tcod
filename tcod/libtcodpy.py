@@ -2252,7 +2252,7 @@ def parser_run(parser, filename, listener=None):
     with _parser_callback_lock:
         _parser_listener = listener
         with propagate_manager:
-            lib.TCOD_parser_run(parser, filename.encode('utf-8'), clistener)
+            lib.TCOD_parser_run(parser, _bytes(filename), clistener)
 
 def parser_delete(parser):
     pass
