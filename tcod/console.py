@@ -60,6 +60,13 @@ class Console(object):
         self._ch = np.zeros((height, width), dtype=np.intc)
         self._fg = np.zeros((height, width, 3), dtype=np.uint8)
         self._bg = np.zeros((height, width, 3), dtype=np.uint8)
+
+        # libtcod uses the root console for defaults.
+        bkgnd_flag = alignment = 0
+        if lib.TCOD_ctx.root != ffi.NULL:
+            bkgnd_flag = lib.TCOD_ctx.root.bkgnd_flag
+            alignment = lib.TCOD_ctx.root.alignment
+
         self._console_data = self.console_c = ffi.new(
             'TCOD_console_data_t*',
             {
@@ -67,8 +74,8 @@ class Console(object):
             'ch_array': ffi.cast('int*', self._ch.ctypes.data),
             'fg_array': ffi.cast('TCOD_color_t*', self._fg.ctypes.data),
             'bg_array': ffi.cast('TCOD_color_t*', self._bg.ctypes.data),
-            'bkgnd_flag': tcod.BKGND_SET,
-            'alignment': tcod.LEFT,
+            'bkgnd_flag': bkgnd_flag,
+            'alignment': alignment,
             'fore': (255, 255, 255),
             'back': (0, 0, 0),
             },
