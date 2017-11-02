@@ -155,24 +155,24 @@ class ConsoleBuffer(object):
             fill_back (bool):
                 If True, fill the background color.
         """
-        dest = dest.console_c if dest else ffi.NULL
-        if (console_get_width(dest) != self.width or
-            console_get_height(dest) != self.height):
+        if not dest:
+            dest = tcod.console.Console._from_cdata(ffi.NULL)
+        if (dest.width != self.width or
+            dest.height != self.height):
             raise ValueError('ConsoleBuffer.blit: Destination console has an incorrect size.')
 
         if fill_back:
-            lib.TCOD_console_fill_background(dest or ffi.NULL,
-                                              ffi.new('int[]', self.back_r),
-                                              ffi.new('int[]', self.back_g),
-                                              ffi.new('int[]', self.back_b))
-        if fill_fore:
-            lib.TCOD_console_fill_foreground(dest or ffi.NULL,
-                                              ffi.new('int[]', self.fore_r),
-                                              ffi.new('int[]', self.fore_g),
-                                              ffi.new('int[]', self.fore_b))
-            lib.TCOD_console_fill_char(dest or ffi.NULL,
-                                        ffi.new('int[]', self.char))
+            bg = dest.bg.ravel()
+            bg[0::3] = self.back_r
+            bg[1::3] = self.back_g
+            bg[2::3] = self.back_b
 
+        if fill_fore:
+            fg = dest.fg.ravel()
+            fg[0::3] = self.fore_r
+            fg[1::3] = self.fore_g
+            fg[2::3] = self.fore_b
+            dest.ch.ravel()[:] = self.char
 
 class Dice(_CDataWrapper):
     """
