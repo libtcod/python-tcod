@@ -2,6 +2,15 @@
  Changelog
 ===========
 
+
+4.1.1 - 2017-11-02
+------------------
+Fixed
+ - Fixed `ConsoleBuffer.blit` regression.
+ - Console defaults corrected, the root console's blend mode and alignment is
+   the default value for newly made Console's.
+ - You can give a byte string as a filename to load parsers.
+
 4.1.0 - 2017-07-19
 ------------------
 Added
