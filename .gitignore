@@ -64,3 +64,5 @@ dependencies/SDL2*
 tcod/x86
 tcod/x64
 tcod/SDL2.framework
+deb_dist/
+*.tar.gz
