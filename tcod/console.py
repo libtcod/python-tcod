@@ -210,6 +210,8 @@ class Console(object):
             x (int): The x coordinate from the left.
             y (int): The y coordinate from the top.
             string (Text): A Unicode string optionaly using color codes.
+            bg_blend (int): Blending mode to use, defaults to BKGND_DEFAULT.
+            alignment (Optinal[int]): Text alignment.
         """
         alignment = self.default_alignment if alignment is None else alignment
 
