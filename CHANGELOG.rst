@@ -2,6 +2,11 @@
  Changelog
 ===========
 
+Unreleased
+------------------
+Removed
+ - Source distrubitions no longer include tests, examples, or fonts.
+   `Find these on GitHub. <https://github.com/HexDecimal/python-tdl>`_
 
 4.1.1 - 2017-11-02
 ------------------

@@ -2,17 +2,10 @@ include *.py *.cfg *.txt *.rst
 
 recursive-include tdl *.py *.png *.txt *.md *.rst
 
-recursive-include fonts *.png *.txt *.md *.rst
-
-recursive-include examples *.py *.cfg *.png *.md *.rst
-
 recursive-include tcod *.py *.c *.h
-
-recursive-include tests *.py
-recursive-include libtcod/data *.cfg *.png *.txt
 
 recursive-include libtcod/include *.h
 recursive-include libtcod/src *.c *.h
-include libtcod/*.txt
+include libtcod/*.txt libtcod/*.md
 
 recursive-include dependencies/fake_libc_include *.h
