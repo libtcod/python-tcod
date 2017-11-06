@@ -49,18 +49,27 @@ To install using pip, use the following command::
 
 Linux
 -----
-On Linux, tdl will need to be built from source.  Assuming you have Python and
-pip, you run these commands to install tdl::
+The easiest method to install tdl on Linux would be from the PPA,
+this method will work for the Zesty, Artful, and Bionic versions of Ubuntu::
 
-    $ sudo apt install gcc libsdl2-dev libffi-dev python-dev libomp-dev
-    $ pip install tdl
+    $ sudo add-apt-repository ppa:4b796c65/ppa
+    $ sudo apt-get update
+    $ sudo apt-get install python-tdl python3-tdl
+
+Otherwise tdl will need to be built from source.  Assuming you have Python,
+pip, and apt-get, then you'll run these commands to install tdl and its
+dependencies to your user environment::
+
+    $ sudo apt-get install gcc python-dev python3-dev libsdl2-dev libffi-dev libomp-dev
+    $ pip2 install --user tdl
+    $ pip3 install --user tdl
 
 ==============
  Requirements
 ==============
 * Python 2.7+, Python 3.4+, or PyPy 5.4+
 * Windows, Linux, or MacOS.
-* Linux requires the libsdl2 package and must be installed from source.
+* On Linux, requires libsdl2 to run.
 
 =========
  License
