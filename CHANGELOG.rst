@@ -4,6 +4,8 @@
 
 Unreleased
 ------------------
+Changed
+ - Updated libtcod backend to v1.6.4
 Removed
  - Source distrubitions no longer include tests, examples, or fonts.
    `Find these on GitHub. <https://github.com/HexDecimal/python-tdl>`_
