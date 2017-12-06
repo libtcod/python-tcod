@@ -1,3 +1,8 @@
+prune examples
+prune fonts
+prune libtcod
+prune tests
+
 include *.py *.cfg *.txt *.rst
 
 recursive-include tdl *.py *.png *.txt *.md *.rst
