@@ -223,6 +223,8 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     install_python
     if [[ -n "$PYTHON_EXE" ]]; then
         virtualenv venv -p $PYTHON_EXE
-        source venv/bin/activate
+    else
+        virtualenv venv
     fi
+    source venv/bin/activate
 fi
