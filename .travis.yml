@@ -64,10 +64,6 @@ before_script:
  - pip install pytest pytest-cov
 script:
 - pytest -v
-- cd dist
-- pip install --upgrade *.whl
-- python -c "import tcod"
-- cd -
 after_success:
 - pip install codacy-coverage python-coveralls codecov
 - codecov
