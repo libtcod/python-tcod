@@ -253,8 +253,8 @@ if sys.platform == 'win32' and '--compiler=mingw32' not in sys.argv:
     if USE_OPENMP:
         extra_compile_args.append('/openmp')
 else:
-    extra_compile_args.extend(['-flto'])
-    extra_link_args.extend(['-flto', '-O3'])
+    extra_compile_args.extend(['-flto', '-O3', '-fPIC'])
+    extra_link_args.extend(['-flto', '-O3', '-fPIC'])
     if USE_OPENMP is None:
         USE_OPENMP = sys.platform != 'darwin'
 

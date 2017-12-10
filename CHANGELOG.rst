@@ -9,6 +9,9 @@ Changed
 Removed
  - Source distrubitions no longer include tests, examples, or fonts.
    `Find these on GitHub. <https://github.com/HexDecimal/python-tdl>`_
+Fixed
+ - Fixed "final link failed: Nonrepresentable section on output" error
+   when compiling for Linux.
 
 4.1.1 - 2017-11-02
 ------------------
