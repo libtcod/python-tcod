@@ -29,7 +29,9 @@ matrix:
   - os: osx
     language: generic
     env: PYPY_VERSION=5.8.0
-
+  - os: osx
+    language: generic
+    env: PYPY_VERSION=5.9.0
   fast_finish: true
 
 sudo: required
@@ -50,7 +52,7 @@ before_install:
 - 'if [[ "$BREW_PYTHON3" == "true" ]]; then virtualenv venv -p python3; fi'
 - 'if [[ "$BREW_PYTHON3" == "true" ]]; then source venv/bin/activate; fi'
 - source .travis/install_python.sh
-- pip install --upgrade pip setuptools
+- pip install --disable-pip-version-check --upgrade pip setuptools
 - 'pip install -U hg+https://bitbucket.org/HexDecimal/wheel@abi3-windows-fix#egg=wheel'
 - 'if [[ "$TRAVIS_PYTHON_VERSION" == pypy* || -n "$PYPY_VERSION" ]]; then pip install git+https://bitbucket.org/pypy/numpy.git; fi'
 - pip install --requirement requirements.txt

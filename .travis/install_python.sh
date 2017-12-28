@@ -137,10 +137,12 @@ function get_pypy3_build_prefix {
     if [[ $version =~ ([0-9]+)\.([0-9]+) ]]; then
         local major=${BASH_REMATCH[1]}
         local minor=${BASH_REMATCH[2]}
-        if (( $major <= 2 )); then
+        if (( $major == 5 && $minor <= 5 )); then
+            echo "pypy3.3-v"
+        elif (( $major < 5 )); then
             echo "pypy3-"
         else
-            echo "pypy3.3-v"
+            echo "pypy3-v"
         fi
     else
         echo "error: expected version number, got $1" 1>&2
