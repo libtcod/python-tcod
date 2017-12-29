@@ -62,7 +62,6 @@ install:
 - cmd: "%ACTIVATE_VENV%"
 - cmd: "python --version"
 - cmd: "set PATH=%PATH%;C:\\MinGW\\bin"
-- cmd: echo "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 > "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64/vcvars64.bat"
 - cmd: "pip install --upgrade pip setuptools"
 - cmd: "if defined PYPY pip install git+https://bitbucket.org/pypy/numpy.git"
 - 'pip install -e hg+https://bitbucket.org/HexDecimal/wheel@abi3-windows-fix#egg=wheel'
