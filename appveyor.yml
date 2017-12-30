@@ -13,7 +13,7 @@ environment:
     platform: Any CPU
   - PYTHON: C:\Python27\python.exe
     platform: Any CPU
-  - PYPY: pypy2-v5.4.1-win32
+  - PYPY: pypy2-v5.7.1-win32
     platform: Any CPU
   - PYTHON: C:\Python36-x64\python.exe
     platform: x64
@@ -27,12 +27,6 @@ environment:
     platform: x64
     DEPLOY_ONLY: true
   - PYTHON: C:\Python36\python.exe
-    platform: Any CPU
-    DEPLOY_ONLY: true
-  - PYPY: pypy2-v5.6.0-win32
-    platform: Any CPU
-    DEPLOY_ONLY: true
-  - PYPY: pypy2-v5.7.1-win32
     platform: Any CPU
     DEPLOY_ONLY: true
   - PYPY: pypy2-v5.8.0-win32
