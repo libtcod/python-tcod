@@ -88,16 +88,15 @@ sources += [file for file in walk_sources('libtcod/src')
 
 libraries = []
 library_dirs = []
-define_macros = [('LIBTCOD_EXPORTS', None),
-                 ('TCOD_SDL2', None),
-                 ('_CRT_SECURE_NO_WARNINGS', None),
-                 ]
+define_macros = []
 
 sources += walk_sources('tcod/')
 sources += walk_sources('tdl/')
 
 if sys.platform == 'win32':
     libraries += ['User32', 'OpenGL32']
+    define_macros.append(('TCODLIB_API', ''))
+    define_macros.append(('_CRT_SECURE_NO_WARNINGS', None))
 
 if 'linux' in sys.platform:
     libraries += ['GL']
@@ -225,7 +224,6 @@ def get_ast():
                                r'-DDECLSPEC=',
                                r'-DSDLCALL=',
                                r'-DTCODLIB_API=',
-                               r'-DTCOD_SDL2=',
                                r'-DSDL_FORCE_INLINE=',
                                r'-U__GNUC__',
                                r'-D_SDL_thread_h',
