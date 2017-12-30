@@ -294,6 +294,8 @@ class Mouse(_CDataWrapper):
         """Return a representation of this Mouse object."""
         params = []
         for attr in ['x', 'y', 'dx', 'dy', 'cx', 'cy', 'dcx', 'dcy']:
+            if getattr(self, attr) == 0:
+                continue
             params.append('%s=%r' % (attr, getattr(self, attr)))
         for attr in ['lbutton', 'rbutton', 'mbutton',
                      'lbutton_pressed', 'rbutton_pressed', 'mbutton_pressed',
@@ -552,7 +554,7 @@ Color(204,102,0), Color(255,128,0)]
 
 
 def console_init_root(w, h, title, fullscreen=False,
-                      renderer=RENDERER_GLSL):
+                      renderer=RENDERER_SDL):
     """Set up the primary display and return the root console.
 
     Args:

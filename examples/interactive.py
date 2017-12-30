@@ -8,7 +8,6 @@ import io
 import time
 import traceback
 
-sys.path.insert(0, '../')
 import tdl
 
 sys.ps1 = '>>> '

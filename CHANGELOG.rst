@@ -12,6 +12,8 @@ Removed
 Fixed
  - Fixed "final link failed: Nonrepresentable section on output" error
    when compiling for Linux.
+ - `tcod.console_init_root` defaults to the SDL renderer, other renderers can
+   cause issues with things such as mouse movement events.
 
 4.1.1 - 2017-11-02
 ------------------

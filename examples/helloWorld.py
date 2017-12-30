@@ -2,11 +2,6 @@
 """
     Example showing some of the most basic functions needed to say "Hello World"
 """
-# you can skip past this part and go onto the next.
-# what this does is allow tdl to be imported without installing it first.
-import sys
-sys.path.insert(0, '../')
-
 # import the tdl library and all of it's functions, this gives us access to anything
 # starting with "tdl."
 import tdl

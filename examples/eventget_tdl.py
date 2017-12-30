@@ -3,9 +3,6 @@
     An interactive example of what events are available.
 """
 
-import sys
-sys.path.insert(0, '../')
-
 import tdl
 
 WIDTH, HEIGHT = 80, 60
@@ -16,7 +13,7 @@ console = tdl.init(WIDTH, HEIGHT)
 textWindow = tdl.Window(console, 0, 0, WIDTH, -2)
 
 # slow down the program so that the user can more clearly see the motion events
-tdl.setFPS(24)
+tdl.set_fps(24)
 
 while 1:
     event = tdl.event.wait()
