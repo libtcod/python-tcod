@@ -1,11 +1,17 @@
 ===========
  Changelog
 ===========
+Changes relevant for users of the the tdl and tcod packages are documented
+here.
+
+This project adheres to `Semantic Versioning <https://semver.org/>`_ since
+v2.0.0
 
 Unreleased
 ------------------
 Changed
  - Updated libtcod backend to v1.6.4
+ - Updated SDL to v2.0.7 for Windows/MacOS.
 Removed
  - Source distrubitions no longer include tests, examples, or fonts.
    `Find these on GitHub. <https://github.com/HexDecimal/python-tdl>`_
