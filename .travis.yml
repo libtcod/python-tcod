@@ -37,6 +37,10 @@ addons:
     packages:
       - libsdl2-dev
       - mesa-common-dev
+      - fakeroot
+      - debhelper
+      - python-all
+      - python3-pip
 
 before_install:
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi'
@@ -50,12 +54,14 @@ before_install:
 - 'pip install -U hg+https://bitbucket.org/HexDecimal/wheel@abi3-windows-fix#egg=wheel'
 - 'if [[ "$TRAVIS_PYTHON_VERSION" == pypy* || -n "$PYPY_VERSION" ]]; then pip install git+https://bitbucket.org/pypy/numpy.git; fi'
 - pip install --requirement requirements.txt
+- source .travis/upload_ppa.sh
 install:
 - if [[ -z "$TRAVIS_TAG" ]]; then export BUILD_FLAGS="-g"; fi
 - python setup.py build $BUILD_FLAGS develop bdist_wheel
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python -m pip install git+git://github.com/HexDecimal/delocate.git@custom; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-wheel -v dist/*.whl; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-listdeps --all dist/*.whl; fi'
+- deb_install
 before_script:
  - pip install pytest pytest-cov
 script:
@@ -68,3 +74,4 @@ after_success:
 - python-codacy-coverage -r coverage.xml
 - if [[ -n "$TRAVIS_TAG" ]]; then pip install twine; fi
 - if [[ -n "$TRAVIS_TAG" && "$TRAVIS_OS_NAME" == "osx" ]]; then twine upload --skip-existing dist/*; fi
+- deb_upload
