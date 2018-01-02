@@ -7,19 +7,19 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
-Unreleased
+4.2.0 - 2018-01-02
 ------------------
 Changed
  - Updated libtcod backend to v1.6.4
  - Updated SDL to v2.0.7 for Windows/MacOS.
 Removed
- - Source distrubitions no longer include tests, examples, or fonts.
+ - Source distributions no longer include tests, examples, or fonts.
    `Find these on GitHub. <https://github.com/HexDecimal/python-tdl>`_
 Fixed
  - Fixed "final link failed: Nonrepresentable section on output" error
    when compiling for Linux.
- - `tcod.console_init_root` defaults to the SDL renderer, other renderers can
-   cause issues with things such as mouse movement events.
+ - `tcod.console_init_root` defaults to the SDL renderer, other renderers
+   cause issues with mouse movement events.
 
 4.1.1 - 2017-11-02
 ------------------
