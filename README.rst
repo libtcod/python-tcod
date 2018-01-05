@@ -47,6 +47,11 @@ To install using pip, use the following command::
 
     > python -m pip install tdl
 
+If you get the error "ImportError: DLL load failed: The specified module could
+not be found." when trying to import tcod/tdl then you may need the latest
+`Microsoft Visual C runtime
+<https://support.microsoft.com/en-ca/help/2977003/the-latest-supported-visual-c-downloads>`_.
+
 Linux
 -----
 The easiest method to install tdl on Linux would be from the PPA,
