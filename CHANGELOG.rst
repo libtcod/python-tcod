@@ -12,6 +12,8 @@ Unreleased
 Fixed
  - The Win dynamic linker will now prefer the bundled version of SDL, fixes:
    "ImportError: DLL load failed: The specified procedure could not be found."
+ - `key.c` is no longer set when `key.vk == KEY_TEXT`, this fixes a regression
+    which was causing events to be heard twice in the libtcod/Python tutorial.
 
 4.2.0 - 2018-01-02
 ------------------
