@@ -14,7 +14,7 @@ except ImportError:
     from urllib.request import urlretrieve
 import zipfile
 
-SDL2_VERSION = '2.0.7'
+SDL2_VERSION = os.environ.get('SDL_VERSION', '2.0.7')
 
 CFFI_HEADER = 'tcod/cffi.h'
 CFFI_EXTRA_CDEFS = 'tcod/cdef.h'

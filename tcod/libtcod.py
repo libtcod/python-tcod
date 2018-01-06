@@ -13,8 +13,10 @@ from tcod import __path__
 if _sys.platform == 'win32':
     # add Windows dll's to PATH
     _bits, _linkage = _platform.architecture()
-    _os.environ['PATH'] += (';' +
-        _os.path.join(__path__[0], 'x86/' if _bits == '32bit' else 'x64'))
+    _os.environ['PATH'] = '%s;%s' % (
+        _os.path.join(__path__[0], 'x86' if _bits == '32bit' else 'x64'),
+        _os.environ['PATH'],
+        )
 
 def _import_library_functions(lib):
     # imports libtcod namespace into thie module
