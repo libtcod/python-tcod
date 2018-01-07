@@ -42,6 +42,7 @@ addons:
       - python-all
       - python3-pip
       - devscripts
+      - dput
 
 before_install:
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi'
