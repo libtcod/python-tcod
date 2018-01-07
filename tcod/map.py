@@ -8,7 +8,7 @@ Example::
     array([[False, False, False],
            [False, False, False],
            [False, False, False],
-           [False, False, False]], dtype=bool)
+           [False, False, False]]...)
 
     # Like the rest of the tcod modules, all arrays here are
     # in row-major order and are addressed with [y,x]
@@ -18,14 +18,14 @@ Example::
     array([[ True,  True,  True],
            [False,  True,  True],
            [False,  True,  True],
-           [ True,  True,  True]], dtype=bool)
+           [ True,  True,  True]]...)
 
     >>> m.compute_fov(0, 0)
     >>> m.fov
     array([[ True,  True,  True],
            [ True,  True,  True],
            [False,  True,  True],
-           [False, False,  True]], dtype=bool)
+           [False, False,  True]]...)
     >>> m.fov[3,1]
     False
 
