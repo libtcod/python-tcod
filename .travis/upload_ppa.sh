@@ -10,7 +10,7 @@ function deb_install {
 }
 function deb_upload {
     if [[ -n "$TRAVIS_TAG" && -n "$DEB_READY" ]]; then
-        openssl aes-256-cbc -K $encrypted_765c87af1f2f_key -iv $encrypted_765c87af1f2f_iv -in .travis/launchpad.key.enc | gpg --import
+        openssl aes-256-cbc -K $encrypted_765c87af1f2f_key -iv $encrypted_765c87af1f2f_iv -in .travis/launchpad.key.enc -d | gpg --import
         debsign -k5B69F065 deb_dist/*.changes
         dput ppa:4b796c65/ppa deb_dist/*.changes
     fi
