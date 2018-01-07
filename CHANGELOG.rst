@@ -7,13 +7,20 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
+4.2.3 - 2018-01-06
+------------------
+Fixed
+ - Fixed setup.py regression that could prevent building outside of the git
+   repository.
+
 4.2.2 - 2018-01-06
 ------------------
 Fixed
- - The Win dynamic linker will now prefer the bundled version of SDL, fixes:
+ - The Windows dynamic linker will now prefer the bundled version of SDL.
+   This fixes:
    "ImportError: DLL load failed: The specified procedure could not be found."
  - `key.c` is no longer set when `key.vk == KEY_TEXT`, this fixes a regression
-    which was causing events to be heard twice in the libtcod/Python tutorial.
+   which was causing events to be heard twice in the libtcod/Python tutorial.
 
 4.2.0 - 2018-01-02
 ------------------
