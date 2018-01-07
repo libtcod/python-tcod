@@ -10,14 +10,23 @@ import platform
 def get_version():
     """Get the current version from a git tag, or by reading tdl/version.py"""
     try:
-        version = check_output(['git', 'describe', '--abbrev=0'],
-                               universal_newlines=True)
-        assert version.startswith('v')
-        version = version[1:-1] # remove `v` and newline
+        tag = check_output(['git', 'describe', '--abbrev=0'],
+                           universal_newlines=True).strip()
+        assert tag.startswith('v')
+        version = tag[1:] # remove `v`
+
+        # add .devNN if needed
+        log = check_output(['git', 'log', '%s..HEAD' % tag, '--oneline'],
+                           universal_newlines=True)
+        commits_since_tag = log.count('\n')
+        if commits_since_tag:
+            version += '.dev%i' % commits_since_tag
+
+        # update tdl/version.py
         open('tdl/version.py', 'w').write('__version__ = %r\n' % version)
         return version
     except:
-        exec(open('tdl/version.py').read())
+        exec(open('tdl/version.py').read(), globals())
         return __version__
 
 is_pypy = platform.python_implementation() == 'PyPy'
