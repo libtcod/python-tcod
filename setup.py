@@ -15,6 +15,7 @@ def get_version():
         assert version.startswith('v')
         version = version[1:-1] # remove `v` and newline
         open('tdl/version.py', 'w').write('__version__ = %r\n' % version)
+        return version
     except:
         exec(open('tdl/version.py').read())
         return __version__

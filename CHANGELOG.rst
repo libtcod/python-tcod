@@ -7,7 +7,7 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
-4.2.1 - 2018-01-06
+4.2.2 - 2018-01-06
 ------------------
 Fixed
  - The Win dynamic linker will now prefer the bundled version of SDL, fixes:
