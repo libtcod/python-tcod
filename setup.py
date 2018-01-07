@@ -4,9 +4,20 @@ import sys
 
 from setuptools import setup
 
+from subprocess import check_output
 import platform
 
-exec(open('tdl/version.py').read()) # get __version__
+def get_version():
+    """Get the current version from a git tag, or by reading tdl/version.py"""
+    try:
+        version = check_output(['git', 'describe', '--abbrev=0'],
+                               universal_newlines=True)
+        assert version.startswith('v')
+        version = version[1:-1] # remove `v` and newline
+        open('tdl/version.py', 'w').write('__version__ = %r\n' % version)
+    except:
+        exec(open('tdl/version.py').read())
+        return __version__
 
 is_pypy = platform.python_implementation() == 'PyPy'
 
@@ -32,7 +43,7 @@ pytest_runner = ['pytest-runner'] if needs_pytest else []
 
 setup(
     name='tdl',
-    version=__version__,
+    version=get_version(),
     author='Kyle Stewart',
     author_email='4B796C65+tdl@gmail.com',
     description='Pythonic cffi port of libtcod.',

@@ -66,3 +66,4 @@ tcod/x64
 tcod/SDL2.framework
 deb_dist/
 *.tar.gz
+tdl/version.py
