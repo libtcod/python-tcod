@@ -64,7 +64,10 @@ author = u'Kyle Stewart'
 # built documents.
 #
 # The full version, including alpha/beta/rc tags.
-from tdl import __version__ as release
+from subprocess import check_output
+release = check_output(['git', 'describe', '--abbrev=0'],
+                       universal_newlines=True).strip()[1:]
+print('release version: %r' % release)
 # The short X.Y version.
 import re
 version = re.match(r'([0-9]+\.[0-9]+).*?', release).group()
