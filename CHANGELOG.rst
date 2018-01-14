@@ -7,6 +7,12 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
+Unreleased
+------------------
+Fixed
+ - OpenGL renderer alpha blending is now consistent with all other render
+   modes.
+
 4.2.3 - 2018-01-06
 ------------------
 Fixed
