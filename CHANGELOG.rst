@@ -9,6 +9,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - The `console_init_root` `title` parameter is now optional.
 Fixed
  - OpenGL renderer alpha blending is now consistent with all other render
    modes.

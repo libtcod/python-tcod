@@ -3,6 +3,9 @@
 
 from __future__ import absolute_import as _
 
+import os
+import sys
+
 import threading as _threading
 
 import numpy as _np
@@ -553,14 +556,14 @@ Color(204,102,0), Color(255,128,0)]
     return [Color._new_from_cdata(cdata) for cdata in cres]
 
 
-def console_init_root(w, h, title, fullscreen=False,
+def console_init_root(w, h, title=None, fullscreen=False,
                       renderer=RENDERER_SDL):
     """Set up the primary display and return the root console.
 
     Args:
         w (int): Width in character tiles for the root console.
         h (int): Height in character tiles for the root console.
-        title (AnyStr):
+        title (Optional[AnyStr]):
             This string will be displayed on the created windows title bar.
         renderer: Rendering mode for libtcod to use.
 
@@ -568,6 +571,9 @@ def console_init_root(w, h, title, fullscreen=False,
         Console:
             Returns a special Console instance representing the root console.
     """
+    if title is None:
+        # Use the scripts filename as the title.
+        title = os.path.basename(sys.argv[0])
     lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
     return tcod.console.Console._from_cdata(ffi.NULL) # root console is null
 
