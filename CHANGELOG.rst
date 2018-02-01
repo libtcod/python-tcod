@@ -7,7 +7,7 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
-Unreleased
+4.3.0 - 2018-02-01
 ------------------
 Added
  - You can now set the numpy memory order on tcod.console.Console,

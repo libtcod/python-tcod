@@ -562,6 +562,7 @@ def console_init_root(w, h, title=None, fullscreen=False,
 
     .. versionchanged:: 4.3
         Added `order` parameter.
+        `title` parameter is now optional.
 
     Args:
         w (int): Width in character tiles for the root console.
