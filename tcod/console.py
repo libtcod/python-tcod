@@ -33,6 +33,7 @@ import numpy as np
 
 import tcod.libtcod
 from tcod.libtcod import ffi, lib
+import tcod._internal
 
 if sys.version_info[0] == 2: # Python 2
     def _fmt(string):
@@ -46,20 +47,30 @@ else:
 
 
 class Console(object):
-    """
+    """A console object containing a grid of characters with
+    foreground/background colors.
+
+    .. versionchanged:: 4.3
+        Added `order` parameter.
+
     Args:
         width (int): Width of the new Console.
         height (int): Height of the new Console.
+        order (str): Which numpy memory order to use.
 
     Attributes:
         console_c (CData): A cffi pointer to a TCOD_console_t object.
     """
 
-    def __init__(self, width, height):
+    def __init__(self, width, height, order='C'):
         self._key_color = None
         self._ch = np.zeros((height, width), dtype=np.intc)
-        self._fg = np.zeros((height, width, 3), dtype=np.uint8)
-        self._bg = np.zeros((height, width, 3), dtype=np.uint8)
+        self._fg = np.zeros((height, width), dtype='(3,)u1')
+        self._bg = np.zeros((height, width), dtype='(3,)u1')
+        if tcod._internal.verify_order(order) == 'F':
+            self._ch = self._ch.transpose()
+            self._fg = self._fg.transpose(1, 0, 2)
+            self._bg = self._bg.transpose(1, 0, 2)
 
         # libtcod uses the root console for defaults.
         bkgnd_flag = alignment = 0
@@ -82,15 +93,15 @@ class Console(object):
         )
 
     @classmethod
-    def _from_cdata(cls, cdata):
+    def _from_cdata(cls, cdata, order='C'):
         if isinstance(cdata, cls):
             return cdata
         self = object.__new__(cls)
         self.console_c = cdata
-        self._init_setup_console_data()
+        self._init_setup_console_data(order)
         return self
 
-    def _init_setup_console_data(self):
+    def _init_setup_console_data(self, order='C'):
         """Setup numpy arrays over libtcod data buffers."""
         self._key_color = None
         if self.console_c == ffi.NULL:
@@ -111,6 +122,12 @@ class Console(object):
         buf = ffi.buffer(buf[0:self.width * self.height])
         self._ch = np.frombuffer(buf, np.intc).reshape((self.height,
                                                         self.width))
+
+        order = tcod._internal.verify_order(order)
+        if order == 'F':
+            self._fg = self._fg.transpose(1, 0, 2)
+            self._bg = self._bg.transpose(1, 0, 2)
+            self._ch = self._ch.transpose()
 
     @property
     def width(self):

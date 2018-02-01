@@ -41,6 +41,9 @@ class Map(tcod.map.Map):
     .. versionchanged:: 4.1
         `transparent`, `walkable`, and `fov` are now numpy boolean arrays.
 
+    .. versionchanged:: 4.3
+        Added `order` parameter.
+
     .. deprecated:: 3.2
         :any:`tcod.map.Map` should be used instead.
 
@@ -84,17 +87,8 @@ class Map(tcod.map.Map):
             be using it to read the field-of-view of a :any:`compute_fov` call.
     """
 
-    @property
-    def transparent(self):
-        return self._Map__buffer[:,:,0].transpose()
-
-    @property
-    def walkable(self):
-        return self._Map__buffer[:,:,1].transpose()
-
-    @property
-    def fov(self):
-        return self._Map__buffer[:,:,2].transpose()
+    def __init__(self, width, height, order='F'):
+        super(Map, self).__init__(width, height, order)
 
     def compute_fov(self, x, y, fov='PERMISSIVE', radius=None,
                     light_walls=True, sphere=True, cumulative=False):

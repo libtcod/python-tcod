@@ -36,6 +36,7 @@ from __future__ import absolute_import
 import numpy as np
 
 from tcod.libtcod import lib, ffi
+import tcod._internal
 
 
 class Map(object):
@@ -44,9 +45,13 @@ class Map(object):
     .. versionchanged:: 4.1
         `transparent`, `walkable`, and `fov` are now numpy boolean arrays.
 
+    .. versionchanged:: 4.3
+        Added `order` parameter.
+
     Args:
         width (int): Width of the new Map.
         height (int): Height of the new Map.
+        order (str): Which numpy memory order to use.
 
     Attributes:
         width (int): Read only width of this Map.
@@ -57,12 +62,14 @@ class Map(object):
 
     """
 
-    def __init__(self, width, height):
+    def __init__(self, width, height, order='C'):
         assert ffi.sizeof('cell_t') == 3 # assert buffer alignment
         self.width = width
         self.height = height
 
         self.__buffer = np.zeros((height, width, 3), dtype=np.bool_)
+        if tcod._internal.verify_order(order) == 'F':
+            self.__buffer = self.__buffer.transpose(1, 0, 2)
         self.map_c = self.__as_cdata()
 
     def __as_cdata(self):

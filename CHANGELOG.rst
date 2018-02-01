@@ -9,6 +9,10 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - You can now set the numpy memory order on tcod.console.Console,
+   tcod.map.Map, and tdl.map.Map objects well as from the
+   tcod.console_init_root function.
 Changed
  - The `console_init_root` `title` parameter is now optional.
 Fixed

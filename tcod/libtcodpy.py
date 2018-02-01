@@ -557,8 +557,11 @@ Color(204,102,0), Color(255,128,0)]
 
 
 def console_init_root(w, h, title=None, fullscreen=False,
-                      renderer=RENDERER_SDL):
+                      renderer=RENDERER_SDL, order='C'):
     """Set up the primary display and return the root console.
+
+    .. versionchanged:: 4.3
+        Added `order` parameter.
 
     Args:
         w (int): Width in character tiles for the root console.
@@ -566,6 +569,7 @@ def console_init_root(w, h, title=None, fullscreen=False,
         title (Optional[AnyStr]):
             This string will be displayed on the created windows title bar.
         renderer: Rendering mode for libtcod to use.
+        order (str): Which numpy memory order to use.
 
     Returns:
         Console:
@@ -575,7 +579,7 @@ def console_init_root(w, h, title=None, fullscreen=False,
         # Use the scripts filename as the title.
         title = os.path.basename(sys.argv[0])
     lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
-    return tcod.console.Console._from_cdata(ffi.NULL) # root console is null
+    return tcod.console.Console._from_cdata(ffi.NULL, order)
 
 
 def console_set_custom_font(fontFile, flags=FONT_LAYOUT_ASCII_INCOL,
