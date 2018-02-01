@@ -7,6 +7,13 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
+Unreleased
+------------------
+Fixed
+ - Fixed cffi.api.FFIError "unsupported expression: expected a simple numeric
+   constant" error when building on platforms with an older cffi module and
+   newer SDL headers.
+
 4.3.0 - 2018-02-01
 ------------------
 Added

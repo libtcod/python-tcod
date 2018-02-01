@@ -4,7 +4,9 @@ function deb_install {
         pip install stdeb
         pip3 install --upgrade pip --user
         pip3 install --requirement requirements.txt --user
-        ./setup.py --command-packages=stdeb.command sdist_dsc --with-python2=True --with-python3=True
+        ./setup.py sdist
+        ./setup.py --command-packages=stdeb.command sdist_dsc --use-premade-distfile dist/tdl-*.tar.gz --with-python2=True --with-python3=True --debian-version artful1 --suite artful
+        ./setup.py --command-packages=stdeb.command sdist_dsc --use-premade-distfile dist/tdl-*.tar.gz --with-python2=True --with-python3=True --debian-version bionic1 --suite bionic
         export DEB_READY='yes'
     fi
 }

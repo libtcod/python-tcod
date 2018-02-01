@@ -188,6 +188,12 @@ class CustomPostParser(c_ast.NodeVisitor):
             elif hasattr(enum.value, 'type'):
                 enum.value = c_ast.Constant(enum.value.type, '...')
 
+    def visit_ArrayDecl(self, node):
+        if not node.dim:
+            return
+        if isinstance(node.dim, (c_ast.BinaryOp, c_ast.UnaryOp)):
+            node.dim = c_ast.Constant('int', '...')
+
     def visit_Decl(self, node):
         if node.name is None:
             self.generic_visit(node)
