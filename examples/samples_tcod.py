@@ -1337,6 +1337,8 @@ def main():
     draw_renderer_menu()
 
     while not libtcod.console_is_window_closed():
+        root_console.default_fg = (255, 255, 255)
+        root_console.default_bg = (0, 0, 0)
         # render credits
         if not credits_end:
             root_console.clear()
