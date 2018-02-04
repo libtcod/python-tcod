@@ -247,9 +247,24 @@ try:
 except Exception:
     USE_OPENMP = None
 
+tdl_build = os.environ.get('TDL_BUILD', 'RELEASE').upper()
+
+MSVC_CFLAGS = {
+    'DEBUG': [],
+    'RELEASE': ['/GL', '/O2', '/GS-'],
+}
+MSVC_LDFLAGS = {
+    'DEBUG': [],
+    'RELEASE': ['/LTCG'],
+}
+GCC_CFLAGS = {
+    'DEBUG': [],
+    'RELEASE': ['-flto', '-O3', '-fPIC'],
+}
+
 if sys.platform == 'win32' and '--compiler=mingw32' not in sys.argv:
-    extra_compile_args.extend(['/GL', '/O2', '/GS-'])
-    extra_link_args.extend(['/LTCG'])
+    extra_compile_args.extend(MSVC_CFLAGS[tdl_build])
+    extra_link_args.extend(MSVC_LDFLAGS[tdl_build])
 
     if USE_OPENMP is None:
         USE_OPENMP = sys.version_info[:2] >= (3, 5)
@@ -257,8 +272,8 @@ if sys.platform == 'win32' and '--compiler=mingw32' not in sys.argv:
     if USE_OPENMP:
         extra_compile_args.append('/openmp')
 else:
-    extra_compile_args.extend(['-flto', '-O3', '-fPIC'])
-    extra_link_args.extend(['-flto', '-O3', '-fPIC'])
+    extra_compile_args.extend(GCC_CFLAGS[tdl_build])
+    extra_link_args.extend(GCC_CFLAGS[tdl_build])
     if USE_OPENMP is None:
         USE_OPENMP = sys.platform != 'darwin'
 
