@@ -3,11 +3,13 @@
 import os
 import sys
 
+import numpy
 from cffi import FFI
+from pycparser import c_parser, c_ast, parse_file, c_generator
+
 import shutil
 import subprocess
 import platform
-from pycparser import c_parser, c_ast, parse_file, c_generator
 try:
     from urllib import urlretrieve
 except ImportError:
@@ -74,6 +76,7 @@ include_dirs = [
     'libtcod/src/png/',
     'libtcod/src/zlib/',
     '/usr/include/SDL2/',
+    numpy.get_include(),
 ]
 
 extra_parse_args = []
