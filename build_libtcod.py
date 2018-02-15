@@ -3,6 +3,8 @@
 import os
 import sys
 
+import glob
+
 import numpy
 from cffi import FFI
 from pycparser import c_parser, c_ast, parse_file, c_generator
@@ -84,17 +86,16 @@ extra_compile_args = []
 extra_link_args = []
 sources = []
 
-sources += [file for file in walk_sources('libtcod/src')
-            if 'sys_sfml_c' not in file
-            and 'sdl12' not in file
-            ]
-
 libraries = []
 library_dirs = []
 define_macros = []
 
 sources += walk_sources('tcod/')
 sources += walk_sources('tdl/')
+sources += [file for file in walk_sources('libtcod/src')
+            if 'sys_sfml_c' not in file
+            and 'sdl12' not in file
+            ]
 
 if sys.platform == 'win32':
     libraries += ['User32', 'OpenGL32']
@@ -253,7 +254,7 @@ except Exception:
 tdl_build = os.environ.get('TDL_BUILD', 'RELEASE').upper()
 
 MSVC_CFLAGS = {
-    'DEBUG': [],
+    'DEBUG': ['/Od'],
     'RELEASE': ['/GL', '/O2', '/GS-'],
 }
 MSVC_LDFLAGS = {
@@ -261,7 +262,7 @@ MSVC_LDFLAGS = {
     'RELEASE': ['/LTCG'],
 }
 GCC_CFLAGS = {
-    'DEBUG': [],
+    'DEBUG': ['-O0'],
     'RELEASE': ['-flto', '-O3', '-fPIC'],
 }
 
