@@ -69,8 +69,11 @@ import tdl.event
 import tdl.noise
 import tdl.map
 import tdl.style as _style
-from tdl.version import __version__
 
+try:
+    from tdl.version import __version__
+except ImportError: # Gets imported without version.py by ReadTheDocs
+    __version__ = ''
 
 _IS_PYTHON3 = (_sys.version_info[0] == 3)
 
