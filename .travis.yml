@@ -48,12 +48,14 @@ before_install:
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" && "$USE_OPENMP" == "true" ]]; then source .travis/install_openmp.sh; fi'
-- 'if [[ "$BREW_PYTHON3" == "true" ]]; then brew install python3; fi'
-- 'if [[ "$BREW_PYTHON3" == "true" ]]; then virtualenv venv -p python3; fi'
+- 'if [[ "$BREW_PYTHON3" == "true" ]]; then brew upgrade python3; fi'
+- 'if [[ "$BREW_PYTHON3" == "true" ]]; then brew install python@2; fi'
+- 'if [[ "$BREW_PYTHON3" == "true" ]]; then python3 -m pip install virtualenv; fi'
+- 'if [[ "$BREW_PYTHON3" == "true" ]]; then python3 -m virtualenv venv; fi'
 - 'if [[ "$BREW_PYTHON3" == "true" ]]; then source venv/bin/activate; fi'
 - source .travis/install_python.sh
 - pip install --disable-pip-version-check --upgrade pip setuptools
-- 'pip install -U hg+https://bitbucket.org/HexDecimal/wheel@abi3-windows-fix#egg=wheel'
+- pip install --pre --upgrade wheel
 - 'if [[ "$TRAVIS_PYTHON_VERSION" == pypy* || -n "$PYPY_VERSION" ]]; then pip install git+https://bitbucket.org/pypy/numpy.git; fi'
 - pip install --requirement requirements.txt
 - source .travis/upload_ppa.sh
