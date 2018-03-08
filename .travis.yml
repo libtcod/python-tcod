@@ -26,6 +26,7 @@ matrix:
   - os: osx
     language: generic
     env: PYPY_VERSION=5.9.0
+  # skip 5.10.0 since it's broken
   fast_finish: true
 
 sudo: required
