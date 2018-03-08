@@ -13,6 +13,7 @@ Fixed
  - Fixed cffi.api.FFIError "unsupported expression: expected a simple numeric
    constant" error when building on platforms with an older cffi module and
    newer SDL headers.
+ - tcod/tdl Map and Console objects were not saving stride data when pickled.
 
 4.3.0 - 2018-02-01
 ------------------

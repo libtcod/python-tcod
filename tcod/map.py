@@ -66,11 +66,11 @@ class Map(object):
         assert ffi.sizeof('cell_t') == 3 # assert buffer alignment
         self.width = width
         self.height = height
+        self._order = tcod._internal.verify_order(order)
 
         self.__buffer = np.zeros((height, width, 3), dtype=np.bool_)
-        if tcod._internal.verify_order(order) == 'F':
-            self.__buffer = self.__buffer.transpose(1, 0, 2)
         self.map_c = self.__as_cdata()
+
 
     def __as_cdata(self):
         return ffi.new(
@@ -85,15 +85,18 @@ class Map(object):
 
     @property
     def transparent(self):
-        return self.__buffer[:,:,0]
+        buffer = self.__buffer[:,:,0]
+        return buffer.T if self._order == 'F' else buffer
 
     @property
     def walkable(self):
-        return self.__buffer[:,:,1]
+        buffer = self.__buffer[:,:,1]
+        return buffer.T if self._order == 'F' else buffer
 
     @property
     def fov(self):
-        return self.__buffer[:,:,2]
+        buffer = self.__buffer[:,:,2]
+        return buffer.T if self._order == 'F' else buffer
 
     def compute_fov(self, x, y, radius=0, light_walls=True,
                     algorithm=lib.FOV_RESTRICTIVE):
@@ -113,12 +116,17 @@ class Map(object):
 
     def __setstate__(self, state):
         if '_Map__buffer' not in state: # deprecated
+            # remove this check on major version update
             self.__buffer = np.zeros((state['height'], state['width'], 3),
                               dtype=np.bool_)
             self.__buffer[:,:,0] = state['buffer'] & 0x01
             self.__buffer[:,:,1] = state['buffer'] & 0x02
             self.__buffer[:,:,2] = state['buffer'] & 0x04
             del state['buffer']
+            state['_order'] = 'F'
+        if '_order' not in state: # remove this check on major version update
+            raise RuntimeError(
+                'This Map was saved with a bad version of tdl.')
         self.__dict__.update(state)
         self.map_c = self.__as_cdata()
 

@@ -67,10 +67,7 @@ class Console(object):
         self._ch = np.zeros((height, width), dtype=np.intc)
         self._fg = np.zeros((height, width), dtype='(3,)u1')
         self._bg = np.zeros((height, width), dtype='(3,)u1')
-        if tcod._internal.verify_order(order) == 'F':
-            self._ch = self._ch.transpose()
-            self._fg = self._fg.transpose(1, 0, 2)
-            self._bg = self._bg.transpose(1, 0, 2)
+        self._order = tcod._internal.verify_order(order)
 
         # libtcod uses the root console for defaults.
         bkgnd_flag = alignment = 0
@@ -123,11 +120,7 @@ class Console(object):
         self._ch = np.frombuffer(buf, np.intc).reshape((self.height,
                                                         self.width))
 
-        order = tcod._internal.verify_order(order)
-        if order == 'F':
-            self._fg = self._fg.transpose(1, 0, 2)
-            self._bg = self._bg.transpose(1, 0, 2)
-            self._ch = self._ch.transpose()
+        self._order = tcod._internal.verify_order(order)
 
     @property
     def width(self):
@@ -147,7 +140,7 @@ class Console(object):
 
         Index this array with ``console.bg[y, x, channel]``
         """
-        return self._bg
+        return self._bg.transpose(1, 0, 2) if self._order == 'F' else self._bg
 
     @property
     def fg(self):
@@ -157,7 +150,7 @@ class Console(object):
 
         Index this array with ``console.fg[y, x, channel]``
         """
-        return self._fg
+        return self._fg.transpose(1, 0, 2) if self._order == 'F' else self._fg
 
     @property
     def ch(self):
@@ -167,7 +160,7 @@ class Console(object):
 
         Index this array with ``console.ch[y, x]``
         """
-        return self._ch
+        return self._ch.T if self._order == 'F' else self._ch
 
     @property
     def default_bg(self):

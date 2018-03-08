@@ -118,6 +118,14 @@ def test_console_pickle(console):
     assert (console.bg == console2.bg).all()
 
 
+def test_console_pickle_fortran():
+    console = tcod.console.Console(2, 3, order='F')
+    console2 = pickle.loads(pickle.dumps(console))
+    assert console.ch.strides == console2.ch.strides
+    assert console.fg.strides == console2.fg.strides
+    assert console.bg.strides == console2.bg.strides
+
+
 def test_tcod_map_set_bits():
     map_ = tcod.map.Map(2,2)
 
@@ -147,8 +155,17 @@ def test_tcod_map_copy():
 def test_tcod_map_pickle():
     map_ = tcod.map.Map(3, 3)
     map_.transparent[:] = True
-    assert (map_.transparent[:].tolist() ==
-           pickle.loads(pickle.dumps(copy.copy(map_))).transparent[:].tolist())
+    map2 = pickle.loads(pickle.dumps(copy.copy(map_)))
+    assert (map_.transparent[:].tolist() == map2.transparent[:].tolist())
+
+
+def test_tcod_map_pickle_fortran():
+    map_ = tcod.map.Map(2, 3, order='F')
+    map2 = pickle.loads(pickle.dumps(copy.copy(map_)))
+    assert map_._Map__buffer.strides == map2._Map__buffer.strides
+    assert map_.transparent.strides == map2.transparent.strides
+    assert map_.walkable.strides == map2.walkable.strides
+    assert map_.fov.strides == map2.fov.strides
 
 
 @pytest.mark.parametrize('implementation', [tcod.noise.SIMPLE,
