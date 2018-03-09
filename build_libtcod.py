@@ -92,10 +92,10 @@ define_macros = []
 
 sources += walk_sources('tcod/')
 sources += walk_sources('tdl/')
-sources += [file for file in walk_sources('libtcod/src')
-            if 'sys_sfml_c' not in file
-            and 'sdl12' not in file
-            ]
+sources += ['libtcod/src/libtcod_c.c']
+sources += ['libtcod/src/png/lodepng.c']
+sources += glob.glob('libtcod/src/zlib/*.c')
+
 
 if sys.platform == 'win32':
     libraries += ['User32', 'OpenGL32']
