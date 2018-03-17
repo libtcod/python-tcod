@@ -16,6 +16,7 @@ from tcod.tcod import _int, _unpack_char_p
 from tcod.tcod import _bytes, _unicode, _fmt_bytes, _fmt_unicode
 from tcod.tcod import _CDataWrapper
 from tcod.tcod import _PropagateException
+from tcod.tcod import _console
 
 import tcod.bsp
 from tcod.color import *
@@ -619,7 +620,7 @@ def console_get_width(con):
     .. deprecated:: 2.0
         Use `Console.get_width` instead.
     """
-    return lib.TCOD_console_get_width(con.console_c if con else ffi.NULL)
+    return lib.TCOD_console_get_width(_console(con))
 
 def console_get_height(con):
     """Return the height of a console.
@@ -633,7 +634,7 @@ def console_get_height(con):
     .. deprecated:: 2.0
         Use `Console.get_hright` instead.
     """
-    return lib.TCOD_console_get_height(con.console_c if con else ffi.NULL)
+    return lib.TCOD_console_get_height(_console(con))
 
 def console_map_ascii_code_to_font(asciiCode, fontCharX, fontCharY):
     """Set a character code to new coordinates on the tile-set.
@@ -737,8 +738,7 @@ def console_set_default_background(con, col):
         col (Union[Tuple[int, int, int], Sequence[int]]):
             An (r, g, b) sequence or Color instance.
     """
-    lib.TCOD_console_set_default_background(
-        con.console_c if con else ffi.NULL, col)
+    lib.TCOD_console_set_default_background(_console(con), col)
 
 def console_set_default_foreground(con, col):
     """Change the default foreground color for a console.
@@ -748,8 +748,7 @@ def console_set_default_foreground(con, col):
         col (Union[Tuple[int, int, int], Sequence[int]]):
             An (r, g, b) sequence or Color instance.
     """
-    lib.TCOD_console_set_default_foreground(
-        con.console_c if con else ffi.NULL, col)
+    lib.TCOD_console_set_default_foreground(_console(con), col)
 
 def console_clear(con):
     """Reset a console to its default colors and the space character.
@@ -761,7 +760,7 @@ def console_clear(con):
        :any:`console_set_default_background`
        :any:`console_set_default_foreground`
     """
-    return lib.TCOD_console_clear(con.console_c if con else ffi.NULL)
+    return lib.TCOD_console_clear(_console(con))
 
 def console_put_char(con, x, y, c, flag=BKGND_DEFAULT):
     """Draw the character c at x,y using the default colors and a blend mode.
@@ -773,8 +772,7 @@ def console_put_char(con, x, y, c, flag=BKGND_DEFAULT):
         c (Union[int, AnyStr]): Character to draw, can be an integer or string.
         flag (int): Blending mode to use, defaults to BKGND_DEFAULT.
     """
-    lib.TCOD_console_put_char(
-        con.console_c if con else ffi.NULL, x, y, _int(c), flag)
+    lib.TCOD_console_put_char(_console(con), x, y, _int(c), flag)
 
 def console_put_char_ex(con, x, y, c, fore, back):
     """Draw the character c at x,y using the colors fore and back.
@@ -789,8 +787,7 @@ def console_put_char_ex(con, x, y, c, fore, back):
         back (Union[Tuple[int, int, int], Sequence[int]]):
             An (r, g, b) sequence or Color instance.
     """
-    lib.TCOD_console_put_char_ex(con.console_c if con else ffi.NULL, x, y,
-                                 _int(c), fore, back)
+    lib.TCOD_console_put_char_ex(_console(con), x, y, _int(c), fore, back)
 
 def console_set_char_background(con, x, y, col, flag=BKGND_SET):
     """Change the background color of x,y to col using a blend mode.
@@ -803,8 +800,7 @@ def console_set_char_background(con, x, y, col, flag=BKGND_SET):
             An (r, g, b) sequence or Color instance.
         flag (int): Blending mode to use, defaults to BKGND_SET.
     """
-    lib.TCOD_console_set_char_background(
-        con.console_c if con else ffi.NULL, x, y, col, flag)
+    lib.TCOD_console_set_char_background(_console(con), x, y, col, flag)
 
 def console_set_char_foreground(con, x, y, col):
     """Change the foreground color of x,y to col.
@@ -816,8 +812,7 @@ def console_set_char_foreground(con, x, y, col):
         col (Union[Tuple[int, int, int], Sequence[int]]):
             An (r, g, b) sequence or Color instance.
     """
-    lib.TCOD_console_set_char_foreground(
-        con.console_c if con else ffi.NULL, x, y, col)
+    lib.TCOD_console_set_char_foreground(_console(con), x, y, col)
 
 def console_set_char(con, x, y, c):
     """Change the character at x,y to c, keeping the current colors.
@@ -828,8 +823,7 @@ def console_set_char(con, x, y, c):
         y (int): Character y position from the top.
         c (Union[int, AnyStr]): Character to draw, can be an integer or string.
     """
-    lib.TCOD_console_set_char(
-        con.console_c if con else ffi.NULL, x, y, _int(c))
+    lib.TCOD_console_set_char(_console(con), x, y, _int(c))
 
 def console_set_background_flag(con, flag):
     """Change the default blend mode for this console.
@@ -838,8 +832,7 @@ def console_set_background_flag(con, flag):
         con (Console): Any Console instance.
         flag (int): Blend mode to use by default.
     """
-    lib.TCOD_console_set_background_flag(
-        con.console_c if con else ffi.NULL, flag)
+    lib.TCOD_console_set_background_flag(_console(con), flag)
 
 def console_get_background_flag(con):
     """Return this consoles current blend mode.
@@ -847,8 +840,7 @@ def console_get_background_flag(con):
     Args:
         con (Console): Any Console instance.
     """
-    return lib.TCOD_console_get_background_flag(
-        con.console_c if con else ffi.NULL)
+    return lib.TCOD_console_get_background_flag(_console(con))
 
 def console_set_alignment(con, alignment):
     """Change this consoles current alignment mode.
@@ -861,8 +853,7 @@ def console_set_alignment(con, alignment):
         con (Console): Any Console instance.
         alignment (int):
     """
-    lib.TCOD_console_set_alignment(
-        con.console_c if con else ffi.NULL, alignment)
+    lib.TCOD_console_set_alignment(_console(con), alignment)
 
 def console_get_alignment(con):
     """Return this consoles current alignment mode.
@@ -870,7 +861,7 @@ def console_get_alignment(con):
     Args:
         con (Console): Any Console instance.
     """
-    return lib.TCOD_console_get_alignment(con.console_c if con else ffi.NULL)
+    return lib.TCOD_console_get_alignment(_console(con))
 
 def console_print(con, x, y, fmt):
     """Print a color formatted string on a console.
@@ -881,8 +872,7 @@ def console_print(con, x, y, fmt):
         y (int): Character y position from the top.
         fmt (AnyStr): A unicode or bytes string optionaly using color codes.
     """
-    lib.TCOD_console_print_utf(
-        con.console_c if con else ffi.NULL, x, y, _fmt_unicode(fmt))
+    lib.TCOD_console_print_utf(_console(con), x, y, _fmt_unicode(fmt))
 
 def console_print_ex(con, x, y, flag, alignment, fmt):
     """Print a string on a console using a blend mode and alignment mode.
@@ -892,7 +882,7 @@ def console_print_ex(con, x, y, flag, alignment, fmt):
         x (int): Character x position from the left.
         y (int): Character y position from the top.
     """
-    lib.TCOD_console_print_ex_utf(con.console_c if con else ffi.NULL,
+    lib.TCOD_console_print_ex_utf(_console(con),
                                   x, y, flag, alignment, _fmt_unicode(fmt))
 
 def console_print_rect(con, x, y, w, h, fmt):
@@ -908,7 +898,7 @@ def console_print_rect(con, x, y, w, h, fmt):
         int: The number of lines of text once word-wrapped.
     """
     return lib.TCOD_console_print_rect_utf(
-        con.console_c if con else ffi.NULL, x, y, w, h, _fmt_unicode(fmt))
+        _console(con), x, y, w, h, _fmt_unicode(fmt))
 
 def console_print_rect_ex(con, x, y, w, h, flag, alignment, fmt):
     """Print a string constrained to a rectangle with blend and alignment.
@@ -917,8 +907,7 @@ def console_print_rect_ex(con, x, y, w, h, flag, alignment, fmt):
         int: The number of lines of text once word-wrapped.
     """
     return lib.TCOD_console_print_rect_ex_utf(
-        con.console_c if con else ffi.NULL,
-        x, y, w, h, flag, alignment, _fmt_unicode(fmt))
+        _console(con), x, y, w, h, flag, alignment, _fmt_unicode(fmt))
 
 def console_get_height_rect(con, x, y, w, h, fmt):
     """Return the height of this text once word-wrapped into this rectangle.
@@ -927,29 +916,28 @@ def console_get_height_rect(con, x, y, w, h, fmt):
         int: The number of lines of text once word-wrapped.
     """
     return lib.TCOD_console_get_height_rect_utf(
-        con.console_c if con else ffi.NULL, x, y, w, h, _fmt_unicode(fmt))
+        _console(con), x, y, w, h, _fmt_unicode(fmt))
 
 def console_rect(con, x, y, w, h, clr, flag=BKGND_DEFAULT):
     """Draw a the background color on a rect optionally clearing the text.
 
     If clr is True the affected tiles are changed to space character.
     """
-    lib.TCOD_console_rect(
-        con.console_c if con else ffi.NULL, x, y, w, h, clr, flag)
+    lib.TCOD_console_rect(_console(con), x, y, w, h, clr, flag)
 
 def console_hline(con, x, y, l, flag=BKGND_DEFAULT):
     """Draw a horizontal line on the console.
 
     This always uses the character 196, the horizontal line character.
     """
-    lib.TCOD_console_hline(con.console_c if con else ffi.NULL, x, y, l, flag)
+    lib.TCOD_console_hline(_console(con), x, y, l, flag)
 
 def console_vline(con, x, y, l, flag=BKGND_DEFAULT):
     """Draw a vertical line on the console.
 
     This always uses the character 179, the vertical line character.
     """
-    lib.TCOD_console_vline(con.console_c if con else ffi.NULL, x, y, l, flag)
+    lib.TCOD_console_vline(_console(con), x, y, l, flag)
 
 def console_print_frame(con, x, y, w, h, clear=True, flag=BKGND_DEFAULT, fmt=b''):
     """Draw a framed rectangle with optinal text.
@@ -960,8 +948,7 @@ def console_print_frame(con, x, y, w, h, clear=True, flag=BKGND_DEFAULT, fmt=b''
     fmt will be printed on the inside of the rectangle, word-wrapped.
     """
     lib.TCOD_console_print_frame(
-        con.console_c if con else ffi.NULL,
-        x, y, w, h, clear, flag, _fmt_bytes(fmt))
+        _console(con), x, y, w, h, clear, flag, _fmt_bytes(fmt))
 
 def console_set_color_control(con, fore, back):
     """Configure :any:`color controls`.
@@ -978,30 +965,26 @@ def console_set_color_control(con, fore, back):
 def console_get_default_background(con):
     """Return this consoles default background color."""
     return Color._new_from_cdata(
-        lib.TCOD_console_get_default_background(
-            con.console_c if con else ffi.NULL))
+        lib.TCOD_console_get_default_background(_console(con)))
 
 def console_get_default_foreground(con):
     """Return this consoles default foreground color."""
     return Color._new_from_cdata(
-        lib.TCOD_console_get_default_foreground(
-            con.console_c if con else ffi.NULL))
+        lib.TCOD_console_get_default_foreground(_console(con)))
 
 def console_get_char_background(con, x, y):
     """Return the background color at the x,y of this console."""
     return Color._new_from_cdata(
-        lib.TCOD_console_get_char_background(
-            con.console_c if con else ffi.NULL, x, y))
+        lib.TCOD_console_get_char_background(_console(con), x, y))
 
 def console_get_char_foreground(con, x, y):
     """Return the foreground color at the x,y of this console."""
     return Color._new_from_cdata(
-        lib.TCOD_console_get_char_foreground(
-            con.console_c if con else ffi.NULL, x, y))
+        lib.TCOD_console_get_char_foreground(_console(con), x, y))
 
 def console_get_char(con, x, y):
     """Return the character at the x,y of this console."""
-    return lib.TCOD_console_get_char(con.console_c if con else ffi.NULL, x, y)
+    return lib.TCOD_console_get_char(_console(con), x, y)
 
 def console_set_fade(fade, fadingColor):
     lib.TCOD_console_set_fade(fade, fadingColor)
@@ -1057,17 +1040,17 @@ def console_from_file(filename):
 def console_blit(src, x, y, w, h, dst, xdst, ydst, ffade=1.0,bfade=1.0):
     """Blit the console src from x,y,w,h to console dst at xdst,ydst."""
     lib.TCOD_console_blit(
-        src.console_c if src else ffi.NULL, x, y, w, h,
-        dst.console_c if dst else ffi.NULL, xdst, ydst, ffade, bfade)
+        _console(src), x, y, w, h,
+        _console(dst), xdst, ydst, ffade, bfade)
 
 def console_set_key_color(con, col):
     """Set a consoles blit transparent color."""
-    lib.TCOD_console_set_key_color(con.console_c if con else ffi.NULL, col)
+    lib.TCOD_console_set_key_color(_console(con), col)
     if hasattr(con, 'set_key_color'):
         con.set_key_color(col)
 
 def console_delete(con):
-    con = con.console_c if con else ffi.NULL
+    con = _console(con)
     if con == ffi.NULL:
         lib.TCOD_console_delete(con)
 
@@ -1098,8 +1081,7 @@ def console_fill_foreground(con, r, g, b):
         cg = ffi.new('int[]', g)
         cb = ffi.new('int[]', b)
 
-    lib.TCOD_console_fill_foreground(con.console_c if con else ffi.NULL,
-                                     cr, cg, cb)
+    lib.TCOD_console_fill_foreground(_console(con), cr, cg, cb)
 
 def console_fill_background(con, r, g, b):
     """Fill the backgound of a console with r,g,b.
@@ -1127,8 +1109,7 @@ def console_fill_background(con, r, g, b):
         cg = ffi.new('int[]', g)
         cb = ffi.new('int[]', b)
 
-    lib.TCOD_console_fill_background(con.console_c if con else ffi.NULL,
-                                     cr, cg, cb)
+    lib.TCOD_console_fill_background(_console(con), cr, cg, cb)
 
 def console_fill_char(con,arr):
     """Fill the character tiles of a console with an array.
@@ -1145,37 +1126,32 @@ def console_fill_char(con,arr):
         #otherwise convert using the ffi module
         carr = ffi.new('int[]', arr)
 
-    lib.TCOD_console_fill_char(con.console_c if con else ffi.NULL, carr)
+    lib.TCOD_console_fill_char(_console(con), carr)
 
 def console_load_asc(con, filename):
     """Update a console from a non-delimited ASCII `.asc` file."""
-    return lib.TCOD_console_load_asc(
-        con.console_c if con else ffi.NULL, filename.encode('utf-8'))
+    return lib.TCOD_console_load_asc(_console(con), filename.encode('utf-8'))
 
 def console_save_asc(con, filename):
     """Save a console to a non-delimited ASCII `.asc` file."""
-    return lib.TCOD_console_save_asc(
-        con.console_c if con else ffi.NULL, filename.encode('utf-8'))
+    return lib.TCOD_console_save_asc(_console(con), filename.encode('utf-8'))
 
 def console_load_apf(con, filename):
     """Update a console from an ASCII Paint `.apf` file."""
-    return lib.TCOD_console_load_apf(
-        con.console_c if con else ffi.NULL, filename.encode('utf-8'))
+    return lib.TCOD_console_load_apf(_console(con), filename.encode('utf-8'))
 
 def console_save_apf(con, filename):
     """Save a console to an ASCII Paint `.apf` file."""
-    return lib.TCOD_console_save_apf(
-        con.console_c if con else ffi.NULL, filename.encode('utf-8'))
+    return lib.TCOD_console_save_apf(_console(con), filename.encode('utf-8'))
 
 def console_load_xp(con, filename):
     """Update a console from a REXPaint `.xp` file."""
-    return lib.TCOD_console_load_xp(
-        con.console_c if con else ffi.NULL, filename.encode('utf-8'))
+    return lib.TCOD_console_load_xp(_console(con), filename.encode('utf-8'))
 
 def console_save_xp(con, filename, compress_level=9):
     """Save a console to a REXPaint `.xp` file."""
     return lib.TCOD_console_save_xp(
-        con.console_c if con else ffi.NULL,
+        _console(con),
         filename.encode('utf-8'),
         compress_level,
         )
@@ -1206,8 +1182,7 @@ def console_list_save_xp(console_list, filename, compress_level=9):
     tcod_list = lib.TCOD_list_new()
     try:
         for console in console_list:
-            lib.TCOD_list_push(tcod_list,
-                               console.console_c if console else ffi.NULL)
+            lib.TCOD_list_push(tcod_list, _console(console))
         return lib.TCOD_console_list_save_xp(
             tcod_list, filename.encode('utf-8'), compress_level
             )
@@ -1887,9 +1862,7 @@ def image_from_console(console):
     """
     return tcod.image.Image._from_cdata(
         ffi.gc(
-            lib.TCOD_image_from_console(
-                console.console_c if console else ffi.NULL
-                ),
+            lib.TCOD_image_from_console(_console(console)),
             lib.TCOD_image_delete,
             )
         )

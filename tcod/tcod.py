@@ -4,6 +4,8 @@ from __future__ import absolute_import as _
 
 import sys as _sys
 
+import warnings
+
 from tcod.libtcod import lib, ffi, BKGND_DEFAULT, BKGND_SET
 
 
@@ -132,3 +134,17 @@ class _CDataWrapper(object):
             setattr(self.cdata, attr, value)
         else:
             super(_CDataWrapper, self).__setattr__(attr, value)
+
+
+def _console(console):
+    """Return a cffi console."""
+    try:
+        return console.console_c
+    except AttributeError:
+        warnings.warn(
+            ("Falsy console parameters are deprecated, "
+             "always use a console instance."),
+            DeprecationWarning,
+            stacklevel=2,
+            )
+        return ffi.NULL

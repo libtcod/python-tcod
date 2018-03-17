@@ -4,7 +4,7 @@ from __future__ import absolute_import
 import numpy as np
 
 from tcod.libtcod import ffi, lib
-
+from tcod.tcod import _console
 
 class _ImageBufferArray(np.ndarray):
 
@@ -126,7 +126,7 @@ class Image(object):
             console (Console): A Console with a pixel width and height
                                matching this Image.
         """
-        lib.TCOD_image_refresh_console(self.image_c, console.console_c)
+        lib.TCOD_image_refresh_console(self.image_c, _console(console))
 
     def _get_size(self):
         """Return the (width, height) for this Image.
@@ -203,7 +203,7 @@ class Image(object):
             angle (float): Rotation angle in radians. (Clockwise?)
         """
         lib.TCOD_image_blit(
-            self.image_c, console.console_c,
+            self.image_c, _console(console),
             x, y, bg_blend, scale_x, scale_y, angle)
 
     def blit_rect(self, console, x, y, width, height, bg_blend):
@@ -218,7 +218,7 @@ class Image(object):
             bg_blend (int): Background blending mode to use.
         """
         lib.TCOD_image_blit_rect(
-            self.image_c, console.console_c, x, y, width, height, bg_blend)
+            self.image_c, _console(console), x, y, width, height, bg_blend)
 
     def blit_2x(self, console, dest_x, dest_y,
                 img_x=0, img_y=0, img_width=-1, img_height=-1):
@@ -236,7 +236,7 @@ class Image(object):
                               Use -1 for the full Image height.
         """
         lib.TCOD_image_blit_2x(
-            self.image_c, console.console_c,
+            self.image_c, _console(console),
             dest_x, dest_y, img_x, img_y, img_width, img_height)
 
     def save_as(self, filename):

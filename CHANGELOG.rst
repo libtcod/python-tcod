@@ -7,6 +7,13 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
+Unreleased
+------------------
+Deprecated
+ - Deprecated the use of falsy console parameters with libtcodpy functions.
+Fixed
+ - Fixed libtcodpy image functions not supporting falsy console parameters.
+
 4.3.1 - 2018-03-07
 ------------------
 Fixed
