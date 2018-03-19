@@ -76,7 +76,7 @@ after_success:
 - codecov
 - coveralls
 - coverage xml
-- python-codacy-coverage -r coverage.xml
+- if [[ -n "$CODACY_PROJECT_TOKEN" ]]; then python-codacy-coverage -r coverage.xml; fi
 - if [[ -n "$TRAVIS_TAG" ]]; then pip install twine; fi
 - if [[ -n "$TRAVIS_TAG" && "$TRAVIS_OS_NAME" == "osx" ]]; then twine upload --skip-existing dist/*; fi
 - deb_upload

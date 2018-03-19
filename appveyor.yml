@@ -70,7 +70,7 @@ test_script:
 on_success:
 - pip install codacy-coverage python-coveralls
 - coverage xml
-- python-codacy-coverage -r coverage.xml
+- if defined CODACY_PROJECT_TOKEN python-codacy-coverage -r coverage.xml
 
 deploy_script:
 - "if defined APPVEYOR_REPO_TAG_NAME pip install twine"
