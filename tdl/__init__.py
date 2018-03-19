@@ -996,7 +996,8 @@ class Window(_BaseConsole):
     def get_char(self, x, y):
         # inherit docstring
         x, y = self._normalizePoint(x, y)
-        return self.console.get_char(self._translate(x, y))
+        xtrans, ytrans = self._translate(x, y)
+        return self.console.get_char(xtrans, ytrans)
 
     def __repr__(self):
         return "<Window(X=%i Y=%i Width=%i Height=%i)>" % (self.x, self.y,
