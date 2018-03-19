@@ -13,6 +13,7 @@ Deprecated
  - Deprecated the use of falsy console parameters with libtcodpy functions.
 Fixed
  - Fixed libtcodpy image functions not supporting falsy console parameters.
+ - Fixed tdl `Window.get_char` method. (by Kaczor2704)
 
 4.3.1 - 2018-03-07
 ------------------
