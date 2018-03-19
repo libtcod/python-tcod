@@ -7,13 +7,13 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
-Unreleased
+4.3.2 - 2018-03-18
 ------------------
 Deprecated
  - Deprecated the use of falsy console parameters with libtcodpy functions.
 Fixed
  - Fixed libtcodpy image functions not supporting falsy console parameters.
- - Fixed tdl `Window.get_char` method. (by Kaczor2704)
+ - Fixed tdl `Window.get_char` method. (Kaczor2704)
 
 4.3.1 - 2018-03-07
 ------------------
