@@ -16,8 +16,6 @@ float _pycall_path_swap_src_dest(int x1, int y1,
                                  int x2, int y2, void *user_data);
 float _pycall_path_dest_only(int x1, int y1, int x2, int y2, void *user_data);
 
-bool _pycall_line_listener(int x, int y);
-
 void _pycall_sdl_hook(void *);
 
 }

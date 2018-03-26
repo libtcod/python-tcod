@@ -1935,7 +1935,6 @@ def line_step():
         return x[0], y[0]
     return None,None
 
-_line_listener_lock = _threading.Lock()
 
 def line(xo, yo, xd, yd, py_callback):
     """ Iterate over a line using a callback function.
@@ -1960,13 +1959,13 @@ def line(xo, yo, xd, yd, py_callback):
     .. deprecated:: 2.0
        Use `line_iter` instead.
     """
-    with _PropagateException() as propagate:
-        with _line_listener_lock:
-            @ffi.def_extern(onerror=propagate)
-            def _pycall_line_listener(x, y):
-                return py_callback(x, y)
-            return bool(lib.TCOD_line(xo, yo, xd, yd,
-                                       lib._pycall_line_listener))
+    for x, y in line_iter(xo, yo, xd, yd):
+        if not py_callback(x, y):
+            break
+    else:
+        return True
+    return False
+
 
 def line_iter(xo, yo, xd, yd):
     """ returns an iterator
