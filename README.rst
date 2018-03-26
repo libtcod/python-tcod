@@ -65,7 +65,7 @@ Otherwise tdl will need to be built from source.  Assuming you have Python,
 pip, and apt-get, then you'll run these commands to install tdl and its
 dependencies to your user environment::
 
-    $ sudo apt-get install gcc python-dev python3-dev libsdl2-dev libffi-dev
+    $ sudo apt-get install gcc python-dev python3-dev libsdl2-dev libffi-dev libomp5
     $ pip2 install tdl
     $ pip3 install tdl
 
@@ -74,7 +74,7 @@ dependencies to your user environment::
 ==============
 * Python 2.7+, Python 3.4+, or PyPy 5.4+
 * Windows, Linux, or MacOS.
-* On Linux, requires libsdl2 to run.
+* On Linux, requires libsdl2 and libomp5 to run.
 
 =========
  License
