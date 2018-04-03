@@ -221,6 +221,12 @@ class Dice(_CDataWrapper):
                  self.multiplier, self.addsub))
 
 
+# reverse lookup table for KEY_X attributes, used by Key.__repr__
+_LOOKUP_VK = {
+    value:'KEY_%s' % key[6:] for key,value in lib.__dict__.items()
+    if key.startswith('TCODK')
+    }
+
 class Key(_CDataWrapper):
     """Key Event instance
 
@@ -258,13 +264,17 @@ class Key(_CDataWrapper):
     def __repr__(self):
         """Return a representation of this Key object."""
         params = []
-        params.append('vk=%r, c=%r, text=%r, pressed=%r' %
-                      (self.vk, self.c, self.text, self.pressed))
+        params.append('pressed=%r, vk=tcod.%s' %
+                      (self.pressed, _LOOKUP_VK[self.vk]))
+        if self.c:
+            params.append('c=ord(%r)' % chr(self.c))
+        if self.text:
+            params.append('text=%r' % self.text)
         for attr in ['shift', 'lalt', 'lctrl', 'lmeta',
                      'ralt', 'rctrl', 'rmeta']:
             if getattr(self, attr):
                 params.append('%s=%r' % (attr, getattr(self, attr)))
-        return ('%s(%s)' % (self.__class__.__name__, ', '.join(params)))
+        return 'tcod.Key(%s)' % ', '.join(params)
 
 
 class Mouse(_CDataWrapper):
@@ -306,7 +316,7 @@ class Mouse(_CDataWrapper):
                      'wheel_up', 'wheel_down']:
             if getattr(self, attr):
                 params.append('%s=%r' % (attr, getattr(self, attr)))
-        return ('%s(%s)' % (self.__class__.__name__, ', '.join(params)))
+        return 'tcod.Mouse(%s)' % ', '.join(params)
 
 
 def bsp_new_with_size(x, y, w, h):
