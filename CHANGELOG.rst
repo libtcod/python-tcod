@@ -7,6 +7,11 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
+Unreleased
+------------------
+Changed
+ - Updated libtcod to v1.6.6
+
 4.3.2 - 2018-03-18
 ------------------
 Deprecated
