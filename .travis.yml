@@ -55,7 +55,9 @@ before_install:
 - 'if [[ "$BREW_PYTHON3" == "true" ]]; then python3 -m virtualenv venv; fi'
 - 'if [[ "$BREW_PYTHON3" == "true" ]]; then source venv/bin/activate; fi'
 - source .travis/install_python.sh
-- pip install --disable-pip-version-check --upgrade pip setuptools
+- 'wget https://bootstrap.pypa.io/get-pip.py'
+- python get-pip.py
+- pip install --upgrade setuptools
 - pip install --pre --upgrade wheel
 - 'if [[ "$TRAVIS_PYTHON_VERSION" == pypy* || -n "$PYPY_VERSION" ]]; then pip install git+https://bitbucket.org/pypy/numpy.git; fi'
 - pip install --requirement requirements.txt
