@@ -56,7 +56,7 @@ install:
 - cmd: "%ACTIVATE_VENV%"
 - cmd: "python --version"
 - cmd: "set PATH=%PATH%;C:\\MinGW\\bin"
-- cmd: "pip install --upgrade pip setuptools"
+- cmd: "pip install --upgrade setuptools"
 - cmd: "if defined PYPY pip install git+https://bitbucket.org/pypy/numpy.git"
 - 'pip install -e hg+https://bitbucket.org/HexDecimal/wheel@abi3-windows-fix#egg=wheel'
 - cmd: "pip install --requirement requirements.txt"
