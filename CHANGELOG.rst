@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - Added the libtcodpy module as an alias for tcod.  Actual use of it is
+   deprecated, it exists primarily for backward compatibility.
 Changed
  - Updated libtcod to v1.6.6
 

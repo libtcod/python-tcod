@@ -7,7 +7,7 @@ try:
 except ImportError:
     numpy = None
 
-import tcod as libtcodpy
+import libtcodpy
 
 def test_console_behaviour(console):
     assert not console

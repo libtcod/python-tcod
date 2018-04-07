@@ -61,6 +61,7 @@ setup(
                                 open('CHANGELOG.rst', 'r').read()]),
     url='https://github.com/HexDecimal/python-tdl',
     download_url='https://pypi.python.org/pypi/tdl',
+    py_modules=['libtcodpy'],
     packages=['tdl', 'tcod'],
     package_data={
         'tdl': ['*.png'],
