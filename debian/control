@@ -1,5 +1,5 @@
 Source: tdl
-Maintainer: Kyle Stewart <4B796C65+tdl@gmail.com>
+Maintainer: Kyle Stewart <4b796c65+tdl@gmail.com>
 Section: python
 Priority: optional
 Build-Depends: dh-python, python-setuptools (>= 0.6b3), python3-setuptools, python-all-dev (>= 2.6.6-3), python3-all-dev, debhelper (>= 9), libsdl2-dev, python-pycparser, python3-pycparser, python-cffi, python3-cffi, python-numpy, python3-numpy
@@ -9,6 +9,8 @@ X-Python3-Version: >= 3.4
 Homepage: https://github.com/HexDecimal/python-tdl
 
 Package: python-tdl
+Provides: python-libtcod
+Conflicts: python-libtcod
 Architecture: any
 Depends: ${misc:Depends}, ${python:Depends}, ${shlibs:Depends}, libsdl2-2.0-0
 Description: Pythonic cffi port of libtcod.
