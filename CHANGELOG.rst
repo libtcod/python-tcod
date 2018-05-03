@@ -7,7 +7,7 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
-Unreleased
+4.4.0 - 2018-05-02
 ------------------
 Added
  - Added the libtcodpy module as an alias for tcod.  Actual use of it is
