@@ -13,20 +13,7 @@ matrix:
     env: USE_OPENMP=true BREW_PYTHON3=true
   - os: osx
     language: generic
-    env: MB_PYTHON_VERSION=2.7.13
-  - os: osx
-    language: generic
-    env: MB_PYTHON_VERSION=3.4.4
-  - os: osx
-    language: generic
-    env: PYPY_VERSION=5.7.1
-  - os: osx
-    language: generic
-    env: PYPY_VERSION=5.8.0
-  - os: osx
-    language: generic
-    env: PYPY_VERSION=5.9.0
-  # skip 5.10.0 since it's broken
+    env: PYPY_VERSION=6.0.0
   fast_finish: true
 
 sudo: required
@@ -61,14 +48,12 @@ before_install:
 - pip install --pre --upgrade wheel
 - 'if [[ "$TRAVIS_PYTHON_VERSION" == pypy* || -n "$PYPY_VERSION" ]]; then pip install git+https://bitbucket.org/pypy/numpy.git; fi'
 - pip install --requirement requirements.txt
-- source .travis/upload_ppa.sh
 install:
 - if [[ -z "$TRAVIS_TAG" ]]; then export BUILD_FLAGS="-g"; fi
 - python setup.py build $BUILD_FLAGS develop bdist_wheel
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python -m pip install git+git://github.com/HexDecimal/delocate.git@custom; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-wheel -v dist/*.whl; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-listdeps --all dist/*.whl; fi'
-- deb_install
 before_script:
  - pip install pytest pytest-cov
 script:
@@ -81,4 +66,3 @@ after_success:
 - if [[ -n "$CODACY_PROJECT_TOKEN" ]]; then python-codacy-coverage -r coverage.xml; fi
 - if [[ -n "$TRAVIS_TAG" ]]; then pip install twine; fi
 - if [[ -n "$TRAVIS_TAG" && "$TRAVIS_OS_NAME" == "osx" ]]; then twine upload --skip-existing dist/*; fi
-- deb_upload
