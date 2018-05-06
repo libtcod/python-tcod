@@ -38,6 +38,9 @@ environment:
   - PYPY: pypy2-v5.10.0-win32
     platform: Any CPU
     DEPLOY_ONLY: true
+  - PYPY: pypy2-v6.0.0-win32
+    platform: Any CPU
+    DEPLOY_ONLY: true
 
 matrix:
   allow_failures:
