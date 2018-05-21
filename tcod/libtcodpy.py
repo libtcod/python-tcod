@@ -718,6 +718,14 @@ def console_is_window_closed():
     """Returns True if the window has received and exit event."""
     return lib.TCOD_console_is_window_closed()
 
+def console_has_mouse_focus():
+    """Return True if the window has mouse focus."""
+    return lib.TCOD_console_has_mouse_focus()
+
+def console_is_active():
+    """Return True if the window has keyboard focus."""
+    return lib.TCOD_console_is_active()
+
 def console_set_window_title(title):
     """Change the current title bar string.
 

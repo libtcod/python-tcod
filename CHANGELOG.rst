@@ -12,6 +12,8 @@ v2.0.0
 Added
  - Added the libtcodpy module as an alias for tcod.  Actual use of it is
    deprecated, it exists primarily for backward compatibility.
+ - Adding missing libtcodpy functions `console_has_mouse_focus` and
+   `console_is_active`.
 Changed
  - Updated libtcod to v1.6.6
 
