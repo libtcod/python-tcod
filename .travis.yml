@@ -16,7 +16,7 @@ matrix:
     env: PYPY_VERSION=6.0.0
   fast_finish: true
 
-sudo: required
+sudo: false
 dist: trusty
 cache: pip
 
@@ -24,13 +24,6 @@ addons:
   apt:
     packages:
       - libsdl2-dev
-      - mesa-common-dev
-      - fakeroot
-      - debhelper
-      - python-all
-      - python3-pip
-      - devscripts
-      - dput
 
 before_install:
 - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi'
