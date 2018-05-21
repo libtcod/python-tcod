@@ -43,7 +43,7 @@ before_install:
 - pip install --requirement requirements.txt
 install:
 - if [[ -z "$TRAVIS_TAG" ]]; then export BUILD_FLAGS="-g"; fi
-- python setup.py build $BUILD_FLAGS develop bdist_wheel
+- python setup.py build $BUILD_FLAGS develop bdist_wheel --py-limited-api=cp34
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python -m pip install git+git://github.com/HexDecimal/delocate.git@custom; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-wheel -v dist/*.whl; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-listdeps --all dist/*.whl; fi'

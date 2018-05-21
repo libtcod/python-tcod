@@ -61,7 +61,6 @@ install:
 - cmd: "set PATH=%PATH%;C:\\MinGW\\bin"
 - cmd: "pip install --upgrade setuptools"
 - cmd: "if defined PYPY pip install git+https://bitbucket.org/pypy/numpy.git"
-- 'pip install -e hg+https://bitbucket.org/HexDecimal/wheel@abi3-windows-fix#egg=wheel'
 - cmd: "pip install --requirement requirements.txt"
 - cmd: "python setup.py build sdist develop bdist_wheel"
 build: off
