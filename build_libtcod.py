@@ -19,6 +19,7 @@ except ImportError:
 import zipfile
 
 SDL2_VERSION = os.environ.get('SDL_VERSION', '2.0.7')
+TDL_NO_SDL2_EXPORTS = os.environ.get('TDL_NO_SDL2_EXPORTS', '0') == '1'
 
 CFFI_HEADER = 'tcod/cffi.h'
 CFFI_EXTRA_CDEFS = 'tcod/cdef.h'
@@ -96,6 +97,8 @@ sources += ['libtcod/src/libtcod_c.c']
 sources += ['libtcod/src/png/lodepng.c']
 sources += glob.glob('libtcod/src/zlib/*.c')
 
+if TDL_NO_SDL2_EXPORTS:
+    extra_parse_args.append('-DTDL_NO_SDL2_EXPORTS')
 
 if sys.platform == 'win32':
     libraries += ['User32', 'OpenGL32']
