@@ -7,6 +7,11 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
+Unreleased
+------------------
+Fixed
+ - Fixed tdl failing to install via pip unless Numpy was installed first.
+
 4.4.0 - 2018-05-02
 ------------------
 Added

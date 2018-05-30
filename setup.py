@@ -75,6 +75,7 @@ setup(
     setup_requires=[
         'cffi>=1.8.1,<2',
         'pycparser>=2.14,<3',
+        'numpy>=1.10,<2' if not is_pypy else '',
         ] + pytest_runner,
     tests_require=[
         'pytest',
