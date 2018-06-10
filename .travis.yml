@@ -16,7 +16,8 @@ matrix:
     env: PYPY_VERSION=6.0.0
   fast_finish: true
 
-sudo: false
+# sudo is required to prevent xvfb crashes from container-based workers.
+sudo: required
 dist: trusty
 cache: pip
 
