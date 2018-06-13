@@ -9,8 +9,16 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - Updated libtcod to v1.7.0
+ - Error messages when failing to create an SDL window should be a less vague.
+ - You no longer need to initialize libtcod before you can print to an
+   off-screen console.
 Fixed
  - Fixed tdl failing to install via pip unless Numpy was installed first.
+ - Avoid crashes if the root console has a character code higher than expected.
+Removed
+ - No more debug output when loading fonts.
 
 4.4.0 - 2018-05-02
 ------------------
