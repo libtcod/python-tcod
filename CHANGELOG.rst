@@ -11,6 +11,7 @@ Unreleased
 ------------------
 Changed
  - Updated libtcod to v1.7.0
+ - Updated SDL to v2.0.8
  - Error messages when failing to create an SDL window should be a less vague.
  - You no longer need to initialize libtcod before you can print to an
    off-screen console.
