@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+4.5.0 - 2018-06-12
+------------------
 Changed
  - Updated libtcod to v1.7.0
  - Updated SDL to v2.0.8
