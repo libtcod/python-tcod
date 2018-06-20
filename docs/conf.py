@@ -56,7 +56,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'python-tcod/tdl'
-copyright = u'2017, Kyle Stewart'
+copyright = u'2009-2018, Kyle Stewart'
 author = u'Kyle Stewart'
 
 # The version info for the project you're documenting, acts as replacement for
