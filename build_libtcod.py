@@ -78,7 +78,6 @@ include_dirs = [
     'libtcod/include/',
     'libtcod/src/png/',
     'libtcod/src/zlib/',
-    '/usr/include/SDL2/',
     numpy.get_include(),
 ]
 
