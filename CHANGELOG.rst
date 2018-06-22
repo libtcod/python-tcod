@@ -9,6 +9,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Deprecated
+ - Deprecated all libtcodpy map functions.
 Fixed
  - Fixed `tcod.map_copy` could break the `tcod.map.Map` class.
  - Fixed `tcod.map_clear` `transparent` and `walkable` parameters were reverse.

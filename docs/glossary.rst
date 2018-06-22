@@ -4,44 +4,37 @@ Glossary
 
 .. glossary::
 
-    color control
-    color controls
-        .. data:: tcod.COLCTRL_1
-        .. data:: tcod.COLCTRL_2
-        .. data:: tcod.COLCTRL_3
-        .. data:: tcod.COLCTRL_4
-        .. data:: tcod.COLCTRL_5
-
-            Configurable color control constant which can be set up with
-            :any:`tcod.console_set_color_control`.
-
-        .. data:: tcod.COLCTRL_STOP
-        .. data:: tcod.COLCTRL_FORE_RGB
-        .. data:: tcod.COLCTRL_BACK_RGB
-
     console defaults
         The default values implied by any Console print or put functions which
         don't explicitly ask for them as parameters.
 
     libtcod-cffi
+        This is the `cffi` implementation of libtcodpy, the original was
+        made using `ctypes` which was more difficult to maintain.
+
+        `libtcod-cffi` is now part of :term:`python-tcod`.
+
     python-tcod
         `python-tcod` is a superset of the :term:`libtcodpy` API.  The major
         additions include class functionality in returned objects, no manual
         memory management, pickle-able objects, and `numpy` array attributes
         in most objects.
 
-        The `numpy` attributes in particular can be used to dynamically speed
+        The `numpy` attributes in particular can be used to dramatically speed
         up the performance of your program compared to using :term:`libtcodpy`.
 
-    tdl
+        `python-tcod` is installed as part of :term:`python-tdl`
+
     python-tdl
-        `tdl` is a high-level wrapper over :term:`libtcodpy` and now
-        :term:`python-tcod`, it usually doesn't do anything that you couldn't
-        do yourself with just :term:`libtcodpy` and Python.
+        `tdl` is a high-level wrapper over :term:`libtcodpy` although it now
+        uses :term:`python-tcod`, it doesn't do anything that you couldn't do
+        yourself with just :term:`libtcodpy` and Python.
 
         Currently no new features are planned for `tdl`, instead new features
-        are added to `libtcod` itself and then ported to
-        :term:`python-tcod`.
+        are added to `libtcod` itself and then ported to :term:`python-tcod`.
+
+        :term:`python-tcod` and :term:`libtcodpy` are included in installations
+        of `python-tdl`.
 
     libtcodpy
         `libtcodpy` is more or less a direct port of `libtcod`'s C API to

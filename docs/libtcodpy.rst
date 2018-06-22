@@ -35,6 +35,21 @@ color
 .. autofunction:: tcod.color_scale_HSV
 .. autofunction:: tcod.color_gen_map
 
+color controls
+~~~~~~~~~~~~~~
+Configurable color control constants which can be set up with
+:any:`tcod.console_set_color_control`.
+
+.. data:: tcod.COLCTRL_1
+.. data:: tcod.COLCTRL_2
+.. data:: tcod.COLCTRL_3
+.. data:: tcod.COLCTRL_4
+.. data:: tcod.COLCTRL_5
+
+.. data:: tcod.COLCTRL_STOP
+.. data:: tcod.COLCTRL_FORE_RGB
+.. data:: tcod.COLCTRL_BACK_RGB
+
 console
 -------
 

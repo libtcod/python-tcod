@@ -2023,6 +2023,13 @@ FOV_RESTRICTIVE = 12
 NB_FOV_ALGORITHMS = 13
 
 def map_new(w, h):
+    # type: (int, int) -> tcod.map.Map
+    """Return a :any:`tcod.map.Map` with a width and height.
+
+    .. deprecated:: 4.5
+        Use the :any:`tcod.map` module for working with field-of-view,
+        or :any:`tcod.path` for working with path-finding.
+    """
     return tcod.map.Map(w, h)
 
 def map_copy(source, dest):
@@ -2038,6 +2045,15 @@ def map_copy(source, dest):
     dest._Map__buffer[:] = source._Map__buffer[:]
 
 def map_set_properties(m, x, y, isTrans, isWalk):
+    # type: (tcod.map.Map, int, int, bool, bool) -> None
+    """Set the properties of a single cell.
+
+    .. note::
+        This function is slow.
+    .. deprecated:: 4.5
+        Use :any:`tcod.map.Map.transparent` and :any:`tcod.map.Map.walkable`
+        arrays to set these properties.
+    """
     lib.TCOD_map_set_properties(m.map_c, x, y, isTrans, isWalk)
 
 def map_clear(m, transparent=False, walkable=False):
@@ -2052,36 +2068,83 @@ def map_clear(m, transparent=False, walkable=False):
     m.walkable[:] = walkable
 
 def map_compute_fov(m, x, y, radius=0, light_walls=True, algo=FOV_RESTRICTIVE ):
-    lib.TCOD_map_compute_fov(m.map_c, x, y, radius, light_walls, algo)
+    # type: (tcod.map.Map, int, int, int, bool, int) -> None
+    """Compute the field-of-view for a map instance.
+
+    .. deprecated:: 4.5
+        Use :any:`tcod.map.Map.compute_fov` instead.
+    """
+    m.compute_fov(x, y, radius, light_walls, algo)
 
 def map_is_in_fov(m, x, y):
+    # type: (tcod.map.Map, int, int) -> bool
+    """Return True if the cell at x,y is lit by the last field-of-view
+    algorithm.
+
+    .. note::
+        This function is slow.
+    .. deprecated:: 4.5
+        Use :any:`tcod.map.Map.fov` to check this property.
+    """
     return lib.TCOD_map_is_in_fov(m.map_c, x, y)
 
 def map_is_transparent(m, x, y):
+    # type: (tcod.map.Map, int, int) -> bool
+    """
+    .. note::
+        This function is slow.
+    .. deprecated:: 4.5
+        Use :any:`tcod.map.Map.transparent` to check this property.
+    """
     return lib.TCOD_map_is_transparent(m.map_c, x, y)
 
 def map_is_walkable(m, x, y):
+    # type: (tcod.map.Map, int, int) -> bool
+    """
+    .. note::
+        This function is slow.
+    .. deprecated:: 4.5
+        Use :any:`tcod.map.Map.walkable` to check this property.
+    """
     return lib.TCOD_map_is_walkable(m.map_c, x, y)
 
 def map_delete(m):
-    pass
+    """This function does nothing."""
 
 def map_get_width(map):
+    # type: (tcod.map.Map) -> int
+    """Return the width of a map.
+
+    .. deprecated:: 4.5
+        Check the :any:`tcod.map.Map.width` attribute instead.
+    """
     return map.width
 
 def map_get_height(map):
+    # type: (tcod.map.Map) -> int
+    """Return the height of a map.
+
+    .. deprecated:: 4.5
+        Check the :any:`tcod.map.Map.height` attribute instead.
+    """
     return map.height
 
 def mouse_show_cursor(visible):
+    # type: (bool) -> None
+    """Change the visibility of the mouse cursor."""
     lib.TCOD_mouse_show_cursor(visible)
 
 def mouse_is_cursor_visible():
+    # type: () -> bool
+    """Return True if the mouse cursor is visible."""
     return lib.TCOD_mouse_is_cursor_visible()
 
 def mouse_move(x, y):
+    # type (int, int) -> None
     lib.TCOD_mouse_move(x, y)
 
 def mouse_get_status():
+    # type: () -> Mouse
     return Mouse(lib.TCOD_mouse_get_status())
 
 def namegen_parse(filename,random=None):
