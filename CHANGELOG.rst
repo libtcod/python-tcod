@@ -9,6 +9,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Fixed `tcod.map_copy` could break the `tcod.map.Map` class.
 
 4.5.0 - 2018-06-12
 ------------------

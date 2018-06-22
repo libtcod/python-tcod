@@ -2026,7 +2026,16 @@ def map_new(w, h):
     return tcod.map.Map(w, h)
 
 def map_copy(source, dest):
-    return lib.TCOD_map_copy(source.map_c, dest.map_c)
+    # type: (tcod.map.Map, tcod.map.Map) -> None
+    """Copy map data from `source` to `dest`.
+
+    .. deprecated:: 4.5
+        Use Python's copy module, or see :any:`tcod.map.Map` and assign between
+        array attributes manually.
+    """
+    if source.width != dest.width or source.height != dest.height:
+        dest.__init__(source.width, source.height, source._order)
+    dest._Map__buffer[:] = source._Map__buffer[:]
 
 def map_set_properties(m, x, y, isTrans, isWalk):
     lib.TCOD_map_set_properties(m.map_c, x, y, isTrans, isWalk)
