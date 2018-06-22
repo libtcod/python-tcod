@@ -2040,10 +2040,16 @@ def map_copy(source, dest):
 def map_set_properties(m, x, y, isTrans, isWalk):
     lib.TCOD_map_set_properties(m.map_c, x, y, isTrans, isWalk)
 
-def map_clear(m,walkable=False,transparent=False):
-    # walkable/transparent looks incorrectly ordered here.
-    # TODO: needs test.
-    lib.TCOD_map_clear(m.map_c, walkable, transparent)
+def map_clear(m, transparent=False, walkable=False):
+    # type: (tcod.map.Map, bool, bool) -> None
+    """Change all map cells to a specific value.
+
+    .. deprecated:: 4.5
+        Use :any:`tcod.map.Map.transparent` and :any:`tcod.map.Map.walkable`
+        arrays to set these properties.
+    """
+    m.transparent[:] = transparent
+    m.walkable[:] = walkable
 
 def map_compute_fov(m, x, y, radius=0, light_walls=True, algo=FOV_RESTRICTIVE ):
     lib.TCOD_map_compute_fov(m.map_c, x, y, radius, light_walls, algo)
