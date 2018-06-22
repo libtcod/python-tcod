@@ -12,8 +12,10 @@ Unreleased
 Deprecated
  - Deprecated all libtcodpy map functions.
 Fixed
- - Fixed `tcod.map_copy` could break the `tcod.map.Map` class.
- - Fixed `tcod.map_clear` `transparent` and `walkable` parameters were reverse.
+ - `tcod.map_copy` could break the `tcod.map.Map` class.
+ - `tcod.map_clear` `transparent` and `walkable` parameters were reversed.
+ - When multiple SDL2 headers were installed, the wrong ones would be used when
+   the library is built.
 
 4.5.0 - 2018-06-12
 ------------------
