@@ -7,7 +7,7 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
-Unreleased
+4.5.1 - 2018-06-23
 ------------------
 Deprecated
  - Deprecated all libtcodpy map functions.
@@ -16,7 +16,7 @@ Fixed
  - `tcod.map_clear` `transparent` and `walkable` parameters were reversed.
  - When multiple SDL2 headers were installed, the wrong ones would be used when
    the library is built.
- - python-tdl fails to install via pip unless Numpy is installed first.
+ - Fails to build via pip unless Numpy is installed first.
 
 4.5.0 - 2018-06-12
 ------------------
