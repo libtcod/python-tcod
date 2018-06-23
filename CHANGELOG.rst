@@ -16,6 +16,7 @@ Fixed
  - `tcod.map_clear` `transparent` and `walkable` parameters were reversed.
  - When multiple SDL2 headers were installed, the wrong ones would be used when
    the library is built.
+ - python-tdl fails to install via pip unless Numpy is installed first.
 
 4.5.0 - 2018-06-12
 ------------------
@@ -26,7 +27,6 @@ Changed
  - You no longer need to initialize libtcod before you can print to an
    off-screen console.
 Fixed
- - Fixed tdl failing to install via pip unless Numpy was installed first.
  - Avoid crashes if the root console has a character code higher than expected.
 Removed
  - No more debug output when loading fonts.

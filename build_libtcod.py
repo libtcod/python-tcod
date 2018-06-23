@@ -5,7 +5,6 @@ import sys
 
 import glob
 
-import numpy
 from cffi import FFI
 from pycparser import c_parser, c_ast, parse_file, c_generator
 
@@ -78,7 +77,6 @@ include_dirs = [
     'libtcod/include/',
     'libtcod/src/png/',
     'libtcod/src/zlib/',
-    numpy.get_include(),
 ]
 
 extra_parse_args = []
