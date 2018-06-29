@@ -1416,7 +1416,7 @@ def heightmap_new(w, h):
     Returns:
         numpy.ndarray: A C-contiguous mapping of float32 values.
     """
-    return _np.ndarray((h, w), _np.float32)
+    return _np.zeros((h, w), _np.float32)
 
 def heightmap_set_value(hm, x, y, value):
     """Set the value of a point on a heightmap.

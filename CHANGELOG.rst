@@ -7,6 +7,11 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
+Unreleased
+------------------
+Fixed
+ - Arrays from `tcod.heightmap_new` are now properly zeroed out.
+
 4.5.1 - 2018-06-23
 ------------------
 Deprecated
