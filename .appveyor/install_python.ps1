@@ -12,6 +12,12 @@ if ($env:PYPY -or $env:PYPY3) {
     & '7z' x C:\pypy.zip -oC:\
     & $env:PYTHON -m ensurepip
 }
+if ($env:WEB_PYTHON) {
+    $PYTHON_INSTALLER = 'C:\python-webinstall.exe'
+    Start-FileDownload $env:WEB_PYTHON -FileName $PYTHON_INSTALLER
+    Start-Process $PYTHON_INSTALLER -Wait -ArgumentList "/quiet InstallAllUsers=1 TargetDir=C:\UserPython Include_doc=0 Include_launcher=0 Include_test=0 Shortcuts=0"
+    $env:PYTHON = 'C:\UserPython\python.exe'
+}
 & $env:PYTHON -m pip install --disable-pip-version-check virtualenv
 & $env:PYTHON -m virtualenv venv
 
