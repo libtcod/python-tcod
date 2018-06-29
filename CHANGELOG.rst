@@ -7,8 +7,10 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
-Unreleased
+4.5.2 - 2018-06-29
 ------------------
+Added
+ - New wheels for Python3.7 on Windows.
 Fixed
  - Arrays from `tcod.heightmap_new` are now properly zeroed out.
 
