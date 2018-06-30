@@ -7,6 +7,11 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
+Unreleased
+------------------
+Deprecated
+ - Python 2.7 support will be dropped in the near future.
+
 4.5.2 - 2018-06-29
 ------------------
 Added
