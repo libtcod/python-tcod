@@ -7,7 +7,7 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
-4.6.0 - 2018-06-30
+4.6.1 - 2018-06-30
 ------------------
 Added
  - New function `tcod.line_where` for indexing NumPy arrays using a Bresenham
