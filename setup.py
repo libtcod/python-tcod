@@ -12,8 +12,7 @@ def get_version():
     try:
         tag = check_output(['git', 'describe', '--abbrev=0'],
                            universal_newlines=True).strip()
-        assert tag.startswith('v')
-        version = tag[1:] # remove `v`
+        assert not tag.startswith('v')
 
         # add .devNN if needed
         log = check_output(['git', 'log', '%s..HEAD' % tag, '--oneline'],
