@@ -2020,7 +2020,7 @@ def line_where(x1, y1, x2, y2, inclusive=True):
         >>> where
         (array([1, 1, 2, 2, 3]...), array([0, 1, 2, 3, 4]...))
         >>> array = np.zeros((5, 5), dtype=np.int32)
-        >>> array[where] = np.arange(1, 6)
+        >>> array[where] = np.arange(len(where[0])) + 1
         >>> array
         array([[0, 0, 0, 0, 0],
                [1, 2, 0, 0, 0],
