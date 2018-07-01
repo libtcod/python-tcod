@@ -1,7 +1,7 @@
 #ifndef _TCOD_C_CODE_TDL_H_
 #define _TCOD_C_CODE_TDL_H_
 
-#include <libtcod.h>
+#include "../libtcod/include/libtcod.h"
 
 /* TDL FUNCTONS ----------------------------------------------------------- */
 

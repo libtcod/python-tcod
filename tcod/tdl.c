@@ -1,8 +1,7 @@
 /* extra functions provided for the python-tdl library */
 #include "tdl.h"
 
-#include <libtcod.h>
-#include <wrappers.h>
+#include "../libtcod/include/wrappers.h"
 
 void SDL_main(void){};
 

@@ -230,7 +230,6 @@ def get_ast():
 
     ast = parse_file(filename=CFFI_HEADER, use_cpp=True,
                      cpp_args=[r'-Idependencies/fake_libc_include',
-                               r'-Ilibtcod/include',
                                r'-DDECLSPEC=',
                                r'-DSDLCALL=',
                                r'-DTCODLIB_API=',

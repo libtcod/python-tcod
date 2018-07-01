@@ -1,7 +1,7 @@
 
-#include <noise.h>
-#include <noise_defaults.h>
-#include <mersenne.h>
+#include "../libtcod/include/noise.h"
+#include "../libtcod/include/noise_defaults.h"
+#include "../libtcod/include/mersenne.h"
 
 /* Copied from libtcod's noise.c, needs to be kept up-to-date! */
 typedef struct {

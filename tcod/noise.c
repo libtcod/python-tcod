@@ -1,7 +1,6 @@
 #include "noise.h"
 
-#include <libtcod.h>
-#include <noise_defaults.h>
+#include "../libtcod/include/libtcod.h"
 
 float NoiseGetSample(TDLNoise *noise, float *xyzw) {
   switch (noise->implementation) {

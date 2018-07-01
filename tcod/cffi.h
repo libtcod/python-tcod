@@ -6,9 +6,9 @@
 #include <SDL.h>
 #endif
 
-#include <libtcod.h>
-#include <libtcod_int.h>
-#include <wrappers.h>
+#include "../libtcod/include/libtcod.h"
+#include "../libtcod/include/libtcod_int.h"
+#include "../libtcod/include/wrappers.h"
 
 #include "noise.h"
 #include "path.h"
