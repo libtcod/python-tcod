@@ -1,4 +1,5 @@
-
+#ifndef PYTHON_TCOD_RANDOM_H_
+#define PYTHON_TCOD_RANDOM_H_
 
 /* define libtcod random functions */
 
@@ -16,3 +17,5 @@ double TCOD_random_get_gaussian_double_range_inv(
     TCOD_random_t mersenne, double min, double max);
 double TCOD_random_get_gaussian_double_range_custom_inv(
     TCOD_random_t mersenne, double min, double max, double mean);
+
+#endif /* PYTHON_TCOD_RANDOM_H_ */

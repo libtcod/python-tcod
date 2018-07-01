@@ -1,5 +1,5 @@
-#ifndef _TCOD_C_CODE_PATH_H_
-#define _TCOD_C_CODE_PATH_H_
+#ifndef PYTHON_TCOD_PATH_H_
+#define PYTHON_TCOD_PATH_H_
 
 typedef struct {
     int width;
@@ -34,4 +34,4 @@ float PathCostArrayInt32(const int x1, const int y1,
                          const int x2, const int y2,
                          const PathCostArray *map);
 
-#endif
+#endif /* PYTHON_TCOD_PATH_H_ */

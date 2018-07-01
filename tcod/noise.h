@@ -1,3 +1,5 @@
+#ifndef PYTHON_TCOD_NOISE_H_
+#define PYTHON_TCOD_NOISE_H_
 
 #include "../libtcod/include/noise.h"
 #include "../libtcod/include/noise_defaults.h"
@@ -42,3 +44,5 @@ void NoiseSampleMeshGrid(
 void NoiseSampleOpenMeshGrid(TDLNoise *noise,
                              const int ndim, const long *shape,
                              const float **ogrid_in, float *out);
+
+#endif /* PYTHON_TCOD_NOISE_H_ */
