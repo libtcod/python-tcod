@@ -274,6 +274,7 @@ line
 .. autofunction:: tcod.line_step
 .. autofunction:: tcod.line
 .. autofunction:: tcod.line_iter
+.. autofunction:: tcod.line_where
 
 map
 ---

@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - New function `tcod.line_where` for indexing NumPy arrays using a Bresenham
+   line.
 Deprecated
  - Python 2.7 support will be dropped in the near future.
 

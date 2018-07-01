@@ -9,6 +9,7 @@ import sys
 import threading as _threading
 
 import numpy as _np
+import numpy as np
 
 from tcod.libtcod import *
 
@@ -2006,6 +2007,38 @@ def line_iter(xo, yo, xd, yd):
     yield xo, yo
     while not lib.TCOD_line_step_mt(x, y, data):
         yield (x[0], y[0])
+
+
+def line_where(x1, y1, x2, y2, inclusive=True):
+    # type: (int, int, int, int, bool) -> tuple[np.ndarray, np.ndarray]
+    """Return a NumPy index array following a Bresenham line.
+
+    If `inclusive` is true then the start point is included in the result.
+
+    Example:
+        >>> where = tcod.line_where(1, 0, 3, 4)
+        >>> where
+        (array([1, 1, 2, 2, 3]...), array([0, 1, 2, 3, 4]...))
+        >>> array = np.zeros((5, 5), dtype=np.int32)
+        >>> array[where] = np.arange(1, 6)
+        >>> array
+        array([[0, 0, 0, 0, 0],
+               [1, 2, 0, 0, 0],
+               [0, 0, 3, 4, 0],
+               [0, 0, 0, 0, 5],
+               [0, 0, 0, 0, 0]]...)
+
+    .. versionadded:: 4.6
+    """
+    length = max(abs(x1 - x2), abs(y1 - y2)) + 1
+    array = np.ndarray((2, length), dtype=np.intc)
+    x = ffi.cast('int*', array[0].ctypes.data)
+    y = ffi.cast('int*', array[1].ctypes.data)
+    lib.LineWhere(x1, y1, x2, y2, x, y)
+    if not inclusive:
+        array = array[:, 1:]
+    return tuple(array)
+
 
 FOV_BASIC = 0
 FOV_DIAMOND = 1
