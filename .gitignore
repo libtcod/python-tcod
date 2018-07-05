@@ -71,3 +71,4 @@ tdl/version.py
 .debhelper/
 debian/files
 debian/python*
+.pytest_cache
