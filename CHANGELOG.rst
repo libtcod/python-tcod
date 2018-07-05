@@ -7,7 +7,7 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
-Unreleased
+5.0.0 - 2018-07-05
 ------------------
 Changed
  - tcod.path: all classes now use `shape` instead of `width` and `height`.
