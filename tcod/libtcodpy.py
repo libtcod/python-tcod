@@ -1234,7 +1234,7 @@ def path_new_using_function(w, h, func, userData=0, dcost=1.41):
         AStar: A new AStar instance.
     """
     return tcod.path.AStar(
-        tcod.path._EdgeCostFunc((func, userData), w, h),
+        tcod.path._EdgeCostFunc((func, userData), (w, h)),
         dcost,
         )
 
@@ -1350,7 +1350,7 @@ def dijkstra_new(m, dcost=1.41):
 
 def dijkstra_new_using_function(w, h, func, userData=0, dcost=1.41):
     return tcod.path.Dijkstra(
-        tcod.path._EdgeCostFunc((func, userData), w, h),
+        tcod.path._EdgeCostFunc((func, userData), (w, h)),
         dcost,
         )
 

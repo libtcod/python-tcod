@@ -270,10 +270,11 @@ def path_cost(this_x, this_y, dest_x, dest_y):
 
 def test_path_callback():
     astar = tcod.path.AStar(
-        tcod.path.EdgeCostCallback(path_cost, width=10, height=10)
+        tcod.path.EdgeCostCallback(path_cost, (10, 10))
         )
     astar = pickle.loads(pickle.dumps(astar))
-    assert len(astar.get_path(0, 0, 9, 9)) == 9
+    assert astar.get_path(0, 0, 5, 0) == \
+        [(1, 0), (2, 0), (3, 0), (4, 0), (5, 0)]
     repr(astar) # cover __repr__ methods
 
 

@@ -13,29 +13,32 @@ Example::
     ...     dtype=np.int8,
     ...     )
     ...
-    >>> height, width = dungeon.shape
 
     # Create a pathfinder from a numpy array.
     # This is the recommended way to use the tcod.path module.
     >>> astar = tcod.path.AStar(dungeon)
-    >>> print(astar.get_path(0, 0, 4, 2))
-    [(0, 1), (1, 2), (2, 1), (3, 0), (4, 1), (4, 2)]
+    >>> print(astar.get_path(0, 0, 2, 4))
+    [(1, 0), (2, 1), (1, 2), (0, 3), (1, 4), (2, 4)]
     >>> astar.cost[0, 1] = 1 # You can access the map array via this attribute.
-    >>> print(astar.get_path(0, 0, 4, 2))
-    [(1, 0), (2, 0), (3, 0), (4, 1), (4, 2)]
+    >>> print(astar.get_path(0, 0, 2, 4))
+    [(0, 1), (0, 2), (0, 3), (1, 4), (2, 4)]
 
     # Create a pathfinder from an edge_cost function.
     # Calling Python functions from C is known to be very slow.
     >>> def edge_cost(my_x, my_y, dest_x, dest_y):
-    ...     return dungeon[dest_y, dest_x]
+    ...     return dungeon[dest_x, dest_y]
     ...
     >>> dijkstra = tcod.path.Dijkstra(
-    ...     tcod.path.EdgeCostCallback(edge_cost, width, height),
+    ...     tcod.path.EdgeCostCallback(edge_cost, dungeon.shape),
     ...     )
     ...
     >>> dijkstra.set_goal(0, 0)
-    >>> print(dijkstra.get_path(4, 2))
-    [(1, 0), (2, 0), (3, 0), (4, 1), (4, 2)]
+    >>> print(dijkstra.get_path(2, 4))
+    [(0, 1), (0, 2), (0, 3), (1, 4), (2, 4)]
+
+.. versionchanged:: 5.0
+    All path-finding functions now respect the NumPy array shape (if a NumPy
+    array is used.)
 """
 
 from __future__ import absolute_import
@@ -47,6 +50,7 @@ from tcod.libtcod import lib, ffi
 
 @ffi.def_extern()
 def _pycall_path_old(x1, y1, x2, y2, handle):
+    # type: (int, int, int, int, cffi.CData]) -> float
     """libtcodpy style callback, needs to preserve the old userData issue."""
     func, userData = ffi.from_handle(handle)
     return func(x1, y1, x2, y2, userData)
@@ -54,79 +58,81 @@ def _pycall_path_old(x1, y1, x2, y2, handle):
 
 @ffi.def_extern()
 def _pycall_path_simple(x1, y1, x2, y2, handle):
+    # type: (int, int, int, int, cffi.CData]) -> float
     """Does less and should run faster, just calls the handle function."""
     return ffi.from_handle(handle)(x1, y1, x2, y2)
 
 
 @ffi.def_extern()
 def _pycall_path_swap_src_dest(x1, y1, x2, y2, handle):
+    # type: (int, int, int, int, cffi.CData]) -> float
     """A TDL function dest comes first to match up with a dest only call."""
     return ffi.from_handle(handle)(x2, y2, x1, y1)
 
 
 @ffi.def_extern()
 def _pycall_path_dest_only(x1, y1, x2, y2, handle):
+    # type: (int, int, int, int, cffi.CData]) -> float
     """A TDL function which samples the dest coordinate only."""
     return ffi.from_handle(handle)(x2, y2)
 
+
 def _get_pathcost_func(name):
+    # type: (str) -> Callable[[int, int, int, int, cffi.CData], float]
     """Return a properly cast PathCostArray callback."""
     return ffi.cast('TCOD_path_func_t', ffi.addressof(lib, name))
 
 
 class _EdgeCostFunc(object):
-    """
-    Args:
-        userdata (Any): Custom userdata to send to the C call.
-        width (int): The maximum width of this callback.
-        height (int): The maximum height of this callback.
+    """Generic edge-cost function factory.
+
+    `userdata` is the custom userdata to send to the C call.
+
+    `shape` is the maximum boundary for the algorithm.
     """
     _CALLBACK_P = lib._pycall_path_old
 
-    def __init__(self, userdata, width, height):
+    def __init__(self, userdata, shape):
+        # type: (Any, Tuple[int, int]) -> None
         self._userdata = userdata
-        self.width = width
-        self.height = height
+        self.shape = shape
 
     def get_tcod_path_ffi(self):
-        """
-
-        Returns:
-            Tuple[CData, CData]: A cffi (callback, userdata) pair.
-
-
-        """
-        return (self._CALLBACK_P, ffi.new_handle(self._userdata),
-                self.width, self.height)
+        # type: () -> Tuple[cffi.CData, cffi.CData, Tuple[int, int]]
+        """Return (C callback, userdata handle, shape)"""
+        return self._CALLBACK_P, ffi.new_handle(self._userdata), self.shape
 
     def __repr__(self):
-        return '%s(%r, width=%r, height=%r)' % (
+        return '%s(%r, shape=%r)' % (
             self.__class__.__name__,
-            self._userdata, self.width, self.height,
+            self._userdata, self.shape,
             )
 
 
 class EdgeCostCallback(_EdgeCostFunc):
     """Calculate cost from an edge-cost callback.
 
-    Args:
-        callback (Callable[[int, int, int, int], float]):
-            A callback which can handle the following parameters:
-            `(source_x:int, source_y:int, dest_x:int, dest_y:int) -> float`
-        width (int): The maximum width of this callback.
-        height (int): The maximum height of this callback.
+    `callback` is the custom userdata to send to the C call.
+
+    `shape` is a 2-item tuple representing the maximum boundary for the
+    algorithm.  The callback will not be called with parameters outside of
+    these bounds.
+
+    .. versionchanged:: 5.0
+        Now only accepts a `shape` argument instead of `width` and `height`.
     """
     _CALLBACK_P = lib._pycall_path_simple
 
-    def __init__(self, callback, width, height):
+    def __init__(self, callback, shape):
+        # type: (Callable[[int, int, int, int], float], Tuple[int, int])
         self.callback = callback
-        super(EdgeCostCallback, self).__init__(callback, width, height)
+        super(EdgeCostCallback, self).__init__(callback, shape)
 
 class NodeCostArray(np.ndarray):
     """Calculate cost from a numpy array of nodes.
 
-    Args:
-        array (numpy.ndarray): A numpy array with the cost of each node.
+    `array` is a NumPy array holding the path-cost of each node.
+    A cost of 0 means the node is blocking.
     """
 
     _C_ARRAY_CALLBACKS = {
@@ -142,22 +148,15 @@ class NodeCostArray(np.ndarray):
 
     def __new__(cls, array):
         """Validate a numpy array and setup a C callback."""
-        self = np.ascontiguousarray(array).view(cls)
+        self = np.asarray(array).view(cls)
         return self
-
-    @property
-    def width(self):
-        return self.shape[1]
-
-    @property
-    def height(self):
-        return self.shape[0]
 
     def __repr__(self):
         return '%s(%r)' % (self.__class__.__name__,
                            repr(self.view(np.ndarray)))
 
     def get_tcod_path_ffi(self):
+        # type: () -> Tuple[cffi.CData, cffi.CData, Tuple[int, int]]
         if len(self.shape) != 2:
             raise ValueError('Array must have a 2d shape, shape is %r' %
                              (self.shape,))
@@ -168,23 +167,24 @@ class NodeCostArray(np.ndarray):
         array_type, callback = \
             self._C_ARRAY_CALLBACKS[self.dtype.type]
         userdata = ffi.new(
-            'PathCostArray*',
-            (self.width, ffi.cast(array_type, self.ctypes.data)),
+            'struct PathCostArray*',
+            (ffi.cast('char*', self.ctypes.data), self.strides),
         )
-        return callback, userdata, self.width, self.height
+        return callback, userdata, self.shape
 
 
 class _PathFinder(object):
     """A class sharing methods used by AStar and Dijkstra."""
 
     def __init__(self, cost, diagonal=1.41):
+        # type: (Union[tcod.map.Map, numpy.ndarray, Any], float)
         self.cost = cost
         self.diagonal = diagonal
         self._path_c = None
         self._callback = self._userdata = None
 
         if hasattr(self.cost, 'map_c'):
-            self.width, self.height = self.cost.width, self.cost.height
+            self.shape = self.cost.width, self.cost.height
             self._path_c = ffi.gc(
                 self._path_new_using_map(self.cost.map_c, diagonal),
                 self._path_delete,
@@ -193,16 +193,16 @@ class _PathFinder(object):
 
         if not hasattr(self.cost, 'get_tcod_path_ffi'):
             assert not callable(self.cost), \
-                "Any callback alone is missing width & height information. " \
+                "Any callback alone is missing shape information. " \
                 "Wrap your callback in tcod.path.EdgeCostCallback"
             self.cost = NodeCostArray(self.cost)
 
-        self._callback, self._userdata, self.width, self.height = \
+        self._callback, self._userdata, self.shape = \
             self.cost.get_tcod_path_ffi()
         self._path_c = ffi.gc(
             self._path_new_using_function(
-                self.width,
-                self.height,
+                self.cost.shape[0],
+                self.cost.shape[1],
                 self._callback,
                 self._userdata,
                 diagonal
@@ -217,8 +217,7 @@ class _PathFinder(object):
     def __getstate__(self):
         state = self.__dict__.copy()
         del state['_path_c']
-        del state['width']
-        del state['height']
+        del state['shape']
         del state['_callback']
         del state['_userdata']
         return state
@@ -241,6 +240,7 @@ class AStar(_PathFinder):
     """
 
     def get_path(self, start_x, start_y, goal_x, goal_y):
+        # type: (int, int, int, int) -> List[Tuple[int, int]]
         """Return a list of (x, y) steps to reach the goal point, if possible.
 
         Args:
@@ -274,11 +274,13 @@ class Dijkstra(_PathFinder):
     _path_delete = lib.TCOD_dijkstra_delete
 
     def set_goal(self, x, y):
+        # type: (int, int) -> None
         """Set the goal point and recompute the Dijkstra path-finder.
         """
         lib.TCOD_dijkstra_compute(self._path_c, x, y)
 
     def get_path(self, x, y):
+        # type: (int, int) -> List[Tuple[int, int]]
         """Return a list of (x, y) steps to reach the goal point, if possible.
         """
         lib.TCOD_dijkstra_path_set(self._path_c, x, y)

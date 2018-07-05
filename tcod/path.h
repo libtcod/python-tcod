@@ -1,37 +1,38 @@
 #ifndef PYTHON_TCOD_PATH_H_
 #define PYTHON_TCOD_PATH_H_
 
-typedef struct {
-    int width;
-    void *array;
-} PathCostArray;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-float PathCostArrayFloat32(const int x1, const int y1,
-                           const int x2, const int y2,
-                           const PathCostArray *map);
+struct PathCostArray {
+    char *array;
+    long long strides[2];
+};
 
-float PathCostArrayUInt8(const int x1, const int y1,
-                         const int x2, const int y2,
-                         const PathCostArray *map);
+float PathCostArrayFloat32(int x1, int y1, int x2, int y2,
+                           const struct PathCostArray *map);
 
-float PathCostArrayUInt16(const int x1, const int y1,
-                          const int x2, const int y2,
-                          const PathCostArray *map);
+float PathCostArrayUInt8(int x1, int y1, int x2, int y2,
+                         const struct PathCostArray *map);
 
-float PathCostArrayUInt32(const int x1, const int y1,
-                          const int x2, const int y2,
-                          const PathCostArray *map);
+float PathCostArrayUInt16(int x1, int y1, int x2, int y2,
+                          const struct PathCostArray *map);
 
-float PathCostArrayInt8(const int x1, const int y1,
-                        const int x2, const int y2,
-                        const PathCostArray *map);
+float PathCostArrayUInt32(int x1, int y1, int x2, int y2,
+                          const struct PathCostArray *map);
 
-float PathCostArrayInt16(const int x1, const int y1,
-                         const int x2, const int y2,
-                         const PathCostArray *map);
+float PathCostArrayInt8(int x1, int y1, int x2, int y2,
+                        const struct PathCostArray *map);
 
-float PathCostArrayInt32(const int x1, const int y1,
-                         const int x2, const int y2,
-                         const PathCostArray *map);
+float PathCostArrayInt16(int x1, int y1, int x2, int y2,
+                         const struct PathCostArray *map);
+
+float PathCostArrayInt32(int x1, int y1, int x2, int y2,
+                         const struct PathCostArray *map);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PYTHON_TCOD_PATH_H_ */

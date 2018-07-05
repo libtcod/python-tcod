@@ -7,6 +7,15 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
+Unreleased
+------------------
+Changed
+ - tcod.path: all classes now use `shape` instead of `width` and `height`.
+ - tcod.path now respects NumPy array shape, instead of assuming that arrays
+   need to be transposed from C memory order.  From now on `x` and `y` mean
+   1st and 2nd axis.  This doesn't affect non-NumPy code.
+ - tcod.path now has full support of non-contiguous memory.
+
 4.6.1 - 2018-06-30
 ------------------
 Added

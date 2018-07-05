@@ -211,9 +211,9 @@ class AStar(tcod.path.AStar):
     def __init__(self, width, height, callback,
                  diagnalCost=_math.sqrt(2), advanced=False):
         if advanced:
-            cost = self.__DeprecatedEdgeCost(callback, width, height)
+            cost = self.__DeprecatedEdgeCost(callback, (width, height))
         else:
-            cost = self.__DeprecatedNodeCost(callback, width, height)
+            cost = self.__DeprecatedNodeCost(callback, (width, height))
         super(AStar, self).__init__(cost, diagnalCost or 0.0)
 
     def get_path(self, origX, origY, destX, destY):

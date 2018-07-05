@@ -28,9 +28,8 @@ BITSIZE, LINKAGE = platform.architecture()
 def walk_sources(directory):
     for path, dirs, files in os.walk(directory):
         for source in files:
-            if not source.endswith('.c'):
-                continue
-            yield os.path.join(path, source)
+            if source.endswith('.c') or source.endswith('.cpp'):
+                yield os.path.join(path, source)
 
 def find_sources(directory):
     return [os.path.join(directory, source)
