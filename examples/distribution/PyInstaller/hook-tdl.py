@@ -1,5 +1,5 @@
 """
-    Hook for https://github.com/HexDecimal/python-tdl
+    Hook for https://github.com/libtcod/python-tcod
 
     You should skip this hook if you're using a custom font.
 """

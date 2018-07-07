@@ -1,5 +1,5 @@
 """
-    Hook for https://github.com/HexDecimal/python-tdl
+    Hook for https://github.com/libtcod/python-tcod
 """
 from PyInstaller.utils.hooks import collect_dynamic_libs
 
