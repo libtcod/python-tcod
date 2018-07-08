@@ -423,7 +423,6 @@ def _event_generator():
         # this means you can break out of a event.get loop without losing
         # the leftover events
         yield(_eventQueue.pop(0))
-    raise StopIteration()
 
 
 def wait(timeout=None, flush=True):

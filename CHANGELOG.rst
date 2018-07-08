@@ -7,6 +7,11 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
+Unreleased
+------------------
+Fixed
+ - tdl.event no longer crashes on StopIteration in Python 3.5+
+
 5.0.0 - 2018-07-05
 ------------------
 Changed
