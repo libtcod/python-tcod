@@ -90,6 +90,7 @@ define_macros = []
 sources += walk_sources('tcod/')
 sources += walk_sources('tdl/')
 sources += ['libtcod/src/libtcod_c.c']
+sources += ['libtcod/src/libtcod.cpp']
 sources += ['libtcod/src/png/lodepng.c']
 sources += glob.glob('libtcod/src/zlib/*.c')
 
