@@ -51,7 +51,7 @@ def _fmt_bytes(string):
     return _bytes(string).replace(b'%', b'%%')
 
 def _fmt_unicode(string):
-    return _unicode(string).replace(u'%', u'%%')
+    return string.encode('utf-8').replace(b'%', b'%%')
 
 
 class _PropagateException():

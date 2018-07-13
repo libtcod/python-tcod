@@ -891,7 +891,7 @@ def console_print(con, x, y, fmt):
         y (int): Character y position from the top.
         fmt (AnyStr): A unicode or bytes string optionaly using color codes.
     """
-    lib.TCOD_console_print_utf(_console(con), x, y, _fmt_unicode(fmt))
+    lib.TCOD_console_printf(_console(con), x, y, _fmt_unicode(fmt))
 
 def console_print_ex(con, x, y, flag, alignment, fmt):
     """Print a string on a console using a blend mode and alignment mode.
@@ -901,8 +901,8 @@ def console_print_ex(con, x, y, flag, alignment, fmt):
         x (int): Character x position from the left.
         y (int): Character y position from the top.
     """
-    lib.TCOD_console_print_ex_utf(_console(con),
-                                  x, y, flag, alignment, _fmt_unicode(fmt))
+    lib.TCOD_console_printf_ex(_console(con),
+                               x, y, flag, alignment, _fmt_unicode(fmt))
 
 def console_print_rect(con, x, y, w, h, fmt):
     """Print a string constrained to a rectangle.
@@ -916,7 +916,7 @@ def console_print_rect(con, x, y, w, h, fmt):
     Returns:
         int: The number of lines of text once word-wrapped.
     """
-    return lib.TCOD_console_print_rect_utf(
+    return lib.TCOD_console_printf_rect(
         _console(con), x, y, w, h, _fmt_unicode(fmt))
 
 def console_print_rect_ex(con, x, y, w, h, flag, alignment, fmt):
@@ -925,7 +925,7 @@ def console_print_rect_ex(con, x, y, w, h, flag, alignment, fmt):
     Returns:
         int: The number of lines of text once word-wrapped.
     """
-    return lib.TCOD_console_print_rect_ex_utf(
+    return lib.TCOD_console_printf_rect_ex(
         _console(con), x, y, w, h, flag, alignment, _fmt_unicode(fmt))
 
 def console_get_height_rect(con, x, y, w, h, fmt):
@@ -934,7 +934,7 @@ def console_get_height_rect(con, x, y, w, h, fmt):
     Returns:
         int: The number of lines of text once word-wrapped.
     """
-    return lib.TCOD_console_get_height_rect_utf(
+    return lib.TCOD_console_get_height_rect(
         _console(con), x, y, w, h, _fmt_unicode(fmt))
 
 def console_rect(con, x, y, w, h, clr, flag=BKGND_DEFAULT):

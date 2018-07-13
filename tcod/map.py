@@ -63,7 +63,6 @@ class Map(object):
     """
 
     def __init__(self, width, height, order='C'):
-        assert ffi.sizeof('cell_t') == 3 # assert buffer alignment
         self.width = width
         self.height = height
         self._order = tcod._internal.verify_order(order)
@@ -74,12 +73,12 @@ class Map(object):
 
     def __as_cdata(self):
         return ffi.new(
-            'map_t *',
+            'struct TCOD_Map*',
             (
                 self.width,
                 self.height,
                 self.width * self.height,
-                ffi.cast('cell_t*', self.__buffer.ctypes.data),
+                ffi.cast('struct TCOD_MapCell*', self.__buffer.ctypes.data),
             )
         )
 

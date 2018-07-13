@@ -74,8 +74,7 @@ module_name = 'tcod._libtcod'
 include_dirs = [
     '.',
     'libtcod/include/',
-    'libtcod/src/png/',
-    'libtcod/src/zlib/',
+    'libtcod/src/vendor/zlib/',
 ]
 
 extra_parse_args = []
@@ -91,8 +90,9 @@ sources += walk_sources('tcod/')
 sources += walk_sources('tdl/')
 sources += ['libtcod/src/libtcod_c.c']
 sources += ['libtcod/src/libtcod.cpp']
-sources += ['libtcod/src/png/lodepng.c']
-sources += glob.glob('libtcod/src/zlib/*.c')
+sources += ['libtcod/src/vendor/lodepng.c']
+sources += ['libtcod/src/vendor/utf8proc/utf8proc.c']
+sources += glob.glob('libtcod/src/vendor/zlib/*.c')
 
 if TDL_NO_SDL2_EXPORTS:
     extra_parse_args.append('-DTDL_NO_SDL2_EXPORTS')

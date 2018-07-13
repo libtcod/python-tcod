@@ -76,7 +76,7 @@ class Console(object):
             alignment = lib.TCOD_ctx.root.alignment
 
         self._console_data = self.console_c = ffi.new(
-            'TCOD_console_data_t*',
+            'struct TCOD_Console*',
             {
             'w': width, 'h': height,
             'ch_array': ffi.cast('int*', self._ch.ctypes.data),
@@ -104,7 +104,7 @@ class Console(object):
         if self.console_c == ffi.NULL:
             self._console_data = lib.TCOD_ctx.root
         else:
-            self._console_data = ffi.cast('TCOD_console_data_t *', self.console_c)
+            self._console_data = ffi.cast('struct TCOD_Console*', self.console_c)
 
         def unpack_color(color_data):
             """return a (height, width, 3) shaped array from an image struct"""
@@ -451,4 +451,4 @@ class Console(object):
             }
         )
         self._console_data = self.console_c = ffi.new(
-            'TCOD_console_data_t*', self._console_data)
+            'struct TCOD_Console*', self._console_data)

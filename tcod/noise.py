@@ -80,7 +80,7 @@ class Noise(object):
         self._algorithm = algorithm
         self.noise_c = ffi.gc(
             ffi.cast(
-                'perlin_data_t*',
+                'struct TCOD_Noise*',
                 lib.TCOD_noise_new(dimensions, hurst, lacunarity,
                                    _random_c),
                 ),
@@ -239,9 +239,9 @@ class Noise(object):
         else:
             state['noise_c']['waveletTileData'] = ffi.NULL
 
-        # unpack perlin_data_t and link to Random instance
+        # unpack TCOD_Noise and link to Random instance
         state['noise_c']['rand'] = state['_random'].random_c
-        state['noise_c'] = ffi.new('perlin_data_t*', state['noise_c'])
+        state['noise_c'] = ffi.new('struct TCOD_Noise*', state['noise_c'])
 
         # unpack TDLNoise and link to libtcod noise
         state['_tdl_noise_c']['noise'] = state['noise_c']
@@ -250,7 +250,7 @@ class Noise(object):
 
     def _setstate_old(self, state):
         self._random = state[0]
-        self.noise_c = ffi.new('perlin_data_t*')
+        self.noise_c = ffi.new('struct TCOD_Noise*')
         self.noise_c.ndim = state[3]
         ffi.buffer(self.noise_c.map)[:] = state[4]
         ffi.buffer(self.noise_c.buffer)[:] = state[5]

@@ -6,7 +6,7 @@
 #include "../libtcod/include/mersenne.h"
 
 /* Copied from libtcod's noise.c, needs to be kept up-to-date! */
-typedef struct {
+typedef struct TCOD_Noise {
 	int ndim;
 	unsigned char map[256]; /* Randomized map of indexes into buffer */
 	float buffer[256][TCOD_NOISE_MAX_DIMENSIONS]; 	/* Random 256 x ndim buffer */
@@ -18,7 +18,7 @@ typedef struct {
 	TCOD_random_t rand;
 	/* noise type */
 	TCOD_noise_type_t noise_type;
-} perlin_data_t;
+};
 
 typedef enum NoiseImplementation {
 	kNoiseImplementationSimple,
