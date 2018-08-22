@@ -2,7 +2,6 @@ language: python
 python:
  - "2.7"
  - "3.4"
- - "pypy-5.7.1"
  - "pypy3.5"
 matrix:
   include:
@@ -12,9 +11,6 @@ matrix:
   - os: osx
     language: generic
     env: BREW_PYTHON3=old
-  - os: osx
-    language: generic
-    env: PYPY_VERSION=6.0.0
   - os: osx
     language: generic
     env: USE_OPENMP=true BREW_PYTHON3=latest
