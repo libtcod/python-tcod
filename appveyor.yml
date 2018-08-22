@@ -7,10 +7,6 @@ environment:
     secure: xprpiCGL823NKrs/K2Cps1UVBEmpezXReLxcfLyU1M43ZBBOK91xvjdIJamYKi8D
   DEPLOY_ONLY: false
   matrix:
-  - WEB_PYTHON: https://www.python.org/ftp/python/3.7.0/python-3.7.0-amd64-webinstall.exe
-    platform: x64
-  - WEB_PYTHON: https://www.python.org/ftp/python/3.7.0/python-3.7.0-webinstall.exe
-    platform: Any CPU
   - PYTHON: C:\Python34-x64\python.exe
     platform: x64
   - PYTHON: C:\Python34\python.exe
@@ -32,6 +28,12 @@ environment:
     DEPLOY_ONLY: true
   - PYTHON: C:\Python36\python.exe
     platform: Any CPU
+    DEPLOY_ONLY: true
+  - PYTHON: C:\Python37\python.exe
+    platform: Any CPU
+    DEPLOY_ONLY: true
+  - PYTHON: C:\Python37-x64\python.exe
+    platform: x64
     DEPLOY_ONLY: true
   - PYPY: pypy2-v5.8.0-win32
     platform: Any CPU
