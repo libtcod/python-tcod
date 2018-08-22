@@ -3,6 +3,7 @@ python:
  - "2.7"
  - "3.4"
  - "pypy-5.7.1"
+ - "pypy3.5"
 matrix:
   include:
   - os: osx
@@ -19,6 +20,7 @@ matrix:
     env: USE_OPENMP=true BREW_PYTHON3=latest
   allow_failures:
   - env: USE_OPENMP=true BREW_PYTHON3=latest
+  - python: pypy3.5
   fast_finish: true
 
 # sudo is required to prevent xvfb crashes from container-based workers.
