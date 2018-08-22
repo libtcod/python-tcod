@@ -47,7 +47,6 @@ before_install:
 - python get-pip.py
 - pip install --upgrade setuptools
 - pip install --pre --upgrade wheel
-- 'if [[ "$TRAVIS_PYTHON_VERSION" == pypy* || -n "$PYPY_VERSION" ]]; then pip install git+https://bitbucket.org/pypy/numpy.git; fi'
 - pip install --requirement requirements.txt
 install:
 - if [[ -z "$TRAVIS_TAG" ]]; then export BUILD_FLAGS="-g"; fi
