@@ -145,6 +145,6 @@ def _console(console):
             ("Falsy console parameters are deprecated, "
              "always use a console instance."),
             DeprecationWarning,
-            stacklevel=2,
+            stacklevel=3,
             )
         return ffi.NULL
