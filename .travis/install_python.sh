@@ -160,6 +160,10 @@ function install_python {
         install_mac_pypy $PYPY_VERSION
     elif [ -n "$PYPY3_VERSION" ]; then
         install_mac_pypy3 $PYPY3_VERSION
+    elif [ -z "$BREW_PYTHON3" ]; then
+        # Default Python install is missing virtualenv.
+        python -m ensurepip
+        python -m pip install virtualenv
     fi
 }
 
