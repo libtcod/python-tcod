@@ -155,7 +155,8 @@ def _console(console):
     except AttributeError:
         warnings.warn(
             ("Falsy console parameters are deprecated, "
-             "always use a console instance."),
+             "always use the root console instance returned by "
+             "console_init_root."),
             DeprecationWarning,
             stacklevel=3,
             )
