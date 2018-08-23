@@ -2291,7 +2291,7 @@ def _unpack_union(type_, union):
     if type_ == lib.TCOD_TYPE_BOOL:
         return bool(union.b)
     elif type_ == lib.TCOD_TYPE_CHAR:
-        return _unicode(union.c)
+        return union.c.decode('latin-1')
     elif type_ == lib.TCOD_TYPE_INT:
         return union.i
     elif type_ == lib.TCOD_TYPE_FLOAT:
