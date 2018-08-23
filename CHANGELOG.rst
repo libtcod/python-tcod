@@ -7,7 +7,7 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
-Unreleased
+6.0.0 - 2018-08-23
 ------------------
 Changed
  - Project renamed to tcod on PyPI.
