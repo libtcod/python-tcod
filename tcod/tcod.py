@@ -32,6 +32,12 @@ if _sys.version_info[0] == 2: # Python 2
 
     def _unicode(string):
         if not isinstance(string, unicode):
+            warnings.warn(
+                ("Passing byte strings as parameters to Unicode functions is "
+                 "deprecated."),
+                DeprecationWarning,
+                stacklevel=4,
+                )
             return string.decode('latin-1')
         return string
 
@@ -43,6 +49,12 @@ else: # Python 3
 
     def _unicode(string):
         if isinstance(string, bytes):
+            warnings.warn(
+                ("Passing byte strings as parameters to Unicode functions is "
+                 "deprecated."),
+                DeprecationWarning,
+                stacklevel=4,
+                )
             return string.decode('latin-1')
         return string
 
@@ -51,7 +63,7 @@ def _fmt_bytes(string):
     return _bytes(string).replace(b'%', b'%%')
 
 def _fmt_unicode(string):
-    return string.encode('utf-8').replace(b'%', b'%%')
+    return _unicode(string).encode('utf-8').replace(b'%', b'%%')
 
 
 class _PropagateException():

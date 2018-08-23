@@ -7,6 +7,13 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
+Unreleased
+------------------
+Deprecated
+ - Passing bytes strings to libtcodpy print functions is deprecated.
+Fixed
+ - Fixed libtcodpy print functions not accepting bytes strings.
+
 5.0.1 - 2018-07-08
 ------------------
 Fixed
