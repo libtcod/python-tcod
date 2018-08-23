@@ -13,6 +13,8 @@ Deprecated
  - Passing bytes strings to libtcodpy print functions is deprecated.
 Fixed
  - Fixed libtcodpy print functions not accepting bytes strings.
+ - libtcod constants are now generated at build-time fixing static analysis
+   tools.
 
 5.0.1 - 2018-07-08
 ------------------
