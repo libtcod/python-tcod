@@ -9,6 +9,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - Project renamed to tcod on PyPI.
 Deprecated
  - Passing bytes strings to libtcodpy print functions is deprecated.
 Fixed

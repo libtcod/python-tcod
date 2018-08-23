@@ -52,15 +52,14 @@ needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
 pytest_runner = ['pytest-runner'] if needs_pytest else []
 
 setup(
-    name='tdl',
+    name='tcod',
     version=get_version(),
     author='Kyle Stewart',
     author_email='4B796C65+tdl@gmail.com',
     description='Pythonic cffi port of libtcod.',
     long_description='\n'.join([open('README.rst', 'r').read(),
                                 open('CHANGELOG.rst', 'r').read()]),
-    url='https://github.com/HexDecimal/python-tdl',
-    download_url='https://pypi.python.org/pypi/tdl',
+    url='https://github.com/libtcod/python-tcod',
     py_modules=['libtcodpy'],
     packages=['tdl', 'tcod'],
     package_data={

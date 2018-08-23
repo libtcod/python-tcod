@@ -15,10 +15,10 @@
 =======
 This is a Python cffi_ port of libtcod_.
 
-This library is `hosted on GitHub <https://github.com/HexDecimal/python-tdl>`_.
+This library is `hosted on GitHub <https://github.com/libtcod/python-tcod>`_.
 
 Any issues you have with this module can be reported at the
-`GitHub issue tracker <https://github.com/HexDecimal/python-tdl/issues>`_.
+`GitHub issue tracker <https://github.com/libtcod/python-tcod/issues>`_.
 
 =======
  Usage
@@ -26,9 +26,9 @@ Any issues you have with this module can be reported at the
 This module was designed to be backward compatible with the original libtcodpy
 module distributed with libtcod.
 If you had code that runs on libtcodpy then you can use this library as a
-drop-in replacement::
-
-    import tcod as libtcod
+drop-in replacement.  This installs a libtcodpy module so you'll only need to
+delete the libtcodpy/ folder that's usually bundled in an older libtcodpy
+project.
 
 Guides and Tutorials for libtcodpy should work with the tcod module.
 
@@ -45,7 +45,7 @@ Windows / MacOS
 ---------------
 To install using pip, use the following command::
 
-    > python -m pip install tdl
+    > python -m pip install tcod
 
 If you get the error "ImportError: DLL load failed: The specified module could
 not be found." when trying to import tcod/tdl then you may need the latest
@@ -54,20 +54,13 @@ not be found." when trying to import tcod/tdl then you may need the latest
 
 Linux
 -----
-The easiest method to install tdl on Linux would be from the PPA,
-this method will work for the Zesty, Artful, and Bionic versions of Ubuntu::
-
-    $ sudo add-apt-repository ppa:4b796c65/ppa
-    $ sudo apt-get update
-    $ sudo apt-get install python-tdl python3-tdl
-
-Otherwise tdl will need to be built from source.  Assuming you have Python,
-pip, and apt-get, then you'll run these commands to install tdl and its
-dependencies to your user environment::
+On Linux python-tcod will need to be built from source.
+Assuming you have Python, pip, and apt-get, then you'll run these commands to
+install python-tcod and its dependencies to your user environment::
 
     $ sudo apt-get install gcc python-dev python3-dev libsdl2-dev libffi-dev libomp5
-    $ pip2 install tdl
-    $ pip3 install tdl
+    $ pip2 install tcod
+    $ pip3 install tcod
 
 ==============
  Requirements
@@ -79,7 +72,7 @@ dependencies to your user environment::
 =========
  License
 =========
-python-tdl is distributed under the `Simplified 2-clause FreeBSD license
+python-tcod is distributed under the `Simplified 2-clause FreeBSD license
 <https://github.com/HexDecimal/python-tdl/blob/master/LICENSE.txt>`_.
 
 .. _LICENSE.txt: https://github.com/HexDecimal/python-tdl/blob/master/LICENSE.txt

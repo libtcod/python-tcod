@@ -23,8 +23,6 @@ Glossary
         The `numpy` attributes in particular can be used to dramatically speed
         up the performance of your program compared to using :term:`libtcodpy`.
 
-        `python-tcod` is installed as part of :term:`python-tdl`
-
     python-tdl
         `tdl` is a high-level wrapper over :term:`libtcodpy` although it now
         uses :term:`python-tcod`, it doesn't do anything that you couldn't do
@@ -33,8 +31,8 @@ Glossary
         Currently no new features are planned for `tdl`, instead new features
         are added to `libtcod` itself and then ported to :term:`python-tcod`.
 
-        :term:`python-tcod` and :term:`libtcodpy` are included in installations
-        of `python-tdl`.
+        :term:`python-tdl` and :term:`libtcodpy` are included in installations
+        of `python-tcod`.
 
     libtcodpy
         `libtcodpy` is more or less a direct port of `libtcod`'s C API to
