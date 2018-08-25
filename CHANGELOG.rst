@@ -7,6 +7,11 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
+6.0.1 - 2018-08-24
+------------------
+Fixed
+ - Source distributions were missing C++ source files.
+
 6.0.0 - 2018-08-23
 ------------------
 Changed

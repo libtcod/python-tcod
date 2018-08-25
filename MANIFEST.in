@@ -7,10 +7,10 @@ include *.py *.cfg *.txt *.rst
 
 recursive-include tdl *.py *.png *.txt *.md *.rst
 
-recursive-include tcod *.py *.c *.h
+recursive-include tcod *.py *.c* *.h
 
-recursive-include libtcod/include *.h
-recursive-include libtcod/src *.c *.h
+recursive-include libtcod/include *.h*
+recursive-include libtcod/src *.c* *.h*
 include libtcod/*.txt libtcod/*.md
 
 recursive-include dependencies/fake_libc_include *.h
