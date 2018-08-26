@@ -370,3 +370,5 @@ intersphinx_mapping = {
     'https://docs.python.org/2/': None,
     'https://docs.scipy.org/doc/numpy/': None,
 }
+
+os.environ['READTHEDOCS'] = 'True'

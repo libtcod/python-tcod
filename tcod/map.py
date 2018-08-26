@@ -37,6 +37,7 @@ import numpy as np
 
 from tcod.libtcod import lib, ffi
 import tcod._internal
+import tcod.constants
 
 
 class Map(object):
@@ -98,7 +99,8 @@ class Map(object):
         return buffer.T if self._order == 'F' else buffer
 
     def compute_fov(self, x, y, radius=0, light_walls=True,
-                    algorithm=lib.FOV_RESTRICTIVE):
+                    algorithm=tcod.constants.FOV_RESTRICTIVE):
+        # type (int, int, int, bool, int) -> None
         """Compute a field-of-view on the current instance.
 
         Args:
