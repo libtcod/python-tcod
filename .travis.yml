@@ -51,7 +51,8 @@ install:
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-wheel -v dist/*.whl; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-listdeps --all dist/*.whl; fi'
 before_script:
- - pip install pytest pytest-cov
+# pytest==3.7.3 breaks MacOS doc-tests.
+- pip install 'pytest!=3.7.3' pytest-cov
 script:
 - pytest -v
 after_success:
