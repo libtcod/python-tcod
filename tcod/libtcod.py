@@ -18,8 +18,6 @@ if _sys.platform == 'win32':
         _os.environ['PATH'],
         )
 
-from tcod.constants import *
-
 NOISE_DEFAULT_HURST = 0.5
 NOISE_DEFAULT_LACUNARITY = 2.0
 
@@ -61,3 +59,5 @@ if _os.environ.get('READTHEDOCS'):
     lib = ffi = _Mock()
 else:
     from tcod._libtcod import lib, ffi
+
+from tcod.constants import *

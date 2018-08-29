@@ -20,7 +20,7 @@ from tcod.tcod import _PropagateException
 from tcod.tcod import _console
 
 import tcod.bsp
-from tcod.color import *
+from tcod.color import Color
 import tcod.console
 import tcod.image
 import tcod.map

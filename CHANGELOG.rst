@@ -7,6 +7,11 @@ here.
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
 
+6.0.2 - 2018-08-28
+------------------
+Fixed
+ - Fixed color constants missing at build-time.
+
 6.0.1 - 2018-08-24
 ------------------
 Fixed

@@ -91,20 +91,3 @@ class Color(list):
         """Return a printable representation of the current color."""
         return "%s(%i,%i,%i)" % (self.__class__.__name__,
                                  self.r, self.g, self.b)
-
-
-def _import_colors(lib):
-    """Import all Color constants from lib into this module."""
-    g = globals()
-    for name in dir(lib):
-        if name[:5] != 'TCOD_':
-            continue
-        value = getattr(lib, name)
-        if not isinstance(value, ffi.CData):
-            continue
-        if ffi.typeof(value) != ffi.typeof('TCOD_color_t'):
-            continue
-        g[name[5:]] = Color._new_from_cdata(value)
-
-
-_import_colors(lib)
