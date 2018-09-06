@@ -248,19 +248,41 @@ class Key(_CDataWrapper):
     _BOOL_ATTRIBUTES = ('lalt', 'lctrl', 'lmeta',
                         'ralt', 'rctrl', 'rmeta', 'pressed', 'shift')
 
-    def __init__(self, *args, **kargs):
-        super(Key, self).__init__(*args, **kargs)
-        if self.cdata == ffi.NULL:
-            self.cdata = ffi.new('TCOD_key_t*')
+    def __init__(self, vk=0, c=0, text='', pressed=False,
+                 lalt=False, lctrl=False, lmeta=False,
+                 ralt=False, rctrl=False, rmeta=False, shift=False):
+        if isinstance(vk, ffi.CData):
+            self.cdata = vk
+            return
+        self.cdata = ffi.new('TCOD_key_t*')
+        self.vk = vk
+        self.c = c
+        self.text = text
+        self.pressed = pressed
+        self.lalt = lalt
+        self.lctrl = lctrl
+        self.lmeta = lmeta
+        self.ralt = lalt
+        self.rctrl = lctrl
+        self.rmeta = lmeta
+        self.shift = shift
 
     def __getattr__(self, attr):
         if attr in self._BOOL_ATTRIBUTES:
             return bool(getattr(self.cdata, attr))
         if attr == 'c':
-            return ord(getattr(self.cdata, attr))
+            return ord(self.cdata.c)
         if attr == 'text':
-            return _unpack_char_p(getattr(self.cdata, attr))
+            return ffi.string(self.cdata.text).decode()
         return super(Key, self).__getattr__(attr)
+
+    def __setattr__(self, attr, value):
+        if attr == 'c':
+            self.cdata.c = chr(value).encode('latin-1')
+        elif attr == 'text':
+            self.cdata.text = value.encode()
+        else:
+            super(Key, self).__setattr__(attr, value)
 
     def __repr__(self):
         """Return a representation of this Key object."""
@@ -300,10 +322,22 @@ class Mouse(_CDataWrapper):
         wheel_down (bool): Wheel down event.
     """
 
-    def __init__(self, *args, **kargs):
-        super(Mouse, self).__init__(*args, **kargs)
-        if self.cdata == ffi.NULL:
-            self.cdata = ffi.new('TCOD_mouse_t*')
+    def __init__(self, x=0, y=0, dx=0, dy=0, cx=0, cy=0, dcx=0, dcy=0,
+                 **kargs):
+        if isinstance(x, ffi.CData):
+            self.cdata = x
+            return
+        self.cdata = ffi.new('TCOD_mouse_t*')
+        self.x = x
+        self.y = y
+        self.dx = dx
+        self.dy = dy
+        self.cx = cx
+        self.cy = cy
+        self.dcx = dcx
+        self.dcy = dcy
+        for attr, value in kargs.items():
+            setattr(self, attr, value)
 
     def __repr__(self):
         """Return a representation of this Mouse object."""

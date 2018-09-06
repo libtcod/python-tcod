@@ -281,6 +281,9 @@ def test_path_callback():
 def test_key_repr():
     Key = tcod.Key
     key = Key(vk=1, c=2, shift=True)
+    assert key.vk == 1
+    assert key.c == 2
+    assert key.shift
     key_copy = eval(repr(key))
     assert key.vk == key_copy.vk
     assert key.c == key_copy.c
