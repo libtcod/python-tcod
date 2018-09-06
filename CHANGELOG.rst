@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+6.0.3 - 2018-09-05
+------------------
 Fixed
  - tcod.Key and tcod.Mouse no longer ignore initiation parameters.
 
