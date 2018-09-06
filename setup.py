@@ -48,6 +48,15 @@ def get_package_data():
         files += ['SDL2.framework/Versions/A/SDL2']
     return files
 
+def get_long_description():
+    """Return this projects description."""
+    with open('README.rst', 'r') as f:
+        readme = f.read()
+    with open('CHANGELOG.rst', 'r') as f:
+        changelog = f.read()
+        changelog = changelog.replace('\nUnreleased\n------------------', '')
+    return '\n'.join([readme, changelog])
+
 needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
 pytest_runner = ['pytest-runner'] if needs_pytest else []
 
@@ -57,8 +66,7 @@ setup(
     author='Kyle Stewart',
     author_email='4B796C65+tdl@gmail.com',
     description='Pythonic cffi port of libtcod.',
-    long_description='\n'.join([open('README.rst', 'r').read(),
-                                open('CHANGELOG.rst', 'r').read()]),
+    long_description=get_long_description(),
     url='https://github.com/libtcod/python-tcod',
     py_modules=['libtcodpy'],
     packages=['tdl', 'tcod'],
