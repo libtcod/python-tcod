@@ -262,9 +262,9 @@ class Key(_CDataWrapper):
         self.lalt = lalt
         self.lctrl = lctrl
         self.lmeta = lmeta
-        self.ralt = lalt
-        self.rctrl = lctrl
-        self.rmeta = lmeta
+        self.ralt = ralt
+        self.rctrl = rctrl
+        self.rmeta = rmeta
         self.shift = shift
 
     def __getattr__(self, attr):

@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+- tcod.Key right-hand modifiers are now set independently at initialization,
+  instead of mirroring the left-hand modifier value
 
 6.0.3 - 2018-09-05
 ------------------
