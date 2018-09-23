@@ -499,6 +499,7 @@ def bsp_remove_sons(node):
     node.children = ()
 
 def bsp_delete(node):
+    # type: (Any) -> None
     """Exists for backward compatibility.  Does nothing.
 
     BSP's created by this library are automatically garbage collected once
@@ -508,7 +509,6 @@ def bsp_delete(node):
     .. deprecated:: 2.0
        BSP deletion is automatic.
     """
-    pass
 
 def color_lerp(c1, c2, a):
     """Return the linear interpolation between two colors.
@@ -1103,6 +1103,15 @@ def console_set_key_color(con, col):
         con.set_key_color(col)
 
 def console_delete(con):
+    # type: (Console) -> None
+    """Closes the window if `con` is the root console.
+
+    libtcod objects are automatically garbage collected once they go out of
+    scope.
+
+    This function exists for backwards compatibility.
+    """
+    # type: (Any) -> None
     con = _console(con)
     if con == ffi.NULL:
         lib.TCOD_console_delete(con)
@@ -1376,8 +1385,11 @@ def path_walk(p, recompute):
     return None,None
 
 def path_delete(p):
-    """Does nothing."""
-    pass
+    # type (Any) -> None
+    """Does nothing. libtcod objects are managed by Python's garbage collector.
+
+    This function exists for backwards compatibility with libtcodpy.
+    """
 
 def dijkstra_new(m, dcost=1.41):
     return tcod.path.Dijkstra(m, dcost)
@@ -1420,7 +1432,11 @@ def dijkstra_path_walk(p):
     return None,None
 
 def dijkstra_delete(p):
-    pass
+    # type (Any) -> None
+    """Does nothing. libtcod objects are managed by Python's garbage collector.
+
+    This function exists for backwards compatibility with libtcodpy.
+    """
 
 def _heightmap_cdata(array):
     """Return a new TCOD_heightmap_t instance using an array.
@@ -1857,12 +1873,14 @@ def heightmap_get_minmax(hm):
     return mi[0], ma[0]
 
 def heightmap_delete(hm):
-    """Does nothing.
+    # type (Any) -> None
+    """Does nothing. libtcod objects are managed by Python's garbage collector.
+
+    This function exists for backwards compatibility with libtcodpy.
 
     .. deprecated:: 2.0
         libtcod-cffi deletes heightmaps automatically.
     """
-    pass
 
 def image_new(width, height):
     return tcod.image.Image(width, height)
@@ -1948,7 +1966,11 @@ def image_save(image, filename):
     image.save_as(filename)
 
 def image_delete(image):
-    pass
+    # type (Any) -> None
+    """Does nothing. libtcod objects are managed by Python's garbage collector.
+
+    This function exists for backwards compatibility with libtcodpy.
+    """
 
 def line_init(xo, yo, xd, yd):
     """Initilize a line whose points will be returned by `line_step`.
@@ -2176,7 +2198,11 @@ def map_is_walkable(m, x, y):
     return lib.TCOD_map_is_walkable(m.map_c, x, y)
 
 def map_delete(m):
-    """This function does nothing."""
+    # type (Any) -> None
+    """Does nothing. libtcod objects are managed by Python's garbage collector.
+
+    This function exists for backwards compatibility with libtcodpy.
+    """
 
 def map_get_width(map):
     # type: (tcod.map.Map) -> int
@@ -2309,8 +2335,11 @@ def noise_get_turbulence(n, f, oc, typ=NOISE_DEFAULT):
                                             oc, typ)
 
 def noise_delete(n):
-    """Does nothing."""
-    pass
+    # type (Any) -> None
+    """Does nothing. libtcod objects are managed by Python's garbage collector.
+
+    This function exists for backwards compatibility with libtcodpy.
+    """
 
 _chr = chr
 try:
@@ -2403,7 +2432,11 @@ def parser_run(parser, filename, listener=None):
             lib.TCOD_parser_run(parser, _bytes(filename), clistener)
 
 def parser_delete(parser):
-    pass
+    # type (Any) -> None
+    """Does nothing. libtcod objects are managed by Python's garbage collector.
+
+    This function exists for backwards compatibility with libtcodpy.
+    """
 
 def parser_get_bool_property(parser, name):
     return bool(lib.TCOD_parser_get_bool_property(parser, _bytes(name)))
@@ -2599,8 +2632,11 @@ def random_restore(rnd, backup):
                             backup.random_c)
 
 def random_delete(rnd):
-    """Does nothing."""
-    pass
+    # type (Any) -> None
+    """Does nothing. libtcod objects are managed by Python's garbage collector.
+
+    This function exists for backwards compatibility with libtcodpy.
+    """
 
 def struct_add_flag(struct, name):
     lib.TCOD_struct_add_flag(struct, name)
