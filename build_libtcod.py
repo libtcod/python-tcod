@@ -163,23 +163,28 @@ class CustomPostParser(c_ast.NodeVisitor):
 
     def __init__(self):
         self.ast = None
-        self.typedefs = None
+        self.typedefs = []
+        self.removeable_typedefs = []
+        self.funcdefs = []
 
     def parse(self, ast):
         self.ast = ast
-        self.typedefs = []
         self.visit(ast)
+        for node in self.funcdefs:
+            ast.ext.remove(node)
+        for node in self.removeable_typedefs:
+            ast.ext.remove(node)
         return ast
 
     def visit_Typedef(self, node):
         if node.name in ['wchar_t', 'size_t']:
             # remove fake typedef placeholders
-            self.ast.ext.remove(node)
+            self.removeable_typedefs.append(node)
         else:
             self.generic_visit(node)
             if node.name in self.typedefs:
                 print('warning: %s redefined' % node.name)
-                self.ast.ext.remove(node)
+                self.removeable_typedefs.append(node)
             self.typedefs.append(node.name)
 
     def visit_EnumeratorList(self, node):
@@ -215,7 +220,7 @@ class CustomPostParser(c_ast.NodeVisitor):
 
     def visit_FuncDef(self, node):
         """Exclude function definitions.  Should be declarations only."""
-        self.ast.ext.remove(node)
+        self.funcdefs.append(node)
 
 def get_cdef():
     generator = c_generator.CGenerator()
