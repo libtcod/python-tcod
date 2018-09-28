@@ -10,6 +10,11 @@ v2.0.0
 Unreleased
 ------------------
 
+6.0.5 - 2018-09-28
+------------------
+Fixed
+ - Resolved CDefError error during source installs.
+
 6.0.4 - 2018-09-11
 ------------------
 Fixed
