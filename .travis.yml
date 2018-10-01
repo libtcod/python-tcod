@@ -14,6 +14,12 @@ matrix:
   - os: osx
     language: generic
     env: USE_OPENMP=true BREW_PYTHON3=latest
+  - os: osx
+    language: generic
+    env: MB_PYTHON_VERSION=2.7.15
+  - os: osx
+    language: generic
+    env: MB_PYTHON_VERSION=3.7.0
   allow_failures:
   - env: USE_OPENMP=true BREW_PYTHON3=latest
   - python: pypy3.5
@@ -47,7 +53,7 @@ before_install:
 install:
 - if [[ -z "$TRAVIS_TAG" ]]; then export BUILD_FLAGS="-g"; fi
 - python setup.py build $BUILD_FLAGS develop bdist_wheel --py-limited-api=cp34
-- 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python -m pip install git+git://github.com/HexDecimal/delocate.git@custom; fi'
+- 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python -m pip install delocate; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-wheel -v dist/*.whl; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-listdeps --all dist/*.whl; fi'
 before_script:
@@ -61,5 +67,5 @@ after_success:
 - coveralls
 - coverage xml
 - if [[ -n "$CODACY_PROJECT_TOKEN" ]]; then python-codacy-coverage -r coverage.xml; fi
-- if [[ -n "$TRAVIS_TAG" ]]; then pip install twine; fi
+- if [[ -n "$TRAVIS_TAG" ]]; then pip install --upgrade twine pyOpenSSL; fi
 - if [[ -n "$TRAVIS_TAG" && "$TRAVIS_OS_NAME" == "osx" ]]; then twine upload --skip-existing dist/*; fi

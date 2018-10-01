@@ -228,7 +228,9 @@ function install_mac_pypy3 {
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     install_python
     if [[ -n "$PYTHON_EXE" ]]; then
-        virtualenv venv -p $PYTHON_EXE
+        # Default Python install is missing virtualenv.
+        $PYTHON_EXE -m pip install --upgrade pip virtualenv
+        $PYTHON_EXE -m virtualenv venv -p $PYTHON_EXE
     else
         virtualenv venv
     fi
