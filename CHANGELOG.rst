@@ -10,6 +10,11 @@ v2.0.0
 Unreleased
 ------------------
 
+6.0.6 - 2018-10-01
+------------------
+Fixed
+ - Replaced missing wheels for older and 32-bit versions of MacOS.
+
 6.0.5 - 2018-09-28
 ------------------
 Fixed
