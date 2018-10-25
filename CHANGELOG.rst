@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+7.0.0 - 2018-10-25
+------------------
 Added
  - New `RENDERER_SDL2` and `RENDERER_OPENGL2` renderers.
 Changed
