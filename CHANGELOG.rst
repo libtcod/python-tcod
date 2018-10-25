@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Root console no longer loses track of buffers and defaults on a renderer
+   switch.
 
 6.0.6 - 2018-10-01
 ------------------

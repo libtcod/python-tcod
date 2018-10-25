@@ -45,6 +45,7 @@ else:
         """Return a string that escapes 'C printf' side effects."""
         return string.replace('%', '%%')
 
+_root_console = None
 
 class Console(object):
     """A console object containing a grid of characters with
@@ -98,10 +99,28 @@ class Console(object):
         self._init_setup_console_data(order)
         return self
 
+    @classmethod
+    def _get_root(cls, order=None):
+        """Return a root console singleton with valid buffers.
+
+        This function will also update an already active root console.
+        """
+        global _root_console
+        if _root_console is None:
+            _root_console = object.__new__(cls)
+        self = _root_console
+        if order is not None:
+            self._order = order
+        self.console_c = ffi.NULL
+        self._init_setup_console_data(self._order)
+        return self
+
     def _init_setup_console_data(self, order='C'):
         """Setup numpy arrays over libtcod data buffers."""
+        global _root_console
         self._key_color = None
         if self.console_c == ffi.NULL:
+            _root_console = self
             self._console_data = lib.TCOD_ctx.root
         else:
             self._console_data = ffi.cast('struct TCOD_Console*', self.console_c)

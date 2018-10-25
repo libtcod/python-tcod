@@ -637,7 +637,7 @@ def console_init_root(w, h, title=None, fullscreen=False,
         # Use the scripts filename as the title.
         title = os.path.basename(sys.argv[0])
     lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
-    return tcod.console.Console._from_cdata(ffi.NULL, order)
+    return tcod.console.Console._get_root(order)
 
 
 def console_set_custom_font(fontFile, flags=FONT_LAYOUT_ASCII_INCOL,
@@ -2759,6 +2759,8 @@ def sys_set_renderer(renderer):
        RENDERER_GLSL and RENDERER_OPENGL are not currently available.
     """
     lib.TCOD_sys_set_renderer(renderer)
+    if tcod.console._root_console is not None:
+        tcod.console.Console._get_root()
 
 def sys_get_renderer():
     """Return the current rendering mode.
