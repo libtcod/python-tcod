@@ -65,8 +65,8 @@ install python-tcod and its dependencies to your user environment::
 ==============
  Requirements
 ==============
-* Python 2.7+, Python 3.4+, or PyPy 5.4+
-* Windows, Linux, or MacOS.
+* Python 3.5+
+* Windows, Linux, or MacOS X 10.9+.
 * On Linux, requires libsdl2 and libomp5 to run.
 
 =========

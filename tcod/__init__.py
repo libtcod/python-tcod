@@ -26,6 +26,6 @@ from tcod.version import __version__
 
 if sys.version_info[0] == 2:
     warnings.warn(
-        "python-tcod will drop support for Python 2.7 in the near future.",
+        "python-tcod has dropped support for Python 2.7.",
         DeprecationWarning
     )

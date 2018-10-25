@@ -12,7 +12,10 @@ Unreleased
 Added
  - New `RENDERER_SDL2` and `RENDERER_OPENGL2` renderers.
 Changed
- - Updated to libtcod 1.9.0
+ - Updated libtcod to 1.9.0
+Removed
+ - Dropped support for Python versions before 3.5
+ - Dropped support for MacOS versions before 10.9 Mavericks.
 
 6.0.7 - 2018-10-24
 ------------------

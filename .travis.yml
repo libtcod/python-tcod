@@ -5,7 +5,7 @@ matrix:
     python: 2.7
     env: CC=gcc-8 CXX=g++-8
   - os: linux
-    python: 3.4
+    python: 3.5
     env: CC=gcc-8 CXX=g++-8
   - os: osx
     language: generic
@@ -24,7 +24,11 @@ matrix:
     env: MB_PYTHON_VERSION=3.7.1
   allow_failures:
   - env: USE_OPENMP=true BREW_PYTHON3=latest
+  - env: MB_PYTHON_VERSION=2.7.15
+  - env: USE_OPENMP=true
   - python: pypy3.5
+  - python: 2.7
+
   fast_finish: true
 
 # sudo is required to prevent xvfb crashes from container-based workers.
@@ -56,7 +60,7 @@ before_install:
 - pip install --requirement requirements.txt
 install:
 - if [[ -z "$TRAVIS_TAG" ]]; then export BUILD_FLAGS="-g"; fi
-- python setup.py build $BUILD_FLAGS develop bdist_wheel --py-limited-api=cp34
+- python setup.py build $BUILD_FLAGS develop bdist_wheel --py-limited-api=cp35
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python -m pip install delocate; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-wheel -v dist/*.whl; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-listdeps --all dist/*.whl; fi'
