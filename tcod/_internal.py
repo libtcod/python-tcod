@@ -1,4 +1,15 @@
 
+import functools
+import warnings
+
+def deprecate(message, category=DeprecationWarning, stacklevel=0):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kargs):
+            warnings.warn(message, category, stacklevel=stacklevel + 2)
+            return func(*args, **kargs)
+        return wrapper
+    return decorator
 
 def verify_order(order):
     order = order.upper()

@@ -17,6 +17,7 @@ from tcod import ffi as _ffi
 from tcod import lib as _lib
 from tcod import ffi, lib
 
+from tcod._internal import deprecate
 import tcod.map
 import tcod.path
 import tdl as _tdl
@@ -230,6 +231,7 @@ class AStar(tcod.path.AStar):
         """
         return super(AStar, self).get_path(origX, origY, destX, destY)
 
+@deprecate("This function is very slow.")
 def quick_fov(x, y, callback, fov='PERMISSIVE', radius=7.5, lightWalls=True,
               sphere=True):
     """All field-of-view functionality in one call.

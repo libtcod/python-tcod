@@ -138,7 +138,9 @@ class Console(object):
 
         You can change the consoles background colors by using this array.
 
-        Index this array with ``console.bg[y, x, channel]``
+        Index this array with ``console.bg[i, j, channel] # order='C'`` or
+        ``console.bg[x, y, channel] # order='F'``.
+
         """
         return self._bg.transpose(1, 0, 2) if self._order == 'F' else self._bg
 
@@ -148,7 +150,8 @@ class Console(object):
 
         You can change the consoles foreground colors by using this array.
 
-        Index this array with ``console.fg[y, x, channel]``
+        Index this array with ``console.fg[i, j, channel] # order='C'`` or
+        ``console.fg[x, y, channel] # order='F'``.
         """
         return self._fg.transpose(1, 0, 2) if self._order == 'F' else self._fg
 
@@ -158,7 +161,8 @@ class Console(object):
 
         You can change the consoles character codes by using this array.
 
-        Index this array with ``console.ch[y, x]``
+        Index this array with ``console.ch[i, j] # order='C'`` or
+        ``console.ch[x, y] # order='F'``.
         """
         return self._ch.T if self._order == 'F' else self._ch
 
