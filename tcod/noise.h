@@ -1,24 +1,9 @@
 #ifndef PYTHON_TCOD_NOISE_H_
 #define PYTHON_TCOD_NOISE_H_
 
-#include "../libtcod/include/noise.h"
-#include "../libtcod/include/noise_defaults.h"
-#include "../libtcod/include/mersenne.h"
-
-/* Copied from libtcod's noise.c, needs to be kept up-to-date! */
-typedef struct TCOD_Noise {
-	int ndim;
-	unsigned char map[256]; /* Randomized map of indexes into buffer */
-	float buffer[256][TCOD_NOISE_MAX_DIMENSIONS]; 	/* Random 256 x ndim buffer */
-	/* fractal stuff */
-	float H;
-	float lacunarity;
-	float exponent[TCOD_NOISE_MAX_OCTAVES];
-	float *waveletTileData;
-	TCOD_random_t rand;
-	/* noise type */
-	TCOD_noise_type_t noise_type;
-};
+#include "../libtcod/src/libtcod/noise.h"
+#include "../libtcod/src/libtcod/noise_defaults.h"
+#include "../libtcod/src/libtcod/mersenne.h"
 
 typedef enum NoiseImplementation {
 	kNoiseImplementationSimple,

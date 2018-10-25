@@ -1534,7 +1534,7 @@ cur_sample = 0
 credits_end = False
 first = True
 cur_renderer = 0
-renderer_name=('F1 GLSL   ','F2 OPENGL ','F3 SDL    ')
+renderer_name=('F1 GLSL   ','F2 OPENGL ','F3 SDL    ','F4 SDL2   ','F5 OPENGL2')
 key=libtcod.Key()
 mouse=libtcod.Mouse()
 while not libtcod.console_is_window_closed():
@@ -1607,6 +1607,10 @@ while not libtcod.console_is_window_closed():
         libtcod.sys_set_renderer(libtcod.RENDERER_OPENGL)
     elif key.vk == libtcod.KEY_F3:
         libtcod.sys_set_renderer(libtcod.RENDERER_SDL)
+    elif key.vk == libtcod.KEY_F4:
+        libtcod.sys_set_renderer(libtcod.RENDERER_SDL2)
+    elif key.vk == libtcod.KEY_F5:
+        libtcod.sys_set_renderer(libtcod.RENDERER_OPENGL2)
     libtcod.console_flush()
 
 

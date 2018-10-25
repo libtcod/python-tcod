@@ -853,7 +853,6 @@ def console_put_char_ex(con, x, y, c, fore, back):
     """
     lib.TCOD_console_put_char_ex(_console(con), x, y, _int(c), fore, back)
 
-@deprecate("Directly access a consoles background color with `console.bg`")
 def console_set_char_background(con, x, y, col, flag=BKGND_SET):
     """Change the background color of x,y to col using a blend mode.
 

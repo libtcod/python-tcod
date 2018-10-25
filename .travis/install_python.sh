@@ -176,7 +176,7 @@ function install_macpython {
     local py_version=$1
     local py_stripped=$(strip_ver_suffix $py_version)
     local inst_ext=$(pyinst_ext_for_version $py_version)
-    local py_inst=python-$py_version-macosx10.6.$inst_ext
+    local py_inst=python-$py_version-macosx10.9.$inst_ext
     local inst_path=$DOWNLOADS_SDIR/$py_inst
     mkdir -p $DOWNLOADS_SDIR
     wget -nv $MACPYTHON_URL/$py_stripped/${py_inst} -P $DOWNLOADS_SDIR

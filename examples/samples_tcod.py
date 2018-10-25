@@ -1352,9 +1352,12 @@ RENDERER_KEYS = {
     libtcod.KEY_F1: libtcod.RENDERER_GLSL,
     libtcod.KEY_F2: libtcod.RENDERER_OPENGL,
     libtcod.KEY_F3: libtcod.RENDERER_SDL,
+    libtcod.KEY_F4: libtcod.RENDERER_SDL2,
+    libtcod.KEY_F5: libtcod.RENDERER_OPENGL2,
     }
 
-RENDERER_NAMES = ('F1 GLSL   ', 'F2 OPENGL ', 'F3 SDL    ')
+RENDERER_NAMES = ('F1 GLSL   ', 'F2 OPENGL ', 'F3 SDL    ', 'F4 SDL2   ',
+                  'F5 OPENGL2')
 
 SAMPLES = (
     TrueColorSample(),
@@ -1382,11 +1385,11 @@ def main():
     while not libtcod.console_is_window_closed():
         root_console.default_fg = (255, 255, 255)
         root_console.default_bg = (0, 0, 0)
+        root_console.clear()
+        draw_samples_menu()
+        draw_renderer_menu()
         # render credits
         if not credits_end:
-            root_console.clear()
-            draw_samples_menu()
-            draw_renderer_menu()
             credits_end = libtcod.console_credits_render(60, 43, 0)
 
         # render the sample

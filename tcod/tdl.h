@@ -1,7 +1,7 @@
 #ifndef PYTHON_TCOD_TDL_H_
 #define PYTHON_TCOD_TDL_H_
 
-#include "../libtcod/include/libtcod.h"
+#include "../libtcod/src/libtcod/libtcod.h"
 
 /* TDL FUNCTONS ----------------------------------------------------------- */
 

@@ -9,6 +9,10 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - New `RENDERER_SDL2` and `RENDERER_OPENGL2` renderers.
+Changed
+ - Updated to libtcod 1.9.0
 
 6.0.7 - 2018-10-24
 ------------------

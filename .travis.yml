@@ -1,10 +1,12 @@
 language: python
-python:
- - "2.7"
- - "3.4"
- - "pypy3.5"
 matrix:
   include:
+  - os: linux
+    python: 2.7
+    env: CC=gcc-8 CXX=g++-8
+  - os: linux
+    python: 3.4
+    env: CC=gcc-8 CXX=g++-8
   - os: osx
     language: generic
     env: USE_OPENMP=true
@@ -19,7 +21,7 @@ matrix:
     env: MB_PYTHON_VERSION=2.7.15
   - os: osx
     language: generic
-    env: MB_PYTHON_VERSION=3.7.0
+    env: MB_PYTHON_VERSION=3.7.1
   allow_failures:
   - env: USE_OPENMP=true BREW_PYTHON3=latest
   - python: pypy3.5
@@ -32,12 +34,14 @@ cache: pip
 
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
+      - g++-8
       - libsdl2-dev
 
 before_install:
-- 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi'
-- 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi'
+- source .travis/before_install.sh
 - 'if [[ "$BREW_PYTHON3" == "old" ]]; then HOMEBREW_NO_AUTO_UPDATE=1 brew install python3; fi'
 - 'if [[ "$BREW_PYTHON3" == "latest" ]]; then brew upgrade python3; fi'
 - 'if [[ -n "$BREW_PYTHON3" ]]; then python3 -m pip install virtualenv; fi'

@@ -1,7 +1,7 @@
 
 #include "tcod.h"
 
-#include "../libtcod/include/bresenham.h"
+#include "../libtcod/src/libtcod/bresenham.h"
 
 /**
  *  Write a Bresenham line to the `x_out` and `y_out` arrays.

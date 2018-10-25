@@ -7,6 +7,23 @@ from setuptools import setup
 from subprocess import check_output
 import platform
 
+from distutils.unixccompiler import UnixCCompiler
+
+C_STANDARD = '-std=c99'
+CPP_STANDARD = '-std=c++14'
+
+old_compile = UnixCCompiler._compile
+
+def new_compile(self, obj, src, ext, cc_args, extra_postargs, pp_opts):
+    cc_args = list(cc_args)
+    if UnixCCompiler.language_map[ext] == 'c':
+        cc_args.append(C_STANDARD)
+    elif UnixCCompiler.language_map[ext] == 'c++':
+        cc_args.append(CPP_STANDARD)
+    return old_compile(self, obj, src, ext, cc_args, extra_postargs, pp_opts)
+
+UnixCCompiler._compile = new_compile
+
 def get_version():
     """Get the current version from a git tag, or by reading tdl/version.py"""
     try:
