@@ -306,6 +306,7 @@ def test_image(console, tmpdir):
     libtcodpy.image_delete(libtcodpy.image_load('libtcod/data/img/circle.png'))
 
 @pytest.mark.parametrize('sample', ['@', u'\u2603']) # Unicode snowman
+@pytest.mark.xfail(reason='Unreliable')
 def test_clipboard(console, sample):
     saved = libtcodpy.sys_clipboard_get()
     try:
