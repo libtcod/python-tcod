@@ -2,6 +2,7 @@
 
 import unittest
 import itertools
+import pytest
 
 import tdl
 
@@ -47,14 +48,14 @@ class MapTests(unittest.TestCase):
             for x, ch in enumerate(line):
                 trans = ch == ' '
                 self.map.transparent[x,y] = self.map.walkable[x,y] = trans
-                self.assertEquals(self.map.transparent[x,y], trans)
-                self.assertEquals(self.map.walkable[x,y], trans)
+                assert self.map.transparent[x,y] == trans
+                assert self.map.walkable[x,y] == trans
 
     def test_map_compute_fov(self):
         fov = self.map.compute_fov(*self.POINT_A)
-        self.assertTrue(list(fov), 'should be non-empty')
+        assert list(fov), 'should be non-empty'
         fov = self.map.compute_fov(*self.POINT_A, fov='PERMISSIVE8')
-        self.assertTrue(list(fov), 'should be non-empty')
+        assert list(fov), 'should be non-empty'
         with self.assertRaises(tdl.TDLError):
             self.map.compute_fov(*self.POINT_A, fov='invalid option')
 
@@ -69,6 +70,7 @@ class MapTests(unittest.TestCase):
             self.assertTrue((x, y) in self.map)
         self.assertFalse((-1, -1) in self.map)
 
+    @pytest.mark.filterwarnings("ignore:This function is very slow.")
     def test_quick_fov(self):
         fov = tdl.map.quick_fov(self.POINT_B[0], self.POINT_B[1],
                                 self.map_is_transparant, radius=2.5)

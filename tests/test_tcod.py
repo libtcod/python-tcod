@@ -51,6 +51,7 @@ def test_tcod_bsp():
     str(bsp)
 
 
+@pytest.mark.filterwarnings("ignore:Directly access a consoles")
 def test_array_read_write(console):
     FG = (255, 254, 253)
     BG = (1, 2, 3)
@@ -93,7 +94,7 @@ def test_console_defaults(console):
     console.default_alignment = tcod.RIGHT
     assert console.default_alignment == tcod.RIGHT
 
-
+@pytest.mark.filterwarnings("ignore:Parameter names have been moved around,")
 def test_console_methods(console):
     console.put_char(0, 0, ord('@'))
     console.print_(0, 0, 'Test')

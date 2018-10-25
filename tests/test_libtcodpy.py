@@ -26,11 +26,11 @@ def assert_char(console, x, y, ch=None, fg=None, bg=None):
             ch = ord(ch)
         except TypeError:
             pass
-        assert libtcodpy.console_get_char(console, x, y) == ch
+        assert console.ch[y, x] == ch
     if fg is not None:
-        assert libtcodpy.console_get_char_foreground(console, x, y) == fg
+        assert (console.fg[y, x] == fg).all()
     if bg is not None:
-        assert libtcodpy.console_get_char_background(console, x, y) == bg
+        assert (console.bg[y, x] == bg).all()
 
 def test_console_defaults(console, fg, bg):
     libtcodpy.console_set_default_foreground(console, fg)
@@ -38,14 +38,17 @@ def test_console_defaults(console, fg, bg):
     libtcodpy.console_clear(console)
     assert_char(console, 0, 0, None, fg, bg)
 
+@pytest.mark.filterwarnings("ignore:Directly access a consoles")
 def test_console_set_char_background(console, bg):
     libtcodpy.console_set_char_background(console, 0, 0, bg, libtcodpy.BKGND_SET)
     assert_char(console, 0, 0, bg=bg)
 
+@pytest.mark.filterwarnings("ignore:Directly access a consoles")
 def test_console_set_char_foreground(console, fg):
     libtcodpy.console_set_char_foreground(console, 0, 0, fg)
     assert_char(console, 0, 0, fg=fg)
 
+@pytest.mark.filterwarnings("ignore:Directly access a consoles")
 def test_console_set_char(console, ch):
     libtcodpy.console_set_char(console, 0, 0, ch)
     assert_char(console, 0, 0, ch=ch)
@@ -100,15 +103,12 @@ def test_console_fade(console):
     libtcodpy.console_get_fade()
     libtcodpy.console_get_fading_color()
 
+
 def assertConsolesEqual(a, b):
-    for y in range(libtcodpy.console_get_height(a)):
-        for x in range(libtcodpy.console_get_width(a)):
-            assert libtcodpy.console_get_char(a, x, y) == \
-                libtcodpy.console_get_char(b, x, y)
-            assert libtcodpy.console_get_char_foreground(a, x, y) == \
-                libtcodpy.console_get_char_foreground(b, x, y)
-            assert libtcodpy.console_get_char_background(a, x, y) == \
-                libtcodpy.console_get_char_background(b, x, y)
+    return ((a.fg[:] == b.fg[:]).all() and
+            (a.bg[:] == b.bg[:]).all() and
+            (a.ch[:] == b.ch[:]).all())
+
 
 def test_console_blit(console, offscreen):
     libtcodpy.console_print(offscreen, 0, 0, 'test')
@@ -132,6 +132,7 @@ def test_console_apf_read_write(console, offscreen, tmpdir):
     assert libtcodpy.console_load_apf(offscreen, apf_file)
     assertConsolesEqual(console, offscreen)
 
+@pytest.mark.filterwarnings("ignore:Directly access a consoles")
 def test_console_rexpaint_load_test_file(console):
     xp_console = libtcodpy.console_from_xp('libtcod/data/rexpaint/test.xp')
     assert xp_console
@@ -180,6 +181,7 @@ def test_console_fill_errors(console):
     with pytest.raises(TypeError):
         libtcodpy.console_fill_foreground(console, [0], [], [])
 
+@pytest.mark.filterwarnings("ignore:Directly access a consoles")
 def test_console_fill(console):
     width = libtcodpy.console_get_width(console)
     height = libtcodpy.console_get_height(console)
@@ -200,6 +202,7 @@ def test_console_fill(console):
     assert fill == ch
 
 @pytest.mark.skipif(not numpy, reason='requires numpy module')
+@pytest.mark.filterwarnings("ignore:Directly access a consoles")
 def test_console_fill_numpy(console):
     width = libtcodpy.console_get_width(console)
     height = libtcodpy.console_get_height(console)
@@ -225,6 +228,7 @@ def test_console_fill_numpy(console):
     assert fill == fg.tolist()
     assert fill == ch.tolist()
 
+@pytest.mark.filterwarnings("ignore:Console array attributes perform better")
 def test_console_buffer(console):
     buffer = libtcodpy.ConsoleBuffer(
         libtcodpy.console_get_width(console),
@@ -236,6 +240,7 @@ def test_console_buffer(console):
     buffer.set(0, 0, 0, 0, 0, 0, 0, 0, '@')
     buffer.blit(console)
 
+@pytest.mark.filterwarnings("ignore:Console array attributes perform better")
 def test_console_buffer_error(console):
     buffer = libtcodpy.ConsoleBuffer(0, 0)
     with pytest.raises(ValueError):
@@ -253,6 +258,7 @@ def test_mouse(console):
     repr(mouse)
     libtcodpy.mouse_move(0, 0)
 
+@pytest.mark.filterwarnings("ignore:Use Python's standard 'time' module")
 def test_sys_time(console):
     libtcodpy.sys_set_fps(0)
     libtcodpy.sys_get_fps()
@@ -307,6 +313,7 @@ def test_image(console, tmpdir):
 
 @pytest.mark.parametrize('sample', ['@', u'\u2603']) # Unicode snowman
 @pytest.mark.xfail(reason='Unreliable')
+@pytest.mark.filterwarnings("ignore:This function does not provide reliable")
 def test_clipboard(console, sample):
     saved = libtcodpy.sys_clipboard_get()
     try:

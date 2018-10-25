@@ -376,6 +376,7 @@ class Console(object):
             warnings.warn(
                 "Parameter names have been moved around, see documentation.",
                 DeprecationWarning,
+                stacklevel=2,
                 )
 
         if key_color or self._key_color:
