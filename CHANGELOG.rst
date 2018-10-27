@@ -10,6 +10,12 @@ v2.0.0
 Unreleased
 ------------------
 
+7.0.1 - 2018-10-27
+------------------
+Fixed
+ - Building from source was failing because `console_2tris.glsl*` was missing
+   from source distributions.
+
 7.0.0 - 2018-10-25
 ------------------
 Added
