@@ -640,9 +640,9 @@ def console_init_root(w, h, title=None, fullscreen=False,
     return tcod.console.Console._get_root(order)
 
 
-def console_set_custom_font(fontFile, flags=FONT_LAYOUT_ASCII_INCOL,
-                            nb_char_horiz=0, nb_char_vertic=0):
-    """Load a custom font file.
+def console_set_custom_font(fontFile: str, flags: int=FONT_LAYOUT_ASCII_INCOL,
+                            nb_char_horiz: int=0, nb_char_vertic: int=0):
+    """Load the custom font file at `fontFile`.
 
     Call this before function before calling :any:`tcod.console_init_root`.
 
@@ -654,14 +654,14 @@ def console_set_custom_font(fontFile, flags=FONT_LAYOUT_ASCII_INCOL,
     * tcod.FONT_TYPE_GRAYSCALE
     * tcod.FONT_LAYOUT_TCOD
 
-    Args:
-        fontFile (AnyStr): Path to a font file.
-        flags (int):
-        nb_char_horiz (int):
-        nb_char_vertic (int):
+    `nb_char_horiz` and `nb_char_vertic` are the columns and rows of the font
+    file respectfully.
     """
-    lib.TCOD_console_set_custom_font(_bytes(fontFile), flags,
-                                     nb_char_horiz, nb_char_vertic)
+    if not os.path.exists(fontFile):
+        raise RuntimeError("File not found:\n\t%s"
+                           % (os.path.realpath(fontFile),))
+    lib.TCOD_console_set_custom_font(
+        fontFile.encode('utf-8'), flags, nb_char_horiz, nb_char_vertic)
 
 
 def console_get_width(con):
