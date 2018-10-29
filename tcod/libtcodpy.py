@@ -734,7 +734,7 @@ def console_map_string_to_font(s, fontCharX, fontCharY):
 
     Args:
         s (AnyStr): A string of character codes to map to new values.
-                    The null character `'\x00'` will prematurely end this
+                    The null character `'\\x00'` will prematurely end this
                     function.
         fontCharX (int): The starting X tile coordinate on the loaded tileset.
                          0 is the leftmost tile.
