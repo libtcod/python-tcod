@@ -22,7 +22,10 @@ import sys
 import warnings
 
 from tcod.libtcodpy import *
-from tcod.version import __version__
+try:
+    from tcod.version import __version__
+except ImportError: # Gets imported without version.py by ReadTheDocs
+    __version__ = ''
 
 if sys.version_info[0] == 2:
     warnings.warn(

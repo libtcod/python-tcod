@@ -1,1 +1,1 @@
-from tcod.version import __version__
+from tcod import __version__
