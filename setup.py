@@ -25,7 +25,7 @@ def new_compile(self, obj, src, ext, cc_args, extra_postargs, pp_opts):
 UnixCCompiler._compile = new_compile
 
 def get_version():
-    """Get the current version from a git tag, or by reading tdl/version.py"""
+    """Get the current version from a git tag, or by reading tcod/version.py"""
     try:
         tag = check_output(['git', 'describe', '--abbrev=0'],
                            universal_newlines=True).strip()
@@ -39,11 +39,11 @@ def get_version():
         if commits_since_tag:
             version += '.dev%i' % commits_since_tag
 
-        # update tdl/version.py
-        open('tdl/version.py', 'w').write('__version__ = %r\n' % version)
+        # update tcod/version.py
+        open('tcod/version.py', 'w').write('__version__ = %r\n' % version)
         return version
     except:
-        exec(open('tdl/version.py').read(), globals())
+        exec(open('tcod/version.py').read(), globals())
         return __version__
 
 is_pypy = platform.python_implementation() == 'PyPy'
