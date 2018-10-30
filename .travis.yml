@@ -2,9 +2,6 @@ language: python
 matrix:
   include:
   - os: linux
-    python: 2.7
-    env: CC=gcc-8 CXX=g++-8
-  - os: linux
     python: 3.5
     env: CC=gcc-8 CXX=g++-8
   - os: linux
@@ -22,25 +19,8 @@ matrix:
     env: CC=gcc-8 CXX=g++-8
   - os: osx
     language: generic
-    env: USE_OPENMP=true
-  - os: osx
-    language: generic
-    env: BREW_PYTHON3=old
-  - os: osx
-    language: generic
-    env: USE_OPENMP=true BREW_PYTHON3=latest
-  - os: osx
-    language: generic
-    env: MB_PYTHON_VERSION=2.7.15
-  - os: osx
-    language: generic
     env: MB_PYTHON_VERSION=3.7.1
   allow_failures:
-  - env: USE_OPENMP=true BREW_PYTHON3=latest
-  - env: MB_PYTHON_VERSION=2.7.15
-  - env: USE_OPENMP=true
-  - python: pypy3.5
-  - python: 2.7
   - python: nightly
 
   fast_finish: true
