@@ -6,7 +6,7 @@
 ========
 |VersionsBadge| |ImplementationBadge| |LicenseBadge|
 
-|PyPI| |RTD| |Appveyor| |Travis| |Coveralls| |Codecov| |Codacy| |Scrutinizer| |Landscape|
+|PyPI| |RTD| |Appveyor| |Travis| |Coveralls| |Codecov| |Codacy|
 
 |Requires| |Pyup|
 
@@ -33,13 +33,13 @@ project.
 Guides and Tutorials for libtcodpy should work with the tcod module.
 
 The latest documentation can be found
-`here <https://python-tdl.readthedocs.io/en/latest/>`_.
+`here <https://python-tcod.readthedocs.io/en/latest/>`_.
 
 ==============
  Installation
 ==============
 The recommended way to install is by using pip.  Older versions of pip will
-have issues installing tdl, so make sure it's up-to-date.
+have issues installing tcod, so make sure it's up-to-date.
 
 Windows / MacOS
 ---------------
@@ -75,62 +75,56 @@ install python-tcod and its dependencies to your user environment::
 python-tcod is distributed under the `Simplified 2-clause FreeBSD license
 <https://github.com/HexDecimal/python-tdl/blob/master/LICENSE.txt>`_.
 
-.. _LICENSE.txt: https://github.com/HexDecimal/python-tdl/blob/master/LICENSE.txt
+.. _LICENSE.txt: https://github.com/libtcod/python-tcod/blob/master/LICENSE.txt
 
-.. _python-tdl: https://github.com/HexDecimal/python-tdl/
+.. _python-tdl: https://github.com/libtcod/python-tcod/
 
 .. _cffi: https://cffi.readthedocs.io/en/latest/
 
 .. _numpy: https://docs.scipy.org/doc/numpy/user/index.html
 
-.. _libtcod: https://bitbucket.org/libtcod/libtcod/
+.. _libtcod: https://github.com/libtcod/libtcod
 
 .. _pip: https://pip.pypa.io/en/stable/installing/
 
-.. |VersionsBadge| image:: https://img.shields.io/pypi/pyversions/tdl.svg?maxAge=2592000
-    :target: https://pypi.python.org/pypi/tdl
+.. |VersionsBadge| image:: https://img.shields.io/pypi/pyversions/tcod.svg?maxAge=2592000
+    :target: https://pypi.python.org/pypi/tcod
 
-.. |ImplementationBadge| image:: https://img.shields.io/pypi/implementation/tdl.svg?maxAge=2592000
-    :target: https://pypi.python.org/pypi/tdl
+.. |ImplementationBadge| image:: https://img.shields.io/pypi/implementation/tcod.svg?maxAge=2592000
+    :target: https://pypi.python.org/pypi/tcod
 
-.. |LicenseBadge| image:: https://img.shields.io/pypi/l/tdl.svg?maxAge=2592000
-    :target: https://github.com/HexDecimal/tdl/blob/master/LICENSE.txt
+.. |LicenseBadge| image:: https://img.shields.io/pypi/l/tcod.svg?maxAge=2592000
+    :target: https://github.com/HexDecimal/tcod/blob/master/LICENSE.txt
 
-.. |PyPI| image:: https://img.shields.io/pypi/v/tdl.svg?maxAge=10800
-    :target: https://pypi.python.org/pypi/tdl
+.. |PyPI| image:: https://img.shields.io/pypi/v/tcod.svg?maxAge=10800
+    :target: https://pypi.python.org/pypi/tcod
 
-.. |RTD| image:: https://readthedocs.org/projects/python-tdl/badge/?version=latest
-    :target: http://python-tdl.readthedocs.io/en/latest/?badge=latest
+.. |RTD| image:: https://readthedocs.org/projects/python-tcod/badge/?version=latest
+    :target: http://python-tcod.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
 .. |Appveyor| image:: https://ci.appveyor.com/api/projects/status/bb04bpankj0h1cpa/branch/master?svg=true
     :target: https://ci.appveyor.com/project/HexDecimal/python-tdl/branch/master
 
-.. |Travis| image:: https://travis-ci.org/HexDecimal/python-tdl.svg?branch=master
-    :target: https://travis-ci.org/HexDecimal/python-tdl
+.. |Travis| image:: https://travis-ci.org/libtcod/python-tcod.svg?branch=master
+    :target: https://travis-ci.org/libtcod/python-tcod
 
 .. |Coveralls| image:: https://coveralls.io/repos/github/HexDecimal/python-tdl/badge.svg?branch=master
     :target: https://coveralls.io/github/HexDecimal/python-tdl?branch=master
 
-.. |Codecov| image:: https://codecov.io/gh/HexDecimal/python-tdl/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/HexDecimal/python-tdl
+.. |Codecov| image:: https://codecov.io/gh/libtcod/python-tcod/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/libtcod/python-tcod
 
-.. |Issues| image:: https://img.shields.io/github/issues/HexDecimal/python-tdl.svg?maxAge=3600
-    :target: https://github.com/HexDecimal/python-tdl/issues
+.. |Issues| image:: https://img.shields.io/github/issues/libtcod/python-tcod.svg?maxAge=3600
+    :target: https://github.com/libtcod/python-tcod/issues
 
-.. |Codacy| image:: https://img.shields.io/codacy/grade/6f3d153f1ccc435ca592633e4c35d9f5.svg?maxAge=10800
-    :target: https://www.codacy.com/app/4b796c65-github/python-tdl
+.. |Codacy| image:: https://api.codacy.com/project/badge/Grade/b9df9aff87fb4968a0508a72aeb74a72
+    :target: https://www.codacy.com/app/4b796c65-github/python-tcod?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=libtcod/python-tcod&amp;utm_campaign=Badge_Grade
 
-.. |Scrutinizer| image:: https://scrutinizer-ci.com/g/HexDecimal/python-tdl/badges/quality-score.png?b=master
-    :target: https://scrutinizer-ci.com/g/HexDecimal/python-tdl/
-
-.. |Landscape| image:: https://landscape.io/github/HexDecimal/python-tdl/dev/landscape.svg?style=flat
-    :target: https://landscape.io/github/HexDecimal/python-tdl/dev
-    :alt: Code Health
-
-.. |Requires| image:: https://requires.io/github/HexDecimal/python-tdl/requirements.svg?branch=master
-    :target: https://requires.io/github/HexDecimal/python-tdl/requirements/?branch=master
+.. |Requires| image:: https://requires.io/github/libtcod/python-tcod/requirements.svg?branch=master
+    :target: https://requires.io/github/libtcod/python-tcod/requirements/?branch=master
     :alt: Requirements Status
 
-.. |Pyup| image:: https://pyup.io/repos/github/hexdecimal/python-tdl/shield.svg
-     :target: https://pyup.io/repos/github/hexdecimal/python-tdl/
+.. |Pyup| image:: https://pyup.io/repos/github/libtcod/python-tcod/shield.svg
+    :target: https://pyup.io/repos/github/libtcod/python-tcod/
+    :alt: Updates
