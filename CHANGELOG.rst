@@ -9,6 +9,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - The default renderer can now be anything if not set manually.
 
 7.0.1 - 2018-10-27
 ------------------

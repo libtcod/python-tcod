@@ -7,6 +7,7 @@ import os
 import sys
 
 import threading as _threading
+from typing import Optional
 import warnings
 
 import numpy as _np
@@ -613,30 +614,45 @@ Color(204,102,0), Color(255,128,0)]
     return [Color._new_from_cdata(cdata) for cdata in cres]
 
 
-def console_init_root(w, h, title=None, fullscreen=False,
-                      renderer=RENDERER_SDL, order='C'):
+def console_init_root(
+        w: int, h: int, title: Optional[str]=None, fullscreen: bool=False,
+        renderer: Optional[int]=None, order: str='C') -> tcod.console.Console:
     """Set up the primary display and return the root console.
+
+    `w` and `h` are the columns and rows of the new window (in tiles.)
+
+    `title` is an optional string to display on the windows title bar.
+
+    `fullscreen` determines if the window will start in fullscreen.  Fullscreen
+    mode is unreliable unless the renderer is set to `RENDERER_SDL2` or
+    `RENDERER_OPENGL2`.
+
+    `renderer` is the rendering back-end that libtcod will use.  Options are:
+
+    * `RENDERER_SDL`
+    * `RENDERER_OPENGL`
+    * `RENDERER_GLSL`
+    * `RENDERER_SDL2`
+    * `RENDERER_OPENGL2`
+
+    `order` will affect how the array attributes of the returned root console
+    are indexed.  `order='C'` is the default, but `order='F'` is recommended.
 
     .. versionchanged:: 4.3
         Added `order` parameter.
         `title` parameter is now optional.
 
-    Args:
-        w (int): Width in character tiles for the root console.
-        h (int): Height in character tiles for the root console.
-        title (Optional[AnyStr]):
-            This string will be displayed on the created windows title bar.
-        renderer: Rendering mode for libtcod to use.
-        order (str): Which numpy memory order to use.
-
-    Returns:
-        Console:
-            Returns a special Console instance representing the root console.
+    .. versionchanged:: 8.0
+        The default `renderer` is now automatic instead of always being
+        `RENDERER_SDL`.
     """
     if title is None:
         # Use the scripts filename as the title.
         title = os.path.basename(sys.argv[0])
-    lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
+    if renderer is None:
+        renderer = RENDERER_GLSL # Stable for now.
+    lib.TCOD_console_init_root(
+        w, h, title.encode('utf-8'), fullscreen, renderer)
     return tcod.console.Console._get_root(order)
 
 
