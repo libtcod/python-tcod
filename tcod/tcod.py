@@ -4,6 +4,7 @@ from __future__ import absolute_import as _
 
 import sys as _sys
 
+from typing import Any, AnyStr
 import warnings
 
 from tcod.libtcod import lib, ffi, BKGND_DEFAULT, BKGND_SET
@@ -15,7 +16,7 @@ def _unpack_char_p(char_p):
     return ffi.string(char_p).decode()
 
 
-def _int(int_or_str):
+def _int(int_or_str: Any) -> int:
     'return an integer where a single character string may be expected'
     if isinstance(int_or_str, str):
         return ord(int_or_str)
@@ -23,47 +24,28 @@ def _int(int_or_str):
         return int_or_str[0]
     return int(int_or_str) # check for __count__
 
+def _bytes(string: AnyStr) -> bytes:
+    if isinstance(string, str):
+        return string.encode('utf-8')
+    return string
 
-if _sys.version_info[0] == 2: # Python 2
-    def _bytes(string):
-        if isinstance(string, unicode):
-            return string.encode()
-        return string
-
-    def _unicode(string):
-        if not isinstance(string, unicode):
-            warnings.warn(
-                ("Passing byte strings as parameters to Unicode functions is "
-                 "deprecated."),
-                DeprecationWarning,
-                stacklevel=4,
-                )
-            return string.decode('latin-1')
-        return string
-
-else: # Python 3
-    def _bytes(string):
-        if isinstance(string, str):
-            return string.encode()
-        return string
-
-    def _unicode(string):
-        if isinstance(string, bytes):
-            warnings.warn(
-                ("Passing byte strings as parameters to Unicode functions is "
-                 "deprecated."),
-                DeprecationWarning,
-                stacklevel=4,
-                )
-            return string.decode('latin-1')
-        return string
+def _unicode(string: AnyStr, stacklevel: int=2) -> str:
+    if isinstance(string, bytes):
+        warnings.warn(
+            ("Passing byte strings as parameters to Unicode functions is "
+             "deprecated."),
+            DeprecationWarning,
+            stacklevel=stacklevel + 1,
+            )
+        return string.decode('latin-1')
+    return string
 
 
-def _fmt_bytes(string):
+def _fmt_bytes(string: AnyStr) -> bytes:
     return _bytes(string).replace(b'%', b'%%')
 
-def _fmt_unicode(string):
-    return _unicode(string).encode('utf-8').replace(b'%', b'%%')
+def _fmt_unicode(string: AnyStr) -> str:
+    return _unicode(string, stacklevel=3).encode('utf-8').replace(b'%', b'%%')
 
 
 class _PropagateException():

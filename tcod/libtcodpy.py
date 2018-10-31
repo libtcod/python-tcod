@@ -7,7 +7,7 @@ import os
 import sys
 
 import threading as _threading
-from typing import Optional
+from typing import AnyStr, Optional
 import warnings
 
 import numpy as _np
@@ -615,7 +615,7 @@ Color(204,102,0), Color(255,128,0)]
 
 
 def console_init_root(
-        w: int, h: int, title: Optional[str]=None, fullscreen: bool=False,
+        w: int, h: int, title: Optional[AnyStr]=None, fullscreen: bool=False,
         renderer: Optional[int]=None, order: str='C') -> tcod.console.Console:
     """Set up the primary display and return the root console.
 
@@ -651,12 +651,12 @@ def console_init_root(
         title = os.path.basename(sys.argv[0])
     if renderer is None:
         renderer = RENDERER_GLSL # Stable for now.
-    lib.TCOD_console_init_root(
-        w, h, title.encode('utf-8'), fullscreen, renderer)
+    lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
     return tcod.console.Console._get_root(order)
 
 
-def console_set_custom_font(fontFile: str, flags: int=FONT_LAYOUT_ASCII_INCOL,
+def console_set_custom_font(fontFile: AnyStr, flags:
+                            int=FONT_LAYOUT_ASCII_INCOL,
                             nb_char_horiz: int=0, nb_char_vertic: int=0):
     """Load the custom font file at `fontFile`.
 
@@ -676,8 +676,8 @@ def console_set_custom_font(fontFile: str, flags: int=FONT_LAYOUT_ASCII_INCOL,
     if not os.path.exists(fontFile):
         raise RuntimeError("File not found:\n\t%s"
                            % (os.path.realpath(fontFile),))
-    lib.TCOD_console_set_custom_font(
-        fontFile.encode('utf-8'), flags, nb_char_horiz, nb_char_vertic)
+    lib.TCOD_console_set_custom_font(_bytes(fontFile), flags,
+                                     nb_char_horiz, nb_char_vertic)
 
 
 def console_get_width(con):
