@@ -9,8 +9,12 @@ v2.0.0
 
 Unreleased
 ------------------
+
+8.0.0 - 2018-11-02
+------------------
 Changed
  - The default renderer can now be anything if not set manually.
+ - Better error message for when a font file isn't found.
 
 7.0.1 - 2018-10-27
 ------------------
