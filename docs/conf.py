@@ -367,7 +367,7 @@ rst_epilog = ".. include:: /epilog.rst"
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'https://docs.python.org/2/': None,
+    'https://docs.python.org/3/': None,
     'https://docs.scipy.org/doc/numpy/': None,
 }
 

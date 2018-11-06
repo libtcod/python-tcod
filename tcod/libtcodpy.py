@@ -7,7 +7,7 @@ import os
 import sys
 
 import threading as _threading
-from typing import AnyStr, Optional
+from typing import Any, AnyStr, Optional, Sequence, Tuple
 import warnings
 
 import numpy as _np
@@ -59,6 +59,7 @@ class ConsoleBuffer(object):
         """
         warnings.warn(
             "Console array attributes perform better than this class.",
+            DeprecationWarning,
             stacklevel=2,
         )
         self.width = width
@@ -205,7 +206,8 @@ class Dice(_CDataWrapper):
     """
 
     def __init__(self, *args, **kargs):
-        warnings.warn("Using this class is not recommended.", stacklevel=2)
+        warnings.warn("Using this class is not recommended.",
+                      DeprecationWarning, stacklevel=2)
         super(Dice, self).__init__(*args, **kargs)
         if self.cdata == ffi.NULL:
             self._init(*args, **kargs)
@@ -1470,52 +1472,66 @@ def dijkstra_delete(p):
     This function exists for backwards compatibility with libtcodpy.
     """
 
-def _heightmap_cdata(array):
+def _heightmap_cdata(array: np.ndarray) -> ffi.CData:
     """Return a new TCOD_heightmap_t instance using an array.
 
     Formatting is verified during this function.
     """
+    if array.flags['F_CONTIGUOUS']:
+        array = array.transpose()
     if not array.flags['C_CONTIGUOUS']:
-        raise ValueError('array must be a C-style contiguous segment.')
+        raise ValueError('array must be a contiguous segment.')
     if array.dtype != _np.float32:
         raise ValueError('array dtype must be float32, not %r' % array.dtype)
     width, height = array.shape
     pointer = ffi.cast('float *', array.ctypes.data)
     return ffi.new('TCOD_heightmap_t *', (width, height, pointer))
 
-def heightmap_new(w, h):
+def heightmap_new(w: int, h: int, order: str='C') -> np.ndarray:
     """Return a new numpy.ndarray formatted for use with heightmap functions.
 
-    You can pass a numpy array to any heightmap function as long as all the
+    `w` and `h` are the width and height of the array.
+
+    `order` is given to the new NumPy array, it can be 'C' or 'F'.
+
+    You can pass a NumPy array to any heightmap function as long as all the
     following are true::
-    * The array is 2 dimentional.
-    * The array has the C_CONTIGUOUS flag.
+    * The array is 2 dimensional.
+    * The array has the C_CONTIGUOUS or F_CONTIGUOUS flag.
     * The array's dtype is :any:`dtype.float32`.
 
-    Args:
-        w (int): The width of the new HeightMap.
-        h (int): The height of the new HeightMap.
+    The returned NumPy array will fit all these conditions.
 
-    Returns:
-        numpy.ndarray: A C-contiguous mapping of float32 values.
+    .. versionchanged:: 8.1
+        Added the `order` parameter.
     """
-    return _np.zeros((h, w), _np.float32)
+    if order == 'C':
+        return np.zeros((h, w), _np.float32, order='C')
+    elif order == 'F':
+        return np.zeros((w, h), _np.float32, order='F')
+    else:
+        raise ValueError("Invalid order parameter, should be 'C' or 'F'.")
 
-def heightmap_set_value(hm, x, y, value):
+def heightmap_set_value(hm: np.ndarray, x: int, y: int, value: float) -> None:
     """Set the value of a point on a heightmap.
 
-    Args:
-        hm (numpy.ndarray): A numpy.ndarray formatted for heightmap functions.
-        x (int): The x position to change.
-        y (int): The y position to change.
-        value (float): The value to set.
-
     .. deprecated:: 2.0
-        Do ``hm[y, x] = value`` instead.
+        `hm` is a NumPy array, so values should be assigned to it directly.
     """
-    hm[y, x] = value
+    if hm.flags['C_CONTIGUOUS']:
+        warnings.warn("Assign to this heightmap with hm[i,j] = value\n"
+                      "consider using order='F'",
+                      DeprecationWarning, stacklevel=2)
+        hm[y, x] = value
+    elif hm.flags['F_CONTIGUOUS']:
+        warnings.warn("Assign to this heightmap with hm[x,y] = value",
+                      DeprecationWarning, stacklevel=2)
+        hm[x, y] = value
+    else:
+        raise ValueError("This array is not contiguous.")
 
-def heightmap_add(hm, value):
+@deprecate("Add a scalar to an array using `hm[:] += value`")
+def heightmap_add(hm: np.ndarray, value: float) -> None:
     """Add value to all values on this heightmap.
 
     Args:
@@ -1527,7 +1543,8 @@ def heightmap_add(hm, value):
     """
     hm[:] += value
 
-def heightmap_scale(hm, value):
+@deprecate("Multiply an array with a scaler using `hm[:] *= value`")
+def heightmap_scale(hm: np.ndarray, value: float) -> None:
     """Multiply all items on this heightmap by value.
 
     Args:
@@ -1539,7 +1556,8 @@ def heightmap_scale(hm, value):
     """
     hm[:] *= value
 
-def heightmap_clear(hm):
+@deprecate("Clear an array with`hm[:] = 0`")
+def heightmap_clear(hm: np.ndarray) -> None:
     """Add value to all values on this heightmap.
 
     Args:
@@ -1550,7 +1568,8 @@ def heightmap_clear(hm):
     """
     hm[:] = 0
 
-def heightmap_clamp(hm, mi, ma):
+@deprecate("Clamp array values using `hm.clip(mi, ma)`")
+def heightmap_clamp(hm: np.ndarray, mi: float, ma: float) -> None:
     """Clamp all values on this heightmap between ``mi`` and ``ma``
 
     Args:
@@ -1563,7 +1582,8 @@ def heightmap_clamp(hm, mi, ma):
     """
     hm.clip(mi, ma)
 
-def heightmap_copy(hm1, hm2):
+@deprecate("Copy an array using `hm2[:] = hm1[:]`, or `hm1.copy()`")
+def heightmap_copy(hm1: np.ndarray, hm2: np.ndarray) -> None:
     """Copy the heightmap ``hm1`` to ``hm2``.
 
     Args:
@@ -1575,7 +1595,7 @@ def heightmap_copy(hm1, hm2):
     """
     hm2[:] = hm1[:]
 
-def heightmap_normalize(hm,  mi=0.0, ma=1.0):
+def heightmap_normalize(hm: np.ndarray,  mi: float=0.0, ma: float=1.0) -> None:
     """Normalize heightmap values between ``mi`` and ``ma``.
 
     Args:
@@ -1584,7 +1604,8 @@ def heightmap_normalize(hm,  mi=0.0, ma=1.0):
     """
     lib.TCOD_heightmap_normalize(_heightmap_cdata(hm), mi, ma)
 
-def heightmap_lerp_hm(hm1, hm2, hm3, coef):
+def heightmap_lerp_hm(hm1: np.ndarray, hm2: np.ndarray, hm3: np.ndarray,
+                      coef: float) -> None:
     """Perform linear interpolation between two heightmaps storing the result
     in ``hm3``.
 
@@ -1599,7 +1620,9 @@ def heightmap_lerp_hm(hm1, hm2, hm3, coef):
     lib.TCOD_heightmap_lerp_hm(_heightmap_cdata(hm1), _heightmap_cdata(hm2),
                                _heightmap_cdata(hm3), coef)
 
-def heightmap_add_hm(hm1, hm2, hm3):
+@deprecate("Add 2 arrays using `hm3 = hm1 + hm2`")
+def heightmap_add_hm(hm1: np.ndarray, hm2: np.ndarray,
+                     hm3: np.ndarray) -> None:
     """Add two heightmaps together and stores the result in ``hm3``.
 
     Args:
@@ -1612,7 +1635,9 @@ def heightmap_add_hm(hm1, hm2, hm3):
     """
     hm3[:] = hm1[:] + hm2[:]
 
-def heightmap_multiply_hm(hm1, hm2, hm3):
+@deprecate("Multiply 2 arrays using `hm3 = hm1 * hm2`")
+def heightmap_multiply_hm(hm1: np.ndarray, hm2: np.ndarray,
+                          hm3: np.ndarray) -> None:
     """Multiplies two heightmap's together and stores the result in ``hm3``.
 
     Args:
@@ -1626,7 +1651,8 @@ def heightmap_multiply_hm(hm1, hm2, hm3):
     """
     hm3[:] = hm1[:] * hm2[:]
 
-def heightmap_add_hill(hm, x, y, radius, height):
+def heightmap_add_hill(hm: np.ndarray, x: float, y: float, radius: float,
+                       height: float) -> None:
     """Add a hill (a half spheroid) at given position.
 
     If height == radius or -radius, the hill is a half-sphere.
@@ -1640,7 +1666,8 @@ def heightmap_add_hill(hm, x, y, radius, height):
     """
     lib.TCOD_heightmap_add_hill(_heightmap_cdata(hm), x, y, radius, height)
 
-def heightmap_dig_hill(hm, x, y, radius, height):
+def heightmap_dig_hill(hm: np.ndarray, x: float, y: float, radius: float,
+                       height: float) -> None:
     """
 
     This function takes the highest value (if height > 0) or the lowest
@@ -1657,7 +1684,9 @@ def heightmap_dig_hill(hm, x, y, radius, height):
     """
     lib.TCOD_heightmap_dig_hill(_heightmap_cdata(hm), x, y, radius, height)
 
-def heightmap_rain_erosion(hm, nbDrops, erosionCoef, sedimentationCoef, rnd=None):
+def heightmap_rain_erosion(hm: np.ndarray, nbDrops: int, erosionCoef: float,
+                           sedimentationCoef: float,
+                           rnd: Optional[tcod.random.Random]=None) -> None:
     """Simulate the effect of rain drops on the terrain, resulting in erosion.
 
     ``nbDrops`` should be at least hm.size.
@@ -1670,11 +1699,15 @@ def heightmap_rain_erosion(hm, nbDrops, erosionCoef, sedimentationCoef, rnd=None
                                    stops to flow.
         rnd (Optional[Random]): A tcod.Random instance, or None.
     """
-    lib.TCOD_heightmap_rain_erosion(_heightmap_cdata(hm), nbDrops, erosionCoef,
-                                    sedimentationCoef, rnd.random_c if rnd else ffi.NULL)
+    lib.TCOD_heightmap_rain_erosion(
+        _heightmap_cdata(hm), nbDrops, erosionCoef,
+        sedimentationCoef, rnd.random_c if rnd else ffi.NULL
+    )
 
-def heightmap_kernel_transform(hm, kernelsize, dx, dy, weight, minLevel,
-                               maxLevel):
+def heightmap_kernel_transform(hm: np.ndarray, kernelsize: int,
+                               dx: Sequence[int], dy: Sequence[int],
+                               weight: Sequence[float],
+                               minLevel: float, maxLevel: float) -> None:
     """Apply a generic transformation on the map, so that each resulting cell
     value is the weighted sum of several neighbour cells.
 
@@ -1699,7 +1732,8 @@ def heightmap_kernel_transform(hm, kernelsize, dx, dy, weight, minLevel,
     0.33*value(x-1,y) + 0.33*value(x,y) + 0.33*value(x+1,y).
     To do this, you need a kernel of size 3
     (the sum involves 3 surrounding cells).
-    The dx,dy array will contain
+    The dx,dy array will contain:
+
     * dx=-1, dy=0 for cell (x-1, y)
     * dx=1, dy=0 for cell (x+1, y)
     * dx=0, dy=0 for cell (x, y)
@@ -1721,7 +1755,9 @@ def heightmap_kernel_transform(hm, kernelsize, dx, dy, weight, minLevel,
     lib.TCOD_heightmap_kernel_transform(_heightmap_cdata(hm), kernelsize,
                                         cdx, cdy, cweight, minLevel, maxLevel)
 
-def heightmap_add_voronoi(hm, nbPoints, nbCoef, coef, rnd=None):
+def heightmap_add_voronoi(hm: np.ndarray, nbPoints: Any, nbCoef: int,
+                          coef: Sequence[float],
+                          rnd: Optional[tcod.random.Random]=None) -> None:
     """Add values from a Voronoi diagram to the heightmap.
 
     Args:
@@ -1737,10 +1773,14 @@ def heightmap_add_voronoi(hm, nbPoints, nbCoef, coef, rnd=None):
     """
     nbPoints = len(coef)
     ccoef = ffi.new('float[]', coef)
-    lib.TCOD_heightmap_add_voronoi(_heightmap_cdata(hm), nbPoints,
-                                   nbCoef, ccoef, rnd.random_c if rnd else ffi.NULL)
+    lib.TCOD_heightmap_add_voronoi(
+        _heightmap_cdata(hm), nbPoints,
+        nbCoef, ccoef, rnd.random_c if rnd else ffi.NULL)
 
-def heightmap_add_fbm(hm, noise, mulx, muly, addx, addy, octaves, delta, scale):
+@deprecate("Arrays of noise should be sampled using the tcod.noise module.")
+def heightmap_add_fbm(hm: np.ndarray, noise: tcod.noise.Noise,
+                      mulx: float, muly: float, addx: float, addy: float,
+                      octaves: float, delta: float, scale: float) -> None:
     """Add FBM noise to the heightmap.
 
     The noise coordinate for each map cell is
@@ -1758,13 +1798,19 @@ def heightmap_add_fbm(hm, noise, mulx, muly, addx, addy, octaves, delta, scale):
         octaves (float): Number of octaves in the FBM sum.
         delta (float): The value added to all heightmap cells.
         scale (float): The noise value is scaled with this parameter.
+
+    .. deprecated:: 8.1
+        An equivalent array of noise samples can be taken using a method such
+        as :any:`Noise.sample_ogrid`.
     """
     noise = noise.noise_c if noise is not None else ffi.NULL
     lib.TCOD_heightmap_add_fbm(_heightmap_cdata(hm), noise,
                                mulx, muly, addx, addy, octaves, delta, scale)
 
-def heightmap_scale_fbm(hm, noise, mulx, muly, addx, addy, octaves, delta,
-                        scale):
+@deprecate("Arrays of noise should be sampled using the tcod.noise module.")
+def heightmap_scale_fbm(hm: np.ndarray, noise: tcod.noise.Noise,
+                        mulx: float, muly: float, addx: float, addy: float,
+                        octaves: float, delta: float, scale: float) -> None:
     """Multiply the heighmap values with FBM noise.
 
     Args:
@@ -1777,13 +1823,20 @@ def heightmap_scale_fbm(hm, noise, mulx, muly, addx, addy, octaves, delta,
         octaves (float): Number of octaves in the FBM sum.
         delta (float): The value added to all heightmap cells.
         scale (float): The noise value is scaled with this parameter.
+
+    .. deprecated:: 8.1
+        An equivalent array of noise samples can be taken using a method such
+        as :any:`Noise.sample_ogrid`.
     """
     noise = noise.noise_c if noise is not None else ffi.NULL
     lib.TCOD_heightmap_scale_fbm(_heightmap_cdata(hm), noise,
                                  mulx, muly, addx, addy, octaves, delta, scale)
 
-def heightmap_dig_bezier(hm, px, py, startRadius, startDepth, endRadius,
-                         endDepth):
+def heightmap_dig_bezier(hm: np.ndarray,
+                         px: Tuple[int, int, int, int],
+                         py: Tuple[int, int, int, int],
+                         startRadius: float, startDepth: float,
+                         endRadius: float, endDepth: float) -> None:
     """Carve a path along a cubic Bezier curve.
 
     Both radius and depth can vary linearly along the path.
@@ -1801,24 +1854,27 @@ def heightmap_dig_bezier(hm, px, py, startRadius, startDepth, endRadius,
                                    startDepth, endRadius,
                                    endDepth)
 
-def heightmap_get_value(hm, x, y):
+def heightmap_get_value(hm: np.ndarray, x: int, y: int) -> float:
     """Return the value at ``x``, ``y`` in a heightmap.
 
-    Args:
-        hm (numpy.ndarray): A numpy.ndarray formatted for heightmap functions.
-        x (int): The x position to pick.
-        y (int): The y position to pick.
-
-    Returns:
-        float: The value at ``x``, ``y``.
-
     .. deprecated:: 2.0
-        Do ``value = hm[y, x]`` instead.
+        Access `hm` as a NumPy array instead.
     """
-    # explicit type conversion to pass test, (test should have been better.)
-    return float(hm[y, x])
+    if hm.flags['C_CONTIGUOUS']:
+        warnings.warn("Get a value from this heightmap with hm[i,j]\n"
+                      "consider using order='F'",
+                      DeprecationWarning, stacklevel=2)
+        return hm[y, x]
+    elif hm.flags['F_CONTIGUOUS']:
+        warnings.warn("Get a value from this heightmap with hm[x,y]",
+                      DeprecationWarning, stacklevel=2)
+        return hm[x, y]
+    else:
+        raise ValueError("This array is not contiguous.")
 
-def heightmap_get_interpolated_value(hm, x, y):
+
+def heightmap_get_interpolated_value(hm: np.ndarray,
+                                     x: float, y: float) -> float:
     """Return the interpolated height at non integer coordinates.
 
     Args:
@@ -1832,7 +1888,7 @@ def heightmap_get_interpolated_value(hm, x, y):
     return lib.TCOD_heightmap_get_interpolated_value(_heightmap_cdata(hm),
                                                      x, y)
 
-def heightmap_get_slope(hm, x, y):
+def heightmap_get_slope(hm: np.ndarray, x: int, y: int) -> float:
     """Return the slope between 0 and (pi / 2) at given coordinates.
 
     Args:
@@ -1845,7 +1901,8 @@ def heightmap_get_slope(hm, x, y):
     """
     return lib.TCOD_heightmap_get_slope(_heightmap_cdata(hm), x, y)
 
-def heightmap_get_normal(hm, x, y, waterLevel):
+def heightmap_get_normal(hm: np.ndarray, x: float, y: float,
+                         waterLevel: float) -> Tuple[float, float, float]:
     """Return the map normal at given coordinates.
 
     Args:
@@ -1861,7 +1918,8 @@ def heightmap_get_normal(hm, x, y, waterLevel):
     lib.TCOD_heightmap_get_normal(_heightmap_cdata(hm), x, y, cn, waterLevel)
     return tuple(cn)
 
-def heightmap_count_cells(hm, mi, ma):
+@deprecate("This function is deprecated, see documentation.")
+def heightmap_count_cells(hm: np.ndarray, mi: float, ma: float) -> int:
     """Return the number of map cells which value is between ``mi`` and ``ma``.
 
     Args:
@@ -1871,10 +1929,14 @@ def heightmap_count_cells(hm, mi, ma):
 
     Returns:
         int: The count of values which fall between ``mi`` and ``ma``.
+
+    .. deprecated:: 8.1
+        Can be replaced by an equivalent NumPy function such as:
+        ``numpy.count_nonzero((mi <= hm) & (hm < ma))``
     """
     return lib.TCOD_heightmap_count_cells(_heightmap_cdata(hm), mi, ma)
 
-def heightmap_has_land_on_border(hm, waterlevel):
+def heightmap_has_land_on_border(hm: np.ndarray, waterlevel: float) -> bool:
     """Returns True if the map edges are below ``waterlevel``, otherwise False.
 
     Args:
@@ -1887,7 +1949,8 @@ def heightmap_has_land_on_border(hm, waterlevel):
     return lib.TCOD_heightmap_has_land_on_border(_heightmap_cdata(hm),
                                                  waterlevel)
 
-def heightmap_get_minmax(hm):
+@deprecate("Use `hm.min()` and `hm.max()` instead.")
+def heightmap_get_minmax(hm: np.ndarray) -> Tuple[float, float]:
     """Return the min and max values of this heightmap.
 
     Args:
@@ -1897,15 +1960,15 @@ def heightmap_get_minmax(hm):
         Tuple[float, float]: The (min, max) values.
 
     .. deprecated:: 2.0
-        Do ``hm.min()`` or ``hm.max()`` instead.
+        Use ``hm.min()`` or ``hm.max()`` instead.
     """
     mi = ffi.new('float *')
     ma = ffi.new('float *')
     lib.TCOD_heightmap_get_minmax(_heightmap_cdata(hm), mi, ma)
     return mi[0], ma[0]
 
-def heightmap_delete(hm):
-    # type (Any) -> None
+@deprecate("libtcod objects are deleted automatically.")
+def heightmap_delete(hm: Any) -> None:
     """Does nothing. libtcod objects are managed by Python's garbage collector.
 
     This function exists for backwards compatibility with libtcodpy.
