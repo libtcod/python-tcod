@@ -34,6 +34,8 @@ Added
  - New `RENDERER_SDL2` and `RENDERER_OPENGL2` renderers.
 Changed
  - Updated libtcod to 1.9.0
+ - Now requires SDL 2.0.5, which is not trivially installable on
+   Ubuntu 16.04 LTS.
 Removed
  - Dropped support for Python versions before 3.5
  - Dropped support for MacOS versions before 10.9 Mavericks.
