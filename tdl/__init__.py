@@ -70,7 +70,7 @@ import tdl.noise
 import tdl.map
 import tdl.style as _style
 
-from tcod.version import __version__
+from tcod import __version__
 
 _IS_PYTHON3 = (_sys.version_info[0] == 3)
 
