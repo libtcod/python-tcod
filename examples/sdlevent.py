@@ -150,22 +150,25 @@ class Quit(Event):
 
 class KeyboardEvent(Event):
 
-    def __init__(self, scancode, sym, mod):
+    def __init__(self, scancode, sym, mod, repeat=False):
         self.scancode = scancode
         self.sym = sym
         self.mod = mod
+        self.repeat = repeat
 
     @classmethod
     def from_sdl_event(cls, sdl_event):
         keysym = sdl_event.key.keysym
-        return cls(keysym.scancode, keysym.sym, keysym.mod)
+        return cls(keysym.scancode, keysym.sym, keysym.mod,
+                   bool(sdl_event.key.repeat))
 
     def __repr__(self):
-        return ('sdlevent.%s(scancode=%s, sym=%s, mod=%s)' %
+        return ('sdlevent.%s(scancode=%s, sym=%s, mod=%s%s)' %
                 (self.__class__.__name__,
                  _REVSRSE_SCANCODE_TABLE[self.scancode],
                  _REVSRSE_SYM_TABLE[self.sym],
                  _describe_bitmask(self.mod, _REVSRSE_MOD_TABLE),
+                 ', repeat=True' if self.repeat else '',
                  )
                 )
 
@@ -311,7 +314,7 @@ def _main():
     WIDTH, HEIGHT = 120, 60
     TITLE = 'sdlevent.py engine'
 
-    with tcod.console_init_root(WIDTH, HEIGHT, TITLE) as console:
+    with tcod.console_init_root(WIDTH, HEIGHT, TITLE, order='F') as console:
         tcod.sys_set_fps(24)
         while True:
             for event in wait():
@@ -319,11 +322,13 @@ def _main():
                 if event.type == 'QUIT':
                     raise SystemExit()
                 elif event.type == 'MOUSEMOTION':
-                    console.rect(0, HEIGHT - 1, WIDTH, 1, True)
+                    console.ch[:,-1] = 0
                     console.print_(0, HEIGHT - 1, repr(event))
                 else:
                     console.blit(console, 0, 0, 0, 1, WIDTH, HEIGHT - 2)
+                    console.ch[:,-3] = 0
                     console.print_(0, HEIGHT - 3, repr(event))
+
             tcod.console_flush()
 
 if __name__ == '__main__':
