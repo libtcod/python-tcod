@@ -74,6 +74,17 @@ def get_long_description():
         changelog = changelog.replace('\nUnreleased\n------------------', '')
     return '\n'.join([readme, changelog])
 
+if sys.version_info < (3, 5):
+    error = """
+    python-tcod supports Python 3.5 and above.
+    The last version supporting Python 2.7/3.4 was 'tcod==6.0.7'
+
+    Python {py} detected.
+    """.format(py='.'.join([str(v) for v in sys.version_info[:3]]))
+
+    print(error)
+    sys.exit(1)
+
 needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
 pytest_runner = ['pytest-runner'] if needs_pytest else []
 
@@ -91,6 +102,7 @@ setup(
         'tdl': ['*.png'],
         'tcod': get_package_data(),
         },
+    python_requires='>=3.5',
     install_requires=[
         'cffi>=1.8.1,<2',
         'numpy>=1.10,<2' if not is_pypy else '',
