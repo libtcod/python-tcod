@@ -631,11 +631,11 @@ def console_init_root(
 
     `renderer` is the rendering back-end that libtcod will use.  Options are:
 
-    * `RENDERER_SDL`
-    * `RENDERER_OPENGL`
-    * `RENDERER_GLSL`
-    * `RENDERER_SDL2`
-    * `RENDERER_OPENGL2`
+    * `tcod.RENDERER_SDL`
+    * `tcod.RENDERER_OPENGL`
+    * `tcod.RENDERER_GLSL`
+    * `tcod.RENDERER_SDL2`
+    * `tcod.RENDERER_OPENGL2`
 
     `order` will affect how the array attributes of the returned root console
     are indexed.  `order='C'` is the default, but `order='F'` is recommended.

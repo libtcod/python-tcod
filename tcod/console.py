@@ -13,7 +13,7 @@ Example::
     # Setup the font.
     tcod.console_set_custom_font(
         'arial10x10.png',
-        tcod.FONT_LAYOUT_ASCII_INROW | tcod.FONT_LAYOUT_TCOD,
+        tcod.FONT_LAYOUT_TCOD,
         )
     # Initialize the root console in a context.
     with tcod.console_init_root(80, 60, 'title') as root_console:
