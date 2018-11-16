@@ -1,5 +1,5 @@
 '''
-The following example shows how to travrse the BSP tree using Python.  This
+The following example shows how to traverse the BSP tree using Python.  This
 assumes `create_room` and `connect_rooms` will be replaced by custom code.
 
 Example::
