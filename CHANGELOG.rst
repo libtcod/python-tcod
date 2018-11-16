@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+8.1.0 - 2018-11-15
+------------------
 Changed
  - Heightmap functions now support 'F_CONTIGUOUS' arrays.
  - `tcod.heightmap_new` now has an `order` parameter.
