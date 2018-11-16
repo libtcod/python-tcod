@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+8.1.1 - 2018-11-16
+------------------
 Fixed
  - Printing a frame with an empty string no longer displays a title bar.
 
