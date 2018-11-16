@@ -1023,16 +1023,21 @@ def console_vline(con, x, y, l, flag=BKGND_DEFAULT):
     """
     lib.TCOD_console_vline(_console(con), x, y, l, flag)
 
-def console_print_frame(con, x, y, w, h, clear=True, flag=BKGND_DEFAULT, fmt=b''):
+def console_print_frame(con, x: int, y: int, w: int, h: int, clear: bool=True,
+                        flag: int=BKGND_DEFAULT, fmt: bytes=b''):
     """Draw a framed rectangle with optinal text.
 
     This uses the default background color and blend mode to fill the
     rectangle and the default foreground to draw the outline.
 
-    fmt will be printed on the inside of the rectangle, word-wrapped.
+    `fmt` will be printed on the inside of the rectangle, word-wrapped.
+    If `fmt` is empty then no title will be drawn.
     """
-    lib.TCOD_console_print_frame(
-        _console(con), x, y, w, h, clear, flag, _fmt_bytes(fmt))
+    if fmt:
+        fmt = _fmt_bytes(fmt)
+    else:
+        fmt = ffi.NULL
+    lib.TCOD_console_print_frame(_console(con), x, y, w, h, clear, flag, fmt)
 
 def console_set_color_control(con, fore, back):
     """Configure :any:`color controls`.

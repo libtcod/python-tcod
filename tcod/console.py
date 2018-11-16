@@ -335,21 +335,23 @@ class Console(object):
         """
         lib.TCOD_console_vline(self.console_c, x, y, height, bg_blend)
 
-    def print_frame(self, x, y, width, height, string='',
-                    clear=True, bg_blend=tcod.libtcod.BKGND_DEFAULT):
+    def print_frame(self, x: int, y: int, width: int, height: int,
+                    string: str='', clear: bool=True,
+                    bg_blend: int=tcod.libtcod.BKGND_DEFAULT):
         """Draw a framed rectangle with optinal text.
 
         This uses the default background color and blend mode to fill the
         rectangle and the default foreground to draw the outline.
 
-        string will be printed on the inside of the rectangle, word-wrapped.
+        `string` will be printed on the inside of the rectangle, word-wrapped.
+        If `string` is empty then no title will be drawn.
 
         Args:
             x (int): The x coordinate from the left.
             y (int): The y coordinate from the top.
             width (int): The width if the frame.
             height (int): The height of the frame.
-            string (Text): A Unicode string to print.
+            string (str): A Unicode string to print.
             clear (bool): If True all text in the affected area will be
                           removed.
             bg_blend (int): The background blending flag.
@@ -357,8 +359,12 @@ class Console(object):
         Note:
             This method does not support Unicode outside of the 0-255 range.
         """
+        if string:
+            string = string.encode('latin-1')
+        else:
+            string = ffi.NULL
         lib.TCOD_console_print_frame(self.console_c, x, y, width, height,
-                                     clear, bg_blend, string.encode('latin-1'))
+                                     clear, bg_blend, string)
 
     def blit(self, dest, dest_x=0, dest_y=0,
              src_x=0, src_y=0, width=0, height=0,
