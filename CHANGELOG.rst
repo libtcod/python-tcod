@@ -12,6 +12,7 @@ Unreleased
 Changed
  - Heightmap functions now support 'F_CONTIGUOUS' arrays.
  - `tcod.heightmap_new` now has an `order` parameter.
+ - Updated SDL to 2.0.9
 Deprecated
  - Deprecated heightmap functions which sample noise grids, this can be done
    using the `Noise.sample_ogrid` method.
