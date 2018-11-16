@@ -3,6 +3,8 @@
    Anything included here will be accessible from tcod.libtcod.lib */
 
 #ifndef TDL_NO_SDL2_EXPORTS
+/* Ignore headers with issues. */
+#define SDL_thread_h_
 #include <SDL.h>
 #endif
 
