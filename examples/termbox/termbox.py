@@ -170,10 +170,10 @@ class Termbox:
 
 		try:
 			self.console = tdl.init(width, height)
-                except tdl.TDLException as e:
+		except tdl.TDLException as e:
 			raise TermboxException(e)
 
-                self.e = Event() # cache for event data
+		self.e = Event() # cache for event data
 
 		_instance = self
 
@@ -280,11 +280,11 @@ class Termbox:
 		else:
 			uch = None
 		"""
-                for e in tdl.event.get():
-                  # [ ] not all events are passed thru
-                  self.e.type = e.type
-                  if e.type == 'KEYDOWN':
-                    self.e.key = e.key
-                    return self.e.gettuple()
+		for e in tdl.event.get():
+			# [ ] not all events are passed thru
+			self.e.type = e.type
+			if e.type == 'KEYDOWN':
+				self.e.key = e.key
+				return self.e.gettuple()
 
 		#return (e.type, uch, e.key, e.mod, e.w, e.h, e.x, e.y)
