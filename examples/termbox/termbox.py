@@ -43,12 +43,12 @@ KEY_DELETE           = (0xFFFF-13)
 KEY_PGUP             = (0xFFFF-16)
 KEY_PGDN             = (0xFFFF-17)
 
-KEY_MOUSE_LEFT      =(0xFFFF-22)
-KEY_MOUSE_RIGHT      =(0xFFFF-23)
-KEY_MOUSE_MIDDLE      =(0xFFFF-24)
-KEY_MOUSE_RELEASE      =(0xFFFF-25)
-KEY_MOUSE_WHEEL_UP      =(0xFFFF-26)
-KEY_MOUSE_WHEEL_DOWN      =(0xFFFF-27)
+KEY_MOUSE_LEFT       = (0xFFFF-22)
+KEY_MOUSE_RIGHT      = (0xFFFF-23)
+KEY_MOUSE_MIDDLE     = (0xFFFF-24)
+KEY_MOUSE_RELEASE    = (0xFFFF-25)
+KEY_MOUSE_WHEEL_UP   = (0xFFFF-26)
+KEY_MOUSE_WHEEL_DOWN = (0xFFFF-27)
 
 KEY_CTRL_TILDE       = 0x00
 KEY_CTRL_2           = 0x00
@@ -146,21 +146,21 @@ OUTPUT_GRAYSCALE = 4
 EVENT_KEY        = 'KEYDOWN'
 # /--
 EVENT_RESIZE     = 2
-EVENT_MOUSE		= 3
+EVENT_MOUSE      = 3
 
 class Event:
-    """ Aggregate for Termbox Event structure """
-    type = None
-    ch = None
-    key = None
-    mod = None
-    width = None
-    height = None
-    mousex = None
-    mousey = None
+	""" Aggregate for Termbox Event structure """
+	type = None
+	ch = None
+	key = None
+	mod = None
+	width = None
+	height = None
+	mousex = None
+	mousey = None
 
-    def gettuple(self):
-         return (self.type, self.ch, self.key, self.mod, self.width, self.height, self.mousex, self.mousey)
+	def gettuple(self):
+		return (self.type, self.ch, self.key, self.mod, self.width, self.height, self.mousex, self.mousey)
 
 class Termbox:
 	def __init__(self, width=132, height=60):
