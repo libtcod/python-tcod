@@ -17,10 +17,10 @@ Implementation status:
 """
 
 class TermboxException(Exception):
-	def __init__(self, msg):
-		self.msg = msg
-	def __str__(self):
-		return self.msg
+    def __init__(self, msg):
+        self.msg = msg
+    def __str__(self):
+        return self.msg
 
 _instance = None
 
@@ -43,12 +43,12 @@ KEY_DELETE           = (0xFFFF-13)
 KEY_PGUP             = (0xFFFF-16)
 KEY_PGDN             = (0xFFFF-17)
 
-KEY_MOUSE_LEFT      =(0xFFFF-22)
-KEY_MOUSE_RIGHT      =(0xFFFF-23)
-KEY_MOUSE_MIDDLE      =(0xFFFF-24)
-KEY_MOUSE_RELEASE      =(0xFFFF-25)
-KEY_MOUSE_WHEEL_UP      =(0xFFFF-26)
-KEY_MOUSE_WHEEL_DOWN      =(0xFFFF-27)
+KEY_MOUSE_LEFT = (0xFFFF-22)
+KEY_MOUSE_RIGHT = (0xFFFF-23)
+KEY_MOUSE_MIDDLE = (0xFFFF-24)
+KEY_MOUSE_RELEASE = (0xFFFF-25)
+KEY_MOUSE_WHEEL_UP = (0xFFFF-26)
+KEY_MOUSE_WHEEL_DOWN = (0xFFFF-27)
 
 KEY_CTRL_TILDE       = 0x00
 KEY_CTRL_2           = 0x00
@@ -143,10 +143,10 @@ OUTPUT_GRAYSCALE = 4
 
 
 # -- mapped to tdl
-EVENT_KEY        = 'KEYDOWN'
+EVENT_KEY = 'KEYDOWN'
 # /--
-EVENT_RESIZE     = 2
-EVENT_MOUSE		= 3
+EVENT_RESIZE = 2
+EVENT_MOUSE = 3
 
 class Event:
     """ Aggregate for Termbox Event structure """
@@ -160,131 +160,136 @@ class Event:
     mousey = None
 
     def gettuple(self):
-         return (self.type, self.ch, self.key, self.mod, self.width, self.height, self.mousex, self.mousey)
+         return (self.type, self.ch, self.key, self.mod, self.width,
+                 self.height, self.mousex, self.mousey)
 
 class Termbox:
-	def __init__(self, width=132, height=60):
-		global _instance
-		if _instance:
-			raise TermboxException("It is possible to create only one instance of Termbox")
+    def __init__(self, width=132, height=60):
+        global _instance
+        if _instance:
+            raise TermboxException(
+                "It is possible to create only one instance of Termbox")
 
-		try:
-			self.console = tdl.init(width, height)
-                except tdl.TDLException as e:
-			raise TermboxException(e)
+        try:
+            self.console = tdl.init(width, height)
+        except tdl.TDLException as e:
+            raise TermboxException(e)
 
-                self.e = Event() # cache for event data
+        self.e = Event() # cache for event data
 
-		_instance = self
+        _instance = self
 
-	def __del__(self):
-		self.close()
+    def __del__(self):
+        self.close()
 
-	def __exit__(self, *args):#t, value, traceback):
-		self.close()
+    def __exit__(self, *args):#t, value, traceback):
+        self.close()
 
-	def __enter__(self):
-		return self
+    def __enter__(self):
+        return self
 
-	def close(self):
-		global _instance
-		# tb_shutdown()
-		_instance = None
+    def close(self):
+        global _instance
+        # tb_shutdown()
+        _instance = None
                 # TBD, does nothing
 
-	def present(self):
-		"""Sync state of the internal cell buffer with the terminal.
-		"""
-		tdl.flush()
+    def present(self):
+        """Sync state of the internal cell buffer with the terminal.
+        """
+        tdl.flush()
 
-	def change_cell(self, x, y, ch, fg, bg):
-		"""Change cell in position (x;y).
-		"""
-		self.console.draw_char(x, y, ch, fg, bg)
+    def change_cell(self, x, y, ch, fg, bg):
+        """Change cell in position (x;y).
+        """
+        self.console.draw_char(x, y, ch, fg, bg)
 
-	def width(self):
-		"""Returns width of the terminal screen.
-		"""
-		return self.console.width
+    def width(self):
+        """Returns width of the terminal screen.
+        """
+        return self.console.width
 
-	def height(self):
-		"""Return height of the terminal screen.
-		"""
-		return self.console.height
+    def height(self):
+        """Return height of the terminal screen.
+        """
+        return self.console.height
 
-	def clear(self):
-		"""Clear the internal cell buffer.
-		"""
-		self.console.clear()
+    def clear(self):
+        """Clear the internal cell buffer.
+        """
+        self.console.clear()
 
-	def set_cursor(self, x, y):
-		"""Set cursor position to (x;y).
+    def set_cursor(self, x, y):
+        """Set cursor position to (x;y).
 
-		   Set both arguments to HIDE_CURSOR or use 'hide_cursor' function to hide it.
-		"""
-		tb_set_cursor(x, y)
+           Set both arguments to HIDE_CURSOR or use 'hide_cursor' function to
+           hide it.
+        """
+        tb_set_cursor(x, y)
 
-	def hide_cursor(self):
-		"""Hide cursor.
-		"""
-		tb_set_cursor(-1, -1)
+    def hide_cursor(self):
+        """Hide cursor.
+        """
+        tb_set_cursor(-1, -1)
 
-	def select_input_mode(self, mode):
-		"""Select preferred input mode: INPUT_ESC or INPUT_ALT.
+    def select_input_mode(self, mode):
+        """Select preferred input mode: INPUT_ESC or INPUT_ALT.
 
-		   INPUT_CURRENT returns the selected mode without changing anything.
-		"""
-		return int(tb_select_input_mode(mode))
+           INPUT_CURRENT returns the selected mode without changing anything.
+        """
+        return int(tb_select_input_mode(mode))
 
-	def select_output_mode(self, mode):
-		"""Select preferred output mode: one of OUTPUT_* constants.
+    def select_output_mode(self, mode):
+        """Select preferred output mode: one of OUTPUT_* constants.
 
-		   OUTPUT_CURRENT returns the selected mode without changing anything.
-		"""
-		return int(tb_select_output_mode(mode))
+           OUTPUT_CURRENT returns the selected mode without changing anything.
+        """
+        return int(tb_select_output_mode(mode))
 
-	def peek_event(self, timeout=0):
-		"""Wait for an event up to 'timeout' milliseconds and return it.
+    def peek_event(self, timeout=0):
+        """Wait for an event up to 'timeout' milliseconds and return it.
 
-		   Returns None if there was no event and timeout is expired.
-		   Returns a tuple otherwise: (type, unicode character, key, mod, width, height, mousex, mousey).
-		"""
-		"""
-		cdef tb_event e
-		with self._poll_lock:
-			with nogil:
-				result = tb_peek_event(&e, timeout)
-		assert(result >= 0)
-		if result == 0:
-			return None
-		if e.ch:
-			uch = unichr(e.ch)
-		else:
-			uch = None
-		"""
-		pass #return (e.type, uch, e.key, e.mod, e.w, e.h, e.x, e.y)
+           Returns None if there was no event and timeout is expired.
+           Returns a tuple otherwise: (type, unicode character, key, mod,
+           width, height, mousex, mousey).
+        """
+        """
+        cdef tb_event e
+        with self._poll_lock:
+            with nogil:
+                result = tb_peek_event(&e, timeout)
+        assert(result >= 0)
+        if result == 0:
+            return None
+        if e.ch:
+            uch = unichr(e.ch)
+        else:
+            uch = None
+        """
+        pass #return (e.type, uch, e.key, e.mod, e.w, e.h, e.x, e.y)
 
-	def poll_event(self):
-		"""Wait for an event and return it.
+    def poll_event(self):
+        """Wait for an event and return it.
 
-		   Returns a tuple: (type, unicode character, key, mod, width, height, mousex, mousey).
-		"""
-		"""
-		cdef tb_event e
-		with self._poll_lock:
-			with nogil:
-				result = tb_poll_event(&e)
-		assert(result >= 0)
-		if e.ch:
-			uch = unichr(e.ch)
-		else:
-			uch = None
-		"""
-                for e in tdl.event.get():
-                  # [ ] not all events are passed thru
-                  self.e.type = e.type
-                  if e.type == 'KEYDOWN':
-                    self.e.key = e.key
-                    return self.e.gettuple()
+           Returns a tuple: (type, unicode character, key, mod, width, height,
+           mousex, mousey).
+        """
+        """
+        cdef tb_event e
+        with self._poll_lock:
+            with nogil:
+                result = tb_poll_event(&e)
+        assert(result >= 0)
+        if e.ch:
+            uch = unichr(e.ch)
+        else:
+            uch = None
+        """
+        for e in tdl.event.get():
+          # [ ] not all events are passed thru
+          self.e.type = e.type
+          if e.type == 'KEYDOWN':
+            self.e.key = e.key
+            return self.e.gettuple()
 
-		#return (e.type, uch, e.key, e.mod, e.w, e.h, e.x, e.y)
+        #return (e.type, uch, e.key, e.mod, e.w, e.h, e.x, e.y)
