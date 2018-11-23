@@ -160,8 +160,8 @@ class Event:
     mousey = None
 
     def gettuple(self):
-         return (self.type, self.ch, self.key, self.mod, self.width,
-                 self.height, self.mousex, self.mousey)
+        return (self.type, self.ch, self.key, self.mod, self.width,
+                self.height, self.mousex, self.mousey)
 
 class Termbox:
     def __init__(self, width=132, height=60):
@@ -192,7 +192,7 @@ class Termbox:
         global _instance
         # tb_shutdown()
         _instance = None
-                # TBD, does nothing
+        # TBD, does nothing
 
     def present(self):
         """Sync state of the internal cell buffer with the terminal.
@@ -286,10 +286,10 @@ class Termbox:
             uch = None
         """
         for e in tdl.event.get():
-          # [ ] not all events are passed thru
-          self.e.type = e.type
-          if e.type == 'KEYDOWN':
-            self.e.key = e.key
-            return self.e.gettuple()
+            # [ ] not all events are passed thru
+            self.e.type = e.type
+            if e.type == 'KEYDOWN':
+                self.e.key = e.key
+                return self.e.gettuple()
 
         #return (e.type, uch, e.key, e.mod, e.w, e.h, e.x, e.y)

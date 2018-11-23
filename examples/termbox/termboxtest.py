@@ -2,12 +2,6 @@
 # -*- encoding: utf-8 -*-
 
 import termbox
-import time
-import sys
-import random
-#import psyco
-
-#psyco.full()
 
 spaceord = ord(u" ")
 
