@@ -60,7 +60,7 @@ class Console(object):
 
     def __init__(self, width, height, order='C'):
         self._key_color = None
-        self._ch = np.zeros((height, width), dtype=np.intc)
+        self._ch = np.full((height, width), 0x20, dtype=np.intc)
         self._fg = np.zeros((height, width), dtype='(3,)u1')
         self._bg = np.zeros((height, width), dtype='(3,)u1')
         self._order = tcod._internal.verify_order(order)

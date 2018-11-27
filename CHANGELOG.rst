@@ -17,6 +17,9 @@ Changed
    strings.
 Deprecated
  - Deprecated using bytes strings for all printing functions.
+Fixed
+ - Console objects are now initialized with spaces. This fixes some blit
+   operations.
 
 8.1.1 - 2018-11-16
 ------------------
