@@ -4,7 +4,7 @@
 
 from __future__ import absolute_import as _
 
-import time
+import random
 
 from tcod.libtcod import ffi, lib
 from tcod.libtcod import RNG_MT as MERSENNE_TWISTER
@@ -30,7 +30,7 @@ class Random(object):
     def __init__(self, algorithm, seed=None):
         """Create a new instance using this algorithm and seed."""
         if seed is None:
-            seed = time.time() + time.clock()
+            seed = random.getrandbits(32)
         self.random_c = ffi.gc(
             ffi.cast('mersenne_data_t*',
                      lib.TCOD_random_new_from_seed(algorithm,
