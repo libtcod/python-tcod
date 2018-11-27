@@ -345,5 +345,4 @@ def write_library_constants():
 
 
 if __name__ == "__main__":
-    ffi.compile()
     write_library_constants()

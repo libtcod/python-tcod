@@ -9,6 +9,10 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - New layout `tcod.FONT_LAYOUT_CP437`.
+Changed
+ - Updated libtcod to 1.10.2
 
 8.1.1 - 2018-11-16
 ------------------

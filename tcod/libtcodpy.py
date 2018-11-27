@@ -666,11 +666,17 @@ def console_set_custom_font(fontFile: AnyStr, flags:
 
     Flags can be a mix of the following:
 
-    * tcod.FONT_LAYOUT_ASCII_INCOL
-    * tcod.FONT_LAYOUT_ASCII_INROW
-    * tcod.FONT_TYPE_GREYSCALE
+    * tcod.FONT_LAYOUT_ASCII_INCOL:
+      Decode tileset raw in column-major order.
+    * tcod.FONT_LAYOUT_ASCII_INROW:
+      Decode tileset raw in row-major order.
+    * tcod.FONT_TYPE_GREYSCALE:
+      Force tileset to be read as greyscale.
     * tcod.FONT_TYPE_GRAYSCALE
-    * tcod.FONT_LAYOUT_TCOD
+    * tcod.FONT_LAYOUT_TCOD:
+      Unique layout used by libtcod.
+    * tcod.FONT_LAYOUT_CP437:
+      Decode a row-major Code Page 437 tileset into Unicode.
 
     `nb_char_horiz` and `nb_char_vertic` are the columns and rows of the font
     file respectfully.
