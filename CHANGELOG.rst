@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+8.2.0 - 2018-11-27
+------------------
 Added
  - New layout `tcod.FONT_LAYOUT_CP437`.
 Changed
@@ -20,6 +23,7 @@ Deprecated
 Fixed
  - Console objects are now initialized with spaces. This fixes some blit
    operations.
+ - Unicode code-points above U+FFFF will now work on all platforms.
 
 8.1.1 - 2018-11-16
 ------------------
