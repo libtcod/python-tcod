@@ -18,7 +18,7 @@ from tcod.libtcod import *
 from tcod._internal import deprecate
 
 from tcod.tcod import _int, _unpack_char_p
-from tcod.tcod import _bytes, _unicode, _fmt_bytes, _fmt_unicode
+from tcod.tcod import _bytes, _unicode, _fmt_bytes, _fmt_unicode, _fmt
 from tcod.tcod import _CDataWrapper
 from tcod.tcod import _PropagateException
 from tcod.tcod import _console
@@ -953,7 +953,7 @@ def console_get_alignment(con):
     """
     return lib.TCOD_console_get_alignment(_console(con))
 
-def console_print(con, x, y, fmt):
+def console_print(con: tcod.console.Console, x: int, y: int, fmt: str) -> None:
     """Print a color formatted string on a console.
 
     Args:
@@ -962,9 +962,10 @@ def console_print(con, x, y, fmt):
         y (int): Character y position from the top.
         fmt (AnyStr): A unicode or bytes string optionaly using color codes.
     """
-    lib.TCOD_console_print(_console(con), x, y, _fmt_unicode(fmt))
+    lib.TCOD_console_printf(_console(con), x, y, _fmt(fmt))
 
-def console_print_ex(con, x, y, flag, alignment, fmt):
+def console_print_ex(con: tcod.console.Console, x: int, y: int, flag: int,
+                     alignment: int, fmt: str) -> None:
     """Print a string on a console using a blend mode and alignment mode.
 
     Args:
@@ -972,10 +973,11 @@ def console_print_ex(con, x, y, flag, alignment, fmt):
         x (int): Character x position from the left.
         y (int): Character y position from the top.
     """
-    lib.TCOD_console_print_ex(_console(con),
-                               x, y, flag, alignment, _fmt_unicode(fmt))
+    lib.TCOD_console_printf_ex(_console(con),
+                               x, y, flag, alignment, _fmt(fmt))
 
-def console_print_rect(con, x, y, w, h, fmt):
+def console_print_rect(con: tcod.console.Console,
+                       x: int, y: int, w: int, h: int, fmt: str) -> int:
     """Print a string constrained to a rectangle.
 
     If h > 0 and the bottom of the rectangle is reached,
@@ -987,42 +989,48 @@ def console_print_rect(con, x, y, w, h, fmt):
     Returns:
         int: The number of lines of text once word-wrapped.
     """
-    return lib.TCOD_console_print_rect(
-        _console(con), x, y, w, h, _fmt_unicode(fmt))
+    return lib.TCOD_console_printf_rect(
+        _console(con), x, y, w, h, _fmt(fmt))
 
-def console_print_rect_ex(con, x, y, w, h, flag, alignment, fmt):
+def console_print_rect_ex(con: tcod.console.Console,
+                          x: int, y: int, w: int, h: int,
+                          flag: int, alignment: int, fmt: str) -> int:
     """Print a string constrained to a rectangle with blend and alignment.
 
     Returns:
         int: The number of lines of text once word-wrapped.
     """
-    return lib.TCOD_console_print_rect_ex(
-        _console(con), x, y, w, h, flag, alignment, _fmt_unicode(fmt))
+    return lib.TCOD_console_printf_rect_ex(
+        _console(con), x, y, w, h, flag, alignment, _fmt(fmt))
 
-def console_get_height_rect(con, x, y, w, h, fmt):
+def console_get_height_rect(con: tcod.console.Console,
+                            x: int, y: int, w: int, h: int, fmt: str) -> int:
     """Return the height of this text once word-wrapped into this rectangle.
 
     Returns:
         int: The number of lines of text once word-wrapped.
     """
-    return lib.TCOD_console_get_height_rect(
-        _console(con), x, y, w, h, _fmt_unicode(fmt))
+    return lib.TCOD_console_get_height_rect_fmt(
+        _console(con), x, y, w, h, _fmt(fmt))
 
-def console_rect(con, x, y, w, h, clr, flag=BKGND_DEFAULT):
+def console_rect(con: tcod.console.Console, x: int, y: int, w: int, h: int,
+                 clr: bool, flag: int=BKGND_DEFAULT) -> None:
     """Draw a the background color on a rect optionally clearing the text.
 
     If clr is True the affected tiles are changed to space character.
     """
     lib.TCOD_console_rect(_console(con), x, y, w, h, clr, flag)
 
-def console_hline(con, x, y, l, flag=BKGND_DEFAULT):
+def console_hline(con: tcod.console.Console, x: int, y: int, l: int,
+                  flag: int=BKGND_DEFAULT) -> None:
     """Draw a horizontal line on the console.
 
     This always uses the character 196, the horizontal line character.
     """
     lib.TCOD_console_hline(_console(con), x, y, l, flag)
 
-def console_vline(con, x, y, l, flag=BKGND_DEFAULT):
+def console_vline(con: tcod.console.Console, x: int, y: int, l: int,
+                  flag: int=BKGND_DEFAULT):
     """Draw a vertical line on the console.
 
     This always uses the character 179, the vertical line character.
@@ -1030,7 +1038,7 @@ def console_vline(con, x, y, l, flag=BKGND_DEFAULT):
     lib.TCOD_console_vline(_console(con), x, y, l, flag)
 
 def console_print_frame(con, x: int, y: int, w: int, h: int, clear: bool=True,
-                        flag: int=BKGND_DEFAULT, fmt: bytes=b''):
+                         flag: int=BKGND_DEFAULT, fmt: str='') -> None:
     """Draw a framed rectangle with optinal text.
 
     This uses the default background color and blend mode to fill the
@@ -1038,12 +1046,12 @@ def console_print_frame(con, x: int, y: int, w: int, h: int, clear: bool=True,
 
     `fmt` will be printed on the inside of the rectangle, word-wrapped.
     If `fmt` is empty then no title will be drawn.
+
+    .. versionchanged:: 8.2
+        Now supports Unicode strings.
     """
-    if fmt:
-        fmt = _fmt_bytes(fmt)
-    else:
-        fmt = ffi.NULL
-    lib.TCOD_console_print_frame(_console(con), x, y, w, h, clear, flag, fmt)
+    fmt = _fmt(fmt) if fmt else ffi.NULL
+    lib.TCOD_console_printf_frame(_console(con), x, y, w, h, clear, flag, fmt)
 
 def console_set_color_control(con, fore, back):
     """Configure :any:`color controls`.

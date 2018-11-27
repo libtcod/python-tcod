@@ -27,6 +27,7 @@ from __future__ import absolute_import
 
 import sys
 
+from typing import Optional
 import warnings
 
 import numpy as np
@@ -35,15 +36,9 @@ import tcod.libtcod
 from tcod.libtcod import ffi, lib
 import tcod._internal
 
-if sys.version_info[0] == 2: # Python 2
-    def _fmt(string):
-        if not isinstance(string, unicode):
-            string = string.decode('latin-1')
-        return string.replace(u'%', u'%%')
-else:
-    def _fmt(string):
-        """Return a string that escapes 'C printf' side effects."""
-        return string.replace('%', '%%')
+def _fmt(string: str) -> bytes:
+    """Return a string that escapes 'C printf' side effects."""
+    return string.encode('utf-8').replace(b'%', b'%%')
 
 _root_console = None
 
@@ -235,24 +230,26 @@ class Console(object):
         """
         lib.TCOD_console_put_char(self.console_c, x, y, ch, bg_blend)
 
-    def print_(self, x, y, string, bg_blend=tcod.libtcod.BKGND_DEFAULT,
-               alignment=None):
+    def print_(self, x: int, y: int, string: str,
+               bg_blend: int=tcod.libtcod.BKGND_DEFAULT,
+               alignment: Optional[int]=None) -> None:
         """Print a color formatted string on a console.
 
         Args:
             x (int): The x coordinate from the left.
             y (int): The y coordinate from the top.
-            string (Text): A Unicode string optionaly using color codes.
+            string (str): A Unicode string optionaly using color codes.
             bg_blend (int): Blending mode to use, defaults to BKGND_DEFAULT.
-            alignment (Optinal[int]): Text alignment.
+            alignment (Optional[int]): Text alignment.
         """
         alignment = self.default_alignment if alignment is None else alignment
 
-        lib.TCOD_console_print_ex_utf(self.console_c, x, y,
-                                      bg_blend, alignment, _fmt(string))
+        lib.TCOD_console_printf_ex(self.console_c, x, y,
+                                   bg_blend, alignment, _fmt(string))
 
-    def print_rect(self, x, y, width, height, string,
-                   bg_blend=tcod.libtcod.BKGND_DEFAULT, alignment=None):
+    def print_rect(self, x: int, y: int, width: int, height:int, string: str,
+                   bg_blend: int=tcod.libtcod.BKGND_DEFAULT,
+                   alignment: Optional[int]=None) -> int:
         """Print a string constrained to a rectangle.
 
         If h > 0 and the bottom of the rectangle is reached,
@@ -264,7 +261,7 @@ class Console(object):
             y (int): The y coordinate from the top.
             width (int): Maximum width to render the text.
             height (int): Maximum lines to render the text.
-            string (Text): A Unicode string.
+            string (str): A Unicode string.
             bg_blend (int): Background blending flag.
             alignment (Optional[int]): Alignment flag.
 
@@ -272,10 +269,11 @@ class Console(object):
             int: The number of lines of text once word-wrapped.
         """
         alignment = self.default_alignment if alignment is None else alignment
-        return lib.TCOD_console_print_rect_ex_utf(self.console_c,
+        return lib.TCOD_console_printf_rect_ex(self.console_c,
             x, y, width, height, bg_blend, alignment, _fmt(string))
 
-    def get_height_rect(self, x, y, width, height, string):
+    def get_height_rect(self, x: int, y: int, width: int, height: int,
+                        string: str) -> int:
         """Return the height of this text word-wrapped into this rectangle.
 
         Args:
@@ -283,16 +281,16 @@ class Console(object):
             y (int): The y coordinate from the top.
             width (int): Maximum width to render the text.
             height (int): Maximum lines to render the text.
-            string (Text): A Unicode string.
+            string (str): A Unicode string.
 
         Returns:
             int: The number of lines of text once word-wrapped.
         """
-        return lib.TCOD_console_get_height_rect_utf(
+        return lib.TCOD_console_get_height_rect_fmt(
             self.console_c, x, y, width, height, _fmt(string))
 
-    def rect(self, x, y, width, height, clear,
-             bg_blend=tcod.libtcod.BKGND_DEFAULT):
+    def rect(self, x: int, y: int, width: int, height: int, clear: bool,
+             bg_blend: int=tcod.libtcod.BKGND_DEFAULT) -> None:
         """Draw a the background color on a rect optionally clearing the text.
 
         If clr is True the affected tiles are changed to space character.
@@ -356,15 +354,12 @@ class Console(object):
                           removed.
             bg_blend (int): The background blending flag.
 
-        Note:
-            This method does not support Unicode outside of the 0-255 range.
+        .. versionchanged:: 8.2
+            Now supports Unicode strings.
         """
-        if string:
-            string = string.encode('latin-1')
-        else:
-            string = ffi.NULL
-        lib.TCOD_console_print_frame(self.console_c, x, y, width, height,
-                                     clear, bg_blend, string)
+        string = _fmt(string) if string else ffi.NULL
+        lib.TCOD_console_printf_frame(self.console_c, x, y, width, height,
+                                      clear, bg_blend, string)
 
     def blit(self, dest, dest_x=0, dest_y=0,
              src_x=0, src_y=0, width=0, height=0,

@@ -47,6 +47,18 @@ def _fmt_bytes(string: AnyStr) -> bytes:
 def _fmt_unicode(string: AnyStr) -> str:
     return _unicode(string, stacklevel=3).encode('utf-8').replace(b'%', b'%%')
 
+def _fmt(string: str, stacklevel: int=2) -> bytes:
+    if isinstance(string, bytes):
+        warnings.warn(
+            ("Passing byte strings as parameters to Unicode functions is "
+             "deprecated."),
+            DeprecationWarning,
+            stacklevel=stacklevel + 1,
+        )
+        string = string.decode('latin-1')
+    return string.encode('utf-8').replace(b'%', b'%%')
+
+
 
 class _PropagateException():
     """ context manager designed to propagate exceptions outside of a cffi

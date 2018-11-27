@@ -13,6 +13,10 @@ Added
  - New layout `tcod.FONT_LAYOUT_CP437`.
 Changed
  - Updated libtcod to 1.10.2
+ - `tcod.console_print_frame` and `Console.print_frame` now support Unicode
+   strings.
+Deprecated
+ - Deprecated using bytes strings for all printing functions.
 
 8.1.1 - 2018-11-16
 ------------------
