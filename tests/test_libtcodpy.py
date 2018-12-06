@@ -7,7 +7,7 @@ try:
 except ImportError:
     numpy = None
 
-import libtcodpy
+import tcod as libtcodpy
 
 def test_console_behaviour(console):
     assert not console
@@ -145,6 +145,7 @@ def test_console_rexpaint_load_test_file(console):
     assert (libtcodpy.console_get_char_background(xp_console, 2, 1) ==
             libtcodpy.Color(0, 0, 255))
 
+@pytest.mark.filterwarnings("ignore:Falsy console parameters are deprecated")
 def test_console_rexpaint_save_load(console, tmpdir, ch, fg, bg):
     libtcodpy.console_print(console, 0, 0, 'test')
     libtcodpy.console_put_char_ex(console, 1, 1, ch, fg, bg)
@@ -282,6 +283,7 @@ def test_sys_custom_render(console):
     libtcodpy.console_flush()
     assert escape, 'proof that sdl_callback was called'
 
+@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
 def test_image(console, tmpdir):
     img = libtcodpy.image_new(16, 16)
     libtcodpy.image_clear(img, libtcodpy.Color(0, 0, 0))
@@ -432,6 +434,7 @@ def test_bsp():
 
     libtcodpy.bsp_delete(bsp)
 
+@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
 def test_map():
     map = libtcodpy.map_new(16, 16)
     assert libtcodpy.map_get_width(map) == 16
@@ -490,6 +493,7 @@ def test_namegen_parse():
     assert libtcodpy.namegen_get_sets()
     libtcodpy.namegen_destroy()
 
+@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
 def test_noise():
     noise = libtcodpy.noise_new(1)
     libtcodpy.noise_set_type(noise, libtcodpy.NOISE_SIMPLEX)
@@ -498,6 +502,7 @@ def test_noise():
     libtcodpy.noise_get_turbulence(noise, [0], 4)
     libtcodpy.noise_delete(noise)
 
+@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
 def test_random():
     rand = libtcodpy.random_get_instance()
     rand = libtcodpy.random_new()
@@ -517,6 +522,20 @@ def test_random():
     libtcodpy.random_delete(rand)
     libtcodpy.random_delete(backup)
 
+
+@pytest.mark.filterwarnings("ignore:Assign to this heightmap with")
+@pytest.mark.filterwarnings("ignore:Add a scalar to an array using")
+@pytest.mark.filterwarnings("ignore:Multiply an array with a scaler using `hm")
+@pytest.mark.filterwarnings("ignore:Clear an array with")
+@pytest.mark.filterwarnings("ignore:Clamp array values using")
+@pytest.mark.filterwarnings("ignore:Copy an array using")
+@pytest.mark.filterwarnings("ignore:Add 2 arrays using")
+@pytest.mark.filterwarnings("ignore:Multiply 2 arrays using")
+@pytest.mark.filterwarnings("ignore:Arrays of noise should be sampled using t")
+@pytest.mark.filterwarnings("ignore:Get a value from this heightmap with")
+@pytest.mark.filterwarnings("ignore:This function is deprecated, see document")
+@pytest.mark.filterwarnings("ignore:Use `hm.min\\(\\)` and `hm.max\\(\\)`")
+@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
 def test_heightmap():
     hmap = libtcodpy.heightmap_new(16, 16)
     repr(hmap)
@@ -596,9 +615,11 @@ def path_callback(map_):
         return 0
     return callback
 
+@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
 def test_map_fov(map_):
     libtcodpy.map_compute_fov(map_, *POINT_A)
 
+@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
 def test_astar(map_):
     astar = libtcodpy.path_new_using_map(map_)
 
@@ -623,6 +644,7 @@ def test_astar(map_):
 
     libtcodpy.path_delete(astar)
 
+@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
 def test_astar_callback(map_, path_callback):
     astar = libtcodpy.path_new_using_function(
         libtcodpy.map_get_width(map_),
@@ -632,6 +654,7 @@ def test_astar_callback(map_, path_callback):
     libtcodpy.path_compute(astar, *POINTS_AB)
     libtcodpy.path_delete(astar)
 
+@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
 def test_dijkstra(map_):
     path = libtcodpy.dijkstra_new(map_)
 
@@ -654,6 +677,7 @@ def test_dijkstra(map_):
 
     libtcodpy.dijkstra_delete(path)
 
+@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
 def test_dijkstra_callback(map_, path_callback):
     path = libtcodpy.dijkstra_new_using_function(
         libtcodpy.map_get_width(map_),

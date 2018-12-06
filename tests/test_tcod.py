@@ -19,6 +19,8 @@ def test_line_error():
         tcod.line(*LINE_ARGS, py_callback=raise_Exception)
 
 
+@pytest.mark.filterwarnings("ignore:Iterate over nodes using")
+@pytest.mark.filterwarnings("ignore:Use pre_order method instead of walk.")
 def test_tcod_bsp():
     """
     test tcod additions to BSP

@@ -1452,6 +1452,7 @@ def path_walk(p, recompute):
         return x[0], y[0]
     return None,None
 
+@deprecate("libtcod objects are deleted automatically.")
 def path_delete(p):
     # type (Any) -> None
     """Does nothing. libtcod objects are managed by Python's garbage collector.
@@ -1499,6 +1500,7 @@ def dijkstra_path_walk(p):
         return x[0], y[0]
     return None,None
 
+@deprecate("libtcod objects are deleted automatically.")
 def dijkstra_delete(p):
     # type (Any) -> None
     """Does nothing. libtcod objects are managed by Python's garbage collector.
@@ -2094,6 +2096,7 @@ def image_blit_2x(image, console, dx, dy, sx=0, sy=0, w=-1, h=-1):
 def image_save(image, filename):
     image.save_as(filename)
 
+@deprecate("libtcod objects are deleted automatically.")
 def image_delete(image):
     # type (Any) -> None
     """Does nothing. libtcod objects are managed by Python's garbage collector.
@@ -2326,6 +2329,7 @@ def map_is_walkable(m, x, y):
     """
     return lib.TCOD_map_is_walkable(m.map_c, x, y)
 
+@deprecate("libtcod objects are deleted automatically.")
 def map_delete(m):
     # type (Any) -> None
     """Does nothing. libtcod objects are managed by Python's garbage collector.
@@ -2463,6 +2467,7 @@ def noise_get_turbulence(n, f, oc, typ=NOISE_DEFAULT):
     return lib.TCOD_noise_get_turbulence_ex(n.noise_c, ffi.new('float[4]', f),
                                             oc, typ)
 
+@deprecate("libtcod objects are deleted automatically.")
 def noise_delete(n):
     # type (Any) -> None
     """Does nothing. libtcod objects are managed by Python's garbage collector.
@@ -2560,6 +2565,7 @@ def parser_run(parser, filename, listener=None):
         with propagate_manager:
             lib.TCOD_parser_run(parser, _bytes(filename), clistener)
 
+@deprecate("libtcod objects are deleted automatically.")
 def parser_delete(parser):
     # type (Any) -> None
     """Does nothing. libtcod objects are managed by Python's garbage collector.
@@ -2760,6 +2766,7 @@ def random_restore(rnd, backup):
     lib.TCOD_random_restore(rnd.random_c if rnd else ffi.NULL,
                             backup.random_c)
 
+@deprecate("libtcod objects are deleted automatically.")
 def random_delete(rnd):
     # type (Any) -> None
     """Does nothing. libtcod objects are managed by Python's garbage collector.
