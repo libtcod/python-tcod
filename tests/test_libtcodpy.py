@@ -364,6 +364,13 @@ def test_line_iter():
     """
     assert list(libtcodpy.line_iter(*LINE_ARGS)) == INCLUSIVE_RESULTS
 
+@pytest.mark.filterwarnings("ignore:Assign values via attribute instead.")
+@pytest.mark.filterwarnings("ignore:Use 'node.contains' instead.")
+@pytest.mark.filterwarnings("ignore:Check for children with")
+@pytest.mark.filterwarnings("ignore:Iterate over nodes using")
+@pytest.mark.filterwarnings("ignore:Access children with")
+@pytest.mark.filterwarnings("ignore:Delete bsp children using")
+@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
 def test_bsp():
     """
     commented out statements work in libtcod-cffi

@@ -401,6 +401,7 @@ def bsp_split_recursive(node, randomizer, nb, minHSize, minVSize, maxHRatio,
     node.split_recursive(nb, minHSize, minVSize,
                          maxHRatio, maxVRatio, randomizer)
 
+@deprecate("Assign values via attribute instead.")
 def bsp_resize(node, x, y, w, h):
     """
     .. deprecated:: 2.0
@@ -411,6 +412,7 @@ def bsp_resize(node, x, y, w, h):
     node.width = w
     node.height = h
 
+@deprecate("Access children with 'node.children' instead.")
 def bsp_left(node):
     """
     .. deprecated:: 2.0
@@ -418,6 +420,7 @@ def bsp_left(node):
     """
     return None if not node.children else node.children[0]
 
+@deprecate("Access children with 'node.children' instead.")
 def bsp_right(node):
     """
     .. deprecated:: 2.0
@@ -425,6 +428,7 @@ def bsp_right(node):
     """
     return None if not node.children else node.children[1]
 
+@deprecate("Get the parent with 'node.parent' instead.")
 def bsp_father(node):
     """
     .. deprecated:: 2.0
@@ -432,6 +436,7 @@ def bsp_father(node):
     """
     return node.parent
 
+@deprecate("Check for children with 'bool(node.children)' instead.")
 def bsp_is_leaf(node):
     """
     .. deprecated:: 2.0
@@ -439,6 +444,7 @@ def bsp_is_leaf(node):
     """
     return not node.children
 
+@deprecate("Use 'node.contains' instead.")
 def bsp_contains(node, cx, cy):
     """
     .. deprecated:: 2.0
@@ -446,6 +452,7 @@ def bsp_contains(node, cx, cy):
     """
     return node.contains(cx, cy)
 
+@deprecate("Use 'node.find_node' instead.")
 def bsp_find_node(node, cx, cy):
     """
     .. deprecated:: 2.0
@@ -460,46 +467,53 @@ def _bsp_traverse(node_iter, callback, userData):
     for node in node_iter:
         callback(node, userData)
 
+@deprecate("Iterate over nodes using 'for n in node.pre_order():' instead.")
 def bsp_traverse_pre_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
 
     .. deprecated:: 2.0
-       Use :any:`BSP.walk` instead.
+       Use :any:`BSP.pre_order` instead.
     """
-    _bsp_traverse(node._iter_pre_order(), callback, userData)
+    _bsp_traverse(node.pre_order(), callback, userData)
 
+@deprecate("Iterate over nodes using 'for n in node.in_order():' instead.")
 def bsp_traverse_in_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
 
     .. deprecated:: 2.0
-       Use :any:`BSP.walk` instead.
+       Use :any:`BSP.in_order` instead.
     """
-    _bsp_traverse(node._iter_in_order(), callback, userData)
+    _bsp_traverse(node.in_order(), callback, userData)
 
+@deprecate("Iterate over nodes using 'for n in node.post_order():' instead.")
 def bsp_traverse_post_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
 
     .. deprecated:: 2.0
-       Use :any:`BSP.walk` instead.
+       Use :any:`BSP.post_order` instead.
     """
-    _bsp_traverse(node._iter_post_order(), callback, userData)
+    _bsp_traverse(node.post_order(), callback, userData)
 
+@deprecate("Iterate over nodes using 'for n in node.level_order():' instead.")
 def bsp_traverse_level_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
 
     .. deprecated:: 2.0
-       Use :any:`BSP.walk` instead.
+       Use :any:`BSP.level_order` instead.
     """
-    _bsp_traverse(node._iter_level_order(), callback, userData)
+    _bsp_traverse(node.level_order(), callback, userData)
 
+@deprecate("Iterate over nodes using "
+           "'for n in node.inverted_level_order():' instead.")
 def bsp_traverse_inverted_level_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
 
     .. deprecated:: 2.0
-       Use :any:`BSP.walk` instead.
+       Use :any:`BSP.inverted_level_order` instead.
     """
-    _bsp_traverse(node._iter_inverted_level_order(), callback, userData)
+    _bsp_traverse(node.inverted_level_order(), callback, userData)
 
+@deprecate("Delete bsp children using 'node.children = ()' instead.")
 def bsp_remove_sons(node):
     """Delete all children of a given node.  Not recommended.
 
@@ -512,6 +526,7 @@ def bsp_remove_sons(node):
     """
     node.children = ()
 
+@deprecate("libtcod objects are deleted automatically.")
 def bsp_delete(node):
     # type: (Any) -> None
     """Exists for backward compatibility.  Does nothing.
