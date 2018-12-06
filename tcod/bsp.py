@@ -207,16 +207,16 @@ class BSP(object):
 
         .. versionadded:: 8.3
         """
-        levels = [[self]] # type: List[List['BSP']]
+        levels = [] # type: List[List['BSP']]
         next = [self] # type: List['BSP']
         while next:
+            levels.append(next)
             level = next # type: List['BSP']
             next = []
             for node in level:
                 next.extend(node.children)
-            levels.append(next)
-        for level in levels[::-1]:
-            yield from level
+        while levels:
+            yield from levels.pop()
 
     def contains(self, x: int, y: int) -> bool:
         """Returns True if this node contains these coordinates.
