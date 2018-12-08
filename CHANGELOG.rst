@@ -9,8 +9,11 @@ v2.0.0
 
 Unreleased
 ------------------
+
+8.3.0 - 2018-12-08
+------------------
 Added
- - Added BSP traversal methods in tcod.bsp to gain parity with libtcodpy.
+ - Added BSP traversal methods in tcod.bsp for parity with libtcodpy.
 Deprecated
  - Already deprecated bsp functions are now even more deprecated.
 
