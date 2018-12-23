@@ -9,6 +9,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - libtcodpy key and mouse functions will no longer accept the wrong types.
 
 8.3.0 - 2018-12-08
 ------------------

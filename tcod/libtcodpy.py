@@ -313,6 +313,10 @@ class Key(_CDataWrapper):
                 params.append('%s=%r' % (attr, getattr(self, attr)))
         return 'tcod.Key(%s)' % ', '.join(params)
 
+    @property
+    def key_p(self):
+        return self.cdata
+
 
 class Mouse(_CDataWrapper):
     """Mouse event instance
@@ -366,6 +370,10 @@ class Mouse(_CDataWrapper):
             if getattr(self, attr):
                 params.append('%s=%r' % (attr, getattr(self, attr)))
         return 'tcod.Mouse(%s)' % ', '.join(params)
+
+    @property
+    def mouse_p(self):
+        return self.cdata
 
 
 def bsp_new_with_size(x, y, w, h):
@@ -1127,14 +1135,14 @@ def console_wait_for_keypress(flush):
     Returns:
         Key: A new Key instance.
     """
-    k=Key()
-    lib.TCOD_console_wait_for_keypress_wrapper(k.cdata, flush)
-    return k
+    key = Key()
+    lib.TCOD_console_wait_for_keypress_wrapper(key.key_p, flush)
+    return key
 
 def console_check_for_keypress(flags=KEY_RELEASED):
-    k=Key()
-    lib.TCOD_console_check_for_keypress_wrapper(k.cdata, flags)
-    return k
+    key = Key()
+    lib.TCOD_console_check_for_keypress_wrapper(key.key_p, flags)
+    return key
 
 def console_is_key_pressed(key):
     return lib.TCOD_console_is_key_pressed(key)
@@ -2994,7 +3002,7 @@ def sys_check_for_event(mask, k, m):
                              with an event.  Can be None.
     """
     return lib.TCOD_sys_check_for_event(
-        mask, k.cdata if k else ffi.NULL, m.cdata if m else ffi.NULL)
+        mask, k.key_p if k else ffi.NULL, m.mouse_p if m else ffi.NULL)
 
 def sys_wait_for_event(mask, k, m, flush):
     """Wait for an event then return.
@@ -3011,7 +3019,7 @@ def sys_wait_for_event(mask, k, m, flush):
         flush (bool): Clear the event buffer before waiting.
     """
     return lib.TCOD_sys_wait_for_event(
-        mask, k.cdata if k else ffi.NULL, m.cdata if m else ffi.NULL, flush)
+        mask, k.key_p if k else ffi.NULL, m.mouse_p if m else ffi.NULL, flush)
 
 @deprecate("This function does not provide reliable access to the clipboard.")
 def sys_clipboard_set(text):
