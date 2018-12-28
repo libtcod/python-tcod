@@ -43,7 +43,7 @@ install:
 - cmd: "python setup.py build sdist develop bdist_wheel"
 build: off
 before_test:
-- cmd: "pip install pytest pytest-cov"
+- cmd: "pip install pytest pytest-cov pytest-faulthandler"
 test_script:
 - ps: "pytest -v"
 
