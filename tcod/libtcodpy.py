@@ -2529,7 +2529,7 @@ _parser_listener = None # temporary global pointer to a listener instance
 
 @ffi.def_extern()
 def _pycall_parser_new_struct(struct, name):
-    return _parser_listener.end_struct(struct, _unpack_char_p(name))
+    return _parser_listener.new_struct(struct, _unpack_char_p(name))
 
 @ffi.def_extern()
 def _pycall_parser_new_flag(name):
