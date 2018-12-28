@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+8.3.2 - 2018-12-28
+------------------
 Fixed
  - Fixed rare access violations for some functions which took strings as
    parameters, such as `tcod.console_init_root`.
