@@ -676,7 +676,8 @@ def console_init_root(
         title = os.path.basename(sys.argv[0])
     if renderer is None:
         renderer = RENDERER_GLSL # Stable for now.
-    lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
+    title = _bytes(title)
+    lib.TCOD_console_init_root(w, h, title, fullscreen, renderer)
     return tcod.console.Console._get_root(order)
 
 
@@ -707,7 +708,8 @@ def console_set_custom_font(fontFile: AnyStr, flags:
     if not os.path.exists(fontFile):
         raise RuntimeError("File not found:\n\t%s"
                            % (os.path.realpath(fontFile),))
-    lib.TCOD_console_set_custom_font(_bytes(fontFile), flags,
+    fontFile = _bytes(fontFile)
+    lib.TCOD_console_set_custom_font(fontFile, flags,
                                      nb_char_horiz, nb_char_vertic)
 
 
@@ -825,7 +827,8 @@ def console_set_window_title(title):
     Args:
         title (AnyStr): A string to change the title bar to.
     """
-    lib.TCOD_console_set_window_title(_bytes(title))
+    title = _bytes(title)
+    lib.TCOD_console_set_window_title(title)
 
 def console_credits():
     lib.TCOD_console_credits()
@@ -2057,8 +2060,9 @@ def image_load(filename):
     Args:
         filename (AnyStr): Path to a .bmp or .png image file.
     """
+    filename = _bytes(filename)
     return tcod.image.Image._from_cdata(
-        ffi.gc(lib.TCOD_image_load(_bytes(filename)),
+        ffi.gc(lib.TCOD_image_load(filename),
                lib.TCOD_image_delete)
         )
 
@@ -2381,15 +2385,18 @@ def mouse_get_status():
     # type: () -> Mouse
     return Mouse(lib.TCOD_mouse_get_status())
 
-def namegen_parse(filename,random=None):
-    lib.TCOD_namegen_parse(_bytes(filename), random or ffi.NULL)
+def namegen_parse(filename, random=None):
+    filename = _bytes(filename)
+    lib.TCOD_namegen_parse(filename, random or ffi.NULL)
 
 def namegen_generate(name):
-    return _unpack_char_p(lib.TCOD_namegen_generate(_bytes(name), False))
+    name = _bytes(name)
+    return _unpack_char_p(lib.TCOD_namegen_generate(name, False))
 
 def namegen_generate_custom(name, rule):
-    return _unpack_char_p(lib.TCOD_namegen_generate(_bytes(name),
-                                                     _bytes(rule), False))
+    name = _bytes(name)
+    rule = _bytes(rule)
+    return _unpack_char_p(lib.TCOD_namegen_generate(name, rule, False))
 
 def namegen_get_sets():
     sets = lib.TCOD_namegen_get_sets()
@@ -2550,8 +2557,9 @@ def _pycall_parser_error(msg):
 
 def parser_run(parser, filename, listener=None):
     global _parser_listener
+    filename = _bytes(filename)
     if not listener:
-        lib.TCOD_parser_run(parser, _bytes(filename), ffi.NULL)
+        lib.TCOD_parser_run(parser, filename, ffi.NULL)
         return
 
     propagate_manager = _PropagateException()
@@ -2571,7 +2579,7 @@ def parser_run(parser, filename, listener=None):
     with _parser_callback_lock:
         _parser_listener = listener
         with propagate_manager:
-            lib.TCOD_parser_run(parser, _bytes(filename), clistener)
+            lib.TCOD_parser_run(parser, filename, clistener)
 
 @deprecate("libtcod objects are deleted automatically.")
 def parser_delete(parser):
@@ -2582,32 +2590,40 @@ def parser_delete(parser):
     """
 
 def parser_get_bool_property(parser, name):
-    return bool(lib.TCOD_parser_get_bool_property(parser, _bytes(name)))
+    name = _bytes(name)
+    return bool(lib.TCOD_parser_get_bool_property(parser, name))
 
 def parser_get_int_property(parser, name):
-    return lib.TCOD_parser_get_int_property(parser, _bytes(name))
+    name = _bytes(name)
+    return lib.TCOD_parser_get_int_property(parser, name)
 
 def parser_get_char_property(parser, name):
-    return _chr(lib.TCOD_parser_get_char_property(parser, _bytes(name)))
+    name = _bytes(name)
+    return _chr(lib.TCOD_parser_get_char_property(parser, name))
 
 def parser_get_float_property(parser, name):
-    return lib.TCOD_parser_get_float_property(parser, _bytes(name))
+    name = _bytes(name)
+    return lib.TCOD_parser_get_float_property(parser, name)
 
 def parser_get_string_property(parser, name):
+    name = _bytes(name)
     return _unpack_char_p(
-        lib.TCOD_parser_get_string_property(parser, _bytes(name)))
+        lib.TCOD_parser_get_string_property(parser, name))
 
 def parser_get_color_property(parser, name):
+    name = _bytes(name)
     return Color._new_from_cdata(
-        lib.TCOD_parser_get_color_property(parser, _bytes(name)))
+        lib.TCOD_parser_get_color_property(parser, name))
 
 def parser_get_dice_property(parser, name):
     d = ffi.new('TCOD_dice_t *')
-    lib.TCOD_parser_get_dice_property_py(parser, _bytes(name), d)
+    name = _bytes(name)
+    lib.TCOD_parser_get_dice_property_py(parser, name, d)
     return Dice(d)
 
 def parser_get_list_property(parser, name, type):
-    clist = lib.TCOD_parser_get_list_property(parser, _bytes(name), type)
+    name = _bytes(name)
+    clist = lib.TCOD_parser_get_list_property(parser, name, type)
     return _convert_TCODList(clist, type)
 
 RNG_MT = 0

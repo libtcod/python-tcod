@@ -243,9 +243,9 @@ class Console(object):
             alignment (Optional[int]): Text alignment.
         """
         alignment = self.default_alignment if alignment is None else alignment
-
+        string = _fmt(string)
         lib.TCOD_console_printf_ex(self.console_c, x, y,
-                                   bg_blend, alignment, _fmt(string))
+                                   bg_blend, alignment, string)
 
     def print_rect(self, x: int, y: int, width: int, height:int, string: str,
                    bg_blend: int=tcod.libtcod.BKGND_DEFAULT,
@@ -269,8 +269,9 @@ class Console(object):
             int: The number of lines of text once word-wrapped.
         """
         alignment = self.default_alignment if alignment is None else alignment
+        string = _fmt(string)
         return lib.TCOD_console_printf_rect_ex(self.console_c,
-            x, y, width, height, bg_blend, alignment, _fmt(string))
+            x, y, width, height, bg_blend, alignment, string)
 
     def get_height_rect(self, x: int, y: int, width: int, height: int,
                         string: str) -> int:
@@ -286,8 +287,9 @@ class Console(object):
         Returns:
             int: The number of lines of text once word-wrapped.
         """
+        string = _fmt(string)
         return lib.TCOD_console_get_height_rect_fmt(
-            self.console_c, x, y, width, height, _fmt(string))
+            self.console_c, x, y, width, height, string)
 
     def rect(self, x: int, y: int, width: int, height: int, clear: bool,
              bg_blend: int=tcod.libtcod.BKGND_DEFAULT) -> None:
