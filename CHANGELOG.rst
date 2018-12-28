@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+8.3.1 - 2018-12-28
+------------------
 Fixed
  - libtcodpy key and mouse functions will no longer accept the wrong types.
  - The `new_struct` method was not being called for libtcodpy's custom parsers.
