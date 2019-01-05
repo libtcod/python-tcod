@@ -15,8 +15,6 @@
     Bring any issues or requests to GitHub:
     https://github.com/HexDecimal/libtcod-cffi
 """
-from __future__ import absolute_import
-
 import sys
 
 import warnings

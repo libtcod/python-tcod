@@ -28,7 +28,7 @@ import warnings
 
 import numpy as np
 
-import tcod.libtcod
+import tcod.constants
 from tcod.libtcod import ffi, lib
 import tcod._internal
 
@@ -226,7 +226,7 @@ class Console(object):
         """
         lib.TCOD_console_clear(self.console_c)
 
-    def put_char(self, x, y, ch, bg_blend=tcod.libtcod.BKGND_DEFAULT):
+    def put_char(self, x, y, ch, bg_blend=tcod.constants.BKGND_DEFAULT):
         """Draw the character c at x,y using the default colors and a blend mode.
 
         Args:
@@ -242,7 +242,7 @@ class Console(object):
         x: int,
         y: int,
         string: str,
-        bg_blend: int = tcod.libtcod.BKGND_DEFAULT,
+        bg_blend: int = tcod.constants.BKGND_DEFAULT,
         alignment: Optional[int] = None,
     ) -> None:
         """Print a color formatted string on a console.
@@ -267,7 +267,7 @@ class Console(object):
         width: int,
         height: int,
         string: str,
-        bg_blend: int = tcod.libtcod.BKGND_DEFAULT,
+        bg_blend: int = tcod.constants.BKGND_DEFAULT,
         alignment: Optional[int] = None,
     ) -> int:
         """Print a string constrained to a rectangle.
@@ -321,7 +321,7 @@ class Console(object):
         width: int,
         height: int,
         clear: bool,
-        bg_blend: int = tcod.libtcod.BKGND_DEFAULT,
+        bg_blend: int = tcod.constants.BKGND_DEFAULT,
     ) -> None:
         """Draw a the background color on a rect optionally clearing the text.
 
@@ -340,7 +340,7 @@ class Console(object):
             self.console_c, x, y, width, height, clear, bg_blend
         )
 
-    def hline(self, x, y, width, bg_blend=tcod.libtcod.BKGND_DEFAULT):
+    def hline(self, x, y, width, bg_blend=tcod.constants.BKGND_DEFAULT):
         """Draw a horizontal line on the console.
 
         This always uses the character 196, the horizontal line character.
@@ -353,7 +353,7 @@ class Console(object):
         """
         lib.TCOD_console_hline(self.console_c, x, y, width, bg_blend)
 
-    def vline(self, x, y, height, bg_blend=tcod.libtcod.BKGND_DEFAULT):
+    def vline(self, x, y, height, bg_blend=tcod.constants.BKGND_DEFAULT):
         """Draw a vertical line on the console.
 
         This always uses the character 179, the vertical line character.
@@ -374,7 +374,7 @@ class Console(object):
         height: int,
         string: str = "",
         clear: bool = True,
-        bg_blend: int = tcod.libtcod.BKGND_DEFAULT,
+        bg_blend: int = tcod.constants.BKGND_DEFAULT,
     ):
         """Draw a framed rectangle with optinal text.
 

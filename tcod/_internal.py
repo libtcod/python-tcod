@@ -16,7 +16,7 @@ def deprecate(message, category=DeprecationWarning, stacklevel=0):
 
 def verify_order(order):
     order = order.upper()
-    if order != "C" and order != "F":
+    if order not in ("C", "F"):
         raise TypeError("order must be 'C' or 'F', not %r" % (order,))
     return order
 

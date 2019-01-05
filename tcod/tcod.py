@@ -1,6 +1,5 @@
 """This module focuses on improvements to the Python libtcod API.
 """
-
 from typing import Any, AnyStr
 import warnings
 

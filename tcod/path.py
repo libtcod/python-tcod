@@ -40,9 +40,6 @@ Example::
     All path-finding functions now respect the NumPy array shape (if a NumPy
     array is used.)
 """
-
-from __future__ import absolute_import
-
 import numpy as np
 
 from tcod.libtcod import lib, ffi

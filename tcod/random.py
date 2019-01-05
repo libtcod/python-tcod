@@ -1,17 +1,13 @@
 """
     Random module docs.
 """
-
-from __future__ import absolute_import as _
-
 import random
 
 from tcod.libtcod import ffi, lib
-from tcod.libtcod import RNG_MT
-from tcod.libtcod import RNG_CMWC
+import tcod.constants
 
-MERSENNE_TWISTER = RNG_MT
-COMPLEMENTARY_MULTIPLY_WITH_CARRY = RNG_CMWC
+MERSENNE_TWISTER = tcod.constants.RNG_MT
+COMPLEMENTARY_MULTIPLY_WITH_CARRY = tcod.constants.RNG_CMWC
 
 
 class Random(object):

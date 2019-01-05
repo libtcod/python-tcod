@@ -33,12 +33,10 @@ Example::
     samples = noise.sample_ogrid(ogrid)
     print(samples)
 """
-from __future__ import absolute_import
-
 import numpy as np
 
 from tcod.libtcod import ffi, lib
-import tcod.libtcod
+import tcod.constants
 
 """Noise implementation constants"""
 SIMPLE = 0
@@ -224,7 +222,7 @@ class Noise(object):
         if self.dimensions < 4 and self.noise_c.waveletTileData == ffi.NULL:
             # Trigger a side effect of wavelet, so that copies will be synced.
             saved_algo = self.algorithm
-            self.algorithm = tcod.libtcod.NOISE_WAVELET
+            self.algorithm = tcod.constants.NOISE_WAVELET
             self.get_point()
             self.algorithm = saved_algo
 

@@ -1,28 +1,27 @@
 """This module handles backward compatibility with the ctypes libtcodpy module.
 """
-
-from __future__ import absolute_import as _
-
 import os
 import sys
 
-import threading as _threading
+import threading
 from typing import Any, AnyStr, Optional, Sequence, Tuple
 import warnings
 
-import numpy as _np
 import numpy as np
 
-from tcod.libtcod import *  # noqa: F401 F403
 from tcod.libtcod import ffi, lib
-from tcod.libtcod import (
-    NOISE_DEFAULT_LACUNARITY,
-    NOISE_DEFAULT_HURST,
-    NOISE_DEFAULT,
-    KEY_RELEASED,
+
+from tcod.constants import *  # noqa: F4
+from tcod.constants import (
     BKGND_DEFAULT,
     BKGND_SET,
+    BKGND_ALPH,
+    BKGND_ADDA,
     FONT_LAYOUT_ASCII_INCOL,
+    FOV_RESTRICTIVE,
+    FOV_PERMISSIVE_0,
+    NOISE_DEFAULT,
+    KEY_RELEASED,
     RENDERER_GLSL,
 )
 
@@ -44,6 +43,23 @@ import tcod.path
 import tcod.random
 
 Bsp = tcod.bsp.BSP
+
+NB_FOV_ALGORITHMS = 13
+
+NOISE_DEFAULT_HURST = 0.5
+NOISE_DEFAULT_LACUNARITY = 2.0
+
+
+def FOV_PERMISSIVE(p):
+    return FOV_PERMISSIVE_0 + p
+
+
+def BKGND_ALPHA(a):
+    return BKGND_ALPH | (int(a * 255) << 8)
+
+
+def BKGND_ADDALPHA(a):
+    return BKGND_ADDA | (int(a * 255) << 8)
 
 
 class ConsoleBuffer(object):
@@ -1432,14 +1448,14 @@ def console_fill_foreground(con, r, g, b):
     if len(r) != len(g) or len(r) != len(b):
         raise TypeError("R, G and B must all have the same size.")
     if (
-        isinstance(r, _np.ndarray)
-        and isinstance(g, _np.ndarray)
-        and isinstance(b, _np.ndarray)
+        isinstance(r, np.ndarray)
+        and isinstance(g, np.ndarray)
+        and isinstance(b, np.ndarray)
     ):
         # numpy arrays, use numpy's ctypes functions
-        r = _np.ascontiguousarray(r, dtype=_np.intc)
-        g = _np.ascontiguousarray(g, dtype=_np.intc)
-        b = _np.ascontiguousarray(b, dtype=_np.intc)
+        r = np.ascontiguousarray(r, dtype=np.intc)
+        g = np.ascontiguousarray(g, dtype=np.intc)
+        b = np.ascontiguousarray(b, dtype=np.intc)
         cr = ffi.cast("int *", r.ctypes.data)
         cg = ffi.cast("int *", g.ctypes.data)
         cb = ffi.cast("int *", b.ctypes.data)
@@ -1464,14 +1480,14 @@ def console_fill_background(con, r, g, b):
     if len(r) != len(g) or len(r) != len(b):
         raise TypeError("R, G and B must all have the same size.")
     if (
-        isinstance(r, _np.ndarray)
-        and isinstance(g, _np.ndarray)
-        and isinstance(b, _np.ndarray)
+        isinstance(r, np.ndarray)
+        and isinstance(g, np.ndarray)
+        and isinstance(b, np.ndarray)
     ):
         # numpy arrays, use numpy's ctypes functions
-        r = _np.ascontiguousarray(r, dtype=_np.intc)
-        g = _np.ascontiguousarray(g, dtype=_np.intc)
-        b = _np.ascontiguousarray(b, dtype=_np.intc)
+        r = np.ascontiguousarray(r, dtype=np.intc)
+        g = np.ascontiguousarray(g, dtype=np.intc)
+        b = np.ascontiguousarray(b, dtype=np.intc)
         cr = ffi.cast("int *", r.ctypes.data)
         cg = ffi.cast("int *", g.ctypes.data)
         cb = ffi.cast("int *", b.ctypes.data)
@@ -1490,9 +1506,9 @@ def console_fill_char(con: tcod.console.Console, arr: Sequence[int]):
     `arr` is an array of integers with a length of the consoles width and
     height.
     """
-    if isinstance(arr, _np.ndarray):
+    if isinstance(arr, np.ndarray):
         # numpy arrays, use numpy's ctypes functions
-        arr = _np.ascontiguousarray(arr, dtype=_np.intc)
+        arr = np.ascontiguousarray(arr, dtype=np.intc)
         carr = ffi.cast("int *", arr.ctypes.data)
     else:
         # otherwise convert using the ffi module
@@ -1788,7 +1804,7 @@ def _heightmap_cdata(array: np.ndarray) -> ffi.CData:
         array = array.transpose()
     if not array.flags["C_CONTIGUOUS"]:
         raise ValueError("array must be a contiguous segment.")
-    if array.dtype != _np.float32:
+    if array.dtype != np.float32:
         raise ValueError("array dtype must be float32, not %r" % array.dtype)
     width, height = array.shape
     pointer = ffi.cast("float *", array.ctypes.data)
@@ -1814,9 +1830,9 @@ def heightmap_new(w: int, h: int, order: str = "C") -> np.ndarray:
         Added the `order` parameter.
     """
     if order == "C":
-        return np.zeros((h, w), _np.float32, order="C")
+        return np.zeros((h, w), np.float32, order="C")
     elif order == "F":
-        return np.zeros((w, h), _np.float32, order="F")
+        return np.zeros((w, h), np.float32, order="F")
     else:
         raise ValueError("Invalid order parameter, should be 'C' or 'F'.")
 
@@ -2642,22 +2658,6 @@ def line_where(x1, y1, x2, y2, inclusive=True):
     return tuple(array)
 
 
-FOV_BASIC = 0
-FOV_DIAMOND = 1
-FOV_SHADOW = 2
-FOV_PERMISSIVE_0 = 3
-FOV_PERMISSIVE_1 = 4
-FOV_PERMISSIVE_2 = 5
-FOV_PERMISSIVE_3 = 6
-FOV_PERMISSIVE_4 = 7
-FOV_PERMISSIVE_5 = 8
-FOV_PERMISSIVE_6 = 9
-FOV_PERMISSIVE_7 = 10
-FOV_PERMISSIVE_8 = 11
-FOV_RESTRICTIVE = 12
-NB_FOV_ALGORITHMS = 13
-
-
 def map_new(w, h):
     # type: (int, int) -> tcod.map.Map
     """Return a :any:`tcod.map.Map` with a width and height.
@@ -2967,7 +2967,7 @@ def parser_new_struct(parser, name):
 
 
 # prevent multiple threads from messing with def_extern callbacks
-_parser_callback_lock = _threading.Lock()
+_parser_callback_lock = threading.Lock()
 _parser_listener = None  # temporary global pointer to a listener instance
 
 
