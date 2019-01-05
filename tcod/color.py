@@ -89,5 +89,5 @@ class Color(list):
 
     def __repr__(self):
         """Return a printable representation of the current color."""
-        return "%s(%i,%i,%i)" % (self.__class__.__name__,
-                                 self.r, self.g, self.b)
+        return "%s(%i, %i, %i)" \
+            % (self.__class__.__name__, self.r, self.g, self.b)

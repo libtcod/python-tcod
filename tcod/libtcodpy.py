@@ -629,8 +629,8 @@ def color_gen_map(colors, indexes):
 
     Example:
         >>> tcod.color_gen_map([(0, 0, 0), (255, 128, 0)], [0, 5])
-        [Color(0,0,0), Color(51,25,0), Color(102,51,0), Color(153,76,0), \
-Color(204,102,0), Color(255,128,0)]
+        [Color(0, 0, 0), Color(51, 25, 0), Color(102, 51, 0), \
+Color(153, 76, 0), Color(204, 102, 0), Color(255, 128, 0)]
     """
     ccolors = ffi.new('TCOD_color_t[]', colors)
     cindexes = ffi.new('int[]', indexes)
