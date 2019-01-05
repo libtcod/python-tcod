@@ -9,6 +9,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Fixed libtcodpy `struct_add_value_list` function.
 
 8.3.2 - 2018-12-28
 ------------------

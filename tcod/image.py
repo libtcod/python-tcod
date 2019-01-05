@@ -1,4 +1,3 @@
-
 from __future__ import absolute_import
 
 import numpy as np
@@ -6,12 +5,13 @@ import numpy as np
 from tcod.libtcod import ffi, lib
 from tcod.tcod import _console
 
-class _ImageBufferArray(np.ndarray):
 
+class _ImageBufferArray(np.ndarray):
     def __new__(cls, image):
         size = image.height * image.width
-        self = np.frombuffer(ffi.buffer(lib.TCOD_image_get_colors()[size]),
-                             np.uint8)
+        self = np.frombuffer(
+            ffi.buffer(lib.TCOD_image_get_colors()[size]), np.uint8
+        )
         self = self.reshape((image.height, image.width, 3)).view(cls)
         self._image_c = image.cdata
         return self
@@ -19,7 +19,7 @@ class _ImageBufferArray(np.ndarray):
     def __array_finalize__(self, obj):
         if obj is None:
             return
-        self._image_c = getattr(obj, '_image_c', None)
+        self._image_c = getattr(obj, "_image_c", None)
 
     def __repr__(self):
         return repr(self.view(np.ndarray))
@@ -41,10 +41,12 @@ class Image(object):
         width (int): Read only width of this Image.
         height (int): Read only height of this Image.
     """
+
     def __init__(self, width, height):
         self.width, self.height = width, height
-        self.image_c = ffi.gc(lib.TCOD_image_new(width, height),
-                              lib.TCOD_image_delete)
+        self.image_c = ffi.gc(
+            lib.TCOD_image_new(width, height), lib.TCOD_image_delete
+        )
 
     @classmethod
     def _from_cdata(cls, cdata):
@@ -134,8 +136,8 @@ class Image(object):
         Returns:
             Tuple[int, int]: The (width, height) of this Image
         """
-        w = ffi.new('int *')
-        h = ffi.new('int *')
+        w = ffi.new("int *")
+        h = ffi.new("int *")
         lib.TCOD_image_get_size(self.image_c, w, h)
         return w[0], h[0]
 
@@ -172,8 +174,9 @@ class Image(object):
                 An (r, g, b) tuple containing the averaged color value.
                 Values are in a 0 to 255 range.
         """
-        color = lib.TCOD_image_get_mipmap_pixel(self.image_c,
-                                                left, top, right, bottom)
+        color = lib.TCOD_image_get_mipmap_pixel(
+            self.image_c, left, top, right, bottom
+        )
         return (color.r, color.g, color.b)
 
     def put_pixel(self, x, y, color):
@@ -203,8 +206,15 @@ class Image(object):
             angle (float): Rotation angle in radians. (Clockwise?)
         """
         lib.TCOD_image_blit(
-            self.image_c, _console(console),
-            x, y, bg_blend, scale_x, scale_y, angle)
+            self.image_c,
+            _console(console),
+            x,
+            y,
+            bg_blend,
+            scale_x,
+            scale_y,
+            angle,
+        )
 
     def blit_rect(self, console, x, y, width, height, bg_blend):
         """Blit onto a Console without scaling or rotation.
@@ -218,10 +228,19 @@ class Image(object):
             bg_blend (int): Background blending mode to use.
         """
         lib.TCOD_image_blit_rect(
-            self.image_c, _console(console), x, y, width, height, bg_blend)
+            self.image_c, _console(console), x, y, width, height, bg_blend
+        )
 
-    def blit_2x(self, console, dest_x, dest_y,
-                img_x=0, img_y=0, img_width=-1, img_height=-1):
+    def blit_2x(
+        self,
+        console,
+        dest_x,
+        dest_y,
+        img_x=0,
+        img_y=0,
+        img_width=-1,
+        img_height=-1,
+    ):
         """Blit onto a Console with double resolution.
 
         Args:
@@ -236,8 +255,15 @@ class Image(object):
                               Use -1 for the full Image height.
         """
         lib.TCOD_image_blit_2x(
-            self.image_c, _console(console),
-            dest_x, dest_y, img_x, img_y, img_width, img_height)
+            self.image_c,
+            _console(console),
+            dest_x,
+            dest_y,
+            img_x,
+            img_y,
+            img_width,
+            img_height,
+        )
 
     def save_as(self, filename):
         """Save the Image to a 32-bit .bmp or .png file.
@@ -245,4 +271,4 @@ class Image(object):
         Args:
             filename (Text): File path to same this Image.
         """
-        lib.TCOD_image_save(self.image_c, filename.encode('utf-8'))
+        lib.TCOD_image_save(self.image_c, filename.encode("utf-8"))

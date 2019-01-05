@@ -21,14 +21,14 @@ import sys
 
 import warnings
 
-from tcod.libtcodpy import *
+from tcod.libtcodpy import *  # noqa: F4
+
 try:
     from tcod.version import __version__
-except ImportError: # Gets imported without version.py by ReadTheDocs
-    __version__ = ''
+except ImportError:  # Gets imported without version.py by ReadTheDocs
+    __version__ = ""
 
 if sys.version_info[0] == 2:
     warnings.warn(
-        "python-tcod has dropped support for Python 2.7.",
-        DeprecationWarning
+        "python-tcod has dropped support for Python 2.7.", DeprecationWarning
     )

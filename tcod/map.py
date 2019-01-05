@@ -63,7 +63,7 @@ class Map(object):
 
     """
 
-    def __init__(self, width, height, order='C'):
+    def __init__(self, width, height, order="C"):
         self.width = width
         self.height = height
         self._order = tcod._internal.verify_order(order)
@@ -71,35 +71,40 @@ class Map(object):
         self.__buffer = np.zeros((height, width, 3), dtype=np.bool_)
         self.map_c = self.__as_cdata()
 
-
     def __as_cdata(self):
         return ffi.new(
-            'struct TCOD_Map*',
+            "struct TCOD_Map*",
             (
                 self.width,
                 self.height,
                 self.width * self.height,
-                ffi.cast('struct TCOD_MapCell*', self.__buffer.ctypes.data),
-            )
+                ffi.cast("struct TCOD_MapCell*", self.__buffer.ctypes.data),
+            ),
         )
 
     @property
     def transparent(self):
-        buffer = self.__buffer[:,:,0]
-        return buffer.T if self._order == 'F' else buffer
+        buffer = self.__buffer[:, :, 0]
+        return buffer.T if self._order == "F" else buffer
 
     @property
     def walkable(self):
-        buffer = self.__buffer[:,:,1]
-        return buffer.T if self._order == 'F' else buffer
+        buffer = self.__buffer[:, :, 1]
+        return buffer.T if self._order == "F" else buffer
 
     @property
     def fov(self):
-        buffer = self.__buffer[:,:,2]
-        return buffer.T if self._order == 'F' else buffer
+        buffer = self.__buffer[:, :, 2]
+        return buffer.T if self._order == "F" else buffer
 
-    def compute_fov(self, x, y, radius=0, light_walls=True,
-                    algorithm=tcod.constants.FOV_RESTRICTIVE):
+    def compute_fov(
+        self,
+        x,
+        y,
+        radius=0,
+        light_walls=True,
+        algorithm=tcod.constants.FOV_RESTRICTIVE,
+    ):
         # type (int, int, int, bool, int) -> None
         """Compute a field-of-view on the current instance.
 
@@ -113,25 +118,26 @@ class Map(object):
             algorithm (int): Defaults to tcod.FOV_RESTRICTIVE
         """
         lib.TCOD_map_compute_fov(
-            self.map_c, x, y, radius, light_walls, algorithm)
+            self.map_c, x, y, radius, light_walls, algorithm
+        )
 
     def __setstate__(self, state):
-        if '_Map__buffer' not in state: # deprecated
+        if "_Map__buffer" not in state:  # deprecated
             # remove this check on major version update
-            self.__buffer = np.zeros((state['height'], state['width'], 3),
-                              dtype=np.bool_)
-            self.__buffer[:,:,0] = state['buffer'] & 0x01
-            self.__buffer[:,:,1] = state['buffer'] & 0x02
-            self.__buffer[:,:,2] = state['buffer'] & 0x04
-            del state['buffer']
-            state['_order'] = 'F'
-        if '_order' not in state: # remove this check on major version update
-            raise RuntimeError(
-                'This Map was saved with a bad version of tdl.')
+            self.__buffer = np.zeros(
+                (state["height"], state["width"], 3), dtype=np.bool_
+            )
+            self.__buffer[:, :, 0] = state["buffer"] & 0x01
+            self.__buffer[:, :, 1] = state["buffer"] & 0x02
+            self.__buffer[:, :, 2] = state["buffer"] & 0x04
+            del state["buffer"]
+            state["_order"] = "F"
+        if "_order" not in state:  # remove this check on major version update
+            raise RuntimeError("This Map was saved with a bad version of tdl.")
         self.__dict__.update(state)
         self.map_c = self.__as_cdata()
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        del state['map_c']
+        del state["map_c"]
         return state

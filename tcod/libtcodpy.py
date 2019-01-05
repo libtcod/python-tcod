@@ -13,12 +13,23 @@ import warnings
 import numpy as _np
 import numpy as np
 
-from tcod.libtcod import *
+from tcod.libtcod import *  # noqa: F401 F403
+from tcod.libtcod import ffi, lib
+from tcod.libtcod import (
+    NOISE_DEFAULT_LACUNARITY,
+    NOISE_DEFAULT_HURST,
+    NOISE_DEFAULT,
+    KEY_RELEASED,
+    BKGND_DEFAULT,
+    BKGND_SET,
+    FONT_LAYOUT_ASCII_INCOL,
+    RENDERER_GLSL,
+)
 
 from tcod._internal import deprecate
 
 from tcod.tcod import _int, _unpack_char_p
-from tcod.tcod import _bytes, _unicode, _fmt_bytes, _fmt_unicode, _fmt
+from tcod.tcod import _bytes, _unicode, _fmt
 from tcod.tcod import _CDataWrapper
 from tcod.tcod import _PropagateException
 from tcod.tcod import _console
@@ -53,7 +64,19 @@ class ConsoleBuffer(object):
         fore_b (int): Blue foreground color, from 0 to 255.
         char (AnyStr): A single character str or bytes object.
     """
-    def __init__(self, width, height, back_r=0, back_g=0, back_b=0, fore_r=0, fore_g=0, fore_b=0, char=' '):
+
+    def __init__(
+        self,
+        width,
+        height,
+        back_r=0,
+        back_g=0,
+        back_b=0,
+        fore_r=0,
+        fore_g=0,
+        fore_b=0,
+        char=" ",
+    ):
         """initialize with given width and height. values to fill the buffer
         are optional, defaults to black with no characters.
         """
@@ -66,7 +89,16 @@ class ConsoleBuffer(object):
         self.height = height
         self.clear(back_r, back_g, back_b, fore_r, fore_g, fore_b, char)
 
-    def clear(self, back_r=0, back_g=0, back_b=0, fore_r=0, fore_g=0, fore_b=0, char=' '):
+    def clear(
+        self,
+        back_r=0,
+        back_g=0,
+        back_b=0,
+        fore_r=0,
+        fore_g=0,
+        fore_b=0,
+        char=" ",
+    ):
         """Clears the console.  Values to fill it with are optional, defaults
         to black with no characters.
 
@@ -174,9 +206,11 @@ class ConsoleBuffer(object):
         """
         if not dest:
             dest = tcod.console.Console._from_cdata(ffi.NULL)
-        if (dest.width != self.width or
-            dest.height != self.height):
-            raise ValueError('ConsoleBuffer.blit: Destination console has an incorrect size.')
+        if dest.width != self.width or dest.height != self.height:
+            raise ValueError(
+                "ConsoleBuffer.blit: "
+                "Destination console has an incorrect size."
+            )
 
         if fill_back:
             bg = dest.bg.ravel()
@@ -190,6 +224,7 @@ class ConsoleBuffer(object):
             fg[1::3] = self.fore_g
             fg[2::3] = self.fore_b
             dest.ch.ravel()[:] = self.char
+
 
 class Dice(_CDataWrapper):
     """
@@ -206,14 +241,17 @@ class Dice(_CDataWrapper):
     """
 
     def __init__(self, *args, **kargs):
-        warnings.warn("Using this class is not recommended.",
-                      DeprecationWarning, stacklevel=2)
+        warnings.warn(
+            "Using this class is not recommended.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         super(Dice, self).__init__(*args, **kargs)
         if self.cdata == ffi.NULL:
             self._init(*args, **kargs)
 
     def _init(self, nb_dices=0, nb_faces=0, multiplier=0, addsub=0):
-        self.cdata = ffi.new('TCOD_dice_t*')
+        self.cdata = ffi.new("TCOD_dice_t*")
         self.nb_dices = nb_dices
         self.nb_faces = nb_faces
         self.multiplier = multiplier
@@ -221,26 +259,38 @@ class Dice(_CDataWrapper):
 
     def _get_nb_dices(self):
         return self.nb_rolls
+
     def _set_nb_dices(self, value):
         self.nb_rolls = value
+
     nb_dices = property(_get_nb_dices, _set_nb_dices)
 
     def __str__(self):
-        add = '+(%s)' % self.addsub if self.addsub != 0 else ''
-        return '%id%ix%s%s' % (self.nb_dices, self.nb_faces,
-                               self.multiplier, add)
+        add = "+(%s)" % self.addsub if self.addsub != 0 else ""
+        return "%id%ix%s%s" % (
+            self.nb_dices,
+            self.nb_faces,
+            self.multiplier,
+            add,
+        )
 
     def __repr__(self):
-        return ('%s(nb_dices=%r,nb_faces=%r,multiplier=%r,addsub=%r)' %
-                (self.__class__.__name__, self.nb_dices, self.nb_faces,
-                 self.multiplier, self.addsub))
+        return "%s(nb_dices=%r,nb_faces=%r,multiplier=%r,addsub=%r)" % (
+            self.__class__.__name__,
+            self.nb_dices,
+            self.nb_faces,
+            self.multiplier,
+            self.addsub,
+        )
 
 
 # reverse lookup table for KEY_X attributes, used by Key.__repr__
 _LOOKUP_VK = {
-    value:'KEY_%s' % key[6:] for key,value in lib.__dict__.items()
-    if key.startswith('TCODK')
-    }
+    value: "KEY_%s" % key[6:]
+    for key, value in lib.__dict__.items()
+    if key.startswith("TCODK")
+}
+
 
 class Key(_CDataWrapper):
     """Key Event instance
@@ -248,8 +298,10 @@ class Key(_CDataWrapper):
     Attributes:
         vk (int): TCOD_keycode_t key code
         c (int): character if vk == TCODK_CHAR else 0
-        text (Text): text[TCOD_KEY_TEXT_SIZE]; text if vk == TCODK_TEXT else text[0] == '\0'
-        pressed (bool): does this correspond to a key press or key release event ?
+        text (Text): text[TCOD_KEY_TEXT_SIZE];
+                     text if vk == TCODK_TEXT else text[0] == '\0'
+        pressed (bool): does this correspond to a key press or key release
+                        event?
         lalt (bool): True when left alt is held.
         lctrl (bool): True when left control is held.
         lmeta (bool): True when left meta key is held.
@@ -259,16 +311,35 @@ class Key(_CDataWrapper):
         shift (bool): True when any shift is held.
     """
 
-    _BOOL_ATTRIBUTES = ('lalt', 'lctrl', 'lmeta',
-                        'ralt', 'rctrl', 'rmeta', 'pressed', 'shift')
+    _BOOL_ATTRIBUTES = (
+        "lalt",
+        "lctrl",
+        "lmeta",
+        "ralt",
+        "rctrl",
+        "rmeta",
+        "pressed",
+        "shift",
+    )
 
-    def __init__(self, vk=0, c=0, text='', pressed=False,
-                 lalt=False, lctrl=False, lmeta=False,
-                 ralt=False, rctrl=False, rmeta=False, shift=False):
+    def __init__(
+        self,
+        vk=0,
+        c=0,
+        text="",
+        pressed=False,
+        lalt=False,
+        lctrl=False,
+        lmeta=False,
+        ralt=False,
+        rctrl=False,
+        rmeta=False,
+        shift=False,
+    ):
         if isinstance(vk, ffi.CData):
             self.cdata = vk
             return
-        self.cdata = ffi.new('TCOD_key_t*')
+        self.cdata = ffi.new("TCOD_key_t*")
         self.vk = vk
         self.c = c
         self.text = text
@@ -284,16 +355,16 @@ class Key(_CDataWrapper):
     def __getattr__(self, attr):
         if attr in self._BOOL_ATTRIBUTES:
             return bool(getattr(self.cdata, attr))
-        if attr == 'c':
+        if attr == "c":
             return ord(self.cdata.c)
-        if attr == 'text':
+        if attr == "text":
             return ffi.string(self.cdata.text).decode()
         return super(Key, self).__getattr__(attr)
 
     def __setattr__(self, attr, value):
-        if attr == 'c':
-            self.cdata.c = chr(value).encode('latin-1')
-        elif attr == 'text':
+        if attr == "c":
+            self.cdata.c = chr(value).encode("latin-1")
+        elif attr == "text":
             self.cdata.text = value.encode()
         else:
             super(Key, self).__setattr__(attr, value)
@@ -301,17 +372,25 @@ class Key(_CDataWrapper):
     def __repr__(self):
         """Return a representation of this Key object."""
         params = []
-        params.append('pressed=%r, vk=tcod.%s' %
-                      (self.pressed, _LOOKUP_VK[self.vk]))
+        params.append(
+            "pressed=%r, vk=tcod.%s" % (self.pressed, _LOOKUP_VK[self.vk])
+        )
         if self.c:
-            params.append('c=ord(%r)' % chr(self.c))
+            params.append("c=ord(%r)" % chr(self.c))
         if self.text:
-            params.append('text=%r' % self.text)
-        for attr in ['shift', 'lalt', 'lctrl', 'lmeta',
-                     'ralt', 'rctrl', 'rmeta']:
+            params.append("text=%r" % self.text)
+        for attr in [
+            "shift",
+            "lalt",
+            "lctrl",
+            "lmeta",
+            "ralt",
+            "rctrl",
+            "rmeta",
+        ]:
             if getattr(self, attr):
-                params.append('%s=%r' % (attr, getattr(self, attr)))
-        return 'tcod.Key(%s)' % ', '.join(params)
+                params.append("%s=%r" % (attr, getattr(self, attr)))
+        return "tcod.Key(%s)" % ", ".join(params)
 
     @property
     def key_p(self):
@@ -340,12 +419,13 @@ class Mouse(_CDataWrapper):
         wheel_down (bool): Wheel down event.
     """
 
-    def __init__(self, x=0, y=0, dx=0, dy=0, cx=0, cy=0, dcx=0, dcy=0,
-                 **kargs):
+    def __init__(
+        self, x=0, y=0, dx=0, dy=0, cx=0, cy=0, dcx=0, dcy=0, **kargs
+    ):
         if isinstance(x, ffi.CData):
             self.cdata = x
             return
-        self.cdata = ffi.new('TCOD_mouse_t*')
+        self.cdata = ffi.new("TCOD_mouse_t*")
         self.x = x
         self.y = y
         self.dx = dx
@@ -360,16 +440,23 @@ class Mouse(_CDataWrapper):
     def __repr__(self):
         """Return a representation of this Mouse object."""
         params = []
-        for attr in ['x', 'y', 'dx', 'dy', 'cx', 'cy', 'dcx', 'dcy']:
+        for attr in ["x", "y", "dx", "dy", "cx", "cy", "dcx", "dcy"]:
             if getattr(self, attr) == 0:
                 continue
-            params.append('%s=%r' % (attr, getattr(self, attr)))
-        for attr in ['lbutton', 'rbutton', 'mbutton',
-                     'lbutton_pressed', 'rbutton_pressed', 'mbutton_pressed',
-                     'wheel_up', 'wheel_down']:
+            params.append("%s=%r" % (attr, getattr(self, attr)))
+        for attr in [
+            "lbutton",
+            "rbutton",
+            "mbutton",
+            "lbutton_pressed",
+            "rbutton_pressed",
+            "mbutton_pressed",
+            "wheel_up",
+            "wheel_down",
+        ]:
             if getattr(self, attr):
-                params.append('%s=%r' % (attr, getattr(self, attr)))
-        return 'tcod.Mouse(%s)' % ', '.join(params)
+                params.append("%s=%r" % (attr, getattr(self, attr)))
+        return "tcod.Mouse(%s)" % ", ".join(params)
 
     @property
     def mouse_p(self):
@@ -393,6 +480,7 @@ def bsp_new_with_size(x, y, w, h):
     """
     return Bsp(x, y, w, h)
 
+
 def bsp_split_once(node, horizontal, position):
     """
     .. deprecated:: 2.0
@@ -400,14 +488,18 @@ def bsp_split_once(node, horizontal, position):
     """
     node.split_once(horizontal, position)
 
-def bsp_split_recursive(node, randomizer, nb, minHSize, minVSize, maxHRatio,
-                        maxVRatio):
+
+def bsp_split_recursive(
+    node, randomizer, nb, minHSize, minVSize, maxHRatio, maxVRatio
+):
     """
     .. deprecated:: 2.0
        Use :any:`BSP.split_recursive` instead.
     """
-    node.split_recursive(nb, minHSize, minVSize,
-                         maxHRatio, maxVRatio, randomizer)
+    node.split_recursive(
+        nb, minHSize, minVSize, maxHRatio, maxVRatio, randomizer
+    )
+
 
 @deprecate("Assign values via attribute instead.")
 def bsp_resize(node, x, y, w, h):
@@ -420,6 +512,7 @@ def bsp_resize(node, x, y, w, h):
     node.width = w
     node.height = h
 
+
 @deprecate("Access children with 'node.children' instead.")
 def bsp_left(node):
     """
@@ -427,6 +520,7 @@ def bsp_left(node):
        Use :any:`BSP.children` instead.
     """
     return None if not node.children else node.children[0]
+
 
 @deprecate("Access children with 'node.children' instead.")
 def bsp_right(node):
@@ -436,6 +530,7 @@ def bsp_right(node):
     """
     return None if not node.children else node.children[1]
 
+
 @deprecate("Get the parent with 'node.parent' instead.")
 def bsp_father(node):
     """
@@ -443,6 +538,7 @@ def bsp_father(node):
        Use :any:`BSP.parent` instead.
     """
     return node.parent
+
 
 @deprecate("Check for children with 'bool(node.children)' instead.")
 def bsp_is_leaf(node):
@@ -452,6 +548,7 @@ def bsp_is_leaf(node):
     """
     return not node.children
 
+
 @deprecate("Use 'node.contains' instead.")
 def bsp_contains(node, cx, cy):
     """
@@ -459,6 +556,7 @@ def bsp_contains(node, cx, cy):
        Use :any:`BSP.contains` instead.
     """
     return node.contains(cx, cy)
+
 
 @deprecate("Use 'node.find_node' instead.")
 def bsp_find_node(node, cx, cy):
@@ -468,12 +566,14 @@ def bsp_find_node(node, cx, cy):
     """
     return node.find_node(cx, cy)
 
+
 def _bsp_traverse(node_iter, callback, userData):
     """pack callback into a handle for use with the callback
     _pycall_bsp_callback
     """
     for node in node_iter:
         callback(node, userData)
+
 
 @deprecate("Iterate over nodes using 'for n in node.pre_order():' instead.")
 def bsp_traverse_pre_order(node, callback, userData=0):
@@ -484,6 +584,7 @@ def bsp_traverse_pre_order(node, callback, userData=0):
     """
     _bsp_traverse(node.pre_order(), callback, userData)
 
+
 @deprecate("Iterate over nodes using 'for n in node.in_order():' instead.")
 def bsp_traverse_in_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
@@ -492,6 +593,7 @@ def bsp_traverse_in_order(node, callback, userData=0):
        Use :any:`BSP.in_order` instead.
     """
     _bsp_traverse(node.in_order(), callback, userData)
+
 
 @deprecate("Iterate over nodes using 'for n in node.post_order():' instead.")
 def bsp_traverse_post_order(node, callback, userData=0):
@@ -502,6 +604,7 @@ def bsp_traverse_post_order(node, callback, userData=0):
     """
     _bsp_traverse(node.post_order(), callback, userData)
 
+
 @deprecate("Iterate over nodes using 'for n in node.level_order():' instead.")
 def bsp_traverse_level_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
@@ -511,8 +614,11 @@ def bsp_traverse_level_order(node, callback, userData=0):
     """
     _bsp_traverse(node.level_order(), callback, userData)
 
-@deprecate("Iterate over nodes using "
-           "'for n in node.inverted_level_order():' instead.")
+
+@deprecate(
+    "Iterate over nodes using "
+    "'for n in node.inverted_level_order():' instead."
+)
 def bsp_traverse_inverted_level_order(node, callback, userData=0):
     """Traverse this nodes hierarchy with a callback.
 
@@ -520,6 +626,7 @@ def bsp_traverse_inverted_level_order(node, callback, userData=0):
        Use :any:`BSP.inverted_level_order` instead.
     """
     _bsp_traverse(node.inverted_level_order(), callback, userData)
+
 
 @deprecate("Delete bsp children using 'node.children = ()' instead.")
 def bsp_remove_sons(node):
@@ -534,6 +641,7 @@ def bsp_remove_sons(node):
     """
     node.children = ()
 
+
 @deprecate("libtcod objects are deleted automatically.")
 def bsp_delete(node):
     # type: (Any) -> None
@@ -546,6 +654,7 @@ def bsp_delete(node):
     .. deprecated:: 2.0
        BSP deletion is automatic.
     """
+
 
 def color_lerp(c1, c2, a):
     """Return the linear interpolation between two colors.
@@ -565,6 +674,7 @@ def color_lerp(c1, c2, a):
     """
     return Color._new_from_cdata(lib.TCOD_color_lerp(c1, c2, a))
 
+
 def color_set_hsv(c, h, s, v):
     """Set a color using: hue, saturation, and value parameters.
 
@@ -576,9 +686,10 @@ def color_set_hsv(c, h, s, v):
         s (float): Saturation, from 0 to 1.
         v (float): Value, from 0 to 1.
     """
-    new_color = ffi.new('TCOD_color_t*')
+    new_color = ffi.new("TCOD_color_t*")
     lib.TCOD_color_set_HSV(new_color, h, s, v)
     c[:] = new_color.r, new_color.g, new_color.b
+
 
 def color_get_hsv(c):
     """Return the (hue, saturation, value) of a color.
@@ -591,9 +702,10 @@ def color_get_hsv(c):
         Tuple[float, float, float]:
             A tuple with (hue, saturation, value) values, from 0 to 1.
     """
-    hsv = ffi.new('float [3]')
+    hsv = ffi.new("float [3]")
     lib.TCOD_color_get_HSV(c, hsv, hsv + 1, hsv + 2)
     return hsv[0], hsv[1], hsv[2]
+
 
 def color_scale_HSV(c, scoef, vcoef):
     """Scale a color's saturation and value.
@@ -607,10 +719,11 @@ def color_scale_HSV(c, scoef, vcoef):
         vcoef (float): Value multiplier, from 0 to 1.
                        Use 1 to keep current value.
     """
-    color_p = ffi.new('TCOD_color_t*')
+    color_p = ffi.new("TCOD_color_t*")
     color_p.r, color_p.g, color_p.b = c.r, c.g, c.b
     lib.TCOD_color_scale_HSV(color_p, scoef, vcoef)
     c[:] = color_p.r, color_p.g, color_p.b
+
 
 def color_gen_map(colors, indexes):
     """Return a smoothly defined scale of colors.
@@ -632,16 +745,21 @@ def color_gen_map(colors, indexes):
         [Color(0, 0, 0), Color(51, 25, 0), Color(102, 51, 0), \
 Color(153, 76, 0), Color(204, 102, 0), Color(255, 128, 0)]
     """
-    ccolors = ffi.new('TCOD_color_t[]', colors)
-    cindexes = ffi.new('int[]', indexes)
-    cres = ffi.new('TCOD_color_t[]', max(indexes) + 1)
+    ccolors = ffi.new("TCOD_color_t[]", colors)
+    cindexes = ffi.new("int[]", indexes)
+    cres = ffi.new("TCOD_color_t[]", max(indexes) + 1)
     lib.TCOD_color_gen_map(cres, len(colors), ccolors, cindexes)
     return [Color._new_from_cdata(cdata) for cdata in cres]
 
 
 def console_init_root(
-        w: int, h: int, title: Optional[AnyStr]=None, fullscreen: bool=False,
-        renderer: Optional[int]=None, order: str='C') -> tcod.console.Console:
+    w: int,
+    h: int,
+    title: Optional[AnyStr] = None,
+    fullscreen: bool = False,
+    renderer: Optional[int] = None,
+    order: str = "C",
+) -> tcod.console.Console:
     """Set up the primary display and return the root console.
 
     `w` and `h` are the columns and rows of the new window (in tiles.)
@@ -675,15 +793,18 @@ def console_init_root(
         # Use the scripts filename as the title.
         title = os.path.basename(sys.argv[0])
     if renderer is None:
-        renderer = RENDERER_GLSL # Stable for now.
+        renderer = RENDERER_GLSL  # Stable for now.
     title = _bytes(title)
     lib.TCOD_console_init_root(w, h, title, fullscreen, renderer)
     return tcod.console.Console._get_root(order)
 
 
-def console_set_custom_font(fontFile: AnyStr, flags:
-                            int=FONT_LAYOUT_ASCII_INCOL,
-                            nb_char_horiz: int=0, nb_char_vertic: int=0):
+def console_set_custom_font(
+    fontFile: AnyStr,
+    flags: int = FONT_LAYOUT_ASCII_INCOL,
+    nb_char_horiz: int = 0,
+    nb_char_vertic: int = 0,
+):
     """Load the custom font file at `fontFile`.
 
     Call this before function before calling :any:`tcod.console_init_root`.
@@ -706,11 +827,13 @@ def console_set_custom_font(fontFile: AnyStr, flags:
     file respectfully.
     """
     if not os.path.exists(fontFile):
-        raise RuntimeError("File not found:\n\t%s"
-                           % (os.path.realpath(fontFile),))
+        raise RuntimeError(
+            "File not found:\n\t%s" % (os.path.realpath(fontFile),)
+        )
     fontFile = _bytes(fontFile)
-    lib.TCOD_console_set_custom_font(fontFile, flags,
-                                     nb_char_horiz, nb_char_vertic)
+    lib.TCOD_console_set_custom_font(
+        fontFile, flags, nb_char_horiz, nb_char_vertic
+    )
 
 
 def console_get_width(con):
@@ -727,6 +850,7 @@ def console_get_width(con):
     """
     return lib.TCOD_console_get_width(_console(con))
 
+
 def console_get_height(con):
     """Return the height of a console.
 
@@ -740,6 +864,7 @@ def console_get_height(con):
         Use `Console.height` instead.
     """
     return lib.TCOD_console_get_height(_console(con))
+
 
 def console_map_ascii_code_to_font(asciiCode, fontCharX, fontCharY):
     """Set a character code to new coordinates on the tile-set.
@@ -755,11 +880,14 @@ def console_map_ascii_code_to_font(asciiCode, fontCharX, fontCharY):
         fontCharY (int): The Y tile coordinate on the loaded tileset.
                          0 is the topmost tile.
     """
-    lib.TCOD_console_map_ascii_code_to_font(_int(asciiCode), fontCharX,
-                                                              fontCharY)
+    lib.TCOD_console_map_ascii_code_to_font(
+        _int(asciiCode), fontCharX, fontCharY
+    )
 
-def console_map_ascii_codes_to_font(firstAsciiCode, nbCodes, fontCharX,
-                                    fontCharY):
+
+def console_map_ascii_codes_to_font(
+    firstAsciiCode, nbCodes, fontCharX, fontCharY
+):
     """Remap a contiguous set of codes to a contiguous set of tiles.
 
     Both the tile-set and character codes must be contiguous to use this
@@ -775,8 +903,10 @@ def console_map_ascii_codes_to_font(firstAsciiCode, nbCodes, fontCharX,
                          0 is the topmost tile.
 
     """
-    lib.TCOD_console_map_ascii_codes_to_font(_int(firstAsciiCode), nbCodes,
-                                              fontCharX, fontCharY)
+    lib.TCOD_console_map_ascii_codes_to_font(
+        _int(firstAsciiCode), nbCodes, fontCharX, fontCharY
+    )
+
 
 def console_map_string_to_font(s, fontCharX, fontCharY):
     """Remap a string of codes to a contiguous set of tiles.
@@ -792,6 +922,7 @@ def console_map_string_to_font(s, fontCharX, fontCharY):
     """
     lib.TCOD_console_map_string_to_font_utf(_unicode(s), fontCharX, fontCharY)
 
+
 def console_is_fullscreen():
     """Returns True if the display is fullscreen.
 
@@ -799,6 +930,7 @@ def console_is_fullscreen():
         bool: True if the display is fullscreen, otherwise False.
     """
     return bool(lib.TCOD_console_is_fullscreen())
+
 
 def console_set_fullscreen(fullscreen):
     """Change the display to be fullscreen or windowed.
@@ -809,17 +941,21 @@ def console_set_fullscreen(fullscreen):
     """
     lib.TCOD_console_set_fullscreen(fullscreen)
 
+
 def console_is_window_closed():
     """Returns True if the window has received and exit event."""
     return lib.TCOD_console_is_window_closed()
+
 
 def console_has_mouse_focus():
     """Return True if the window has mouse focus."""
     return lib.TCOD_console_has_mouse_focus()
 
+
 def console_is_active():
     """Return True if the window has keyboard focus."""
     return lib.TCOD_console_is_active()
+
 
 def console_set_window_title(title):
     """Change the current title bar string.
@@ -830,18 +966,23 @@ def console_set_window_title(title):
     title = _bytes(title)
     lib.TCOD_console_set_window_title(title)
 
+
 def console_credits():
     lib.TCOD_console_credits()
+
 
 def console_credits_reset():
     lib.TCOD_console_credits_reset()
 
+
 def console_credits_render(x, y, alpha):
     return lib.TCOD_console_credits_render(x, y, alpha)
+
 
 def console_flush():
     """Update the display to represent the root consoles current state."""
     lib.TCOD_console_flush()
+
 
 # drawing on a console
 def console_set_default_background(con, col):
@@ -854,6 +995,7 @@ def console_set_default_background(con, col):
     """
     lib.TCOD_console_set_default_background(_console(con), col)
 
+
 def console_set_default_foreground(con, col):
     """Change the default foreground color for a console.
 
@@ -863,6 +1005,7 @@ def console_set_default_foreground(con, col):
             An (r, g, b) sequence or Color instance.
     """
     lib.TCOD_console_set_default_foreground(_console(con), col)
+
 
 def console_clear(con):
     """Reset a console to its default colors and the space character.
@@ -876,6 +1019,7 @@ def console_clear(con):
     """
     return lib.TCOD_console_clear(_console(con))
 
+
 def console_put_char(con, x, y, c, flag=BKGND_DEFAULT):
     """Draw the character c at x,y using the default colors and a blend mode.
 
@@ -887,6 +1031,7 @@ def console_put_char(con, x, y, c, flag=BKGND_DEFAULT):
         flag (int): Blending mode to use, defaults to BKGND_DEFAULT.
     """
     lib.TCOD_console_put_char(_console(con), x, y, _int(c), flag)
+
 
 def console_put_char_ex(con, x, y, c, fore, back):
     """Draw the character c at x,y using the colors fore and back.
@@ -903,6 +1048,7 @@ def console_put_char_ex(con, x, y, c, fore, back):
     """
     lib.TCOD_console_put_char_ex(_console(con), x, y, _int(c), fore, back)
 
+
 def console_set_char_background(con, x, y, col, flag=BKGND_SET):
     """Change the background color of x,y to col using a blend mode.
 
@@ -915,6 +1061,7 @@ def console_set_char_background(con, x, y, col, flag=BKGND_SET):
         flag (int): Blending mode to use, defaults to BKGND_SET.
     """
     lib.TCOD_console_set_char_background(_console(con), x, y, col, flag)
+
 
 @deprecate("Directly access a consoles foreground color with `console.fg`")
 def console_set_char_foreground(con, x, y, col):
@@ -929,6 +1076,7 @@ def console_set_char_foreground(con, x, y, col):
     """
     lib.TCOD_console_set_char_foreground(_console(con), x, y, col)
 
+
 @deprecate("Directly access a consoles characters with `console.ch`")
 def console_set_char(con, x, y, c):
     """Change the character at x,y to c, keeping the current colors.
@@ -941,6 +1089,7 @@ def console_set_char(con, x, y, c):
     """
     lib.TCOD_console_set_char(_console(con), x, y, _int(c))
 
+
 def console_set_background_flag(con, flag):
     """Change the default blend mode for this console.
 
@@ -950,6 +1099,7 @@ def console_set_background_flag(con, flag):
     """
     lib.TCOD_console_set_background_flag(_console(con), flag)
 
+
 def console_get_background_flag(con):
     """Return this consoles current blend mode.
 
@@ -957,6 +1107,7 @@ def console_get_background_flag(con):
         con (Console): Any Console instance.
     """
     return lib.TCOD_console_get_background_flag(_console(con))
+
 
 def console_set_alignment(con, alignment):
     """Change this consoles current alignment mode.
@@ -971,6 +1122,7 @@ def console_set_alignment(con, alignment):
     """
     lib.TCOD_console_set_alignment(_console(con), alignment)
 
+
 def console_get_alignment(con):
     """Return this consoles current alignment mode.
 
@@ -978,6 +1130,7 @@ def console_get_alignment(con):
         con (Console): Any Console instance.
     """
     return lib.TCOD_console_get_alignment(_console(con))
+
 
 def console_print(con: tcod.console.Console, x: int, y: int, fmt: str) -> None:
     """Print a color formatted string on a console.
@@ -990,8 +1143,15 @@ def console_print(con: tcod.console.Console, x: int, y: int, fmt: str) -> None:
     """
     lib.TCOD_console_printf(_console(con), x, y, _fmt(fmt))
 
-def console_print_ex(con: tcod.console.Console, x: int, y: int, flag: int,
-                     alignment: int, fmt: str) -> None:
+
+def console_print_ex(
+    con: tcod.console.Console,
+    x: int,
+    y: int,
+    flag: int,
+    alignment: int,
+    fmt: str,
+) -> None:
     """Print a string on a console using a blend mode and alignment mode.
 
     Args:
@@ -999,11 +1159,12 @@ def console_print_ex(con: tcod.console.Console, x: int, y: int, flag: int,
         x (int): Character x position from the left.
         y (int): Character y position from the top.
     """
-    lib.TCOD_console_printf_ex(_console(con),
-                               x, y, flag, alignment, _fmt(fmt))
+    lib.TCOD_console_printf_ex(_console(con), x, y, flag, alignment, _fmt(fmt))
 
-def console_print_rect(con: tcod.console.Console,
-                       x: int, y: int, w: int, h: int, fmt: str) -> int:
+
+def console_print_rect(
+    con: tcod.console.Console, x: int, y: int, w: int, h: int, fmt: str
+) -> int:
     """Print a string constrained to a rectangle.
 
     If h > 0 and the bottom of the rectangle is reached,
@@ -1015,56 +1176,96 @@ def console_print_rect(con: tcod.console.Console,
     Returns:
         int: The number of lines of text once word-wrapped.
     """
-    return lib.TCOD_console_printf_rect(
-        _console(con), x, y, w, h, _fmt(fmt))
+    return lib.TCOD_console_printf_rect(_console(con), x, y, w, h, _fmt(fmt))
 
-def console_print_rect_ex(con: tcod.console.Console,
-                          x: int, y: int, w: int, h: int,
-                          flag: int, alignment: int, fmt: str) -> int:
+
+def console_print_rect_ex(
+    con: tcod.console.Console,
+    x: int,
+    y: int,
+    w: int,
+    h: int,
+    flag: int,
+    alignment: int,
+    fmt: str,
+) -> int:
     """Print a string constrained to a rectangle with blend and alignment.
 
     Returns:
         int: The number of lines of text once word-wrapped.
     """
     return lib.TCOD_console_printf_rect_ex(
-        _console(con), x, y, w, h, flag, alignment, _fmt(fmt))
+        _console(con), x, y, w, h, flag, alignment, _fmt(fmt)
+    )
 
-def console_get_height_rect(con: tcod.console.Console,
-                            x: int, y: int, w: int, h: int, fmt: str) -> int:
+
+def console_get_height_rect(
+    con: tcod.console.Console, x: int, y: int, w: int, h: int, fmt: str
+) -> int:
     """Return the height of this text once word-wrapped into this rectangle.
 
     Returns:
         int: The number of lines of text once word-wrapped.
     """
     return lib.TCOD_console_get_height_rect_fmt(
-        _console(con), x, y, w, h, _fmt(fmt))
+        _console(con), x, y, w, h, _fmt(fmt)
+    )
 
-def console_rect(con: tcod.console.Console, x: int, y: int, w: int, h: int,
-                 clr: bool, flag: int=BKGND_DEFAULT) -> None:
+
+def console_rect(
+    con: tcod.console.Console,
+    x: int,
+    y: int,
+    w: int,
+    h: int,
+    clr: bool,
+    flag: int = BKGND_DEFAULT,
+) -> None:
     """Draw a the background color on a rect optionally clearing the text.
 
     If clr is True the affected tiles are changed to space character.
     """
     lib.TCOD_console_rect(_console(con), x, y, w, h, clr, flag)
 
-def console_hline(con: tcod.console.Console, x: int, y: int, l: int,
-                  flag: int=BKGND_DEFAULT) -> None:
+
+def console_hline(
+    con: tcod.console.Console,
+    x: int,
+    y: int,
+    l: int,
+    flag: int = BKGND_DEFAULT,
+) -> None:
     """Draw a horizontal line on the console.
 
     This always uses the character 196, the horizontal line character.
     """
     lib.TCOD_console_hline(_console(con), x, y, l, flag)
 
-def console_vline(con: tcod.console.Console, x: int, y: int, l: int,
-                  flag: int=BKGND_DEFAULT):
+
+def console_vline(
+    con: tcod.console.Console,
+    x: int,
+    y: int,
+    l: int,
+    flag: int = BKGND_DEFAULT,
+):
     """Draw a vertical line on the console.
 
     This always uses the character 179, the vertical line character.
     """
     lib.TCOD_console_vline(_console(con), x, y, l, flag)
 
-def console_print_frame(con, x: int, y: int, w: int, h: int, clear: bool=True,
-                         flag: int=BKGND_DEFAULT, fmt: str='') -> None:
+
+def console_print_frame(
+    con,
+    x: int,
+    y: int,
+    w: int,
+    h: int,
+    clear: bool = True,
+    flag: int = BKGND_DEFAULT,
+    fmt: str = "",
+) -> None:
     """Draw a framed rectangle with optinal text.
 
     This uses the default background color and blend mode to fill the
@@ -1079,6 +1280,7 @@ def console_print_frame(con, x: int, y: int, w: int, h: int, clear: bool=True,
     fmt = _fmt(fmt) if fmt else ffi.NULL
     lib.TCOD_console_printf_frame(_console(con), x, y, w, h, clear, flag, fmt)
 
+
 def console_set_color_control(con, fore, back):
     """Configure :any:`color controls`.
 
@@ -1091,41 +1293,54 @@ def console_set_color_control(con, fore, back):
     """
     lib.TCOD_console_set_color_control(con, fore, back)
 
+
 def console_get_default_background(con):
     """Return this consoles default background color."""
     return Color._new_from_cdata(
-        lib.TCOD_console_get_default_background(_console(con)))
+        lib.TCOD_console_get_default_background(_console(con))
+    )
+
 
 def console_get_default_foreground(con):
     """Return this consoles default foreground color."""
     return Color._new_from_cdata(
-        lib.TCOD_console_get_default_foreground(_console(con)))
+        lib.TCOD_console_get_default_foreground(_console(con))
+    )
+
 
 @deprecate("Directly access a consoles background color with `console.bg`")
 def console_get_char_background(con, x, y):
     """Return the background color at the x,y of this console."""
     return Color._new_from_cdata(
-        lib.TCOD_console_get_char_background(_console(con), x, y))
+        lib.TCOD_console_get_char_background(_console(con), x, y)
+    )
+
 
 @deprecate("Directly access a consoles foreground color with `console.fg`")
 def console_get_char_foreground(con, x, y):
     """Return the foreground color at the x,y of this console."""
     return Color._new_from_cdata(
-        lib.TCOD_console_get_char_foreground(_console(con), x, y))
+        lib.TCOD_console_get_char_foreground(_console(con), x, y)
+    )
+
 
 @deprecate("Directly access a consoles characters with `console.ch`")
 def console_get_char(con, x, y):
     """Return the character at the x,y of this console."""
     return lib.TCOD_console_get_char(_console(con), x, y)
 
+
 def console_set_fade(fade, fadingColor):
     lib.TCOD_console_set_fade(fade, fadingColor)
+
 
 def console_get_fade():
     return lib.TCOD_console_get_fade()
 
+
 def console_get_fading_color():
     return Color._new_from_cdata(lib.TCOD_console_get_fading_color())
+
 
 # handling keyboard input
 def console_wait_for_keypress(flush):
@@ -1142,18 +1357,22 @@ def console_wait_for_keypress(flush):
     lib.TCOD_console_wait_for_keypress_wrapper(key.key_p, flush)
     return key
 
+
 def console_check_for_keypress(flags=KEY_RELEASED):
     key = Key()
     lib.TCOD_console_check_for_keypress_wrapper(key.key_p, flags)
     return key
 
+
 def console_is_key_pressed(key):
     return lib.TCOD_console_is_key_pressed(key)
+
 
 # using offscreen consoles
 def console_new(w, h):
     """Return an offscreen console of size: w,h."""
     return tcod.console.Console(w, h)
+
 
 def console_from_file(filename):
     """Return a new console object from a filename.
@@ -1167,19 +1386,23 @@ def console_from_file(filename):
     Returns: A new :any`Console` instance.
     """
     return tcod.console.Console._from_cdata(
-        lib.TCOD_console_from_file(filename.encode('utf-8')))
+        lib.TCOD_console_from_file(filename.encode("utf-8"))
+    )
 
-def console_blit(src, x, y, w, h, dst, xdst, ydst, ffade=1.0,bfade=1.0):
+
+def console_blit(src, x, y, w, h, dst, xdst, ydst, ffade=1.0, bfade=1.0):
     """Blit the console src from x,y,w,h to console dst at xdst,ydst."""
     lib.TCOD_console_blit(
-        _console(src), x, y, w, h,
-        _console(dst), xdst, ydst, ffade, bfade)
+        _console(src), x, y, w, h, _console(dst), xdst, ydst, ffade, bfade
+    )
+
 
 def console_set_key_color(con, col):
     """Set a consoles blit transparent color."""
     lib.TCOD_console_set_key_color(_console(con), col)
-    if hasattr(con, 'set_key_color'):
+    if hasattr(con, "set_key_color"):
         con.set_key_color(col)
+
 
 def console_delete(con):
     # type: (Console) -> None
@@ -1195,6 +1418,7 @@ def console_delete(con):
     if con == ffi.NULL:
         lib.TCOD_console_delete(con)
 
+
 # fast color filling
 def console_fill_foreground(con, r, g, b):
     """Fill the foregound of a console with r,g,b.
@@ -1206,23 +1430,27 @@ def console_fill_foreground(con, r, g, b):
         b (Sequence[int]): An array of integers with a length of width*height.
     """
     if len(r) != len(g) or len(r) != len(b):
-        raise TypeError('R, G and B must all have the same size.')
-    if (isinstance(r, _np.ndarray) and isinstance(g, _np.ndarray) and
-            isinstance(b, _np.ndarray)):
-        #numpy arrays, use numpy's ctypes functions
+        raise TypeError("R, G and B must all have the same size.")
+    if (
+        isinstance(r, _np.ndarray)
+        and isinstance(g, _np.ndarray)
+        and isinstance(b, _np.ndarray)
+    ):
+        # numpy arrays, use numpy's ctypes functions
         r = _np.ascontiguousarray(r, dtype=_np.intc)
         g = _np.ascontiguousarray(g, dtype=_np.intc)
         b = _np.ascontiguousarray(b, dtype=_np.intc)
-        cr = ffi.cast('int *', r.ctypes.data)
-        cg = ffi.cast('int *', g.ctypes.data)
-        cb = ffi.cast('int *', b.ctypes.data)
+        cr = ffi.cast("int *", r.ctypes.data)
+        cg = ffi.cast("int *", g.ctypes.data)
+        cb = ffi.cast("int *", b.ctypes.data)
     else:
         # otherwise convert using ffi arrays
-        cr = ffi.new('int[]', r)
-        cg = ffi.new('int[]', g)
-        cb = ffi.new('int[]', b)
+        cr = ffi.new("int[]", r)
+        cg = ffi.new("int[]", g)
+        cb = ffi.new("int[]", b)
 
     lib.TCOD_console_fill_foreground(_console(con), cr, cg, cb)
+
 
 def console_fill_background(con, r, g, b):
     """Fill the backgound of a console with r,g,b.
@@ -1234,77 +1462,87 @@ def console_fill_background(con, r, g, b):
         b (Sequence[int]): An array of integers with a length of width*height.
     """
     if len(r) != len(g) or len(r) != len(b):
-        raise TypeError('R, G and B must all have the same size.')
-    if (isinstance(r, _np.ndarray) and isinstance(g, _np.ndarray) and
-            isinstance(b, _np.ndarray)):
-        #numpy arrays, use numpy's ctypes functions
+        raise TypeError("R, G and B must all have the same size.")
+    if (
+        isinstance(r, _np.ndarray)
+        and isinstance(g, _np.ndarray)
+        and isinstance(b, _np.ndarray)
+    ):
+        # numpy arrays, use numpy's ctypes functions
         r = _np.ascontiguousarray(r, dtype=_np.intc)
         g = _np.ascontiguousarray(g, dtype=_np.intc)
         b = _np.ascontiguousarray(b, dtype=_np.intc)
-        cr = ffi.cast('int *', r.ctypes.data)
-        cg = ffi.cast('int *', g.ctypes.data)
-        cb = ffi.cast('int *', b.ctypes.data)
+        cr = ffi.cast("int *", r.ctypes.data)
+        cg = ffi.cast("int *", g.ctypes.data)
+        cb = ffi.cast("int *", b.ctypes.data)
     else:
         # otherwise convert using ffi arrays
-        cr = ffi.new('int[]', r)
-        cg = ffi.new('int[]', g)
-        cb = ffi.new('int[]', b)
+        cr = ffi.new("int[]", r)
+        cg = ffi.new("int[]", g)
+        cb = ffi.new("int[]", b)
 
     lib.TCOD_console_fill_background(_console(con), cr, cg, cb)
 
-def console_fill_char(con,arr):
+
+def console_fill_char(con: tcod.console.Console, arr: Sequence[int]):
     """Fill the character tiles of a console with an array.
 
-    Args:
-        con (Console): Any Console instance.
-        arr (Sequence[int]): An array of integers with a length of width*height.
+    `arr` is an array of integers with a length of the consoles width and
+    height.
     """
     if isinstance(arr, _np.ndarray):
-        #numpy arrays, use numpy's ctypes functions
+        # numpy arrays, use numpy's ctypes functions
         arr = _np.ascontiguousarray(arr, dtype=_np.intc)
-        carr = ffi.cast('int *', arr.ctypes.data)
+        carr = ffi.cast("int *", arr.ctypes.data)
     else:
-        #otherwise convert using the ffi module
-        carr = ffi.new('int[]', arr)
+        # otherwise convert using the ffi module
+        carr = ffi.new("int[]", arr)
 
     lib.TCOD_console_fill_char(_console(con), carr)
 
+
 def console_load_asc(con, filename):
     """Update a console from a non-delimited ASCII `.asc` file."""
-    return lib.TCOD_console_load_asc(_console(con), filename.encode('utf-8'))
+    return lib.TCOD_console_load_asc(_console(con), filename.encode("utf-8"))
+
 
 def console_save_asc(con, filename):
     """Save a console to a non-delimited ASCII `.asc` file."""
-    return lib.TCOD_console_save_asc(_console(con), filename.encode('utf-8'))
+    return lib.TCOD_console_save_asc(_console(con), filename.encode("utf-8"))
+
 
 def console_load_apf(con, filename):
     """Update a console from an ASCII Paint `.apf` file."""
-    return lib.TCOD_console_load_apf(_console(con), filename.encode('utf-8'))
+    return lib.TCOD_console_load_apf(_console(con), filename.encode("utf-8"))
+
 
 def console_save_apf(con, filename):
     """Save a console to an ASCII Paint `.apf` file."""
-    return lib.TCOD_console_save_apf(_console(con), filename.encode('utf-8'))
+    return lib.TCOD_console_save_apf(_console(con), filename.encode("utf-8"))
+
 
 def console_load_xp(con, filename):
     """Update a console from a REXPaint `.xp` file."""
-    return lib.TCOD_console_load_xp(_console(con), filename.encode('utf-8'))
+    return lib.TCOD_console_load_xp(_console(con), filename.encode("utf-8"))
+
 
 def console_save_xp(con, filename, compress_level=9):
     """Save a console to a REXPaint `.xp` file."""
     return lib.TCOD_console_save_xp(
-        _console(con),
-        filename.encode('utf-8'),
-        compress_level,
-        )
+        _console(con), filename.encode("utf-8"), compress_level
+    )
+
 
 def console_from_xp(filename):
     """Return a single console from a REXPaint `.xp` file."""
     return tcod.console.Console._from_cdata(
-        lib.TCOD_console_from_xp(filename.encode('utf-8')))
+        lib.TCOD_console_from_xp(filename.encode("utf-8"))
+    )
+
 
 def console_list_load_xp(filename):
     """Return a list of consoles from a REXPaint `.xp` file."""
-    tcod_list = lib.TCOD_console_list_from_xp(filename.encode('utf-8'))
+    tcod_list = lib.TCOD_console_list_from_xp(filename.encode("utf-8"))
     if tcod_list == ffi.NULL:
         return None
     try:
@@ -1312,11 +1550,12 @@ def console_list_load_xp(filename):
         lib.TCOD_list_reverse(tcod_list)
         while not lib.TCOD_list_is_empty(tcod_list):
             python_list.append(
-                tcod.console.Console._from_cdata(lib.TCOD_list_pop(tcod_list)),
-                )
+                tcod.console.Console._from_cdata(lib.TCOD_list_pop(tcod_list))
+            )
         return python_list
     finally:
         lib.TCOD_list_delete(tcod_list)
+
 
 def console_list_save_xp(console_list, filename, compress_level=9):
     """Save a list of consoles to a REXPaint `.xp` file."""
@@ -1325,10 +1564,11 @@ def console_list_save_xp(console_list, filename, compress_level=9):
         for console in console_list:
             lib.TCOD_list_push(tcod_list, _console(console))
         return lib.TCOD_console_list_save_xp(
-            tcod_list, filename.encode('utf-8'), compress_level
-            )
+            tcod_list, filename.encode("utf-8"), compress_level
+        )
     finally:
         lib.TCOD_list_delete(tcod_list)
+
 
 def path_new_using_map(m, dcost=1.41):
     """Return a new AStar using the given Map.
@@ -1341,6 +1581,7 @@ def path_new_using_map(m, dcost=1.41):
         AStar: A new AStar instance.
     """
     return tcod.path.AStar(m, dcost)
+
 
 def path_new_using_function(w, h, func, userData=0, dcost=1.41):
     """Return a new AStar using the given callable function.
@@ -1356,9 +1597,9 @@ def path_new_using_function(w, h, func, userData=0, dcost=1.41):
         AStar: A new AStar instance.
     """
     return tcod.path.AStar(
-        tcod.path._EdgeCostFunc((func, userData), (w, h)),
-        dcost,
-        )
+        tcod.path._EdgeCostFunc((func, userData), (w, h)), dcost
+    )
+
 
 def path_compute(p, ox, oy, dx, dy):
     """Find a path from (ox, oy) to (dx, dy).  Return True if path is found.
@@ -1374,6 +1615,7 @@ def path_compute(p, ox, oy, dx, dy):
     """
     return lib.TCOD_path_compute(p._path_c, ox, oy, dx, dy)
 
+
 def path_get_origin(p):
     """Get the current origin position.
 
@@ -1384,10 +1626,11 @@ def path_get_origin(p):
     Returns:
         Tuple[int, int]: An (x, y) point.
     """
-    x = ffi.new('int *')
-    y = ffi.new('int *')
+    x = ffi.new("int *")
+    y = ffi.new("int *")
     lib.TCOD_path_get_origin(p._path_c, x, y)
     return x[0], y[0]
+
 
 def path_get_destination(p):
     """Get the current destination position.
@@ -1397,10 +1640,11 @@ def path_get_destination(p):
     Returns:
         Tuple[int, int]: An (x, y) point.
     """
-    x = ffi.new('int *')
-    y = ffi.new('int *')
+    x = ffi.new("int *")
+    y = ffi.new("int *")
     lib.TCOD_path_get_destination(p._path_c, x, y)
     return x[0], y[0]
+
 
 def path_size(p):
     """Return the current length of the computed path.
@@ -1412,6 +1656,7 @@ def path_size(p):
     """
     return lib.TCOD_path_size(p._path_c)
 
+
 def path_reverse(p):
     """Reverse the direction of a path.
 
@@ -1422,6 +1667,7 @@ def path_reverse(p):
     """
     lib.TCOD_path_reverse(p._path_c)
 
+
 def path_get(p, idx):
     """Get a point on a path.
 
@@ -1429,10 +1675,11 @@ def path_get(p, idx):
         p (AStar): An AStar instance.
         idx (int): Should be in range: 0 <= inx < :any:`path_size`
     """
-    x = ffi.new('int *')
-    y = ffi.new('int *')
+    x = ffi.new("int *")
+    y = ffi.new("int *")
     lib.TCOD_path_get(p._path_c, idx, x, y)
     return x[0], y[0]
+
 
 def path_is_empty(p):
     """Return True if a path is empty.
@@ -1443,6 +1690,7 @@ def path_is_empty(p):
         bool: True if a path is empty.  Otherwise False.
     """
     return lib.TCOD_path_is_empty(p._path_c)
+
 
 def path_walk(p, recompute):
     """Return the next (x, y) point in a path, or (None, None) if it's empty.
@@ -1457,11 +1705,12 @@ def path_walk(p, recompute):
         Union[Tuple[int, int], Tuple[None, None]]:
             A single (x, y) point, or (None, None)
     """
-    x = ffi.new('int *')
-    y = ffi.new('int *')
+    x = ffi.new("int *")
+    y = ffi.new("int *")
     if lib.TCOD_path_walk(p._path_c, x, y, recompute):
         return x[0], y[0]
-    return None,None
+    return None, None
+
 
 @deprecate("libtcod objects are deleted automatically.")
 def path_delete(p):
@@ -1471,45 +1720,55 @@ def path_delete(p):
     This function exists for backwards compatibility with libtcodpy.
     """
 
+
 def dijkstra_new(m, dcost=1.41):
     return tcod.path.Dijkstra(m, dcost)
 
+
 def dijkstra_new_using_function(w, h, func, userData=0, dcost=1.41):
     return tcod.path.Dijkstra(
-        tcod.path._EdgeCostFunc((func, userData), (w, h)),
-        dcost,
-        )
+        tcod.path._EdgeCostFunc((func, userData), (w, h)), dcost
+    )
+
 
 def dijkstra_compute(p, ox, oy):
     lib.TCOD_dijkstra_compute(p._path_c, ox, oy)
 
+
 def dijkstra_path_set(p, x, y):
     return lib.TCOD_dijkstra_path_set(p._path_c, x, y)
+
 
 def dijkstra_get_distance(p, x, y):
     return lib.TCOD_dijkstra_get_distance(p._path_c, x, y)
 
+
 def dijkstra_size(p):
     return lib.TCOD_dijkstra_size(p._path_c)
+
 
 def dijkstra_reverse(p):
     lib.TCOD_dijkstra_reverse(p._path_c)
 
+
 def dijkstra_get(p, idx):
-    x = ffi.new('int *')
-    y = ffi.new('int *')
+    x = ffi.new("int *")
+    y = ffi.new("int *")
     lib.TCOD_dijkstra_get(p._path_c, idx, x, y)
     return x[0], y[0]
+
 
 def dijkstra_is_empty(p):
     return lib.TCOD_dijkstra_is_empty(p._path_c)
 
+
 def dijkstra_path_walk(p):
-    x = ffi.new('int *')
-    y = ffi.new('int *')
+    x = ffi.new("int *")
+    y = ffi.new("int *")
     if lib.TCOD_dijkstra_path_walk(p._path_c, x, y):
         return x[0], y[0]
-    return None,None
+    return None, None
+
 
 @deprecate("libtcod objects are deleted automatically.")
 def dijkstra_delete(p):
@@ -1519,22 +1778,24 @@ def dijkstra_delete(p):
     This function exists for backwards compatibility with libtcodpy.
     """
 
+
 def _heightmap_cdata(array: np.ndarray) -> ffi.CData:
     """Return a new TCOD_heightmap_t instance using an array.
 
     Formatting is verified during this function.
     """
-    if array.flags['F_CONTIGUOUS']:
+    if array.flags["F_CONTIGUOUS"]:
         array = array.transpose()
-    if not array.flags['C_CONTIGUOUS']:
-        raise ValueError('array must be a contiguous segment.')
+    if not array.flags["C_CONTIGUOUS"]:
+        raise ValueError("array must be a contiguous segment.")
     if array.dtype != _np.float32:
-        raise ValueError('array dtype must be float32, not %r' % array.dtype)
+        raise ValueError("array dtype must be float32, not %r" % array.dtype)
     width, height = array.shape
-    pointer = ffi.cast('float *', array.ctypes.data)
-    return ffi.new('TCOD_heightmap_t *', (width, height, pointer))
+    pointer = ffi.cast("float *", array.ctypes.data)
+    return ffi.new("TCOD_heightmap_t *", (width, height, pointer))
 
-def heightmap_new(w: int, h: int, order: str='C') -> np.ndarray:
+
+def heightmap_new(w: int, h: int, order: str = "C") -> np.ndarray:
     """Return a new numpy.ndarray formatted for use with heightmap functions.
 
     `w` and `h` are the width and height of the array.
@@ -1552,12 +1813,13 @@ def heightmap_new(w: int, h: int, order: str='C') -> np.ndarray:
     .. versionchanged:: 8.1
         Added the `order` parameter.
     """
-    if order == 'C':
-        return np.zeros((h, w), _np.float32, order='C')
-    elif order == 'F':
-        return np.zeros((w, h), _np.float32, order='F')
+    if order == "C":
+        return np.zeros((h, w), _np.float32, order="C")
+    elif order == "F":
+        return np.zeros((w, h), _np.float32, order="F")
     else:
         raise ValueError("Invalid order parameter, should be 'C' or 'F'.")
+
 
 def heightmap_set_value(hm: np.ndarray, x: int, y: int, value: float) -> None:
     """Set the value of a point on a heightmap.
@@ -1565,17 +1827,24 @@ def heightmap_set_value(hm: np.ndarray, x: int, y: int, value: float) -> None:
     .. deprecated:: 2.0
         `hm` is a NumPy array, so values should be assigned to it directly.
     """
-    if hm.flags['C_CONTIGUOUS']:
-        warnings.warn("Assign to this heightmap with hm[i,j] = value\n"
-                      "consider using order='F'",
-                      DeprecationWarning, stacklevel=2)
+    if hm.flags["C_CONTIGUOUS"]:
+        warnings.warn(
+            "Assign to this heightmap with hm[i,j] = value\n"
+            "consider using order='F'",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         hm[y, x] = value
-    elif hm.flags['F_CONTIGUOUS']:
-        warnings.warn("Assign to this heightmap with hm[x,y] = value",
-                      DeprecationWarning, stacklevel=2)
+    elif hm.flags["F_CONTIGUOUS"]:
+        warnings.warn(
+            "Assign to this heightmap with hm[x,y] = value",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         hm[x, y] = value
     else:
         raise ValueError("This array is not contiguous.")
+
 
 @deprecate("Add a scalar to an array using `hm[:] += value`")
 def heightmap_add(hm: np.ndarray, value: float) -> None:
@@ -1590,6 +1859,7 @@ def heightmap_add(hm: np.ndarray, value: float) -> None:
     """
     hm[:] += value
 
+
 @deprecate("Multiply an array with a scaler using `hm[:] *= value`")
 def heightmap_scale(hm: np.ndarray, value: float) -> None:
     """Multiply all items on this heightmap by value.
@@ -1603,6 +1873,7 @@ def heightmap_scale(hm: np.ndarray, value: float) -> None:
     """
     hm[:] *= value
 
+
 @deprecate("Clear an array with`hm[:] = 0`")
 def heightmap_clear(hm: np.ndarray) -> None:
     """Add value to all values on this heightmap.
@@ -1614,6 +1885,7 @@ def heightmap_clear(hm: np.ndarray) -> None:
         Do ``hm.array[:] = 0`` instead.
     """
     hm[:] = 0
+
 
 @deprecate("Clamp array values using `hm.clip(mi, ma)`")
 def heightmap_clamp(hm: np.ndarray, mi: float, ma: float) -> None:
@@ -1629,6 +1901,7 @@ def heightmap_clamp(hm: np.ndarray, mi: float, ma: float) -> None:
     """
     hm.clip(mi, ma)
 
+
 @deprecate("Copy an array using `hm2[:] = hm1[:]`, or `hm1.copy()`")
 def heightmap_copy(hm1: np.ndarray, hm2: np.ndarray) -> None:
     """Copy the heightmap ``hm1`` to ``hm2``.
@@ -1642,7 +1915,10 @@ def heightmap_copy(hm1: np.ndarray, hm2: np.ndarray) -> None:
     """
     hm2[:] = hm1[:]
 
-def heightmap_normalize(hm: np.ndarray,  mi: float=0.0, ma: float=1.0) -> None:
+
+def heightmap_normalize(
+    hm: np.ndarray, mi: float = 0.0, ma: float = 1.0
+) -> None:
     """Normalize heightmap values between ``mi`` and ``ma``.
 
     Args:
@@ -1651,8 +1927,10 @@ def heightmap_normalize(hm: np.ndarray,  mi: float=0.0, ma: float=1.0) -> None:
     """
     lib.TCOD_heightmap_normalize(_heightmap_cdata(hm), mi, ma)
 
-def heightmap_lerp_hm(hm1: np.ndarray, hm2: np.ndarray, hm3: np.ndarray,
-                      coef: float) -> None:
+
+def heightmap_lerp_hm(
+    hm1: np.ndarray, hm2: np.ndarray, hm3: np.ndarray, coef: float
+) -> None:
     """Perform linear interpolation between two heightmaps storing the result
     in ``hm3``.
 
@@ -1664,12 +1942,18 @@ def heightmap_lerp_hm(hm1: np.ndarray, hm2: np.ndarray, hm3: np.ndarray,
         hm3 (numpy.ndarray): A destination heightmap to store the result.
         coef (float): The linear interpolation coefficient.
     """
-    lib.TCOD_heightmap_lerp_hm(_heightmap_cdata(hm1), _heightmap_cdata(hm2),
-                               _heightmap_cdata(hm3), coef)
+    lib.TCOD_heightmap_lerp_hm(
+        _heightmap_cdata(hm1),
+        _heightmap_cdata(hm2),
+        _heightmap_cdata(hm3),
+        coef,
+    )
+
 
 @deprecate("Add 2 arrays using `hm3 = hm1 + hm2`")
-def heightmap_add_hm(hm1: np.ndarray, hm2: np.ndarray,
-                     hm3: np.ndarray) -> None:
+def heightmap_add_hm(
+    hm1: np.ndarray, hm2: np.ndarray, hm3: np.ndarray
+) -> None:
     """Add two heightmaps together and stores the result in ``hm3``.
 
     Args:
@@ -1682,9 +1966,11 @@ def heightmap_add_hm(hm1: np.ndarray, hm2: np.ndarray,
     """
     hm3[:] = hm1[:] + hm2[:]
 
+
 @deprecate("Multiply 2 arrays using `hm3 = hm1 * hm2`")
-def heightmap_multiply_hm(hm1: np.ndarray, hm2: np.ndarray,
-                          hm3: np.ndarray) -> None:
+def heightmap_multiply_hm(
+    hm1: np.ndarray, hm2: np.ndarray, hm3: np.ndarray
+) -> None:
     """Multiplies two heightmap's together and stores the result in ``hm3``.
 
     Args:
@@ -1698,8 +1984,10 @@ def heightmap_multiply_hm(hm1: np.ndarray, hm2: np.ndarray,
     """
     hm3[:] = hm1[:] * hm2[:]
 
-def heightmap_add_hill(hm: np.ndarray, x: float, y: float, radius: float,
-                       height: float) -> None:
+
+def heightmap_add_hill(
+    hm: np.ndarray, x: float, y: float, radius: float, height: float
+) -> None:
     """Add a hill (a half spheroid) at given position.
 
     If height == radius or -radius, the hill is a half-sphere.
@@ -1713,14 +2001,17 @@ def heightmap_add_hill(hm: np.ndarray, x: float, y: float, radius: float,
     """
     lib.TCOD_heightmap_add_hill(_heightmap_cdata(hm), x, y, radius, height)
 
-def heightmap_dig_hill(hm: np.ndarray, x: float, y: float, radius: float,
-                       height: float) -> None:
+
+def heightmap_dig_hill(
+    hm: np.ndarray, x: float, y: float, radius: float, height: float
+) -> None:
     """
 
     This function takes the highest value (if height > 0) or the lowest
     (if height < 0) between the map and the hill.
 
-    It's main goal is to carve things in maps (like rivers) by digging hills along a curve.
+    It's main goal is to carve things in maps (like rivers) by digging hills
+    along a curve.
 
     Args:
         hm (numpy.ndarray): A numpy.ndarray formatted for heightmap functions.
@@ -1731,9 +2022,14 @@ def heightmap_dig_hill(hm: np.ndarray, x: float, y: float, radius: float,
     """
     lib.TCOD_heightmap_dig_hill(_heightmap_cdata(hm), x, y, radius, height)
 
-def heightmap_rain_erosion(hm: np.ndarray, nbDrops: int, erosionCoef: float,
-                           sedimentationCoef: float,
-                           rnd: Optional[tcod.random.Random]=None) -> None:
+
+def heightmap_rain_erosion(
+    hm: np.ndarray,
+    nbDrops: int,
+    erosionCoef: float,
+    sedimentationCoef: float,
+    rnd: Optional[tcod.random.Random] = None,
+) -> None:
     """Simulate the effect of rain drops on the terrain, resulting in erosion.
 
     ``nbDrops`` should be at least hm.size.
@@ -1747,14 +2043,23 @@ def heightmap_rain_erosion(hm: np.ndarray, nbDrops: int, erosionCoef: float,
         rnd (Optional[Random]): A tcod.Random instance, or None.
     """
     lib.TCOD_heightmap_rain_erosion(
-        _heightmap_cdata(hm), nbDrops, erosionCoef,
-        sedimentationCoef, rnd.random_c if rnd else ffi.NULL
+        _heightmap_cdata(hm),
+        nbDrops,
+        erosionCoef,
+        sedimentationCoef,
+        rnd.random_c if rnd else ffi.NULL,
     )
 
-def heightmap_kernel_transform(hm: np.ndarray, kernelsize: int,
-                               dx: Sequence[int], dy: Sequence[int],
-                               weight: Sequence[float],
-                               minLevel: float, maxLevel: float) -> None:
+
+def heightmap_kernel_transform(
+    hm: np.ndarray,
+    kernelsize: int,
+    dx: Sequence[int],
+    dy: Sequence[int],
+    weight: Sequence[float],
+    minLevel: float,
+    maxLevel: float,
+) -> None:
     """Apply a generic transformation on the map, so that each resulting cell
     value is the weighted sum of several neighbour cells.
 
@@ -1796,15 +2101,21 @@ def heightmap_kernel_transform(hm: np.ndarray, kernelsize: int,
         >>> tcod.heightmap_kernel_transform(heightmap, 3, dx, dy, weight,
         ...                                 0.0, 1.0)
     """
-    cdx = ffi.new('int[]', dx)
-    cdy = ffi.new('int[]', dy)
-    cweight = ffi.new('float[]', weight)
-    lib.TCOD_heightmap_kernel_transform(_heightmap_cdata(hm), kernelsize,
-                                        cdx, cdy, cweight, minLevel, maxLevel)
+    cdx = ffi.new("int[]", dx)
+    cdy = ffi.new("int[]", dy)
+    cweight = ffi.new("float[]", weight)
+    lib.TCOD_heightmap_kernel_transform(
+        _heightmap_cdata(hm), kernelsize, cdx, cdy, cweight, minLevel, maxLevel
+    )
 
-def heightmap_add_voronoi(hm: np.ndarray, nbPoints: Any, nbCoef: int,
-                          coef: Sequence[float],
-                          rnd: Optional[tcod.random.Random]=None) -> None:
+
+def heightmap_add_voronoi(
+    hm: np.ndarray,
+    nbPoints: Any,
+    nbCoef: int,
+    coef: Sequence[float],
+    rnd: Optional[tcod.random.Random] = None,
+) -> None:
     """Add values from a Voronoi diagram to the heightmap.
 
     Args:
@@ -1819,15 +2130,28 @@ def heightmap_add_voronoi(hm: np.ndarray, nbPoints: Any, nbCoef: int,
         rnd (Optional[Random]): A Random instance, or None.
     """
     nbPoints = len(coef)
-    ccoef = ffi.new('float[]', coef)
+    ccoef = ffi.new("float[]", coef)
     lib.TCOD_heightmap_add_voronoi(
-        _heightmap_cdata(hm), nbPoints,
-        nbCoef, ccoef, rnd.random_c if rnd else ffi.NULL)
+        _heightmap_cdata(hm),
+        nbPoints,
+        nbCoef,
+        ccoef,
+        rnd.random_c if rnd else ffi.NULL,
+    )
+
 
 @deprecate("Arrays of noise should be sampled using the tcod.noise module.")
-def heightmap_add_fbm(hm: np.ndarray, noise: tcod.noise.Noise,
-                      mulx: float, muly: float, addx: float, addy: float,
-                      octaves: float, delta: float, scale: float) -> None:
+def heightmap_add_fbm(
+    hm: np.ndarray,
+    noise: tcod.noise.Noise,
+    mulx: float,
+    muly: float,
+    addx: float,
+    addy: float,
+    octaves: float,
+    delta: float,
+    scale: float,
+) -> None:
     """Add FBM noise to the heightmap.
 
     The noise coordinate for each map cell is
@@ -1851,13 +2175,31 @@ def heightmap_add_fbm(hm: np.ndarray, noise: tcod.noise.Noise,
         as :any:`Noise.sample_ogrid`.
     """
     noise = noise.noise_c if noise is not None else ffi.NULL
-    lib.TCOD_heightmap_add_fbm(_heightmap_cdata(hm), noise,
-                               mulx, muly, addx, addy, octaves, delta, scale)
+    lib.TCOD_heightmap_add_fbm(
+        _heightmap_cdata(hm),
+        noise,
+        mulx,
+        muly,
+        addx,
+        addy,
+        octaves,
+        delta,
+        scale,
+    )
+
 
 @deprecate("Arrays of noise should be sampled using the tcod.noise module.")
-def heightmap_scale_fbm(hm: np.ndarray, noise: tcod.noise.Noise,
-                        mulx: float, muly: float, addx: float, addy: float,
-                        octaves: float, delta: float, scale: float) -> None:
+def heightmap_scale_fbm(
+    hm: np.ndarray,
+    noise: tcod.noise.Noise,
+    mulx: float,
+    muly: float,
+    addx: float,
+    addy: float,
+    octaves: float,
+    delta: float,
+    scale: float,
+) -> None:
     """Multiply the heighmap values with FBM noise.
 
     Args:
@@ -1876,14 +2218,28 @@ def heightmap_scale_fbm(hm: np.ndarray, noise: tcod.noise.Noise,
         as :any:`Noise.sample_ogrid`.
     """
     noise = noise.noise_c if noise is not None else ffi.NULL
-    lib.TCOD_heightmap_scale_fbm(_heightmap_cdata(hm), noise,
-                                 mulx, muly, addx, addy, octaves, delta, scale)
+    lib.TCOD_heightmap_scale_fbm(
+        _heightmap_cdata(hm),
+        noise,
+        mulx,
+        muly,
+        addx,
+        addy,
+        octaves,
+        delta,
+        scale,
+    )
 
-def heightmap_dig_bezier(hm: np.ndarray,
-                         px: Tuple[int, int, int, int],
-                         py: Tuple[int, int, int, int],
-                         startRadius: float, startDepth: float,
-                         endRadius: float, endDepth: float) -> None:
+
+def heightmap_dig_bezier(
+    hm: np.ndarray,
+    px: Tuple[int, int, int, int],
+    py: Tuple[int, int, int, int],
+    startRadius: float,
+    startDepth: float,
+    endRadius: float,
+    endDepth: float,
+) -> None:
     """Carve a path along a cubic Bezier curve.
 
     Both radius and depth can vary linearly along the path.
@@ -1897,9 +2253,16 @@ def heightmap_dig_bezier(hm: np.ndarray,
         endRadius (float): The ending radius size.
         endDepth (float): The ending depth.
     """
-    lib.TCOD_heightmap_dig_bezier(_heightmap_cdata(hm), px, py, startRadius,
-                                   startDepth, endRadius,
-                                   endDepth)
+    lib.TCOD_heightmap_dig_bezier(
+        _heightmap_cdata(hm),
+        px,
+        py,
+        startRadius,
+        startDepth,
+        endRadius,
+        endDepth,
+    )
+
 
 def heightmap_get_value(hm: np.ndarray, x: int, y: int) -> float:
     """Return the value at ``x``, ``y`` in a heightmap.
@@ -1907,21 +2270,28 @@ def heightmap_get_value(hm: np.ndarray, x: int, y: int) -> float:
     .. deprecated:: 2.0
         Access `hm` as a NumPy array instead.
     """
-    if hm.flags['C_CONTIGUOUS']:
-        warnings.warn("Get a value from this heightmap with hm[i,j]\n"
-                      "consider using order='F'",
-                      DeprecationWarning, stacklevel=2)
+    if hm.flags["C_CONTIGUOUS"]:
+        warnings.warn(
+            "Get a value from this heightmap with hm[i,j]\n"
+            "consider using order='F'",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return hm[y, x]
-    elif hm.flags['F_CONTIGUOUS']:
-        warnings.warn("Get a value from this heightmap with hm[x,y]",
-                      DeprecationWarning, stacklevel=2)
+    elif hm.flags["F_CONTIGUOUS"]:
+        warnings.warn(
+            "Get a value from this heightmap with hm[x,y]",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return hm[x, y]
     else:
         raise ValueError("This array is not contiguous.")
 
 
-def heightmap_get_interpolated_value(hm: np.ndarray,
-                                     x: float, y: float) -> float:
+def heightmap_get_interpolated_value(
+    hm: np.ndarray, x: float, y: float
+) -> float:
     """Return the interpolated height at non integer coordinates.
 
     Args:
@@ -1932,8 +2302,10 @@ def heightmap_get_interpolated_value(hm: np.ndarray,
     Returns:
         float: The value at ``x``, ``y``.
     """
-    return lib.TCOD_heightmap_get_interpolated_value(_heightmap_cdata(hm),
-                                                     x, y)
+    return lib.TCOD_heightmap_get_interpolated_value(
+        _heightmap_cdata(hm), x, y
+    )
+
 
 def heightmap_get_slope(hm: np.ndarray, x: int, y: int) -> float:
     """Return the slope between 0 and (pi / 2) at given coordinates.
@@ -1948,8 +2320,10 @@ def heightmap_get_slope(hm: np.ndarray, x: int, y: int) -> float:
     """
     return lib.TCOD_heightmap_get_slope(_heightmap_cdata(hm), x, y)
 
-def heightmap_get_normal(hm: np.ndarray, x: float, y: float,
-                         waterLevel: float) -> Tuple[float, float, float]:
+
+def heightmap_get_normal(
+    hm: np.ndarray, x: float, y: float, waterLevel: float
+) -> Tuple[float, float, float]:
     """Return the map normal at given coordinates.
 
     Args:
@@ -1961,9 +2335,10 @@ def heightmap_get_normal(hm: np.ndarray, x: float, y: float,
     Returns:
         Tuple[float, float, float]: An (x, y, z) vector normal.
     """
-    cn = ffi.new('float[3]')
+    cn = ffi.new("float[3]")
     lib.TCOD_heightmap_get_normal(_heightmap_cdata(hm), x, y, cn, waterLevel)
     return tuple(cn)
+
 
 @deprecate("This function is deprecated, see documentation.")
 def heightmap_count_cells(hm: np.ndarray, mi: float, ma: float) -> int:
@@ -1983,6 +2358,7 @@ def heightmap_count_cells(hm: np.ndarray, mi: float, ma: float) -> int:
     """
     return lib.TCOD_heightmap_count_cells(_heightmap_cdata(hm), mi, ma)
 
+
 def heightmap_has_land_on_border(hm: np.ndarray, waterlevel: float) -> bool:
     """Returns True if the map edges are below ``waterlevel``, otherwise False.
 
@@ -1993,8 +2369,10 @@ def heightmap_has_land_on_border(hm: np.ndarray, waterlevel: float) -> bool:
     Returns:
         bool: True if the map edges are below ``waterlevel``, otherwise False.
     """
-    return lib.TCOD_heightmap_has_land_on_border(_heightmap_cdata(hm),
-                                                 waterlevel)
+    return lib.TCOD_heightmap_has_land_on_border(
+        _heightmap_cdata(hm), waterlevel
+    )
+
 
 @deprecate("Use `hm.min()` and `hm.max()` instead.")
 def heightmap_get_minmax(hm: np.ndarray) -> Tuple[float, float]:
@@ -2009,10 +2387,11 @@ def heightmap_get_minmax(hm: np.ndarray) -> Tuple[float, float]:
     .. deprecated:: 2.0
         Use ``hm.min()`` or ``hm.max()`` instead.
     """
-    mi = ffi.new('float *')
-    ma = ffi.new('float *')
+    mi = ffi.new("float *")
+    ma = ffi.new("float *")
     lib.TCOD_heightmap_get_minmax(_heightmap_cdata(hm), mi, ma)
     return mi[0], ma[0]
+
 
 @deprecate("libtcod objects are deleted automatically.")
 def heightmap_delete(hm: Any) -> None:
@@ -2024,35 +2403,46 @@ def heightmap_delete(hm: Any) -> None:
         libtcod-cffi deletes heightmaps automatically.
     """
 
+
 def image_new(width, height):
     return tcod.image.Image(width, height)
+
 
 def image_clear(image, col):
     image.clear(col)
 
+
 def image_invert(image):
     image.invert()
+
 
 def image_hflip(image):
     image.hflip()
 
+
 def image_rotate90(image, num=1):
     image.rotate90(num)
+
 
 def image_vflip(image):
     image.vflip()
 
+
 def image_scale(image, neww, newh):
     image.scale(neww, newh)
+
 
 def image_set_key_color(image, col):
     image.set_key_color(col)
 
+
 def image_get_alpha(image, x, y):
     image.get_alpha(x, y)
 
+
 def image_is_pixel_transparent(image, x, y):
     lib.TCOD_image_is_pixel_transparent(image.image_c, x, y)
+
 
 def image_load(filename):
     """Load an image file into an Image instance and return it.
@@ -2062,9 +2452,9 @@ def image_load(filename):
     """
     filename = _bytes(filename)
     return tcod.image.Image._from_cdata(
-        ffi.gc(lib.TCOD_image_load(filename),
-               lib.TCOD_image_delete)
-        )
+        ffi.gc(lib.TCOD_image_load(filename), lib.TCOD_image_delete)
+    )
+
 
 def image_from_console(console):
     """Return an Image with a Consoles pixel data.
@@ -2078,35 +2468,45 @@ def image_from_console(console):
         ffi.gc(
             lib.TCOD_image_from_console(_console(console)),
             lib.TCOD_image_delete,
-            )
         )
+    )
+
 
 def image_refresh_console(image, console):
     image.refresh_console(console)
 
+
 def image_get_size(image):
     return image.width, image.height
+
 
 def image_get_pixel(image, x, y):
     return image.get_pixel(x, y)
 
+
 def image_get_mipmap_pixel(image, x0, y0, x1, y1):
     return image.get_mipmap_pixel(x0, y0, x1, y1)
+
 
 def image_put_pixel(image, x, y, col):
     image.put_pixel(x, y, col)
 
+
 def image_blit(image, console, x, y, bkgnd_flag, scalex, scaley, angle):
     image.blit(console, x, y, bkgnd_flag, scalex, scaley, angle)
+
 
 def image_blit_rect(image, console, x, y, w, h, bkgnd_flag):
     image.blit_rect(console, x, y, w, h, bkgnd_flag)
 
+
 def image_blit_2x(image, console, dx, dy, sx=0, sy=0, w=-1, h=-1):
     image.blit_2x(console, dx, dy, sx, sy, w, h)
 
+
 def image_save(image, filename):
     image.save_as(filename)
+
 
 @deprecate("libtcod objects are deleted automatically.")
 def image_delete(image):
@@ -2115,6 +2515,7 @@ def image_delete(image):
 
     This function exists for backwards compatibility with libtcodpy.
     """
+
 
 def line_init(xo, yo, xd, yd):
     """Initilize a line whose points will be returned by `line_step`.
@@ -2134,6 +2535,7 @@ def line_init(xo, yo, xd, yd):
     """
     lib.TCOD_line_init(xo, yo, xd, yd)
 
+
 def line_step():
     """After calling line_init returns (x, y) points of the line.
 
@@ -2147,12 +2549,12 @@ def line_step():
     .. deprecated:: 2.0
        Use `line_iter` instead.
     """
-    x = ffi.new('int *')
-    y = ffi.new('int *')
+    x = ffi.new("int *")
+    y = ffi.new("int *")
     ret = lib.TCOD_line_step(x, y)
     if not ret:
         return x[0], y[0]
-    return None,None
+    return None, None
 
 
 def line(xo, yo, xd, yd, py_callback):
@@ -2200,10 +2602,10 @@ def line_iter(xo, yo, xd, yd):
     Returns:
         Iterator[Tuple[int,int]]: An iterator of (x,y) points.
     """
-    data = ffi.new('TCOD_bresenham_data_t *')
+    data = ffi.new("TCOD_bresenham_data_t *")
     lib.TCOD_line_init_mt(xo, yo, xd, yd, data)
-    x = ffi.new('int *')
-    y = ffi.new('int *')
+    x = ffi.new("int *")
+    y = ffi.new("int *")
     yield xo, yo
     while not lib.TCOD_line_step_mt(x, y, data):
         yield (x[0], y[0])
@@ -2232,8 +2634,8 @@ def line_where(x1, y1, x2, y2, inclusive=True):
     """
     length = max(abs(x1 - x2), abs(y1 - y2)) + 1
     array = np.ndarray((2, length), dtype=np.intc)
-    x = ffi.cast('int*', array[0].ctypes.data)
-    y = ffi.cast('int*', array[1].ctypes.data)
+    x = ffi.cast("int*", array[0].ctypes.data)
+    y = ffi.cast("int*", array[1].ctypes.data)
     lib.LineWhere(x1, y1, x2, y2, x, y)
     if not inclusive:
         array = array[:, 1:]
@@ -2255,6 +2657,7 @@ FOV_PERMISSIVE_8 = 11
 FOV_RESTRICTIVE = 12
 NB_FOV_ALGORITHMS = 13
 
+
 def map_new(w, h):
     # type: (int, int) -> tcod.map.Map
     """Return a :any:`tcod.map.Map` with a width and height.
@@ -2264,6 +2667,7 @@ def map_new(w, h):
         or :any:`tcod.path` for working with path-finding.
     """
     return tcod.map.Map(w, h)
+
 
 def map_copy(source, dest):
     # type: (tcod.map.Map, tcod.map.Map) -> None
@@ -2277,6 +2681,7 @@ def map_copy(source, dest):
         dest.__init__(source.width, source.height, source._order)
     dest._Map__buffer[:] = source._Map__buffer[:]
 
+
 def map_set_properties(m, x, y, isTrans, isWalk):
     # type: (tcod.map.Map, int, int, bool, bool) -> None
     """Set the properties of a single cell.
@@ -2289,6 +2694,7 @@ def map_set_properties(m, x, y, isTrans, isWalk):
     """
     lib.TCOD_map_set_properties(m.map_c, x, y, isTrans, isWalk)
 
+
 def map_clear(m, transparent=False, walkable=False):
     # type: (tcod.map.Map, bool, bool) -> None
     """Change all map cells to a specific value.
@@ -2300,7 +2706,8 @@ def map_clear(m, transparent=False, walkable=False):
     m.transparent[:] = transparent
     m.walkable[:] = walkable
 
-def map_compute_fov(m, x, y, radius=0, light_walls=True, algo=FOV_RESTRICTIVE ):
+
+def map_compute_fov(m, x, y, radius=0, light_walls=True, algo=FOV_RESTRICTIVE):
     # type: (tcod.map.Map, int, int, int, bool, int) -> None
     """Compute the field-of-view for a map instance.
 
@@ -2308,6 +2715,7 @@ def map_compute_fov(m, x, y, radius=0, light_walls=True, algo=FOV_RESTRICTIVE ):
         Use :any:`tcod.map.Map.compute_fov` instead.
     """
     m.compute_fov(x, y, radius, light_walls, algo)
+
 
 def map_is_in_fov(m, x, y):
     # type: (tcod.map.Map, int, int) -> bool
@@ -2321,6 +2729,7 @@ def map_is_in_fov(m, x, y):
     """
     return lib.TCOD_map_is_in_fov(m.map_c, x, y)
 
+
 def map_is_transparent(m, x, y):
     # type: (tcod.map.Map, int, int) -> bool
     """
@@ -2330,6 +2739,7 @@ def map_is_transparent(m, x, y):
         Use :any:`tcod.map.Map.transparent` to check this property.
     """
     return lib.TCOD_map_is_transparent(m.map_c, x, y)
+
 
 def map_is_walkable(m, x, y):
     # type: (tcod.map.Map, int, int) -> bool
@@ -2341,6 +2751,7 @@ def map_is_walkable(m, x, y):
     """
     return lib.TCOD_map_is_walkable(m.map_c, x, y)
 
+
 @deprecate("libtcod objects are deleted automatically.")
 def map_delete(m):
     # type (Any) -> None
@@ -2348,6 +2759,7 @@ def map_delete(m):
 
     This function exists for backwards compatibility with libtcodpy.
     """
+
 
 def map_get_width(map):
     # type: (tcod.map.Map) -> int
@@ -2358,6 +2770,7 @@ def map_get_width(map):
     """
     return map.width
 
+
 def map_get_height(map):
     # type: (tcod.map.Map) -> int
     """Return the height of a map.
@@ -2367,52 +2780,65 @@ def map_get_height(map):
     """
     return map.height
 
+
 def mouse_show_cursor(visible):
     # type: (bool) -> None
     """Change the visibility of the mouse cursor."""
     lib.TCOD_mouse_show_cursor(visible)
+
 
 def mouse_is_cursor_visible():
     # type: () -> bool
     """Return True if the mouse cursor is visible."""
     return lib.TCOD_mouse_is_cursor_visible()
 
+
 def mouse_move(x, y):
     # type (int, int) -> None
     lib.TCOD_mouse_move(x, y)
+
 
 def mouse_get_status():
     # type: () -> Mouse
     return Mouse(lib.TCOD_mouse_get_status())
 
+
 def namegen_parse(filename, random=None):
     filename = _bytes(filename)
     lib.TCOD_namegen_parse(filename, random or ffi.NULL)
 
+
 def namegen_generate(name):
     name = _bytes(name)
     return _unpack_char_p(lib.TCOD_namegen_generate(name, False))
+
 
 def namegen_generate_custom(name, rule):
     name = _bytes(name)
     rule = _bytes(rule)
     return _unpack_char_p(lib.TCOD_namegen_generate(name, rule, False))
 
+
 def namegen_get_sets():
     sets = lib.TCOD_namegen_get_sets()
     try:
         lst = []
         while not lib.TCOD_list_is_empty(sets):
-            lst.append(_unpack_char_p(ffi.cast('char *', lib.TCOD_list_pop(sets))))
+            lst.append(
+                _unpack_char_p(ffi.cast("char *", lib.TCOD_list_pop(sets)))
+            )
     finally:
         lib.TCOD_list_delete(sets)
     return lst
 
+
 def namegen_destroy():
     lib.TCOD_namegen_destroy()
 
-def noise_new(dim, h=NOISE_DEFAULT_HURST, l=NOISE_DEFAULT_LACUNARITY,
-        random=None):
+
+def noise_new(
+    dim, h=NOISE_DEFAULT_HURST, l=NOISE_DEFAULT_LACUNARITY, random=None
+):
     """Return a new Noise instance.
 
     Args:
@@ -2426,6 +2852,7 @@ def noise_new(dim, h=NOISE_DEFAULT_HURST, l=NOISE_DEFAULT_LACUNARITY,
     """
     return tcod.noise.Noise(dim, hurst=h, lacunarity=l, seed=random)
 
+
 def noise_set_type(n, typ):
     """Set a Noise objects default noise algorithm.
 
@@ -2433,6 +2860,7 @@ def noise_set_type(n, typ):
         typ (int): Any NOISE_* constant.
     """
     n.algorithm = typ
+
 
 def noise_get(n, f, typ=NOISE_DEFAULT):
     """Return the noise value sampled from the ``f`` coordinate.
@@ -2450,7 +2878,8 @@ def noise_get(n, f, typ=NOISE_DEFAULT):
     Returns:
         float: The sampled noise value.
     """
-    return lib.TCOD_noise_get_ex(n.noise_c, ffi.new('float[4]', f), typ)
+    return lib.TCOD_noise_get_ex(n.noise_c, ffi.new("float[4]", f), typ)
+
 
 def noise_get_fbm(n, f, oc, typ=NOISE_DEFAULT):
     """Return the fractal Brownian motion sampled from the ``f`` coordinate.
@@ -2464,8 +2893,10 @@ def noise_get_fbm(n, f, oc, typ=NOISE_DEFAULT):
     Returns:
         float: The sampled noise value.
     """
-    return lib.TCOD_noise_get_fbm_ex(n.noise_c, ffi.new('float[4]', f),
-                                     oc, typ)
+    return lib.TCOD_noise_get_fbm_ex(
+        n.noise_c, ffi.new("float[4]", f), oc, typ
+    )
+
 
 def noise_get_turbulence(n, f, oc, typ=NOISE_DEFAULT):
     """Return the turbulence noise sampled from the ``f`` coordinate.
@@ -2479,8 +2910,10 @@ def noise_get_turbulence(n, f, oc, typ=NOISE_DEFAULT):
     Returns:
         float: The sampled noise value.
     """
-    return lib.TCOD_noise_get_turbulence_ex(n.noise_c, ffi.new('float[4]', f),
-                                            oc, typ)
+    return lib.TCOD_noise_get_turbulence_ex(
+        n.noise_c, ffi.new("float[4]", f), oc, typ
+    )
+
 
 @deprecate("libtcod objects are deleted automatically.")
 def noise_delete(n):
@@ -2490,27 +2923,24 @@ def noise_delete(n):
     This function exists for backwards compatibility with libtcodpy.
     """
 
-_chr = chr
-try:
-    _chr = unichr # Python 2
-except NameError:
-    pass
 
 def _unpack_union(type_, union):
-    '''
+    """
         unpack items from parser new_property (value_converter)
-    '''
+    """
     if type_ == lib.TCOD_TYPE_BOOL:
         return bool(union.b)
     elif type_ == lib.TCOD_TYPE_CHAR:
-        return union.c.decode('latin-1')
+        return union.c.decode("latin-1")
     elif type_ == lib.TCOD_TYPE_INT:
         return union.i
     elif type_ == lib.TCOD_TYPE_FLOAT:
         return union.f
-    elif (type_ == lib.TCOD_TYPE_STRING or
-         lib.TCOD_TYPE_VALUELIST15 >= type_ >= lib.TCOD_TYPE_VALUELIST00):
-         return _unpack_char_p(union.s)
+    elif (
+        type_ == lib.TCOD_TYPE_STRING
+        or lib.TCOD_TYPE_VALUELIST15 >= type_ >= lib.TCOD_TYPE_VALUELIST00
+    ):
+        return _unpack_char_p(union.s)
     elif type_ == lib.TCOD_TYPE_COLOR:
         return Color._new_from_cdata(union.col)
     elif type_ == lib.TCOD_TYPE_DICE:
@@ -2518,42 +2948,55 @@ def _unpack_union(type_, union):
     elif type_ & lib.TCOD_TYPE_LIST:
         return _convert_TCODList(union.list, type_ & 0xFF)
     else:
-        raise RuntimeError('Unknown libtcod type: %i' % type_)
+        raise RuntimeError("Unknown libtcod type: %i" % type_)
+
 
 def _convert_TCODList(clist, type_):
-    return [_unpack_union(type_, lib.TDL_list_get_union(clist, i))
-            for i in range(lib.TCOD_list_size(clist))]
+    return [
+        _unpack_union(type_, lib.TDL_list_get_union(clist, i))
+        for i in range(lib.TCOD_list_size(clist))
+    ]
+
 
 def parser_new():
     return ffi.gc(lib.TCOD_parser_new(), lib.TCOD_parser_delete)
 
+
 def parser_new_struct(parser, name):
     return lib.TCOD_parser_new_struct(parser, name)
 
+
 # prevent multiple threads from messing with def_extern callbacks
 _parser_callback_lock = _threading.Lock()
-_parser_listener = None # temporary global pointer to a listener instance
+_parser_listener = None  # temporary global pointer to a listener instance
+
 
 @ffi.def_extern()
 def _pycall_parser_new_struct(struct, name):
     return _parser_listener.new_struct(struct, _unpack_char_p(name))
 
+
 @ffi.def_extern()
 def _pycall_parser_new_flag(name):
     return _parser_listener.new_flag(_unpack_char_p(name))
 
+
 @ffi.def_extern()
 def _pycall_parser_new_property(propname, type, value):
-    return _parser_listener.new_property(_unpack_char_p(propname), type,
-                                 _unpack_union(type, value))
+    return _parser_listener.new_property(
+        _unpack_char_p(propname), type, _unpack_union(type, value)
+    )
+
 
 @ffi.def_extern()
 def _pycall_parser_end_struct(struct, name):
     return _parser_listener.end_struct(struct, _unpack_char_p(name))
 
+
 @ffi.def_extern()
 def _pycall_parser_error(msg):
     _parser_listener.error(_unpack_char_p(msg))
+
 
 def parser_run(parser, filename, listener=None):
     global _parser_listener
@@ -2563,16 +3006,15 @@ def parser_run(parser, filename, listener=None):
         return
 
     propagate_manager = _PropagateException()
-    propagate = propagate_manager.propagate
 
     clistener = ffi.new(
-        'TCOD_parser_listener_t *',
+        "TCOD_parser_listener_t *",
         {
-            'new_struct': lib._pycall_parser_new_struct,
-            'new_flag': lib._pycall_parser_new_flag,
-            'new_property': lib._pycall_parser_new_property,
-            'end_struct': lib._pycall_parser_end_struct,
-            'error': lib._pycall_parser_error,
+            "new_struct": lib._pycall_parser_new_struct,
+            "new_flag": lib._pycall_parser_new_flag,
+            "new_property": lib._pycall_parser_new_property,
+            "end_struct": lib._pycall_parser_end_struct,
+            "error": lib._pycall_parser_error,
         },
     )
 
@@ -2580,6 +3022,7 @@ def parser_run(parser, filename, listener=None):
         _parser_listener = listener
         with propagate_manager:
             lib.TCOD_parser_run(parser, filename, clistener)
+
 
 @deprecate("libtcod objects are deleted automatically.")
 def parser_delete(parser):
@@ -2589,42 +3032,51 @@ def parser_delete(parser):
     This function exists for backwards compatibility with libtcodpy.
     """
 
+
 def parser_get_bool_property(parser, name):
     name = _bytes(name)
     return bool(lib.TCOD_parser_get_bool_property(parser, name))
+
 
 def parser_get_int_property(parser, name):
     name = _bytes(name)
     return lib.TCOD_parser_get_int_property(parser, name)
 
+
 def parser_get_char_property(parser, name):
     name = _bytes(name)
-    return _chr(lib.TCOD_parser_get_char_property(parser, name))
+    return chr(lib.TCOD_parser_get_char_property(parser, name))
+
 
 def parser_get_float_property(parser, name):
     name = _bytes(name)
     return lib.TCOD_parser_get_float_property(parser, name)
 
+
 def parser_get_string_property(parser, name):
     name = _bytes(name)
-    return _unpack_char_p(
-        lib.TCOD_parser_get_string_property(parser, name))
+    return _unpack_char_p(lib.TCOD_parser_get_string_property(parser, name))
+
 
 def parser_get_color_property(parser, name):
     name = _bytes(name)
     return Color._new_from_cdata(
-        lib.TCOD_parser_get_color_property(parser, name))
+        lib.TCOD_parser_get_color_property(parser, name)
+    )
+
 
 def parser_get_dice_property(parser, name):
-    d = ffi.new('TCOD_dice_t *')
+    d = ffi.new("TCOD_dice_t *")
     name = _bytes(name)
     lib.TCOD_parser_get_dice_property_py(parser, name, d)
     return Dice(d)
+
 
 def parser_get_list_property(parser, name, type):
     name = _bytes(name)
     clist = lib.TCOD_parser_get_list_property(parser, name, type)
     return _convert_TCODList(clist, type)
+
 
 RNG_MT = 0
 RNG_CMWC = 1
@@ -2635,6 +3087,7 @@ DISTRIBUTION_GAUSSIAN_RANGE = 2
 DISTRIBUTION_GAUSSIAN_INVERSE = 3
 DISTRIBUTION_GAUSSIAN_RANGE_INVERSE = 4
 
+
 def random_get_instance():
     """Return the default Random instance.
 
@@ -2642,7 +3095,9 @@ def random_get_instance():
         Random: A Random instance using the default random number generator.
     """
     return tcod.random.Random._new_from_cdata(
-        ffi.cast('mersenne_data_t*', lib.TCOD_random_get_instance()))
+        ffi.cast("mersenne_data_t*", lib.TCOD_random_get_instance())
+    )
+
 
 def random_new(algo=RNG_CMWC):
     """Return a new Random instance.  Using ``algo``.
@@ -2654,6 +3109,7 @@ def random_new(algo=RNG_CMWC):
         Random: A new Random instance using the given algorithm.
     """
     return tcod.random.Random(algo)
+
 
 def random_new_from_seed(seed, algo=RNG_CMWC):
     """Return a new Random instance.  Using the given ``seed`` and ``algo``.
@@ -2668,6 +3124,7 @@ def random_new_from_seed(seed, algo=RNG_CMWC):
     """
     return tcod.random.Random(algo, seed)
 
+
 def random_set_distribution(rnd, dist):
     """Change the distribution mode of a random number generator.
 
@@ -2676,6 +3133,7 @@ def random_set_distribution(rnd, dist):
         dist (int): The distribution mode to use.  Should be DISTRIBUTION_*.
     """
     lib.TCOD_random_set_distribution(rnd.random_c if rnd else ffi.NULL, dist)
+
 
 def random_get_int(rnd, mi, ma):
     """Return a random integer in the range: ``mi`` <= n <= ``ma``.
@@ -2692,6 +3150,7 @@ def random_get_int(rnd, mi, ma):
     """
     return lib.TCOD_random_get_int(rnd.random_c if rnd else ffi.NULL, mi, ma)
 
+
 def random_get_float(rnd, mi, ma):
     """Return a random float in the range: ``mi`` <= n <= ``ma``.
 
@@ -2707,7 +3166,9 @@ def random_get_float(rnd, mi, ma):
                in the range ``mi`` <= n <= ``ma``.
     """
     return lib.TCOD_random_get_double(
-        rnd.random_c if rnd else ffi.NULL, mi, ma)
+        rnd.random_c if rnd else ffi.NULL, mi, ma
+    )
+
 
 def random_get_double(rnd, mi, ma):
     """Return a random float in the range: ``mi`` <= n <= ``ma``.
@@ -2717,7 +3178,9 @@ def random_get_double(rnd, mi, ma):
         Both funtions return a double precision float.
     """
     return lib.TCOD_random_get_double(
-        rnd.random_c if rnd else ffi.NULL, mi, ma)
+        rnd.random_c if rnd else ffi.NULL, mi, ma
+    )
+
 
 def random_get_int_mean(rnd, mi, ma, mean):
     """Return a random weighted integer in the range: ``mi`` <= n <= ``ma``.
@@ -2734,7 +3197,9 @@ def random_get_int_mean(rnd, mi, ma, mean):
         int: A random weighted integer in the range ``mi`` <= n <= ``ma``.
     """
     return lib.TCOD_random_get_int_mean(
-        rnd.random_c if rnd else ffi.NULL, mi, ma, mean)
+        rnd.random_c if rnd else ffi.NULL, mi, ma, mean
+    )
+
 
 def random_get_float_mean(rnd, mi, ma, mean):
     """Return a random weighted float in the range: ``mi`` <= n <= ``ma``.
@@ -2752,7 +3217,9 @@ def random_get_float_mean(rnd, mi, ma, mean):
                in the range ``mi`` <= n <= ``ma``.
     """
     return lib.TCOD_random_get_double_mean(
-        rnd.random_c if rnd else ffi.NULL, mi, ma, mean)
+        rnd.random_c if rnd else ffi.NULL, mi, ma, mean
+    )
+
 
 def random_get_double_mean(rnd, mi, ma, mean):
     """Return a random weighted float in the range: ``mi`` <= n <= ``ma``.
@@ -2762,7 +3229,9 @@ def random_get_double_mean(rnd, mi, ma, mean):
         Both funtions return a double precision float.
     """
     return lib.TCOD_random_get_double_mean(
-        rnd.random_c if rnd else ffi.NULL, mi, ma, mean)
+        rnd.random_c if rnd else ffi.NULL, mi, ma, mean
+    )
+
 
 def random_save(rnd):
     """Return a copy of a random number generator.
@@ -2775,10 +3244,14 @@ def random_save(rnd):
     """
     return tcod.random.Random._new_from_cdata(
         ffi.gc(
-            ffi.cast('mersenne_data_t*',
-                     lib.TCOD_random_save(rnd.random_c if rnd else ffi.NULL)),
-            lib.TCOD_random_delete),
+            ffi.cast(
+                "mersenne_data_t*",
+                lib.TCOD_random_save(rnd.random_c if rnd else ffi.NULL),
+            ),
+            lib.TCOD_random_delete,
         )
+    )
+
 
 def random_restore(rnd, backup):
     """Restore a random number generator from a backed up copy.
@@ -2787,8 +3260,8 @@ def random_restore(rnd, backup):
         rnd (Optional[Random]): A Random instance, or None to use the default.
         backup (Random): The Random instance which was used as a backup.
     """
-    lib.TCOD_random_restore(rnd.random_c if rnd else ffi.NULL,
-                            backup.random_c)
+    lib.TCOD_random_restore(rnd.random_c if rnd else ffi.NULL, backup.random_c)
+
 
 @deprecate("libtcod objects are deleted automatically.")
 def random_delete(rnd):
@@ -2798,34 +3271,42 @@ def random_delete(rnd):
     This function exists for backwards compatibility with libtcodpy.
     """
 
+
 def struct_add_flag(struct, name):
     lib.TCOD_struct_add_flag(struct, name)
+
 
 def struct_add_property(struct, name, typ, mandatory):
     lib.TCOD_struct_add_property(struct, name, typ, mandatory)
 
+
 def struct_add_value_list(struct, name, value_list, mandatory):
-    CARRAY = c_char_p * (len(value_list) + 1)
-    cvalue_list = CARRAY()
-    for i, value in enumerate(value_list):
-        cvalue_list[i] = cast(value, c_char_p)
-    cvalue_list[len(value_list)] = 0
-    lib.TCOD_struct_add_value_list(struct, name, cvalue_list, mandatory)
+    c_strings = [
+        ffi.new("char[]", value.encode("utf-8")) for value in value_list
+    ]
+    c_value_list = ffi.new("char*[]", c_strings)
+    lib.TCOD_struct_add_value_list(struct, name, c_value_list, mandatory)
+
 
 def struct_add_list_property(struct, name, typ, mandatory):
     lib.TCOD_struct_add_list_property(struct, name, typ, mandatory)
 
+
 def struct_add_structure(struct, sub_struct):
     lib.TCOD_struct_add_structure(struct, sub_struct)
+
 
 def struct_get_name(struct):
     return _unpack_char_p(lib.TCOD_struct_get_name(struct))
 
+
 def struct_is_mandatory(struct, name):
     return lib.TCOD_struct_is_mandatory(struct, name)
 
+
 def struct_get_type(struct, name):
     return lib.TCOD_struct_get_type(struct, name)
+
 
 # high precision time functions
 def sys_set_fps(fps):
@@ -2837,6 +3318,7 @@ def sys_set_fps(fps):
         fps (int): A frame rate limit (i.e. 60)
     """
     lib.TCOD_sys_set_fps(fps)
+
 
 def sys_get_fps():
     """Return the current frames per second.
@@ -2851,6 +3333,7 @@ def sys_get_fps():
     """
     return lib.TCOD_sys_get_fps()
 
+
 def sys_get_last_frame_length():
     """Return the delta time of the last rendered frame in seconds.
 
@@ -2858,6 +3341,7 @@ def sys_get_last_frame_length():
         float: The delta time of the last rendered frame.
     """
     return lib.TCOD_sys_get_last_frame_length()
+
 
 @deprecate("Use Python's standard 'time' module instead of this function.")
 def sys_sleep_milli(val):
@@ -2871,6 +3355,7 @@ def sys_sleep_milli(val):
     """
     lib.TCOD_sys_sleep_milli(val)
 
+
 @deprecate("Use Python's standard 'time' module instead of this function.")
 def sys_elapsed_milli():
     """Get number of milliseconds since the start of the program.
@@ -2882,6 +3367,7 @@ def sys_elapsed_milli():
        Use :any:`time.clock` instead.
     """
     return lib.TCOD_sys_elapsed_milli()
+
 
 @deprecate("Use Python's standard 'time' module instead of this function.")
 def sys_elapsed_seconds():
@@ -2895,6 +3381,7 @@ def sys_elapsed_seconds():
     """
     return lib.TCOD_sys_elapsed_seconds()
 
+
 def sys_set_renderer(renderer):
     """Change the current rendering mode to renderer.
 
@@ -2905,11 +3392,13 @@ def sys_set_renderer(renderer):
     if tcod.console._root_console is not None:
         tcod.console.Console._get_root()
 
+
 def sys_get_renderer():
     """Return the current rendering mode.
 
     """
     return lib.TCOD_sys_get_renderer()
+
 
 # easy screenshots
 def sys_save_screenshot(name=None):
@@ -2928,6 +3417,7 @@ def sys_save_screenshot(name=None):
         name = _bytes(name)
     lib.TCOD_sys_save_screenshot(name or ffi.NULL)
 
+
 # custom fullscreen resolution
 def sys_force_fullscreen_resolution(width, height):
     """Force a specific resolution in fullscreen.
@@ -2945,16 +3435,18 @@ def sys_force_fullscreen_resolution(width, height):
     """
     lib.TCOD_sys_force_fullscreen_resolution(width, height)
 
+
 def sys_get_current_resolution():
     """Return the current resolution as (width, height)
 
     Returns:
         Tuple[int,int]: The current resolution.
     """
-    w = ffi.new('int *')
-    h = ffi.new('int *')
+    w = ffi.new("int *")
+    h = ffi.new("int *")
     lib.TCOD_sys_get_current_resolution(w, h)
     return w[0], h[0]
+
 
 def sys_get_char_size():
     """Return the current fonts character size as (width, height)
@@ -2962,10 +3454,11 @@ def sys_get_char_size():
     Returns:
         Tuple[int,int]: The current font glyph size in (width, height)
     """
-    w = ffi.new('int *')
-    h = ffi.new('int *')
+    w = ffi.new("int *")
+    h = ffi.new("int *")
     lib.TCOD_sys_get_char_size(w, h)
     return w[0], h[0]
+
 
 # update font bitmap
 def sys_update_char(asciiCode, fontx, fonty, img, x, y):
@@ -2986,6 +3479,7 @@ def sys_update_char(asciiCode, fontx, fonty, img, x, y):
     """
     lib.TCOD_sys_update_char(_int(asciiCode), fontx, fonty, img, x, y)
 
+
 def sys_register_SDL_renderer(callback):
     """Register a custom randering function with libtcod.
 
@@ -3002,10 +3496,13 @@ def sys_register_SDL_renderer(callback):
             A function which takes a single argument.
     """
     with _PropagateException() as propagate:
+
         @ffi.def_extern(onerror=propagate)
         def _pycall_sdl_hook(sdl_surface):
             callback(sdl_surface)
+
         lib.TCOD_sys_register_SDL_renderer(lib._pycall_sdl_hook)
+
 
 def sys_check_for_event(mask, k, m):
     """Check for and return an event.
@@ -3018,7 +3515,9 @@ def sys_check_for_event(mask, k, m):
                              with an event.  Can be None.
     """
     return lib.TCOD_sys_check_for_event(
-        mask, k.key_p if k else ffi.NULL, m.mouse_p if m else ffi.NULL)
+        mask, k.key_p if k else ffi.NULL, m.mouse_p if m else ffi.NULL
+    )
+
 
 def sys_wait_for_event(mask, k, m, flush):
     """Wait for an event then return.
@@ -3035,7 +3534,9 @@ def sys_wait_for_event(mask, k, m, flush):
         flush (bool): Clear the event buffer before waiting.
     """
     return lib.TCOD_sys_wait_for_event(
-        mask, k.key_p if k else ffi.NULL, m.mouse_p if m else ffi.NULL, flush)
+        mask, k.key_p if k else ffi.NULL, m.mouse_p if m else ffi.NULL, flush
+    )
+
 
 @deprecate("This function does not provide reliable access to the clipboard.")
 def sys_clipboard_set(text):
@@ -3044,7 +3545,8 @@ def sys_clipboard_set(text):
     .. deprecated:: 6.0
        This function does not provide reliable access to the clipboard.
     """
-    return lib.TCOD_sys_clipboard_set(text.encode('utf-8'))
+    return lib.TCOD_sys_clipboard_set(text.encode("utf-8"))
+
 
 @deprecate("This function does not provide reliable access to the clipboard.")
 def sys_clipboard_get():
@@ -3053,4 +3555,4 @@ def sys_clipboard_get():
     .. deprecated:: 6.0
        This function does not provide reliable access to the clipboard.
     """
-    return ffi.string(lib.TCOD_sys_clipboard_get()).decode('utf-8')
+    return ffi.string(lib.TCOD_sys_clipboard_get()).decode("utf-8")

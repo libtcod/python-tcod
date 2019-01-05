@@ -80,7 +80,7 @@ def _pycall_path_dest_only(x1, y1, x2, y2, handle):
 def _get_pathcost_func(name):
     # type: (str) -> Callable[[int, int, int, int, cffi.CData], float]
     """Return a properly cast PathCostArray callback."""
-    return ffi.cast('TCOD_path_func_t', ffi.addressof(lib, name))
+    return ffi.cast("TCOD_path_func_t", ffi.addressof(lib, name))
 
 
 class _EdgeCostFunc(object):
@@ -90,6 +90,7 @@ class _EdgeCostFunc(object):
 
     `shape` is the maximum boundary for the algorithm.
     """
+
     _CALLBACK_P = lib._pycall_path_old
 
     def __init__(self, userdata, shape):
@@ -103,10 +104,11 @@ class _EdgeCostFunc(object):
         return self._CALLBACK_P, ffi.new_handle(self._userdata), self.shape
 
     def __repr__(self):
-        return '%s(%r, shape=%r)' % (
+        return "%s(%r, shape=%r)" % (
             self.__class__.__name__,
-            self._userdata, self.shape,
-            )
+            self._userdata,
+            self.shape,
+        )
 
 
 class EdgeCostCallback(_EdgeCostFunc):
@@ -121,12 +123,14 @@ class EdgeCostCallback(_EdgeCostFunc):
     .. versionchanged:: 5.0
         Now only accepts a `shape` argument instead of `width` and `height`.
     """
+
     _CALLBACK_P = lib._pycall_path_simple
 
     def __init__(self, callback, shape):
         # type: (Callable[[int, int, int, int], float], Tuple[int, int])
         self.callback = callback
         super(EdgeCostCallback, self).__init__(callback, shape)
+
 
 class NodeCostArray(np.ndarray):
     """Calculate cost from a numpy array of nodes.
@@ -136,15 +140,15 @@ class NodeCostArray(np.ndarray):
     """
 
     _C_ARRAY_CALLBACKS = {
-        np.float32: ('float*', _get_pathcost_func('PathCostArrayFloat32')),
-        np.bool_: ('int8_t*', _get_pathcost_func('PathCostArrayInt8')),
-        np.int8: ('int8_t*', _get_pathcost_func('PathCostArrayInt8')),
-        np.uint8: ('uint8_t*', _get_pathcost_func('PathCostArrayUInt8')),
-        np.int16: ('int16_t*', _get_pathcost_func('PathCostArrayInt16')),
-        np.uint16: ('uint16_t*', _get_pathcost_func('PathCostArrayUInt16')),
-        np.int32: ('int32_t*', _get_pathcost_func('PathCostArrayInt32')),
-        np.uint32: ('uint32_t*', _get_pathcost_func('PathCostArrayUInt32')),
-        }
+        np.float32: ("float*", _get_pathcost_func("PathCostArrayFloat32")),
+        np.bool_: ("int8_t*", _get_pathcost_func("PathCostArrayInt8")),
+        np.int8: ("int8_t*", _get_pathcost_func("PathCostArrayInt8")),
+        np.uint8: ("uint8_t*", _get_pathcost_func("PathCostArrayUInt8")),
+        np.int16: ("int16_t*", _get_pathcost_func("PathCostArrayInt16")),
+        np.uint16: ("uint16_t*", _get_pathcost_func("PathCostArrayUInt16")),
+        np.int32: ("int32_t*", _get_pathcost_func("PathCostArrayInt32")),
+        np.uint32: ("uint32_t*", _get_pathcost_func("PathCostArrayUInt32")),
+    }
 
     def __new__(cls, array):
         """Validate a numpy array and setup a C callback."""
@@ -152,23 +156,27 @@ class NodeCostArray(np.ndarray):
         return self
 
     def __repr__(self):
-        return '%s(%r)' % (self.__class__.__name__,
-                           repr(self.view(np.ndarray)))
+        return "%s(%r)" % (
+            self.__class__.__name__,
+            repr(self.view(np.ndarray)),
+        )
 
     def get_tcod_path_ffi(self):
         # type: () -> Tuple[cffi.CData, cffi.CData, Tuple[int, int]]
         if len(self.shape) != 2:
-            raise ValueError('Array must have a 2d shape, shape is %r' %
-                             (self.shape,))
+            raise ValueError(
+                "Array must have a 2d shape, shape is %r" % (self.shape,)
+            )
         if self.dtype.type not in self._C_ARRAY_CALLBACKS:
-            raise ValueError('dtype must be one of %r, dtype is %r' %
-                             (self._C_ARRAY_CALLBACKS.keys(), self.dtype.type))
+            raise ValueError(
+                "dtype must be one of %r, dtype is %r"
+                % (self._C_ARRAY_CALLBACKS.keys(), self.dtype.type)
+            )
 
-        array_type, callback = \
-            self._C_ARRAY_CALLBACKS[self.dtype.type]
+        array_type, callback = self._C_ARRAY_CALLBACKS[self.dtype.type]
         userdata = ffi.new(
-            'struct PathCostArray*',
-            (ffi.cast('char*', self.ctypes.data), self.strides),
+            "struct PathCostArray*",
+            (ffi.cast("char*", self.ctypes.data), self.strides),
         )
         return callback, userdata, self.shape
 
@@ -183,43 +191,48 @@ class _PathFinder(object):
         self._path_c = None
         self._callback = self._userdata = None
 
-        if hasattr(self.cost, 'map_c'):
+        if hasattr(self.cost, "map_c"):
             self.shape = self.cost.width, self.cost.height
             self._path_c = ffi.gc(
                 self._path_new_using_map(self.cost.map_c, diagonal),
                 self._path_delete,
-                )
+            )
             return
 
-        if not hasattr(self.cost, 'get_tcod_path_ffi'):
-            assert not callable(self.cost), \
-                "Any callback alone is missing shape information. " \
+        if not hasattr(self.cost, "get_tcod_path_ffi"):
+            assert not callable(self.cost), (
+                "Any callback alone is missing shape information. "
                 "Wrap your callback in tcod.path.EdgeCostCallback"
+            )
             self.cost = NodeCostArray(self.cost)
 
-        self._callback, self._userdata, self.shape = \
+        self._callback, self._userdata, self.shape = (
             self.cost.get_tcod_path_ffi()
+        )
         self._path_c = ffi.gc(
             self._path_new_using_function(
                 self.cost.shape[0],
                 self.cost.shape[1],
                 self._callback,
                 self._userdata,
-                diagonal
-                ),
+                diagonal,
+            ),
             self._path_delete,
-            )
+        )
 
     def __repr__(self):
-        return '%s(cost=%r, diagonal=%r)' % (self.__class__.__name__,
-                                             self.cost, self.diagonal)
+        return "%s(cost=%r, diagonal=%r)" % (
+            self.__class__.__name__,
+            self.cost,
+            self.diagonal,
+        )
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        del state['_path_c']
-        del state['shape']
-        del state['_callback']
-        del state['_userdata']
+        del state["_path_c"]
+        del state["shape"]
+        del state["_callback"]
+        del state["_userdata"]
         return state
 
     def __setstate__(self, state):
@@ -254,7 +267,7 @@ class AStar(_PathFinder):
         """
         lib.TCOD_path_compute(self._path_c, start_x, start_y, goal_x, goal_y)
         path = []
-        x = ffi.new('int[2]')
+        x = ffi.new("int[2]")
         y = x + 1
         while lib.TCOD_path_walk(self._path_c, x, y, False):
             path.append((x[0], y[0]))
@@ -285,7 +298,7 @@ class Dijkstra(_PathFinder):
         """
         lib.TCOD_dijkstra_path_set(self._path_c, x, y)
         path = []
-        pointer_x = ffi.new('int[2]')
+        pointer_x = ffi.new("int[2]")
         pointer_y = pointer_x + 1
         while lib.TCOD_dijkstra_path_walk(self._path_c, pointer_x, pointer_y):
             path.append((pointer_x[0], pointer_y[0]))

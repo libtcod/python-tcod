@@ -4,7 +4,7 @@
 
 from __future__ import absolute_import
 
-from tcod.libtcod import ffi, lib
+from tcod.libtcod import lib
 
 
 class Color(list):
@@ -17,7 +17,7 @@ class Color(list):
     """
 
     def __init__(self, r=0, g=0, b=0):
-        self[:] = (r & 0xff, g & 0xff, b & 0xff)
+        self[:] = (r & 0xFF, g & 0xFF, b & 0xFF)
 
     @property
     def r(self):
@@ -26,23 +26,25 @@ class Color(list):
 
     @r.setter
     def r(self, value):
-        self[0] = value & 0xff
+        self[0] = value & 0xFF
 
     @property
     def g(self):
         """int: Green value, always normalised to 0-255."""
         return self[1]
+
     @g.setter
     def g(self, value):
-        self[1] = value & 0xff
+        self[1] = value & 0xFF
 
     @property
     def b(self):
         """int: Blue value, always normalised to 0-255."""
         return self[2]
+
     @b.setter
     def b(self, value):
-        self[2] = value & 0xff
+        self[2] = value & 0xFF
 
     @classmethod
     def _new_from_cdata(cls, cdata):
@@ -53,13 +55,13 @@ class Color(list):
         try:
             return list.__getitem__(self, index)
         except TypeError:
-            return list.__getitem__(self, 'rgb'.index(index))
+            return list.__getitem__(self, "rgb".index(index))
 
     def __setitem__(self, index, value):
         try:
             list.__setitem__(self, index, value)
         except TypeError:
-            list.__setitem__(self, 'rgb'.index(index), value)
+            list.__setitem__(self, "rgb".index(index), value)
 
     def __eq__(self, other):
         """Compare equality between colors.
@@ -85,9 +87,14 @@ class Color(list):
             return Color._new_from_cdata(lib.TCOD_color_multiply(self, other))
         else:
             return Color._new_from_cdata(
-                lib.TCOD_color_multiply_scalar(self, other))
+                lib.TCOD_color_multiply_scalar(self, other)
+            )
 
     def __repr__(self):
         """Return a printable representation of the current color."""
-        return "%s(%i, %i, %i)" \
-            % (self.__class__.__name__, self.r, self.g, self.b)
+        return "%s(%i, %i, %i)" % (
+            self.__class__.__name__,
+            self.r,
+            self.g,
+            self.b,
+        )

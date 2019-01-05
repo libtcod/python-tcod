@@ -7,8 +7,11 @@ from __future__ import absolute_import as _
 import random
 
 from tcod.libtcod import ffi, lib
-from tcod.libtcod import RNG_MT as MERSENNE_TWISTER
-from tcod.libtcod import RNG_CMWC as COMPLEMENTARY_MULTIPLY_WITH_CARRY
+from tcod.libtcod import RNG_MT
+from tcod.libtcod import RNG_CMWC
+
+MERSENNE_TWISTER = RNG_MT
+COMPLEMENTARY_MULTIPLY_WITH_CARRY = RNG_CMWC
 
 
 class Random(object):
@@ -27,15 +30,20 @@ class Random(object):
     Attributes:
         random_c (CData): A cffi pointer to a TCOD_random_t object.
     """
+
     def __init__(self, algorithm, seed=None):
         """Create a new instance using this algorithm and seed."""
         if seed is None:
             seed = random.getrandbits(32)
         self.random_c = ffi.gc(
-            ffi.cast('mersenne_data_t*',
-                     lib.TCOD_random_new_from_seed(algorithm,
-                                                   hash(seed) % (1 << 32))),
-            lib.TCOD_random_delete)
+            ffi.cast(
+                "mersenne_data_t*",
+                lib.TCOD_random_new_from_seed(
+                    algorithm, hash(seed) % (1 << 32)
+                ),
+            ),
+            lib.TCOD_random_delete,
+        )
 
     @classmethod
     def _new_from_cdata(cls, cdata):
@@ -90,28 +98,30 @@ class Random(object):
         Returns:
             float: A random float.
         """
-        return lib.TCOD_random_get_gaussian_double_inv(self.random_c, mu, sigma)
+        return lib.TCOD_random_get_gaussian_double_inv(
+            self.random_c, mu, sigma
+        )
 
     def __getstate__(self):
         """Pack the self.random_c attribute into a portable state."""
         state = self.__dict__.copy()
-        state['random_c'] = {
-            'algo': self.random_c.algo,
-            'distribution': self.random_c.distribution,
-            'mt': list(self.random_c.mt),
-            'cur_mt': self.random_c.cur_mt,
-            'Q': list(self.random_c.Q),
-            'c': self.random_c.c,
-            'cur': self.random_c.cur,
-            }
+        state["random_c"] = {
+            "algo": self.random_c.algo,
+            "distribution": self.random_c.distribution,
+            "mt": list(self.random_c.mt),
+            "cur_mt": self.random_c.cur_mt,
+            "Q": list(self.random_c.Q),
+            "c": self.random_c.c,
+            "cur": self.random_c.cur,
+        }
         return state
 
     def __setstate__(self, state):
         """Create a new cdata object with the stored paramaters."""
         try:
-            cdata = state['random_c']
-        except KeyError: # old/deprecated format
-            cdata = state['cdata']
-            del state['cdata']
-        state['random_c'] = ffi.new('mersenne_data_t*', cdata)
+            cdata = state["random_c"]
+        except KeyError:  # old/deprecated format
+            cdata = state["cdata"]
+            del state["cdata"]
+        state["random_c"] = ffi.new("mersenne_data_t*", cdata)
         self.__dict__.update(state)

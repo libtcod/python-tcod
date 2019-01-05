@@ -1,66 +1,62 @@
 """This module focuses on improvements to the Python libtcod API.
 """
-from __future__ import absolute_import as _
-
-import sys as _sys
 
 from typing import Any, AnyStr
 import warnings
 
-from tcod.libtcod import lib, ffi, BKGND_DEFAULT, BKGND_SET
+from tcod.libtcod import ffi
 
 
 def _unpack_char_p(char_p):
     if char_p == ffi.NULL:
-        return ''
+        return ""
     return ffi.string(char_p).decode()
 
 
 def _int(int_or_str: Any) -> int:
-    'return an integer where a single character string may be expected'
+    "return an integer where a single character string may be expected"
     if isinstance(int_or_str, str):
         return ord(int_or_str)
     if isinstance(int_or_str, bytes):
         return int_or_str[0]
-    return int(int_or_str) # check for __count__
+    return int(int_or_str)  # check for __count__
+
 
 def _bytes(string: AnyStr) -> bytes:
     if isinstance(string, str):
-        return string.encode('utf-8')
-    return string
-
-def _unicode(string: AnyStr, stacklevel: int=2) -> str:
-    if isinstance(string, bytes):
-        warnings.warn(
-            ("Passing byte strings as parameters to Unicode functions is "
-             "deprecated."),
-            DeprecationWarning,
-            stacklevel=stacklevel + 1,
-            )
-        return string.decode('latin-1')
+        return string.encode("utf-8")
     return string
 
 
-def _fmt_bytes(string: AnyStr) -> bytes:
-    return _bytes(string).replace(b'%', b'%%')
-
-def _fmt_unicode(string: AnyStr) -> str:
-    return _unicode(string, stacklevel=3).encode('utf-8').replace(b'%', b'%%')
-
-def _fmt(string: str, stacklevel: int=2) -> bytes:
+def _unicode(string: AnyStr, stacklevel: int = 2) -> str:
     if isinstance(string, bytes):
         warnings.warn(
-            ("Passing byte strings as parameters to Unicode functions is "
-             "deprecated."),
+            (
+                "Passing byte strings as parameters to Unicode functions is "
+                "deprecated."
+            ),
             DeprecationWarning,
             stacklevel=stacklevel + 1,
         )
-        string = string.decode('latin-1')
-    return string.encode('utf-8').replace(b'%', b'%%')
+        return string.decode("latin-1")
+    return string
 
 
+def _fmt(string: str, stacklevel: int = 2) -> bytes:
+    if isinstance(string, bytes):
+        warnings.warn(
+            (
+                "Passing byte strings as parameters to Unicode functions is "
+                "deprecated."
+            ),
+            DeprecationWarning,
+            stacklevel=stacklevel + 1,
+        )
+        string = string.decode("latin-1")
+    return string.encode("utf-8").replace(b"%", b"%%")
 
-class _PropagateException():
+
+class _PropagateException:
     """ context manager designed to propagate exceptions outside of a cffi
     callback context.  normally cffi suppresses the exception
 
@@ -72,7 +68,7 @@ class _PropagateException():
     """
 
     def __init__(self):
-        self.exc_info = None # (exception, exc_value, traceback)
+        self.exc_info = None  # (exception, exc_value, traceback)
 
     def propagate(self, *exc_info):
         """ set an exception to be raised once this context exits
@@ -106,10 +102,9 @@ class _PropagateException():
 
 
 class _CDataWrapper(object):
-
     def __init__(self, *args, **kargs):
         self.cdata = self._get_cdata_from_args(*args, **kargs)
-        if self.cdata == None:
+        if self.cdata is None:
             self.cdata = ffi.NULL
         super(_CDataWrapper, self).__init__()
 
@@ -119,7 +114,6 @@ class _CDataWrapper(object):
             return args[0]
         else:
             return None
-
 
     def __hash__(self):
         return hash(self.cdata)
@@ -131,12 +125,12 @@ class _CDataWrapper(object):
             return NotImplemented
 
     def __getattr__(self, attr):
-        if 'cdata' in self.__dict__:
-            return getattr(self.__dict__['cdata'], attr)
+        if "cdata" in self.__dict__:
+            return getattr(self.__dict__["cdata"], attr)
         raise AttributeError(attr)
 
     def __setattr__(self, attr, value):
-        if hasattr(self, 'cdata') and hasattr(self.cdata, attr):
+        if hasattr(self, "cdata") and hasattr(self.cdata, attr):
             setattr(self.cdata, attr, value)
         else:
             super(_CDataWrapper, self).__setattr__(attr, value)
@@ -148,10 +142,12 @@ def _console(console):
         return console.console_c
     except AttributeError:
         warnings.warn(
-            ("Falsy console parameters are deprecated, "
-             "always use the root console instance returned by "
-             "console_init_root."),
+            (
+                "Falsy console parameters are deprecated, "
+                "always use the root console instance returned by "
+                "console_init_root."
+            ),
             DeprecationWarning,
             stacklevel=3,
-            )
+        )
         return ffi.NULL

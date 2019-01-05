@@ -5,3 +5,7 @@ requires = [
     "cffi>=1.8.1,<2",
     "pycparser>=2.14,<3",
 ]
+
+[tool.black]
+line-length = 79
+py36 = false

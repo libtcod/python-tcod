@@ -23,10 +23,11 @@ Example::
         else:
             print('Dig a room for %s.' % node)
 """
-from typing import Iterator, Optional, Union, Tuple, List
+from typing import Iterator, Optional
 
 from tcod.libtcod import lib, ffi
 from tcod._internal import deprecate
+import tcod.random
 
 
 class BSP(object):
@@ -54,21 +55,22 @@ class BSP(object):
     """
 
     def __init__(self, x: int, y: int, width: int, height: int):
-        self.x = x # type: int
-        self.y = y # type: int
-        self.width = width # type: int
-        self.height = height # type: int
+        self.x = x  # type: int
+        self.y = y  # type: int
+        self.width = width  # type: int
+        self.height = height  # type: int
 
-        self.level = 0 # type: int
-        self.position = 0 # type: int
-        self.horizontal = False # type: bool
+        self.level = 0  # type: int
+        self.position = 0  # type: int
+        self.horizontal = False  # type: bool
 
-        self.parent = None # type: Optional['BSP']
-        self.children = () # type: Union[Tuple[], Tuple['BSP', 'BSP']]
+        self.parent = None  # type: Optional['BSP']
+        self.children = ()  # type: Union[Tuple[], Tuple['BSP', 'BSP']]
 
     @property
     def w(self) -> int:
         return self.width
+
     @w.setter
     def w(self, value: int):
         self.width = value
@@ -76,29 +78,41 @@ class BSP(object):
     @property
     def h(self) -> int:
         return self.height
+
     @h.setter
     def h(self, value: int):
         self.height = value
 
     def _as_cdata(self):
-        cdata = ffi.gc(lib.TCOD_bsp_new_with_size(self.x, self.y,
-                                                  self.width, self.height),
-                       lib.TCOD_bsp_delete)
+        cdata = ffi.gc(
+            lib.TCOD_bsp_new_with_size(
+                self.x, self.y, self.width, self.height
+            ),
+            lib.TCOD_bsp_delete,
+        )
         cdata.level = self.level
         return cdata
 
     def __str__(self):
         """Provide a useful readout when printed."""
-        status = 'leaf'
+        status = "leaf"
         if self.children:
-            status = ('split at position=%i,horizontal=%r' %
-                      (self.position, self.horizontal))
+            status = "split at position=%i,horizontal=%r" % (
+                self.position,
+                self.horizontal,
+            )
 
-        return ('<%s(x=%i,y=%i,width=%i,height=%i)level=%i,%s>' %
-                (self.__class__.__name__,
-                 self.x, self.y, self.width, self.height, self.level, status))
+        return "<%s(x=%i,y=%i,width=%i,height=%i)level=%i,%s>" % (
+            self.__class__.__name__,
+            self.x,
+            self.y,
+            self.width,
+            self.height,
+            self.level,
+            status,
+        )
 
-    def _unpack_bsp_tree(self, cdata):
+    def _unpack_bsp_tree(self, cdata) -> None:
         self.x = cdata.x
         self.y = cdata.y
         self.width = cdata.w
@@ -114,7 +128,7 @@ class BSP(object):
         self.children[1].parent = self
         self.children[1]._unpack_bsp_tree(lib.TCOD_bsp_right(cdata))
 
-    def split_once(self, horizontal: bool, position: int):
+    def split_once(self, horizontal: bool, position: int) -> None:
         """Split this partition into 2 sub-partitions.
 
         Args:
@@ -125,8 +139,15 @@ class BSP(object):
         lib.TCOD_bsp_split_once(cdata, horizontal, position)
         self._unpack_bsp_tree(cdata)
 
-    def split_recursive(self, depth, min_width, min_height,
-                        max_horizontal_ratio, max_vertical_ratio, seed=None):
+    def split_recursive(
+        self,
+        depth: int,
+        min_width: int,
+        min_height: int,
+        max_horizontal_ratio: float,
+        max_vertical_ratio: float,
+        seed: Optional[tcod.random.Random] = None,
+    ) -> None:
         """Divide this partition recursively.
 
         Args:
@@ -145,13 +166,15 @@ class BSP(object):
             cdata,
             seed or ffi.NULL,
             depth,
-            min_width, min_height,
-            max_horizontal_ratio, max_vertical_ratio,
+            min_width,
+            min_height,
+            max_horizontal_ratio,
+            max_vertical_ratio,
         )
         self._unpack_bsp_tree(cdata)
 
-    @deprecate('Use pre_order method instead of walk.')
-    def walk(self) -> Iterator['BSP']:
+    @deprecate("Use pre_order method instead of walk.")
+    def walk(self) -> Iterator["BSP"]:
         """Iterate over this BSP's hierarchy in pre order.
 
         .. deprecated:: 2.3
@@ -159,7 +182,7 @@ class BSP(object):
         """
         return self.post_order()
 
-    def pre_order(self) -> Iterator['BSP']:
+    def pre_order(self) -> Iterator["BSP"]:
         """Iterate over this BSP's hierarchy in pre order.
 
         .. versionadded:: 8.3
@@ -168,7 +191,7 @@ class BSP(object):
         for child in self.children:
             yield from child.pre_order()
 
-    def in_order(self) -> Iterator['BSP']:
+    def in_order(self) -> Iterator["BSP"]:
         """Iterate over this BSP's hierarchy in order.
 
         .. versionadded:: 8.3
@@ -180,7 +203,7 @@ class BSP(object):
         else:
             yield self
 
-    def post_order(self) -> Iterator['BSP']:
+    def post_order(self) -> Iterator["BSP"]:
         """Iterate over this BSP's hierarchy in post order.
 
         .. versionadded:: 8.3
@@ -189,29 +212,29 @@ class BSP(object):
             yield from child.post_order()
         yield self
 
-    def level_order(self) -> Iterator['BSP']:
+    def level_order(self) -> Iterator["BSP"]:
         """Iterate over this BSP's hierarchy in level order.
 
         .. versionadded:: 8.3
         """
-        next = [self] # type: List['BSP']
+        next = [self]  # type: List['BSP']
         while next:
-            level = next # type: List['BSP']
+            level = next  # type: List['BSP']
             next = []
             yield from level
             for node in level:
                 next.extend(node.children)
 
-    def inverted_level_order(self) -> Iterator['BSP']:
+    def inverted_level_order(self) -> Iterator["BSP"]:
         """Iterate over this BSP's hierarchy in inverse level order.
 
         .. versionadded:: 8.3
         """
-        levels = [] # type: List[List['BSP']]
-        next = [self] # type: List['BSP']
+        levels = []  # type: List[List['BSP']]
+        next = [self]  # type: List['BSP']
         while next:
             levels.append(next)
-            level = next # type: List['BSP']
+            level = next  # type: List['BSP']
             next = []
             for node in level:
                 next.extend(node.children)
@@ -229,10 +252,12 @@ class BSP(object):
             bool: True if this node contains these coordinates.
                   Otherwise False.
         """
-        return (self.x <= x < self.x + self.width and
-                self.y <= y < self.y + self.height)
+        return (
+            self.x <= x < self.x + self.width
+            and self.y <= y < self.y + self.height
+        )
 
-    def find_node(self, x: int, y: int) -> Optional['BSP']:
+    def find_node(self, x: int, y: int) -> Optional["BSP"]:
         """Return the deepest node which contains these coordinates.
 
         Returns:
@@ -247,6 +272,4 @@ class BSP(object):
         return self
 
 
-__all__ = [
-    "BSP",
-]
+__all__ = ["BSP"]

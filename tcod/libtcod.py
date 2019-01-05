@@ -10,30 +10,34 @@ import platform as _platform
 
 from tcod import __path__
 
-if _sys.platform == 'win32':
+if _sys.platform == "win32":
     # add Windows dll's to PATH
     _bits, _linkage = _platform.architecture()
-    _os.environ['PATH'] = '%s;%s' % (
-        _os.path.join(__path__[0], 'x86' if _bits == '32bit' else 'x64'),
-        _os.environ['PATH'],
-        )
+    _os.environ["PATH"] = "%s;%s" % (
+        _os.path.join(__path__[0], "x86" if _bits == "32bit" else "x64"),
+        _os.environ["PATH"],
+    )
 
 NOISE_DEFAULT_HURST = 0.5
 NOISE_DEFAULT_LACUNARITY = 2.0
 
-def FOV_PERMISSIVE(p) :
-    return FOV_PERMISSIVE_0+p
+
+def FOV_PERMISSIVE(p):
+    return FOV_PERMISSIVE_0 + p
+
 
 def BKGND_ALPHA(a):
     return BKGND_ALPH | (int(a * 255) << 8)
 
+
 def BKGND_ADDALPHA(a):
     return BKGND_ADDA | (int(a * 255) << 8)
+
 
 class _Mock(object):
     """Mock object needed for ReadTheDocs."""
 
-    CData = () # This gets passed to an isinstance call.
+    CData = ()  # This gets passed to an isinstance call.
 
     @staticmethod
     def def_extern():
@@ -50,14 +54,16 @@ class _Mock(object):
 
     def __str__(self):
         """Just have ? in case anything leaks as a parameter default."""
-        return '?'
+        return "?"
 
 
-if _os.environ.get('READTHEDOCS'):
+if _os.environ.get("READTHEDOCS"):
     # Mock the lib and ffi objects needed to compile docs for readthedocs.io
     # Allows an import without building the cffi module first.
     lib = ffi = _Mock()
 else:
-    from tcod._libtcod import lib, ffi
+    from tcod._libtcod import lib, ffi  # noqa: F401
 
-from tcod.constants import *
+from tcod.constants import *  # noqa: F4
+from tcod.constants import FOV_PERMISSIVE_0  # noqa: F402
+from tcod.constants import BKGND_ALPH, BKGND_ADDA  # noqa: F402
