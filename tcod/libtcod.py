@@ -45,3 +45,5 @@ if os.environ.get("READTHEDOCS"):
     lib = ffi = _Mock()
 else:
     from tcod._libtcod import lib, ffi  # noqa: F401
+
+__all__ = ["ffi", "lib"]
