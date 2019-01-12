@@ -54,7 +54,7 @@ install:
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-wheel -v dist/*.whl; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-listdeps --all dist/*.whl; fi'
 before_script:
-- pip install pytest pytest-cov pytest-faulthandler
+- pip install --upgrade pytest pytest-cov pytest-faulthandler
 script:
 - pytest -v
 after_success:
