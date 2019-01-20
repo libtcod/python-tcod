@@ -37,6 +37,8 @@ addons:
     packages:
       - g++-8
       - libsdl2-dev
+services:
+  - xvfb
 
 before_install:
 - source .travis/before_install.sh
