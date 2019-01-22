@@ -16,11 +16,13 @@ and tcod the names and values used are directly derived from SDL.
 As a general guideline for turn-based rouge-likes, you should use
 KeyDown.sym for commands, and TextInput.text for name entry fields.
 """
-from typing import Any, Dict, Optional, Iterator
+import collections
+from typing import Any, Dict, Optional, Iterator, Tuple
 
 import tcod
 import tcod.event_constants
 from tcod.event_constants import *
+
 
 def _describe_bitmask(
     bits: int, table: Dict[Any, str], default: Any = "0"
@@ -44,6 +46,15 @@ def _describe_bitmask(
         return default
     return "|".join(result)
 
+
+def _pixel_to_tile(x: float, y: float) -> Tuple[float, float]:
+    """Convert pixel coordinates to tile coordinates."""
+    xy = tcod.ffi.new("double[2]", (x, y))
+    tcod.lib.TCOD_sys_pixel_to_tile(xy, xy + 1)
+    return xy[0], xy[1]
+
+
+Point = collections.namedtuple("Point", ["x", "y"])
 
 # manually define names for SDL macros
 BUTTON_LEFT = 1
@@ -105,7 +116,9 @@ class Quit(Event):
 
 
 class KeyboardEvent(Event):
-    def __init__(self, scancode, sym, mod, repeat=False):
+    def __init__(
+        self, scancode: int, sym: int, mod: int, repeat: bool = False
+    ):
         self.scancode = scancode
         self.sym = sym
         self.mod = mod
@@ -123,7 +136,9 @@ class KeyboardEvent(Event):
             self.__class__.__name__,
             tcod.event_constants._REVERSE_SCANCODE_TABLE[self.scancode],
             tcod.event_constants._REVERSE_SYM_TABLE[self.sym],
-            _describe_bitmask(self.mod, tcod.event_constants._REVERSE_MOD_TABLE),
+            _describe_bitmask(
+                self.mod, tcod.event_constants._REVERSE_MOD_TABLE
+            ),
             ", repeat=True" if self.repeat else "",
         )
 
@@ -137,45 +152,69 @@ class KeyUp(KeyboardEvent):
 
 
 class MouseMotion(Event):
-    def __init__(self, x, y, xrel, yrel, state):
-        self.x = x
-        self.y = y
-        self.xrel = xrel
-        self.yrel = yrel
+    def __init__(
+        self,
+        pixel: Tuple[int, int],
+        pixel_motion: Tuple[int, int],
+        tile: Tuple[int, int],
+        tile_motion: Tuple[int, int],
+        state: int,
+    ):
+        self.pixel = Point(*pixel)
+        self.pixel_motion = Point(*pixel_motion)
+        self.tile = Point(*tile)
+        self.tile_motion = Point(*tile_motion)
         self.state = state
 
     @classmethod
     def from_sdl_event(cls, sdl_event):
         motion = sdl_event.motion
-        return cls(motion.x, motion.y, motion.xrel, motion.yrel, motion.state)
+
+        pixel = motion.x, motion.y
+        pixel_motion = motion.xrel, motion.yrel
+        subtile = _pixel_to_tile(*pixel)
+        tile = int(subtile[0]), int(subtile[1])
+        prev_pixel = pixel[0] - pixel_motion[0], pixel[1] - pixel_motion[1]
+        prev_subtile = _pixel_to_tile(*prev_pixel)
+        prev_tile = int(prev_subtile[0]), int(prev_subtile[1])
+        tile_motion = tile[0] - prev_tile[0], tile[1] - prev_tile[1]
+        return cls(pixel, pixel_motion, tile, tile_motion, motion.state)
 
     def __repr__(self):
-        return "tcod.event.%s(x=%i, y=%i, xrel=%i, yrel=%i, state=%s)" % (
+        return (
+            "tcod.event.%s(pixel=%r, pixel_motion=%r, "
+            "tile=%r, tile_motion=%r, state=%s)"
+        ) % (
             self.__class__.__name__,
-            self.x,
-            self.y,
-            self.xrel,
-            self.yrel,
+            self.pixel,
+            self.pixel_motion,
+            self.tile,
+            self.tile_motion,
             _describe_bitmask(self.state, _REVERSE_BUTTON_MASK_TABLE),
         )
 
 
 class MouseButtonEvent(Event):
-    def __init__(self, x, y, button):
-        self.x = x
-        self.y = y
+    def __init__(
+        self, pixel: Tuple[int, int], tile: Tuple[int, int], button: int
+    ):
+        self.pixel = Point(*pixel)
+        self.tile = Point(*tile)
         self.button = button
 
     @classmethod
     def from_sdl_event(cls, sdl_event):
         button = sdl_event.button
-        return cls(button.x, button.y, button.button)
+        pixel = button.x, button.y
+        subtile = _pixel_to_tile(*pixel)
+        tile = int(subtile[0]), int(subtile[1])
+        return cls(pixel, tile, button.button)
 
     def __repr__(self):
-        return "tcod.event.%s(x=%i, y=%i, button=%s)" % (
+        return "tcod.event.%s(pixel=%r, tile=%r, button=%s)" % (
             self.__class__.__name__,
-            self.x,
-            self.y,
+            self.pixel,
+            self.tile,
             _REVERSE_BUTTON_TABLE[self.button],
         )
 
@@ -189,10 +228,10 @@ class MouseButtonUp(MouseButtonEvent):
 
 
 class MouseWheel(Event):
-    def __init__(self, x, y, direction):
+    def __init__(self, x: int, y: int, flipped: bool = False):
         self.x = x
         self.y = y
-        self.direction = direction
+        self.flipped = flipped
 
     @classmethod
     def from_sdl_event(cls, sdl_event):
@@ -200,16 +239,16 @@ class MouseWheel(Event):
         return cls(wheel.x, wheel.y, wheel.direction)
 
     def __repr__(self):
-        return "tcod.event.%s(x=%i, y=%i, direction=%s)" % (
+        return "tcod.event.%s(x=%i, y=%i%s)" % (
             self.__class__.__name__,
             self.x,
             self.y,
-            tcod.event_constants._REVERSE_WHEEL_TABLE[self.direction],
+            ", flipped=True" if self.flipped else "",
         )
 
 
 class TextInput(Event):
-    def __init__(self, text):
+    def __init__(self, text: str):
         self.text = text
 
     @classmethod
@@ -267,6 +306,7 @@ def wait(timeout: Optional[float] = None) -> Iterator[Any]:
 
 
 __all__ = [
+    "Point",
     "Event",
     "Quit",
     "KeynoardEvent",
