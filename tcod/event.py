@@ -15,13 +15,14 @@ and tcod the names and values used are directly derived from SDL.
 
 As a general guideline for turn-based rouge-likes, you should use
 KeyDown.sym for commands, and TextInput.text for name entry fields.
+
+.. versionadded:: 8.4
 """
-import collections
-from typing import Any, Dict, Optional, Iterator, Tuple
+from typing import Any, Dict, NamedTuple, Optional, Iterator, Tuple
 
 import tcod
 import tcod.event_constants
-from tcod.event_constants import *
+from tcod.event_constants import *  # noqa: F4
 
 
 def _describe_bitmask(
@@ -54,7 +55,7 @@ def _pixel_to_tile(x: float, y: float) -> Tuple[float, float]:
     return xy[0], xy[1]
 
 
-Point = collections.namedtuple("Point", ["x", "y"])
+Point = NamedTuple("Point", [("x", float), ("y", float)])
 
 # manually define names for SDL macros
 BUTTON_LEFT = 1
@@ -89,15 +90,13 @@ _REVERSE_BUTTON_MASK_TABLE = {
 class Event:
     """The base event class."""
 
+    def __init__(self, type: str = ""):
+        self.type = type if type else self.__class__.__name__.upper()
+
     @classmethod
     def from_sdl_event(cls, sdl_event):
         """Return a class instance from a cffi SDL_Event pointer."""
         raise NotImplementedError()
-
-    @property
-    def type(self):
-        """All event types are just the class name, but all upper-case."""
-        return self.__class__.__name__.upper()
 
 
 class Quit(Event):
@@ -119,6 +118,7 @@ class KeyboardEvent(Event):
     def __init__(
         self, scancode: int, sym: int, mod: int, repeat: bool = False
     ):
+        super().__init__()
         self.scancode = scancode
         self.sym = sym
         self.mod = mod
@@ -160,6 +160,7 @@ class MouseMotion(Event):
         tile_motion: Tuple[int, int],
         state: int,
     ):
+        super().__init__()
         self.pixel = Point(*pixel)
         self.pixel_motion = Point(*pixel_motion)
         self.tile = Point(*tile)
@@ -198,6 +199,7 @@ class MouseButtonEvent(Event):
     def __init__(
         self, pixel: Tuple[int, int], tile: Tuple[int, int], button: int
     ):
+        super().__init__()
         self.pixel = Point(*pixel)
         self.tile = Point(*tile)
         self.button = button
@@ -229,6 +231,7 @@ class MouseButtonUp(MouseButtonEvent):
 
 class MouseWheel(Event):
     def __init__(self, x: int, y: int, flipped: bool = False):
+        super().__init__()
         self.x = x
         self.y = y
         self.flipped = flipped
@@ -236,7 +239,7 @@ class MouseWheel(Event):
     @classmethod
     def from_sdl_event(cls, sdl_event):
         wheel = sdl_event.wheel
-        return cls(wheel.x, wheel.y, wheel.direction)
+        return cls(wheel.x, wheel.y, bool(wheel.direction))
 
     def __repr__(self):
         return "tcod.event.%s(x=%i, y=%i%s)" % (
@@ -249,6 +252,7 @@ class MouseWheel(Event):
 
 class TextInput(Event):
     def __init__(self, text: str):
+        super().__init__()
         self.text = text
 
     @classmethod
@@ -305,11 +309,58 @@ def wait(timeout: Optional[float] = None) -> Iterator[Any]:
     return get()
 
 
+class EventDispatch:
+    def dispatch(self, event: Any):
+        getattr(self, "ev_%s" % (event.type.lower(),))(event)
+
+    def event_get(self):
+        for event in get():
+            self.dispatch(event)
+
+    def event_wait(self, timeout: Optional[float]):
+        wait(timeout)
+        self.event_get()
+
+    def ev_quit(self, event: Quit):
+        pass
+
+    def ev_keydown(self, event: KeyDown):
+        pass
+
+    def ev_keyup(self, event: KeyUp):
+        pass
+
+    def ev_mousemotion(self, event: MouseMotion):
+        pass
+
+    def ev_mousebuttondown(self, event: MouseButtonDown):
+        pass
+
+    def ev_mousebuttonup(self, event: MouseButtonUp):
+        pass
+
+    def ev_mousewheel(self, event: MouseWheel):
+        pass
+
+    def ev_textinput(self, event: TextInput):
+        pass
+
+
 __all__ = [
     "Point",
+    "BUTTON_LEFT",
+    "BUTTON_MIDDLE",
+    "BUTTON_RIGHT",
+    "BUTTON_X1",
+    "BUTTON_X2",
+    "BUTTON_LMASK",
+    "BUTTON_MMASK",
+    "BUTTON_RMASK",
+    "BUTTON_X1MASK",
+    "BUTTON_X2MASK",
     "Event",
     "Quit",
-    "KeynoardEvent",
+    "KeyboardEvent",
     "KeyDown",
     "KeyUp",
     "MouseMotion",
@@ -320,4 +371,5 @@ __all__ = [
     "TextInput",
     "get",
     "wait",
+    "EventDispatch",
 ] + tcod.event_constants.__all__
