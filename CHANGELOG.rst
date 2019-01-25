@@ -9,6 +9,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - Added tcod.event module, based off of the sdlevent.py shim.
 Changed
  - Updated libtcod to 1.10.3
 Fixed

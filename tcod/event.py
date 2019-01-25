@@ -90,8 +90,11 @@ _REVERSE_BUTTON_MASK_TABLE = {
 class Event:
     """The base event class."""
 
-    def __init__(self, type: str = ""):
-        self.type = type if type else self.__class__.__name__.upper()
+    def __init__(self, type: Optional[str] = None):
+        if type is None:
+            type = self.__class__.__name__.upper()
+        self.type = type
+        self.sdl_event = None
 
     @classmethod
     def from_sdl_event(cls, sdl_event):
@@ -108,7 +111,9 @@ class Quit(Event):
 
     @classmethod
     def from_sdl_event(cls, sdl_event):
-        return cls()
+        self = cls()
+        self.sdl_event = sdl_event
+        return self
 
     def __repr__(self):
         return "tcod.event.%s()" % self.__class__.__name__
@@ -127,9 +132,11 @@ class KeyboardEvent(Event):
     @classmethod
     def from_sdl_event(cls, sdl_event):
         keysym = sdl_event.key.keysym
-        return cls(
+        self = cls(
             keysym.scancode, keysym.sym, keysym.mod, bool(sdl_event.key.repeat)
         )
+        self.sdl_event = sdl_event
+        return self
 
     def __repr__(self):
         return "tcod.event.%s(scancode=%s, sym=%s, mod=%s%s)" % (
@@ -179,7 +186,9 @@ class MouseMotion(Event):
         prev_subtile = _pixel_to_tile(*prev_pixel)
         prev_tile = int(prev_subtile[0]), int(prev_subtile[1])
         tile_motion = tile[0] - prev_tile[0], tile[1] - prev_tile[1]
-        return cls(pixel, pixel_motion, tile, tile_motion, motion.state)
+        self = cls(pixel, pixel_motion, tile, tile_motion, motion.state)
+        self.sdl_event = sdl_event
+        return self
 
     def __repr__(self):
         return (
@@ -210,7 +219,9 @@ class MouseButtonEvent(Event):
         pixel = button.x, button.y
         subtile = _pixel_to_tile(*pixel)
         tile = int(subtile[0]), int(subtile[1])
-        return cls(pixel, tile, button.button)
+        self = cls(pixel, tile, button.button)
+        self.sdl_event = sdl_event
+        return self
 
     def __repr__(self):
         return "tcod.event.%s(pixel=%r, tile=%r, button=%s)" % (
@@ -239,7 +250,9 @@ class MouseWheel(Event):
     @classmethod
     def from_sdl_event(cls, sdl_event):
         wheel = sdl_event.wheel
-        return cls(wheel.x, wheel.y, bool(wheel.direction))
+        self = cls(wheel.x, wheel.y, bool(wheel.direction))
+        self.sdl_event = sdl_event
+        return self
 
     def __repr__(self):
         return "tcod.event.%s(x=%i, y=%i%s)" % (
@@ -257,10 +270,28 @@ class TextInput(Event):
 
     @classmethod
     def from_sdl_event(cls, sdl_event):
-        return cls(tcod.ffi.string(sdl_event.text.text, 32).decode("utf8"))
+        self = cls(tcod.ffi.string(sdl_event.text.text, 32).decode("utf8"))
+        self.sdl_event = sdl_event
+        return self
 
     def __repr__(self):
         return "tcod.event.%s(text=%r)" % (self.__class__.__name__, self.text)
+
+
+class Undefined(Event):
+    """This class is a place holder for SDL events without a Python class."""
+
+    def __init__(self):
+        super().__init__("")
+
+    @classmethod
+    def from_sdl_event(cls, sdl_event):
+        self = cls()
+        self.sdl_event = sdl_event
+        return self
+
+    def __str__(self):
+        return "<Undefined sdl_event.type=%i>" % self.sdl_event.type
 
 
 _SDL_TO_CLASS_TABLE = {
@@ -286,6 +317,8 @@ def get() -> Iterator[Any]:
     while tcod.lib.SDL_PollEvent(sdl_event):
         if sdl_event.type in _SDL_TO_CLASS_TABLE:
             yield _SDL_TO_CLASS_TABLE[sdl_event.type].from_sdl_event(sdl_event)
+        else:
+            yield Undefined.from_sdl_event(sdl_event)
 
 
 def wait(timeout: Optional[float] = None) -> Iterator[Any]:
@@ -311,7 +344,8 @@ def wait(timeout: Optional[float] = None) -> Iterator[Any]:
 
 class EventDispatch:
     def dispatch(self, event: Any):
-        getattr(self, "ev_%s" % (event.type.lower(),))(event)
+        if event.type:
+            getattr(self, "ev_%s" % (event.type.lower(),))(event)
 
     def event_get(self):
         for event in get():
@@ -369,6 +403,7 @@ __all__ = [
     "MouseButtonUp",
     "MouseWheel",
     "TextInput",
+    "Undefined",
     "get",
     "wait",
     "EventDispatch",
