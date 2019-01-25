@@ -23,7 +23,7 @@ Example::
         else:
             print('Dig a room for %s.' % node)
 """
-from typing import Iterator, Optional
+from typing import Iterator, List, Optional, Union  # noqa: F401
 
 from tcod.libtcod import lib, ffi
 from tcod._internal import deprecate
@@ -65,7 +65,7 @@ class BSP(object):
         self.horizontal = False  # type: bool
 
         self.parent = None  # type: Optional['BSP']
-        self.children = ()  # type: Union[Tuple[], Tuple['BSP', 'BSP']]
+        self.children = ()  # type: Union[Tuple[()], Tuple['BSP', 'BSP']]
 
     @property
     def w(self) -> int:

@@ -1420,8 +1420,7 @@ def console_set_key_color(con, col):
         con.set_key_color(col)
 
 
-def console_delete(con):
-    # type: (Console) -> None
+def console_delete(con: tcod.console.Console) -> None:
     """Closes the window if `con` is the root console.
 
     libtcod objects are automatically garbage collected once they go out of
@@ -1429,7 +1428,6 @@ def console_delete(con):
 
     This function exists for backwards compatibility.
     """
-    # type: (Any) -> None
     con = _console(con)
     if con == ffi.NULL:
         lib.TCOD_console_delete(con)
@@ -2627,8 +2625,9 @@ def line_iter(xo, yo, xd, yd):
         yield (x[0], y[0])
 
 
-def line_where(x1, y1, x2, y2, inclusive=True):
-    # type: (int, int, int, int, bool) -> tuple[np.ndarray, np.ndarray]
+def line_where(
+    x1: int, y1: int, x2: int, y2: int, inclusive: bool = True
+) -> Tuple[np.ndarray, np.ndarray]:
     """Return a NumPy index array following a Bresenham line.
 
     If `inclusive` is true then the start point is included in the result.

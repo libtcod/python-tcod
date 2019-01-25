@@ -41,41 +41,46 @@ Example::
     array is used.)
 """
 import numpy as np
+from typing import Any, Callable, List, Tuple, Union
 
 from tcod.libtcod import lib, ffi
+import tcod.map
 
 
 @ffi.def_extern()
-def _pycall_path_old(x1, y1, x2, y2, handle):
-    # type: (int, int, int, int, cffi.CData]) -> float
+def _pycall_path_old(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:
     """libtcodpy style callback, needs to preserve the old userData issue."""
     func, userData = ffi.from_handle(handle)
     return func(x1, y1, x2, y2, userData)
 
 
 @ffi.def_extern()
-def _pycall_path_simple(x1, y1, x2, y2, handle):
-    # type: (int, int, int, int, cffi.CData]) -> float
+def _pycall_path_simple(
+    x1: int, y1: int, x2: int, y2: int, handle: Any
+) -> float:
     """Does less and should run faster, just calls the handle function."""
     return ffi.from_handle(handle)(x1, y1, x2, y2)
 
 
 @ffi.def_extern()
-def _pycall_path_swap_src_dest(x1, y1, x2, y2, handle):
-    # type: (int, int, int, int, cffi.CData]) -> float
+def _pycall_path_swap_src_dest(
+    x1: int, y1: int, x2: int, y2: int, handle: Any
+) -> float:
     """A TDL function dest comes first to match up with a dest only call."""
     return ffi.from_handle(handle)(x2, y2, x1, y1)
 
 
 @ffi.def_extern()
-def _pycall_path_dest_only(x1, y1, x2, y2, handle):
-    # type: (int, int, int, int, cffi.CData]) -> float
+def _pycall_path_dest_only(
+    x1: int, y1: int, x2: int, y2: int, handle: Any
+) -> float:
     """A TDL function which samples the dest coordinate only."""
     return ffi.from_handle(handle)(x2, y2)
 
 
-def _get_pathcost_func(name):
-    # type: (str) -> Callable[[int, int, int, int, cffi.CData], float]
+def _get_pathcost_func(
+    name: str
+) -> Callable[[int, int, int, int, Any], float]:
     """Return a properly cast PathCostArray callback."""
     return ffi.cast("TCOD_path_func_t", ffi.addressof(lib, name))
 
@@ -90,13 +95,11 @@ class _EdgeCostFunc(object):
 
     _CALLBACK_P = lib._pycall_path_old
 
-    def __init__(self, userdata, shape):
-        # type: (Any, Tuple[int, int]) -> None
+    def __init__(self, userdata: Any, shape: Tuple[int, int]) -> None:
         self._userdata = userdata
         self.shape = shape
 
-    def get_tcod_path_ffi(self):
-        # type: () -> Tuple[cffi.CData, cffi.CData, Tuple[int, int]]
+    def get_tcod_path_ffi(self) -> Tuple[Any, Any, Tuple[int, int]]:
         """Return (C callback, userdata handle, shape)"""
         return self._CALLBACK_P, ffi.new_handle(self._userdata), self.shape
 
@@ -123,8 +126,11 @@ class EdgeCostCallback(_EdgeCostFunc):
 
     _CALLBACK_P = lib._pycall_path_simple
 
-    def __init__(self, callback, shape):
-        # type: (Callable[[int, int, int, int], float], Tuple[int, int])
+    def __init__(
+        self,
+        callback: Callable[[int, int, int, int], float],
+        shape: Tuple[int, int],
+    ):
         self.callback = callback
         super(EdgeCostCallback, self).__init__(callback, shape)
 
@@ -158,8 +164,7 @@ class NodeCostArray(np.ndarray):
             repr(self.view(np.ndarray)),
         )
 
-    def get_tcod_path_ffi(self):
-        # type: () -> Tuple[cffi.CData, cffi.CData, Tuple[int, int]]
+    def get_tcod_path_ffi(self) -> Tuple[Any, Any, Tuple[int, int]]:
         if len(self.shape) != 2:
             raise ValueError(
                 "Array must have a 2d shape, shape is %r" % (self.shape,)
@@ -181,8 +186,11 @@ class NodeCostArray(np.ndarray):
 class _PathFinder(object):
     """A class sharing methods used by AStar and Dijkstra."""
 
-    def __init__(self, cost, diagonal=1.41):
-        # type: (Union[tcod.map.Map, numpy.ndarray, Any], float)
+    def __init__(
+        self,
+        cost: Union[tcod.map.Map, np.ndarray, Any],
+        diagonal: float = 1.41,
+    ):
         self.cost = cost
         self.diagonal = diagonal
         self._path_c = None
@@ -249,8 +257,9 @@ class AStar(_PathFinder):
             A value of 0 will disable diagonal movement entirely.
     """
 
-    def get_path(self, start_x, start_y, goal_x, goal_y):
-        # type: (int, int, int, int) -> List[Tuple[int, int]]
+    def get_path(
+        self, start_x: int, start_y: int, goal_x: int, goal_y: int
+    ) -> List[Tuple[int, int]]:
         """Return a list of (x, y) steps to reach the goal point, if possible.
 
         Args:
@@ -283,14 +292,12 @@ class Dijkstra(_PathFinder):
     _path_new_using_function = lib.TCOD_dijkstra_new_using_function
     _path_delete = lib.TCOD_dijkstra_delete
 
-    def set_goal(self, x, y):
-        # type: (int, int) -> None
+    def set_goal(self, x: int, y: int) -> None:
         """Set the goal point and recompute the Dijkstra path-finder.
         """
         lib.TCOD_dijkstra_compute(self._path_c, x, y)
 
-    def get_path(self, x, y):
-        # type: (int, int) -> List[Tuple[int, int]]
+    def get_path(self, x: int, y: int) -> List[Tuple[int, int]]:
         """Return a list of (x, y) steps to reach the goal point, if possible.
         """
         lib.TCOD_dijkstra_path_set(self._path_c, x, y)
