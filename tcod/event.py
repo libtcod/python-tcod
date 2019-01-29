@@ -161,11 +161,11 @@ class KeyUp(KeyboardEvent):
 class MouseMotion(Event):
     def __init__(
         self,
-        pixel: Tuple[int, int],
-        pixel_motion: Tuple[int, int],
-        tile: Tuple[int, int],
-        tile_motion: Tuple[int, int],
-        state: int,
+        pixel: Tuple[int, int] = (0, 0),
+        pixel_motion: Tuple[int, int] = (0, 0),
+        tile: Tuple[int, int] = (0, 0),
+        tile_motion: Tuple[int, int] = (0, 0),
+        state: int = 0,
     ):
         super().__init__()
         self.pixel = Point(*pixel)
@@ -206,7 +206,10 @@ class MouseMotion(Event):
 
 class MouseButtonEvent(Event):
     def __init__(
-        self, pixel: Tuple[int, int], tile: Tuple[int, int], button: int
+        self,
+        pixel: Tuple[int, int] = (0, 0),
+        tile: Tuple[int, int] = (0, 0),
+        button: int = 0,
     ):
         super().__init__()
         self.pixel = Point(*pixel)
@@ -435,6 +438,9 @@ class EventDispatch:
         pass
 
     def ev_windowexposed(self, event: WindowEvent):
+        pass
+
+    def ev_windowmoved(self, event: WindowEvent):
         pass
 
     def ev_windowresized(self, event: WindowEvent):
