@@ -8,7 +8,9 @@ from __future__ import division
 
 import os
 
+import copy
 import math
+import random
 import time
 
 import numpy as np
@@ -1005,7 +1007,6 @@ bsp_min_room_size = 4
 bsp_random_room = False
 # if true, there is always a wall on north & west side of a room
 bsp_room_walls = True
-bsp_map = None
 # draw a vertical line
 def vline(m, x, y1, y2):
     if y1 > y2:
@@ -1051,44 +1052,25 @@ def hline_right(m, x, y):
 
 
 # the class building the dungeon from the bsp nodes
-def traverse_node(node, *dat):
-    global bsp_map
+def traverse_node(bsp_map, node):
     if not node.children:
         # calculate the room size
-        minx = node.x + 1
-        maxx = node.x + node.w - 1
-        miny = node.y + 1
-        maxy = node.y + node.h - 1
-        if not bsp_room_walls:
-            if minx > 1:
-                minx -= 1
-            if miny > 1:
-                miny -= 1
-        if maxx == SAMPLE_SCREEN_WIDTH - 1:
-            maxx -= 1
-        if maxy == SAMPLE_SCREEN_HEIGHT - 1:
-            maxy -= 1
+        if bsp_room_walls:
+            node.width -= 1
+            node.height -= 1
         if bsp_random_room:
-            minx = libtcod.random_get_int(
-                None, minx, maxx - bsp_min_room_size + 1
+            new_width = random.randint(
+                min(node.width, bsp_min_room_size), node.width
             )
-            miny = libtcod.random_get_int(
-                None, miny, maxy - bsp_min_room_size + 1
+            new_height = random.randint(
+                min(node.height, bsp_min_room_size), node.height
             )
-            maxx = libtcod.random_get_int(
-                None, minx + bsp_min_room_size - 1, maxx
-            )
-            maxy = libtcod.random_get_int(
-                None, miny + bsp_min_room_size - 1, maxy
-            )
-        # resize the node to fit the room
-        node.x = minx
-        node.y = miny
-        node.w = maxx - minx + 1
-        node.h = maxy - miny + 1
+            node.x += random.randint(0, node.width - new_width)
+            node.y += random.randint(0, node.height - new_height)
+            node.width, node.height = new_width, new_height
         # dig the room
-        for x in range(minx, maxx + 1):
-            for y in range(miny, maxy + 1):
+        for x in range(node.x, node.x + node.width):
+            for y in range(node.y, node.y + node.height):
                 bsp_map[x][y] = True
     else:
         # resize the node to fit its sons
@@ -1102,11 +1084,9 @@ def traverse_node(node, *dat):
             # vertical corridor
             if left.x + left.w - 1 < right.x or right.x + right.w - 1 < left.x:
                 # no overlapping zone. we need a Z shaped corridor
-                x1 = libtcod.random_get_int(None, left.x, left.x + left.w - 1)
-                x2 = libtcod.random_get_int(
-                    None, right.x, right.x + right.w - 1
-                )
-                y = libtcod.random_get_int(None, left.y + left.h, right.y)
+                x1 = random.randint(left.x, left.x + left.w - 1)
+                x2 = random.randint(right.x, right.x + right.w - 1)
+                y = random.randint(left.y + left.h, right.y)
                 vline_up(bsp_map, x1, y - 1)
                 hline(bsp_map, x1, y, x2)
                 vline_down(bsp_map, x2, y + 1)
@@ -1114,18 +1094,16 @@ def traverse_node(node, *dat):
                 # straight vertical corridor
                 minx = max(left.x, right.x)
                 maxx = min(left.x + left.w - 1, right.x + right.w - 1)
-                x = libtcod.random_get_int(None, minx, maxx)
+                x = random.randint(minx, maxx)
                 vline_down(bsp_map, x, right.y)
                 vline_up(bsp_map, x, right.y - 1)
         else:
             # horizontal corridor
             if left.y + left.h - 1 < right.y or right.y + right.h - 1 < left.y:
                 # no overlapping zone. we need a Z shaped corridor
-                y1 = libtcod.random_get_int(None, left.y, left.y + left.h - 1)
-                y2 = libtcod.random_get_int(
-                    None, right.y, right.y + right.h - 1
-                )
-                x = libtcod.random_get_int(None, left.x + left.w, right.x)
+                y1 = random.randint(left.y, left.y + left.h - 1)
+                y2 = random.randint(right.y, right.y + right.h - 1)
+                x = random.randint(left.x + left.w, right.x)
                 hline_left(bsp_map, x - 1, y1)
                 vline(bsp_map, x, y1, y2)
                 hline_right(bsp_map, x + 1, y2)
@@ -1133,68 +1111,45 @@ def traverse_node(node, *dat):
                 # straight horizontal corridor
                 miny = max(left.y, right.y)
                 maxy = min(left.y + left.h - 1, right.y + right.h - 1)
-                y = libtcod.random_get_int(None, miny, maxy)
+                y = random.randint(miny, maxy)
                 hline_left(bsp_map, right.x - 1, y)
                 hline_right(bsp_map, right.x, y)
     return True
 
 
-bsp = None
-bsp_generate = True
-bsp_refresh = False
-
-
 class BSPSample(Sample):
     def __init__(self):
         self.name = "Bsp toolkit"
+        self.bsp = tcod.bsp.BSP(
+            1, 1, SAMPLE_SCREEN_WIDTH - 1, SAMPLE_SCREEN_HEIGHT - 1
+        )
+        self.bsp_map = np.zeros(
+            (SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT), dtype=bool, order="F"
+        )
+        self.bsp_generate()
+
+    def bsp_generate(self):
+        self.bsp.children = ()
+        if bsp_room_walls:
+            self.bsp.split_recursive(
+                bsp_depth,
+                bsp_min_room_size + 1,
+                bsp_min_room_size + 1,
+                1.5,
+                1.5,
+            )
+        else:
+            self.bsp.split_recursive(
+                bsp_depth, bsp_min_room_size, bsp_min_room_size, 1.5, 1.5
+            )
+        self.bsp_refresh()
+
+    def bsp_refresh(self):
+        self.bsp_map[...] = False
+        for node in copy.deepcopy(self.bsp).inverted_level_order():
+            traverse_node(self.bsp_map, node)
 
     def on_draw(self, delta_time):
-        global bsp, bsp_generate, bsp_refresh, bsp_map
-        global bsp_random_room, bsp_room_walls, bsp_depth, bsp_min_room_size
-        if bsp_generate or bsp_refresh:
-            # dungeon generation
-            if bsp is None:
-                # create the bsp
-                bsp = libtcod.bsp_new_with_size(
-                    0, 0, SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT
-                )
-            else:
-                # restore the nodes size
-                bsp.x = 0
-                bsp.y = 0
-                bsp.width = SAMPLE_SCREEN_WIDTH
-                bsp.height = SAMPLE_SCREEN_HEIGHT
-            bsp_map = list()
-            for x in range(SAMPLE_SCREEN_WIDTH):
-                bsp_map.append([False] * SAMPLE_SCREEN_HEIGHT)
-            if bsp_generate:
-                # build a new random bsp tree
-                bsp.children = ()
-                if bsp_room_walls:
-                    libtcod.bsp_split_recursive(
-                        bsp,
-                        0,
-                        bsp_depth,
-                        bsp_min_room_size + 1,
-                        bsp_min_room_size + 1,
-                        1.5,
-                        1.5,
-                    )
-                else:
-                    libtcod.bsp_split_recursive(
-                        bsp,
-                        0,
-                        bsp_depth,
-                        bsp_min_room_size,
-                        bsp_min_room_size,
-                        1.5,
-                        1.5,
-                    )
-            # create the dungeon from the bsp
-            for node in bsp.inverted_level_order():
-                traverse_node(node)
-            bsp_generate = False
-            bsp_refresh = False
         sample_console.clear()
         sample_console.default_fg = libtcod.white
         rooms = "OFF"
@@ -1217,42 +1172,37 @@ class BSPSample(Sample):
         # render the level
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
-                if not bsp_map[x][y]:
-                    libtcod.console_set_char_background(
-                        sample_console, x, y, DARK_WALL, libtcod.BKGND_SET
-                    )
-                else:
-                    libtcod.console_set_char_background(
-                        sample_console, x, y, DARK_GROUND, libtcod.BKGND_SET
-                    )
+                color = DARK_GROUND if self.bsp_map[x][y] else DARK_WALL
+                libtcod.console_set_char_background(
+                    sample_console, x, y, color, libtcod.BKGND_SET
+                )
 
     def ev_keydown(self, event):
-        global bsp, bsp_generate, bsp_refresh, bsp_map
         global bsp_random_room, bsp_room_walls, bsp_depth, bsp_min_room_size
         if event.sym in (tcod.event.K_RETURN, tcod.event.K_KP_ENTER):
-            bsp_generate = True
+            self.bsp_generate()
         elif event.sym == ord(" "):
-            bsp_refresh = True
-        elif event.sym == ord("="):
+            self.bsp_refresh()
+        elif event.sym in (tcod.event.K_EQUALS, tcod.event.K_KP_PLUS):
             bsp_depth += 1
-            bsp_generate = True
-        elif event.sym == ord("-") and bsp_depth > 1:
-            bsp_depth -= 1
-            bsp_generate = True
-        elif event.sym == ord("*"):
+            self.bsp_generate()
+        elif event.sym in (tcod.event.K_MINUS, tcod.event.K_KP_MINUS):
+            bsp_depth = max(1, bsp_depth - 1)
+            self.bsp_generate()
+        elif event.sym in (tcod.event.K_8, tcod.event.K_KP_MULTIPLY):
             bsp_min_room_size += 1
-            bsp_generate = True
-        elif event.sym == ord("/") and bsp_min_room_size > 2:
-            bsp_min_room_size -= 1
-            bsp_generate = True
+            self.bsp_generate()
+        elif event.sym in (tcod.event.K_SLASH, tcod.event.K_KP_DIVIDE):
+            bsp_min_room_size = max(2, bsp_min_room_size - 1)
+            self.bsp_generate()
         elif event.sym in (tcod.event.K_1, tcod.event.K_KP_1):
             bsp_random_room = not bsp_random_room
             if not bsp_random_room:
                 bsp_room_walls = True
-            bsp_refresh = True
+            self.bsp_refresh()
         elif event.sym in (tcod.event.K_2, tcod.event.K_KP_2):
             bsp_room_walls = not bsp_room_walls
-            bsp_refresh = True
+            self.bsp_refresh()
         else:
             super().ev_keydown(event)
 
@@ -1598,17 +1548,17 @@ class FastRenderSample(Sample):
 
         # create new light source
         if (
-            libtcod.random_get_float(0, 0, 1) <= time_delta * LIGHTS_CHANCE
+            random.random() <= time_delta * LIGHTS_CHANCE
             and len(lights) < MAX_LIGHTS
         ):
-            x = libtcod.random_get_float(0, -0.5, 0.5)
-            y = libtcod.random_get_float(0, -0.5, 0.5)
-            strength = libtcod.random_get_float(0, MIN_LIGHT_STRENGTH, 1.0)
+            x = random.uniform(-0.5, 0.5)
+            y = random.uniform(-0.5, 0.5)
+            strength = random.uniform(MIN_LIGHT_STRENGTH, 1.0)
 
             color = libtcod.Color(
                 0, 0, 0
             )  # create bright colors with random hue
-            hue = libtcod.random_get_float(0, 0, 360)
+            hue = random.uniform(0, 0, 360)
             libtcod.color_set_hsv(color, hue, 0.5, strength)
             lights.append(
                 Light(x, y, TEX_STRETCH, color.r, color.g, color.b, strength)
