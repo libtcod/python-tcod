@@ -278,6 +278,54 @@ class TextInput(Event):
         return "tcod.event.%s(text=%r)" % (self.__class__.__name__, self.text)
 
 
+class WindowEvent(Event):
+    def __init__(self, type: str, x: Optional[int] = 0, y: Optional[int] = 0):
+        super().__init__(type)
+        self.x = x  # type(Optional[int])
+        self.y = y  # type(Optional[int])
+
+    @classmethod
+    def from_sdl_event(cls, sdl_event):
+        if sdl_event.window.event not in cls.__WINDOW_TYPES:
+            return Undefined.from_sdl_event(sdl_event)
+        self = cls(
+            cls.__WINDOW_TYPES[sdl_event.window.event],
+            sdl_event.window.data1,
+            sdl_event.window.data2,
+        )
+        self.sdl_event = sdl_event
+        return self
+
+    def __repr__(self):
+        params = ""
+        if self.x or self.y:
+            params = ", x=%r, y=%r" % (self.x, self.y)
+        return "tcod.event.%s(type=%r%s)" % (
+            self.__class__.__name__,
+            self.type,
+            params,
+        )
+
+    __WINDOW_TYPES = {
+        tcod.lib.SDL_WINDOWEVENT_SHOWN: "WindowShown",
+        tcod.lib.SDL_WINDOWEVENT_HIDDEN: "WindowHidden",
+        tcod.lib.SDL_WINDOWEVENT_EXPOSED: "WindowExposed",
+        tcod.lib.SDL_WINDOWEVENT_MOVED: "WindowMoved",
+        tcod.lib.SDL_WINDOWEVENT_RESIZED: "WindowResized",
+        tcod.lib.SDL_WINDOWEVENT_SIZE_CHANGED: "WindowSizeChanged",
+        tcod.lib.SDL_WINDOWEVENT_MINIMIZED: "WindowMinimized",
+        tcod.lib.SDL_WINDOWEVENT_MAXIMIZED: "WindowMaximized",
+        tcod.lib.SDL_WINDOWEVENT_RESTORED: "WindowRestored",
+        tcod.lib.SDL_WINDOWEVENT_ENTER: "WindowEnter",
+        tcod.lib.SDL_WINDOWEVENT_LEAVE: "WindowLeave",
+        tcod.lib.SDL_WINDOWEVENT_FOCUS_GAINED: "WindowFocusGained",
+        tcod.lib.SDL_WINDOWEVENT_FOCUS_LOST: "WindowFocusLost",
+        tcod.lib.SDL_WINDOWEVENT_CLOSE: "WindowClose",
+        tcod.lib.SDL_WINDOWEVENT_TAKE_FOCUS: "WindowTakeFocus",
+        tcod.lib.SDL_WINDOWEVENT_HIT_TEST: "WindowHitTest",
+    }
+
+
 class Undefined(Event):
     """This class is a place holder for SDL events without a Python class."""
 
@@ -303,6 +351,7 @@ _SDL_TO_CLASS_TABLE = {
     tcod.lib.SDL_MOUSEBUTTONUP: MouseButtonUp,
     tcod.lib.SDL_MOUSEWHEEL: MouseWheel,
     tcod.lib.SDL_TEXTINPUT: TextInput,
+    tcod.lib.SDL_WINDOWEVENT: WindowEvent,
 }
 
 
@@ -379,6 +428,51 @@ class EventDispatch:
     def ev_textinput(self, event: TextInput):
         pass
 
+    def ev_windowshown(self, event: WindowEvent):
+        pass
+
+    def ev_windowhidden(self, event: WindowEvent):
+        pass
+
+    def ev_windowexposed(self, event: WindowEvent):
+        pass
+
+    def ev_windowresized(self, event: WindowEvent):
+        pass
+
+    def ev_windowsizechanged(self, event: WindowEvent):
+        pass
+
+    def ev_windowminimized(self, event: WindowEvent):
+        pass
+
+    def ev_windowmaximized(self, event: WindowEvent):
+        pass
+
+    def ev_windowrestored(self, event: WindowEvent):
+        pass
+
+    def ev_windowenter(self, event: WindowEvent):
+        pass
+
+    def ev_windowleave(self, event: WindowEvent):
+        pass
+
+    def ev_windowfocusgained(self, event: WindowEvent):
+        pass
+
+    def ev_windowfocuslost(self, event: WindowEvent):
+        pass
+
+    def ev_windowclose(self, event: WindowEvent):
+        pass
+
+    def ev_windowtakefocus(self, event: WindowEvent):
+        pass
+
+    def ev_windowhittest(self, event: WindowEvent):
+        pass
+
 
 __all__ = [
     "Point",
@@ -403,6 +497,7 @@ __all__ = [
     "MouseButtonUp",
     "MouseWheel",
     "TextInput",
+    "WindowEvent",
     "Undefined",
     "get",
     "wait",
