@@ -73,3 +73,4 @@ debian/files
 debian/python*
 .pytest_cache
 Thumbs.db
+.mypy_cache/
