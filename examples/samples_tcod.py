@@ -1,10 +1,10 @@
-#!/usr/bin/env python
-#
-# libtcod python samples
-# This code demonstrates various usages of libtcod modules
-# It's in the public domain.
-#
-from __future__ import division
+#!/usr/bin/env python3
+"""
+This code demonstrates various usages of python-tcod.
+"""
+# To the extent possible under law, the tcod.maintainers have waived all
+# copyright and related or neighboring rights to these samples.
+# https://creativecommons.org/publicdomain/zero/1.0/
 
 import os
 
@@ -14,41 +14,34 @@ import random
 import time
 
 import numpy as np
-import tcod as libtcod
+import tcod
 import tcod.event
 
 SAMPLE_SCREEN_WIDTH = 46
 SAMPLE_SCREEN_HEIGHT = 20
 SAMPLE_SCREEN_X = 20
 SAMPLE_SCREEN_Y = 10
-font = os.path.join("data/fonts/consolas10x10_gs_tc.png")
-libtcod.console_set_custom_font(
-    font, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD
+FONT = "data/fonts/consolas10x10_gs_tc.png"
+tcod.console_set_custom_font(
+    FONT, tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD
 )
-root_console = libtcod.console_init_root(80, 50, "tcod python sample", False)
+root_console = tcod.console_init_root(80, 50, "tcod python samples", False)
 sample_console = tcod.console.Console(
     SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT
 )
 
 
 class Sample(tcod.event.EventDispatch):
-    def __init__(self, name="", func=None):
+    def __init__(self, name: str = ""):
         self.name = name
-        self.func = func
 
     def on_enter(self):
         pass
 
-    def on_draw(self, delta_time):
+    def on_draw(self, delta_time: int):
         pass
 
-    def on_key(self, key):
-        pass
-
-    def on_mouse(self, mouse):
-        pass
-
-    def ev_keydown(self, event):
+    def ev_keydown(self, event: tcod.event.KeyDown):
         global cur_sample
         if event.sym == tcod.event.K_DOWN:
             cur_sample = (cur_sample + 1) % len(SAMPLES)
@@ -62,22 +55,22 @@ class Sample(tcod.event.EventDispatch):
             event.sym == tcod.event.K_RETURN
             and event.mod & tcod.event.KMOD_LALT
         ):
-            libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
+            tcod.console_set_fullscreen(not tcod.console_is_fullscreen())
         elif event.sym == tcod.event.K_PRINTSCREEN or event.sym == ord("p"):
             print("screenshot")
             if event.mod & tcod.event.KMOD_LALT:
-                libtcod.console_save_apf(None, "samples.apf")
+                tcod.console_save_apf(None, "samples.apf")
                 print("apf")
             else:
-                libtcod.sys_save_screenshot()
+                tcod.sys_save_screenshot()
                 print("png")
         elif event.sym == tcod.event.K_ESCAPE:
             raise SystemExit()
         elif event.sym in RENDERER_KEYS:
-            libtcod.sys_set_renderer(RENDERER_KEYS[event.sym])
+            tcod.sys_set_renderer(RENDERER_KEYS[event.sym])
             draw_renderer_menu()
 
-    def ev_quit(self, event):
+    def ev_quit(self, event: tcod.event.Quit):
         raise SystemExit()
 
 
@@ -104,7 +97,7 @@ class TrueColorSample(Sample):
         ]
 
     def on_enter(self):
-        libtcod.sys_set_fps(0)
+        tcod.sys_set_fps(0)
         sample_console.clear()
 
     def on_draw(self, delta_time):
@@ -154,7 +147,7 @@ class TrueColorSample(Sample):
 
     def print_banner(self):
         # print text on top of samples
-        sample_console.default_bg = libtcod.grey
+        sample_console.default_bg = tcod.grey
         sample_console.print_rect(
             x=sample_console.width // 2,
             y=5,
@@ -162,8 +155,8 @@ class TrueColorSample(Sample):
             height=sample_console.height - 1,
             string="The Doryen library uses 24 bits colors, for both "
             "background and foreground.",
-            bg_blend=libtcod.BKGND_MULTIPLY,
-            alignment=libtcod.CENTER,
+            bg_blend=tcod.BKGND_MULTIPLY,
+            alignment=tcod.CENTER,
         )
 
 
@@ -175,10 +168,10 @@ class TrueColorSample(Sample):
 class OffscreenConsoleSample(Sample):
     def __init__(self):
         self.name = "Offscreen console"
-        self.secondary = libtcod.console.Console(
+        self.secondary = tcod.console.Console(
             sample_console.width // 2, sample_console.height // 2
         )
-        self.screenshot = libtcod.console.Console(
+        self.screenshot = tcod.console.Console(
             sample_console.width, sample_console.height
         )
         self.counter = 0
@@ -194,7 +187,7 @@ class OffscreenConsoleSample(Sample):
             sample_console.height // 2,
             "Offscreen console",
             False,
-            libtcod.BKGND_NONE,
+            tcod.BKGND_NONE,
         )
 
         self.secondary.print_rect(
@@ -204,22 +197,14 @@ class OffscreenConsoleSample(Sample):
             sample_console.height // 2,
             "You can render to an offscreen console and blit in on another "
             "one, simulating alpha transparency.",
-            libtcod.BKGND_NONE,
-            libtcod.CENTER,
+            tcod.BKGND_NONE,
+            tcod.CENTER,
         )
 
     def on_enter(self):
-        libtcod.sys_set_fps(0)
+        tcod.sys_set_fps(0)
         # get a "screenshot" of the current sample screen
-        sample_console.blit(
-            self.screenshot,
-            0,
-            0,
-            0,
-            0,
-            sample_console.width,
-            sample_console.height,
-        )
+        sample_console.blit(self.screenshot)
 
     def on_draw(self, delta_time):
         self.counter += delta_time * 1.5
@@ -235,15 +220,7 @@ class OffscreenConsoleSample(Sample):
                 self.ydir = -1
             elif self.y == -5:
                 self.ydir = 1
-        self.screenshot.blit(
-            sample_console,
-            0,
-            0,
-            0,
-            0,
-            sample_console.width,
-            sample_console.height,
-        )
+        self.screenshot.blit(sample_console)
         self.secondary.blit(
             sample_console,
             self.x,
@@ -282,16 +259,14 @@ class LineDrawingSample(Sample):
 
     def __init__(self):
         self.name = "Line drawing"
-        self.mk_flag = libtcod.BKGND_SET
-        self.bk_flag = libtcod.BKGND_SET
+        self.mk_flag = tcod.BKGND_SET
+        self.bk_flag = tcod.BKGND_SET
 
-        self.bk = libtcod.console_new(
-            sample_console.width, sample_console.height
-        )
+        self.bk = tcod.console_new(sample_console.width, sample_console.height)
         # initialize the colored background
         for x in range(sample_console.width):
             for y in range(sample_console.height):
-                col = libtcod.Color(
+                col = tcod.Color(
                     x * 255 // (sample_console.width - 1),
                     (x + y)
                     * 255
@@ -301,54 +276,46 @@ class LineDrawingSample(Sample):
                 self.bk.bg[y, x] = col
                 self.bk.ch[:] = ord(" ")
 
-    def ev_keydown(self, event):
+    def ev_keydown(self, event: tcod.event.KeyDown):
         if event.sym in (tcod.event.K_RETURN, tcod.event.K_KP_ENTER):
             self.bk_flag += 1
-            if (self.bk_flag & 0xFF) > libtcod.BKGND_ALPH:
-                self.bk_flag = libtcod.BKGND_NONE
+            if (self.bk_flag & 0xFF) > tcod.BKGND_ALPH:
+                self.bk_flag = tcod.BKGND_NONE
         else:
             super().ev_keydown(event)
 
     def on_enter(self):
-        libtcod.sys_set_fps(0)
-        sample_console.default_fg = libtcod.white
+        tcod.sys_set_fps(0)
+        sample_console.default_fg = tcod.white
 
     def on_draw(self, delta_time):
         alpha = 0.0
-        if (self.bk_flag & 0xFF) == libtcod.BKGND_ALPH:
+        if (self.bk_flag & 0xFF) == tcod.BKGND_ALPH:
             # for the alpha mode, update alpha every frame
-            alpha = (1.0 + math.cos(libtcod.sys_elapsed_seconds() * 2)) / 2.0
-            self.bk_flag = libtcod.BKGND_ALPHA(alpha)
-        elif (self.bk_flag & 0xFF) == libtcod.BKGND_ADDA:
+            alpha = (1.0 + math.cos(tcod.sys_elapsed_seconds() * 2)) / 2.0
+            self.bk_flag = tcod.BKGND_ALPHA(alpha)
+        elif (self.bk_flag & 0xFF) == tcod.BKGND_ADDA:
             # for the add alpha mode, update alpha every frame
-            alpha = (1.0 + math.cos(libtcod.sys_elapsed_seconds() * 2)) / 2.0
-            self.bk_flag = libtcod.BKGND_ADDALPHA(alpha)
+            alpha = (1.0 + math.cos(tcod.sys_elapsed_seconds() * 2)) / 2.0
+            self.bk_flag = tcod.BKGND_ADDALPHA(alpha)
 
-        self.bk.blit(
-            sample_console,
-            0,
-            0,
-            0,
-            0,
-            sample_console.width,
-            sample_console.height,
-        )
+        self.bk.blit(sample_console)
         recty = int(
             (sample_console.height - 2) * ((1.0 + math.cos(time.time())) / 2.0)
         )
         for x in range(sample_console.width):
-            col = libtcod.Color(
+            col = tcod.Color(
                 x * 255 // sample_console.width,
                 x * 255 // sample_console.width,
                 x * 255 // sample_console.width,
             )
-            libtcod.console_set_char_background(
+            tcod.console_set_char_background(
                 sample_console, x, recty, col, self.bk_flag
             )
-            libtcod.console_set_char_background(
+            tcod.console_set_char_background(
                 sample_console, x, recty + 1, col, self.bk_flag
             )
-            libtcod.console_set_char_background(
+            tcod.console_set_char_background(
                 sample_console, x, recty + 2, col, self.bk_flag
             )
         angle = time.time() * 2.0
@@ -364,13 +331,13 @@ class LineDrawingSample(Sample):
         )
         # draw the line
         # in python the easiest way is to use the line iterator
-        for x, y in libtcod.line_iter(xo, yo, xd, yd):
+        for x, y in tcod.line_iter(xo, yo, xd, yd):
             if (
                 0 <= x < sample_console.width
                 and 0 <= y < sample_console.height
             ):
-                libtcod.console_set_char_background(
-                    sample_console, x, y, libtcod.light_blue, self.bk_flag
+                tcod.console_set_char_background(
+                    sample_console, x, y, tcod.light_blue, self.bk_flag
                 )
         sample_console.print_(
             2, 2, "%s (ENTER to change)" % self.FLAG_NAMES[self.bk_flag & 0xFF]
@@ -382,15 +349,15 @@ class LineDrawingSample(Sample):
 #############################################
 
 NOISE_OPTIONS = [  # [name, algorithm, implementation],
-    ["perlin noise", libtcod.NOISE_PERLIN, libtcod.noise.SIMPLE],
-    ["simplex noise", libtcod.NOISE_SIMPLEX, libtcod.noise.SIMPLE],
-    ["wavelet noise", libtcod.NOISE_WAVELET, libtcod.noise.SIMPLE],
-    ["perlin fbm", libtcod.NOISE_PERLIN, libtcod.noise.FBM],
-    ["perlin turbulence", libtcod.NOISE_PERLIN, libtcod.noise.TURBULENCE],
-    ["simplex fbm", libtcod.NOISE_SIMPLEX, libtcod.noise.FBM],
-    ["simplex turbulence", libtcod.NOISE_SIMPLEX, libtcod.noise.TURBULENCE],
-    ["wavelet fbm", libtcod.NOISE_WAVELET, libtcod.noise.FBM],
-    ["wavelet turbulence", libtcod.NOISE_WAVELET, libtcod.noise.TURBULENCE],
+    ["perlin noise", tcod.NOISE_PERLIN, tcod.noise.SIMPLE],
+    ["simplex noise", tcod.NOISE_SIMPLEX, tcod.noise.SIMPLE],
+    ["wavelet noise", tcod.NOISE_WAVELET, tcod.noise.SIMPLE],
+    ["perlin fbm", tcod.NOISE_PERLIN, tcod.noise.FBM],
+    ["perlin turbulence", tcod.NOISE_PERLIN, tcod.noise.TURBULENCE],
+    ["simplex fbm", tcod.NOISE_SIMPLEX, tcod.noise.FBM],
+    ["simplex turbulence", tcod.NOISE_SIMPLEX, tcod.noise.TURBULENCE],
+    ["wavelet fbm", tcod.NOISE_WAVELET, tcod.noise.FBM],
+    ["wavelet turbulence", tcod.NOISE_WAVELET, tcod.noise.TURBULENCE],
 ]
 
 
@@ -402,10 +369,10 @@ class NoiseSample(Sample):
         self.dy = 0.0
         self.octaves = 4.0
         self.zoom = 3.0
-        self.hurst = libtcod.NOISE_DEFAULT_HURST
-        self.lacunarity = libtcod.NOISE_DEFAULT_LACUNARITY
+        self.hurst = tcod.NOISE_DEFAULT_HURST
+        self.lacunarity = tcod.NOISE_DEFAULT_LACUNARITY
         self.noise = self.get_noise()
-        self.img = libtcod.image_new(
+        self.img = tcod.image_new(
             SAMPLE_SCREEN_WIDTH * 2, SAMPLE_SCREEN_HEIGHT * 2
         )
 
@@ -418,7 +385,7 @@ class NoiseSample(Sample):
         return NOISE_OPTIONS[self.func][2]
 
     def get_noise(self):
-        return libtcod.noise.Noise(
+        return tcod.noise.Noise(
             2,
             self.algorithm,
             self.implementation,
@@ -429,7 +396,7 @@ class NoiseSample(Sample):
         )
 
     def on_enter(self):
-        libtcod.sys_set_fps(0)
+        tcod.sys_set_fps(0)
 
     def on_draw(self, delta_time):
         sample_console.clear()
@@ -445,14 +412,14 @@ class NoiseSample(Sample):
                 c = int((value + 1.0) / 2.0 * 255)
                 c = max(0, min(c, 255))
                 self.img.put_pixel(x, y, (c // 2, c // 2, c))
-        sample_console.default_bg = libtcod.grey
+        sample_console.default_bg = tcod.grey
         rectw = 24
         recth = 13
-        if self.implementation == libtcod.noise.SIMPLE:
+        if self.implementation == tcod.noise.SIMPLE:
             recth = 10
         self.img.blit_2x(sample_console, 0, 0)
-        sample_console.default_bg = libtcod.grey
-        sample_console.rect(2, 2, rectw, recth, False, libtcod.BKGND_MULTIPLY)
+        sample_console.default_bg = tcod.grey
+        sample_console.rect(2, 2, rectw, recth, False, tcod.BKGND_MULTIPLY)
         sample_console.fg[2 : 2 + recth, 2 : 2 + rectw] = (
             sample_console.fg[2 : 2 + recth, 2 : 2 + rectw]
             * sample_console.default_bg
@@ -462,17 +429,17 @@ class NoiseSample(Sample):
         for curfunc in range(len(NOISE_OPTIONS)):
             text = "%i : %s" % (curfunc + 1, NOISE_OPTIONS[curfunc][0])
             if curfunc == self.func:
-                sample_console.default_fg = libtcod.white
-                sample_console.default_bg = libtcod.light_blue
+                sample_console.default_fg = tcod.white
+                sample_console.default_bg = tcod.light_blue
                 sample_console.print_(
-                    2, 2 + curfunc, text, libtcod.BKGND_SET, libtcod.LEFT
+                    2, 2 + curfunc, text, tcod.BKGND_SET, tcod.LEFT
                 )
             else:
-                sample_console.default_fg = libtcod.grey
+                sample_console.default_fg = tcod.grey
                 sample_console.print_(2, 2 + curfunc, text)
-        sample_console.default_fg = libtcod.white
+        sample_console.default_fg = tcod.white
         sample_console.print_(2, 11, "Y/H : zoom (%2.1f)" % self.zoom)
-        if self.implementation != libtcod.noise.SIMPLE:
+        if self.implementation != tcod.noise.SIMPLE:
             sample_console.print_(2, 12, "E/D : hurst (%2.1f)" % self.hurst)
             sample_console.print_(
                 2, 13, "R/F : lacunarity (%2.1f)" % self.lacunarity
@@ -481,7 +448,7 @@ class NoiseSample(Sample):
                 2, 14, "T/G : octaves (%2.1f)" % self.octaves
             )
 
-    def ev_keydown(self, event):
+    def ev_keydown(self, event: tcod.event.KeyDown):
         if ord("9") >= event.sym >= ord("1"):
             self.func = event.sym - ord("1")
             self.noise = self.get_noise()
@@ -514,10 +481,10 @@ class NoiseSample(Sample):
 #############################################
 # field of view sample
 #############################################
-DARK_WALL = libtcod.Color(0, 0, 100)
-LIGHT_WALL = libtcod.Color(130, 110, 50)
-DARK_GROUND = libtcod.Color(50, 50, 150)
-LIGHT_GROUND = libtcod.Color(200, 180, 50)
+DARK_WALL = tcod.Color(0, 0, 100)
+LIGHT_WALL = tcod.Color(130, 110, 50)
+DARK_GROUND = tcod.Color(50, 50, 150)
+LIGHT_GROUND = tcod.Color(200, 180, 50)
 
 SAMPLE_MAP = [
     "##############################################",
@@ -578,9 +545,9 @@ class FOVSample(Sample):
         self.light_walls = True
         self.algo_num = 0
         # 1d noise for the torch flickering
-        self.noise = libtcod.noise_new(1, 1.0, 1.0)
+        self.noise = tcod.noise_new(1, 1.0, 1.0)
 
-        self.map = libtcod.map_new(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
+        self.map = tcod.map_new(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
         self.map.walkable[:] = SAMPLE_MAP[:] == " "
         self.map.transparent[:] = self.map.walkable[:] | (SAMPLE_MAP == "=")
 
@@ -594,8 +561,8 @@ class FOVSample(Sample):
         self.dark_map_bg[SAMPLE_MAP[:] == "#"] = DARK_WALL
 
     def draw_ui(self):
-        libtcod.console_set_default_foreground(sample_console, libtcod.white)
-        libtcod.console_print(
+        tcod.console_set_default_foreground(sample_console, tcod.white)
+        tcod.console_print(
             sample_console,
             1,
             1,
@@ -609,22 +576,22 @@ class FOVSample(Sample):
                 FOV_ALGO_NAMES[self.algo_num],
             ),
         )
-        libtcod.console_set_default_foreground(sample_console, libtcod.black)
+        tcod.console_set_default_foreground(sample_console, tcod.black)
 
     def on_enter(self):
-        libtcod.sys_set_fps(60)
+        tcod.sys_set_fps(60)
         # we draw the foreground only the first time.
         #  during the player movement, only the @ is redrawn.
         #  the rest impacts only the background color
         # draw the help text & player @
-        libtcod.console_clear(sample_console)
+        tcod.console_clear(sample_console)
         self.draw_ui()
-        libtcod.console_put_char(
-            sample_console, self.px, self.py, "@", libtcod.BKGND_NONE
+        tcod.console_put_char(
+            sample_console, self.px, self.py, "@", tcod.BKGND_NONE
         )
         # draw windows
-        sample_console.ch[np.where(SAMPLE_MAP == "=")] = libtcod.CHAR_DHLINE
-        sample_console.fg[np.where(SAMPLE_MAP == "=")] = libtcod.black
+        sample_console.ch[np.where(SAMPLE_MAP == "=")] = tcod.CHAR_DHLINE
+        sample_console.fg[np.where(SAMPLE_MAP == "=")] = tcod.black
 
     def on_draw(self, delta_time):
         dx = 0.0
@@ -645,15 +612,11 @@ class FOVSample(Sample):
             self.torchx += 0.1
             # randomize the light position between -1.5 and 1.5
             tdx = [self.torchx + 20.0]
-            dx = (
-                libtcod.noise_get(self.noise, tdx, libtcod.NOISE_SIMPLEX) * 1.5
-            )
+            dx = tcod.noise_get(self.noise, tdx, tcod.NOISE_SIMPLEX) * 1.5
             tdx[0] += 30.0
-            dy = (
-                libtcod.noise_get(self.noise, tdx, libtcod.NOISE_SIMPLEX) * 1.5
-            )
-            di = 0.2 * libtcod.noise_get(
-                self.noise, [self.torchx], libtcod.NOISE_SIMPLEX
+            dy = tcod.noise_get(self.noise, tdx, tcod.NOISE_SIMPLEX) * 1.5
+            di = 0.2 * tcod.noise_get(
+                self.noise, [self.torchx], tcod.NOISE_SIMPLEX
             )
             # where_fov = np.where(self.map.fov[:])
             mgrid = np.mgrid[:SAMPLE_SCREEN_HEIGHT, :SAMPLE_SCREEN_WIDTH]
@@ -671,7 +634,7 @@ class FOVSample(Sample):
             light[where_visible] = light[where_visible].clip(0, 1)
 
             for yx in zip(*where_visible):
-                sample_console.bg[yx] = libtcod.color_lerp(
+                sample_console.bg[yx] = tcod.color_lerp(
                     tuple(self.dark_map_bg[yx]),
                     tuple(self.light_map_bg[yx]),
                     light[yx],
@@ -680,7 +643,7 @@ class FOVSample(Sample):
             where_fov = np.where(self.map.fov[:])
             sample_console.bg[where_fov] = self.light_map_bg[where_fov]
 
-    def ev_keydown(self, event):
+    def ev_keydown(self, event: tcod.event.KeyDown):
         MOVE_KEYS = {
             ord("i"): (0, -1),
             ord("j"): (-1, 0),
@@ -691,13 +654,13 @@ class FOVSample(Sample):
         if event.sym in MOVE_KEYS:
             x, y = MOVE_KEYS[event.sym]
             if SAMPLE_MAP[self.py + y][self.px + x] == " ":
-                libtcod.console_put_char(
-                    sample_console, self.px, self.py, " ", libtcod.BKGND_NONE
+                tcod.console_put_char(
+                    sample_console, self.px, self.py, " ", tcod.BKGND_NONE
                 )
                 self.px += x
                 self.py += y
-                libtcod.console_put_char(
-                    sample_console, self.px, self.py, "@", libtcod.BKGND_NONE
+                tcod.console_put_char(
+                    sample_console, self.px, self.py, "@", tcod.BKGND_NONE
                 )
                 self.recompute = True
         elif event.sym == ord("t"):
@@ -710,7 +673,7 @@ class FOVSample(Sample):
             self.recompute = True
         elif event.sym in FOV_SELECT_KEYS:
             self.algo_num += FOV_SELECT_KEYS[event.sym]
-            self.algo_num %= libtcod.NB_FOV_ALGORITHMS
+            self.algo_num %= tcod.NB_FOV_ALGORITHMS
             self.draw_ui()
             self.recompute = True
         else:
@@ -739,239 +702,201 @@ class PathfindingSample(Sample):
         self.busy = 0.0
         self.oldchar = " "
 
-        self.map = libtcod.map_new(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
+        self.map = tcod.map_new(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
                 if SAMPLE_MAP[y][x] == " ":
                     # ground
-                    libtcod.map_set_properties(self.map, x, y, True, True)
+                    tcod.map_set_properties(self.map, x, y, True, True)
                 elif SAMPLE_MAP[y][x] == "=":
                     # window
-                    libtcod.map_set_properties(self.map, x, y, True, False)
-        self.path = libtcod.path_new_using_map(self.map)
-        self.dijk = libtcod.dijkstra_new(self.map)
+                    tcod.map_set_properties(self.map, x, y, True, False)
+        self.path = tcod.path_new_using_map(self.map)
+        self.dijk = tcod.dijkstra_new(self.map)
 
     def on_enter(self):
-        libtcod.sys_set_fps(60)
+        tcod.sys_set_fps(60)
         # we draw the foreground only the first time.
         #  during the player movement, only the @ is redrawn.
         #  the rest impacts only the background color
         # draw the help text & player @
-        libtcod.console_clear(sample_console)
-        libtcod.console_set_default_foreground(sample_console, libtcod.white)
-        libtcod.console_put_char(
-            sample_console, self.dx, self.dy, "+", libtcod.BKGND_NONE
+        tcod.console_clear(sample_console)
+        tcod.console_set_default_foreground(sample_console, tcod.white)
+        tcod.console_put_char(
+            sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE
         )
-        libtcod.console_put_char(
-            sample_console, self.px, self.py, "@", libtcod.BKGND_NONE
+        tcod.console_put_char(
+            sample_console, self.px, self.py, "@", tcod.BKGND_NONE
         )
-        libtcod.console_print(
+        tcod.console_print(
             sample_console,
             1,
             1,
             "IJKL / mouse :\nmove destination\nTAB : A*/dijkstra",
         )
-        libtcod.console_print(sample_console, 1, 4, "Using : A*")
+        tcod.console_print(sample_console, 1, 4, "Using : A*")
         # draw windows
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
                 if SAMPLE_MAP[y][x] == "=":
-                    libtcod.console_put_char(
-                        sample_console,
-                        x,
-                        y,
-                        libtcod.CHAR_DHLINE,
-                        libtcod.BKGND_NONE,
+                    tcod.console_put_char(
+                        sample_console, x, y, tcod.CHAR_DHLINE, tcod.BKGND_NONE
                     )
         self.recalculate = True
 
     def on_draw(self, delta_time):
         if self.recalculate:
             if self.using_astar:
-                libtcod.path_compute(
+                tcod.path_compute(
                     self.path, self.px, self.py, self.dx, self.dy
                 )
             else:
                 self.dijk_dist = 0.0
                 # compute dijkstra grid (distance from px,py)
-                libtcod.dijkstra_compute(self.dijk, self.px, self.py)
+                tcod.dijkstra_compute(self.dijk, self.px, self.py)
                 # get the maximum distance (needed for rendering)
                 for y in range(SAMPLE_SCREEN_HEIGHT):
                     for x in range(SAMPLE_SCREEN_WIDTH):
-                        d = libtcod.dijkstra_get_distance(self.dijk, x, y)
+                        d = tcod.dijkstra_get_distance(self.dijk, x, y)
                         if d > self.dijk_dist:
                             self.dijk_dist = d
                 # compute path from px,py to dx,dy
-                libtcod.dijkstra_path_set(self.dijk, self.dx, self.dy)
+                tcod.dijkstra_path_set(self.dijk, self.dx, self.dy)
             self.recalculate = False
             self.busy = 0.2
         # draw the dungeon
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
                 if SAMPLE_MAP[y][x] == "#":
-                    libtcod.console_set_char_background(
-                        sample_console, x, y, DARK_WALL, libtcod.BKGND_SET
+                    tcod.console_set_char_background(
+                        sample_console, x, y, DARK_WALL, tcod.BKGND_SET
                     )
                 else:
-                    libtcod.console_set_char_background(
-                        sample_console, x, y, DARK_GROUND, libtcod.BKGND_SET
+                    tcod.console_set_char_background(
+                        sample_console, x, y, DARK_GROUND, tcod.BKGND_SET
                     )
         # draw the path
         if self.using_astar:
-            for i in range(libtcod.path_size(self.path)):
-                x, y = libtcod.path_get(self.path, i)
-                libtcod.console_set_char_background(
-                    sample_console, x, y, LIGHT_GROUND, libtcod.BKGND_SET
+            for i in range(tcod.path_size(self.path)):
+                x, y = tcod.path_get(self.path, i)
+                tcod.console_set_char_background(
+                    sample_console, x, y, LIGHT_GROUND, tcod.BKGND_SET
                 )
         else:
             for y in range(SAMPLE_SCREEN_HEIGHT):
                 for x in range(SAMPLE_SCREEN_WIDTH):
                     if SAMPLE_MAP[y][x] != "#":
-                        libtcod.console_set_char_background(
+                        tcod.console_set_char_background(
                             sample_console,
                             x,
                             y,
-                            libtcod.color_lerp(
+                            tcod.color_lerp(
                                 LIGHT_GROUND,
                                 DARK_GROUND,
                                 0.9
-                                * libtcod.dijkstra_get_distance(
-                                    self.dijk, x, y
-                                )
+                                * tcod.dijkstra_get_distance(self.dijk, x, y)
                                 / self.dijk_dist,
                             ),
-                            libtcod.BKGND_SET,
+                            tcod.BKGND_SET,
                         )
-            for i in range(libtcod.dijkstra_size(self.dijk)):
-                x, y = libtcod.dijkstra_get(self.dijk, i)
-                libtcod.console_set_char_background(
-                    sample_console, x, y, LIGHT_GROUND, libtcod.BKGND_SET
+            for i in range(tcod.dijkstra_size(self.dijk)):
+                x, y = tcod.dijkstra_get(self.dijk, i)
+                tcod.console_set_char_background(
+                    sample_console, x, y, LIGHT_GROUND, tcod.BKGND_SET
                 )
 
         # move the creature
-        self.busy -= libtcod.sys_get_last_frame_length()
+        self.busy -= tcod.sys_get_last_frame_length()
         if self.busy <= 0.0:
             self.busy = 0.2
             if self.using_astar:
-                if not libtcod.path_is_empty(self.path):
-                    libtcod.console_put_char(
-                        sample_console,
-                        self.px,
-                        self.py,
-                        " ",
-                        libtcod.BKGND_NONE,
+                if not tcod.path_is_empty(self.path):
+                    tcod.console_put_char(
+                        sample_console, self.px, self.py, " ", tcod.BKGND_NONE
                     )
-                    self.px, self.py = libtcod.path_walk(self.path, True)
-                    libtcod.console_put_char(
-                        sample_console,
-                        self.px,
-                        self.py,
-                        "@",
-                        libtcod.BKGND_NONE,
+                    self.px, self.py = tcod.path_walk(self.path, True)
+                    tcod.console_put_char(
+                        sample_console, self.px, self.py, "@", tcod.BKGND_NONE
                     )
             else:
-                if not libtcod.dijkstra_is_empty(self.dijk):
-                    libtcod.console_put_char(
-                        sample_console,
-                        self.px,
-                        self.py,
-                        " ",
-                        libtcod.BKGND_NONE,
+                if not tcod.dijkstra_is_empty(self.dijk):
+                    tcod.console_put_char(
+                        sample_console, self.px, self.py, " ", tcod.BKGND_NONE
                     )
-                    self.px, self.py = libtcod.dijkstra_path_walk(self.dijk)
-                    libtcod.console_put_char(
-                        sample_console,
-                        self.px,
-                        self.py,
-                        "@",
-                        libtcod.BKGND_NONE,
+                    self.px, self.py = tcod.dijkstra_path_walk(self.dijk)
+                    tcod.console_put_char(
+                        sample_console, self.px, self.py, "@", tcod.BKGND_NONE
                     )
                     self.recalculate = True
 
-    def ev_keydown(self, event):
+    def ev_keydown(self, event: tcod.event.KeyDown):
         if event.sym == ord("i") and self.dy > 0:
             # destination move north
-            libtcod.console_put_char(
-                sample_console,
-                self.dx,
-                self.dy,
-                self.oldchar,
-                libtcod.BKGND_NONE,
+            tcod.console_put_char(
+                sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE
             )
             self.dy -= 1
-            self.oldchar = libtcod.console_get_char(
+            self.oldchar = tcod.console_get_char(
                 sample_console, self.dx, self.dy
             )
-            libtcod.console_put_char(
-                sample_console, self.dx, self.dy, "+", libtcod.BKGND_NONE
+            tcod.console_put_char(
+                sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE
             )
             if SAMPLE_MAP[self.dy][self.dx] == " ":
                 self.recalculate = True
         elif event.sym == ord("k") and self.dy < SAMPLE_SCREEN_HEIGHT - 1:
             # destination move south
-            libtcod.console_put_char(
-                sample_console,
-                self.dx,
-                self.dy,
-                self.oldchar,
-                libtcod.BKGND_NONE,
+            tcod.console_put_char(
+                sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE
             )
             self.dy += 1
-            self.oldchar = libtcod.console_get_char(
+            self.oldchar = tcod.console_get_char(
                 sample_console, self.dx, self.dy
             )
-            libtcod.console_put_char(
-                sample_console, self.dx, self.dy, "+", libtcod.BKGND_NONE
+            tcod.console_put_char(
+                sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE
             )
             if SAMPLE_MAP[self.dy][self.dx] == " ":
                 self.recalculate = True
         elif event.sym == ord("j") and self.dx > 0:
             # destination move west
-            libtcod.console_put_char(
-                sample_console,
-                self.dx,
-                self.dy,
-                self.oldchar,
-                libtcod.BKGND_NONE,
+            tcod.console_put_char(
+                sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE
             )
             self.dx -= 1
-            self.oldchar = libtcod.console_get_char(
+            self.oldchar = tcod.console_get_char(
                 sample_console, self.dx, self.dy
             )
-            libtcod.console_put_char(
-                sample_console, self.dx, self.dy, "+", libtcod.BKGND_NONE
+            tcod.console_put_char(
+                sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE
             )
             if SAMPLE_MAP[self.dy][self.dx] == " ":
                 self.recalculate = True
         elif event.sym == ord("l") and self.dx < SAMPLE_SCREEN_WIDTH - 1:
             # destination move east
-            libtcod.console_put_char(
-                sample_console,
-                self.dx,
-                self.dy,
-                self.oldchar,
-                libtcod.BKGND_NONE,
+            tcod.console_put_char(
+                sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE
             )
             self.dx += 1
-            self.oldchar = libtcod.console_get_char(
+            self.oldchar = tcod.console_get_char(
                 sample_console, self.dx, self.dy
             )
-            libtcod.console_put_char(
-                sample_console, self.dx, self.dy, "+", libtcod.BKGND_NONE
+            tcod.console_put_char(
+                sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE
             )
             if SAMPLE_MAP[self.dy][self.dx] == " ":
                 self.recalculate = True
         elif event.sym == tcod.event.K_TAB:
             self.using_astar = not self.using_astar
             if self.using_astar:
-                libtcod.console_print(sample_console, 1, 4, "Using : A*      ")
+                tcod.console_print(sample_console, 1, 4, "Using : A*      ")
             else:
-                libtcod.console_print(sample_console, 1, 4, "Using : Dijkstra")
+                tcod.console_print(sample_console, 1, 4, "Using : Dijkstra")
             self.recalculate = True
         else:
             super().ev_keydown(event)
 
-    def ev_mousemotion(self, event):
+    def ev_mousemotion(self, event: tcod.event.MouseMotion):
         mx = event.tile.x - SAMPLE_SCREEN_X
         my = event.tile.y - SAMPLE_SCREEN_Y
         if (
@@ -979,20 +904,16 @@ class PathfindingSample(Sample):
             and 0 <= my < SAMPLE_SCREEN_HEIGHT
             and (self.dx != mx or self.dy != my)
         ):
-            libtcod.console_put_char(
-                sample_console,
-                self.dx,
-                self.dy,
-                self.oldchar,
-                libtcod.BKGND_NONE,
+            tcod.console_put_char(
+                sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE
             )
             self.dx = mx
             self.dy = my
-            self.oldchar = libtcod.console_get_char(
+            self.oldchar = tcod.console_get_char(
                 sample_console, self.dx, self.dy
             )
-            libtcod.console_put_char(
-                sample_console, self.dx, self.dy, "+", libtcod.BKGND_NONE
+            tcod.console_put_char(
+                sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE
             )
             if SAMPLE_MAP[self.dy][self.dx] == " ":
                 self.recalculate = True
@@ -1151,7 +1072,7 @@ class BSPSample(Sample):
 
     def on_draw(self, delta_time):
         sample_console.clear()
-        sample_console.default_fg = libtcod.white
+        sample_console.default_fg = tcod.white
         rooms = "OFF"
         if bsp_random_room:
             rooms = "ON"
@@ -1173,11 +1094,11 @@ class BSPSample(Sample):
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
                 color = DARK_GROUND if self.bsp_map[x][y] else DARK_WALL
-                libtcod.console_set_char_background(
-                    sample_console, x, y, color, libtcod.BKGND_SET
+                tcod.console_set_char_background(
+                    sample_console, x, y, color, tcod.BKGND_SET
                 )
 
-    def ev_keydown(self, event):
+    def ev_keydown(self, event: tcod.event.KeyDown):
         global bsp_random_room, bsp_room_walls, bsp_depth, bsp_min_room_size
         if event.sym in (tcod.event.K_RETURN, tcod.event.K_KP_ENTER):
             self.bsp_generate()
@@ -1210,23 +1131,21 @@ class BSPSample(Sample):
 #############################################
 # image sample
 #############################################
-img_blue = libtcod.Color(0, 0, 255)
-img_green = libtcod.Color(0, 255, 0)
 
 
 class ImageSample(Sample):
     def __init__(self):
         self.name = "Image toolkit"
 
-        self.img = libtcod.image_load("data/img/skull.png")
-        self.img.set_key_color(libtcod.black)
-        self.circle = libtcod.image_load("data/img/circle.png")
+        self.img = tcod.image_load("data/img/skull.png")
+        self.img.set_key_color(tcod.black)
+        self.circle = tcod.image_load("data/img/circle.png")
 
     def on_enter(self):
-        libtcod.sys_set_fps(0)
+        tcod.sys_set_fps(0)
 
     def on_draw(self, delta_time):
-        sample_console.default_bg = libtcod.black
+        sample_console.default_bg = tcod.black
         sample_console.clear()
         x = sample_console.width / 2 + math.cos(time.time()) * 10.0
         y = sample_console.height / 2
@@ -1236,37 +1155,35 @@ class ImageSample(Sample):
         if int(time.time() / 2):
             # split the color channels of circle.png
             # the red channel
-            sample_console.default_bg = libtcod.red
+            sample_console.default_bg = (255, 0, 0)
 
-            sample_console.rect(0, 3, 15, 15, False, libtcod.BKGND_SET)
+            sample_console.rect(0, 3, 15, 15, False, tcod.BKGND_SET)
             self.circle.blit_rect(
-                sample_console, 0, 3, -1, -1, libtcod.BKGND_MULTIPLY
+                sample_console, 0, 3, -1, -1, tcod.BKGND_MULTIPLY
             )
             # the green channel
-            sample_console.default_bg = img_green
-            sample_console.rect(15, 3, 15, 15, False, libtcod.BKGND_SET)
+            sample_console.default_bg = (0, 255, 0)
+            sample_console.rect(15, 3, 15, 15, False, tcod.BKGND_SET)
             self.circle.blit_rect(
-                sample_console, 15, 3, -1, -1, libtcod.BKGND_MULTIPLY
+                sample_console, 15, 3, -1, -1, tcod.BKGND_MULTIPLY
             )
             # the blue channel
-            sample_console.default_bg = img_blue
-            sample_console.rect(30, 3, 15, 15, False, libtcod.BKGND_SET)
+            sample_console.default_bg = (0, 0, 255)
+            sample_console.rect(30, 3, 15, 15, False, tcod.BKGND_SET)
             self.circle.blit_rect(
-                sample_console, 30, 3, -1, -1, libtcod.BKGND_MULTIPLY
+                sample_console, 30, 3, -1, -1, tcod.BKGND_MULTIPLY
             )
         else:
             # render circle.png with normal blitting
+            self.circle.blit_rect(sample_console, 0, 3, -1, -1, tcod.BKGND_SET)
             self.circle.blit_rect(
-                sample_console, 0, 3, -1, -1, libtcod.BKGND_SET
+                sample_console, 15, 3, -1, -1, tcod.BKGND_SET
             )
             self.circle.blit_rect(
-                sample_console, 15, 3, -1, -1, libtcod.BKGND_SET
-            )
-            self.circle.blit_rect(
-                sample_console, 30, 3, -1, -1, libtcod.BKGND_SET
+                sample_console, 30, 3, -1, -1, tcod.BKGND_SET
             )
         self.img.blit(
-            sample_console, x, y, libtcod.BKGND_SET, scalex, scaley, angle
+            sample_console, x, y, tcod.BKGND_SET, scalex, scaley, angle
         )
 
 
@@ -1285,16 +1202,16 @@ class MouseSample(Sample):
         self.log = []
 
     def on_enter(self):
-        sample_console.default_bg = libtcod.grey
-        sample_console.default_fg = libtcod.light_yellow
-        libtcod.mouse_move(320, 200)
-        libtcod.mouse_show_cursor(True)
-        libtcod.sys_set_fps(60)
+        sample_console.default_bg = tcod.grey
+        sample_console.default_fg = tcod.light_yellow
+        tcod.mouse_move(320, 200)
+        tcod.mouse_show_cursor(True)
+        tcod.sys_set_fps(60)
 
-    def ev_mousemotion(self, event):
+    def ev_mousemotion(self, event: tcod.event.MouseMotion):
         self.motion = event
 
-    def ev_mousebuttondown(self, event):
+    def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown):
         if event.button == tcod.event.BUTTON_LEFT:
             self.lbut = True
         elif event.button == tcod.event.BUTTON_MIDDLE:
@@ -1302,7 +1219,7 @@ class MouseSample(Sample):
         elif event.button == tcod.event.BUTTON_RIGHT:
             self.rbut = True
 
-    def ev_mousebuttonup(self, event):
+    def ev_mousebuttonup(self, event: tcod.event.MouseButtonUp):
         if event.button == tcod.event.BUTTON_LEFT:
             self.lbut = False
         elif event.button == tcod.event.BUTTON_MIDDLE:
@@ -1335,11 +1252,11 @@ class MouseSample(Sample):
         )
         sample_console.print_(1, 10, "1 : Hide cursor\n2 : Show cursor")
 
-    def ev_keydown(self, event):
+    def ev_keydown(self, event: tcod.event.KeyDown):
         if event.sym == ord("1"):
-            libtcod.mouse_show_cursor(False)
+            tcod.mouse_show_cursor(False)
         elif event.sym == ord("2"):
-            libtcod.mouse_show_cursor(True)
+            tcod.mouse_show_cursor(True)
         else:
             super().ev_keydown(event)
 
@@ -1360,24 +1277,22 @@ class NameGeneratorSample(Sample):
         self.sets = None
 
     def on_enter(self):
-        libtcod.sys_set_fps(60)
+        tcod.sys_set_fps(60)
 
     def on_draw(self, delta_time):
         if self.nbsets == 0:
             # parse all *.cfg files in data/namegen
-            for file in os.listdir(b"data/namegen"):
-                if file.find(b".cfg") > 0:
-                    libtcod.namegen_parse(
-                        os.path.join(b"data", b"namegen", file)
-                    )
+            for file in os.listdir("data/namegen"):
+                if file.find(".cfg") > 0:
+                    tcod.namegen_parse(os.path.join("data/namegen", file))
             # get the sets list
-            self.sets = libtcod.namegen_get_sets()
+            self.sets = tcod.namegen_get_sets()
             print(self.sets)
             self.nbsets = len(self.sets)
         while len(self.names) > 15:
             self.names.pop(0)
         sample_console.clear()
-        sample_console.default_fg = libtcod.white
+        sample_console.default_fg = tcod.white
         sample_console.print_(
             1,
             1,
@@ -1389,15 +1304,15 @@ class NameGeneratorSample(Sample):
                 SAMPLE_SCREEN_WIDTH - 2,
                 2 + i,
                 self.names[i],
-                libtcod.BKGND_NONE,
-                libtcod.RIGHT,
+                tcod.BKGND_NONE,
+                tcod.RIGHT,
             )
-        self.delay += libtcod.sys_get_last_frame_length()
+        self.delay += tcod.sys_get_last_frame_length()
         if self.delay > 0.5:
             self.delay -= 0.5
-            self.names.append(libtcod.namegen_generate(self.sets[self.curset]))
+            self.names.append(tcod.namegen_generate(self.sets[self.curset]))
 
-    def ev_keydown(self, event):
+    def ev_keydown(self, event: tcod.event.KeyDown):
         if event.sym == ord("="):
             self.curset += 1
             if self.curset == self.nbsets:
@@ -1446,7 +1361,7 @@ if numpy_available:
     xc = xc - HALF_W
     yc = yc - HALF_H
 
-noise2d = libtcod.noise_new(2, 0.5, 2.0)
+noise2d = tcod.noise_new(2, 0.5, 2.0)
 if numpy_available:  # the texture starts empty
     texture = np.zeros((RES_U, RES_V))
 
@@ -1464,9 +1379,9 @@ class FastRenderSample(Sample):
 
     def on_enter(self):
         global frac_t, abs_t, lights, tex_r, tex_g, tex_b
-        libtcod.sys_set_fps(0)
+        tcod.sys_set_fps(0)
         sample_console.clear()  # render status message
-        sample_console.default_fg = libtcod.white
+        sample_console.default_fg = tcod.white
         sample_console.print_(1, SCREEN_H - 3, "Renderer: NumPy")
 
         frac_t = (
@@ -1479,9 +1394,7 @@ class FastRenderSample(Sample):
     def on_draw(self, delta_time):
         global use_numpy, frac_t, abs_t, lights, tex_r, tex_g, tex_b, xc, yc, texture, texture2, brightness2, R2, G2, B2
 
-        time_delta = (
-            libtcod.sys_get_last_frame_length() * SPEED
-        )  # advance time
+        time_delta = tcod.sys_get_last_frame_length() * SPEED  # advance time
         frac_t += time_delta  # increase fractional (always < 1.0) time
         abs_t += time_delta  # increase absolute elapsed time
         int_t = int(
@@ -1520,9 +1433,9 @@ class FastRenderSample(Sample):
             for v in range(RES_V - int_t, RES_V):
                 for u in range(0, RES_U):
                     tex_v = (v + int_abs_t) / float(RES_V)
-                    texture[u, v] = libtcod.noise_get_fbm(
+                    texture[u, v] = tcod.noise_get_fbm(
                         noise2d, [u / float(RES_U), tex_v], 32.0
-                    ) + libtcod.noise_get_fbm(
+                    ) + tcod.noise_get_fbm(
                         noise2d, [1 - u / float(RES_U), tex_v], 32.0
                     )
 
@@ -1555,11 +1468,9 @@ class FastRenderSample(Sample):
             y = random.uniform(-0.5, 0.5)
             strength = random.uniform(MIN_LIGHT_STRENGTH, 1.0)
 
-            color = libtcod.Color(
-                0, 0, 0
-            )  # create bright colors with random hue
-            hue = random.uniform(0, 0, 360)
-            libtcod.color_set_hsv(color, hue, 0.5, strength)
+            color = tcod.Color(0, 0, 0)  # create bright colors with random hue
+            hue = random.uniform(0, 360)
+            tcod.color_set_hsv(color, hue, 0.5, strength)
             lights.append(
                 Light(x, y, TEX_STRETCH, color.r, color.g, color.b, strength)
             )
@@ -1603,11 +1514,11 @@ class FastRenderSample(Sample):
 #############################################
 
 RENDERER_KEYS = {
-    tcod.event.K_F1: libtcod.RENDERER_GLSL,
-    tcod.event.K_F2: libtcod.RENDERER_OPENGL,
-    tcod.event.K_F3: libtcod.RENDERER_SDL,
-    tcod.event.K_F4: libtcod.RENDERER_SDL2,
-    tcod.event.K_F5: libtcod.RENDERER_OPENGL2,
+    tcod.event.K_F1: tcod.RENDERER_GLSL,
+    tcod.event.K_F2: tcod.RENDERER_OPENGL,
+    tcod.event.K_F3: tcod.RENDERER_SDL,
+    tcod.event.K_F4: tcod.RENDERER_SDL2,
+    tcod.event.K_F5: tcod.RENDERER_OPENGL2,
 }
 
 RENDERER_NAMES = (
@@ -1642,7 +1553,7 @@ def main():
     draw_samples_menu()
     draw_renderer_menu()
 
-    while not libtcod.console_is_window_closed():
+    while not tcod.console_is_window_closed():
         root_console.default_fg = (255, 255, 255)
         root_console.default_bg = (0, 0, 0)
         root_console.clear()
@@ -1650,21 +1561,13 @@ def main():
         draw_renderer_menu()
         # render credits
         if not credits_end:
-            credits_end = libtcod.console_credits_render(60, 43, 0)
+            credits_end = tcod.console_credits_render(60, 43, 0)
 
         # render the sample
-        SAMPLES[cur_sample].on_draw(libtcod.sys_get_last_frame_length())
-        sample_console.blit(
-            root_console,
-            SAMPLE_SCREEN_X,
-            SAMPLE_SCREEN_Y,
-            0,
-            0,
-            sample_console.width,
-            sample_console.height,
-        )
+        SAMPLES[cur_sample].on_draw(tcod.sys_get_last_frame_length())
+        sample_console.blit(root_console, SAMPLE_SCREEN_X, SAMPLE_SCREEN_Y)
         draw_stats()
-        libtcod.console_flush()
+        tcod.console_flush()
         handle_events()
 
 
@@ -1676,67 +1579,60 @@ def handle_events():
 def draw_samples_menu():
     for i, sample in enumerate(SAMPLES):
         if i == cur_sample:
-            root_console.default_fg = libtcod.white
-            root_console.default_bg = libtcod.light_blue
+            root_console.default_fg = tcod.white
+            root_console.default_bg = tcod.light_blue
         else:
-            root_console.default_fg = libtcod.grey
-            root_console.default_bg = libtcod.black
+            root_console.default_fg = tcod.grey
+            root_console.default_bg = tcod.black
         root_console.print_(
             2,
             46 - (len(SAMPLES) - i),
             "  %s" % sample.name.ljust(19),
-            libtcod.BKGND_SET,
-            libtcod.LEFT,
+            tcod.BKGND_SET,
+            tcod.LEFT,
         )
 
 
 def draw_stats():
-    root_console.default_fg = libtcod.grey
+    root_console.default_fg = tcod.grey
     root_console.print_(
         79,
         46,
         " last frame : %3d ms (%3d fps)"
-        % (
-            libtcod.sys_get_last_frame_length() * 1000.0,
-            libtcod.sys_get_fps(),
-        ),
-        libtcod.BKGND_NONE,
-        libtcod.RIGHT,
+        % (tcod.sys_get_last_frame_length() * 1000.0, tcod.sys_get_fps()),
+        tcod.BKGND_NONE,
+        tcod.RIGHT,
     )
     root_console.print_(
         79,
         47,
         "elapsed : %8d ms %4.2fs"
         % (time.perf_counter() * 1000, time.perf_counter()),
-        libtcod.BKGND_NONE,
-        libtcod.RIGHT,
+        tcod.BKGND_NONE,
+        tcod.RIGHT,
     )
 
 
 def draw_renderer_menu():
-    current_renderer = libtcod.sys_get_renderer()
-    root_console.default_fg = libtcod.grey
-    root_console.default_bg = libtcod.black
+    current_renderer = tcod.sys_get_renderer()
+    root_console.default_fg = tcod.grey
+    root_console.default_bg = tcod.black
     root_console.print_(
         42,
-        46 - (libtcod.NB_RENDERERS + 1),
+        46 - (tcod.NB_RENDERERS + 1),
         "Renderer :",
-        libtcod.BKGND_SET,
-        libtcod.LEFT,
+        tcod.BKGND_SET,
+        tcod.LEFT,
     )
     for i, name in enumerate(RENDERER_NAMES):
         if i == current_renderer:
-            root_console.default_fg = libtcod.white
-            root_console.default_bg = libtcod.light_blue
+            root_console.default_fg = tcod.white
+            root_console.default_bg = tcod.light_blue
         else:
-            root_console.default_fg = libtcod.grey
-            root_console.default_bg = libtcod.black
+            root_console.default_fg = tcod.grey
+            root_console.default_bg = tcod.black
         root_console.print_(
-            42,
-            46 - (libtcod.NB_RENDERERS - i),
-            name,
-            libtcod.BKGND_SET,
-            libtcod.LEFT,
+            42, 46 - (tcod.NB_RENDERERS - i), name, tcod.BKGND_SET, tcod.LEFT
         )
 
 
