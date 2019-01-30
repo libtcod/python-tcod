@@ -38,7 +38,7 @@ class Sample(tcod.event.EventDispatch):
     def on_enter(self):
         pass
 
-    def on_draw(self, delta_time: int):
+    def on_draw(self):
         pass
 
     def ev_keydown(self, event: tcod.event.KeyDown):
@@ -100,7 +100,7 @@ class TrueColorSample(Sample):
         tcod.sys_set_fps(0)
         sample_console.clear()
 
-    def on_draw(self, delta_time):
+    def on_draw(self):
         self.slide_corner_colors()
         self.interpolate_corner_colors()
         self.darken_background_characters()
@@ -202,14 +202,14 @@ class OffscreenConsoleSample(Sample):
         )
 
     def on_enter(self):
+        self.counter = time.perf_counter()
         tcod.sys_set_fps(0)
         # get a "screenshot" of the current sample screen
-        sample_console.blit(self.screenshot)
+        sample_console.blit(dest=self.screenshot)
 
-    def on_draw(self, delta_time):
-        self.counter += delta_time * 1.5
-        if self.counter >= 1:
-            self.counter -= 1
+    def on_draw(self):
+        if time.perf_counter() - self.counter >= 1:
+            self.counter = time.perf_counter()
             self.x += self.xdir
             self.y += self.ydir
             if self.x == sample_console.width / 2 + 5:
@@ -288,7 +288,7 @@ class LineDrawingSample(Sample):
         tcod.sys_set_fps(0)
         sample_console.default_fg = tcod.white
 
-    def on_draw(self, delta_time):
+    def on_draw(self):
         alpha = 0.0
         if (self.bk_flag & 0xFF) == tcod.BKGND_ALPH:
             # for the alpha mode, update alpha every frame
@@ -398,10 +398,10 @@ class NoiseSample(Sample):
     def on_enter(self):
         tcod.sys_set_fps(0)
 
-    def on_draw(self, delta_time):
+    def on_draw(self):
         sample_console.clear()
-        self.dx += delta_time * 0.25
-        self.dy += delta_time * 0.25
+        self.dx = time.perf_counter() * 0.25
+        self.dy = time.perf_counter() * 0.25
         for y in range(2 * sample_console.height):
             for x in range(2 * sample_console.width):
                 f = [
@@ -593,7 +593,7 @@ class FOVSample(Sample):
         sample_console.ch[np.where(SAMPLE_MAP == "=")] = tcod.CHAR_DHLINE
         sample_console.fg[np.where(SAMPLE_MAP == "=")] = tcod.black
 
-    def on_draw(self, delta_time):
+    def on_draw(self):
         dx = 0.0
         dy = 0.0
         di = 0.0
@@ -744,7 +744,7 @@ class PathfindingSample(Sample):
                     )
         self.recalculate = True
 
-    def on_draw(self, delta_time):
+    def on_draw(self):
         if self.recalculate:
             if self.using_astar:
                 tcod.path_compute(
@@ -1070,7 +1070,7 @@ class BSPSample(Sample):
         for node in copy.deepcopy(self.bsp).inverted_level_order():
             traverse_node(self.bsp_map, node)
 
-    def on_draw(self, delta_time):
+    def on_draw(self):
         sample_console.clear()
         sample_console.default_fg = tcod.white
         rooms = "OFF"
@@ -1144,7 +1144,7 @@ class ImageSample(Sample):
     def on_enter(self):
         tcod.sys_set_fps(0)
 
-    def on_draw(self, delta_time):
+    def on_draw(self):
         sample_console.default_bg = tcod.black
         sample_console.clear()
         x = sample_console.width / 2 + math.cos(time.time()) * 10.0
@@ -1227,7 +1227,7 @@ class MouseSample(Sample):
         elif event.button == tcod.event.BUTTON_RIGHT:
             self.rbut = False
 
-    def on_draw(self, delta_time):
+    def on_draw(self):
         sample_console.clear()
         sample_console.print_(
             1,
@@ -1279,7 +1279,7 @@ class NameGeneratorSample(Sample):
     def on_enter(self):
         tcod.sys_set_fps(60)
 
-    def on_draw(self, delta_time):
+    def on_draw(self):
         if self.nbsets == 0:
             # parse all *.cfg files in data/namegen
             for file in os.listdir("data/namegen"):
@@ -1391,7 +1391,7 @@ class FastRenderSample(Sample):
         lights = []  # lights list, and current color of the tunnel texture
         tex_r, tex_g, tex_b = 0, 0, 0
 
-    def on_draw(self, delta_time):
+    def on_draw(self):
         global use_numpy, frac_t, abs_t, lights, tex_r, tex_g, tex_b, xc, yc, texture, texture2, brightness2, R2, G2, B2
 
         time_delta = tcod.sys_get_last_frame_length() * SPEED  # advance time
@@ -1564,7 +1564,7 @@ def main():
             credits_end = tcod.console_credits_render(60, 43, 0)
 
         # render the sample
-        SAMPLES[cur_sample].on_draw(tcod.sys_get_last_frame_length())
+        SAMPLES[cur_sample].on_draw()
         sample_console.blit(root_console, SAMPLE_SCREEN_X, SAMPLE_SCREEN_Y)
         draw_stats()
         tcod.console_flush()
