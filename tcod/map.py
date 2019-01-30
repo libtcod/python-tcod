@@ -30,6 +30,8 @@ Example::
     False
 
 """
+from typing import Any
+
 import numpy as np
 
 from tcod.libtcod import lib, ffi
@@ -60,7 +62,7 @@ class Map(object):
 
     """
 
-    def __init__(self, width, height, order="C"):
+    def __init__(self, width: int, height: int, order: str = "C"):
         self.width = width
         self.height = height
         self._order = tcod._internal.verify_order(order)
@@ -68,7 +70,7 @@ class Map(object):
         self.__buffer = np.zeros((height, width, 3), dtype=np.bool_)
         self.map_c = self.__as_cdata()
 
-    def __as_cdata(self):
+    def __as_cdata(self) -> Any:
         return ffi.new(
             "struct TCOD_Map*",
             (
@@ -80,29 +82,28 @@ class Map(object):
         )
 
     @property
-    def transparent(self):
+    def transparent(self) -> np.array:
         buffer = self.__buffer[:, :, 0]
         return buffer.T if self._order == "F" else buffer
 
     @property
-    def walkable(self):
+    def walkable(self) -> np.array:
         buffer = self.__buffer[:, :, 1]
         return buffer.T if self._order == "F" else buffer
 
     @property
-    def fov(self):
+    def fov(self) -> np.array:
         buffer = self.__buffer[:, :, 2]
         return buffer.T if self._order == "F" else buffer
 
     def compute_fov(
         self,
-        x,
-        y,
-        radius=0,
-        light_walls=True,
-        algorithm=tcod.constants.FOV_RESTRICTIVE,
+        x: int,
+        y: int,
+        radius: int = 0,
+        light_walls: bool = True,
+        algorithm: int = tcod.constants.FOV_RESTRICTIVE,
     ):
-        # type (int, int, int, bool, int) -> None
         """Compute a field-of-view on the current instance.
 
         Args:

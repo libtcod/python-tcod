@@ -436,7 +436,16 @@ class Mouse(_CDataWrapper):
     """
 
     def __init__(
-        self, x=0, y=0, dx=0, dy=0, cx=0, cy=0, dcx=0, dcy=0, **kargs
+        self,
+        x: int = 0,
+        y: int = 0,
+        dx: int = 0,
+        dy: int = 0,
+        cx: int = 0,
+        cy: int = 0,
+        dcx: int = 0,
+        dcy: int = 0,
+        **kargs
     ):
         if isinstance(x, ffi.CData):
             self.cdata = x
@@ -771,7 +780,7 @@ Color(153, 76, 0), Color(204, 102, 0), Color(255, 128, 0)]
 def console_init_root(
     w: int,
     h: int,
-    title: Optional[AnyStr] = None,
+    title: Optional[str] = None,
     fullscreen: bool = False,
     renderer: Optional[int] = None,
     order: str = "C",
@@ -810,8 +819,7 @@ def console_init_root(
         title = os.path.basename(sys.argv[0])
     if renderer is None:
         renderer = RENDERER_GLSL  # Stable for now.
-    title = _bytes(title)
-    lib.TCOD_console_init_root(w, h, title, fullscreen, renderer)
+    lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
     return tcod.console.Console._get_root(order)
 
 
@@ -846,9 +854,8 @@ def console_set_custom_font(
         raise RuntimeError(
             "File not found:\n\t%s" % (os.path.realpath(fontFile),)
         )
-    fontFile = _bytes(fontFile)
     lib.TCOD_console_set_custom_font(
-        fontFile, flags, nb_char_horiz, nb_char_vertic
+        _bytes(fontFile), flags, nb_char_horiz, nb_char_vertic
     )
 
 
@@ -1506,8 +1513,8 @@ def console_fill_char(con: tcod.console.Console, arr: Sequence[int]):
     """
     if isinstance(arr, np.ndarray):
         # numpy arrays, use numpy's ctypes functions
-        arr = np.ascontiguousarray(arr, dtype=np.intc)
-        carr = ffi.cast("int *", arr.ctypes.data)
+        np_array = np.ascontiguousarray(arr, dtype=np.intc)
+        carr = ffi.cast("int *", np_array.ctypes.data)
     else:
         # otherwise convert using the ffi module
         carr = ffi.new("int[]", arr)
@@ -2351,7 +2358,7 @@ def heightmap_get_normal(
     """
     cn = ffi.new("float[3]")
     lib.TCOD_heightmap_get_normal(_heightmap_cdata(hm), x, y, cn, waterLevel)
-    return tuple(cn)
+    return tuple(cn)  # type: ignore
 
 
 @deprecate("This function is deprecated, see documentation.")
@@ -2627,7 +2634,7 @@ def line_iter(xo, yo, xd, yd):
 
 def line_where(
     x1: int, y1: int, x2: int, y2: int, inclusive: bool = True
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> Tuple[np.array, np.array]:
     """Return a NumPy index array following a Bresenham line.
 
     If `inclusive` is true then the start point is included in the result.
@@ -2654,7 +2661,7 @@ def line_where(
     lib.LineWhere(x1, y1, x2, y2, x, y)
     if not inclusive:
         array = array[:, 1:]
-    return tuple(array)
+    return tuple(array)  # type: ignore
 
 
 def map_new(w, h):
@@ -2677,8 +2684,10 @@ def map_copy(source, dest):
         array attributes manually.
     """
     if source.width != dest.width or source.height != dest.height:
-        dest.__init__(source.width, source.height, source._order)
-    dest._Map__buffer[:] = source._Map__buffer[:]
+        dest.__init__(  # type: ignore
+            source.width, source.height, source._order
+        )
+    dest._Map__buffer[:] = source._Map__buffer[:]  # type: ignore
 
 
 def map_set_properties(m, x, y, isTrans, isWalk):
@@ -2706,8 +2715,14 @@ def map_clear(m, transparent=False, walkable=False):
     m.walkable[:] = walkable
 
 
-def map_compute_fov(m, x, y, radius=0, light_walls=True, algo=FOV_RESTRICTIVE):
-    # type: (tcod.map.Map, int, int, int, bool, int) -> None
+def map_compute_fov(
+    m: tcod.map.Map,
+    x: int,
+    y: int,
+    radius: int = 0,
+    light_walls: bool = True,
+    algo: int = FOV_RESTRICTIVE,
+) -> None:
     """Compute the field-of-view for a map instance.
 
     .. deprecated:: 4.5
@@ -2836,7 +2851,10 @@ def namegen_destroy():
 
 
 def noise_new(
-    dim, h=NOISE_DEFAULT_HURST, l=NOISE_DEFAULT_LACUNARITY, random=None
+    dim,
+    h=NOISE_DEFAULT_HURST,
+    l=NOISE_DEFAULT_LACUNARITY,  # noqa: E741
+    random=None,
 ):
     """Return a new Noise instance.
 
@@ -3308,7 +3326,7 @@ def struct_get_type(struct, name):
 
 
 # high precision time functions
-def sys_set_fps(fps):
+def sys_set_fps(fps: int) -> None:
     """Set the maximum frame rate.
 
     You can disable the frame limit again by setting fps to 0.
@@ -3319,7 +3337,7 @@ def sys_set_fps(fps):
     lib.TCOD_sys_set_fps(fps)
 
 
-def sys_get_fps():
+def sys_get_fps() -> int:
     """Return the current frames per second.
 
     This the actual frame rate, not the frame limit set by
@@ -3333,7 +3351,7 @@ def sys_get_fps():
     return lib.TCOD_sys_get_fps()
 
 
-def sys_get_last_frame_length():
+def sys_get_last_frame_length() -> float:
     """Return the delta time of the last rendered frame in seconds.
 
     Returns:
@@ -3343,7 +3361,7 @@ def sys_get_last_frame_length():
 
 
 @deprecate("Use Python's standard 'time' module instead of this function.")
-def sys_sleep_milli(val):
+def sys_sleep_milli(val: int) -> None:
     """Sleep for 'val' milliseconds.
 
     Args:
@@ -3356,7 +3374,7 @@ def sys_sleep_milli(val):
 
 
 @deprecate("Use Python's standard 'time' module instead of this function.")
-def sys_elapsed_milli():
+def sys_elapsed_milli() -> int:
     """Get number of milliseconds since the start of the program.
 
     Returns:
@@ -3369,7 +3387,7 @@ def sys_elapsed_milli():
 
 
 @deprecate("Use Python's standard 'time' module instead of this function.")
-def sys_elapsed_seconds():
+def sys_elapsed_seconds() -> float:
     """Get number of seconds since the start of the program.
 
     Returns:
@@ -3381,7 +3399,7 @@ def sys_elapsed_seconds():
     return lib.TCOD_sys_elapsed_seconds()
 
 
-def sys_set_renderer(renderer):
+def sys_set_renderer(renderer: int) -> None:
     """Change the current rendering mode to renderer.
 
     .. deprecated:: 2.0
@@ -3392,7 +3410,7 @@ def sys_set_renderer(renderer):
         tcod.console.Console._get_root()
 
 
-def sys_get_renderer():
+def sys_get_renderer() -> int:
     """Return the current rendering mode.
 
     """
@@ -3400,7 +3418,7 @@ def sys_get_renderer():
 
 
 # easy screenshots
-def sys_save_screenshot(name=None):
+def sys_save_screenshot(name: Optional[str] = None) -> None:
     """Save a screenshot to a file.
 
     By default this will automatically save screenshots in the working
@@ -3412,13 +3430,13 @@ def sys_save_screenshot(name=None):
     Args:
         file Optional[AnyStr]: File path to save screenshot.
     """
-    if name is not None:
-        name = _bytes(name)
-    lib.TCOD_sys_save_screenshot(name or ffi.NULL)
+    lib.TCOD_sys_save_screenshot(
+        _bytes(name) if name is not None else ffi.NULL
+    )
 
 
 # custom fullscreen resolution
-def sys_force_fullscreen_resolution(width, height):
+def sys_force_fullscreen_resolution(width: int, height: int) -> None:
     """Force a specific resolution in fullscreen.
 
     Will use the smallest available resolution so that:
@@ -3435,7 +3453,7 @@ def sys_force_fullscreen_resolution(width, height):
     lib.TCOD_sys_force_fullscreen_resolution(width, height)
 
 
-def sys_get_current_resolution():
+def sys_get_current_resolution() -> Tuple[int, int]:
     """Return the current resolution as (width, height)
 
     Returns:
@@ -3447,7 +3465,7 @@ def sys_get_current_resolution():
     return w[0], h[0]
 
 
-def sys_get_char_size():
+def sys_get_char_size() -> Tuple[int, int]:
     """Return the current fonts character size as (width, height)
 
     Returns:

@@ -23,7 +23,7 @@ Example::
     # The window is closed here, after the above context exits.
 """
 
-from typing import Optional
+from typing import Any, Optional, Tuple  # noqa: F401
 import warnings
 
 import numpy as np
@@ -95,7 +95,7 @@ class Console(object):
         return self
 
     @classmethod
-    def _get_root(cls, order=None):
+    def _get_root(cls, order: Optional[str] = None) -> "Console":
         """Return a root console singleton with valid buffers.
 
         This function will also update an already active root console.
@@ -110,7 +110,7 @@ class Console(object):
         self._init_setup_console_data(self._order)
         return self
 
-    def _init_setup_console_data(self, order="C"):
+    def _init_setup_console_data(self, order: str = "C") -> None:
         """Setup numpy arrays over libtcod data buffers."""
         global _root_console
         self._key_color = None
@@ -122,7 +122,7 @@ class Console(object):
                 "struct TCOD_Console*", self.console_c
             )
 
-        def unpack_color(color_data):
+        def unpack_color(color_data: Any) -> np.array:
             """return a (height, width, 3) shaped array from an image struct"""
             color_buffer = ffi.buffer(color_data[0 : self.width * self.height])
             array = np.frombuffer(color_buffer, np.uint8)
@@ -140,17 +140,17 @@ class Console(object):
         self._order = tcod._internal.verify_order(order)
 
     @property
-    def width(self):
+    def width(self) -> int:
         """int: The width of this Console. (read-only)"""
         return lib.TCOD_console_get_width(self.console_c)
 
     @property
-    def height(self):
+    def height(self) -> int:
         """int: The height of this Console. (read-only)"""
         return lib.TCOD_console_get_height(self.console_c)
 
     @property
-    def bg(self):
+    def bg(self) -> np.array:
         """A uint8 array with the shape (height, width, 3).
 
         You can change the consoles background colors by using this array.
@@ -162,7 +162,7 @@ class Console(object):
         return self._bg.transpose(1, 0, 2) if self._order == "F" else self._bg
 
     @property
-    def fg(self):
+    def fg(self) -> np.array:
         """A uint8 array with the shape (height, width, 3).
 
         You can change the consoles foreground colors by using this array.
@@ -173,7 +173,7 @@ class Console(object):
         return self._fg.transpose(1, 0, 2) if self._order == "F" else self._fg
 
     @property
-    def ch(self):
+    def ch(self) -> np.array:
         """An integer array with the shape (height, width).
 
         You can change the consoles character codes by using this array.
@@ -184,7 +184,7 @@ class Console(object):
         return self._ch.T if self._order == "F" else self._ch
 
     @property
-    def default_bg(self):
+    def default_bg(self) -> Tuple[int, int, int]:
         """Tuple[int, int, int]: The default background color."""
         color = self._console_data.back
         return color.r, color.g, color.b
@@ -255,9 +255,8 @@ class Console(object):
             alignment (Optional[int]): Text alignment.
         """
         alignment = self.default_alignment if alignment is None else alignment
-        string = _fmt(string)
         lib.TCOD_console_printf_ex(
-            self.console_c, x, y, bg_blend, alignment, string
+            self.console_c, x, y, bg_blend, alignment, _fmt(string)
         )
 
     def print_rect(
@@ -289,9 +288,15 @@ class Console(object):
             int: The number of lines of text once word-wrapped.
         """
         alignment = self.default_alignment if alignment is None else alignment
-        string = _fmt(string)
         return lib.TCOD_console_printf_rect_ex(
-            self.console_c, x, y, width, height, bg_blend, alignment, string
+            self.console_c,
+            x,
+            y,
+            width,
+            height,
+            bg_blend,
+            alignment,
+            _fmt(string),
         )
 
     def get_height_rect(
@@ -309,9 +314,8 @@ class Console(object):
         Returns:
             int: The number of lines of text once word-wrapped.
         """
-        string = _fmt(string)
         return lib.TCOD_console_get_height_rect_fmt(
-            self.console_c, x, y, width, height, string
+            self.console_c, x, y, width, height, _fmt(string)
         )
 
     def rect(

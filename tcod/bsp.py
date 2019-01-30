@@ -23,7 +23,7 @@ Example::
         else:
             print('Dig a room for %s.' % node)
 """
-from typing import Iterator, List, Optional, Union  # noqa: F401
+from typing import Any, Iterator, List, Optional, Tuple, Union  # noqa: F401
 
 from tcod.libtcod import lib, ffi
 from tcod._internal import deprecate
@@ -43,9 +43,9 @@ class BSP(object):
         position (int): The integer of where the node was split.
         horizontal (bool): This nodes split orientation.
         parent (Optional[BSP]): This nodes parent or None
-        children (Optional[Tuple[BSP, BSP]]):
+        children (Union[Tuple[()], Tuple[BSP, BSP]]):
             A tuple of (left, right) BSP instances, or
-            None if this BSP has no children.
+            an empty tuple if this BSP has no children.
 
     Args:
         x (int): Rectangle left coordinate.
@@ -55,10 +55,10 @@ class BSP(object):
     """
 
     def __init__(self, x: int, y: int, width: int, height: int):
-        self.x = x  # type: int
-        self.y = y  # type: int
-        self.width = width  # type: int
-        self.height = height  # type: int
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
 
         self.level = 0  # type: int
         self.position = 0  # type: int
@@ -83,7 +83,7 @@ class BSP(object):
     def h(self, value: int):
         self.height = value
 
-    def _as_cdata(self):
+    def _as_cdata(self) -> Any:
         cdata = ffi.gc(
             lib.TCOD_bsp_new_with_size(
                 self.x, self.y, self.width, self.height

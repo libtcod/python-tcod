@@ -6,7 +6,7 @@ import warnings
 from tcod.libtcod import ffi
 
 
-def _unpack_char_p(char_p):
+def _unpack_char_p(char_p: Any) -> str:
     if char_p == ffi.NULL:
         return ""
     return ffi.string(char_p).decode()
@@ -135,7 +135,7 @@ class _CDataWrapper(object):
             super(_CDataWrapper, self).__setattr__(attr, value)
 
 
-def _console(console):
+def _console(console: Any) -> Any:
     """Return a cffi console."""
     try:
         return console.console_c

@@ -13,34 +13,34 @@ class Color(list):
         b (int): Blue value, from 0 to 255.
     """
 
-    def __init__(self, r=0, g=0, b=0):
+    def __init__(self, r: int = 0, g: int = 0, b: int = 0):
         self[:] = (r & 0xFF, g & 0xFF, b & 0xFF)
 
     @property
-    def r(self):
+    def r(self) -> int:
         """int: Red value, always normalised to 0-255."""
         return self[0]
 
     @r.setter
-    def r(self, value):
+    def r(self, value: int):
         self[0] = value & 0xFF
 
     @property
-    def g(self):
+    def g(self) -> int:
         """int: Green value, always normalised to 0-255."""
         return self[1]
 
     @g.setter
-    def g(self, value):
+    def g(self, value: int):
         self[1] = value & 0xFF
 
     @property
-    def b(self):
+    def b(self) -> int:
         """int: Blue value, always normalised to 0-255."""
         return self[2]
 
     @b.setter
-    def b(self, value):
+    def b(self, value: int):
         self[2] = value & 0xFF
 
     @classmethod

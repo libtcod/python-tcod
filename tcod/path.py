@@ -41,10 +41,10 @@ Example::
     array is used.)
 """
 import numpy as np
-from typing import Any, Callable, List, Tuple, Union
+from typing import Any, Callable, List, Tuple, Union  # noqa: F401
 
 from tcod.libtcod import lib, ffi
-import tcod.map
+import tcod.map  # noqa: F401
 
 
 @ffi.def_extern()
@@ -186,11 +186,7 @@ class NodeCostArray(np.ndarray):
 class _PathFinder(object):
     """A class sharing methods used by AStar and Dijkstra."""
 
-    def __init__(
-        self,
-        cost: Union[tcod.map.Map, np.ndarray, Any],
-        diagonal: float = 1.41,
-    ):
+    def __init__(self, cost: Any, diagonal: float = 1.41):
         self.cost = cost
         self.diagonal = diagonal
         self._path_c = None

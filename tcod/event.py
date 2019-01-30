@@ -277,18 +277,18 @@ class TextInput(Event):
         self.sdl_event = sdl_event
         return self
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "tcod.event.%s(text=%r)" % (self.__class__.__name__, self.text)
 
 
 class WindowEvent(Event):
     def __init__(self, type: str, x: Optional[int] = 0, y: Optional[int] = 0):
         super().__init__(type)
-        self.x = x  # type(Optional[int])
-        self.y = y  # type(Optional[int])
+        self.x = x
+        self.y = y
 
     @classmethod
-    def from_sdl_event(cls, sdl_event):
+    def from_sdl_event(cls, sdl_event: Any):
         if sdl_event.window.event not in cls.__WINDOW_TYPES:
             return Undefined.from_sdl_event(sdl_event)
         self = cls(
@@ -299,7 +299,7 @@ class WindowEvent(Event):
         self.sdl_event = sdl_event
         return self
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         params = ""
         if self.x or self.y:
             params = ", x=%r, y=%r" % (self.x, self.y)
@@ -332,17 +332,19 @@ class WindowEvent(Event):
 class Undefined(Event):
     """This class is a place holder for SDL events without a Python class."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("")
 
     @classmethod
-    def from_sdl_event(cls, sdl_event):
+    def from_sdl_event(cls, sdl_event: Any) -> "Undefined":
         self = cls()
         self.sdl_event = sdl_event
         return self
 
-    def __str__(self):
-        return "<Undefined sdl_event.type=%i>" % self.sdl_event.type
+    def __str__(self) -> str:
+        if self.sdl_event:
+            return "<Undefined sdl_event.type=%i>" % self.sdl_event.type
+        return "<Undefined>"
 
 
 _SDL_TO_CLASS_TABLE = {
@@ -355,7 +357,7 @@ _SDL_TO_CLASS_TABLE = {
     tcod.lib.SDL_MOUSEWHEEL: MouseWheel,
     tcod.lib.SDL_TEXTINPUT: TextInput,
     tcod.lib.SDL_WINDOWEVENT: WindowEvent,
-}
+}  # type: Dict[int, Any]
 
 
 def get() -> Iterator[Any]:
@@ -395,88 +397,88 @@ def wait(timeout: Optional[float] = None) -> Iterator[Any]:
 
 
 class EventDispatch:
-    def dispatch(self, event: Any):
+    def dispatch(self, event: Any) -> None:
         if event.type:
             getattr(self, "ev_%s" % (event.type.lower(),))(event)
 
-    def event_get(self):
+    def event_get(self) -> None:
         for event in get():
             self.dispatch(event)
 
-    def event_wait(self, timeout: Optional[float]):
+    def event_wait(self, timeout: Optional[float]) -> None:
         wait(timeout)
         self.event_get()
 
-    def ev_quit(self, event: Quit):
+    def ev_quit(self, event: Quit) -> None:
         pass
 
-    def ev_keydown(self, event: KeyDown):
+    def ev_keydown(self, event: KeyDown) -> None:
         pass
 
-    def ev_keyup(self, event: KeyUp):
+    def ev_keyup(self, event: KeyUp) -> None:
         pass
 
-    def ev_mousemotion(self, event: MouseMotion):
+    def ev_mousemotion(self, event: MouseMotion) -> None:
         pass
 
-    def ev_mousebuttondown(self, event: MouseButtonDown):
+    def ev_mousebuttondown(self, event: MouseButtonDown) -> None:
         pass
 
-    def ev_mousebuttonup(self, event: MouseButtonUp):
+    def ev_mousebuttonup(self, event: MouseButtonUp) -> None:
         pass
 
-    def ev_mousewheel(self, event: MouseWheel):
+    def ev_mousewheel(self, event: MouseWheel) -> None:
         pass
 
-    def ev_textinput(self, event: TextInput):
+    def ev_textinput(self, event: TextInput) -> None:
         pass
 
-    def ev_windowshown(self, event: WindowEvent):
+    def ev_windowshown(self, event: WindowEvent) -> None:
         pass
 
-    def ev_windowhidden(self, event: WindowEvent):
+    def ev_windowhidden(self, event: WindowEvent) -> None:
         pass
 
-    def ev_windowexposed(self, event: WindowEvent):
+    def ev_windowexposed(self, event: WindowEvent) -> None:
         pass
 
-    def ev_windowmoved(self, event: WindowEvent):
+    def ev_windowmoved(self, event: WindowEvent) -> None:
         pass
 
-    def ev_windowresized(self, event: WindowEvent):
+    def ev_windowresized(self, event: WindowEvent) -> None:
         pass
 
-    def ev_windowsizechanged(self, event: WindowEvent):
+    def ev_windowsizechanged(self, event: WindowEvent) -> None:
         pass
 
-    def ev_windowminimized(self, event: WindowEvent):
+    def ev_windowminimized(self, event: WindowEvent) -> None:
         pass
 
-    def ev_windowmaximized(self, event: WindowEvent):
+    def ev_windowmaximized(self, event: WindowEvent) -> None:
         pass
 
-    def ev_windowrestored(self, event: WindowEvent):
+    def ev_windowrestored(self, event: WindowEvent) -> None:
         pass
 
-    def ev_windowenter(self, event: WindowEvent):
+    def ev_windowenter(self, event: WindowEvent) -> None:
         pass
 
-    def ev_windowleave(self, event: WindowEvent):
+    def ev_windowleave(self, event: WindowEvent) -> None:
         pass
 
-    def ev_windowfocusgained(self, event: WindowEvent):
+    def ev_windowfocusgained(self, event: WindowEvent) -> None:
         pass
 
-    def ev_windowfocuslost(self, event: WindowEvent):
+    def ev_windowfocuslost(self, event: WindowEvent) -> None:
         pass
 
-    def ev_windowclose(self, event: WindowEvent):
+    def ev_windowclose(self, event: WindowEvent) -> None:
         pass
 
-    def ev_windowtakefocus(self, event: WindowEvent):
+    def ev_windowtakefocus(self, event: WindowEvent) -> None:
         pass
 
-    def ev_windowhittest(self, event: WindowEvent):
+    def ev_windowhittest(self, event: WindowEvent) -> None:
         pass
 
 

@@ -19,6 +19,7 @@ import sys
 
 import warnings
 
+from tcod.libtcod import lib, ffi  # noqa: F4
 from tcod.libtcodpy import *  # noqa: F4
 
 try:
