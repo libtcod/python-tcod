@@ -282,32 +282,28 @@ class TextInput(Event):
 
 
 class WindowEvent(Event):
-    def __init__(self, type: str, x: Optional[int] = 0, y: Optional[int] = 0):
-        super().__init__(type)
-        self.x = x
-        self.y = y
-
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any):
+    def from_sdl_event(cls, sdl_event: Any) -> Any:
         if sdl_event.window.event not in cls.__WINDOW_TYPES:
             return Undefined.from_sdl_event(sdl_event)
-        self = cls(
-            cls.__WINDOW_TYPES[sdl_event.window.event],
-            sdl_event.window.data1,
-            sdl_event.window.data2,
-        )
+        event_type = cls.__WINDOW_TYPES[sdl_event.window.event]
+        self = None  # type: Any
+        if sdl_event.window.event == tcod.lib.SDL_WINDOWEVENT_MOVED:
+            self = WindowMoved(sdl_event.window.data1, sdl_event.window.data2)
+        elif sdl_event.window.event in (
+            tcod.lib.SDL_WINDOWEVENT_RESIZED,
+            tcod.lib.SDL_WINDOWEVENT_SIZE_CHANGED,
+        ):
+            self = WindowResized(
+                event_type, sdl_event.window.data1, sdl_event.window.data2
+            )
+        else:
+            self = cls(event_type)
         self.sdl_event = sdl_event
         return self
 
     def __repr__(self) -> str:
-        params = ""
-        if self.x or self.y:
-            params = ", x=%r, y=%r" % (self.x, self.y)
-        return "tcod.event.%s(type=%r%s)" % (
-            self.__class__.__name__,
-            self.type,
-            params,
-        )
+        return "tcod.event.%s(type=%r)" % (self.__class__.__name__, self.type)
 
     __WINDOW_TYPES = {
         tcod.lib.SDL_WINDOWEVENT_SHOWN: "WindowShown",
@@ -327,6 +323,36 @@ class WindowEvent(Event):
         tcod.lib.SDL_WINDOWEVENT_TAKE_FOCUS: "WindowTakeFocus",
         tcod.lib.SDL_WINDOWEVENT_HIT_TEST: "WindowHitTest",
     }
+
+
+class WindowMoved(WindowEvent):
+    def __init__(self, x: int, y: int) -> None:
+        super().__init__(None)
+        self.x = x
+        self.y = y
+
+    def __repr__(self) -> str:
+        return "tcod.event.%s(type=%r, x=%r, y=%r)" % (
+            self.__class__.__name__,
+            self.type,
+            self.x,
+            self.y,
+        )
+
+
+class WindowResized(WindowEvent):
+    def __init__(self, type: str, width: int, height: int) -> None:
+        super().__init__(type)
+        self.width = width
+        self.height = height
+
+    def __repr__(self) -> str:
+        return "tcod.event.%s(type=%r, width=%r, height=%r)" % (
+            self.__class__.__name__,
+            self.type,
+            self.width,
+            self.height,
+        )
 
 
 class Undefined(Event):
@@ -442,13 +468,13 @@ class EventDispatch:
     def ev_windowexposed(self, event: WindowEvent) -> None:
         pass
 
-    def ev_windowmoved(self, event: WindowEvent) -> None:
+    def ev_windowmoved(self, event: WindowMoved) -> None:
         pass
 
-    def ev_windowresized(self, event: WindowEvent) -> None:
+    def ev_windowresized(self, event: WindowResized) -> None:
         pass
 
-    def ev_windowsizechanged(self, event: WindowEvent) -> None:
+    def ev_windowsizechanged(self, event: WindowResized) -> None:
         pass
 
     def ev_windowminimized(self, event: WindowEvent) -> None:
@@ -506,6 +532,8 @@ __all__ = [
     "MouseWheel",
     "TextInput",
     "WindowEvent",
+    "WindowMoved",
+    "WindowResized",
     "Undefined",
     "get",
     "wait",
