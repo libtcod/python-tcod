@@ -9,12 +9,16 @@ v2.0.0
 
 Unreleased
 ------------------
+
+8.4.0 - 2019-01-31
+------------------
 Added
  - Added tcod.event module, based off of the sdlevent.py shim.
 Changed
  - Updated libtcod to 1.10.3
 Fixed
  - Fixed libtcodpy `struct_add_value_list` function.
+ - Fixed all issues with tcod.Mouse attributes: cx, cy, dcx, dcy.
 
 8.3.2 - 2018-12-28
 ------------------
