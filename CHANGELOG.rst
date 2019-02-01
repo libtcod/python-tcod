@@ -18,7 +18,9 @@ Changed
  - Updated libtcod to 1.10.3
 Fixed
  - Fixed libtcodpy `struct_add_value_list` function.
- - Fixed all issues with tcod.Mouse attributes: cx, cy, dcx, dcy.
+ - Use correct math for tile-based delta in mouse events.
+ - New renderers now support tile-based mouse coordinates.
+ - SDL2 renderer will now properly refresh after the window is resized.
 
 8.3.2 - 2018-12-28
 ------------------
