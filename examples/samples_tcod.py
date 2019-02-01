@@ -928,6 +928,8 @@ bsp_min_room_size = 4
 bsp_random_room = False
 # if true, there is always a wall on north & west side of a room
 bsp_room_walls = True
+
+
 # draw a vertical line
 def vline(m, x, y1, y2):
     if y1 > y2:
@@ -1352,7 +1354,8 @@ LIGHT_UPDATE = (
 )  # how much the ambient light changes to reflect current light sources
 AMBIENT_LIGHT = 0.8  # brightness of tunnel texture
 
-# the coordinates of all tiles in the screen, as numpy arrays. example: (4x3 pixels screen)
+# the coordinates of all tiles in the screen, as numpy arrays.
+# example: (4x3 pixels screen)
 # xc = [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]
 # yc = [[1, 1, 1, 1], [2, 2, 2, 2], [3, 3, 3, 3]]
 if numpy_available:
@@ -1384,26 +1387,28 @@ class FastRenderSample(Sample):
         sample_console.default_fg = tcod.white
         sample_console.print_(1, SCREEN_H - 3, "Renderer: NumPy")
 
-        frac_t = (
-            RES_V - 1
-        )  # time is represented in number of pixels of the texture, start later in time to initialize texture
+        # time is represented in number of pixels of the texture, start later
+        # in time to initialize texture
+        frac_t = RES_V - 1
         abs_t = RES_V - 1
         lights = []  # lights list, and current color of the tunnel texture
         tex_r, tex_g, tex_b = 0, 0, 0
 
     def on_draw(self):
-        global use_numpy, frac_t, abs_t, lights, tex_r, tex_g, tex_b, xc, yc, texture, texture2, brightness2, R2, G2, B2
+        global use_numpy, frac_t, abs_t, lights, tex_r, tex_g, tex_b, xc, yc
+        global texture, texture2, brightness2, R2, G2, B2
 
         time_delta = tcod.sys_get_last_frame_length() * SPEED  # advance time
         frac_t += time_delta  # increase fractional (always < 1.0) time
         abs_t += time_delta  # increase absolute elapsed time
-        int_t = int(
-            frac_t
-        )  # integer time units that passed this frame (number of texture pixels to advance)
+        # integer time units that passed this frame (number of texture pixels
+        # to advance)
+        int_t = int(frac_t)
         frac_t -= int_t  # keep this < 1.0
 
-        # change texture color according to presence of lights (basically, sum them
-        # to get ambient light and smoothly change the current color into that)
+        # change texture color according to presence of lights (basically, sum
+        # them to get ambient light and smoothly change the current color into
+        # that)
         ambient_r = AMBIENT_LIGHT * sum(
             light.r * light.strength for light in lights
         )
@@ -1418,15 +1423,13 @@ class FastRenderSample(Sample):
         tex_g = tex_g * (1 - alpha) + ambient_g * alpha
         tex_b = tex_b * (1 - alpha) + ambient_b * alpha
 
-        if (
-            int_t >= 1
-        ):  # roll texture (ie, advance in tunnel) according to int_t
-            int_t = (
-                int_t % RES_V
-            )  # can't roll more than the texture's size (can happen when time_delta is large)
-            int_abs_t = int(
-                abs_t
-            )  # new pixels are based on absolute elapsed time
+        if int_t >= 1:
+            # roll texture (ie, advance in tunnel) according to int_t
+            # can't roll more than the texture's size (can happen when
+            # time_delta is large)
+            int_t = int_t % RES_V
+            # new pixels are based on absolute elapsed time
+            int_abs_t = int(abs_t)
 
             texture = np.roll(texture, -int_t, 1)
             # replace new stretch of texture with new values
@@ -1481,13 +1484,15 @@ class FastRenderSample(Sample):
         ]
 
         for light in lights:  # render lights
-            # move light's Z coordinate with time, then project its XYZ coordinates to screen-space
+            # move light's Z coordinate with time, then project its XYZ
+            # coordinates to screen-space
             light.z -= float(time_delta) / TEX_STRETCH
             xl = light.x / light.z * SCREEN_H
             yl = light.y / light.z * SCREEN_H
 
-            # calculate brightness of light according to distance from viewer and strength,
-            # then calculate brightness of each pixel with inverse square distance law
+            # calculate brightness of light according to distance from viewer
+            # and strength, then calculate brightness of each pixel with
+            # inverse square distance law
             light_brightness = (
                 LIGHT_BRIGHTNESS
                 * light.strength
