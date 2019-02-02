@@ -1,20 +1,17 @@
 """
-An alternative, more direct implementation of event handling using cffi
-calls to SDL functions.  The current code is incomplete, but can be
-extended easily by following the official SDL documentation.
-
-This module be run directly like any other event get example, but is meant
-to be copied into your code base.  Then you can use the tcod.event.get and
-tcod.event.wait functions in your code.
+An alternative, more direct implementation of event handling based on using
+cffi calls to SDL functions.  The current code is partially incomplete.
 
 Printing any event will tell you its attributes in a human readable format.
-An events type attr is just the classes name with all letters upper-case.
+An events type attribute if omitted is just the classes name with all letters
+upper-case.  Do not use :any:`isinstance` to tell events apart as that method
+won't be forward compatible.
 
-Like in tdl, events use a type attribute to tell events apart.  Unlike tdl
-and tcod the names and values used are directly derived from SDL.
+As a general guideline, you should use :any:`KeyboardEvent.sym` for command
+inputs, and :any:`TextInput.text` for name entry fields.
 
-As a general guideline for turn-based rouge-likes, you should use
-KeyDown.sym for commands, and TextInput.text for name entry fields.
+Remember to add the line ``import tcod.event``, as importing this module is not
+implied by ``import tcod``.
 
 .. versionadded:: 8.4
 """
@@ -26,7 +23,7 @@ from tcod.event_constants import *  # noqa: F4
 
 
 def _describe_bitmask(
-    bits: int, table: Dict[Any, str], default: Any = "0"
+    bits: int, table: Dict[Any, str], default: str = "0"
 ) -> str:
     """Returns a bitmask in human readable form.
 
@@ -69,6 +66,13 @@ BUTTON_RMASK = 0x04
 BUTTON_X1MASK = 0x08
 BUTTON_X2MASK = 0x10
 
+KMOD_SHIFT = (
+    tcod.event_constants.KMOD_LSHIFT | tcod.event_constants.KMOD_RSHIFT
+)
+KMOD_CTRL = tcod.event_constants.KMOD_LCTRL | tcod.event_constants.KMOD_RCTRL
+KMOD_ALT = tcod.event_constants.KMOD_LALT | tcod.event_constants.KMOD_RALT
+KMOD_GUI = tcod.event_constants.KMOD_LGUI | tcod.event_constants.KMOD_RGUI
+
 # reverse tables are used to get the tcod.event name from the value.
 _REVERSE_BUTTON_TABLE = {
     BUTTON_LEFT: "tcod.event.BUTTON_LEFT",
@@ -88,7 +92,13 @@ _REVERSE_BUTTON_MASK_TABLE = {
 
 
 class Event:
-    """The base event class."""
+    """The base event class.
+
+    Attributes:
+        type (str): This events type.
+        sdl_event: When available, this holds a python-cffi 'SDL_Event*'
+                   pointer.  All sub-classes have this attribute.
+    """
 
     def __init__(self, type: Optional[str] = None):
         if type is None:
@@ -97,8 +107,8 @@ class Event:
         self.sdl_event = None
 
     @classmethod
-    def from_sdl_event(cls, sdl_event):
-        """Return a class instance from a cffi SDL_Event pointer."""
+    def from_sdl_event(cls, sdl_event: Any) -> Any:
+        """Return a class instance from a python-cffi 'SDL_Event*' pointer."""
         raise NotImplementedError()
 
 
@@ -107,19 +117,32 @@ class Quit(Event):
 
     For more info on when this event is triggered see:
     https://wiki.libsdl.org/SDL_EventType#SDL_QUIT
+
+    Attributes:
+        type (str): Always "QUIT".
     """
 
     @classmethod
-    def from_sdl_event(cls, sdl_event):
+    def from_sdl_event(cls, sdl_event: Any) -> "Quit":
         self = cls()
         self.sdl_event = sdl_event
         return self
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "tcod.event.%s()" % self.__class__.__name__
 
 
 class KeyboardEvent(Event):
+    """
+    Attributes:
+        type (str): Will be "KEYDOWN" or "KEYUP", depending on the event.
+        scancode (int): The keyboard scan-code, this is the physical location
+                        of the key on the keyboard rather than the keys symbol.
+        sym (int): The keyboard symbol.
+        mod (int): A bitmask of modifier keys.
+        repeat (bool): True if this event exists because of key repeat.
+    """
+
     def __init__(
         self, scancode: int, sym: int, mod: int, repeat: bool = False
     ):
@@ -130,7 +153,7 @@ class KeyboardEvent(Event):
         self.repeat = repeat
 
     @classmethod
-    def from_sdl_event(cls, sdl_event):
+    def from_sdl_event(cls, sdl_event: Any) -> Any:
         keysym = sdl_event.key.keysym
         self = cls(
             keysym.scancode, keysym.sym, keysym.mod, bool(sdl_event.key.repeat)
@@ -138,7 +161,7 @@ class KeyboardEvent(Event):
         self.sdl_event = sdl_event
         return self
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "tcod.event.%s(scancode=%s, sym=%s, mod=%s%s)" % (
             self.__class__.__name__,
             tcod.event_constants._REVERSE_SCANCODE_TABLE[self.scancode],
@@ -159,6 +182,24 @@ class KeyUp(KeyboardEvent):
 
 
 class MouseMotion(Event):
+    """
+    Attributes:
+        type (str): Always "MOUSEMOTION".
+        pixel (Point): The pixel coordinates of the mouse.
+        pixel_motion (Point): The pixel delta.
+        tile (Point): The integer tile coordinates of the mouse on the screen.
+        tile_motion (Point): The integer tile delta.
+        state (int): A bitmask of which mouse buttons are currently held.
+
+            Will be a combination of the following names:
+
+            * tcod.event.BUTTON_LMASK
+            * tcod.event.BUTTON_MMASK
+            * tcod.event.BUTTON_RMASK
+            * tcod.event.BUTTON_X1MASK
+            * tcod.event.BUTTON_X2MASK
+    """
+
     def __init__(
         self,
         pixel: Tuple[int, int] = (0, 0),
@@ -175,7 +216,7 @@ class MouseMotion(Event):
         self.state = state
 
     @classmethod
-    def from_sdl_event(cls, sdl_event):
+    def from_sdl_event(cls, sdl_event: Any) -> "MouseMotion":
         motion = sdl_event.motion
 
         pixel = motion.x, motion.y
@@ -190,7 +231,7 @@ class MouseMotion(Event):
         self.sdl_event = sdl_event
         return self
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             "tcod.event.%s(pixel=%r, pixel_motion=%r, "
             "tile=%r, tile_motion=%r, state=%s)"
@@ -205,6 +246,23 @@ class MouseMotion(Event):
 
 
 class MouseButtonEvent(Event):
+    """
+    Attributes:
+        type (str): Will be "MOUSEBUTTONDOWN" or "MOUSEBUTTONUP",
+                    depending on the event.
+        pixel (Point): The pixel coordinates of the mouse.
+        tile (Point): The integer tile coordinates of the mouse on the screen.
+        button (int): Which mouse button.
+
+            This will be one of the following names:
+
+            * tcod.event.BUTTON_LEFT
+            * tcod.event.BUTTON_MIDDLE
+            * tcod.event.BUTTON_RIGHT
+            * tcod.event.BUTTON_X1
+            * tcod.event.BUTTON_X2
+    """
+
     def __init__(
         self,
         pixel: Tuple[int, int] = (0, 0),
@@ -217,7 +275,7 @@ class MouseButtonEvent(Event):
         self.button = button
 
     @classmethod
-    def from_sdl_event(cls, sdl_event):
+    def from_sdl_event(cls, sdl_event: Any) -> Any:
         button = sdl_event.button
         pixel = button.x, button.y
         subtile = _pixel_to_tile(*pixel)
@@ -226,7 +284,7 @@ class MouseButtonEvent(Event):
         self.sdl_event = sdl_event
         return self
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "tcod.event.%s(pixel=%r, tile=%r, button=%s)" % (
             self.__class__.__name__,
             self.pixel,
@@ -244,6 +302,16 @@ class MouseButtonUp(MouseButtonEvent):
 
 
 class MouseWheel(Event):
+    """
+    Attributes:
+        type (str): Always "MOUSEWHEEL".
+        x (int): Horizontal scrolling. A positive value means scrolling right.
+        y (int): Vertical scrolling. A positive value means scrolling away from
+                 the user.
+        flipped (bool): If True then the values of `x` and `y` are the opposite
+                        of their usual values.
+    """
+
     def __init__(self, x: int, y: int, flipped: bool = False):
         super().__init__()
         self.x = x
@@ -251,13 +319,13 @@ class MouseWheel(Event):
         self.flipped = flipped
 
     @classmethod
-    def from_sdl_event(cls, sdl_event):
+    def from_sdl_event(cls, sdl_event: Any) -> "MouseWheel":
         wheel = sdl_event.wheel
         self = cls(wheel.x, wheel.y, bool(wheel.direction))
         self.sdl_event = sdl_event
         return self
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "tcod.event.%s(x=%i, y=%i%s)" % (
             self.__class__.__name__,
             self.x,
@@ -267,12 +335,18 @@ class MouseWheel(Event):
 
 
 class TextInput(Event):
+    """
+    Attributes:
+        type (str): Always "TEXTINPUT".
+        text (str): A Unicode string with the input.
+    """
+
     def __init__(self, text: str):
         super().__init__()
         self.text = text
 
     @classmethod
-    def from_sdl_event(cls, sdl_event):
+    def from_sdl_event(cls, sdl_event: Any) -> "TextInput":
         self = cls(tcod.ffi.string(sdl_event.text.text, 32).decode("utf8"))
         self.sdl_event = sdl_event
         return self
@@ -282,6 +356,11 @@ class TextInput(Event):
 
 
 class WindowEvent(Event):
+    """
+    Attributes:
+        type (str): A window event could mean various event types.
+    """
+
     @classmethod
     def from_sdl_event(cls, sdl_event: Any) -> Any:
         if sdl_event.window.event not in cls.__WINDOW_TYPES:
@@ -326,6 +405,13 @@ class WindowEvent(Event):
 
 
 class WindowMoved(WindowEvent):
+    """
+    Attributes:
+        type (str): Always "WINDOWMOVED".
+        x (int): Movement on the x-axis.
+        x (int): Movement on the y-axis.
+    """
+
     def __init__(self, x: int, y: int) -> None:
         super().__init__(None)
         self.x = x
@@ -341,6 +427,13 @@ class WindowMoved(WindowEvent):
 
 
 class WindowResized(WindowEvent):
+    """
+    Attributes:
+        type (str): "WINDOWRESIZED" or "WINDOWSIZECHANGED"
+        width (int): The current width of the window.
+        height (int): The current height of the window.
+    """
+
     def __init__(self, type: str, width: int, height: int) -> None:
         super().__init__(type)
         self.width = width
@@ -356,7 +449,9 @@ class WindowResized(WindowEvent):
 
 
 class Undefined(Event):
-    """This class is a place holder for SDL events without a Python class."""
+    """This class is a place holder for SDL events without their own tcod.event
+    class.
+    """
 
     def __init__(self) -> None:
         super().__init__("")
@@ -387,11 +482,25 @@ _SDL_TO_CLASS_TABLE = {
 
 
 def get() -> Iterator[Any]:
-    """Iterate over all pending events.
+    """Return an iterator for all pending events.
 
-    Returns:
-        Iterator[tcod.event.Event]:
-            An iterator of Event subclasses.
+    Events are processed as the iterator is consumed.  Breaking out of, or
+    discarding the iterator will leave the remaining events on the event queue.
+
+    Example::
+
+        for event in tcod.event.get():
+            if event.type == "QUIT":
+                print(event)
+                raise SystemExit()
+            elif event.type == "KEYDOWN":
+                print(event)
+            elif event.type == "MOUSEBUTTONDOWN":
+                print(event)
+            elif event.type == "MOUSEMOTION":
+                print(event)
+            else:
+                print(event)
     """
     sdl_event = tcod.ffi.new("SDL_Event*")
     while tcod.lib.SDL_PollEvent(sdl_event):
@@ -402,18 +511,27 @@ def get() -> Iterator[Any]:
 
 
 def wait(timeout: Optional[float] = None) -> Iterator[Any]:
-    """Block until events exist, then iterate over all events.
+    """Block until events exist, then return an event iterator.
 
-    Keep in mind that this function will wake even for events not handled by
-    this module.
+    `timeout` is the maximum number of seconds to wait as a floating point
+    number with millisecond precision, or it can be None to wait forever.
 
-    Args:
-        timeout (Optional[float]):
-            Maximum number of seconds to wait, or None to wait forever.
-            Has millisecond percision.
+    Returns the same iterator as a call to :any:`tcod.event.get`.
 
-    Returns:
-        Iterator[tcod.event.Event]: Same iterator as a call to tcod.event.get
+    Example::
+
+        for event in tcod.event.wait():
+            if event.type == "QUIT":
+                print(event)
+                raise SystemExit()
+            elif event.type == "KEYDOWN":
+                print(event)
+            elif event.type == "MOUSEBUTTONDOWN":
+                print(event)
+            elif event.type == "MOUSEMOTION":
+                print(event)
+            else:
+                print(event)
     """
     if timeout is not None:
         tcod.lib.SDL_WaitEventTimeout(tcod.ffi.NULL, int(timeout * 1000))
@@ -423,7 +541,44 @@ def wait(timeout: Optional[float] = None) -> Iterator[Any]:
 
 
 class EventDispatch:
+    """This class dispatches events to methods depending on the events type
+    attribute.
+
+    To use this class, make a sub-class and override the relevant `ev_*`
+    methods.  Then send events to the dispatch method.
+
+    Example::
+
+        import tcod
+        import tcod.event
+
+        class State(tcod.event.EventDispatch):
+            def ev_quit(self, event):
+                raise SystemExit()
+
+            def ev_keydown(self, event):
+                print(event)
+
+            def ev_mousebuttondown(self, event):
+                print(event)
+
+            def ev_mousemotion(self, event):
+                print(event)
+
+        root_console = tcod.console_init_root(80, 60)
+        state = State()
+        while True:
+            for event in tcod.event.wait()
+                state.dispatch(event)
+    """
+
     def dispatch(self, event: Any) -> None:
+        """Send an event to an `ev_*` method.
+
+        `*` will be the events type converted to lower-case.
+
+        If `event.type` is an empty string or None then it will be ignored.
+        """
         if event.type:
             getattr(self, "ev_%s" % (event.type.lower(),))(event)
 
@@ -436,70 +591,73 @@ class EventDispatch:
         self.event_get()
 
     def ev_quit(self, event: Quit) -> None:
-        pass
+        """Called when the termination of the program is requested."""
 
     def ev_keydown(self, event: KeyDown) -> None:
-        pass
+        """Called when a keyboard key is pressed or repeated."""
 
     def ev_keyup(self, event: KeyUp) -> None:
-        pass
+        """Called when a keyboard key is released."""
 
     def ev_mousemotion(self, event: MouseMotion) -> None:
-        pass
+        """Called when the mouse is moved."""
 
     def ev_mousebuttondown(self, event: MouseButtonDown) -> None:
-        pass
+        """Called when a mouse button is pressed."""
 
     def ev_mousebuttonup(self, event: MouseButtonUp) -> None:
-        pass
+        """Called when a mouse button is released."""
 
     def ev_mousewheel(self, event: MouseWheel) -> None:
-        pass
+        """Called when the mouse wheel is scrolled."""
 
     def ev_textinput(self, event: TextInput) -> None:
-        pass
+        """Called to handle Unicode input."""
 
     def ev_windowshown(self, event: WindowEvent) -> None:
-        pass
+        """Called when the window is shown."""
 
     def ev_windowhidden(self, event: WindowEvent) -> None:
-        pass
+        """Called when the window is hidden."""
 
     def ev_windowexposed(self, event: WindowEvent) -> None:
-        pass
+        """Called when a window is exposed, and needs to be refreshed.
+
+        This usually means a call to :any:`tcod.console_flush` is necessary.
+        """
 
     def ev_windowmoved(self, event: WindowMoved) -> None:
-        pass
+        """Called when the window is moved."""
 
     def ev_windowresized(self, event: WindowResized) -> None:
-        pass
+        """Called when the window is resized."""
 
     def ev_windowsizechanged(self, event: WindowResized) -> None:
-        pass
+        """Called when the system or user changes the size of the window."""
 
     def ev_windowminimized(self, event: WindowEvent) -> None:
-        pass
+        """Called when the window is minimized."""
 
     def ev_windowmaximized(self, event: WindowEvent) -> None:
-        pass
+        """Called when the window is maximized."""
 
     def ev_windowrestored(self, event: WindowEvent) -> None:
-        pass
+        """Called when the window is restored."""
 
     def ev_windowenter(self, event: WindowEvent) -> None:
-        pass
+        """Called when the window gains mouse focus."""
 
     def ev_windowleave(self, event: WindowEvent) -> None:
-        pass
+        """Called when the window loses mouse focus."""
 
     def ev_windowfocusgained(self, event: WindowEvent) -> None:
-        pass
+        """Called when the window gains keyboard focus."""
 
     def ev_windowfocuslost(self, event: WindowEvent) -> None:
-        pass
+        """Called when the window loses keyboard focus."""
 
     def ev_windowclose(self, event: WindowEvent) -> None:
-        pass
+        """Called when the window manager requests the window to be closed."""
 
     def ev_windowtakefocus(self, event: WindowEvent) -> None:
         pass

@@ -25,6 +25,7 @@ Contents:
    :caption: python-tcod API
 
    tcod
+   tcod/event
    libtcodpy
 
 .. toctree::
