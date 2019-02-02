@@ -41,7 +41,7 @@ def _fmt(string: str) -> bytes:
 _root_console = None
 
 
-class Console(object):
+class Console:
     """A console object containing a grid of characters with
     foreground/background colors.
 
@@ -57,8 +57,8 @@ class Console(object):
         console_c (CData): A cffi pointer to a TCOD_console_t object.
     """
 
-    def __init__(self, width, height, order="C"):
-        self._key_color = None
+    def __init__(self, width: int, height: int, order: str = "C"):
+        self._key_color = None  # type: Optional[Tuple[int, int, int]]
         self._ch = np.full((height, width), 0x20, dtype=np.intc)
         self._fg = np.zeros((height, width), dtype="(3,)u1")
         self._bg = np.zeros((height, width), dtype="(3,)u1")
@@ -86,10 +86,10 @@ class Console(object):
         )
 
     @classmethod
-    def _from_cdata(cls, cdata, order="C"):
+    def _from_cdata(cls, cdata: Any, order: str = "C") -> "Console":
         if isinstance(cdata, cls):
             return cdata
-        self = object.__new__(cls)
+        self = object.__new__(cls)  # type: Console
         self.console_c = cdata
         self._init_setup_console_data(order)
         return self
@@ -103,7 +103,7 @@ class Console(object):
         global _root_console
         if _root_console is None:
             _root_console = object.__new__(cls)
-        self = _root_console
+        self = _root_console  # type: Console
         if order is not None:
             self._order = order
         self.console_c = ffi.NULL
@@ -142,12 +142,12 @@ class Console(object):
     @property
     def width(self) -> int:
         """int: The width of this Console. (read-only)"""
-        return lib.TCOD_console_get_width(self.console_c)
+        return lib.TCOD_console_get_width(self.console_c)  # type: ignore
 
     @property
     def height(self) -> int:
         """int: The height of this Console. (read-only)"""
-        return lib.TCOD_console_get_height(self.console_c)
+        return lib.TCOD_console_get_height(self.console_c)  # type: ignore
 
     @property
     def bg(self) -> np.array:
@@ -190,43 +190,49 @@ class Console(object):
         return color.r, color.g, color.b
 
     @default_bg.setter
-    def default_bg(self, color):
+    def default_bg(self, color: Tuple[int, int, int]) -> None:
         self._console_data.back = color
 
     @property
-    def default_fg(self):
+    def default_fg(self) -> Tuple[int, int, int]:
         """Tuple[int, int, int]: The default foreground color."""
         color = self._console_data.fore
         return color.r, color.g, color.b
 
     @default_fg.setter
-    def default_fg(self, color):
+    def default_fg(self, color: Tuple[int, int, int]) -> None:
         self._console_data.fore = color
 
     @property
-    def default_bg_blend(self):
+    def default_bg_blend(self) -> int:
         """int: The default blending mode."""
-        return self._console_data.bkgnd_flag
+        return self._console_data.bkgnd_flag  # type: ignore
 
     @default_bg_blend.setter
-    def default_bg_blend(self, value):
+    def default_bg_blend(self, value: int) -> None:
         self._console_data.bkgnd_flag = value
 
     @property
-    def default_alignment(self):
+    def default_alignment(self) -> int:
         """int: The default text alignment."""
-        return self._console_data.alignment
+        return self._console_data.alignment  # type: ignore
 
     @default_alignment.setter
-    def default_alignment(self, value):
+    def default_alignment(self, value: int) -> None:
         self._console_data.alignment = value
 
-    def clear(self):
+    def clear(self) -> None:
         """Reset this console to its default colors and the space character.
         """
         lib.TCOD_console_clear(self.console_c)
 
-    def put_char(self, x, y, ch, bg_blend=tcod.constants.BKGND_DEFAULT):
+    def put_char(
+        self,
+        x: int,
+        y: int,
+        ch: int,
+        bg_blend: int = tcod.constants.BKGND_DEFAULT,
+    ) -> None:
         """Draw the character c at x,y using the default colors and a blend mode.
 
         Args:
@@ -250,7 +256,7 @@ class Console(object):
         Args:
             x (int): The x coordinate from the left.
             y (int): The y coordinate from the top.
-            string (str): A Unicode string optionaly using color codes.
+            string (str): A Unicode string optionally using color codes.
             bg_blend (int): Blending mode to use, defaults to BKGND_DEFAULT.
             alignment (Optional[int]): Text alignment.
         """
@@ -288,7 +294,7 @@ class Console(object):
             int: The number of lines of text once word-wrapped.
         """
         alignment = self.default_alignment if alignment is None else alignment
-        return lib.TCOD_console_printf_rect_ex(
+        return lib.TCOD_console_printf_rect_ex(  # type: ignore
             self.console_c,
             x,
             y,
@@ -314,7 +320,7 @@ class Console(object):
         Returns:
             int: The number of lines of text once word-wrapped.
         """
-        return lib.TCOD_console_get_height_rect_fmt(
+        return lib.TCOD_console_get_height_rect_fmt(  # type: ignore
             self.console_c, x, y, width, height, _fmt(string)
         )
 
@@ -344,7 +350,13 @@ class Console(object):
             self.console_c, x, y, width, height, clear, bg_blend
         )
 
-    def hline(self, x, y, width, bg_blend=tcod.constants.BKGND_DEFAULT):
+    def hline(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        bg_blend: int = tcod.constants.BKGND_DEFAULT,
+    ) -> None:
         """Draw a horizontal line on the console.
 
         This always uses the character 196, the horizontal line character.
@@ -352,12 +364,18 @@ class Console(object):
         Args:
             x (int): The x coordinate from the left.
             y (int): The y coordinate from the top.
-            width (int): The horozontal length of this line.
+            width (int): The horizontal length of this line.
             bg_blend (int): The background blending flag.
         """
         lib.TCOD_console_hline(self.console_c, x, y, width, bg_blend)
 
-    def vline(self, x, y, height, bg_blend=tcod.constants.BKGND_DEFAULT):
+    def vline(
+        self,
+        x: int,
+        y: int,
+        height: int,
+        bg_blend: int = tcod.constants.BKGND_DEFAULT,
+    ) -> None:
         """Draw a vertical line on the console.
 
         This always uses the character 179, the vertical line character.
@@ -379,7 +397,7 @@ class Console(object):
         string: str = "",
         clear: bool = True,
         bg_blend: int = tcod.constants.BKGND_DEFAULT,
-    ):
+    ) -> None:
         """Draw a framed rectangle with optinal text.
 
         This uses the default background color and blend mode to fill the
@@ -408,17 +426,17 @@ class Console(object):
 
     def blit(
         self,
-        dest,
-        dest_x=0,
-        dest_y=0,
-        src_x=0,
-        src_y=0,
-        width=0,
-        height=0,
-        fg_alpha=1.0,
-        bg_alpha=1.0,
-        key_color=None,
-    ):
+        dest: "Console",
+        dest_x: int = 0,
+        dest_y: int = 0,
+        src_x: int = 0,
+        src_y: int = 0,
+        width: int = 0,
+        height: int = 0,
+        fg_alpha: float = 1.0,
+        bg_alpha: float = 1.0,
+        key_color: Optional[Tuple[int, int, int]] = None,
+    ) -> None:
         """Blit from this console onto the ``dest`` console.
 
         Args:
@@ -446,15 +464,15 @@ class Console(object):
         """
         # The old syntax is easy to detect and correct.
         if hasattr(src_y, "console_c"):
-            src_x, src_y, width, height, dest, dest_x, dest_y = (
-                dest,
-                dest_x,
-                dest_y,
-                src_x,
+            (
+                src_x,  # type: ignore
                 src_y,
                 width,
                 height,
-            )
+                dest,  # type: ignore
+                dest_x,
+                dest_y,
+            ) = (dest, dest_x, dest_y, src_x, src_y, width, height)
             warnings.warn(
                 "Parameter names have been moved around, see documentation.",
                 DeprecationWarning,
@@ -490,7 +508,7 @@ class Console(object):
                 bg_alpha,
             )
 
-    def set_key_color(self, color):
+    def set_key_color(self, color: Tuple[int, int, int]) -> None:
         """Set a consoles blit transparent color.
 
         Args:
@@ -498,7 +516,7 @@ class Console(object):
         """
         self._key_color = color
 
-    def __enter__(self):
+    def __enter__(self) -> "Console":
         """Returns this console in a managed context.
 
         When the root console is used as a context, the graphical window will
@@ -512,23 +530,23 @@ class Console(object):
             raise NotImplementedError("Only the root console has a context.")
         return self
 
-    def __exit__(self, *args):
+    def __exit__(self, *args: Any) -> None:
         """Closes the graphical window on exit.
 
-        Some tcod functions may have undefined behavior after this point.
+        Some tcod functions may have undefined behaviour after this point.
         """
         lib.TCOD_console_delete(self.console_c)
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         """Returns False if this is the root console.
 
-        This mimics libtcodpy behavior.
+        This mimics libtcodpy behaviour.
         """
-        return self.console_c != ffi.NULL
+        return bool(self.console_c != ffi.NULL)
 
     __nonzero__ = __bool__
 
-    def __getstate__(self):
+    def __getstate__(self) -> Any:
         state = self.__dict__.copy()
         del state["console_c"]
         state["_console_data"] = {
@@ -545,7 +563,7 @@ class Console(object):
             state["_bg"] = np.copy(self._bg)
         return state
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: Any) -> None:
         self._key_color = None
         self.__dict__.update(state)
         self._console_data.update(

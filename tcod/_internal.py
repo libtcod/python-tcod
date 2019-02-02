@@ -11,7 +11,7 @@ def deprecate(
 ) -> Callable[[F], F]:
     def decorator(func: F) -> F:
         @functools.wraps(func)
-        def wrapper(*args, **kargs):
+        def wrapper(*args, **kargs):  # type: ignore
             warnings.warn(message, category, stacklevel=stacklevel + 2)
             return func(*args, **kargs)
 
