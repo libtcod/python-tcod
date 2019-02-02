@@ -1,4 +1,7 @@
 """
+    .. deprecated:: 8.4
+        This module has been deprecated.
+
     Getting Started
     ===============
       Once the library is imported you can load the font you want to use with
@@ -71,6 +74,12 @@ import tdl.map
 import tdl.style as _style
 
 from tcod import __version__
+
+_warnings.warn(
+    "The tdl module has been deprecated.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 _IS_PYTHON3 = (_sys.version_info[0] == 3)
 

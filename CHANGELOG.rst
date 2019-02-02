@@ -9,6 +9,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Deprecated
+ - The tdl module has been deprecated.
 
 8.4.1 - 2019-02-01
 ------------------
