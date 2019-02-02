@@ -3,6 +3,7 @@
 import os
 import sys
 
+import atexit
 import threading
 from typing import Any, AnyStr, Optional, Sequence, Tuple
 import warnings
@@ -3573,3 +3574,17 @@ def sys_clipboard_get():
        This function does not provide reliable access to the clipboard.
     """
     return ffi.string(lib.TCOD_sys_clipboard_get()).decode("utf-8")
+
+
+@atexit.register
+def _atexit_verify() -> None:
+    """Warns if the libtcod root console is implicitly deleted."""
+    if lib.TCOD_ctx.root:
+        warnings.warn(
+            "The libtcod root console was implicitly deleted.\n"
+            "Make sure the 'with' statement is used with the root console to"
+            " ensure that it closes properly.",
+            ResourceWarning,
+            stacklevel=2,
+        )
+        lib.TCOD_console_delete(ffi.NULL)
