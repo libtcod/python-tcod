@@ -9,6 +9,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Window event types were not upper-case.
 
 8.4.0 - 2019-01-31
 ------------------

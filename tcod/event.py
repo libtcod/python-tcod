@@ -286,7 +286,7 @@ class WindowEvent(Event):
     def from_sdl_event(cls, sdl_event: Any) -> Any:
         if sdl_event.window.event not in cls.__WINDOW_TYPES:
             return Undefined.from_sdl_event(sdl_event)
-        event_type = cls.__WINDOW_TYPES[sdl_event.window.event]
+        event_type = cls.__WINDOW_TYPES[sdl_event.window.event].upper()
         self = None  # type: Any
         if sdl_event.window.event == tcod.lib.SDL_WINDOWEVENT_MOVED:
             self = WindowMoved(sdl_event.window.data1, sdl_event.window.data2)
