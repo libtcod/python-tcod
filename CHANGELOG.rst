@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+8.4.1 - 2019-02-01
+------------------
 Fixed
  - Window event types were not upper-case.
  - Fixed regression where libtcodpy mouse wheel events unset mouse coordinates.
