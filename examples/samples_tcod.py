@@ -22,12 +22,10 @@ SAMPLE_SCREEN_HEIGHT = 20
 SAMPLE_SCREEN_X = 20
 SAMPLE_SCREEN_Y = 10
 FONT = "data/fonts/consolas10x10_gs_tc.png"
-tcod.console_set_custom_font(
-    FONT, tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD
-)
-root_console = tcod.console_init_root(80, 50, "tcod python samples", False)
+
+root_console = None
 sample_console = tcod.console.Console(
-    SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT
+    SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT, order="F"
 )
 
 
@@ -93,7 +91,7 @@ class TrueColorSample(Sample):
         self.corners = np.array([0, 1, 2, 3])
         # sample screen mesh-grid
         self.mgrid = np.mgrid[
-            0 : 1 : SAMPLE_SCREEN_HEIGHT * 1j, 0 : 1 : SAMPLE_SCREEN_WIDTH * 1j
+            0 : 1 : SAMPLE_SCREEN_WIDTH * 1j, 0 : 1 : SAMPLE_SCREEN_HEIGHT * 1j
         ]
 
     def on_enter(self):
@@ -420,8 +418,8 @@ class NoiseSample(Sample):
         self.img.blit_2x(sample_console, 0, 0)
         sample_console.default_bg = tcod.grey
         sample_console.rect(2, 2, rectw, recth, False, tcod.BKGND_MULTIPLY)
-        sample_console.fg[2 : 2 + recth, 2 : 2 + rectw] = (
-            sample_console.fg[2 : 2 + recth, 2 : 2 + rectw]
+        sample_console.fg[2 : 2 + rectw, 2 : 2 + recth] = (
+            sample_console.fg[2 : 2 + rectw, 2 : 2 + recth]
             * sample_console.default_bg
             / 255
         )
@@ -509,7 +507,7 @@ SAMPLE_MAP = [
     "##############################################",
 ]
 
-SAMPLE_MAP = np.array([list(line) for line in SAMPLE_MAP])
+SAMPLE_MAP = np.array([list(line) for line in SAMPLE_MAP]).transpose()
 
 FOV_ALGO_NAMES = [
     "BASIC      ",
@@ -547,7 +545,9 @@ class FOVSample(Sample):
         # 1d noise for the torch flickering
         self.noise = tcod.noise_new(1, 1.0, 1.0)
 
-        self.map = tcod.map_new(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
+        self.map = tcod.map.Map(
+            SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT, order="F"
+        )
         self.map.walkable[:] = SAMPLE_MAP[:] == " "
         self.map.transparent[:] = self.map.walkable[:] | (SAMPLE_MAP == "=")
 
@@ -653,7 +653,7 @@ class FOVSample(Sample):
         FOV_SELECT_KEYS = {ord("-"): -1, ord("="): 1}
         if event.sym in MOVE_KEYS:
             x, y = MOVE_KEYS[event.sym]
-            if SAMPLE_MAP[self.py + y][self.px + x] == " ":
+            if SAMPLE_MAP[self.px + x, self.py + y] == " ":
                 tcod.console_put_char(
                     sample_console, self.px, self.py, " ", tcod.BKGND_NONE
                 )
@@ -705,10 +705,10 @@ class PathfindingSample(Sample):
         self.map = tcod.map_new(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
-                if SAMPLE_MAP[y][x] == " ":
+                if SAMPLE_MAP[x, y] == " ":
                     # ground
                     tcod.map_set_properties(self.map, x, y, True, True)
-                elif SAMPLE_MAP[y][x] == "=":
+                elif SAMPLE_MAP[x, y] == "=":
                     # window
                     tcod.map_set_properties(self.map, x, y, True, False)
         self.path = tcod.path_new_using_map(self.map)
@@ -738,7 +738,7 @@ class PathfindingSample(Sample):
         # draw windows
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
-                if SAMPLE_MAP[y][x] == "=":
+                if SAMPLE_MAP[x, y] == "=":
                     tcod.console_put_char(
                         sample_console, x, y, tcod.CHAR_DHLINE, tcod.BKGND_NONE
                     )
@@ -767,7 +767,7 @@ class PathfindingSample(Sample):
         # draw the dungeon
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
-                if SAMPLE_MAP[y][x] == "#":
+                if SAMPLE_MAP[x, y] == "#":
                     tcod.console_set_char_background(
                         sample_console, x, y, DARK_WALL, tcod.BKGND_SET
                     )
@@ -785,7 +785,7 @@ class PathfindingSample(Sample):
         else:
             for y in range(SAMPLE_SCREEN_HEIGHT):
                 for x in range(SAMPLE_SCREEN_WIDTH):
-                    if SAMPLE_MAP[y][x] != "#":
+                    if SAMPLE_MAP[x, y] != "#":
                         tcod.console_set_char_background(
                             sample_console,
                             x,
@@ -836,13 +836,11 @@ class PathfindingSample(Sample):
                 sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE
             )
             self.dy -= 1
-            self.oldchar = tcod.console_get_char(
-                sample_console, self.dx, self.dy
-            )
+            self.oldchar = sample_console.ch[self.dx, self.dy]
             tcod.console_put_char(
                 sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE
             )
-            if SAMPLE_MAP[self.dy][self.dx] == " ":
+            if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
         elif event.sym == ord("k") and self.dy < SAMPLE_SCREEN_HEIGHT - 1:
             # destination move south
@@ -850,13 +848,11 @@ class PathfindingSample(Sample):
                 sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE
             )
             self.dy += 1
-            self.oldchar = tcod.console_get_char(
-                sample_console, self.dx, self.dy
-            )
+            self.oldchar = sample_console.ch[self.dx, self.dy]
             tcod.console_put_char(
                 sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE
             )
-            if SAMPLE_MAP[self.dy][self.dx] == " ":
+            if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
         elif event.sym == ord("j") and self.dx > 0:
             # destination move west
@@ -864,13 +860,11 @@ class PathfindingSample(Sample):
                 sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE
             )
             self.dx -= 1
-            self.oldchar = tcod.console_get_char(
-                sample_console, self.dx, self.dy
-            )
+            self.oldchar = sample_console.ch[self.dx, self.dy]
             tcod.console_put_char(
                 sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE
             )
-            if SAMPLE_MAP[self.dy][self.dx] == " ":
+            if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
         elif event.sym == ord("l") and self.dx < SAMPLE_SCREEN_WIDTH - 1:
             # destination move east
@@ -878,13 +872,11 @@ class PathfindingSample(Sample):
                 sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE
             )
             self.dx += 1
-            self.oldchar = tcod.console_get_char(
-                sample_console, self.dx, self.dy
-            )
+            self.oldchar = sample_console.ch[self.dx, self.dy]
             tcod.console_put_char(
                 sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE
             )
-            if SAMPLE_MAP[self.dy][self.dx] == " ":
+            if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
         elif event.sym == tcod.event.K_TAB:
             self.using_astar = not self.using_astar
@@ -909,13 +901,11 @@ class PathfindingSample(Sample):
             )
             self.dx = mx
             self.dy = my
-            self.oldchar = tcod.console_get_char(
-                sample_console, self.dx, self.dy
-            )
+            self.oldchar = sample_console.ch[self.dx, self.dy]
             tcod.console_put_char(
                 sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE
             )
-            if SAMPLE_MAP[self.dy][self.dx] == " ":
+            if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
 
 
@@ -1511,7 +1501,7 @@ class FastRenderSample(Sample):
         B = B.clip(0, 255)
 
         # fill the screen with these background colors
-        sample_console.bg.transpose()[:] = [R.T, G.T, B.T]
+        sample_console.bg.transpose(2, 1, 0)[...] = (R, G, B)
 
 
 #############################################
@@ -1552,7 +1542,13 @@ cur_sample = 0
 
 
 def main():
-    global cur_sample
+    global cur_sample, root_console
+    tcod.console_set_custom_font(
+        FONT, tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD
+    )
+    root_console = tcod.console_init_root(
+        80, 50, "tcod python samples", False, order="F"
+    )
     credits_end = False
     SAMPLES[cur_sample].on_enter()
     draw_samples_menu()
