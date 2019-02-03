@@ -2,7 +2,7 @@
 """
 This code demonstrates various usages of python-tcod.
 """
-# To the extent possible under law, the tcod.maintainers have waived all
+# To the extent possible under law, the libtcod maintainers have waived all
 # copyright and related or neighboring rights to these samples.
 # https://creativecommons.org/publicdomain/zero/1.0/
 
@@ -72,9 +72,6 @@ class Sample(tcod.event.EventDispatch):
         raise SystemExit()
 
 
-#############################################
-# true color sample
-#############################################
 class TrueColorSample(Sample):
     def __init__(self):
         self.name = "True colors"
@@ -89,8 +86,8 @@ class TrueColorSample(Sample):
         )
         # corner indexes
         self.corners = np.array([0, 1, 2, 3])
-        # sample screen mesh-grid
-        self.mgrid = np.mgrid[
+        # sample screen interpolation mesh-grid
+        self.interp_x, self.interp_y = np.mgrid[
             0 : 1 : SAMPLE_SCREEN_WIDTH * 1j, 0 : 1 : SAMPLE_SCREEN_HEIGHT * 1j
         ]
 
@@ -121,13 +118,13 @@ class TrueColorSample(Sample):
     def interpolate_corner_colors(self):
         # interpolate corner colors across the sample console
         for i in range(3):  # for each color channel
-            left = (self.colors[2, i] - self.colors[0, i]) * self.mgrid[
-                0
-            ] + self.colors[0, i]
-            right = (self.colors[3, i] - self.colors[1, i]) * self.mgrid[
-                0
-            ] + self.colors[1, i]
-            sample_console.bg[:, :, i] = (right - left) * self.mgrid[1] + left
+            left = (
+                self.colors[2, i] - self.colors[0, i]
+            ) * self.interp_y + self.colors[0, i]
+            right = (
+                self.colors[3, i] - self.colors[1, i]
+            ) * self.interp_y + self.colors[1, i]
+            sample_console.bg[:, :, i] = (right - left) * self.interp_x + left
 
     def darken_background_characters(self):
         # darken background characters
@@ -156,11 +153,6 @@ class TrueColorSample(Sample):
             bg_blend=tcod.BKGND_MULTIPLY,
             alignment=tcod.CENTER,
         )
-
-
-#############################################
-# offscreen console sample
-#############################################
 
 
 class OffscreenConsoleSample(Sample):
@@ -232,11 +224,6 @@ class OffscreenConsoleSample(Sample):
         )
 
 
-#############################################
-# line drawing sample
-#############################################
-
-
 class LineDrawingSample(Sample):
 
     FLAG_NAMES = [
@@ -260,19 +247,16 @@ class LineDrawingSample(Sample):
         self.mk_flag = tcod.BKGND_SET
         self.bk_flag = tcod.BKGND_SET
 
-        self.bk = tcod.console_new(sample_console.width, sample_console.height)
+        self.bk = tcod.console.Console(
+            sample_console.width, sample_console.height, order="F"
+        )
         # initialize the colored background
-        for x in range(sample_console.width):
-            for y in range(sample_console.height):
-                col = tcod.Color(
-                    x * 255 // (sample_console.width - 1),
-                    (x + y)
-                    * 255
-                    // (sample_console.width - 1 + sample_console.height - 1),
-                    y * 255 // (sample_console.height - 1),
-                )
-                self.bk.bg[y, x] = col
-                self.bk.ch[:] = ord(" ")
+        self.bk.bg[:, :, 0].T[:] = np.linspace(0, 255, self.bk.width)
+        self.bk.bg[:, :, 2] = np.linspace(0, 255, self.bk.height)
+        self.bk.bg[:, :, 1] = (
+            self.bk.bg[:, :, 0].astype(int) + self.bk.bg[:, :, 2]
+        ) / 2
+        self.bk.ch[:] = ord(" ")
 
     def ev_keydown(self, event: tcod.event.KeyDown):
         if event.sym in (tcod.event.K_RETURN, tcod.event.K_KP_ENTER):
@@ -290,11 +274,11 @@ class LineDrawingSample(Sample):
         alpha = 0.0
         if (self.bk_flag & 0xFF) == tcod.BKGND_ALPH:
             # for the alpha mode, update alpha every frame
-            alpha = (1.0 + math.cos(tcod.sys_elapsed_seconds() * 2)) / 2.0
+            alpha = (1.0 + math.cos(time.time() * 2)) / 2.0
             self.bk_flag = tcod.BKGND_ALPHA(alpha)
         elif (self.bk_flag & 0xFF) == tcod.BKGND_ADDA:
             # for the add alpha mode, update alpha every frame
-            alpha = (1.0 + math.cos(tcod.sys_elapsed_seconds() * 2)) / 2.0
+            alpha = (1.0 + math.cos(time.time() * 2)) / 2.0
             self.bk_flag = tcod.BKGND_ADDALPHA(alpha)
 
         self.bk.blit(sample_console)
@@ -302,11 +286,7 @@ class LineDrawingSample(Sample):
             (sample_console.height - 2) * ((1.0 + math.cos(time.time())) / 2.0)
         )
         for x in range(sample_console.width):
-            col = tcod.Color(
-                x * 255 // sample_console.width,
-                x * 255 // sample_console.width,
-                x * 255 // sample_console.width,
-            )
+            col = [x * 255 // sample_console.width] * 3
             tcod.console_set_char_background(
                 sample_console, x, recty, col, self.bk_flag
             )
@@ -342,24 +322,19 @@ class LineDrawingSample(Sample):
         )
 
 
-#############################################
-# noise sample
-#############################################
-
-NOISE_OPTIONS = [  # [name, algorithm, implementation],
-    ["perlin noise", tcod.NOISE_PERLIN, tcod.noise.SIMPLE],
-    ["simplex noise", tcod.NOISE_SIMPLEX, tcod.noise.SIMPLE],
-    ["wavelet noise", tcod.NOISE_WAVELET, tcod.noise.SIMPLE],
-    ["perlin fbm", tcod.NOISE_PERLIN, tcod.noise.FBM],
-    ["perlin turbulence", tcod.NOISE_PERLIN, tcod.noise.TURBULENCE],
-    ["simplex fbm", tcod.NOISE_SIMPLEX, tcod.noise.FBM],
-    ["simplex turbulence", tcod.NOISE_SIMPLEX, tcod.noise.TURBULENCE],
-    ["wavelet fbm", tcod.NOISE_WAVELET, tcod.noise.FBM],
-    ["wavelet turbulence", tcod.NOISE_WAVELET, tcod.noise.TURBULENCE],
-]
-
-
 class NoiseSample(Sample):
+    NOISE_OPTIONS = [  # [name, algorithm, implementation],
+        ["perlin noise", tcod.NOISE_PERLIN, tcod.noise.SIMPLE],
+        ["simplex noise", tcod.NOISE_SIMPLEX, tcod.noise.SIMPLE],
+        ["wavelet noise", tcod.NOISE_WAVELET, tcod.noise.SIMPLE],
+        ["perlin fbm", tcod.NOISE_PERLIN, tcod.noise.FBM],
+        ["perlin turbulence", tcod.NOISE_PERLIN, tcod.noise.TURBULENCE],
+        ["simplex fbm", tcod.NOISE_SIMPLEX, tcod.noise.FBM],
+        ["simplex turbulence", tcod.NOISE_SIMPLEX, tcod.noise.TURBULENCE],
+        ["wavelet fbm", tcod.NOISE_WAVELET, tcod.noise.FBM],
+        ["wavelet turbulence", tcod.NOISE_WAVELET, tcod.noise.TURBULENCE],
+    ]
+
     def __init__(self):
         self.name = "Noise"
         self.func = 0
@@ -376,11 +351,11 @@ class NoiseSample(Sample):
 
     @property
     def algorithm(self):
-        return NOISE_OPTIONS[self.func][1]
+        return self.NOISE_OPTIONS[self.func][1]
 
     @property
     def implementation(self):
-        return NOISE_OPTIONS[self.func][2]
+        return self.NOISE_OPTIONS[self.func][2]
 
     def get_noise(self):
         return tcod.noise.Noise(
@@ -424,8 +399,8 @@ class NoiseSample(Sample):
             / 255
         )
 
-        for curfunc in range(len(NOISE_OPTIONS)):
-            text = "%i : %s" % (curfunc + 1, NOISE_OPTIONS[curfunc][0])
+        for curfunc in range(len(self.NOISE_OPTIONS)):
+            text = "%i : %s" % (curfunc + 1, self.NOISE_OPTIONS[curfunc][0])
             if curfunc == self.func:
                 sample_console.default_fg = tcod.white
                 sample_console.default_bg = tcod.light_blue
@@ -479,10 +454,10 @@ class NoiseSample(Sample):
 #############################################
 # field of view sample
 #############################################
-DARK_WALL = tcod.Color(0, 0, 100)
-LIGHT_WALL = tcod.Color(130, 110, 50)
-DARK_GROUND = tcod.Color(50, 50, 150)
-LIGHT_GROUND = tcod.Color(200, 180, 50)
+DARK_WALL = (0, 0, 100)
+LIGHT_WALL = (130, 110, 50)
+DARK_GROUND = (50, 50, 150)
+LIGHT_GROUND = (200, 180, 50)
 
 SAMPLE_MAP = [
     "##############################################",
@@ -619,26 +594,22 @@ class FOVSample(Sample):
                 self.noise, [self.torchx], tcod.NOISE_SIMPLEX
             )
             # where_fov = np.where(self.map.fov[:])
-            mgrid = np.mgrid[:SAMPLE_SCREEN_HEIGHT, :SAMPLE_SCREEN_WIDTH]
+            mgrid = np.mgrid[:SAMPLE_SCREEN_WIDTH, :SAMPLE_SCREEN_HEIGHT]
             # get squared distance
-            light = (mgrid[0] - self.py + dy) ** 2 + (
-                mgrid[1] - self.px + dx
+            light = (mgrid[0] - self.px + dx) ** 2 + (
+                mgrid[1] - self.py + dy
             ) ** 2
             light = light.astype(np.float16)
-            where_visible = np.where(
-                (light < SQUARED_TORCH_RADIUS) & self.map.fov[:]
-            )
-            light[where_visible] = SQUARED_TORCH_RADIUS - light[where_visible]
-            light[where_visible] /= SQUARED_TORCH_RADIUS
-            light[where_visible] += di
-            light[where_visible] = light[where_visible].clip(0, 1)
+            visible = (light < SQUARED_TORCH_RADIUS) & self.map.fov[:]
+            light[...] = SQUARED_TORCH_RADIUS - light
+            light[...] /= SQUARED_TORCH_RADIUS
+            light[...] += di
+            light[...] = light.clip(0, 1)
+            light[~visible] = 0
 
-            for yx in zip(*where_visible):
-                sample_console.bg[yx] = tcod.color_lerp(
-                    tuple(self.dark_map_bg[yx]),
-                    tuple(self.light_map_bg[yx]),
-                    light[yx],
-                )
+            sample_console.bg[...] = (
+                self.light_map_bg.astype(np.float16) - self.dark_map_bg
+            ) * light[..., np.newaxis] + self.dark_map_bg
         else:
             where_fov = np.where(self.map.fov[:])
             sample_console.bg[where_fov] = self.light_map_bg[where_fov]
@@ -678,11 +649,6 @@ class FOVSample(Sample):
             self.recompute = True
         else:
             super().ev_keydown(event)
-
-
-#############################################
-# pathfinding sample
-#############################################
 
 
 class PathfindingSample(Sample):
@@ -1120,11 +1086,6 @@ class BSPSample(Sample):
             super().ev_keydown(event)
 
 
-#############################################
-# image sample
-#############################################
-
-
 class ImageSample(Sample):
     def __init__(self):
         self.name = "Image toolkit"
@@ -1179,12 +1140,6 @@ class ImageSample(Sample):
         )
 
 
-#############################################
-# mouse sample
-#############################################
-butstatus = ("OFF", "ON")
-
-
 class MouseSample(Sample):
     def __init__(self):
         self.name = "Mouse support"
@@ -1237,9 +1192,9 @@ class MouseSample(Sample):
                 self.motion.tile.y,
                 self.motion.tile_motion.x,
                 self.motion.tile_motion.y,
-                butstatus[self.lbut],
-                butstatus[self.rbut],
-                butstatus[self.mbut],
+                ("OFF", "ON")[self.lbut],
+                ("OFF", "ON")[self.rbut],
+                ("OFF", "ON")[self.mbut],
             ),
         )
         sample_console.print_(1, 10, "1 : Hide cursor\n2 : Show cursor")
@@ -1251,11 +1206,6 @@ class MouseSample(Sample):
             tcod.mouse_show_cursor(True)
         else:
             super().ev_keydown(event)
-
-
-#############################################
-# name generator sample
-#############################################
 
 
 class NameGeneratorSample(Sample):
