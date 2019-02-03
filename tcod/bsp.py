@@ -72,7 +72,7 @@ class BSP(object):
         return self.width
 
     @w.setter
-    def w(self, value: int):
+    def w(self, value: int) -> None:
         self.width = value
 
     @property
@@ -80,7 +80,7 @@ class BSP(object):
         return self.height
 
     @h.setter
-    def h(self, value: int):
+    def h(self, value: int) -> None:
         self.height = value
 
     def _as_cdata(self) -> Any:
@@ -93,7 +93,7 @@ class BSP(object):
         cdata.level = self.level
         return cdata
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Provide a useful readout when printed."""
         status = "leaf"
         if self.children:
@@ -112,7 +112,7 @@ class BSP(object):
             status,
         )
 
-    def _unpack_bsp_tree(self, cdata) -> None:
+    def _unpack_bsp_tree(self, cdata: Any) -> None:
         self.x = cdata.x
         self.y = cdata.y
         self.width = cdata.w
@@ -266,7 +266,7 @@ class BSP(object):
         if not self.contains(x, y):
             return None
         for child in self.children:
-            found = child.find_node(x, y)
+            found = child.find_node(x, y)  # type: Optional["BSP"]
             if found:
                 return found
         return self

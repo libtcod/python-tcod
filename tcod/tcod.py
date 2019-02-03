@@ -1,6 +1,6 @@
 """This module focuses on improvements to the Python libtcod API.
 """
-from typing import Any, AnyStr
+from typing import Any, AnyStr, Callable
 import warnings
 
 from tcod.libtcod import ffi
@@ -9,7 +9,7 @@ from tcod.libtcod import ffi
 def _unpack_char_p(char_p: Any) -> str:
     if char_p == ffi.NULL:
         return ""
-    return ffi.string(char_p).decode()
+    return ffi.string(char_p).decode()  # type: ignore
 
 
 def _int(int_or_str: Any) -> int:
@@ -66,10 +66,11 @@ class _PropagateException:
     # give propagate as onerror parameter for ffi.def_extern
     """
 
-    def __init__(self):
-        self.exc_info = None  # (exception, exc_value, traceback)
+    def __init__(self) -> None:
+        # (exception, exc_value, traceback)
+        self.exc_info = None  # type: Any
 
-    def propagate(self, *exc_info):
+    def propagate(self, *exc_info: Any) -> None:
         """ set an exception to be raised once this context exits
 
         if multiple errors are caught, only keep the first exception raised
@@ -77,13 +78,13 @@ class _PropagateException:
         if not self.exc_info:
             self.exc_info = exc_info
 
-    def __enter__(self):
+    def __enter__(self) -> Callable[[Any], None]:
         """ once in context, only the propagate call is needed to use this
         class effectively
         """
         return self.propagate
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type: Any, value: Any, traceback: Any) -> None:
         """ if we're holding on to an exception, raise it now
 
         prefers our held exception over any current raising error
@@ -101,34 +102,34 @@ class _PropagateException:
 
 
 class _CDataWrapper(object):
-    def __init__(self, *args, **kargs):
+    def __init__(self, *args: Any, **kargs: Any):
         self.cdata = self._get_cdata_from_args(*args, **kargs)
         if self.cdata is None:
             self.cdata = ffi.NULL
         super(_CDataWrapper, self).__init__()
 
     @staticmethod
-    def _get_cdata_from_args(*args, **kargs):
+    def _get_cdata_from_args(*args: Any, **kargs: Any) -> Any:
         if len(args) == 1 and isinstance(args[0], ffi.CData) and not kargs:
             return args[0]
         else:
             return None
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.cdata)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> Any:
         try:
             return self.cdata == other.cdata
         except AttributeError:
             return NotImplemented
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str) -> Any:
         if "cdata" in self.__dict__:
             return getattr(self.__dict__["cdata"], attr)
         raise AttributeError(attr)
 
-    def __setattr__(self, attr, value):
+    def __setattr__(self, attr: str, value: Any) -> None:
         if hasattr(self, "cdata") and hasattr(self.cdata, attr):
             setattr(self.cdata, attr, value)
         else:

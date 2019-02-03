@@ -2,6 +2,7 @@
     Random module docs.
 """
 import random
+from typing import Any, Hashable, Optional
 
 from tcod.libtcod import ffi, lib
 import tcod.constants
@@ -27,7 +28,7 @@ class Random(object):
         random_c (CData): A cffi pointer to a TCOD_random_t object.
     """
 
-    def __init__(self, algorithm, seed=None):
+    def __init__(self, algorithm: int, seed: Optional[Hashable] = None):
         """Create a new instance using this algorithm and seed."""
         if seed is None:
             seed = random.getrandbits(32)
@@ -42,13 +43,13 @@ class Random(object):
         )
 
     @classmethod
-    def _new_from_cdata(cls, cdata):
+    def _new_from_cdata(cls, cdata: Any) -> "Random":
         """Return a new instance encapsulating this cdata."""
-        self = object.__new__(cls)
+        self = object.__new__(cls)  # type: "Random"
         self.random_c = cdata
         return self
 
-    def randint(self, low, high):
+    def randint(self, low: int, high: int) -> int:
         """Return a random integer within the linear range: low <= n <= high.
 
         Args:
@@ -58,21 +59,21 @@ class Random(object):
         Returns:
             int: A random integer.
         """
-        return lib.TCOD_random_get_i(self.random_c, low, high)
+        return int(lib.TCOD_random_get_i(self.random_c, low, high))
 
-    def uniform(self, low, high):
+    def uniform(self, low: float, high: float) -> float:
         """Return a random floating number in the range: low <= n <= high.
 
         Args:
-            low (int): The lower bound of the random range.
-            high (int): The upper bound of the random range.
+            low (float): The lower bound of the random range.
+            high (float): The upper bound of the random range.
 
         Returns:
             float: A random float.
         """
-        return lib.TCOD_random_get_double(self.random_c, low, high)
+        return float(lib.TCOD_random_get_double(self.random_c, low, high))
 
-    def guass(self, mu, sigma):
+    def guass(self, mu: float, sigma: float) -> float:
         """Return a random number using Gaussian distribution.
 
         Args:
@@ -82,9 +83,11 @@ class Random(object):
         Returns:
             float: A random float.
         """
-        return lib.TCOD_random_get_gaussian_double(self.random_c, mu, sigma)
+        return float(
+            lib.TCOD_random_get_gaussian_double(self.random_c, mu, sigma)
+        )
 
-    def inverse_guass(self, mu, sigma):
+    def inverse_guass(self, mu: float, sigma: float) -> float:
         """Return a random Gaussian number using the Box-Muller transform.
 
         Args:
@@ -94,11 +97,11 @@ class Random(object):
         Returns:
             float: A random float.
         """
-        return lib.TCOD_random_get_gaussian_double_inv(
-            self.random_c, mu, sigma
+        return float(
+            lib.TCOD_random_get_gaussian_double_inv(self.random_c, mu, sigma)
         )
 
-    def __getstate__(self):
+    def __getstate__(self) -> Any:
         """Pack the self.random_c attribute into a portable state."""
         state = self.__dict__.copy()
         state["random_c"] = {
@@ -112,7 +115,7 @@ class Random(object):
         }
         return state
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: Any) -> None:
         """Create a new cdata object with the stored paramaters."""
         try:
             cdata = state["random_c"]

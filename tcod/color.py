@@ -1,10 +1,12 @@
 """
 
 """
+from typing import Any, List
+
 from tcod.libtcod import lib
 
 
-class Color(list):
+class Color(List[int]):
     """
 
     Args:
@@ -22,7 +24,7 @@ class Color(list):
         return self[0]
 
     @r.setter
-    def r(self, value: int):
+    def r(self, value: int) -> None:
         self[0] = value & 0xFF
 
     @property
@@ -31,7 +33,7 @@ class Color(list):
         return self[1]
 
     @g.setter
-    def g(self, value: int):
+    def g(self, value: int) -> None:
         self[1] = value & 0xFF
 
     @property
@@ -40,27 +42,27 @@ class Color(list):
         return self[2]
 
     @b.setter
-    def b(self, value: int):
+    def b(self, value: int) -> None:
         self[2] = value & 0xFF
 
     @classmethod
-    def _new_from_cdata(cls, cdata):
+    def _new_from_cdata(cls, cdata: Any) -> "Color":
         """new in libtcod-cffi"""
         return cls(cdata.r, cdata.g, cdata.b)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: Any) -> int:  # type: ignore
         try:
-            return list.__getitem__(self, index)
+            return super().__getitem__(index)  # type: ignore
         except TypeError:
-            return list.__getitem__(self, "rgb".index(index))
+            return super().__getitem__("rgb".index(index))
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index: Any, value: Any) -> None:
         try:
-            list.__setitem__(self, index, value)
+            super().__setitem__(index, value)
         except TypeError:
-            list.__setitem__(self, "rgb".index(index), value)
+            super().__setitem__("rgb".index(index), value)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         """Compare equality between colors.
 
         Also compares with standard sequences such as 3-item tuples or lists.
@@ -70,15 +72,15 @@ class Color(list):
         except TypeError:
             return False
 
-    def __add__(self, other):
+    def __add__(self, other: Any) -> "Color":
         """Add two colors together."""
         return Color._new_from_cdata(lib.TCOD_color_add(self, other))
 
-    def __sub__(self, other):
+    def __sub__(self, other: Any) -> "Color":
         """Subtract one color from another."""
         return Color._new_from_cdata(lib.TCOD_color_subtract(self, other))
 
-    def __mul__(self, other):
+    def __mul__(self, other: Any) -> "Color":
         """Multiply with a scaler or another color."""
         if isinstance(other, (Color, list, tuple)):
             return Color._new_from_cdata(lib.TCOD_color_multiply(self, other))
@@ -87,7 +89,7 @@ class Color(list):
                 lib.TCOD_color_multiply_scalar(self, other)
             )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a printable representation of the current color."""
         return "%s(%i, %i, %i)" % (
             self.__class__.__name__,

@@ -6,7 +6,7 @@ import pytest
 
 import tcod as libtcod
 
-@pytest.mark.filterwarnings("ignore:Using this class is not recommended.")
+@pytest.mark.filterwarnings("ignore:.*")
 def test_parser():
     print ('***** File Parser test *****')
     parser=libtcod.parser_new()

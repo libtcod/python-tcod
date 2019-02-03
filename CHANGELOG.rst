@@ -11,6 +11,10 @@ Unreleased
 ------------------
 Deprecated
  - The tdl module has been deprecated.
+ - The libtcodpy parser functions have been deprecated.
+Fixed
+ - `tcod.image_is_pixel_transparent` and `tcod.image_get_alpha` now return
+   values.
 
 8.4.1 - 2019-02-01
 ------------------

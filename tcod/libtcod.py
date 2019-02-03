@@ -23,19 +23,19 @@ class _Mock(object):
     CData = ()  # This gets passed to an isinstance call.
 
     @staticmethod
-    def def_extern():
+    def def_extern() -> Any:
         """Pass def_extern call silently."""
         return lambda func: func
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: Any) -> Any:
         """This object pretends to have everything."""
         return self
 
-    def __call__(self, *args, **kargs):
+    def __call__(self, *args: Any, **kargs: Any) -> Any:
         """Suppress any other calls"""
         return self
 
-    def __str__(self):
+    def __str__(self) -> Any:
         """Just have ? in case anything leaks as a parameter default."""
         return "?"
 

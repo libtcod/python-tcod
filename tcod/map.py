@@ -103,7 +103,7 @@ class Map(object):
         radius: int = 0,
         light_walls: bool = True,
         algorithm: int = tcod.constants.FOV_RESTRICTIVE,
-    ):
+    ) -> None:
         """Compute a field-of-view on the current instance.
 
         Args:
@@ -119,7 +119,7 @@ class Map(object):
             self.map_c, x, y, radius, light_walls, algorithm
         )
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: Any) -> None:
         if "_Map__buffer" not in state:  # deprecated
             # remove this check on major version update
             self.__buffer = np.zeros(
@@ -135,7 +135,7 @@ class Map(object):
         self.__dict__.update(state)
         self.map_c = self.__as_cdata()
 
-    def __getstate__(self):
+    def __getstate__(self) -> Any:
         state = self.__dict__.copy()
         del state["map_c"]
         return state

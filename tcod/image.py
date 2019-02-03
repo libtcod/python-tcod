@@ -1,28 +1,31 @@
+from typing import Any, Tuple
+
 import numpy as np
 
+import tcod.console
 from tcod.libtcod import ffi, lib
 from tcod.tcod import _console
 
 
-class _ImageBufferArray(np.ndarray):
-    def __new__(cls, image):
+class _ImageBufferArray(np.ndarray):  # type: ignore
+    def __new__(cls, image: Any) -> "_ImageBufferArray":
         size = image.height * image.width
         self = np.frombuffer(
             ffi.buffer(lib.TCOD_image_get_colors()[size]), np.uint8
         )
         self = self.reshape((image.height, image.width, 3)).view(cls)
         self._image_c = image.cdata
-        return self
+        return self  # type: ignore
 
-    def __array_finalize__(self, obj):
+    def __array_finalize__(self, obj: Any) -> None:
         if obj is None:
             return
         self._image_c = getattr(obj, "_image_c", None)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return repr(self.view(np.ndarray))
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index: Any, value: Any) -> None:
         """Must invalidate mipmaps on any write."""
         np.ndarray.__setitem__(self, index, value)
         if self._image_c is not None:
@@ -40,20 +43,20 @@ class Image(object):
         height (int): Read only height of this Image.
     """
 
-    def __init__(self, width, height):
+    def __init__(self, width: int, height: int):
         self.width, self.height = width, height
         self.image_c = ffi.gc(
             lib.TCOD_image_new(width, height), lib.TCOD_image_delete
         )
 
     @classmethod
-    def _from_cdata(cls, cdata):
-        self = object.__new__(cls)
+    def _from_cdata(cls, cdata: Any) -> "Image":
+        self = object.__new__(cls)  # type: "Image"
         self.image_c = cdata
         self.width, self.height = self._get_size()
         return self
 
-    def clear(self, color):
+    def clear(self, color: Tuple[int, int, int]) -> None:
         """Fill this entire Image with color.
 
         Args:
@@ -62,15 +65,15 @@ class Image(object):
         """
         lib.TCOD_image_clear(self.image_c, color)
 
-    def invert(self):
+    def invert(self) -> None:
         """Invert all colors in this Image."""
         lib.TCOD_image_invert(self.image_c)
 
-    def hflip(self):
+    def hflip(self) -> None:
         """Horizontally flip this Image."""
         lib.TCOD_image_hflip(self.image_c)
 
-    def rotate90(self, rotations=1):
+    def rotate90(self, rotations: int = 1) -> None:
         """Rotate this Image clockwise in 90 degree steps.
 
         Args:
@@ -78,11 +81,11 @@ class Image(object):
         """
         lib.TCOD_image_rotate90(self.image_c, rotations)
 
-    def vflip(self):
+    def vflip(self) -> None:
         """Vertically flip this Image."""
         lib.TCOD_image_vflip(self.image_c)
 
-    def scale(self, width, height):
+    def scale(self, width: int, height: int) -> None:
         """Scale this Image to the new width and height.
 
         Args:
@@ -92,7 +95,7 @@ class Image(object):
         lib.TCOD_image_scale(self.image_c, width, height)
         self.width, self.height = width, height
 
-    def set_key_color(self, color):
+    def set_key_color(self, color: Tuple[int, int, int]) -> None:
         """Set a color to be transparent during blitting functions.
 
         Args:
@@ -101,7 +104,7 @@ class Image(object):
         """
         lib.TCOD_image_set_key_color(self.image_c, color)
 
-    def get_alpha(self, x, y):
+    def get_alpha(self, x: int, y: int) -> int:
         """Get the Image alpha of the pixel at x, y.
 
         Args:
@@ -112,9 +115,9 @@ class Image(object):
             int: The alpha value of the pixel.
             With 0 being fully transparent and 255 being fully opaque.
         """
-        return lib.TCOD_image_get_alpha(self.image_c, x, y)
+        return lib.TCOD_image_get_alpha(self.image_c, x, y)  # type: ignore
 
-    def refresh_console(self, console):
+    def refresh_console(self, console: tcod.console.Console) -> None:
         """Update an Image created with :any:`tcod.image_from_console`.
 
         The console used with this function should have the same width and
@@ -128,7 +131,7 @@ class Image(object):
         """
         lib.TCOD_image_refresh_console(self.image_c, _console(console))
 
-    def _get_size(self):
+    def _get_size(self) -> Tuple[int, int]:
         """Return the (width, height) for this Image.
 
         Returns:
@@ -139,7 +142,7 @@ class Image(object):
         lib.TCOD_image_get_size(self.image_c, w, h)
         return w[0], h[0]
 
-    def get_pixel(self, x, y):
+    def get_pixel(self, x: int, y: int) -> Tuple[int, int, int]:
         """Get the color of a pixel in this Image.
 
         Args:
@@ -154,7 +157,9 @@ class Image(object):
         color = lib.TCOD_image_get_pixel(self.image_c, x, y)
         return color.r, color.g, color.b
 
-    def get_mipmap_pixel(self, left, top, right, bottom):
+    def get_mipmap_pixel(
+        self, left: float, top: float, right: float, bottom: float
+    ) -> Tuple[int, int, int]:
         """Get the average color of a rectangle in this Image.
 
         Parameters should stay within the following limits:
@@ -162,10 +167,10 @@ class Image(object):
         * 0 <= top < bottom < Image.height
 
         Args:
-            left (int): Left corner of the region.
-            top (int): Top corner of the region.
-            right (int): Right corner of the region.
-            bottom (int): Bottom corner of the region.
+            left (float): Left corner of the region.
+            top (float): Top corner of the region.
+            right (float): Right corner of the region.
+            bottom (float): Bottom corner of the region.
 
         Returns:
             Tuple[int, int, int]:
@@ -177,7 +182,7 @@ class Image(object):
         )
         return (color.r, color.g, color.b)
 
-    def put_pixel(self, x, y, color):
+    def put_pixel(self, x: int, y: int, color: Tuple[int, int, int]) -> None:
         """Change a pixel on this Image.
 
         Args:
@@ -188,13 +193,22 @@ class Image(object):
         """
         lib.TCOD_image_put_pixel(self.image_c, x, y, color)
 
-    def blit(self, console, x, y, bg_blend, scale_x, scale_y, angle):
+    def blit(
+        self,
+        console: tcod.console.Console,
+        x: float,
+        y: float,
+        bg_blend: int,
+        scale_x: float,
+        scale_y: float,
+        angle: float,
+    ) -> None:
         """Blit onto a Console using scaling and rotation.
 
         Args:
             console (Console): Blit destination Console.
-            x (int): Console X position for the center of the Image blit.
-            y (int): Console Y position for the center of the Image blit.
+            x (float): Console X position for the center of the Image blit.
+            y (float): Console Y position for the center of the Image blit.
                      The Image blit is centered on this position.
             bg_blend (int): Background blending mode to use.
             scale_x (float): Scaling along Image x axis.
@@ -214,7 +228,15 @@ class Image(object):
             angle,
         )
 
-    def blit_rect(self, console, x, y, width, height, bg_blend):
+    def blit_rect(
+        self,
+        console: tcod.console.Console,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        bg_blend: int,
+    ) -> None:
         """Blit onto a Console without scaling or rotation.
 
         Args:
@@ -231,14 +253,14 @@ class Image(object):
 
     def blit_2x(
         self,
-        console,
-        dest_x,
-        dest_y,
-        img_x=0,
-        img_y=0,
-        img_width=-1,
-        img_height=-1,
-    ):
+        console: tcod.console.Console,
+        dest_x: int,
+        dest_y: int,
+        img_x: int = 0,
+        img_y: int = 0,
+        img_width: int = -1,
+        img_height: int = -1,
+    ) -> None:
         """Blit onto a Console with double resolution.
 
         Args:
@@ -263,7 +285,7 @@ class Image(object):
             img_height,
         )
 
-    def save_as(self, filename):
+    def save_as(self, filename: str) -> None:
         """Save the Image to a 32-bit .bmp or .png file.
 
         Args:

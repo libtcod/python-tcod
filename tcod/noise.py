@@ -33,10 +33,13 @@ Example::
     samples = noise.sample_ogrid(ogrid)
     print(samples)
 """
+from typing import Any, Optional
+
 import numpy as np
 
 from tcod.libtcod import ffi, lib
 import tcod.constants
+import tcod.random
 
 """Noise implementation constants"""
 SIMPLE = 0
@@ -71,13 +74,13 @@ class Noise(object):
 
     def __init__(
         self,
-        dimensions,
-        algorithm=2,
-        implementation=SIMPLE,
-        hurst=0.5,
-        lacunarity=2.0,
-        octaves=4,
-        seed=None,
+        dimensions: int,
+        algorithm: int = 2,
+        implementation: int = SIMPLE,
+        hurst: float = 0.5,
+        lacunarity: float = 2.0,
+        octaves: float = 4,
+        seed: Optional[tcod.random.Random] = None,
     ):
         if not 0 < dimensions <= 4:
             raise ValueError(
@@ -100,48 +103,50 @@ class Noise(object):
         self.implementation = implementation  # sanity check
 
     @property
-    def dimensions(self):
-        return self._tdl_noise_c.dimensions
+    def dimensions(self) -> int:
+        return int(self._tdl_noise_c.dimensions)
 
     @property
-    def dimentions(self):  # deprecated
+    def dimentions(self) -> int:  # deprecated
         return self.dimensions
 
     @property
-    def algorithm(self):
-        return self.noise_c.noise_type
+    def algorithm(self) -> int:
+        return int(self.noise_c.noise_type)
 
     @algorithm.setter
-    def algorithm(self, value):
+    def algorithm(self, value: int) -> None:
         lib.TCOD_noise_set_type(self.noise_c, value)
 
     @property
-    def implementation(self):
-        return self._tdl_noise_c.implementation
+    def implementation(self) -> int:
+        return int(self._tdl_noise_c.implementation)
 
     @implementation.setter
-    def implementation(self, value):
+    def implementation(self, value: int) -> None:
         if not 0 <= value < 3:
             raise ValueError("%r is not a valid implementation. " % (value,))
         self._tdl_noise_c.implementation = value
 
     @property
-    def hurst(self):
-        return self.noise_c.H
+    def hurst(self) -> float:
+        return float(self.noise_c.H)
 
     @property
-    def lacunarity(self):
-        return self.noise_c.lacunarity
+    def lacunarity(self) -> float:
+        return float(self.noise_c.lacunarity)
 
     @property
-    def octaves(self):
-        return self._tdl_noise_c.octaves
+    def octaves(self) -> float:
+        return float(self._tdl_noise_c.octaves)
 
     @octaves.setter
-    def octaves(self, value):
+    def octaves(self, value: float) -> None:
         self._tdl_noise_c.octaves = value
 
-    def get_point(self, x=0, y=0, z=0, w=0):
+    def get_point(
+        self, x: float = 0, y: float = 0, z: float = 0, w: float = 0
+    ) -> float:
         """Return the noise value at the (x, y, z, w) point.
 
         Args:
@@ -150,9 +155,9 @@ class Noise(object):
             z (float): The position on the 3rd axis.
             w (float): The position on the 4th axis.
         """
-        return lib.NoiseGetSample(self._tdl_noise_c, (x, y, z, w))
+        return float(lib.NoiseGetSample(self._tdl_noise_c, (x, y, z, w)))
 
-    def sample_mgrid(self, mgrid):
+    def sample_mgrid(self, mgrid: np.array) -> np.array:
         """Sample a mesh-grid array and return the result.
 
         The :any:`sample_ogrid` method performs better as there is a lot of
@@ -188,7 +193,7 @@ class Noise(object):
         )
         return out
 
-    def sample_ogrid(self, ogrid):
+    def sample_ogrid(self, ogrid: np.array) -> np.array:
         """Sample an open mesh-grid array and return the result.
 
         Args
@@ -217,7 +222,7 @@ class Noise(object):
         )
         return out
 
-    def __getstate__(self):
+    def __getstate__(self) -> Any:
         state = self.__dict__.copy()
         if self.dimensions < 4 and self.noise_c.waveletTileData == ffi.NULL:
             # Trigger a side effect of wavelet, so that copies will be synced.
@@ -250,7 +255,7 @@ class Noise(object):
         }
         return state
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: Any) -> None:
         if isinstance(state, tuple):  # deprecated format
             return self._setstate_old(state)
         # unpack wavelet tile data if it exists
@@ -271,7 +276,7 @@ class Noise(object):
         state["_tdl_noise_c"] = ffi.new("TDLNoise*", state["_tdl_noise_c"])
         self.__dict__.update(state)
 
-    def _setstate_old(self, state):
+    def _setstate_old(self, state: Any) -> None:
         self._random = state[0]
         self.noise_c = ffi.new("struct TCOD_Noise*")
         self.noise_c.ndim = state[3]

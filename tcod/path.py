@@ -40,49 +40,52 @@ Example::
     All path-finding functions now respect the NumPy array shape (if a NumPy
     array is used.)
 """
-import numpy as np
 from typing import Any, Callable, List, Tuple, Union  # noqa: F401
+
+import numpy as np
 
 from tcod.libtcod import lib, ffi
 import tcod.map  # noqa: F401
 
 
-@ffi.def_extern()
+@ffi.def_extern()  # type: ignore
 def _pycall_path_old(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:
     """libtcodpy style callback, needs to preserve the old userData issue."""
     func, userData = ffi.from_handle(handle)
-    return func(x1, y1, x2, y2, userData)
+    return func(x1, y1, x2, y2, userData)  # type: ignore
 
 
-@ffi.def_extern()
+@ffi.def_extern()  # type: ignore
 def _pycall_path_simple(
     x1: int, y1: int, x2: int, y2: int, handle: Any
 ) -> float:
     """Does less and should run faster, just calls the handle function."""
-    return ffi.from_handle(handle)(x1, y1, x2, y2)
+    return ffi.from_handle(handle)(x1, y1, x2, y2)  # type: ignore
 
 
-@ffi.def_extern()
+@ffi.def_extern()  # type: ignore
 def _pycall_path_swap_src_dest(
     x1: int, y1: int, x2: int, y2: int, handle: Any
 ) -> float:
     """A TDL function dest comes first to match up with a dest only call."""
-    return ffi.from_handle(handle)(x2, y2, x1, y1)
+    return ffi.from_handle(handle)(x2, y2, x1, y1)  # type: ignore
 
 
-@ffi.def_extern()
+@ffi.def_extern()  # type: ignore
 def _pycall_path_dest_only(
     x1: int, y1: int, x2: int, y2: int, handle: Any
 ) -> float:
     """A TDL function which samples the dest coordinate only."""
-    return ffi.from_handle(handle)(x2, y2)
+    return ffi.from_handle(handle)(x2, y2)  # type: ignore
 
 
 def _get_pathcost_func(
     name: str
 ) -> Callable[[int, int, int, int, Any], float]:
     """Return a properly cast PathCostArray callback."""
-    return ffi.cast("TCOD_path_func_t", ffi.addressof(lib, name))
+    return ffi.cast(  # type: ignore
+        "TCOD_path_func_t", ffi.addressof(lib, name)
+    )
 
 
 class _EdgeCostFunc(object):
@@ -103,7 +106,7 @@ class _EdgeCostFunc(object):
         """Return (C callback, userdata handle, shape)"""
         return self._CALLBACK_P, ffi.new_handle(self._userdata), self.shape
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "%s(%r, shape=%r)" % (
             self.__class__.__name__,
             self._userdata,
@@ -135,7 +138,7 @@ class EdgeCostCallback(_EdgeCostFunc):
         super(EdgeCostCallback, self).__init__(callback, shape)
 
 
-class NodeCostArray(np.ndarray):
+class NodeCostArray(np.ndarray):  # type: ignore
     """Calculate cost from a numpy array of nodes.
 
     `array` is a NumPy array holding the path-cost of each node.
@@ -153,12 +156,12 @@ class NodeCostArray(np.ndarray):
         np.uint32: ("uint32_t*", _get_pathcost_func("PathCostArrayUInt32")),
     }
 
-    def __new__(cls, array):
+    def __new__(cls, array: np.array) -> "NodeCostArray":
         """Validate a numpy array and setup a C callback."""
         self = np.asarray(array).view(cls)
-        return self
+        return self  # type: ignore
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "%s(%r)" % (
             self.__class__.__name__,
             repr(self.view(np.ndarray)),
@@ -221,14 +224,14 @@ class _PathFinder(object):
             self._path_delete,
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "%s(cost=%r, diagonal=%r)" % (
             self.__class__.__name__,
             self.cost,
             self.diagonal,
         )
 
-    def __getstate__(self):
+    def __getstate__(self) -> Any:
         state = self.__dict__.copy()
         del state["_path_c"]
         del state["shape"]
@@ -236,9 +239,9 @@ class _PathFinder(object):
         del state["_userdata"]
         return state
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: Any) -> None:
         self.__dict__.update(state)
-        self.__init__(self.cost, self.diagonal)
+        self.__init__(self.cost, self.diagonal)  # type: ignore
 
     _path_new_using_map = lib.TCOD_path_new_using_map
     _path_new_using_function = lib.TCOD_path_new_using_function

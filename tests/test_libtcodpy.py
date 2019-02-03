@@ -502,7 +502,7 @@ def test_noise():
     libtcodpy.noise_get_turbulence(noise, [0], 4)
     libtcodpy.noise_delete(noise)
 
-@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
+@pytest.mark.filterwarnings("ignore:.*")
 def test_random():
     rand = libtcodpy.random_get_instance()
     rand = libtcodpy.random_new()
