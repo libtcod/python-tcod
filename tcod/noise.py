@@ -37,6 +37,7 @@ from typing import Any, Optional
 
 import numpy as np
 
+from tcod._internal import deprecate
 from tcod.libtcod import ffi, lib
 import tcod.constants
 import tcod.random
@@ -106,8 +107,9 @@ class Noise(object):
     def dimensions(self) -> int:
         return int(self._tdl_noise_c.dimensions)
 
-    @property
-    def dimentions(self) -> int:  # deprecated
+    @property  # type: ignore
+    @deprecate("This is a misspelling of 'dimensions'.")
+    def dimentions(self) -> int:
         return self.dimensions
 
     @property

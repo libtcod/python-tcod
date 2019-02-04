@@ -524,6 +524,7 @@ class Mouse(_CDataWrapper):
         return self.cdata
 
 
+@deprecate("Call tcod.bsp.BSP(x, y, width, height) instead.")
 def bsp_new_with_size(x: int, y: int, w: int, h: int) -> tcod.bsp.BSP:
     """Create a new BSP instance with the given rectangle.
 
@@ -542,6 +543,7 @@ def bsp_new_with_size(x: int, y: int, w: int, h: int) -> tcod.bsp.BSP:
     return Bsp(x, y, w, h)
 
 
+@deprecate("Call node.split_once instead.")
 def bsp_split_once(
     node: tcod.bsp.BSP, horizontal: bool, position: int
 ) -> None:
@@ -552,6 +554,7 @@ def bsp_split_once(
     node.split_once(horizontal, position)
 
 
+@deprecate("Call node.split_recursive instead.")
 def bsp_split_recursive(
     node: tcod.bsp.BSP,
     randomizer: Optional[tcod.random.Random],
@@ -1566,7 +1569,7 @@ def console_delete(con: tcod.console.Console) -> None:
         lib.TCOD_console_delete(con)
 
 
-# fast color filling
+@deprecate("Assign to the console.fg array instead.")
 def console_fill_foreground(
     con: tcod.console.Console,
     r: Sequence[int],
@@ -1580,6 +1583,9 @@ def console_fill_foreground(
         r (Sequence[int]): An array of integers with a length of width*height.
         g (Sequence[int]): An array of integers with a length of width*height.
         b (Sequence[int]): An array of integers with a length of width*height.
+
+    .. deprecated:: 8.4
+        You should assign to :any:`tcod.console.Console.fg` instead.
     """
     if len(r) != len(g) or len(r) != len(b):
         raise TypeError("R, G and B must all have the same size.")
@@ -1604,6 +1610,7 @@ def console_fill_foreground(
     lib.TCOD_console_fill_foreground(_console(con), cr, cg, cb)
 
 
+@deprecate("Assign to the console.bg array instead.")
 def console_fill_background(
     con: tcod.console.Console,
     r: Sequence[int],
@@ -1617,6 +1624,9 @@ def console_fill_background(
         r (Sequence[int]): An array of integers with a length of width*height.
         g (Sequence[int]): An array of integers with a length of width*height.
         b (Sequence[int]): An array of integers with a length of width*height.
+
+    .. deprecated:: 8.4
+        You should assign to :any:`tcod.console.Console.bg` instead.
     """
     if len(r) != len(g) or len(r) != len(b):
         raise TypeError("R, G and B must all have the same size.")
@@ -1641,11 +1651,15 @@ def console_fill_background(
     lib.TCOD_console_fill_background(_console(con), cr, cg, cb)
 
 
+@deprecate("Assign to the console.ch array instead.")
 def console_fill_char(con: tcod.console.Console, arr: Sequence[int]) -> None:
     """Fill the character tiles of a console with an array.
 
     `arr` is an array of integers with a length of the consoles width and
     height.
+
+    .. deprecated:: 8.4
+        You should assign to :any:`tcod.console.Console.ch` instead.
     """
     if isinstance(arr, np.ndarray):
         # numpy arrays, use numpy's ctypes functions
@@ -2461,6 +2475,7 @@ def heightmap_dig_bezier(
     )
 
 
+@deprecate("This object can be accessed as a NumPy array.")
 def heightmap_get_value(hm: np.ndarray, x: int, y: int) -> float:
     """Return the value at ``x``, ``y`` in a heightmap.
 
@@ -2750,6 +2765,7 @@ def image_delete(image: tcod.image.Image) -> None:
     """
 
 
+@deprecate("Use tcod.line_iter instead.")
 def line_init(xo: int, yo: int, xd: int, yd: int) -> None:
     """Initilize a line whose points will be returned by `line_step`.
 
@@ -2769,6 +2785,7 @@ def line_init(xo: int, yo: int, xd: int, yd: int) -> None:
     lib.TCOD_line_init(xo, yo, xd, yd)
 
 
+@deprecate("Use tcod.line_iter instead.")
 def line_step() -> Union[Tuple[int, int], Tuple[None, None]]:
     """After calling line_init returns (x, y) points of the line.
 
@@ -2790,6 +2807,7 @@ def line_step() -> Union[Tuple[int, int], Tuple[None, None]]:
     return None, None
 
 
+@deprecate("Use tcod.line_iter instead.")
 def line(
     xo: int, yo: int, xd: int, yd: int, py_callback: Callable[[int, int], bool]
 ) -> bool:
@@ -2878,6 +2896,7 @@ def line_where(
     return tuple(array)  # type: ignore
 
 
+@deprecate("Call tcod.map.Map(width, height) instead.")
 def map_new(w: int, h: int) -> tcod.map.Map:
     """Return a :any:`tcod.map.Map` with a width and height.
 
@@ -2888,6 +2907,7 @@ def map_new(w: int, h: int) -> tcod.map.Map:
     return tcod.map.Map(w, h)
 
 
+@deprecate("Use Python's standard copy module instead.")
 def map_copy(source: tcod.map.Map, dest: tcod.map.Map) -> None:
     """Copy map data from `source` to `dest`.
 
@@ -2902,6 +2922,7 @@ def map_copy(source: tcod.map.Map, dest: tcod.map.Map) -> None:
     dest._Map__buffer[:] = source._Map__buffer[:]  # type: ignore
 
 
+@deprecate("Set properties using the m.transparent and m.walkable arrays.")
 def map_set_properties(
     m: tcod.map.Map, x: int, y: int, isTrans: bool, isWalk: bool
 ) -> None:
@@ -2916,6 +2937,7 @@ def map_set_properties(
     lib.TCOD_map_set_properties(m.map_c, x, y, isTrans, isWalk)
 
 
+@deprecate("Clear maps using NumPy broadcast rules instead.")
 def map_clear(
     m: tcod.map.Map, transparent: bool = False, walkable: bool = False
 ) -> None:
@@ -2929,6 +2951,7 @@ def map_clear(
     m.walkable[:] = walkable
 
 
+@deprecate("Call the map.compute_fov method instead.")
 def map_compute_fov(
     m: tcod.map.Map,
     x: int,
@@ -2945,6 +2968,7 @@ def map_compute_fov(
     m.compute_fov(x, y, radius, light_walls, algo)
 
 
+@deprecate("Use map.fov to check for this property.")
 def map_is_in_fov(m: tcod.map.Map, x: int, y: int) -> bool:
     """Return True if the cell at x,y is lit by the last field-of-view
     algorithm.
@@ -2957,6 +2981,7 @@ def map_is_in_fov(m: tcod.map.Map, x: int, y: int) -> bool:
     return bool(lib.TCOD_map_is_in_fov(m.map_c, x, y))
 
 
+@deprecate("Use map.transparent to check for this property.")
 def map_is_transparent(m: tcod.map.Map, x: int, y: int) -> bool:
     """
     .. note::
@@ -2967,6 +2992,7 @@ def map_is_transparent(m: tcod.map.Map, x: int, y: int) -> bool:
     return bool(lib.TCOD_map_is_transparent(m.map_c, x, y))
 
 
+@deprecate("Use map.walkable to check for this property.")
 def map_is_walkable(m: tcod.map.Map, x: int, y: int) -> bool:
     """
     .. note::
@@ -2985,6 +3011,7 @@ def map_delete(m: tcod.map.Map) -> None:
     """
 
 
+@deprecate("Check the map.width attribute instead.")
 def map_get_width(map: tcod.map.Map) -> int:
     """Return the width of a map.
 
@@ -2994,6 +3021,7 @@ def map_get_width(map: tcod.map.Map) -> int:
     return map.width
 
 
+@deprecate("Check the map.height attribute instead.")
 def map_get_height(map: tcod.map.Map) -> int:
     """Return the height of a map.
 
