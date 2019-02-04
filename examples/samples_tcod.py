@@ -251,7 +251,7 @@ class LineDrawingSample(Sample):
             sample_console.width, sample_console.height, order="F"
         )
         # initialize the colored background
-        self.bk.bg[:, :, 0].T[:] = np.linspace(0, 255, self.bk.width)
+        self.bk.bg[:, :, 0] = np.linspace(0, 255, self.bk.width)[:, np.newaxis]
         self.bk.bg[:, :, 2] = np.linspace(0, 255, self.bk.height)
         self.bk.bg[:, :, 1] = (
             self.bk.bg[:, :, 0].astype(int) + self.bk.bg[:, :, 2]
