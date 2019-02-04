@@ -4,6 +4,7 @@ import os
 import sys
 
 import glob
+import re
 from typing import List, Tuple, Any, Dict, Iterator
 
 from cffi import FFI
@@ -243,7 +244,13 @@ class CustomPostParser(c_ast.NodeVisitor):
 
 def get_cdef():
     generator = c_generator.CGenerator()
-    return generator.visit(get_ast())
+    cdef = generator.visit(get_ast())
+    cdef = re.sub(
+        pattern=r"typedef int (ptrdiff_t);",
+        repl=r"typedef int... \1;",
+        string=cdef,
+    )
+    return cdef
 
 
 def get_ast():

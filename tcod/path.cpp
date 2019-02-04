@@ -1,5 +1,7 @@
 #include "path.h"
 
+#include "../libtcod/src/libtcod/pathfinding/generic.h"
+
 #include <SDL_stdinc.h>
 
 static char* PickArrayValue(const struct PathCostArray *map, int i, int j) {
