@@ -15,6 +15,8 @@ Deprecated
 Fixed
  - `tcod.image_is_pixel_transparent` and `tcod.image_get_alpha` now return
    values.
+ - `Console.print_frame` was clearing tiles outside if it's bounds.
+ - The `FONT_LAYOUT_CP437` layout was incorrect.
 
 8.4.1 - 2019-02-01
 ------------------
