@@ -6,21 +6,23 @@ with :any:`console_set_custom_font` first.
 Example::
 
     # Make sure 'arial10x10.png' is in the same directory as this script.
-    import time
-
     import tcod
+    import tcod.event
 
     # Setup the font.
     tcod.console_set_custom_font(
-        'arial10x10.png',
-        tcod.FONT_LAYOUT_TCOD,
-        )
+        "arial10x10.png",
+        tcod.FONT_LAYOUT_TCOD | tcod.FONT_TYPE_GREYSCALE,
+    )
     # Initialize the root console in a context.
-    with tcod.console_init_root(80, 60, 'title') as root_console:
+    with tcod.console_init_root(80, 60) as root_console:
         root_console.print_(x=0, y=0, string='Hello World!')
-        tcod.console_flush() # Show the console.
-        time.sleep(3) # Wait 3 seconds.
-    # The window is closed here, after the above context exits.
+        while True:
+            tcod.console_flush()  # Show the console.
+            for event in tcod.event.wait():
+                if event.type == "QUIT":
+                    raise SystemExit()
+        # The libtcod window will be closed at the end of this with-block.
 """
 
 from typing import Any, Optional, Tuple  # noqa: F401
