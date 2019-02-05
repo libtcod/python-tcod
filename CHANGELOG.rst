@@ -9,13 +9,16 @@ v2.0.0
 
 Unreleased
 ------------------
+
+8.4.2 - 2019-02-05
+------------------
 Deprecated
  - The tdl module has been deprecated.
  - The libtcodpy parser functions have been deprecated.
 Fixed
  - `tcod.image_is_pixel_transparent` and `tcod.image_get_alpha` now return
    values.
- - `Console.print_frame` was clearing tiles outside if it's bounds.
+ - `Console.print_frame` was clearing tiles outside if its bounds.
  - The `FONT_LAYOUT_CP437` layout was incorrect.
 
 8.4.1 - 2019-02-01
