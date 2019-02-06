@@ -10,6 +10,12 @@ v2.0.0
 Unreleased
 ------------------
 
+8.4.3 - 2019-02-06
+------------------
+Changed
+ - Updated libtcod to 1.10.5
+ - The SDL2/OPENGL2 renderers will now auto-detect a custom fonts key-color.
+
 8.4.2 - 2019-02-05
 ------------------
 Deprecated
