@@ -2,23 +2,25 @@
 
 import pytest
 
-try:
-    import numpy
-except ImportError:
-    numpy = None
-
+import numpy
+import numpy as np
 import tcod as libtcodpy
+import tcod
+
 
 def test_console_behaviour(console):
     assert not console
+
 
 @pytest.mark.skip('takes too long')
 def test_credits_long(console):
     libtcodpy.console_credits()
 
+
 def test_credits(console):
     libtcodpy.console_credits_render(0, 0, True)
     libtcodpy.console_credits_reset()
+
 
 def assert_char(console, x, y, ch=None, fg=None, bg=None):
     if ch is not None:
@@ -32,35 +34,46 @@ def assert_char(console, x, y, ch=None, fg=None, bg=None):
     if bg is not None:
         assert (console.bg[y, x] == bg).all()
 
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_defaults(console, fg, bg):
     libtcodpy.console_set_default_foreground(console, fg)
     libtcodpy.console_set_default_background(console, bg)
     libtcodpy.console_clear(console)
     assert_char(console, 0, 0, None, fg, bg)
 
-@pytest.mark.filterwarnings("ignore:Directly access a consoles")
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_set_char_background(console, bg):
     libtcodpy.console_set_char_background(console, 0, 0, bg, libtcodpy.BKGND_SET)
     assert_char(console, 0, 0, bg=bg)
 
-@pytest.mark.filterwarnings("ignore:Directly access a consoles")
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_set_char_foreground(console, fg):
     libtcodpy.console_set_char_foreground(console, 0, 0, fg)
     assert_char(console, 0, 0, fg=fg)
 
-@pytest.mark.filterwarnings("ignore:Directly access a consoles")
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_set_char(console, ch):
     libtcodpy.console_set_char(console, 0, 0, ch)
     assert_char(console, 0, 0, ch=ch)
 
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_put_char(console, ch):
     libtcodpy.console_put_char(console, 0, 0, ch, libtcodpy.BKGND_SET)
     assert_char(console, 0, 0, ch=ch)
 
+
+@pytest.mark.filterwarnings("ignore:.")
 def console_put_char_ex(console, ch, fg, bg):
     libtcodpy.console_put_char_ex(console, 0, 0, ch, fg, bg)
     assert_char(console, 0, 0, ch=ch, fg=fg, bg=bg)
 
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_printing(console, fg, bg):
     libtcodpy.console_set_background_flag(console,
                                           libtcodpy.BKGND_SET)
@@ -88,16 +101,24 @@ def test_console_printing(console, fg, bg):
 
     libtcodpy.console_set_color_control(libtcodpy.COLCTRL_1, fg, bg)
 
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_rect(console):
     libtcodpy.console_rect(console, 0, 0, 4, 4, False, libtcodpy.BKGND_SET)
 
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_lines(console):
     libtcodpy.console_hline(console, 0, 0, 4)
     libtcodpy.console_vline(console, 0, 0, 4)
 
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_print_frame(console):
     libtcodpy.console_print_frame(console, 0, 0, 9, 9)
 
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_fade(console):
     libtcodpy.console_set_fade(0, libtcodpy.Color(0, 0, 0))
     libtcodpy.console_get_fade()
@@ -110,12 +131,15 @@ def assertConsolesEqual(a, b):
             (a.ch[:] == b.ch[:]).all())
 
 
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_blit(console, offscreen):
     libtcodpy.console_print(offscreen, 0, 0, 'test')
     libtcodpy.console_blit(offscreen, 0, 0, 0, 0, console, 0, 0, 1, 1)
     assertConsolesEqual(console, offscreen)
     libtcodpy.console_set_key_color(offscreen, libtcodpy.black)
 
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_asc_read_write(console, offscreen, tmpdir):
     libtcodpy.console_print(console, 0, 0, 'test')
 
@@ -124,6 +148,8 @@ def test_console_asc_read_write(console, offscreen, tmpdir):
     assert libtcodpy.console_load_asc(offscreen, asc_file)
     assertConsolesEqual(console, offscreen)
 
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_apf_read_write(console, offscreen, tmpdir):
     libtcodpy.console_print(console, 0, 0, 'test')
 
@@ -132,7 +158,8 @@ def test_console_apf_read_write(console, offscreen, tmpdir):
     assert libtcodpy.console_load_apf(offscreen, apf_file)
     assertConsolesEqual(console, offscreen)
 
-@pytest.mark.filterwarnings("ignore:Directly access a consoles")
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_rexpaint_load_test_file(console):
     xp_console = libtcodpy.console_from_xp('libtcod/data/rexpaint/test.xp')
     assert xp_console
@@ -145,7 +172,8 @@ def test_console_rexpaint_load_test_file(console):
     assert (libtcodpy.console_get_char_background(xp_console, 2, 1) ==
             libtcodpy.Color(0, 0, 255))
 
-@pytest.mark.filterwarnings("ignore:Falsy console parameters are deprecated")
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_rexpaint_save_load(console, tmpdir, ch, fg, bg):
     libtcodpy.console_print(console, 0, 0, 'test')
     libtcodpy.console_put_char_ex(console, 1, 1, ch, fg, bg)
@@ -157,6 +185,8 @@ def test_console_rexpaint_save_load(console, tmpdir, ch, fg, bg):
     assert libtcodpy.console_load_xp(None, xp_file)
     assertConsolesEqual(console, xp_console)
 
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_rexpaint_list_save_load(console, tmpdir):
     con1 = libtcodpy.console_new(8, 2)
     con2 = libtcodpy.console_new(8, 2)
@@ -169,20 +199,24 @@ def test_console_rexpaint_list_save_load(console, tmpdir):
         libtcodpy.console_delete(a)
         libtcodpy.console_delete(b)
 
+
 def test_console_fullscreen(console):
     libtcodpy.console_set_fullscreen(False)
+
 
 def test_console_key_input(console):
     libtcodpy.console_check_for_keypress()
     libtcodpy.console_is_key_pressed(libtcodpy.KEY_ENTER)
 
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_fill_errors(console):
     with pytest.raises(TypeError):
         libtcodpy.console_fill_background(console, [0], [], [])
     with pytest.raises(TypeError):
         libtcodpy.console_fill_foreground(console, [0], [], [])
 
-@pytest.mark.filterwarnings("ignore:Directly access a consoles")
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_fill(console):
     width = libtcodpy.console_get_width(console)
     height = libtcodpy.console_get_height(console)
@@ -202,8 +236,8 @@ def test_console_fill(console):
     assert fill == fg
     assert fill == ch
 
-@pytest.mark.skipif(not numpy, reason='requires numpy module')
-@pytest.mark.filterwarnings("ignore:Directly access a consoles")
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_fill_numpy(console):
     width = libtcodpy.console_get_width(console)
     height = libtcodpy.console_get_height(console)
@@ -229,7 +263,7 @@ def test_console_fill_numpy(console):
     assert fill == fg.tolist()
     assert fill == ch.tolist()
 
-@pytest.mark.filterwarnings("ignore:Console array attributes perform better")
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_buffer(console):
     buffer = libtcodpy.ConsoleBuffer(
         libtcodpy.console_get_width(console),
@@ -331,6 +365,8 @@ EXCLUSIVE_RESULTS = [(-4, 1), (-3, 2), (-2, 3), (-1, 4), (0, 5), (1, 6),
                      (2, 7), (3, 8), (4, 9), (5, 10)]
 INCLUSIVE_RESULTS = [(-5, 0)] + EXCLUSIVE_RESULTS
 
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_line_step():
     """
     libtcodpy.line_init and libtcodpy.line_step
@@ -340,6 +376,8 @@ def test_line_step():
         assert libtcodpy.line_step() == expected_xy
     assert libtcodpy.line_step() == (None, None)
 
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_line():
     """
     tests normal use, lazy evaluation, and error propagation
@@ -360,19 +398,15 @@ def test_line():
     assert libtcodpy.line(*LINE_ARGS, py_callback=return_false) == 0
     assert test_result == INCLUSIVE_RESULTS[:1]
 
+
 def test_line_iter():
     """
     libtcodpy.line_iter
     """
     assert list(libtcodpy.line_iter(*LINE_ARGS)) == INCLUSIVE_RESULTS
 
-@pytest.mark.filterwarnings("ignore:Assign values via attribute instead.")
-@pytest.mark.filterwarnings("ignore:Use 'node.contains' instead.")
-@pytest.mark.filterwarnings("ignore:Check for children with")
-@pytest.mark.filterwarnings("ignore:Iterate over nodes using")
-@pytest.mark.filterwarnings("ignore:Access children with")
-@pytest.mark.filterwarnings("ignore:Delete bsp children using")
-@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_bsp():
     """
     commented out statements work in libtcod-cffi
@@ -434,7 +468,8 @@ def test_bsp():
 
     libtcodpy.bsp_delete(bsp)
 
-@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_map():
     map = libtcodpy.map_new(16, 16)
     assert libtcodpy.map_get_width(map) == 16
@@ -446,6 +481,7 @@ def test_map():
     assert libtcodpy.map_is_walkable(map, 0, 0)
     libtcodpy.map_is_in_fov(map, 0, 0)
     libtcodpy.map_delete(map)
+
 
 def test_color():
     color_a = libtcodpy.Color(0, 1, 2)
@@ -468,10 +504,12 @@ def test_color():
     libtcodpy.color_get_hsv(color)
     libtcodpy.color_scale_HSV(color, 0, 0)
 
+
 def test_color_repr():
     Color = libtcodpy.Color
     col = Color(0, 1, 2)
     assert eval(repr(col)) == col
+
 
 def test_color_math():
     color_a = libtcodpy.Color(0, 1, 2)
@@ -482,16 +520,19 @@ def test_color_math():
     assert libtcodpy.Color(255, 255, 255) * color_a == color_a
     assert color_a * 100 == libtcodpy.Color(0, 100, 200)
 
+
 def test_color_gen_map():
     colors = libtcodpy.color_gen_map([(0, 0, 0), (255, 255, 255)], [0, 8])
     assert colors[0] == libtcodpy.Color(0, 0, 0)
     assert colors[-1] == libtcodpy.Color(255, 255, 255)
+
 
 def test_namegen_parse():
     libtcodpy.namegen_parse('libtcod/data/namegen/jice_celtic.cfg')
     assert libtcodpy.namegen_generate('Celtic female')
     assert libtcodpy.namegen_get_sets()
     libtcodpy.namegen_destroy()
+
 
 @pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
 def test_noise():
@@ -502,7 +543,8 @@ def test_noise():
     libtcodpy.noise_get_turbulence(noise, [0], 4)
     libtcodpy.noise_delete(noise)
 
-@pytest.mark.filterwarnings("ignore:.*")
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_random():
     rand = libtcodpy.random_get_instance()
     rand = libtcodpy.random_new()
@@ -523,19 +565,7 @@ def test_random():
     libtcodpy.random_delete(backup)
 
 
-@pytest.mark.filterwarnings("ignore:Assign to this heightmap with")
-@pytest.mark.filterwarnings("ignore:Add a scalar to an array using")
-@pytest.mark.filterwarnings("ignore:Multiply an array with a scaler using `hm")
-@pytest.mark.filterwarnings("ignore:Clear an array with")
-@pytest.mark.filterwarnings("ignore:Clamp array values using")
-@pytest.mark.filterwarnings("ignore:Copy an array using")
-@pytest.mark.filterwarnings("ignore:Add 2 arrays using")
-@pytest.mark.filterwarnings("ignore:Multiply 2 arrays using")
-@pytest.mark.filterwarnings("ignore:Arrays of noise should be sampled using t")
-@pytest.mark.filterwarnings("ignore:Get a value from this heightmap with")
-@pytest.mark.filterwarnings("ignore:This function is deprecated, see document")
-@pytest.mark.filterwarnings("ignore:Use `hm.min\\(\\)` and `hm.max\\(\\)`")
-@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
+@pytest.mark.filterwarnings("ignore:.")
 def test_heightmap():
     hmap = libtcodpy.heightmap_new(16, 16)
     repr(hmap)
@@ -579,17 +609,18 @@ def test_heightmap():
     libtcodpy.heightmap_delete(hmap)
 
 MAP = (
-       '############',
-       '#   ###    #',
-       '#   ###    #',
-       '#   ### ####',
-       '## #### # ##',
-       '##      ####',
-       '############',
-       )
+    '############',
+    '#   ###    #',
+    '#   ###    #',
+    '#   ### ####',
+    '## #### # ##',
+    '##      ####',
+    '############',
+)
 
-MAP_WIDTH = len(MAP[0])
-MAP_HEIGHT = len(MAP)
+MAP = np.array([list(line) for line in MAP])
+
+MAP_HEIGHT, MAP_WIDTH = MAP.shape
 
 POINT_A = (2, 2)
 POINT_B = (9, 2)
@@ -598,28 +629,30 @@ POINT_C = (9, 4)
 POINTS_AB = POINT_A + POINT_B # valid path
 POINTS_AC = POINT_A + POINT_C # invalid path
 
+
 @pytest.fixture()
 def map_():
-    map_ = libtcodpy.map_new(MAP_WIDTH, MAP_HEIGHT)
-    for y, line in enumerate(MAP):
-        for x, ch in enumerate(line):
-            libtcodpy.map_set_properties(map_, x, y, ch == ' ', ch == ' ')
+    map_ = tcod.map.Map(MAP_WIDTH, MAP_HEIGHT)
+    map_.walkable[...] = map_.transparent[...] = MAP[...] == ' '
     yield map_
     libtcodpy.map_delete(map_)
+
 
 @pytest.fixture()
 def path_callback(map_):
     def callback(ox, oy, dx, dy, user_data):
-        if libtcodpy.map_is_walkable(map_, dx, dy):
+        if map_.walkable[dy, dx]:
             return 1
         return 0
     return callback
 
-@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_map_fov(map_):
     libtcodpy.map_compute_fov(map_, *POINT_A)
 
-@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_astar(map_):
     astar = libtcodpy.path_new_using_map(map_)
 
@@ -644,7 +677,8 @@ def test_astar(map_):
 
     libtcodpy.path_delete(astar)
 
-@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_astar_callback(map_, path_callback):
     astar = libtcodpy.path_new_using_function(
         libtcodpy.map_get_width(map_),
@@ -654,7 +688,8 @@ def test_astar_callback(map_, path_callback):
     libtcodpy.path_compute(astar, *POINTS_AB)
     libtcodpy.path_delete(astar)
 
-@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_dijkstra(map_):
     path = libtcodpy.dijkstra_new(map_)
 
@@ -677,7 +712,8 @@ def test_dijkstra(map_):
 
     libtcodpy.dijkstra_delete(path)
 
-@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
+
+@pytest.mark.filterwarnings("ignore:.")
 def test_dijkstra_callback(map_, path_callback):
     path = libtcodpy.dijkstra_new_using_function(
         libtcodpy.map_get_width(map_),

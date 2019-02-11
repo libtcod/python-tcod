@@ -53,6 +53,7 @@ def test_tcod_bsp():
     str(bsp)
 
 
+@pytest.mark.filterwarnings("ignore:Use map.+ to check for this")
 def test_tcod_map_set_bits():
     map_ = tcod.map.Map(2,2)
 

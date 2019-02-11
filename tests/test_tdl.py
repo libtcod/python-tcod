@@ -24,7 +24,7 @@ class TDLTemplate(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.console = tdl.init(WIDTH, HEIGHT, 'TDL UnitTest', False, renderer='GLSL')
+        cls.console = tdl.init(WIDTH, HEIGHT, 'TDL UnitTest', False, renderer='SDL')
         # make a small window in the corner
         cls.window = tdl.Window(cls.console, 0, 0, WINWIDTH, WINHEIGHT)
 

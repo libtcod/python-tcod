@@ -9,7 +9,7 @@ def pytest_addoption(parser):
     parser.addoption("--no-window", action="store_true",
         help="Skip tests which need a rendering context.")
 
-@pytest.fixture(scope="session", params=['SDL', 'OPENGL', 'GLSL'])
+@pytest.fixture(scope="session", params=['SDL', 'SDL2'])
 def session_console(request):
     if(pytest.config.getoption("--no-window")):
         pytest.skip("This test needs a rendering context.")
