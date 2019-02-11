@@ -935,6 +935,7 @@ def console_set_custom_font(
     )
 
 
+@deprecate("Check `con.width` instead.")
 def console_get_width(con: tcod.console.Console) -> int:
     """Return the width of a console.
 
@@ -950,6 +951,7 @@ def console_get_width(con: tcod.console.Console) -> int:
     return int(lib.TCOD_console_get_width(_console(con)))
 
 
+@deprecate("Check `con.height` instead.")
 def console_get_height(con: tcod.console.Console) -> int:
     """Return the height of a console.
 
@@ -1085,6 +1087,7 @@ def console_flush() -> None:
 
 
 # drawing on a console
+@deprecate("Set the `con.default_bg` attribute instead.")
 def console_set_default_background(
     con: tcod.console.Console, col: Tuple[int, int, int]
 ) -> None:
@@ -1094,10 +1097,14 @@ def console_set_default_background(
         con (Console): Any Console instance.
         col (Union[Tuple[int, int, int], Sequence[int]]):
             An (r, g, b) sequence or Color instance.
+
+    .. deprecated:: 8.5
+        Use :any:`Console.default_bg` instead.
     """
     lib.TCOD_console_set_default_background(_console(con), col)
 
 
+@deprecate("Set the `con.default_fg` attribute instead.")
 def console_set_default_foreground(
     con: tcod.console.Console, col: Tuple[int, int, int]
 ) -> None:
@@ -1107,10 +1114,14 @@ def console_set_default_foreground(
         con (Console): Any Console instance.
         col (Union[Tuple[int, int, int], Sequence[int]]):
             An (r, g, b) sequence or Color instance.
+
+    .. deprecated:: 8.5
+        Use :any:`Console.default_fg` instead.
     """
     lib.TCOD_console_set_default_foreground(_console(con), col)
 
 
+@deprecate("Call the `con.clear()` method instead.")
 def console_clear(con: tcod.console.Console) -> None:
     """Reset a console to its default colors and the space character.
 
@@ -1120,6 +1131,9 @@ def console_clear(con: tcod.console.Console) -> None:
     .. seealso::
        :any:`console_set_default_background`
        :any:`console_set_default_foreground`
+
+    .. deprecated:: 8.5
+        Call the :any:`Console.clear` method instead.
     """
     lib.TCOD_console_clear(_console(con))
 
@@ -1198,6 +1212,10 @@ def console_set_char_foreground(
         y (int): Character y position from the top.
         col (Union[Tuple[int, int, int], Sequence[int]]):
             An (r, g, b) sequence or Color instance.
+
+    .. deprecated:: 8.4
+        Array access performs significantly faster than using this function.
+        See :any:`Console.fg`.
     """
     lib.TCOD_console_set_char_foreground(_console(con), x, y, col)
 
@@ -1213,29 +1231,42 @@ def console_set_char(
         x (int): Character x position from the left.
         y (int): Character y position from the top.
         c (Union[int, AnyStr]): Character to draw, can be an integer or string.
+
+    .. deprecated:: 8.4
+        Array access performs significantly faster than using this function.
+        See :any:`Console.ch`.
     """
     lib.TCOD_console_set_char(_console(con), x, y, _int(c))
 
 
+@deprecate("Set the `con.default_bg_blend` attribute instead.")
 def console_set_background_flag(con: tcod.console.Console, flag: int) -> None:
     """Change the default blend mode for this console.
 
     Args:
         con (Console): Any Console instance.
         flag (int): Blend mode to use by default.
+
+    .. deprecated:: 8.5
+        Set :any:`Console.default_bg_blend` instead.
     """
     lib.TCOD_console_set_background_flag(_console(con), flag)
 
 
+@deprecate("Check the `con.default_bg_blend` attribute instead.")
 def console_get_background_flag(con: tcod.console.Console) -> int:
     """Return this consoles current blend mode.
 
     Args:
         con (Console): Any Console instance.
+
+    .. deprecated:: 8.5
+        Check :any:`Console.default_bg_blend` instead.
     """
     return int(lib.TCOD_console_get_background_flag(_console(con)))
 
 
+@deprecate("Set the `con.default_alignment` attribute instead.")
 def console_set_alignment(con: tcod.console.Console, alignment: int) -> None:
     """Change this consoles current alignment mode.
 
@@ -1246,19 +1277,27 @@ def console_set_alignment(con: tcod.console.Console, alignment: int) -> None:
     Args:
         con (Console): Any Console instance.
         alignment (int):
+
+    .. deprecated:: 8.5
+        Set :any:`Console.default_alignment` instead.
     """
     lib.TCOD_console_set_alignment(_console(con), alignment)
 
 
+@deprecate("Check the `con.default_alignment` attribute instead.")
 def console_get_alignment(con: tcod.console.Console) -> int:
     """Return this consoles current alignment mode.
 
     Args:
         con (Console): Any Console instance.
+
+    .. deprecated:: 8.5
+        Check :any:`Console.default_alignment` instead.
     """
     return int(lib.TCOD_console_get_alignment(_console(con)))
 
 
+@deprecate("Call the `con.print_` method instead.")
 def console_print(con: tcod.console.Console, x: int, y: int, fmt: str) -> None:
     """Print a color formatted string on a console.
 
@@ -1267,10 +1306,14 @@ def console_print(con: tcod.console.Console, x: int, y: int, fmt: str) -> None:
         x (int): Character x position from the left.
         y (int): Character y position from the top.
         fmt (AnyStr): A unicode or bytes string optionaly using color codes.
+
+    .. deprecated:: 8.5
+        Use :any:`Console.print_` instead.
     """
     lib.TCOD_console_printf(_console(con), x, y, _fmt(fmt))
 
 
+@deprecate("Call the `con.print_` method instead.")
 def console_print_ex(
     con: tcod.console.Console,
     x: int,
@@ -1285,10 +1328,14 @@ def console_print_ex(
         con (Console): Any Console instance.
         x (int): Character x position from the left.
         y (int): Character y position from the top.
+
+    .. deprecated:: 8.5
+        Use :any:`Console.print_` instead.
     """
     lib.TCOD_console_printf_ex(_console(con), x, y, flag, alignment, _fmt(fmt))
 
 
+@deprecate("Call the `con.print_rect` method instead.")
 def console_print_rect(
     con: tcod.console.Console, x: int, y: int, w: int, h: int, fmt: str
 ) -> int:
@@ -1302,12 +1349,16 @@ def console_print_rect(
 
     Returns:
         int: The number of lines of text once word-wrapped.
+
+    .. deprecated:: 8.5
+        Use :any:`Console.print_rect` instead.
     """
     return int(
         lib.TCOD_console_printf_rect(_console(con), x, y, w, h, _fmt(fmt))
     )
 
 
+@deprecate("Call the `con.print_rect` method instead.")
 def console_print_rect_ex(
     con: tcod.console.Console,
     x: int,
@@ -1322,6 +1373,9 @@ def console_print_rect_ex(
 
     Returns:
         int: The number of lines of text once word-wrapped.
+
+    .. deprecated:: 8.5
+        Use :any:`Console.print_rect` instead.
     """
     return int(
         lib.TCOD_console_printf_rect_ex(
@@ -1330,6 +1384,7 @@ def console_print_rect_ex(
     )
 
 
+@deprecate("Call the `con.get_height_rect` method instead.")
 def console_get_height_rect(
     con: tcod.console.Console, x: int, y: int, w: int, h: int, fmt: str
 ) -> int:
@@ -1337,6 +1392,9 @@ def console_get_height_rect(
 
     Returns:
         int: The number of lines of text once word-wrapped.
+
+    .. deprecated:: 8.5
+        Use :any:`Console.get_height_rect` instead.
     """
     return int(
         lib.TCOD_console_get_height_rect_fmt(
@@ -1345,6 +1403,7 @@ def console_get_height_rect(
     )
 
 
+@deprecate("Call the `con.rect` method instead.")
 def console_rect(
     con: tcod.console.Console,
     x: int,
@@ -1357,10 +1416,14 @@ def console_rect(
     """Draw a the background color on a rect optionally clearing the text.
 
     If clr is True the affected tiles are changed to space character.
+
+    .. deprecated:: 8.5
+        Use :any:`Console.rect` instead.
     """
     lib.TCOD_console_rect(_console(con), x, y, w, h, clr, flag)
 
 
+@deprecate("Call the `con.hline` method instead.")
 def console_hline(
     con: tcod.console.Console,
     x: int,
@@ -1371,10 +1434,14 @@ def console_hline(
     """Draw a horizontal line on the console.
 
     This always uses the character 196, the horizontal line character.
+
+    .. deprecated:: 8.5
+        Use :any:`Console.hline` instead.
     """
     lib.TCOD_console_hline(_console(con), x, y, l, flag)
 
 
+@deprecate("Call the `con.vline` method instead.")
 def console_vline(
     con: tcod.console.Console,
     x: int,
@@ -1385,10 +1452,14 @@ def console_vline(
     """Draw a vertical line on the console.
 
     This always uses the character 179, the vertical line character.
+
+    .. deprecated:: 8.5
+        Use :any:`Console.vline` instead.
     """
     lib.TCOD_console_vline(_console(con), x, y, l, flag)
 
 
+@deprecate("Call the `con.print_frame` method instead.")
 def console_print_frame(
     con: tcod.console.Console,
     x: int,
@@ -1409,6 +1480,9 @@ def console_print_frame(
 
     .. versionchanged:: 8.2
         Now supports Unicode strings.
+
+    .. deprecated:: 8.5
+        Use :any:`Console.print_frame` instead.
     """
     fmt = _fmt(fmt) if fmt else ffi.NULL
     lib.TCOD_console_printf_frame(_console(con), x, y, w, h, clear, flag, fmt)
@@ -1429,15 +1503,25 @@ def console_set_color_control(
     lib.TCOD_console_set_color_control(con, fore, back)
 
 
+@deprecate("Check the `con.default_bg` attribute instead.")
 def console_get_default_background(con: tcod.console.Console) -> Color:
-    """Return this consoles default background color."""
+    """Return this consoles default background color.
+
+    .. deprecated:: 8.5
+        Use :any:`Console.default_bg` instead.
+    """
     return Color._new_from_cdata(
         lib.TCOD_console_get_default_background(_console(con))
     )
 
 
+@deprecate("Check the `con.default_fg` attribute instead.")
 def console_get_default_foreground(con: tcod.console.Console) -> Color:
-    """Return this consoles default foreground color."""
+    """Return this consoles default foreground color.
+
+    .. deprecated:: 8.5
+        Use :any:`Console.default_fg` instead.
+    """
     return Color._new_from_cdata(
         lib.TCOD_console_get_default_foreground(_console(con))
     )
@@ -1447,7 +1531,12 @@ def console_get_default_foreground(con: tcod.console.Console) -> Color:
 def console_get_char_background(
     con: tcod.console.Console, x: int, y: int
 ) -> Color:
-    """Return the background color at the x,y of this console."""
+    """Return the background color at the x,y of this console.
+
+    .. deprecated:: 8.4
+        Array access performs significantly faster than using this function.
+        See :any:`Console.bg`.
+    """
     return Color._new_from_cdata(
         lib.TCOD_console_get_char_background(_console(con), x, y)
     )
@@ -1457,7 +1546,12 @@ def console_get_char_background(
 def console_get_char_foreground(
     con: tcod.console.Console, x: int, y: int
 ) -> Color:
-    """Return the foreground color at the x,y of this console."""
+    """Return the foreground color at the x,y of this console.
+
+    .. deprecated:: 8.4
+        Array access performs significantly faster than using this function.
+        See :any:`Console.fg`.
+    """
     return Color._new_from_cdata(
         lib.TCOD_console_get_char_foreground(_console(con), x, y)
     )
@@ -1465,7 +1559,12 @@ def console_get_char_foreground(
 
 @deprecate("Directly access a consoles characters with `console.ch`")
 def console_get_char(con: tcod.console.Console, x: int, y: int) -> int:
-    """Return the character at the x,y of this console."""
+    """Return the character at the x,y of this console.
+
+    .. deprecated:: 8.4
+        Array access performs significantly faster than using this function.
+        See :any:`Console.ch`.
+    """
     return lib.TCOD_console_get_char(_console(con), x, y)  # type: ignore
 
 
@@ -1508,8 +1607,14 @@ def console_is_key_pressed(key: int) -> bool:
 
 
 # using offscreen consoles
+@deprecate("Create a console using `tcod.console.Console(...)` instead.")
 def console_new(w: int, h: int) -> tcod.console.Console:
-    """Return an offscreen console of size: w,h."""
+    """Return an offscreen console of size: w,h.
+
+    .. deprecated:: 8.5
+        Create new consoles using :any:`tcod.console.Console` instead of this
+        function.
+    """
     return tcod.console.Console(w, h)
 
 
@@ -1529,6 +1634,7 @@ def console_from_file(filename: str) -> tcod.console.Console:
     )
 
 
+@deprecate("Call the `Console.blit` method instead.")
 def console_blit(
     src: tcod.console.Console,
     x: int,
@@ -1541,16 +1647,25 @@ def console_blit(
     ffade: float = 1.0,
     bfade: float = 1.0,
 ) -> None:
-    """Blit the console src from x,y,w,h to console dst at xdst,ydst."""
+    """Blit the console src from x,y,w,h to console dst at xdst,ydst.
+
+    .. deprecated:: 8.5
+        Call the :any:`Console.blit` method instead.
+    """
     lib.TCOD_console_blit(
         _console(src), x, y, w, h, _console(dst), xdst, ydst, ffade, bfade
     )
 
 
+@deprecate("Call the `Console.set_key_color` method instead.")
 def console_set_key_color(
     con: tcod.console.Console, col: Tuple[int, int, int]
 ) -> None:
-    """Set a consoles blit transparent color."""
+    """Set a consoles blit transparent color.
+
+    .. deprecated:: 8.5
+        Call the :any:`Console.set_key_color` method instead.
+    """
     lib.TCOD_console_set_key_color(_console(con), col)
     if hasattr(con, "set_key_color"):
         con.set_key_color(col)
