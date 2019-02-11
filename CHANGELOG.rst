@@ -17,6 +17,9 @@ Changed
 Deprecated
  - Most libtcodpy console functions have been replaced by the tcod.console
    module.
+Fixed
+ - `tcod.console.Console.blit` was ignoring the key color set by
+   `Console.set_key_color`.
 
 8.4.3 - 2019-02-06
 ------------------

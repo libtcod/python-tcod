@@ -551,7 +551,8 @@ class Console:
                 stacklevel=2,
             )
 
-        if key_color or self._key_color:
+        key_color = key_color or self._key_color
+        if key_color:
             key_color = ffi.new("TCOD_color_t*", key_color)
             lib.TCOD_console_blit_key_color(
                 self.console_c,
@@ -580,11 +581,10 @@ class Console:
                 bg_alpha,
             )
 
-    def set_key_color(self, color: Tuple[int, int, int]) -> None:
+    def set_key_color(self, color: Optional[Tuple[int, int, int]]) -> None:
         """Set a consoles blit transparent color.
 
-        Args:
-            color (Tuple[int, int, int]):
+        `color` is the (r, g, b) color, or None to disable key color.
         """
         self._key_color = color
 
