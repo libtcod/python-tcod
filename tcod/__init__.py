@@ -15,10 +15,6 @@
     Bring any issues or requests to GitHub:
     https://github.com/HexDecimal/libtcod-cffi
 """
-import sys
-
-import warnings
-
 from tcod.libtcod import lib, ffi  # noqa: F4
 from tcod.libtcodpy import *  # noqa: F4
 
@@ -26,8 +22,3 @@ try:
     from tcod.version import __version__
 except ImportError:  # Gets imported without version.py by ReadTheDocs
     __version__ = ""
-
-if sys.version_info[0] == 2:
-    warnings.warn(
-        "python-tcod has dropped support for Python 2.7.", DeprecationWarning
-    )

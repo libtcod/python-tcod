@@ -546,8 +546,6 @@ class Console:
         """
         return bool(self.console_c != ffi.NULL)
 
-    __nonzero__ = __bool__
-
     def __getstate__(self) -> Any:
         state = self.__dict__.copy()
         del state["console_c"]
