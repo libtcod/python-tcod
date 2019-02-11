@@ -15,7 +15,7 @@ Example::
         tcod.FONT_LAYOUT_TCOD | tcod.FONT_TYPE_GREYSCALE,
     )
     # Initialize the root console in a context.
-    with tcod.console_init_root(80, 60) as root_console:
+    with tcod.console_init_root(80, 60, order="F") as root_console:
         root_console.print_(x=0, y=0, string='Hello World!')
         while True:
             tcod.console_flush()  # Show the console.
@@ -47,30 +47,95 @@ class Console:
     """A console object containing a grid of characters with
     foreground/background colors.
 
+    `width` and `height` are the size of the console (in tiles.)
+
+    `order` determines how the axes of NumPy array attributes are arraigned.
+    `order="F"` will swap the first two axes which allows for more intuitive
+    `[x, y]` indexing.
+
+    With `buffer` the console can be initialized from another array. The
+    `buffer` should be compatible with the `width`, `height`, and `order`
+    given; and should also have a dtype compatible with :any:`Console.DTYPE`.
+
+    `copy` is a placeholder.  In the future this will determine if the
+    `buffer` is copied or used as-is.  So set it to None or True as
+    appropriate.
+
+    `default_bg`, `default_bg`, `default_bg_blend`, and `default_alignment` are
+    the default values used in some methods.  The `default_bg` and `default_bg`
+    will affect the starting foreground and background color of the console.
+
     .. versionchanged:: 4.3
         Added `order` parameter.
 
-    Args:
-        width (int): Width of the new Console.
-        height (int): Height of the new Console.
-        order (str): Which numpy memory order to use.
+    .. versionchanged:: 8.5
+        Added `buffer`, `copy`, and default parameters.
+        Arrays are initialized as if the :any:`clear` method was called.
 
     Attributes:
-        console_c (CData): A cffi pointer to a TCOD_console_t object.
+        console_c: A python-cffi "TCOD_Console*" object.
+        DTYPE:
+            A class attribute which provides a dtype compatible with this
+            class.
+
+            ``[("ch", np.intc), ("fg", "(3,)u1"), ("bg", "(3,)u1")]``
+
+            Example::
+
+                >>> buffer = np.zeros(
+                ...     shape=(20, 3),
+                ...     dtype=tcod.console.Console.DTYPE,
+                ...     order="F",
+                ... )
+                >>> buffer["ch"] = ord(' ')
+                >>> buffer["ch"][:, 1] = ord('x')
+                >>> c = tcod.console.Console(20, 3, order="F", buffer=buffer)
+                >>> print(c)
+                <                    |
+                |xxxxxxxxxxxxxxxxxxxx|
+                |                    >
+
+            .. versionadded:: 8.5
     """
 
-    def __init__(self, width: int, height: int, order: str = "C"):
+    DTYPE = [("ch", np.intc), ("fg", "(3,)u1"), ("bg", "(3,)u1")]  # type: Any
+
+    def __init__(
+        self,
+        width: int,
+        height: int,
+        order: str = "C",
+        buffer: Optional[np.array] = None,
+        copy: Optional[bool] = None,
+        default_bg: Tuple[int, int, int] = (0, 0, 0),
+        default_fg: Tuple[int, int, int] = (255, 255, 255),
+        default_bg_blend: Optional[int] = None,
+        default_alignment: Optional[int] = None,
+    ):
         self._key_color = None  # type: Optional[Tuple[int, int, int]]
-        self._ch = np.full((height, width), 0x20, dtype=np.intc)
-        self._fg = np.zeros((height, width), dtype="(3,)u1")
-        self._bg = np.zeros((height, width), dtype="(3,)u1")
         self._order = tcod._internal.verify_order(order)
+        if copy is not None and not copy:
+            raise ValueError("copy=False is not supported in this version.")
+        if buffer is not None:
+            if self._order == "F":
+                buffer = buffer.transpose()
+            self._ch = np.ascontiguousarray(buffer["ch"], np.intc)
+            self._fg = np.ascontiguousarray(buffer["fg"], "u1")
+            self._bg = np.ascontiguousarray(buffer["bg"], "u1")
+        else:
+            self._ch = np.ndarray((height, width), dtype=np.intc)
+            self._fg = np.ndarray((height, width), dtype="(3,)u1")
+            self._bg = np.ndarray((height, width), dtype="(3,)u1")
 
         # libtcod uses the root console for defaults.
-        bkgnd_flag = alignment = 0
-        if lib.TCOD_ctx.root != ffi.NULL:
-            bkgnd_flag = lib.TCOD_ctx.root.bkgnd_flag
-            alignment = lib.TCOD_ctx.root.alignment
+        if default_bg_blend is None:
+            default_bg_blend = 0
+            if lib.TCOD_ctx.root != ffi.NULL:
+                default_bg_blend = lib.TCOD_ctx.root.bkgnd_flag
+        if default_alignment is None:
+            default_alignment = 0
+            if lib.TCOD_ctx.root != ffi.NULL:
+                default_alignment = lib.TCOD_ctx.root.alignment
 
         self._console_data = self.console_c = ffi.new(
             "struct TCOD_Console*",
@@ -80,15 +145,20 @@ class Console:
                 "ch_array": ffi.cast("int*", self._ch.ctypes.data),
                 "fg_array": ffi.cast("TCOD_color_t*", self._fg.ctypes.data),
                 "bg_array": ffi.cast("TCOD_color_t*", self._bg.ctypes.data),
-                "bkgnd_flag": bkgnd_flag,
-                "alignment": alignment,
-                "fore": (255, 255, 255),
-                "back": (0, 0, 0),
+                "bkgnd_flag": default_bg_blend,
+                "alignment": default_alignment,
+                "fore": default_fg,
+                "back": default_bg,
             },
         )
 
+        if buffer is None:
+            self.clear()
+
     @classmethod
     def _from_cdata(cls, cdata: Any, order: str = "C") -> "Console":
+        """Return a Console instance which wraps this `TCOD_Console*` object.
+        """
         if isinstance(cdata, cls):
             return cdata
         self = object.__new__(cls)  # type: Console
@@ -157,8 +227,8 @@ class Console:
 
         You can change the consoles background colors by using this array.
 
-        Index this array with ``console.bg[i, j, channel] # order='C'`` or
-        ``console.bg[x, y, channel] # order='F'``.
+        Index this array with ``console.bg[i, j, channel]  # order='C'`` or
+        ``console.bg[x, y, channel]  # order='F'``.
 
         """
         return self._bg.transpose(1, 0, 2) if self._order == "F" else self._bg
@@ -169,8 +239,8 @@ class Console:
 
         You can change the consoles foreground colors by using this array.
 
-        Index this array with ``console.fg[i, j, channel] # order='C'`` or
-        ``console.fg[x, y, channel] # order='F'``.
+        Index this array with ``console.fg[i, j, channel]  # order='C'`` or
+        ``console.fg[x, y, channel]  # order='F'``.
         """
         return self._fg.transpose(1, 0, 2) if self._order == "F" else self._fg
 
@@ -180,8 +250,8 @@ class Console:
 
         You can change the consoles character codes by using this array.
 
-        Index this array with ``console.ch[i, j] # order='C'`` or
-        ``console.ch[x, y] # order='F'``.
+        Index this array with ``console.ch[i, j]  # order='C'`` or
+        ``console.ch[x, y]  # order='F'``.
         """
         return self._ch.T if self._order == "F" else self._ch
 
@@ -575,4 +645,32 @@ class Console:
         )
         self._console_data = self.console_c = ffi.new(
             "struct TCOD_Console*", self._console_data
+        )
+
+    def __repr__(self) -> str:
+        """Return a string representation of this console."""
+        buffer = np.ndarray((self.height, self.width), dtype=self.DTYPE)
+        buffer["ch"] = self.ch
+        buffer["fg"] = self.fg
+        buffer["bg"] = self.bg
+        return (
+            "tcod.console.Console(width=%i, height=%i, "
+            "order=%r,buffer=\n%r,\ndefault_bg=%r, default_fg=%r, "
+            "default_bg_blend=%s, default_alignment=%s)"
+            % (
+                self.width,
+                self.height,
+                self._order,
+                buffer,
+                self.default_bg,
+                self.default_fg,
+                self.default_bg_blend,
+                self.default_alignment,
+            )
+        )
+
+    def __str__(self) -> str:
+        """Return a simplified representation of this consoles contents."""
+        return "<%s>" % "|\n|".join(
+            "".join(chr(c) for c in line) for line in self._ch
         )

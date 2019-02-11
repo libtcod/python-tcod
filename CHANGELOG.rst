@@ -9,6 +9,11 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - `tcod.console.Console` now supports `str` and `repr`.
+Changed
+ - You can now give default values or an array when initializing a
+   `tcod.console.Console` instance.
 
 8.4.3 - 2019-02-06
 ------------------
