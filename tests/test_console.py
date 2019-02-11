@@ -66,6 +66,7 @@ def test_console_defaults():
 
 
 @pytest.mark.filterwarnings("ignore:Parameter names have been moved around,")
+@pytest.mark.filterwarnings("ignore:Pass the key color to Console.blit instea")
 def test_console_methods():
     console = tcod.console.Console(width=12, height=10)
     console.put_char(0, 0, ord('@'))

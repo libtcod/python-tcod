@@ -1657,14 +1657,17 @@ def console_blit(
     )
 
 
-@deprecate("Call the `Console.set_key_color` method instead.")
+@deprecate(
+    "Pass the key color to `Console.blit` instead of calling this function."
+)
 def console_set_key_color(
     con: tcod.console.Console, col: Tuple[int, int, int]
 ) -> None:
     """Set a consoles blit transparent color.
 
     .. deprecated:: 8.5
-        Call the :any:`Console.set_key_color` method instead.
+        Pass the key color to :any:`tcod.console.Console.blit` instead of
+        calling this function.
     """
     lib.TCOD_console_set_key_color(_console(con), col)
     if hasattr(con, "set_key_color"):

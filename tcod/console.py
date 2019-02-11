@@ -33,6 +33,7 @@ import numpy as np
 import tcod.constants
 from tcod.libtcod import ffi, lib
 import tcod._internal
+from tcod._internal import deprecate
 
 
 def _fmt(string: str) -> bytes:
@@ -594,10 +595,17 @@ class Console:
                 bg_alpha,
             )
 
+    @deprecate(
+        "Pass the key color to Console.blit instead of calling this function."
+    )
     def set_key_color(self, color: Optional[Tuple[int, int, int]]) -> None:
         """Set a consoles blit transparent color.
 
         `color` is the (r, g, b) color, or None to disable key color.
+
+        .. deprecated:: 8.5
+            Pass the key color to :any:`Console.blit` instead of calling this
+            function.
         """
         self._key_color = color
 
