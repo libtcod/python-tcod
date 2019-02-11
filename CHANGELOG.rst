@@ -14,6 +14,7 @@ Added
 Changed
  - You can now give default values or an array when initializing a
    `tcod.console.Console` instance.
+ - `Console.clear` can now take `fg` and `bg` parameters.
 Deprecated
  - Most libtcodpy console functions have been replaced by the tcod.console
    module.

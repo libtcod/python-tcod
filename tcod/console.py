@@ -293,9 +293,22 @@ class Console:
     def default_alignment(self, value: int) -> None:
         self._console_data.alignment = value
 
-    def clear(self) -> None:
+    def clear(
+        self,
+        fg: Optional[Tuple[int, int, int]] = None,
+        bg: Optional[Tuple[int, int, int]] = None,
+    ) -> None:
         """Reset this console to its default colors and the space character.
+
+        If `fg` or `bg` are provided they will become the new default colors.
+
+        .. versionchanged:: 8.5
+            Added the `fg` and `bg` parameters.
         """
+        if fg:
+            self.default_fg = fg
+        if bg:
+            self.default_bg = bg
         lib.TCOD_console_clear(self.console_c)
 
     def put_char(
