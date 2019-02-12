@@ -14,12 +14,14 @@ Added
 Changed
  - You can now give default values or an array when initializing a
    `tcod.console.Console` instance.
- - `Console.clear` can now take `fg` and `bg` parameters.
+ - `Console.clear` can now take `ch`, `fg`, and `bg` parameters.
 Deprecated
  - Most libtcodpy console functions have been replaced by the tcod.console
    module.
  - Deprecated the `set_key_color` functions.  You can pass key colors to
    `Console.blit` instead.
+ - `Console.clear` should be given the colors to clear with as parameters,
+   rather than by using `default_fg` or `default_bg`.
 Fixed
  - `tcod.console.Console.blit` was ignoring the key color set by
    `Console.set_key_color`.

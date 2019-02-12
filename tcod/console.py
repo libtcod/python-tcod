@@ -154,7 +154,7 @@ class Console:
         )
 
         if buffer is None:
-            self.clear()
+            self.clear(fg=default_fg, bg=default_bg)
 
     @classmethod
     def _from_cdata(cls, cdata: Any, order: str = "C") -> "Console":
@@ -294,23 +294,49 @@ class Console:
     def default_alignment(self, value: int) -> None:
         self._console_data.alignment = value
 
-    def clear(
-        self,
-        fg: Optional[Tuple[int, int, int]] = None,
-        bg: Optional[Tuple[int, int, int]] = None,
-    ) -> None:
-        """Reset this console to its default colors and the space character.
+    def __clear_warning(self, name: str, value: Tuple[int, int, int]) -> None:
+        """Raise a warning for bad default values during calls to clear."""
+        warnings.warn(
+            "Clearing with the console default values is deprecated.\n"
+            "Add %s=%r to this call." % (name, value),
+            DeprecationWarning,
+            stacklevel=3,
+        )
 
-        If `fg` or `bg` are provided they will become the new default colors.
+    def clear(  # type: ignore
+        self,
+        ch: int = ord(" "),
+        fg: Tuple[int, int, int] = ...,
+        bg: Tuple[int, int, int] = ...,
+    ) -> None:
+        """Reset all values in this console to a single value.
+
+        `ch` is the character to clear the console with.  Defaults to the space
+        character.
+
+        `fg` and `bg` are the colors to clear the console with.  Defaults to
+        white-on-black if the console defaults are untouched.
+
+        .. note::
+            If `fg`/`bg` are not set, they will default to
+            :any:`default_fg`/:any:`default_bg`.
+            However, default values other than white-on-back are deprecated.
 
         .. versionchanged:: 8.5
-            Added the `fg` and `bg` parameters.
+            Added the `ch`, `fg`, and `bg` parameters.
+            Non-white-on-black default values are deprecated.
         """
-        if fg:
-            self.default_fg = fg
-        if bg:
-            self.default_bg = bg
-        lib.TCOD_console_clear(self.console_c)
+        if fg is ...:
+            fg = self.default_fg
+            if fg != (255, 255, 255):
+                self.__clear_warning("fg", fg)
+        if bg is ...:
+            bg = self.default_bg
+            if bg != (0, 0, 0):
+                self.__clear_warning("bg", bg)
+        self.ch[...] = ch
+        self.fg[...] = fg
+        self.bg[...] = bg
 
     def put_char(
         self,
