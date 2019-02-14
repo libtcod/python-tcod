@@ -18,7 +18,8 @@ if ($env:WEB_PYTHON) {
     Start-Process $PYTHON_INSTALLER -Wait -ArgumentList "/quiet InstallAllUsers=1 TargetDir=C:\UserPython Include_doc=0 Include_launcher=0 Include_test=0 Shortcuts=0"
     $env:PYTHON = 'C:\UserPython\python.exe'
 }
-& $env:PYTHON -m pip install --disable-pip-version-check virtualenv
+& $env:PYTHON -m pip install --disable-pip-version-check --upgrade pip
+& $env:PYTHON -m pip install --no-warn-script-location "virtualenv>=16"
 & $env:PYTHON -m virtualenv venv
 
 if ($env:PYPY) {
