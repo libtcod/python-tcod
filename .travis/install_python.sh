@@ -215,7 +215,7 @@ function install_mac_pypy3 {
     # Version given in full major.minor.micro e.g "3.4.1".
     # sets $PYTHON_EXE variable to python executable
     local py_version=$1
-    local py_build=$(get_pypy3_build_prefix $py_version)$py_version-osx64
+    local py_build=$py_version-osx64
     local py_zip=$py_build.tar.bz2
     local zip_path=$DOWNLOADS_SDIR/$py_zip
     mkdir -p $DOWNLOADS_SDIR
@@ -229,6 +229,7 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     install_python
     if [[ -n "$PYTHON_EXE" ]]; then
         # Default Python install is missing virtualenv.
+        $PYTHON_EXE -m ensurepip
         $PYTHON_EXE -m pip install --upgrade pip virtualenv
         $PYTHON_EXE -m virtualenv venv -p $PYTHON_EXE
     else
