@@ -406,15 +406,17 @@ class Console:
             int: The number of lines of text once word-wrapped.
         """
         alignment = self.default_alignment if alignment is None else alignment
-        return lib.TCOD_console_printf_rect_ex(  # type: ignore
-            self.console_c,
-            x,
-            y,
-            width,
-            height,
-            bg_blend,
-            alignment,
-            _fmt(string),
+        return int(
+            lib.TCOD_console_printf_rect_ex(
+                self.console_c,
+                x,
+                y,
+                width,
+                height,
+                bg_blend,
+                alignment,
+                _fmt(string),
+            )
         )
 
     def get_height_rect(
@@ -432,8 +434,11 @@ class Console:
         Returns:
             int: The number of lines of text once word-wrapped.
         """
-        return lib.TCOD_console_get_height_rect_fmt(  # type: ignore
-            self.console_c, x, y, width, height, _fmt(string)
+        string_ = string.encode("utf-8")
+        return int(
+            lib.get_height_rect(
+                self.console_c, x, y, width, height, string_, len(string_)
+            )
         )
 
     def rect(
@@ -447,7 +452,7 @@ class Console:
     ) -> None:
         """Draw a the background color on a rect optionally clearing the text.
 
-        If clr is True the affected tiles are changed to space character.
+        If `clear` is True the affected tiles are changed to space character.
 
         Args:
             x (int): The x coordinate from the left.
@@ -471,7 +476,7 @@ class Console:
     ) -> None:
         """Draw a horizontal line on the console.
 
-        This always uses the character 196, the horizontal line character.
+        This always uses ord('─'), the horizontal line character.
 
         Args:
             x (int): The x coordinate from the left.
@@ -490,7 +495,7 @@ class Console:
     ) -> None:
         """Draw a vertical line on the console.
 
-        This always uses the character 179, the vertical line character.
+        This always uses ord('│'), the vertical line character.
 
         Args:
             x (int): The x coordinate from the left.
@@ -510,7 +515,7 @@ class Console:
         clear: bool = True,
         bg_blend: int = tcod.constants.BKGND_DEFAULT,
     ) -> None:
-        """Draw a framed rectangle with optinal text.
+        """Draw a framed rectangle with optional text.
 
         This uses the default background color and blend mode to fill the
         rectangle and the default foreground to draw the outline.
@@ -720,4 +725,136 @@ class Console:
         """Return a simplified representation of this consoles contents."""
         return "<%s>" % "|\n|".join(
             "".join(chr(c) for c in line) for line in self._ch
+        )
+
+    def _pythonic_index(self, x: int, y: int) -> Tuple[int, int]:
+        if x < 0:
+            x += self.width
+        if y < 0:
+            y += self.height
+        return x, y
+
+    def print(
+        self,
+        x: int,
+        y: int,
+        string: str,
+        fg: Optional[Tuple[int, int, int]] = (255, 255, 255),
+        bg: Optional[Tuple[int, int, int]] = (0, 0, 0),
+        bg_blend: int = tcod.constants.BKGND_SET,
+        alignment: int = tcod.constants.LEFT,
+    ) -> None:
+        """Print a string on a console with manual line breaks.
+
+        `x` and `y` are the starting tile, with ``0,0`` as the upper left
+        corner of the console.
+
+        `string` is a Unicode string.
+
+        .. versionadded:: 8.5
+        """
+        x, y = self._pythonic_index(x, y)
+        string_ = string.encode("utf-8")  # type: bytes
+        lib.console_print(
+            self.console_c,
+            x,
+            y,
+            string_,
+            len(string_),
+            (fg,) if fg is not None else ffi.NULL,
+            (bg,) if bg is not None else ffi.NULL,
+            bg_blend,
+            alignment,
+        )
+
+    def print_box(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        string: str,
+        fg: Optional[Tuple[int, int, int]] = (255, 255, 255),
+        bg: Optional[Tuple[int, int, int]] = (0, 0, 0),
+        bg_blend: int = tcod.constants.BKGND_DEFAULT,
+        alignment: int = tcod.constants.LEFT,
+    ) -> int:
+        """Print a string constrained to a rectangle.
+
+        .. versionadded:: 8.5
+        """
+        x, y = self._pythonic_index(x, y)
+        string_ = string.encode("utf-8")  # type: bytes
+        return int(
+            lib.print_rect(
+                self.console_c,
+                x,
+                y,
+                width,
+                height,
+                string_,
+                len(string_),
+                (fg,) if fg is not None else ffi.NULL,
+                (bg,) if bg is not None else ffi.NULL,
+                bg_blend,
+                alignment,
+            )
+        )
+
+    def draw_frame(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        title: str = "",
+        fg: Optional[Tuple[int, int, int]] = (255, 255, 255),
+        bg: Optional[Tuple[int, int, int]] = (0, 0, 0),
+        bg_blend: int = tcod.constants.BKGND_SET,
+        clear: bool = True,
+    ) -> None:
+        """Draw a framed rectangle with an optional title.
+        """
+        x, y = self._pythonic_index(x, y)
+        title_ = title.encode("utf-8")  # type: bytes
+        lib.print_frame(
+            self.console_c,
+            x,
+            y,
+            width,
+            height,
+            title_,
+            len(title_),
+            (fg,) if fg is not None else ffi.NULL,
+            (bg,) if bg is not None else ffi.NULL,
+            bg_blend,
+            clear,
+        )
+
+    def draw_rect(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        ch: int,
+        fg: Optional[Tuple[int, int, int]] = (255, 255, 255),
+        bg: Optional[Tuple[int, int, int]] = (0, 0, 0),
+        bg_blend: int = tcod.constants.BKGND_SET,
+    ) -> None:
+        """Draw characters and colors over a rectangular region.
+
+        .. versionadded:: 8.5
+        """
+        x, y = self._pythonic_index(x, y)
+        lib.draw_rect(
+            self.console_c,
+            x,
+            y,
+            width,
+            height,
+            ch,
+            (fg,) if fg is not None else ffi.NULL,
+            (bg,) if bg is not None else ffi.NULL,
+            bg_blend,
         )
