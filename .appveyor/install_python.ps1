@@ -5,6 +5,7 @@ if ($env:PYPY -or $env:PYPY3) {
     } else {
         $env:PYPY_EXE='pypy.exe'
     }
+    $env:PYPY = $env:PYPY + '-win32'
     $env:PYTHON = 'C:\' + $env:PYPY + '\' + $env:PYPY_EXE
     $env:PATH += ';' + 'C:\' + $env:PYPY + '\'
     $PYPY_DOWNLOAD = 'https://bitbucket.org/pypy/pypy/downloads/' + $env:PYPY + '.zip'
