@@ -18,8 +18,8 @@ Added
 Changed
  - Updated libtcod to 1.10.6
  - Printing generates more compact layouts.
- - You can now give default values or an array when initializing a
-   `tcod.console.Console` instance.
+ - You can now give an array when initializing a `tcod.console.Console`
+   instance.
  - `Console.clear` can now take `ch`, `fg`, and `bg` parameters.
 Deprecated
  - Most libtcodpy console functions have been replaced by the tcod.console
