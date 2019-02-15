@@ -58,14 +58,6 @@ class Console:
     `buffer` should be compatible with the `width`, `height`, and `order`
     given; and should also have a dtype compatible with :any:`Console.DTYPE`.
 
-    `copy` is a placeholder.  In the future this will determine if the
-    `buffer` is copied or used as-is.  So set it to None or True as
-    appropriate.
-
-    `default_bg`, `default_bg`, `default_bg_blend`, and `default_alignment` are
-    the default values used in some methods.  The `default_bg` and `default_bg`
-    will affect the starting foreground and background color of the console.
-
     .. versionchanged:: 4.3
         Added `order` parameter.
 
@@ -107,16 +99,9 @@ class Console:
         height: int,
         order: str = "C",
         buffer: Optional[np.array] = None,
-        copy: Optional[bool] = None,
-        default_bg: Tuple[int, int, int] = (0, 0, 0),
-        default_fg: Tuple[int, int, int] = (255, 255, 255),
-        default_bg_blend: Optional[int] = None,
-        default_alignment: Optional[int] = None,
     ):
         self._key_color = None  # type: Optional[Tuple[int, int, int]]
         self._order = tcod._internal.verify_order(order)
-        if copy is not None and not copy:
-            raise ValueError("copy=False is not supported in this version.")
         if buffer is not None:
             if self._order == "F":
                 buffer = buffer.transpose()
@@ -129,14 +114,11 @@ class Console:
             self._bg = np.ndarray((height, width), dtype="(3,)u1")
 
         # libtcod uses the root console for defaults.
-        if default_bg_blend is None:
-            default_bg_blend = 0
-            if lib.TCOD_ctx.root != ffi.NULL:
-                default_bg_blend = lib.TCOD_ctx.root.bkgnd_flag
-        if default_alignment is None:
-            default_alignment = 0
-            if lib.TCOD_ctx.root != ffi.NULL:
-                default_alignment = lib.TCOD_ctx.root.alignment
+        default_bg_blend = 0
+        default_alignment = 0
+        if lib.TCOD_ctx.root != ffi.NULL:
+            default_bg_blend = lib.TCOD_ctx.root.bkgnd_flag
+            default_alignment = lib.TCOD_ctx.root.alignment
 
         self._console_data = self.console_c = ffi.new(
             "struct TCOD_Console*",
@@ -148,13 +130,13 @@ class Console:
                 "bg_array": ffi.cast("TCOD_color_t*", self._bg.ctypes.data),
                 "bkgnd_flag": default_bg_blend,
                 "alignment": default_alignment,
-                "fore": default_fg,
-                "back": default_bg,
+                "fore": (255, 255, 255),
+                "back": (0, 0, 0),
             },
         )
 
         if buffer is None:
-            self.clear(fg=default_fg, bg=default_bg)
+            self.clear()
 
     @classmethod
     def _from_cdata(cls, cdata: Any, order: str = "C") -> "Console":
@@ -262,7 +244,8 @@ class Console:
         color = self._console_data.back
         return color.r, color.g, color.b
 
-    @default_bg.setter
+    @default_bg.setter  # type: ignore
+    @deprecate("Console defaults have been deprecated.")
     def default_bg(self, color: Tuple[int, int, int]) -> None:
         self._console_data.back = color
 
@@ -272,7 +255,8 @@ class Console:
         color = self._console_data.fore
         return color.r, color.g, color.b
 
-    @default_fg.setter
+    @default_fg.setter  # type: ignore
+    @deprecate("Console defaults have been deprecated.")
     def default_fg(self, color: Tuple[int, int, int]) -> None:
         self._console_data.fore = color
 
@@ -281,7 +265,8 @@ class Console:
         """int: The default blending mode."""
         return self._console_data.bkgnd_flag  # type: ignore
 
-    @default_bg_blend.setter
+    @default_bg_blend.setter  # type: ignore
+    @deprecate("Console defaults have been deprecated.")
     def default_bg_blend(self, value: int) -> None:
         self._console_data.bkgnd_flag = value
 
@@ -290,7 +275,8 @@ class Console:
         """int: The default text alignment."""
         return self._console_data.alignment  # type: ignore
 
-    @default_alignment.setter
+    @default_alignment.setter  # type: ignore
+    @deprecate("Console defaults have been deprecated.")
     def default_alignment(self, value: int) -> None:
         self._console_data.alignment = value
 
@@ -355,6 +341,84 @@ class Console:
         """
         lib.TCOD_console_put_char(self.console_c, x, y, ch, bg_blend)
 
+    __ALIGNMENT_LOOKUP = {0: "tcod.LEFT", 1: "tcod.RIGHT", 2: "tcod.CENTER"}
+
+    __BG_BLEND_LOOKUP = {
+        0: "tcod.BKGND_NONE",
+        1: "tcod.BKGND_SET",
+        2: "tcod.BKGND_MULTIPLY",
+        3: "tcod.BKGND_LIGHTEN",
+        4: "tcod.BKGND_DARKEN",
+        5: "tcod.BKGND_SCREEN",
+        6: "tcod.BKGND_COLOR_DODGE",
+        7: "tcod.BKGND_COLOR_BURN",
+        8: "tcod.BKGND_ADD",
+        9: "tcod.BKGND_ADDA",
+        10: "tcod.BKGND_BURN",
+        11: "tcod.BKGND_OVERLAY",
+        12: "tcod.BKGND_ALPH",
+        13: "tcod.BKGND_DEFAULT",
+    }
+
+    def __deprecate_defaults(
+        self,
+        new_func: str,
+        bg_blend: Any,
+        alignment: Any = ...,
+        clear: Any = ...,
+    ) -> None:
+        """Return the parameters needed to recreate the current default state.
+        """
+        fg = None  # type: Any
+        bg = None  # type: Any
+        fg = self.default_fg if self.default_fg != (255, 255, 255) else None
+        bg = self.default_bg if self.default_bg != (0, 0, 0) else None
+        if bg_blend == tcod.constants.BKGND_NONE:
+            bg = "None"
+        if bg_blend == tcod.constants.BKGND_DEFAULT:
+            bg_blend = self.default_bg_blend
+        else:
+            bg_blend = None
+        if bg_blend == tcod.constants.BKGND_NONE:
+            bg = "None"
+            bg_blend = None
+        if bg_blend == tcod.constants.BKGND_SET:
+            bg_blend = None
+        if alignment is None:
+            alignment = self.default_alignment
+            if alignment == tcod.constants.LEFT:
+                alignment = None
+        else:
+            alignment = None
+        if clear is not ...:
+            fg = "None"
+        params = []
+        if clear is True:
+            params.append('ch=ord(" ")')
+        if clear is False:
+            params.append("ch=0")
+        if fg is not None:
+            params.append("fg=%s" % (fg,))
+        if bg is not None:
+            params.append("bg=%s" % (bg,))
+        if bg_blend is not None:
+            params.append("bg_blend=%s" % (self.__BG_BLEND_LOOKUP[bg_blend],))
+        if alignment is not None:
+            params.append(
+                "alignment=%s" % (self.__ALIGNMENT_LOOKUP[alignment],)
+            )
+        param_str = ", ".join(params)
+        if not param_str:
+            param_str = "."
+        else:
+            param_str = " and add the following parameters:\n%s" % (param_str,)
+        warnings.warn(
+            "Console functions using default values have been deprecated.\n"
+            "Replace this method with `Console.%s`%s" % (new_func, param_str),
+            DeprecationWarning,
+            stacklevel=3,
+        )
+
     def print_(
         self,
         x: int,
@@ -371,7 +435,14 @@ class Console:
             string (str): A Unicode string optionally using color codes.
             bg_blend (int): Blending mode to use, defaults to BKGND_DEFAULT.
             alignment (Optional[int]): Text alignment.
+
+        .. deprecated:: 8.5
+            Console methods which depend on console defaults have been
+            deprecated.
+            Use :any:`Console.print` instead, calling this function will print
+            a warning detailing which default values need to be made explicit.
         """
+        self.__deprecate_defaults("print", bg_blend, alignment)
         alignment = self.default_alignment if alignment is None else alignment
         lib.TCOD_console_printf_ex(
             self.console_c, x, y, bg_blend, alignment, _fmt(string)
@@ -404,7 +475,15 @@ class Console:
 
         Returns:
             int: The number of lines of text once word-wrapped.
+
+        .. deprecated:: 8.5
+            Console methods which depend on console defaults have been
+            deprecated.
+            Use :any:`Console.print_box` instead, calling this function will
+            print a warning detailing which default values need to be made
+            explicit.
         """
+        self.__deprecate_defaults("print_box", bg_blend, alignment)
         alignment = self.default_alignment if alignment is None else alignment
         return int(
             lib.TCOD_console_printf_rect_ex(
@@ -462,7 +541,15 @@ class Console:
             clear (bool): If True all text in the affected area will be
                           removed.
             bg_blend (int): Background blending flag.
+
+        .. deprecated:: 8.5
+            Console methods which depend on console defaults have been
+            deprecated.
+            Use :any:`Console.draw_rect` instead, calling this function will
+            print a warning detailing which default values need to be made
+            explicit.
         """
+        self.__deprecate_defaults("draw_rect", bg_blend, clear=bool(clear))
         lib.TCOD_console_rect(
             self.console_c, x, y, width, height, clear, bg_blend
         )
@@ -483,7 +570,15 @@ class Console:
             y (int): The y coordinate from the top.
             width (int): The horizontal length of this line.
             bg_blend (int): The background blending flag.
+
+        .. deprecated:: 8.5
+            Console methods which depend on console defaults have been
+            deprecated.
+            Use :any:`Console.draw_rect` instead, calling this function will
+            print a warning detailing which default values need to be made
+            explicit.
         """
+        self.__deprecate_defaults("draw_rect", bg_blend)
         lib.TCOD_console_hline(self.console_c, x, y, width, bg_blend)
 
     def vline(
@@ -502,7 +597,15 @@ class Console:
             y (int): The y coordinate from the top.
             height (int): The horozontal length of this line.
             bg_blend (int): The background blending flag.
+
+        .. deprecated:: 8.5
+            Console methods which depend on console defaults have been
+            deprecated.
+            Use :any:`Console.draw_rect` instead, calling this function will
+            print a warning detailing which default values need to be made
+            explicit.
         """
+        self.__deprecate_defaults("draw_rect", bg_blend)
         lib.TCOD_console_vline(self.console_c, x, y, height, bg_blend)
 
     def print_frame(
@@ -535,7 +638,15 @@ class Console:
 
         .. versionchanged:: 8.2
             Now supports Unicode strings.
+
+        .. deprecated:: 8.5
+            Console methods which depend on console defaults have been
+            deprecated.
+            Use :any:`Console.draw_frame` instead, calling this function will
+            print a warning detailing which default values need to be made
+            explicit.
         """
+        self.__deprecate_defaults("draw_frame", bg_blend)
         string = _fmt(string) if string else ffi.NULL
         lib.TCOD_console_printf_frame(
             self.console_c, x, y, width, height, clear, bg_blend, string
@@ -707,18 +818,8 @@ class Console:
         buffer["bg"] = self.bg
         return (
             "tcod.console.Console(width=%i, height=%i, "
-            "order=%r,buffer=\n%r,\ndefault_bg=%r, default_fg=%r, "
-            "default_bg_blend=%s, default_alignment=%s)"
-            % (
-                self.width,
-                self.height,
-                self._order,
-                buffer,
-                self.default_bg,
-                self.default_fg,
-                self.default_bg_blend,
-                self.default_alignment,
-            )
+            "order=%r,buffer=\n%r)"
+            % (self.width, self.height, self._order, buffer)
         )
 
     def __str__(self) -> str:
@@ -746,10 +847,22 @@ class Console:
     ) -> None:
         """Print a string on a console with manual line breaks.
 
-        `x` and `y` are the starting tile, with ``0,0`` as the upper left
-        corner of the console.
+        `x` and `y` are the starting tile, with ``0,0`` as the upper-left
+        corner of the console.  You can use negative numbers if you want to
+        start printing relative to the bottom-right corner.
 
-        `string` is a Unicode string.
+        `string` is a Unicode string which may include color control
+        characters.  Strings which are too long will be truncated until the
+        next newline character ``"\n"``.
+
+        `fg` and `bg` are the foreground text color and background tile color
+        respectfully.  This is a 3-item tuple with (r, g, b) color values from
+        0 to 255.  These parameters can also be set to `None` to leave the
+        colors unchanged.
+
+        `bg_blend` is the blend type used by libtcod.
+
+        `alignment` can be `tcod.LEFT`, `tcod.CENTER`, or `tcod.RIGHT`.
 
         .. versionadded:: 8.5
         """
@@ -779,7 +892,28 @@ class Console:
         bg_blend: int = tcod.constants.BKGND_DEFAULT,
         alignment: int = tcod.constants.LEFT,
     ) -> int:
-        """Print a string constrained to a rectangle.
+        """Print a string constrained to a rectangle and return the height.
+
+        `x` and `y` are the starting tile, with ``0,0`` as the upper-left
+        corner of the console.  You can use negative numbers if you want to
+        start printing relative to the bottom-right corner.
+
+        `width` and `height` determine the bounds of the rectangle, the text
+        will automatically be broken to fit within these bounds.
+
+        `string` is a Unicode string which may include color control
+        characters.
+
+        `fg` and `bg` are the foreground text color and background tile color
+        respectfully.  This is a 3-item tuple with (r, g, b) color values from
+        0 to 255.  These parameters can also be set to `None` to leave the
+        colors unchanged.
+
+        `bg_blend` is the blend type used by libtcod.
+
+        `alignment` can be `tcod.LEFT`, `tcod.CENTER`, or `tcod.RIGHT`.
+
+        Returns the actual height of the printed area.
 
         .. versionadded:: 8.5
         """
@@ -808,12 +942,31 @@ class Console:
         width: int,
         height: int,
         title: str = "",
+        clear: bool = True,
         fg: Optional[Tuple[int, int, int]] = (255, 255, 255),
         bg: Optional[Tuple[int, int, int]] = (0, 0, 0),
         bg_blend: int = tcod.constants.BKGND_SET,
-        clear: bool = True,
     ) -> None:
         """Draw a framed rectangle with an optional title.
+
+        `x` and `y` are the starting tile, with ``0,0`` as the upper-left
+        corner of the console.  You can use negative numbers if you want to
+        start printing relative to the bottom-right corner.
+
+        `width` and `height` determine the size of the frame.
+
+        `title` is a Unicode string.
+
+        If `clear` is True than the region inside of the frame will be cleared.
+
+        `fg` and `bg` are the foreground text color and background tile color
+        respectfully.  This is a 3-item tuple with (r, g, b) color values from
+        0 to 255.  These parameters can also be set to `None` to leave the
+        colors unchanged.
+
+        `bg_blend` is the blend type used by libtcod.
+
+        .. versionadded:: 8.5
         """
         x, y = self._pythonic_index(x, y)
         title_ = title.encode("utf-8")  # type: bytes
@@ -843,6 +996,22 @@ class Console:
         bg_blend: int = tcod.constants.BKGND_SET,
     ) -> None:
         """Draw characters and colors over a rectangular region.
+
+        `x` and `y` are the starting tile, with ``0,0`` as the upper-left
+        corner of the console.  You can use negative numbers if you want to
+        start printing relative to the bottom-right corner.
+
+        `width` and `height` determine the size of the rectangle.
+
+        `ch` is a Unicode integer.  You can use 0 to leave the current
+        characters unchanged.
+
+        `fg` and `bg` are the foreground text color and background tile color
+        respectfully.  This is a 3-item tuple with (r, g, b) color values from
+        0 to 255.  These parameters can also be set to `None` to leave the
+        colors unchanged.
+
+        `bg_blend` is the blend type used by libtcod.
 
         .. versionadded:: 8.5
         """

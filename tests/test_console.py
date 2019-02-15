@@ -38,19 +38,9 @@ def test_array_read_write():
     assert tuple(tcod.console_get_char_background(console, 2, 1)) == BG
 
 
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_defaults():
-    console = tcod.console.Console(
-        width=12,
-        height=10,
-        default_bg=(3, 6, 9),
-        default_fg=(12, 15, 18),
-        default_bg_blend=tcod.BKGND_MULTIPLY,
-        default_alignment=tcod.LEFT,
-    )
-    assert console.default_bg == (3, 6, 9)
-    assert console.default_fg == (12, 15, 18)
-    assert console.default_bg_blend == tcod.BKGND_MULTIPLY
-    assert console.default_alignment == tcod.LEFT
+    console = tcod.console.Console(width=12, height=10)
 
     console.default_bg = [2, 3, 4]
     assert console.default_bg == (2, 3, 4)
@@ -123,11 +113,9 @@ def test_console_fortran_buffer():
 
 
 def test_console_clear():
-    console = tcod.console.Console(
-        1, 1, default_fg=(1, 2, 3), default_bg=(4, 5, 6)
-    )
-    assert console.fg[0, 0].tolist() == [1, 2, 3]
-    assert console.bg[0, 0].tolist() == [4, 5, 6]
+    console = tcod.console.Console(1, 1)
+    assert console.fg[0, 0].tolist() == [255, 255, 255]
+    assert console.bg[0, 0].tolist() == [0, 0, 0]
     console.clear(fg=(7, 8, 9), bg=(10, 11, 12))
     assert console.fg[0, 0].tolist() == [7, 8, 9]
     assert console.bg[0, 0].tolist() == [10, 11, 12]

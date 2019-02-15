@@ -11,6 +11,7 @@ Unreleased
 ------------------
 Added
  - `tcod.console.Console` now supports `str` and `repr`.
+ - Added new Console methods which are independent from the console defaults.
 Changed
  - You can now give default values or an array when initializing a
    `tcod.console.Console` instance.
@@ -22,6 +23,9 @@ Deprecated
    `Console.blit` instead.
  - `Console.clear` should be given the colors to clear with as parameters,
    rather than by using `default_fg` or `default_bg`.
+ - Most functions which depend on console default values have been deprecated.
+   The new deprecation warnings will give details on how to make default values
+   explicit.
 Fixed
  - `tcod.console.Console.blit` was ignoring the key color set by
    `Console.set_key_color`.
