@@ -9,10 +9,15 @@ v2.0.0
 
 Unreleased
 ------------------
+
+8.5.0 - 2019-02-15
+------------------
 Added
  - `tcod.console.Console` now supports `str` and `repr`.
  - Added new Console methods which are independent from the console defaults.
 Changed
+ - Updated libtcod to 1.10.6
+ - Printing generates more compact layouts.
  - You can now give default values or an array when initializing a
    `tcod.console.Console` instance.
  - `Console.clear` can now take `ch`, `fg`, and `bg` parameters.
@@ -29,6 +34,7 @@ Deprecated
 Fixed
  - `tcod.console.Console.blit` was ignoring the key color set by
    `Console.set_key_color`.
+ - The `SDL2` and `OPENGL2` renders can now large numbers of tiles.
 
 8.4.3 - 2019-02-06
 ------------------
