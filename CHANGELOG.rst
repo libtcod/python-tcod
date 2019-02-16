@@ -9,18 +9,20 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+- New console methods now default to an `fg` and `bg` of None.
 
 8.5.0 - 2019-02-15
 ------------------
 Added
  - `tcod.console.Console` now supports `str` and `repr`.
  - Added new Console methods which are independent from the console defaults.
-Changed
- - Updated libtcod to 1.10.6
- - Printing generates more compact layouts.
  - You can now give an array when initializing a `tcod.console.Console`
    instance.
  - `Console.clear` can now take `ch`, `fg`, and `bg` parameters.
+Changed
+ - Updated libtcod to 1.10.6
+ - Printing generates more compact layouts.
 Deprecated
  - Most libtcodpy console functions have been replaced by the tcod.console
    module.

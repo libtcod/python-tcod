@@ -369,18 +369,16 @@ class Console:
     ) -> None:
         """Return the parameters needed to recreate the current default state.
         """
-        fg = None  # type: Any
-        bg = None  # type: Any
-        fg = self.default_fg if self.default_fg != (255, 255, 255) else None
-        bg = self.default_bg if self.default_bg != (0, 0, 0) else None
+        fg = self.default_fg  # type: Any
+        bg = self.default_bg  # type: Any
         if bg_blend == tcod.constants.BKGND_NONE:
-            bg = "None"
+            bg = None
         if bg_blend == tcod.constants.BKGND_DEFAULT:
             bg_blend = self.default_bg_blend
         else:
             bg_blend = None
         if bg_blend == tcod.constants.BKGND_NONE:
-            bg = "None"
+            bg = None
             bg_blend = None
         if bg_blend == tcod.constants.BKGND_SET:
             bg_blend = None
@@ -391,7 +389,7 @@ class Console:
         else:
             alignment = None
         if clear is not ...:
-            fg = "None"
+            fg = None
         params = []
         if clear is True:
             params.append('ch=ord(" ")')
@@ -840,8 +838,8 @@ class Console:
         x: int,
         y: int,
         string: str,
-        fg: Optional[Tuple[int, int, int]] = (255, 255, 255),
-        bg: Optional[Tuple[int, int, int]] = (0, 0, 0),
+        fg: Optional[Tuple[int, int, int]] = None,
+        bg: Optional[Tuple[int, int, int]] = None,
         bg_blend: int = tcod.constants.BKGND_SET,
         alignment: int = tcod.constants.LEFT,
     ) -> None:
@@ -865,6 +863,9 @@ class Console:
         `alignment` can be `tcod.LEFT`, `tcod.CENTER`, or `tcod.RIGHT`.
 
         .. versionadded:: 8.5
+
+        .. versionchanged:: 9.0
+            `fg` and `bg` now default to `None`.
         """
         x, y = self._pythonic_index(x, y)
         string_ = string.encode("utf-8")  # type: bytes
@@ -887,8 +888,8 @@ class Console:
         width: int,
         height: int,
         string: str,
-        fg: Optional[Tuple[int, int, int]] = (255, 255, 255),
-        bg: Optional[Tuple[int, int, int]] = (0, 0, 0),
+        fg: Optional[Tuple[int, int, int]] = None,
+        bg: Optional[Tuple[int, int, int]] = None,
         bg_blend: int = tcod.constants.BKGND_DEFAULT,
         alignment: int = tcod.constants.LEFT,
     ) -> int:
@@ -916,6 +917,9 @@ class Console:
         Returns the actual height of the printed area.
 
         .. versionadded:: 8.5
+
+        .. versionchanged:: 9.0
+            `fg` and `bg` now default to `None`.
         """
         x, y = self._pythonic_index(x, y)
         string_ = string.encode("utf-8")  # type: bytes
@@ -943,8 +947,8 @@ class Console:
         height: int,
         title: str = "",
         clear: bool = True,
-        fg: Optional[Tuple[int, int, int]] = (255, 255, 255),
-        bg: Optional[Tuple[int, int, int]] = (0, 0, 0),
+        fg: Optional[Tuple[int, int, int]] = None,
+        bg: Optional[Tuple[int, int, int]] = None,
         bg_blend: int = tcod.constants.BKGND_SET,
     ) -> None:
         """Draw a framed rectangle with an optional title.
@@ -967,6 +971,9 @@ class Console:
         `bg_blend` is the blend type used by libtcod.
 
         .. versionadded:: 8.5
+
+        .. versionchanged:: 9.0
+            `fg` and `bg` now default to `None`.
         """
         x, y = self._pythonic_index(x, y)
         title_ = title.encode("utf-8")  # type: bytes
@@ -991,8 +998,8 @@ class Console:
         width: int,
         height: int,
         ch: int,
-        fg: Optional[Tuple[int, int, int]] = (255, 255, 255),
-        bg: Optional[Tuple[int, int, int]] = (0, 0, 0),
+        fg: Optional[Tuple[int, int, int]] = None,
+        bg: Optional[Tuple[int, int, int]] = None,
         bg_blend: int = tcod.constants.BKGND_SET,
     ) -> None:
         """Draw characters and colors over a rectangular region.
@@ -1014,6 +1021,9 @@ class Console:
         `bg_blend` is the blend type used by libtcod.
 
         .. versionadded:: 8.5
+
+        .. versionchanged:: 9.0
+            `fg` and `bg` now default to `None`.
         """
         x, y = self._pythonic_index(x, y)
         lib.draw_rect(
