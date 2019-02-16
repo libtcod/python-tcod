@@ -853,7 +853,7 @@ class Console:
 
         `string` is a Unicode string which may include color control
         characters.  Strings which are too long will be truncated until the
-        next newline character ``"\n"``.
+        next newline character ``"\\n"``.
 
         `fg` and `bg` are the foreground text color and background tile color
         respectfully.  This is a 3-item tuple with (r, g, b) color values from
