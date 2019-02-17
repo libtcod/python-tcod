@@ -148,6 +148,7 @@ class TrueColorSample(Sample):
             height=sample_console.height - 1,
             string="The Doryen library uses 24 bits colors, for both "
             "background and foreground.",
+            fg=tcod.white,
             bg=tcod.grey,
             bg_blend=tcod.BKGND_MULTIPLY,
             alignment=tcod.CENTER,
@@ -176,6 +177,8 @@ class OffscreenConsoleSample(Sample):
             sample_console.height // 2,
             "Offscreen console",
             False,
+            fg=tcod.white,
+            bg=tcod.black,
         )
 
         self.secondary.print_box(
@@ -185,6 +188,7 @@ class OffscreenConsoleSample(Sample):
             sample_console.height // 2,
             "You can render to an offscreen console and blit in on another "
             "one, simulating alpha transparency.",
+            fg=tcod.white,
             bg=None,
             alignment=tcod.CENTER,
         )
@@ -318,6 +322,7 @@ class LineDrawingSample(Sample):
             2,
             2,
             "%s (ENTER to change)" % self.FLAG_NAMES[self.bk_flag & 0xFF],
+            fg=tcod.white,
             bg=None,
         )
 
@@ -413,16 +418,30 @@ class NoiseSample(Sample):
                 sample_console.print(
                     2, 2 + curfunc, text, fg=tcod.grey, bg=None
                 )
-        sample_console.print(2, 11, "Y/H : zoom (%2.1f)" % self.zoom, bg=None)
+        sample_console.print(
+            2, 11, "Y/H : zoom (%2.1f)" % self.zoom, fg=tcod.white, bg=None
+        )
         if self.implementation != tcod.noise.SIMPLE:
             sample_console.print(
-                2, 12, "E/D : hurst (%2.1f)" % self.hurst, bg=None
+                2,
+                12,
+                "E/D : hurst (%2.1f)" % self.hurst,
+                fg=tcod.white,
+                bg=None,
             )
             sample_console.print(
-                2, 13, "R/F : lacunarity (%2.1f)" % self.lacunarity, bg=None
+                2,
+                13,
+                "R/F : lacunarity (%2.1f)" % self.lacunarity,
+                fg=tcod.white,
+                bg=None,
             )
             sample_console.print(
-                2, 14, "T/G : octaves (%2.1f)" % self.octaves, bg=None
+                2,
+                14,
+                "T/G : octaves (%2.1f)" % self.octaves,
+                fg=tcod.white,
+                bg=None,
             )
 
     def ev_keydown(self, event: tcod.event.KeyDown):
@@ -552,6 +571,7 @@ class FOVSample(Sample):
                 "on " if self.light_walls else "off",
                 FOV_ALGO_NAMES[self.algo_num],
             ),
+            fg=tcod.white,
             bg=None,
         )
 
@@ -697,9 +717,10 @@ class PathfindingSample(Sample):
             1,
             1,
             "IJKL / mouse :\nmove destination\nTAB : A*/dijkstra",
+            fg=tcod.white,
             bg=None,
         )
-        sample_console.print(1, 4, "Using : A*", bg=None)
+        sample_console.print(1, 4, "Using : A*", fg=tcod.white, bg=None)
         # draw windows
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
@@ -1040,13 +1061,16 @@ class BSPSample(Sample):
             "+-: bsp depth %d\n"
             "*/: room size %d\n"
             "1 : random room size %s" % (bsp_depth, bsp_min_room_size, rooms),
+            fg=tcod.white,
             bg=None,
         )
         if bsp_random_room:
             walls = "OFF"
             if bsp_room_walls:
                 walls = "ON"
-            sample_console.print_(1, 6, "2 : room walls %s" % walls)
+            sample_console.print(
+                1, 6, "2 : room walls %s" % walls, fg=tcod.white, bg=None
+            )
         # render the level
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
@@ -1239,6 +1263,7 @@ class NameGeneratorSample(Sample):
             1,
             "%s\n\n+ : next generator\n- : prev generator"
             % self.sets[self.curset],
+            fg=tcod.white,
             bg=None,
         )
         for i in range(len(self.names)):
@@ -1246,6 +1271,7 @@ class NameGeneratorSample(Sample):
                 SAMPLE_SCREEN_WIDTH - 2,
                 2 + i,
                 self.names[i],
+                fg=tcod.white,
                 bg=None,
                 alignment=tcod.RIGHT,
             )
@@ -1324,7 +1350,9 @@ class FastRenderSample(Sample):
         global frac_t, abs_t, lights, tex_r, tex_g, tex_b
         tcod.sys_set_fps(0)
         sample_console.clear()  # render status message
-        sample_console.print(1, SCREEN_H - 3, "Renderer: NumPy", bg=None)
+        sample_console.print(
+            1, SCREEN_H - 3, "Renderer: NumPy", fg=tcod.white, bg=None
+        )
 
         # time is represented in number of pixels of the texture, start later
         # in time to initialize texture

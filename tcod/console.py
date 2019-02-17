@@ -865,7 +865,7 @@ class Console:
         .. versionadded:: 8.5
 
         .. versionchanged:: 9.0
-            `fg` and `bg` now default to `None`.
+            `fg` and `bg` now default to `None` instead of white-on-black.
         """
         x, y = self._pythonic_index(x, y)
         string_ = string.encode("utf-8")  # type: bytes
@@ -919,7 +919,7 @@ class Console:
         .. versionadded:: 8.5
 
         .. versionchanged:: 9.0
-            `fg` and `bg` now default to `None`.
+            `fg` and `bg` now default to `None` instead of white-on-black.
         """
         x, y = self._pythonic_index(x, y)
         string_ = string.encode("utf-8")  # type: bytes
@@ -973,7 +973,7 @@ class Console:
         .. versionadded:: 8.5
 
         .. versionchanged:: 9.0
-            `fg` and `bg` now default to `None`.
+            `fg` and `bg` now default to `None` instead of white-on-black.
         """
         x, y = self._pythonic_index(x, y)
         title_ = title.encode("utf-8")  # type: bytes
@@ -1023,7 +1023,7 @@ class Console:
         .. versionadded:: 8.5
 
         .. versionchanged:: 9.0
-            `fg` and `bg` now default to `None`.
+            `fg` and `bg` now default to `None` instead of white-on-black.
         """
         x, y = self._pythonic_index(x, y)
         lib.draw_rect(
