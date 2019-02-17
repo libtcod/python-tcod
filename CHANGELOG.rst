@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+9.0.0 - 2019-02-17
+------------------
 Changed
 - New console methods now default to an `fg` and `bg` of None instead of
   white-on-black.
