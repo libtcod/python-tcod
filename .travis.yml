@@ -69,10 +69,11 @@ before_script:
 script:
 - pytest -v
 after_success:
+- if [[ -n "$TRAVIS_TAG" ]]; then pip install --upgrade twine; fi
+- if [[ -n "$TRAVIS_TAG" && -z "$PYPY3_VERSION" ]]; then pip install --upgrade pyOpenSSL; fi
+- if [[ -n "$TRAVIS_TAG" && "$TRAVIS_OS_NAME" == "osx" ]]; then twine upload --skip-existing dist/*; fi
 - pip install codacy-coverage python-coveralls codecov
 - codecov
 - coveralls
 - coverage xml
 - if [[ -n "$CODACY_PROJECT_TOKEN" ]]; then python-codacy-coverage -r coverage.xml; fi
-- if [[ -n "$TRAVIS_TAG" ]]; then pip install --upgrade twine pyOpenSSL; fi
-- if [[ -n "$TRAVIS_TAG" && "$TRAVIS_OS_NAME" == "osx" ]]; then twine upload --skip-existing dist/*; fi
