@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+9.1.0 - 2019-02-23
+------------------
 Added
 - Added the `tcod.random.MULTIPLY_WITH_CARRY` constant.
 Changed
