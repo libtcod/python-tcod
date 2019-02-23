@@ -10,6 +10,9 @@ def deprecate(
     message: str, category: Any = DeprecationWarning, stacklevel: int = 0
 ) -> Callable[[F], F]:
     def decorator(func: F) -> F:
+        if not __debug__:
+            return func
+
         @functools.wraps(func)
         def wrapper(*args, **kargs):  # type: ignore
             warnings.warn(message, category, stacklevel=stacklevel + 2)

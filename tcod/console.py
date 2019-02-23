@@ -369,6 +369,9 @@ class Console:
     ) -> None:
         """Return the parameters needed to recreate the current default state.
         """
+        if not __debug__:
+            return
+
         fg = self.default_fg  # type: Any
         bg = self.default_bg  # type: Any
         if bg_blend == tcod.constants.BKGND_NONE:

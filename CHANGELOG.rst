@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+- The overhead for warnings has been reduced when running Python with the
+  optimize `-O` flag.
 
 9.0.0 - 2019-02-17
 ------------------
