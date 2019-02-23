@@ -9,9 +9,12 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+- Added the `tcod.random.MULTIPLY_WITH_CARRY` constant.
 Changed
 - The overhead for warnings has been reduced when running Python with the
   optimize `-O` flag.
+- `tcod.random.Random` now provides a default algorithm.
 
 9.0.0 - 2019-02-17
 ------------------

@@ -1,5 +1,9 @@
 """
-    Random module docs.
+Usually it's recommend to the Python's standard library `random` module
+instead of this one.
+
+However, you will need to use these generators to get deterministic results
+from the :any:`Noise` and :any:`BSP` classes.
 """
 import random
 from typing import Any, Hashable, Optional
@@ -9,26 +13,34 @@ import tcod.constants
 
 MERSENNE_TWISTER = tcod.constants.RNG_MT
 COMPLEMENTARY_MULTIPLY_WITH_CARRY = tcod.constants.RNG_CMWC
+MULTIPLY_WITH_CARRY = tcod.constants.RNG_CMWC
 
 
 class Random(object):
     """The libtcod random number generator.
 
-    If all you need is a random number generator then it's recommended
-    that you use the :any:`random` module from the Python standard library.
+    `algorithm` defaults to Mersenne Twister, it can be one of:
 
-    If ``seed`` is None then a random seed will be generated.
+    * tcod.random.MERSENNE_TWISTER
+    * tcod.random.MULTIPLY_WITH_CARRY
 
-    Args:
-        algorithm (int): The algorithm to use.
-        seed (Optional[Hashable]):
-            Could be a 32-bit integer, but any hashable object is accepted.
+    `seed` is a 32-bit number or any Python hashable object like a string.
+    Using the same seed will cause the generator to return deterministic
+    values.  The default `seed` of None will generate a random seed instead.
 
     Attributes:
         random_c (CData): A cffi pointer to a TCOD_random_t object.
+
+    .. versionchanged:: 9.1
+        Added `tcod.random.MULTIPLY_WITH_CARRY` constant.
+        `algorithm` parameter now defaults to `tcod.random.MERSENNE_TWISTER`.
     """
 
-    def __init__(self, algorithm: int, seed: Optional[Hashable] = None):
+    def __init__(
+        self,
+        algorithm: int = MERSENNE_TWISTER,
+        seed: Optional[Hashable] = None,
+    ):
         """Create a new instance using this algorithm and seed."""
         if seed is None:
             seed = random.getrandbits(32)
