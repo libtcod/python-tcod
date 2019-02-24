@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+9.2.0 - 2019-02-24
+------------------
 Added
 - New `tcod.console.get_height_rect` function, which can be used to get the
   height of a print call without an existing console.
