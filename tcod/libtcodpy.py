@@ -35,7 +35,6 @@ from tcod.constants import (
     FOV_PERMISSIVE_0,
     NOISE_DEFAULT,
     KEY_RELEASED,
-    RENDERER_GLSL,
 )
 
 from tcod._internal import deprecate
@@ -894,9 +893,11 @@ def console_init_root(
         # Use the scripts filename as the title.
         title = os.path.basename(sys.argv[0])
     if renderer is None:
-        renderer = RENDERER_GLSL  # Stable for now.
+        renderer = tcod.constants.RENDERER_SDL2
     lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
-    return tcod.console.Console._get_root(order)
+    console = tcod.console.Console._get_root(order)
+    console.clear()
+    return console
 
 
 def console_set_custom_font(

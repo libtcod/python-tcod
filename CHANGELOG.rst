@@ -20,6 +20,7 @@ Fixed
 - Windows and MacOS builds now restrict exported SDL2 symbols to only
   SDL 2.0.5;  This will avoid hard to debug import errors when the wrong
   version of SDL is dynamically linked.
+- The root console now starts with a white foreground.
 
 9.1.0 - 2019-02-23
 ------------------
