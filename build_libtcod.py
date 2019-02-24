@@ -95,10 +95,10 @@ define_macros = []
 
 sources += walk_sources("tcod/")
 sources += walk_sources("tdl/")
-sources += walk_sources("libtcod/src/libtcod")
+sources += ["libtcod/src/libtcod_c.c"]
+sources += ["libtcod/src/libtcod.cpp"]
 sources += ["libtcod/src/vendor/glad.c"]
 sources += ["libtcod/src/vendor/lodepng.cpp"]
-sources += ["libtcod/src/vendor/stb.c"]
 sources += ["libtcod/src/vendor/utf8proc/utf8proc.c"]
 sources += glob.glob("libtcod/src/vendor/zlib/*.c")
 
