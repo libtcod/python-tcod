@@ -20,7 +20,11 @@ try:
 except ImportError:
     from urllib.request import urlretrieve
 
-SDL2_VERSION = os.environ.get("SDL_VERSION", "2.0.9")
+# The SDL2 version to parse and export symbols from.
+SDL2_PARSE_VERSION = os.environ.get("SDL_VERSION", "2.0.5")
+# The SDL2 version to include in binary distributions.
+SDL2_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "2.0.9")
+
 TDL_NO_SDL2_EXPORTS = os.environ.get("TDL_NO_SDL2_EXPORTS", "0") == "1"
 
 CFFI_HEADER = "tcod/cffi.h"
@@ -122,13 +126,15 @@ else:
 # included SDL headers are for whatever OS's don't easily come with them
 
 if sys.platform in ["win32", "darwin"]:
-    SDL2_PATH = unpack_sdl2(SDL2_VERSION)
+    SDL2_PARSE_PATH = unpack_sdl2(SDL2_PARSE_VERSION)
+    SDL2_BUNDLE_PATH = unpack_sdl2(SDL2_BUNDLE_VERSION)
     include_dirs.append("libtcod/src/zlib/")
 
 if sys.platform == "win32":
-    include_dirs.append(os.path.join(SDL2_PATH, "include"))
+    include_dirs.append(os.path.join(SDL2_PARSE_PATH, "include"))
     ARCH_MAPPING = {"32bit": "x86", "64bit": "x64"}
-    SDL2_LIB_DIR = os.path.join(SDL2_PATH, "lib/", ARCH_MAPPING[BITSIZE])
+    SDL2_LIB_DIR = os.path.join(SDL2_BUNDLE_PATH, "lib/",
+                                ARCH_MAPPING[BITSIZE])
     library_dirs.append(SDL2_LIB_DIR)
     SDL2_LIB_DEST = os.path.join("tcod", ARCH_MAPPING[BITSIZE])
     if not os.path.exists(SDL2_LIB_DEST):
@@ -152,12 +158,12 @@ def fix_header(filepath):
 
 
 if sys.platform == "darwin":
-    HEADER_DIR = os.path.join(SDL2_PATH, "Headers")
+    HEADER_DIR = os.path.join(SDL2_PARSE_PATH, "Headers")
     fix_header(os.path.join(HEADER_DIR, "SDL_assert.h"))
     fix_header(os.path.join(HEADER_DIR, "SDL_config_macosx.h"))
     include_dirs.append(HEADER_DIR)
-    extra_link_args += ["-F%s/.." % SDL2_PATH]
-    extra_link_args += ["-rpath", "%s/.." % SDL2_PATH]
+    extra_link_args += ["-F%s/.." % SDL2_BUNDLE_PATH]
+    extra_link_args += ["-rpath", "%s/.." % SDL2_BUNDLE_PATH]
     extra_link_args += ["-rpath", "/usr/local/opt/llvm/lib/"]
 
 if sys.platform not in ["win32", "darwin"]:
@@ -256,9 +262,9 @@ def get_cdef():
 def get_ast():
     global extra_parse_args
     if "win32" in sys.platform:
-        extra_parse_args += [r"-I%s/include" % SDL2_PATH]
+        extra_parse_args += [r"-I%s/include" % SDL2_PARSE_PATH]
     if "darwin" in sys.platform:
-        extra_parse_args += [r"-I%s/Headers" % SDL2_PATH]
+        extra_parse_args += [r"-I%s/Headers" % SDL2_PARSE_PATH]
 
     ast = parse_file(
         filename=CFFI_HEADER,

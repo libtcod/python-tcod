@@ -16,6 +16,9 @@ Fixed
 - The new print methods now handle alignment according to how they were
   documented.
 - `SDL2` and `OPENGL2` now support screenshots.
+- Windows and MacOS builds now restrict exported SDL2 symbols to only
+  SDL 2.0.5;  This will avoid hard to debug import errors when the wrong
+  version of SDL is dynamically linked.
 
 9.1.0 - 2019-02-23
 ------------------
