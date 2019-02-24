@@ -12,6 +12,7 @@ Unreleased
 Added
 - New `tcod.console.get_height_rect` function, which can be used to get the
   height of a print call without an existing console.
+- New `tcod.tileset` module, with a `set_truetype_font` function.
 Fixed
 - The new print methods now handle alignment according to how they were
   documented.

@@ -26,6 +26,7 @@ Contents:
 
    tcod
    tcod/event
+   tcod/tileset
    libtcodpy
 
 .. toctree::
