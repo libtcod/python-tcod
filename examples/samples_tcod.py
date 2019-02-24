@@ -142,7 +142,7 @@ class TrueColorSample(Sample):
     def print_banner(self):
         # print text on top of samples
         sample_console.print_box(
-            x=sample_console.width // 2,
+            x=1,
             y=5,
             width=sample_console.width - 2,
             height=sample_console.height - 1,
@@ -182,7 +182,7 @@ class OffscreenConsoleSample(Sample):
         )
 
         self.secondary.print_box(
-            sample_console.width // 4,
+            1,
             2,
             sample_console.width // 2 - 2,
             sample_console.height // 2,

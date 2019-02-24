@@ -9,6 +9,13 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+- New `tcod.console.get_height_rect` function, which can be used to get the
+  height of a print call without an existing console.
+Fixed
+- The new print methods now handle alignment according to how they were
+  documented.
+- `SDL2` and `OPENGL2` now support screenshots.
 
 9.1.0 - 2019-02-23
 ------------------

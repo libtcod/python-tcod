@@ -80,6 +80,13 @@ int get_height_rect(
   return tcod::console::get_height_rect(console, x, y, width, height,
                                         std::string(str, str_n));
 }
+int get_height_rect2(
+    int width,
+    const char* str,
+    int str_n)
+{
+  return tcod::console::get_height_rect(width, std::string(str, str_n));
+}
 void print_frame(
     TCOD_Console* console,
     int x,

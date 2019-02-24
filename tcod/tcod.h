@@ -50,6 +50,10 @@ int get_height_rect(
     int height,
     const char* str,
     int str_n);
+int get_height_rect2(
+    int width,
+    const char* str,
+    int str_n);
 void print_frame(
     TCOD_Console *con,
     int x,

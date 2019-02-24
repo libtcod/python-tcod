@@ -1040,3 +1040,16 @@ class Console:
             (bg,) if bg is not None else ffi.NULL,
             bg_blend,
         )
+
+
+def get_height_rect(width: int, string: str) -> int:
+    """Return the number of lines which would be printed from these parameters.
+
+    `width` is the width of the print boundary.
+
+    `string` is a Unicode string which may include color control characters.
+
+    .. versionadded:: 9.2
+    """
+    string_ = string.encode("utf-8")  # type: bytes
+    return int(lib.get_height_rect2(width, string_, len(string_)))
