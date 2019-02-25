@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+9.2.1 - 2019-02-25
+------------------
 Fixed
 - `tcod.sys_get_char_size` fixed on the new renderers.
 
