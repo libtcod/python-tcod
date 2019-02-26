@@ -298,7 +298,10 @@ tdl_build = os.environ.get("TDL_BUILD", "RELEASE").upper()
 
 MSVC_CFLAGS = {"DEBUG": ["/Od"], "RELEASE": ["/GL", "/O2", "/GS-"]}
 MSVC_LDFLAGS = {"DEBUG": [], "RELEASE": ["/LTCG"]}
-GCC_CFLAGS = {"DEBUG": ["-O0"], "RELEASE": ["-flto", "-O3", "-fPIC"]}
+GCC_CFLAGS = {
+    "DEBUG": ["-Og", "-g", "-fPIC"],
+    "RELEASE": ["-flto", "-O3", "-g", "-fPIC"],
+}
 
 if sys.platform == "win32" and "--compiler=mingw32" not in sys.argv:
     extra_compile_args.extend(MSVC_CFLAGS[tdl_build])
