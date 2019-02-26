@@ -9,6 +9,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+- `Console.print_box` wasn't setting the background color by default.
 
 9.2.1 - 2019-02-25
 ------------------

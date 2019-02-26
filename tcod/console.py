@@ -893,7 +893,7 @@ class Console:
         string: str,
         fg: Optional[Tuple[int, int, int]] = None,
         bg: Optional[Tuple[int, int, int]] = None,
-        bg_blend: int = tcod.constants.BKGND_DEFAULT,
+        bg_blend: int = tcod.constants.BKGND_SET,
         alignment: int = tcod.constants.LEFT,
     ) -> int:
         """Print a string constrained to a rectangle and return the height.
