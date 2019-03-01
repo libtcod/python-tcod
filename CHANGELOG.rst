@@ -12,6 +12,8 @@ Unreleased
 Deprecated
  - The behavior for negative indexes on the new print functions may change in
    the future.
+ - Methods and functionality preventing `tcod.Color` from behaving like a tuple
+   have been deprecated.
 
 9.2.2 - 2019-02-26
 ------------------

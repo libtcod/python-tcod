@@ -2,7 +2,9 @@
 
 """
 from typing import Any, List
+import warnings
 
+from tcod._internal import deprecate
 from tcod.libtcod import lib
 
 
@@ -20,28 +22,43 @@ class Color(List[int]):
 
     @property
     def r(self) -> int:
-        """int: Red value, always normalised to 0-255."""
+        """int: Red value, always normalised to 0-255.
+
+        .. deprecated:: 9.2
+            Color attributes will not be mutable in the future.
+        """
         return self[0]
 
-    @r.setter
+    @r.setter  # type: ignore
+    @deprecate("Setting color attributes has been deprecated.")
     def r(self, value: int) -> None:
         self[0] = value & 0xFF
 
     @property
     def g(self) -> int:
-        """int: Green value, always normalised to 0-255."""
+        """int: Green value, always normalised to 0-255.
+
+        .. deprecated:: 9.2
+            Color attributes will not be mutable in the future.
+        """
         return self[1]
 
-    @g.setter
+    @g.setter  # type: ignore
+    @deprecate("Setting color attributes has been deprecated.")
     def g(self, value: int) -> None:
         self[1] = value & 0xFF
 
     @property
     def b(self) -> int:
-        """int: Blue value, always normalised to 0-255."""
+        """int: Blue value, always normalised to 0-255.
+
+        .. deprecated:: 9.2
+            Color attributes will not be mutable in the future.
+        """
         return self[2]
 
-    @b.setter
+    @b.setter  # type: ignore
+    @deprecate("Setting color attributes has been deprecated.")
     def b(self, value: int) -> None:
         self[2] = value & 0xFF
 
@@ -51,11 +68,21 @@ class Color(List[int]):
         return cls(cdata.r, cdata.g, cdata.b)
 
     def __getitem__(self, index: Any) -> int:  # type: ignore
+        """
+        .. deprecated:: 9.2
+            Accessing colors via a letter index is deprecated.
+        """
         try:
-            return super().__getitem__(index)  # type: ignore
+            return super().__getitem__(index)
         except TypeError:
+            warnings.warn(
+                "Accessing colors via a letter index is deprecated",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             return super().__getitem__("rgb".index(index))
 
+    @deprecate("This class will not be mutable in the future.")
     def __setitem__(self, index: Any, value: Any) -> None:
         try:
             super().__setitem__(index, value)
@@ -72,16 +99,31 @@ class Color(List[int]):
         except TypeError:
             return False
 
+    @deprecate("Use NumPy instead for color math operations.")
     def __add__(self, other: Any) -> "Color":
-        """Add two colors together."""
+        """Add two colors together.
+
+        .. deprecated:: 9.2
+            Use NumPy instead for color math operations.
+        """
         return Color._new_from_cdata(lib.TCOD_color_add(self, other))
 
+    @deprecate("Use NumPy instead for color math operations.")
     def __sub__(self, other: Any) -> "Color":
-        """Subtract one color from another."""
+        """Subtract one color from another.
+
+        .. deprecated:: 9.2
+            Use NumPy instead for color math operations.
+        """
         return Color._new_from_cdata(lib.TCOD_color_subtract(self, other))
 
+    @deprecate("Use NumPy instead for color math operations.")
     def __mul__(self, other: Any) -> "Color":
-        """Multiply with a scaler or another color."""
+        """Multiply with a scaler or another color.
+
+        .. deprecated:: 9.2
+            Use NumPy instead for color math operations.
+        """
         if isinstance(other, (Color, list, tuple)):
             return Color._new_from_cdata(lib.TCOD_color_multiply(self, other))
         else:
