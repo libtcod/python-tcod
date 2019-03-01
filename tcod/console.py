@@ -830,6 +830,12 @@ class Console:
         )
 
     def _pythonic_index(self, x: int, y: int) -> Tuple[int, int]:
+        if __debug__ and (x < 0 or y < 0):
+            warnings.warn(
+                "How negative indexes are handled my change in the future.",
+                PendingDeprecationWarning,
+                stacklevel=3,
+            )
         if x < 0:
             x += self.width
         if y < 0:
@@ -850,7 +856,8 @@ class Console:
 
         `x` and `y` are the starting tile, with ``0,0`` as the upper-left
         corner of the console.  You can use negative numbers if you want to
-        start printing relative to the bottom-right corner.
+        start printing relative to the bottom-right corner, but this behavior
+        may change in future versions.
 
         `string` is a Unicode string which may include color control
         characters.  Strings which are too long will be truncated until the
@@ -900,7 +907,8 @@ class Console:
 
         `x` and `y` are the starting tile, with ``0,0`` as the upper-left
         corner of the console.  You can use negative numbers if you want to
-        start printing relative to the bottom-right corner.
+        start printing relative to the bottom-right corner, but this behavior
+        may change in future versions.
 
         `width` and `height` determine the bounds of the rectangle, the text
         will automatically be broken to fit within these bounds.
@@ -958,7 +966,8 @@ class Console:
 
         `x` and `y` are the starting tile, with ``0,0`` as the upper-left
         corner of the console.  You can use negative numbers if you want to
-        start printing relative to the bottom-right corner.
+        start printing relative to the bottom-right corner, but this behavior
+        may change in future versions.
 
         `width` and `height` determine the size of the frame.
 
@@ -1009,7 +1018,8 @@ class Console:
 
         `x` and `y` are the starting tile, with ``0,0`` as the upper-left
         corner of the console.  You can use negative numbers if you want to
-        start printing relative to the bottom-right corner.
+        start printing relative to the bottom-right corner, but this behavior
+        may change in future versions.
 
         `width` and `height` determine the size of the rectangle.
 

@@ -9,6 +9,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Deprecated
+ - The behavior for negative indexes on the new print functions may change in
+   the future.
 
 9.2.2 - 2019-02-26
 ------------------
