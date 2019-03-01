@@ -76,4 +76,4 @@ after_success:
 - codecov
 - coveralls
 - coverage xml
-- if [[ -n "$CODACY_PROJECT_TOKEN" ]]; then python-codacy-coverage -r coverage.xml; fi
+- if [[ -n "$CODACY_PROJECT_TOKEN" ]]; then python-codacy-coverage -r coverage.xml || true; fi
