@@ -60,6 +60,7 @@ def get_package_data():
     """get data files which will be included in the main tcod/ directory"""
     BITSIZE, LINKAGE = platform.architecture()
     files = [
+        "py.typed",
         "lib/LIBTCOD-CREDITS.txt",
         "lib/LIBTCOD-LICENSE.txt",
         "lib/README-SDL.txt",

@@ -9,6 +9,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - The `tcod` package is now compatible with mypy.
 
 9.2.3 - 2019-03-01
 ------------------
