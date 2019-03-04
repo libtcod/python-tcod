@@ -9,6 +9,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Fixed `tcod.namegen_generate_custom`.
 
 9.2.4 - 2019-03-02
 ------------------

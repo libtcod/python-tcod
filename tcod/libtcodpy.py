@@ -3180,7 +3180,7 @@ def namegen_generate(name: str) -> str:
 
 def namegen_generate_custom(name: str, rule: str) -> str:
     return _unpack_char_p(
-        lib.TCOD_namegen_generate(_bytes(name), _bytes(rule), False)
+        lib.TCOD_namegen_generate_custom(_bytes(name), _bytes(rule), False)
     )
 
 
