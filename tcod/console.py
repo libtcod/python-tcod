@@ -92,6 +92,7 @@ class Console:
     """
 
     DTYPE = [("ch", np.intc), ("fg", "(3,)u1"), ("bg", "(3,)u1")]  # type: Any
+    _DTYPE_RGB = np.dtype("(3,)u1")  # type: Any
 
     def __init__(
         self,
@@ -110,8 +111,8 @@ class Console:
             self._bg = np.ascontiguousarray(buffer["bg"], "u1")
         else:
             self._ch = np.ndarray((height, width), dtype=np.intc)
-            self._fg = np.ndarray((height, width), dtype="(3,)u1")
-            self._bg = np.ndarray((height, width), dtype="(3,)u1")
+            self._fg = np.ndarray((height, width), dtype=self._DTYPE_RGB)
+            self._bg = np.ndarray((height, width), dtype=self._DTYPE_RGB)
 
         # libtcod uses the root console for defaults.
         default_bg_blend = 0
