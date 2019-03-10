@@ -9,7 +9,8 @@ def main():
     WIDTH, HEIGHT = 120, 60
     TITLE = None
 
-    with tcod.console_init_root(WIDTH, HEIGHT, TITLE, order="F") as console:
+    with tcod.console_init_root(WIDTH, HEIGHT, TITLE, order="F",
+                                renderer=tcod.RENDERER_SDL) as console:
         tcod.sys_set_fps(24)
         while True:
             tcod.console_flush()

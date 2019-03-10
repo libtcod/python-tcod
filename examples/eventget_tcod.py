@@ -7,7 +7,8 @@ WIDTH, HEIGHT = 80, 60
 key = tcod.Key()
 mouse = tcod.Mouse()
 
-with tcod.console_init_root(WIDTH, HEIGHT, 'tcod events example') as console:
+with tcod.console_init_root(WIDTH, HEIGHT, 'tcod events example',
+                            renderer=tcod.RENDERER_SDL) as console:
     tcod.sys_set_fps(24)
     while not tcod.console_is_window_closed():
         ev = tcod.sys_wait_for_event(tcod.EVENT_ANY, key, mouse, False)
