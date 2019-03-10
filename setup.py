@@ -87,8 +87,11 @@ def get_long_description():
 
 if sys.version_info < (3, 5):
     error = """
-    python-tcod supports Python 3.5 and above.
-    The last version supporting Python 2.7/3.4 was 'tcod==6.0.7'
+    This version of python-tcod only supports Python 3.5 and above.
+    The last version supporting Python 2.7/3.4 was 'tcod==6.0.7'.
+
+    The end-of-life for Python 2 is the year 2020.
+    https://pythonclock.org/
 
     Python {py} detected.
     """.format(

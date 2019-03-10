@@ -8,11 +8,17 @@ from typing import Any  # noqa: F401
 
 from tcod import __path__  # type: ignore
 
+
+def get_architecture() -> str:
+    """Return the Windows architecture, one of "x86" or "x64"."""
+    return "x86" if platform.architecture()[0] == "32bit" else "x64"
+
+
 if sys.platform == "win32":
     # add Windows dll's to PATH
     _bits, _linkage = platform.architecture()
     os.environ["PATH"] = "%s;%s" % (
-        os.path.join(__path__[0], "x86" if _bits == "32bit" else "x64"),
+        os.path.join(__path__[0], get_architecture()),
         os.environ["PATH"],
     )
 
@@ -48,6 +54,19 @@ if os.environ.get("READTHEDOCS"):
     # Allows an import without building the cffi module first.
     lib = ffi = _Mock()
 else:
-    from tcod._libtcod import lib, ffi  # type: ignore # noqa: F401
+    try:
+        from tcod._libtcod import lib, ffi  # type: ignore # noqa: F401
+    except ImportError as exc:
+        if "The specified module could not be found." in exc.args[0]:
+            print(
+                "You may need to install 'vc_redist.{arch}.exe'"
+                " from Microsoft at:\n"
+                "https://support.microsoft.com/en-us/help/2977003/"
+                "the-latest-supported-visual-c-downloads\n".format(
+                    arch=get_architecture()
+                ),
+                file=sys.stderr,
+            )
+        raise
 
 __all__ = ["ffi", "lib"]
