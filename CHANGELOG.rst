@@ -1,8 +1,7 @@
 ===========
  Changelog
 ===========
-Changes relevant for users of the the tdl and tcod packages are documented
-here.
+Changes relevant to the users of python-tcod are documented here.
 
 This project adheres to `Semantic Versioning <https://semver.org/>`_ since
 v2.0.0
@@ -31,42 +30,42 @@ Deprecated
 9.2.2 - 2019-02-26
 ------------------
 Fixed
-- `Console.print_box` wasn't setting the background color by default.
+ - `Console.print_box` wasn't setting the background color by default.
 
 9.2.1 - 2019-02-25
 ------------------
 Fixed
-- `tcod.sys_get_char_size` fixed on the new renderers.
+ - `tcod.sys_get_char_size` fixed on the new renderers.
 
 9.2.0 - 2019-02-24
 ------------------
 Added
-- New `tcod.console.get_height_rect` function, which can be used to get the
-  height of a print call without an existing console.
-- New `tcod.tileset` module, with a `set_truetype_font` function.
+ - New `tcod.console.get_height_rect` function, which can be used to get the
+   height of a print call without an existing console.
+ - New `tcod.tileset` module, with a `set_truetype_font` function.
 Fixed
-- The new print methods now handle alignment according to how they were
-  documented.
-- `SDL2` and `OPENGL2` now support screenshots.
-- Windows and MacOS builds now restrict exported SDL2 symbols to only
-  SDL 2.0.5;  This will avoid hard to debug import errors when the wrong
-  version of SDL is dynamically linked.
-- The root console now starts with a white foreground.
+ - The new print methods now handle alignment according to how they were
+   documented.
+ - `SDL2` and `OPENGL2` now support screenshots.
+ - Windows and MacOS builds now restrict exported SDL2 symbols to only
+   SDL 2.0.5;  This will avoid hard to debug import errors when the wrong
+   version of SDL is dynamically linked.
+ - The root console now starts with a white foreground.
 
 9.1.0 - 2019-02-23
 ------------------
 Added
-- Added the `tcod.random.MULTIPLY_WITH_CARRY` constant.
+ - Added the `tcod.random.MULTIPLY_WITH_CARRY` constant.
 Changed
-- The overhead for warnings has been reduced when running Python with the
-  optimize `-O` flag.
-- `tcod.random.Random` now provides a default algorithm.
+ - The overhead for warnings has been reduced when running Python with the
+   optimize `-O` flag.
+ - `tcod.random.Random` now provides a default algorithm.
 
 9.0.0 - 2019-02-17
 ------------------
 Changed
-- New console methods now default to an `fg` and `bg` of None instead of
-  white-on-black.
+ - New console methods now default to an `fg` and `bg` of None instead of
+   white-on-black.
 
 8.5.0 - 2019-02-15
 ------------------
