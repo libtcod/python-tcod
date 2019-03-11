@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - The SDL2/OPENGL2 renderers can potentially use a fall-back font when none
+   are provided.
 
 9.2.5 - 2019-03-04
 ------------------
