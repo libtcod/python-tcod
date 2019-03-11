@@ -32,35 +32,18 @@ project.
 
 Guides and Tutorials for libtcodpy should work with the tcod module.
 
-The latest documentation can be found
-`here <https://python-tcod.readthedocs.io/en/latest/>`_.
+The latest documentation can be found here:
+https://python-tcod.readthedocs.io/en/latest/
 
 ==============
  Installation
 ==============
-The recommended way to install is by using pip.  Older versions of pip will
-have issues installing tcod, so make sure it's up-to-date.
+Detailed installation instructions are here:
+https://python-tcod.readthedocs.io/en/latest/installation.html
 
-Windows / MacOS
----------------
-To install using pip, use the following command::
+For the most part it's just::
 
-    > python -m pip install tcod
-
-If you get the error "ImportError: DLL load failed: The specified module could
-not be found." when trying to import tcod/tdl then you may need the latest
-`Microsoft Visual C runtime
-<https://support.microsoft.com/en-ca/help/2977003/the-latest-supported-visual-c-downloads>`_.
-
-Linux
------
-On Linux python-tcod will need to be built from source.
-Assuming you have Python, pip, and apt-get, then you'll run these commands to
-install python-tcod and its dependencies to your user environment::
-
-    $ sudo apt-get install gcc python-dev python3-dev libsdl2-dev libffi-dev libomp5
-    $ pip2 install tcod
-    $ pip3 install tcod
+    pip3 install tcod
 
 ==============
  Requirements

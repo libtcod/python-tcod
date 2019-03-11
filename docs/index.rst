@@ -14,11 +14,14 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
-   :caption: Readme
 
    installation
-   changelog
    glossary
+
+.. toctree::
+   :maxdepth: 1
+
+   changelog
 
 .. toctree::
    :maxdepth: 2

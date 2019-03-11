@@ -8,6 +8,8 @@ Glossary
         The default values implied by any Console print or put functions which
         don't explicitly ask for them as parameters.
 
+        These have been deprecated since version `8.5`.
+
     libtcod-cffi
         This is the `cffi` implementation of libtcodpy, the original was
         made using `ctypes` which was more difficult to maintain.
@@ -37,7 +39,7 @@ Glossary
     libtcodpy
         `libtcodpy` is more or less a direct port of `libtcod`'s C API to
         Python.  This caused a handful of issues including instances needing
-        to be freed manually or a memory leak will occur and some functions
+        to be freed manually or a memory leak will occur, and some functions
         performing badly in Python due to the need to call them frequently.
 
         These issues are fixed in :term:`python-tcod` which implements the full
