@@ -3164,6 +3164,7 @@ def mouse_move(x: int, y: int) -> None:
     lib.TCOD_mouse_move(x, y)
 
 
+@deprecate("Use tcod.event.get_mouse_state() instead.")
 def mouse_get_status() -> Mouse:
     return Mouse(lib.TCOD_mouse_get_status())
 

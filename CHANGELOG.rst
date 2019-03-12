@@ -11,6 +11,9 @@ Unreleased
 Added
  - The SDL2/OPENGL2 renderers can potentially use a fall-back font when none
    are provided.
+ - New function `tcod.event.get_mouse_state`.
+Deprecated
+ - `tcod.mouse_get_status` has been deprecated.
 
 9.2.5 - 2019-03-04
 ------------------

@@ -181,7 +181,46 @@ class KeyUp(KeyboardEvent):
     pass
 
 
-class MouseMotion(Event):
+class MouseState(Event):
+    """
+    Attributes:
+        type (str): Always "MOUSESTATE".
+        pixel (Point): The pixel coordinates of the mouse.
+        tile (Point): The integer tile coordinates of the mouse on the screen.
+        state (int): A bitmask of which mouse buttons are currently held.
+
+            Will be a combination of the following names:
+
+            * tcod.event.BUTTON_LMASK
+            * tcod.event.BUTTON_MMASK
+            * tcod.event.BUTTON_RMASK
+            * tcod.event.BUTTON_X1MASK
+            * tcod.event.BUTTON_X2MASK
+
+    .. addedversion:: 9.3
+    """
+
+    def __init__(
+        self,
+        pixel: Tuple[int, int] = (0, 0),
+        tile: Tuple[int, int] = (0, 0),
+        state: int = 0,
+    ):
+        super().__init__()
+        self.pixel = Point(*pixel)
+        self.tile = Point(*tile)
+        self.state = state
+
+    def __repr__(self) -> str:
+        return ("tcod.event.%s(pixel=%r, tile=%r, state=%s)") % (
+            self.__class__.__name__,
+            self.pixel,
+            self.tile,
+            _describe_bitmask(self.state, _REVERSE_BUTTON_MASK_TABLE),
+        )
+
+
+class MouseMotion(MouseState):
     """
     Attributes:
         type (str): Always "MOUSEMOTION".
@@ -208,12 +247,9 @@ class MouseMotion(Event):
         tile_motion: Tuple[int, int] = (0, 0),
         state: int = 0,
     ):
-        super().__init__()
-        self.pixel = Point(*pixel)
+        super().__init__(pixel, tile, state)
         self.pixel_motion = Point(*pixel_motion)
-        self.tile = Point(*tile)
         self.tile_motion = Point(*tile_motion)
-        self.state = state
 
     @classmethod
     def from_sdl_event(cls, sdl_event: Any) -> "MouseMotion":
@@ -245,7 +281,7 @@ class MouseMotion(Event):
         )
 
 
-class MouseButtonEvent(Event):
+class MouseButtonEvent(MouseState):
     """
     Attributes:
         type (str): Will be "MOUSEBUTTONDOWN" or "MOUSEBUTTONUP",
@@ -269,10 +305,15 @@ class MouseButtonEvent(Event):
         tile: Tuple[int, int] = (0, 0),
         button: int = 0,
     ):
-        super().__init__()
-        self.pixel = Point(*pixel)
-        self.tile = Point(*tile)
-        self.button = button
+        super().__init__(pixel, tile, button)
+
+    @property
+    def button(self) -> int:
+        return self.state
+
+    @button.setter
+    def button(self, value: int) -> None:
+        self.state = value
 
     @classmethod
     def from_sdl_event(cls, sdl_event: Any) -> Any:
@@ -294,11 +335,11 @@ class MouseButtonEvent(Event):
 
 
 class MouseButtonDown(MouseButtonEvent):
-    pass
+    """Same as MouseButtonEvent but with ``type="MouseButtonDown"``."""
 
 
 class MouseButtonUp(MouseButtonEvent):
-    pass
+    """Same as MouseButtonEvent but with ``type="MouseButtonUp"``."""
 
 
 class MouseWheel(Event):
@@ -309,7 +350,8 @@ class MouseWheel(Event):
         y (int): Vertical scrolling. A positive value means scrolling away from
                  the user.
         flipped (bool): If True then the values of `x` and `y` are the opposite
-                        of their usual values.
+                        of their usual values.  This depends on the settings of
+                        the Operating System.
     """
 
     def __init__(self, x: int, y: int, flipped: bool = False):
@@ -664,6 +706,17 @@ class EventDispatch:
 
     def ev_windowhittest(self, event: WindowEvent) -> None:
         pass
+
+
+def get_mouse_state() -> MouseState:
+    """Return the current state of the mouse.
+
+    .. addedversion:: 9.3
+    """
+    xy = tcod.ffi.new("int[2]")
+    buttons = tcod.lib.SDL_GetMouseState(xy, xy + 1)
+    x, y = _pixel_to_tile(*xy)
+    return MouseState((xy[0], xy[1]), (int(x), int(y)), buttons)
 
 
 __all__ = [
