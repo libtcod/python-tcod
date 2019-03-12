@@ -9,6 +9,7 @@ F = TypeVar("F", bound=FuncType)
 def deprecate(
     message: str, category: Any = DeprecationWarning, stacklevel: int = 0
 ) -> Callable[[F], F]:
+    """Return a decorator which adds a warning to functions."""
     def decorator(func: F) -> F:
         if not __debug__:
             return func
@@ -21,6 +22,17 @@ def deprecate(
         return cast(F, wrapper)
 
     return decorator
+
+
+def pending_deprecate(
+    message: str = "This function may be deprecated in the future."
+    " Consider raising an issue on GitHub if you need this feature.",
+    category: Any = PendingDeprecationWarning,
+    stacklevel: int = 0,
+) -> Callable[[F], F]:
+    """Like deprecate, but the default parameters are filled out for a generic
+    pending deprecation warning."""
+    return deprecate(message, category, stacklevel)
 
 
 def verify_order(order: str) -> str:

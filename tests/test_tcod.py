@@ -152,6 +152,7 @@ def test_noise_copy():
             noise2.sample_ogrid(np.ogrid[:3,:1])).all()
 
 
+@pytest.mark.filterwarnings("ignore:.*")
 def test_color_class():
     assert tcod.black == tcod.black
     assert tcod.black == (0, 0, 0)

@@ -8,6 +8,7 @@ import tcod
 
 
 @pytest.mark.filterwarnings("ignore:Directly access a consoles")
+@pytest.mark.filterwarnings("ignore:This function may be deprecated in the fu")
 def test_array_read_write():
     console = tcod.console.Console(width=12, height=10)
     FG = (255, 254, 253)
@@ -96,6 +97,7 @@ def test_console_repr():
     eval(repr(tcod.console.Console(10, 2)))
 
 
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_str():
     console = tcod.console.Console(10, 2)
     console.print_(0, 0, "Test")

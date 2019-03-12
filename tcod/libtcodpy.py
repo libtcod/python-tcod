@@ -37,7 +37,7 @@ from tcod.constants import (
     KEY_RELEASED,
 )
 
-from tcod._internal import deprecate
+from tcod._internal import deprecate, pending_deprecate
 
 from tcod.tcod import _int, _unpack_char_p
 from tcod.tcod import _bytes, _unicode, _fmt
@@ -360,6 +360,9 @@ class Key(_CDataWrapper):
         rctrl (bool): True when right control is held.
         rmeta (bool): True when right meta key is held.
         shift (bool): True when any shift is held.
+
+    .. deprecated:: 9.3
+        Use events from the :any:`tcod.event` module instead.
     """
 
     _BOOL_ATTRIBUTES = (
@@ -468,6 +471,9 @@ class Mouse(_CDataWrapper):
         mbutton_pressed (bool): Middle button pressed event.
         wheel_up (bool): Wheel up event.
         wheel_down (bool): Wheel down event.
+
+    .. deprecated:: 9.3
+        Use events from the :any:`tcod.event` module instead.
     """
 
     def __init__(
@@ -752,6 +758,7 @@ def bsp_delete(node: tcod.bsp.BSP) -> None:
     """
 
 
+@pending_deprecate()
 def color_lerp(
     c1: Tuple[int, int, int], c2: Tuple[int, int, int], a: float
 ) -> Color:
@@ -773,6 +780,7 @@ def color_lerp(
     return Color._new_from_cdata(lib.TCOD_color_lerp(c1, c2, a))
 
 
+@pending_deprecate()
 def color_set_hsv(c: Color, h: float, s: float, v: float) -> None:
     """Set a color using: hue, saturation, and value parameters.
 
@@ -789,6 +797,7 @@ def color_set_hsv(c: Color, h: float, s: float, v: float) -> None:
     c[:] = new_color.r, new_color.g, new_color.b
 
 
+@pending_deprecate()
 def color_get_hsv(c: Tuple[int, int, int]) -> Tuple[float, float, float]:
     """Return the (hue, saturation, value) of a color.
 
@@ -805,6 +814,7 @@ def color_get_hsv(c: Tuple[int, int, int]) -> Tuple[float, float, float]:
     return hsv[0], hsv[1], hsv[2]
 
 
+@pending_deprecate()
 def color_scale_HSV(c: Color, scoef: float, vcoef: float) -> None:
     """Scale a color's saturation and value.
 
@@ -823,6 +833,7 @@ def color_scale_HSV(c: Color, scoef: float, vcoef: float) -> None:
     c[:] = color_p.r, color_p.g, color_p.b
 
 
+@pending_deprecate()
 def color_gen_map(
     colors: Iterable[Tuple[int, int, int]], indexes: Iterable[int]
 ) -> List[Color]:
@@ -968,6 +979,7 @@ def console_get_height(con: tcod.console.Console) -> int:
     return int(lib.TCOD_console_get_height(_console(con)))
 
 
+@pending_deprecate()
 def console_map_ascii_code_to_font(
     asciiCode: int, fontCharX: int, fontCharY: int
 ) -> None:
@@ -989,6 +1001,7 @@ def console_map_ascii_code_to_font(
     )
 
 
+@pending_deprecate()
 def console_map_ascii_codes_to_font(
     firstAsciiCode: int, nbCodes: int, fontCharX: int, fontCharY: int
 ) -> None:
@@ -1012,6 +1025,7 @@ def console_map_ascii_codes_to_font(
     )
 
 
+@pending_deprecate()
 def console_map_string_to_font(s: str, fontCharX: int, fontCharY: int) -> None:
     """Remap a string of codes to a contiguous set of tiles.
 
@@ -1046,16 +1060,23 @@ def console_set_fullscreen(fullscreen: bool) -> None:
     lib.TCOD_console_set_fullscreen(fullscreen)
 
 
+@deprecate('Use the tcod.event module to check for "QUIT" type events.')
 def console_is_window_closed() -> bool:
-    """Returns True if the window has received and exit event."""
+    """Returns True if the window has received and exit event.
+
+    .. deprecated:: 9.3
+        Use the :any:`tcod.event` module to check for "QUIT" type events.
+    """
     return bool(lib.TCOD_console_is_window_closed())
 
 
+@pending_deprecate()
 def console_has_mouse_focus() -> bool:
     """Return True if the window has mouse focus."""
     return bool(lib.TCOD_console_has_mouse_focus())
 
 
+@pending_deprecate()
 def console_is_active() -> bool:
     """Return True if the window has keyboard focus."""
     return bool(lib.TCOD_console_is_active())
@@ -1070,6 +1091,7 @@ def console_set_window_title(title: str) -> None:
     lib.TCOD_console_set_window_title(_bytes(title))
 
 
+@pending_deprecate()
 def console_credits() -> None:
     lib.TCOD_console_credits()
 
@@ -1139,6 +1161,7 @@ def console_clear(con: tcod.console.Console) -> None:
     lib.TCOD_console_clear(_console(con))
 
 
+@pending_deprecate()
 def console_put_char(
     con: tcod.console.Console,
     x: int,
@@ -1158,6 +1181,7 @@ def console_put_char(
     lib.TCOD_console_put_char(_console(con), x, y, _int(c), flag)
 
 
+@pending_deprecate()
 def console_put_char_ex(
     con: tcod.console.Console,
     x: int,
@@ -1181,6 +1205,7 @@ def console_put_char_ex(
     lib.TCOD_console_put_char_ex(_console(con), x, y, _int(c), fore, back)
 
 
+@pending_deprecate()
 def console_set_char_background(
     con: tcod.console.Console,
     x: int,
@@ -1489,6 +1514,7 @@ def console_print_frame(
     lib.TCOD_console_printf_frame(_console(con), x, y, w, h, clear, flag, fmt)
 
 
+@pending_deprecate()
 def console_set_color_control(
     con: int, fore: Tuple[int, int, int], back: Tuple[int, int, int]
 ) -> None:
@@ -1569,19 +1595,23 @@ def console_get_char(con: tcod.console.Console, x: int, y: int) -> int:
     return lib.TCOD_console_get_char(_console(con), x, y)  # type: ignore
 
 
+@pending_deprecate()
 def console_set_fade(fade: int, fadingColor: Tuple[int, int, int]) -> None:
     lib.TCOD_console_set_fade(fade, fadingColor)
 
 
+@pending_deprecate()
 def console_get_fade() -> int:
     return int(lib.TCOD_console_get_fade())
 
 
+@pending_deprecate()
 def console_get_fading_color() -> Color:
     return Color._new_from_cdata(lib.TCOD_console_get_fading_color())
 
 
 # handling keyboard input
+@deprecate("Use the tcod.event.wait function to wait for events.")
 def console_wait_for_keypress(flush: bool) -> Key:
     """Block until the user presses a key, then returns a new Key.
 
@@ -1591,18 +1621,27 @@ def console_wait_for_keypress(flush: bool) -> Key:
 
     Returns:
         Key: A new Key instance.
+
+    .. deprecated:: 9.3
+        Use the :any:`tcod.event.wait` function to wait for events.
     """
     key = Key()
     lib.TCOD_console_wait_for_keypress_wrapper(key.key_p, flush)
     return key
 
 
+@deprecate("Use the tcod.event.get function to check for events.")
 def console_check_for_keypress(flags: int = KEY_RELEASED) -> Key:
+    """
+    .. deprecated:: 9.3
+        Use the :any:`tcod.event.get` function to check for events.
+    """
     key = Key()
     lib.TCOD_console_check_for_keypress_wrapper(key.key_p, flags)
     return key
 
 
+@pending_deprecate()
 def console_is_key_pressed(key: int) -> bool:
     return bool(lib.TCOD_console_is_key_pressed(key))
 
@@ -1682,10 +1721,30 @@ def console_delete(con: tcod.console.Console) -> None:
     scope.
 
     This function exists for backwards compatibility.
+
+    .. deprecated:: 9.3
+        This function is not needed for normal :any:`tcod.console.Console`'s.
+        The root console should be used in a with statement instead to ensure
+        that it closes.
     """
     con = _console(con)
     if con == ffi.NULL:
         lib.TCOD_console_delete(con)
+        warnings.warn(
+            "Instead of this call you should use a with statement to ensure"
+            " the root console closes, for example:"
+            "\n    with tcod.console_init_root(...) as root_console:"
+            "\n        ...",
+            DeprecationWarning,
+            stacklevel=2
+        )
+    else:
+        warnings.warn(
+            "You no longer need to make this call, "
+            "Console's are deleted when they go out of scope.",
+            DeprecationWarning,
+            stacklevel=2
+        )
 
 
 @deprecate("Assign to the console.fg array instead.")
@@ -1791,6 +1850,7 @@ def console_fill_char(con: tcod.console.Console, arr: Sequence[int]) -> None:
     lib.TCOD_console_fill_char(_console(con), carr)
 
 
+@pending_deprecate()
 def console_load_asc(con: tcod.console.Console, filename: str) -> bool:
     """Update a console from a non-delimited ASCII `.asc` file."""
     return bool(
@@ -1798,6 +1858,7 @@ def console_load_asc(con: tcod.console.Console, filename: str) -> bool:
     )
 
 
+@pending_deprecate()
 def console_save_asc(con: tcod.console.Console, filename: str) -> bool:
     """Save a console to a non-delimited ASCII `.asc` file."""
     return bool(
@@ -1805,6 +1866,7 @@ def console_save_asc(con: tcod.console.Console, filename: str) -> bool:
     )
 
 
+@pending_deprecate()
 def console_load_apf(con: tcod.console.Console, filename: str) -> bool:
     """Update a console from an ASCII Paint `.apf` file."""
     return bool(
@@ -1812,6 +1874,7 @@ def console_load_apf(con: tcod.console.Console, filename: str) -> bool:
     )
 
 
+@pending_deprecate()
 def console_save_apf(con: tcod.console.Console, filename: str) -> bool:
     """Save a console to an ASCII Paint `.apf` file."""
     return bool(
@@ -1882,6 +1945,7 @@ def console_list_save_xp(
         lib.TCOD_list_delete(tcod_list)
 
 
+@pending_deprecate()
 def path_new_using_map(
     m: tcod.map.Map, dcost: float = 1.41
 ) -> tcod.path.AStar:
@@ -1897,6 +1961,7 @@ def path_new_using_map(
     return tcod.path.AStar(m, dcost)
 
 
+@pending_deprecate()
 def path_new_using_function(
     w: int,
     h: int,
@@ -1921,6 +1986,7 @@ def path_new_using_function(
     )
 
 
+@pending_deprecate()
 def path_compute(
     p: tcod.path.AStar, ox: int, oy: int, dx: int, dy: int
 ) -> bool:
@@ -1938,6 +2004,7 @@ def path_compute(
     return bool(lib.TCOD_path_compute(p._path_c, ox, oy, dx, dy))
 
 
+@pending_deprecate()
 def path_get_origin(p: tcod.path.AStar) -> Tuple[int, int]:
     """Get the current origin position.
 
@@ -1954,6 +2021,7 @@ def path_get_origin(p: tcod.path.AStar) -> Tuple[int, int]:
     return x[0], y[0]
 
 
+@pending_deprecate()
 def path_get_destination(p: tcod.path.AStar) -> Tuple[int, int]:
     """Get the current destination position.
 
@@ -1968,6 +2036,7 @@ def path_get_destination(p: tcod.path.AStar) -> Tuple[int, int]:
     return x[0], y[0]
 
 
+@pending_deprecate()
 def path_size(p: tcod.path.AStar) -> int:
     """Return the current length of the computed path.
 
@@ -1979,6 +2048,7 @@ def path_size(p: tcod.path.AStar) -> int:
     return int(lib.TCOD_path_size(p._path_c))
 
 
+@pending_deprecate()
 def path_reverse(p: tcod.path.AStar) -> None:
     """Reverse the direction of a path.
 
@@ -1990,6 +2060,7 @@ def path_reverse(p: tcod.path.AStar) -> None:
     lib.TCOD_path_reverse(p._path_c)
 
 
+@pending_deprecate()
 def path_get(p: tcod.path.AStar, idx: int) -> Tuple[int, int]:
     """Get a point on a path.
 
@@ -2003,6 +2074,7 @@ def path_get(p: tcod.path.AStar, idx: int) -> Tuple[int, int]:
     return x[0], y[0]
 
 
+@pending_deprecate()
 def path_is_empty(p: tcod.path.AStar) -> bool:
     """Return True if a path is empty.
 
@@ -2014,6 +2086,7 @@ def path_is_empty(p: tcod.path.AStar) -> bool:
     return bool(lib.TCOD_path_is_empty(p._path_c))
 
 
+@pending_deprecate()
 def path_walk(
     p: tcod.path.AStar, recompute: bool
 ) -> Union[Tuple[int, int], Tuple[None, None]]:
@@ -2044,10 +2117,12 @@ def path_delete(p: tcod.path.AStar) -> None:
     """
 
 
+@pending_deprecate()
 def dijkstra_new(m: tcod.map.Map, dcost: float = 1.41) -> tcod.path.Dijkstra:
     return tcod.path.Dijkstra(m, dcost)
 
 
+@pending_deprecate()
 def dijkstra_new_using_function(
     w: int,
     h: int,
@@ -2060,26 +2135,32 @@ def dijkstra_new_using_function(
     )
 
 
+@pending_deprecate()
 def dijkstra_compute(p: tcod.path.Dijkstra, ox: int, oy: int) -> None:
     lib.TCOD_dijkstra_compute(p._path_c, ox, oy)
 
 
+@pending_deprecate()
 def dijkstra_path_set(p: tcod.path.Dijkstra, x: int, y: int) -> bool:
     return bool(lib.TCOD_dijkstra_path_set(p._path_c, x, y))
 
 
+@pending_deprecate()
 def dijkstra_get_distance(p: tcod.path.Dijkstra, x: int, y: int) -> int:
     return int(lib.TCOD_dijkstra_get_distance(p._path_c, x, y))
 
 
+@pending_deprecate()
 def dijkstra_size(p: tcod.path.Dijkstra) -> int:
     return int(lib.TCOD_dijkstra_size(p._path_c))
 
 
+@pending_deprecate()
 def dijkstra_reverse(p: tcod.path.Dijkstra) -> None:
     lib.TCOD_dijkstra_reverse(p._path_c)
 
 
+@pending_deprecate()
 def dijkstra_get(p: tcod.path.Dijkstra, idx: int) -> Tuple[int, int]:
     x = ffi.new("int *")
     y = ffi.new("int *")
@@ -2087,10 +2168,12 @@ def dijkstra_get(p: tcod.path.Dijkstra, idx: int) -> Tuple[int, int]:
     return x[0], y[0]
 
 
+@pending_deprecate()
 def dijkstra_is_empty(p: tcod.path.Dijkstra) -> bool:
     return bool(lib.TCOD_dijkstra_is_empty(p._path_c))
 
 
+@pending_deprecate()
 def dijkstra_path_walk(
     p: tcod.path.Dijkstra
 ) -> Union[Tuple[int, int], Tuple[None, None]]:
@@ -2125,6 +2208,7 @@ def _heightmap_cdata(array: np.ndarray) -> ffi.CData:
     return ffi.new("TCOD_heightmap_t *", (width, height, pointer))
 
 
+@pending_deprecate()
 def heightmap_new(w: int, h: int, order: str = "C") -> np.ndarray:
     """Return a new numpy.ndarray formatted for use with heightmap functions.
 
@@ -2151,6 +2235,7 @@ def heightmap_new(w: int, h: int, order: str = "C") -> np.ndarray:
         raise ValueError("Invalid order parameter, should be 'C' or 'F'.")
 
 
+@deprecate("Assign to heightmaps as a NumPy array instead.")
 def heightmap_set_value(hm: np.ndarray, x: int, y: int, value: float) -> None:
     """Set the value of a point on a heightmap.
 
@@ -2246,6 +2331,7 @@ def heightmap_copy(hm1: np.ndarray, hm2: np.ndarray) -> None:
     hm2[:] = hm1[:]
 
 
+@pending_deprecate()
 def heightmap_normalize(
     hm: np.ndarray, mi: float = 0.0, ma: float = 1.0
 ) -> None:
@@ -2258,6 +2344,7 @@ def heightmap_normalize(
     lib.TCOD_heightmap_normalize(_heightmap_cdata(hm), mi, ma)
 
 
+@pending_deprecate()
 def heightmap_lerp_hm(
     hm1: np.ndarray, hm2: np.ndarray, hm3: np.ndarray, coef: float
 ) -> None:
@@ -2315,6 +2402,7 @@ def heightmap_multiply_hm(
     hm3[:] = hm1[:] * hm2[:]
 
 
+@pending_deprecate()
 def heightmap_add_hill(
     hm: np.ndarray, x: float, y: float, radius: float, height: float
 ) -> None:
@@ -2332,6 +2420,7 @@ def heightmap_add_hill(
     lib.TCOD_heightmap_add_hill(_heightmap_cdata(hm), x, y, radius, height)
 
 
+@pending_deprecate()
 def heightmap_dig_hill(
     hm: np.ndarray, x: float, y: float, radius: float, height: float
 ) -> None:
@@ -2353,6 +2442,7 @@ def heightmap_dig_hill(
     lib.TCOD_heightmap_dig_hill(_heightmap_cdata(hm), x, y, radius, height)
 
 
+@pending_deprecate()
 def heightmap_rain_erosion(
     hm: np.ndarray,
     nbDrops: int,
@@ -2381,6 +2471,7 @@ def heightmap_rain_erosion(
     )
 
 
+@pending_deprecate()
 def heightmap_kernel_transform(
     hm: np.ndarray,
     kernelsize: int,
@@ -2439,6 +2530,7 @@ def heightmap_kernel_transform(
     )
 
 
+@pending_deprecate()
 def heightmap_add_voronoi(
     hm: np.ndarray,
     nbPoints: Any,
@@ -2561,6 +2653,7 @@ def heightmap_scale_fbm(
     )
 
 
+@pending_deprecate()
 def heightmap_dig_bezier(
     hm: np.ndarray,
     px: Tuple[int, int, int, int],
@@ -2620,6 +2713,7 @@ def heightmap_get_value(hm: np.ndarray, x: int, y: int) -> float:
         raise ValueError("This array is not contiguous.")
 
 
+@pending_deprecate()
 def heightmap_get_interpolated_value(
     hm: np.ndarray, x: float, y: float
 ) -> float:
@@ -2638,6 +2732,7 @@ def heightmap_get_interpolated_value(
     )
 
 
+@pending_deprecate()
 def heightmap_get_slope(hm: np.ndarray, x: int, y: int) -> float:
     """Return the slope between 0 and (pi / 2) at given coordinates.
 
@@ -2652,6 +2747,7 @@ def heightmap_get_slope(hm: np.ndarray, x: int, y: int) -> float:
     return float(lib.TCOD_heightmap_get_slope(_heightmap_cdata(hm), x, y))
 
 
+@pending_deprecate()
 def heightmap_get_normal(
     hm: np.ndarray, x: float, y: float, waterLevel: float
 ) -> Tuple[float, float, float]:
@@ -2690,6 +2786,7 @@ def heightmap_count_cells(hm: np.ndarray, mi: float, ma: float) -> int:
     return int(lib.TCOD_heightmap_count_cells(_heightmap_cdata(hm), mi, ma))
 
 
+@pending_deprecate()
 def heightmap_has_land_on_border(hm: np.ndarray, waterlevel: float) -> bool:
     """Returns True if the map edges are below ``waterlevel``, otherwise False.
 
@@ -2735,50 +2832,61 @@ def heightmap_delete(hm: Any) -> None:
     """
 
 
+@pending_deprecate()
 def image_new(width: int, height: int) -> tcod.image.Image:
     return tcod.image.Image(width, height)
 
 
+@pending_deprecate()
 def image_clear(image: tcod.image.Image, col: Tuple[int, int, int]) -> None:
     image.clear(col)
 
 
+@pending_deprecate()
 def image_invert(image: tcod.image.Image) -> None:
     image.invert()
 
 
+@pending_deprecate()
 def image_hflip(image: tcod.image.Image) -> None:
     image.hflip()
 
 
+@pending_deprecate()
 def image_rotate90(image: tcod.image.Image, num: int = 1) -> None:
     image.rotate90(num)
 
 
+@pending_deprecate()
 def image_vflip(image: tcod.image.Image) -> None:
     image.vflip()
 
 
+@pending_deprecate()
 def image_scale(image: tcod.image.Image, neww: int, newh: int) -> None:
     image.scale(neww, newh)
 
 
+@pending_deprecate()
 def image_set_key_color(
     image: tcod.image.Image, col: Tuple[int, int, int]
 ) -> None:
     image.set_key_color(col)
 
 
+@pending_deprecate()
 def image_get_alpha(image: tcod.image.Image, x: int, y: int) -> int:
     return image.get_alpha(x, y)
 
 
+@pending_deprecate()
 def image_is_pixel_transparent(
     image: tcod.image.Image, x: int, y: int
 ) -> bool:
     return bool(lib.TCOD_image_is_pixel_transparent(image.image_c, x, y))
 
 
+@pending_deprecate()
 def image_load(filename: str) -> tcod.image.Image:
     """Load an image file into an Image instance and return it.
 
@@ -2790,6 +2898,7 @@ def image_load(filename: str) -> tcod.image.Image:
     )
 
 
+@pending_deprecate()
 def image_from_console(console: tcod.console.Console) -> tcod.image.Image:
     """Return an Image with a Consoles pixel data.
 
@@ -2806,34 +2915,40 @@ def image_from_console(console: tcod.console.Console) -> tcod.image.Image:
     )
 
 
+@pending_deprecate()
 def image_refresh_console(
     image: tcod.image.Image, console: tcod.console.Console
 ) -> None:
     image.refresh_console(console)
 
 
+@pending_deprecate()
 def image_get_size(image: tcod.image.Image) -> Tuple[int, int]:
     return image.width, image.height
 
 
+@pending_deprecate()
 def image_get_pixel(
     image: tcod.image.Image, x: int, y: int
 ) -> Tuple[int, int, int]:
     return image.get_pixel(x, y)
 
 
+@pending_deprecate()
 def image_get_mipmap_pixel(
     image: tcod.image.Image, x0: float, y0: float, x1: float, y1: float
 ) -> Tuple[int, int, int]:
     return image.get_mipmap_pixel(x0, y0, x1, y1)
 
 
+@pending_deprecate()
 def image_put_pixel(
     image: tcod.image.Image, x: int, y: int, col: Tuple[int, int, int]
 ) -> None:
     image.put_pixel(x, y, col)
 
 
+@pending_deprecate()
 def image_blit(
     image: tcod.image.Image,
     console: tcod.console.Console,
@@ -2847,6 +2962,7 @@ def image_blit(
     image.blit(console, x, y, bkgnd_flag, scalex, scaley, angle)
 
 
+@pending_deprecate()
 def image_blit_rect(
     image: tcod.image.Image,
     console: tcod.console.Console,
@@ -2859,6 +2975,7 @@ def image_blit_rect(
     image.blit_rect(console, x, y, w, h, bkgnd_flag)
 
 
+@pending_deprecate()
 def image_blit_2x(
     image: tcod.image.Image,
     console: tcod.console.Console,
@@ -2872,6 +2989,7 @@ def image_blit_2x(
     image.blit_2x(console, dx, dy, sx, sy, w, h)
 
 
+@pending_deprecate()
 def image_save(image: tcod.image.Image, filename: str) -> None:
     image.save_as(filename)
 
@@ -3150,16 +3268,19 @@ def map_get_height(map: tcod.map.Map) -> int:
     return map.height
 
 
+@pending_deprecate()
 def mouse_show_cursor(visible: bool) -> None:
     """Change the visibility of the mouse cursor."""
     lib.TCOD_mouse_show_cursor(visible)
 
 
+@pending_deprecate()
 def mouse_is_cursor_visible() -> bool:
     """Return True if the mouse cursor is visible."""
     return bool(lib.TCOD_mouse_is_cursor_visible())
 
 
+@pending_deprecate()
 def mouse_move(x: int, y: int) -> None:
     lib.TCOD_mouse_move(x, y)
 
@@ -3169,22 +3290,26 @@ def mouse_get_status() -> Mouse:
     return Mouse(lib.TCOD_mouse_get_status())
 
 
+@pending_deprecate()
 def namegen_parse(
     filename: str, random: Optional[tcod.random.Random] = None
 ) -> None:
     lib.TCOD_namegen_parse(_bytes(filename), random or ffi.NULL)
 
 
+@pending_deprecate()
 def namegen_generate(name: str) -> str:
     return _unpack_char_p(lib.TCOD_namegen_generate(_bytes(name), False))
 
 
+@pending_deprecate()
 def namegen_generate_custom(name: str, rule: str) -> str:
     return _unpack_char_p(
         lib.TCOD_namegen_generate_custom(_bytes(name), _bytes(rule), False)
     )
 
 
+@pending_deprecate()
 def namegen_get_sets() -> List[str]:
     sets = lib.TCOD_namegen_get_sets()
     try:
@@ -3198,10 +3323,12 @@ def namegen_get_sets() -> List[str]:
     return lst
 
 
+@pending_deprecate()
 def namegen_destroy() -> None:
     lib.TCOD_namegen_destroy()
 
 
+@pending_deprecate()
 def noise_new(
     dim: int,
     h: float = NOISE_DEFAULT_HURST,
@@ -3222,6 +3349,7 @@ def noise_new(
     return tcod.noise.Noise(dim, hurst=h, lacunarity=l, seed=random)
 
 
+@pending_deprecate()
 def noise_set_type(n: tcod.noise.Noise, typ: int) -> None:
     """Set a Noise objects default noise algorithm.
 
@@ -3231,6 +3359,7 @@ def noise_set_type(n: tcod.noise.Noise, typ: int) -> None:
     n.algorithm = typ
 
 
+@pending_deprecate()
 def noise_get(
     n: tcod.noise.Noise, f: Sequence[float], typ: int = NOISE_DEFAULT
 ) -> float:
@@ -3252,6 +3381,7 @@ def noise_get(
     return float(lib.TCOD_noise_get_ex(n.noise_c, ffi.new("float[4]", f), typ))
 
 
+@pending_deprecate()
 def noise_get_fbm(
     n: tcod.noise.Noise,
     f: Sequence[float],
@@ -3274,6 +3404,7 @@ def noise_get_fbm(
     )
 
 
+@pending_deprecate()
 def noise_get_turbulence(
     n: tcod.noise.Noise,
     f: Sequence[float],
@@ -3476,6 +3607,7 @@ DISTRIBUTION_GAUSSIAN_INVERSE = 3
 DISTRIBUTION_GAUSSIAN_RANGE_INVERSE = 4
 
 
+@pending_deprecate()
 def random_get_instance() -> tcod.random.Random:
     """Return the default Random instance.
 
@@ -3487,6 +3619,7 @@ def random_get_instance() -> tcod.random.Random:
     )
 
 
+@pending_deprecate()
 def random_new(algo: int = RNG_CMWC) -> tcod.random.Random:
     """Return a new Random instance.  Using ``algo``.
 
@@ -3499,6 +3632,7 @@ def random_new(algo: int = RNG_CMWC) -> tcod.random.Random:
     return tcod.random.Random(algo)
 
 
+@pending_deprecate()
 def random_new_from_seed(
     seed: Hashable, algo: int = RNG_CMWC
 ) -> tcod.random.Random:
@@ -3515,6 +3649,7 @@ def random_new_from_seed(
     return tcod.random.Random(algo, seed)
 
 
+@pending_deprecate()
 def random_set_distribution(
     rnd: Optional[tcod.random.Random], dist: int
 ) -> None:
@@ -3527,10 +3662,11 @@ def random_set_distribution(
     lib.TCOD_random_set_distribution(rnd.random_c if rnd else ffi.NULL, dist)
 
 
+@pending_deprecate()
 def random_get_int(rnd: Optional[tcod.random.Random], mi: int, ma: int) -> int:
     """Return a random integer in the range: ``mi`` <= n <= ``ma``.
 
-    The result is affacted by calls to :any:`random_set_distribution`.
+    The result is affected by calls to :any:`random_set_distribution`.
 
     Args:
         rnd (Optional[Random]): A Random instance, or None to use the default.
@@ -3545,12 +3681,13 @@ def random_get_int(rnd: Optional[tcod.random.Random], mi: int, ma: int) -> int:
     )
 
 
+@pending_deprecate()
 def random_get_float(
     rnd: Optional[tcod.random.Random], mi: float, ma: float
 ) -> float:
     """Return a random float in the range: ``mi`` <= n <= ``ma``.
 
-    The result is affacted by calls to :any:`random_set_distribution`.
+    The result is affected by calls to :any:`random_set_distribution`.
 
     Args:
         rnd (Optional[Random]): A Random instance, or None to use the default.
@@ -3581,6 +3718,7 @@ def random_get_double(
     )
 
 
+@pending_deprecate()
 def random_get_int_mean(
     rnd: Optional[tcod.random.Random], mi: int, ma: int, mean: int
 ) -> int:
@@ -3604,6 +3742,7 @@ def random_get_int_mean(
     )
 
 
+@pending_deprecate()
 def random_get_float_mean(
     rnd: Optional[tcod.random.Random], mi: float, ma: float, mean: float
 ) -> float:
@@ -3844,6 +3983,7 @@ def sys_save_screenshot(name: Optional[str] = None) -> None:
 
 
 # custom fullscreen resolution
+@pending_deprecate()
 def sys_force_fullscreen_resolution(width: int, height: int) -> None:
     """Force a specific resolution in fullscreen.
 
@@ -3886,6 +4026,7 @@ def sys_get_char_size() -> Tuple[int, int]:
 
 
 # update font bitmap
+@pending_deprecate()
 def sys_update_char(
     asciiCode: int,
     fontx: int,
@@ -3912,6 +4053,7 @@ def sys_update_char(
     lib.TCOD_sys_update_char(_int(asciiCode), fontx, fonty, img, x, y)
 
 
+@pending_deprecate()
 def sys_register_SDL_renderer(callback: Callable[[Any], None]) -> None:
     """Register a custom randering function with libtcod.
 
@@ -3936,6 +4078,7 @@ def sys_register_SDL_renderer(callback: Callable[[Any], None]) -> None:
         lib.TCOD_sys_register_SDL_renderer(lib._pycall_sdl_hook)
 
 
+@deprecate("Use tcod.event.get to check for events.")
 def sys_check_for_event(
     mask: int, k: Optional[Key], m: Optional[Mouse]
 ) -> int:
@@ -3947,6 +4090,9 @@ def sys_check_for_event(
                            an event.  Can be None.
         m (Optional[Mouse]): A tcod.Mouse instance which might be updated
                              with an event.  Can be None.
+
+    .. deprecated:: 9.3
+        Use the :any:`tcod.event.get` function to check for events.
     """
     return int(
         lib.TCOD_sys_check_for_event(
@@ -3955,6 +4101,7 @@ def sys_check_for_event(
     )
 
 
+@deprecate("Use tcod.event.wait to wait for events.")
 def sys_wait_for_event(
     mask: int, k: Optional[Key], m: Optional[Mouse], flush: bool
 ) -> int:
@@ -3970,6 +4117,9 @@ def sys_wait_for_event(
         m (Optional[Mouse]): A tcod.Mouse instance which might be updated
                              with an event.  Can be None.
         flush (bool): Clear the event buffer before waiting.
+
+    .. deprecated:: 9.3
+        Use the :any:`tcod.event.wait` function to wait for events.
     """
     return int(
         lib.TCOD_sys_wait_for_event(

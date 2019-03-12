@@ -1,5 +1,6 @@
 
 import random
+import warnings
 
 import pytest
 
@@ -11,7 +12,7 @@ def pytest_addoption(parser):
 
 @pytest.fixture(scope="session", params=['SDL', 'SDL2'])
 def session_console(request):
-    if(pytest.config.getoption("--no-window")):
+    if(request.config.getoption("--no-window")):
         pytest.skip("This test needs a rendering context.")
     FONT_FILE = 'libtcod/terminal.png'
     WIDTH = 12
@@ -29,10 +30,12 @@ def session_console(request):
 def console(session_console):
     console = session_console
     tcod.console_flush()
-    console.default_fg = (255, 255, 255)
-    console.default_bg = (0, 0, 0)
-    console.default_blend = tcod.BKGND_SET
-    console.default_alignment = tcod.LEFT
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        console.default_fg = (255, 255, 255)
+        console.default_bg = (0, 0, 0)
+        console.default_blend = tcod.BKGND_SET
+        console.default_alignment = tcod.LEFT
     console.clear()
     return console
 

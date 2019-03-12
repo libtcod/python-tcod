@@ -13,7 +13,17 @@ Added
    are provided.
  - New function `tcod.event.get_mouse_state`.
 Deprecated
- - `tcod.mouse_get_status` has been deprecated.
+ - The following functions and classes have been deprecated.
+   - `tcod.Key`
+   - `tcod.Mouse`
+   - `tcod.mouse_get_status`
+   - `tcod.console_is_window_closed`
+   - `tcod.console_check_for_keypress`
+   - `tcod.console_wait_for_keypress`
+   - `tcod.console_delete`
+   - `tcod.sys_check_for_event`
+   - `tcod.sys_wait_for_event`
+ - Many libtcodpy functions have been marked with PendingDeprecationWarning's.
 
 9.2.5 - 2019-03-04
 ------------------

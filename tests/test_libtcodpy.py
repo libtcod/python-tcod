@@ -13,6 +13,7 @@ def test_console_behaviour(console):
 
 
 @pytest.mark.skip('takes too long')
+@pytest.mark.filterwarnings("ignore:.")
 def test_credits_long(console):
     libtcodpy.console_credits()
 
@@ -200,10 +201,12 @@ def test_console_rexpaint_list_save_load(console, tmpdir):
         libtcodpy.console_delete(b)
 
 
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_fullscreen(console):
     libtcodpy.console_set_fullscreen(False)
 
 
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_key_input(console):
     libtcodpy.console_check_for_keypress()
     libtcodpy.console_is_key_pressed(libtcodpy.KEY_ENTER)
@@ -281,11 +284,13 @@ def test_console_buffer_error(console):
     with pytest.raises(ValueError):
         buffer.blit(console)
 
+@pytest.mark.filterwarnings("ignore:.")
 def test_console_font_mapping(console):
     libtcodpy.console_map_ascii_code_to_font('@', 1, 1)
     libtcodpy.console_map_ascii_codes_to_font('@', 1, 0, 0)
     libtcodpy.console_map_string_to_font('@', 0, 0)
 
+@pytest.mark.filterwarnings("ignore:.")
 def test_mouse(console):
     libtcodpy.mouse_show_cursor(True)
     libtcodpy.mouse_is_cursor_visible()
@@ -302,9 +307,11 @@ def test_sys_time(console):
     libtcodpy.sys_elapsed_milli()
     libtcodpy.sys_elapsed_seconds()
 
+@pytest.mark.filterwarnings("ignore:.")
 def test_sys_screenshot(console, tmpdir):
     libtcodpy.sys_save_screenshot(tmpdir.join('test.png').strpath)
 
+@pytest.mark.filterwarnings("ignore:.")
 def test_sys_custom_render(console):
     if libtcodpy.sys_get_renderer() != libtcodpy.RENDERER_SDL:
         pytest.xfail(reason='Only supports SDL')
@@ -317,7 +324,7 @@ def test_sys_custom_render(console):
     libtcodpy.console_flush()
     assert escape, 'proof that sdl_callback was called'
 
-@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
+@pytest.mark.filterwarnings("ignore:.")
 def test_image(console, tmpdir):
     img = libtcodpy.image_new(16, 16)
     libtcodpy.image_clear(img, libtcodpy.Color(0, 0, 0))
@@ -349,7 +356,7 @@ def test_image(console, tmpdir):
 
 @pytest.mark.parametrize('sample', ['@', u'\u2603']) # Unicode snowman
 @pytest.mark.xfail(reason='Unreliable')
-@pytest.mark.filterwarnings("ignore:This function does not provide reliable")
+@pytest.mark.filterwarnings("ignore:.")
 def test_clipboard(console, sample):
     saved = libtcodpy.sys_clipboard_get()
     try:
@@ -483,6 +490,7 @@ def test_map():
     libtcodpy.map_delete(map)
 
 
+@pytest.mark.filterwarnings("ignore:.")
 def test_color():
     color_a = libtcodpy.Color(0, 1, 2)
     assert list(color_a) == [0, 1, 2]
@@ -511,6 +519,7 @@ def test_color_repr():
     assert eval(repr(col)) == col
 
 
+@pytest.mark.filterwarnings("ignore:.")
 def test_color_math():
     color_a = libtcodpy.Color(0, 1, 2)
     color_b = libtcodpy.Color(0, 10, 20)
@@ -521,12 +530,14 @@ def test_color_math():
     assert color_a * 100 == libtcodpy.Color(0, 100, 200)
 
 
+@pytest.mark.filterwarnings("ignore:.")
 def test_color_gen_map():
     colors = libtcodpy.color_gen_map([(0, 0, 0), (255, 255, 255)], [0, 8])
     assert colors[0] == libtcodpy.Color(0, 0, 0)
     assert colors[-1] == libtcodpy.Color(255, 255, 255)
 
 
+@pytest.mark.filterwarnings("ignore:.")
 def test_namegen_parse():
     libtcodpy.namegen_parse('libtcod/data/namegen/jice_celtic.cfg')
     assert libtcodpy.namegen_generate('Celtic female')
@@ -534,7 +545,7 @@ def test_namegen_parse():
     libtcodpy.namegen_destroy()
 
 
-@pytest.mark.filterwarnings("ignore:libtcod objects are deleted automatically")
+@pytest.mark.filterwarnings("ignore:.")
 def test_noise():
     noise = libtcodpy.noise_new(1)
     libtcodpy.noise_set_type(noise, libtcodpy.NOISE_SIMPLEX)
@@ -724,6 +735,7 @@ def test_dijkstra_callback(map_, path_callback):
     libtcodpy.dijkstra_delete(path)
 
 
+@pytest.mark.filterwarnings("ignore:.")
 def test_alpha_blend(console):
     for i in range(256):
         libtcodpy.console_put_char(console, 0, 0, 'x',
