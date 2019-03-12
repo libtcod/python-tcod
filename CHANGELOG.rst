@@ -23,7 +23,11 @@ Deprecated
    - `tcod.console_delete`
    - `tcod.sys_check_for_event`
    - `tcod.sys_wait_for_event`
+ - The SDL, OPENGL, and GLSL renderers have been deprecated.
  - Many libtcodpy functions have been marked with PendingDeprecationWarning's.
+Fixed
+ - To be more compatible with libtcodpy `tcod.console_init_root` will default
+   to the SDL render, but will raise warnings when an old renderer is used.
 
 9.2.5 - 2019-03-04
 ------------------

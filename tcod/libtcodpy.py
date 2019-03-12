@@ -878,16 +878,25 @@ def console_init_root(
     `title` is an optional string to display on the windows title bar.
 
     `fullscreen` determines if the window will start in fullscreen.  Fullscreen
-    mode is unreliable unless the renderer is set to `RENDERER_SDL2` or
-    `RENDERER_OPENGL2`.
+    mode is unreliable unless the renderer is set to `tcod.RENDERER_SDL2` or
+    `tcod.RENDERER_OPENGL2`.
 
-    `renderer` is the rendering back-end that libtcod will use.  Options are:
+    `renderer` is the rendering back-end that libtcod will use.
+    If you don't know which to pick, then use `tcod.RENDERER_SDL2`.
+    Options are:
 
-    * `tcod.RENDERER_SDL`
-    * `tcod.RENDERER_OPENGL`
-    * `tcod.RENDERER_GLSL`
-    * `tcod.RENDERER_SDL2`
-    * `tcod.RENDERER_OPENGL2`
+    * `tcod.RENDERER_SDL`:
+      A deprecated software/SDL2 renderer.
+    * `tcod.RENDERER_OPENGL`:
+      A deprecated SDL2/OpenGL1 renderer.
+    * `tcod.RENDERER_GLSL`:
+      A deprecated SDL2/OpenGL2 renderer.
+    * `tcod.RENDERER_SDL2`:
+      The recommended SDL2 renderer.  Rendering is decided by SDL2 and can be
+      changed by using an SDL2 hint.
+    * `tcod.RENDERER_OPENGL2`:
+      An SDL2/OPENGL2 renderer.  Usually faster than regular SDL2.
+      Requires OpenGL 2.0 Core.
 
     `order` will affect how the array attributes of the returned root console
     are indexed.  `order='C'` is the default, but `order='F'` is recommended.
@@ -904,7 +913,22 @@ def console_init_root(
         # Use the scripts filename as the title.
         title = os.path.basename(sys.argv[0])
     if renderer is None:
-        renderer = tcod.constants.RENDERER_SDL2
+        warnings.warn(
+            "A renderer should be given, see the online documentation.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        renderer = tcod.constants.RENDERER_SDL
+    elif renderer in (
+        tcod.constants.RENDERER_SDL,
+        tcod.constants.RENDERER_OPENGL,
+        tcod.constants.RENDERER_GLSL,
+    ):
+        warnings.warn(
+            "The SDL, OPENGL, and GLSL renderers are deprecated.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
     lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
     console = tcod.console.Console._get_root(order)
     console.clear()
@@ -1736,14 +1760,14 @@ def console_delete(con: tcod.console.Console) -> None:
             "\n    with tcod.console_init_root(...) as root_console:"
             "\n        ...",
             DeprecationWarning,
-            stacklevel=2
+            stacklevel=2,
         )
     else:
         warnings.warn(
             "You no longer need to make this call, "
             "Console's are deleted when they go out of scope.",
             DeprecationWarning,
-            stacklevel=2
+            stacklevel=2,
         )
 
 

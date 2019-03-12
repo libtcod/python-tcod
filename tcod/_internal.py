@@ -10,6 +10,7 @@ def deprecate(
     message: str, category: Any = DeprecationWarning, stacklevel: int = 0
 ) -> Callable[[F], F]:
     """Return a decorator which adds a warning to functions."""
+
     def decorator(func: F) -> F:
         if not __debug__:
             return func
