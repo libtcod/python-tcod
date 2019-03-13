@@ -12,6 +12,8 @@ Added
  - The SDL2/OPENGL2 renderers can potentially use a fall-back font when none
    are provided.
  - New function `tcod.event.get_mouse_state`.
+ - New function `tcod.map.compute_fov` lets you get a visibility array directly
+   from a transparency array.
 Deprecated
  - The following functions and classes have been deprecated.
    - `tcod.Key`

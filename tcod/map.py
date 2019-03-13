@@ -1,33 +1,5 @@
 """libtcod map attributes and field-of-view functions.
 
-Example::
-
-    >>> import tcod.map
-    >>> m = tcod.map.Map(width=3, height=4)
-    >>> m.walkable
-    array([[False, False, False],
-           [False, False, False],
-           [False, False, False],
-           [False, False, False]]...)
-
-    # Like the rest of the tcod modules, all arrays here are
-    # in row-major order and are addressed with [y,x]
-    >>> m.transparent[:] = True # Sets all to True.
-    >>> m.transparent[1:3,0] = False # Sets (1, 0) and (2, 0) to False.
-    >>> m.transparent
-    array([[ True,  True,  True],
-           [False,  True,  True],
-           [False,  True,  True],
-           [ True,  True,  True]]...)
-
-    >>> m.compute_fov(0, 0)
-    >>> m.fov
-    array([[ True,  True,  True],
-           [ True,  True,  True],
-           [False,  True,  True],
-           [False, False,  True]]...)
-    >>> m.fov[3,1]
-    False
 
 """
 from typing import Any
@@ -60,6 +32,34 @@ class Map(object):
         walkable: A boolean array of walkable cells.
         fov: A boolean array of the cells lit by :any:'compute_fov'.
 
+    Example::
+
+        >>> import tcod.map
+        >>> m = tcod.map.Map(width=3, height=4)
+        >>> m.walkable
+        array([[False, False, False],
+               [False, False, False],
+               [False, False, False],
+               [False, False, False]]...)
+
+        # Like the rest of the tcod modules, all arrays here are
+        # in row-major order and are addressed with [y,x]
+        >>> m.transparent[:] = True  # Sets all to True.
+        >>> m.transparent[1:3,0] = False  # Sets (1, 0) and (2, 0) to False.
+        >>> m.transparent
+        array([[ True,  True,  True],
+               [False,  True,  True],
+               [False,  True,  True],
+               [ True,  True,  True]]...)
+
+        >>> m.compute_fov(0, 0)
+        >>> m.fov
+        array([[ True,  True,  True],
+               [ True,  True,  True],
+               [False,  True,  True],
+               [False, False,  True]]...)
+        >>> m.fov[3,1]
+        False
     """
 
     def __init__(self, width: int, height: int, order: str = "C"):
@@ -114,6 +114,9 @@ class Map(object):
                 A value of `0` will give an infinite distance.
             light_walls (bool): Light up walls, or only the floor.
             algorithm (int): Defaults to tcod.FOV_RESTRICTIVE
+
+        If you already have transparency in a NumPy array then you could use
+        :any:`tcod.map_compute_fov` instead.
         """
         lib.TCOD_map_compute_fov(
             self.map_c, x, y, radius, light_walls, algorithm
@@ -139,3 +142,68 @@ class Map(object):
         state = self.__dict__.copy()
         del state["map_c"]
         return state
+
+
+def compute_fov(
+    transparency: np.array,
+    x: int,
+    y: int,
+    radius: int = 0,
+    light_walls: bool = True,
+    algorithm: int = tcod.constants.FOV_RESTRICTIVE,
+) -> np.array:
+    """Return the visible area of a field-of-view computation.
+
+    `transparency` is a 2 dimensional array where all non-zero values are
+    considered transparent.  The returned array will match the shape of this
+    array.
+
+    `x` and `y` are the 1st and 2nd coordinates of the origin point.  Areas
+    are visible when they can be seen from this point-of-view.
+
+    `radius` is the maximum view distance from `x`/`y`.  If this is zero then
+    the maximum distance is used.
+
+    If `light_walls` is True then visible obstacles will be returned, otherwise
+    only transparent areas will be.
+
+    `algorithm` is the field-of-view algorithm to run.  The default value is
+    `tcod.FOV_RESTRICTIVE`.
+    The options are:
+
+    * `tcod.FOV_BASIC`:
+      Simple ray-cast implementation.
+    * `tcod.FOV_DIAMOND`
+    * `tcod.FOV_SHADOW`:
+      Recursive shadow caster.
+    * `tcod.FOV_PERMISSIVE(n)`:
+      `n` starts at 0 (most restrictive) and goes up to 8 (most permissive.)
+    * `tcod.FOV_RESTRICTIVE`
+
+    .. versionadded:: 9.3
+
+    Example::
+
+        >>> explored = np.zeros((3, 5), dtype=bool, order="F")
+        >>> transparency = np.ones((3, 5), dtype=bool, order="F")
+        >>> transparency[:2, 2] = False
+        >>> transparency  # Transparent area.
+        array([[ True,  True, False,  True,  True],
+               [ True,  True, False,  True,  True],
+               [ True,  True,  True,  True,  True]]...)
+        >>> visible = tcod.map.compute_fov(transparency, 0, 0)
+        >>> visible  # Visible area.
+        array([[ True,  True,  True, False, False],
+               [ True,  True,  True, False, False],
+               [ True,  True,  True,  True, False]]...)
+        >>> explored |= visible  # Keep track of an explored area.
+    """
+    if len(transparency.shape) != 2:
+        raise TypeError(
+            "transparency must be an array of 2 dimensions"
+            " (shape is %r)" % transparency.shape
+        )
+    map_ = Map(transparency.shape[1], transparency.shape[0])
+    map_.transparent[...] = transparency
+    map_.compute_fov(x, y, radius, light_walls, algorithm)
+    return map_.fov

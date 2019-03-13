@@ -1,42 +1,14 @@
+.. toctree::
+   :maxdepth: 1
+   :caption: python-tcod API
 
-tcod.console
-============
-
-.. automodule:: tcod.console
-    :members:
-
-tcod.map
-========
-
-.. automodule:: tcod.map
-    :members:
-
-tcod.bsp
-=========
-
-.. automodule:: tcod.bsp
-    :members:
-
-tcod.path
-=========
-
-.. automodule:: tcod.path
-    :members:
-
-tcod.image
-==========
-
-.. automodule:: tcod.image
-    :members:
-
-tcod.random
-===========
-
-.. automodule:: tcod.random
-    :members:
-
-tcod.noise
-==========
-
-.. automodule:: tcod.noise
-    :members:
+   tcod/bsp
+   tcod/console
+   tcod/event
+   tcod/image
+   tcod/map
+   tcod/noise
+   tcod/path
+   tcod/random
+   tcod/tileset
+   libtcodpy
