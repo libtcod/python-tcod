@@ -8,6 +8,12 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - New `Console.tiles` array attribute.
+Changed
+ - `Console.DTYPE` changed to add alpha to its color types.
+Fixed
+ - Console printing was ignoring color codes at the beginning of a string.
 
 9.3.0 - 2019-03-15
 ------------------

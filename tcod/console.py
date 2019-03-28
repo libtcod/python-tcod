@@ -65,13 +65,16 @@ class Console:
         Added `buffer`, `copy`, and default parameters.
         Arrays are initialized as if the :any:`clear` method was called.
 
+    .. versionchanged:: 10.0
+        `DTYPE` changed, `buffer` now requires colors with an alpha channel.
+
     Attributes:
         console_c: A python-cffi "TCOD_Console*" object.
         DTYPE:
             A class attribute which provides a dtype compatible with this
             class.
 
-            ``[("ch", np.intc), ("fg", "(3,)u1"), ("bg", "(3,)u1")]``
+            ``[("ch", np.intc), ("fg", "(4,)u1"), ("bg", "(4,)u1")]``
 
             Example::
 
@@ -89,10 +92,14 @@ class Console:
                 |                    >
 
             .. versionadded:: 8.5
+
+            .. versionchanged:: 10.0
+                Added an alpha channel to the color types.
     """
 
-    DTYPE = [("ch", np.intc), ("fg", "(3,)u1"), ("bg", "(3,)u1")]  # type: Any
-    _DTYPE_RGB = np.dtype("(3,)u1")  # type: Any
+    DTYPE = np.dtype(  # type: Any
+        [("ch", np.intc), ("fg", "(4,)u1"), ("bg", "(4,)u1")]
+    )
 
     def __init__(
         self,
@@ -106,13 +113,9 @@ class Console:
         if buffer is not None:
             if self._order == "F":
                 buffer = buffer.transpose()
-            self._ch = np.ascontiguousarray(buffer["ch"], np.intc)
-            self._fg = np.ascontiguousarray(buffer["fg"], "u1")
-            self._bg = np.ascontiguousarray(buffer["bg"], "u1")
+            self._tiles = np.ascontiguousarray(buffer, self.DTYPE)
         else:
-            self._ch = np.ndarray((height, width), dtype=np.intc)
-            self._fg = np.ndarray((height, width), dtype=self._DTYPE_RGB)
-            self._bg = np.ndarray((height, width), dtype=self._DTYPE_RGB)
+            self._tiles = np.ndarray((height, width), dtype=self.DTYPE)
 
         # libtcod uses the root console for defaults.
         default_bg_blend = 0
@@ -126,9 +129,8 @@ class Console:
             {
                 "w": width,
                 "h": height,
-                "ch_array": ffi.cast("int*", self._ch.ctypes.data),
-                "fg_array": ffi.cast("TCOD_color_t*", self._fg.ctypes.data),
-                "bg_array": ffi.cast("TCOD_color_t*", self._bg.ctypes.data),
+                "tiles": ffi.cast("struct TCOD_ConsoleTile*",
+                                  self._tiles.ctypes.data),
                 "bkgnd_flag": default_bg_blend,
                 "alignment": default_alignment,
                 "fore": (255, 255, 255),
@@ -178,20 +180,10 @@ class Console:
                 "struct TCOD_Console*", self.console_c
             )
 
-        def unpack_color(color_data: Any) -> np.array:
-            """return a (height, width, 3) shaped array from an image struct"""
-            color_buffer = ffi.buffer(color_data[0 : self.width * self.height])
-            array = np.frombuffer(color_buffer, np.uint8)
-            return array.reshape((self.height, self.width, 3))
-
-        self._fg = unpack_color(self._console_data.fg_array)
-        self._bg = unpack_color(self._console_data.bg_array)
-
-        buf = self._console_data.ch_array
-        buf = ffi.buffer(buf[0 : self.width * self.height])
-        self._ch = np.frombuffer(buf, np.intc).reshape(
-            (self.height, self.width)
-        )
+        self._tiles = np.frombuffer(
+            ffi.buffer(self._console_data.tiles[0: self.width * self.height]),
+            dtype=self.DTYPE,
+        ).reshape((self.height, self.width))
 
         self._order = tcod._internal.verify_order(order)
 
@@ -215,7 +207,10 @@ class Console:
         ``console.bg[x, y, channel]  # order='F'``.
 
         """
-        return self._bg.transpose(1, 0, 2) if self._order == "F" else self._bg
+        bg = self._tiles["bg"][..., :3]
+        if self._order == "F":
+            bg = bg.transpose(1, 0, 2)
+        return bg
 
     @property
     def fg(self) -> np.array:
@@ -226,7 +221,10 @@ class Console:
         Index this array with ``console.fg[i, j, channel]  # order='C'`` or
         ``console.fg[x, y, channel]  # order='F'``.
         """
-        return self._fg.transpose(1, 0, 2) if self._order == "F" else self._fg
+        fg = self._tiles["fg"][..., :3]
+        if self._order == "F":
+            fg = fg.transpose(1, 0, 2)
+        return fg
 
     @property
     def ch(self) -> np.array:
@@ -237,7 +235,29 @@ class Console:
         Index this array with ``console.ch[i, j]  # order='C'`` or
         ``console.ch[x, y]  # order='F'``.
         """
-        return self._ch.T if self._order == "F" else self._ch
+        return self._tiles["ch"].T if self._order == "F" else self._tiles["ch"]
+
+    @property
+    def tiles(self) -> np.array:
+        """An array of this consoles tile data.
+
+        This acts as a combination of the `ch`, `fg`, and `bg` attributes.
+        Colors include an alpha channel but how alpha works is currently
+        undefined.
+
+        Example::
+            >>> con = tcod.console.Console(10, 2, order="F")
+            >>> con.tiles[0, 0] = (
+            ...     ord("X"),
+            ...     (*tcod.white, 255),
+            ...     (*tcod.black, 255),
+            ... )
+            >>> con.tiles[0, 0]
+            (88, [255, 255, 255, 255], [  0,   0,   0, 255])
+
+        .. versionadded:: 10.0
+        """
+        return self._tiles.T if self._order == "F" else self._tiles
 
     @property
     def default_bg(self) -> Tuple[int, int, int]:
@@ -321,9 +341,7 @@ class Console:
             bg = self.default_bg
             if bg != (0, 0, 0):
                 self.__clear_warning("bg", bg)
-        self.ch[...] = ch
-        self.fg[...] = fg
-        self.bg[...] = bg
+        self._tiles[...] = ch, (*fg, 255), (*bg, 255)
 
     def put_char(
         self,
@@ -793,41 +811,42 @@ class Console:
             "back": self.default_bg,
         }
         if self.console_c == ffi.NULL:
-            state["_ch"] = np.copy(self._ch)
-            state["_fg"] = np.copy(self._fg)
-            state["_bg"] = np.copy(self._bg)
+            state["_tiles"] = np.copy(self._tiles)
         return state
 
     def __setstate__(self, state: Any) -> None:
         self._key_color = None
+        if "_tiles" not in state:
+            tiles = np.ndarray((self.height, self.width), dtype=self.DTYPE)
+            tiles["ch"] = state["_ch"]
+            tiles["fg"][..., :3] = state["_fg"]
+            tiles["fg"][..., 3] = 255
+            tiles["bg"][..., :3] = state["_bg"]
+            tiles["bg"][..., 3] = 255
+            state["_tiles"] = tiles
+            del state["_ch"]
+            del state["_fg"]
+            del state["_bg"]
+
         self.__dict__.update(state)
-        self._console_data.update(
-            {
-                "ch_array": ffi.cast("int*", self._ch.ctypes.data),
-                "fg_array": ffi.cast("TCOD_color_t*", self._fg.ctypes.data),
-                "bg_array": ffi.cast("TCOD_color_t*", self._bg.ctypes.data),
-            }
-        )
+        self._console_data["tiles"] = ffi.cast("struct TCOD_ConsoleTile*",
+                                               self._tiles.ctypes.data)
         self._console_data = self.console_c = ffi.new(
             "struct TCOD_Console*", self._console_data
         )
 
     def __repr__(self) -> str:
         """Return a string representation of this console."""
-        buffer = np.ndarray((self.height, self.width), dtype=self.DTYPE)
-        buffer["ch"] = self.ch
-        buffer["fg"] = self.fg
-        buffer["bg"] = self.bg
         return (
             "tcod.console.Console(width=%i, height=%i, "
             "order=%r,buffer=\n%r)"
-            % (self.width, self.height, self._order, buffer)
+            % (self.width, self.height, self._order, self.tiles)
         )
 
     def __str__(self) -> str:
         """Return a simplified representation of this consoles contents."""
         return "<%s>" % "|\n|".join(
-            "".join(chr(c) for c in line) for line in self._ch
+            "".join(chr(c) for c in line) for line in self._tiles["ch"]
         )
 
     def _pythonic_index(self, x: int, y: int) -> Tuple[int, int]:
