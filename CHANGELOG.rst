@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+10.0.0 - 2019-03-29
+-------------------
 Added
  - New `Console.tiles` array attribute.
 Changed
