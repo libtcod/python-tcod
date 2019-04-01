@@ -139,7 +139,39 @@ class KeyboardEvent(Event):
         scancode (int): The keyboard scan-code, this is the physical location
                         of the key on the keyboard rather than the keys symbol.
         sym (int): The keyboard symbol.
-        mod (int): A bitmask of modifier keys.
+        mod (int): A bitmask of the currently held modifier keys.
+
+            You can use the following to check if a modifier key is held:
+
+            * `tcod.event.KMOD_LSHIFT`
+                Left shift bit.
+            * `tcod.event.KMOD_RSHIFT`
+                Right shift bit.
+            * `tcod.event.KMOD_LCTRL`
+                Left control bit.
+            * `tcod.event.KMOD_RCTRL`
+                Right control bit.
+            * `tcod.event.KMOD_LALT`
+                Left alt bit.
+            * `tcod.event.KMOD_RALT`
+                Right alt bit.
+            * `tcod.event.KMOD_LGUI`
+                Left meta key bit.
+            * `tcod.event.KMOD_RGUI`
+                Right meta key bit.
+            * `tcod.event.KMOD_SHIFT`
+                ``tcod.event.KMOD_LSHIFT | tcod.event.KMOD_RSHIFT``
+            * `tcod.event.KMOD_CTRL`
+                ``tcod.event.KMOD_LCTRL | tcod.event.KMOD_RCTRL``
+            * `tcod.event.KMOD_ALT`
+                ``tcod.event.KMOD_LALT | tcod.event.KMOD_RALT``
+            * `tcod.event.KMOD_GUI`
+                ``tcod.event.KMOD_LGUI | tcod.event.KMOD_RGUI``
+
+            For example, if shift is held then
+            ``event.mod & tcod.event.KMOD_SHIFT`` will evaluate to a true
+            value.
+
         repeat (bool): True if this event exists because of key repeat.
     """
 
