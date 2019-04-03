@@ -167,6 +167,12 @@ class KeyboardEvent(Event):
                 ``tcod.event.KMOD_LALT | tcod.event.KMOD_RALT``
             * `tcod.event.KMOD_GUI`
                 ``tcod.event.KMOD_LGUI | tcod.event.KMOD_RGUI``
+            * `tcod.event.KMOD_NUM`
+                Num lock bit.
+            * `tcod.event.KMOD_CAPS`
+                Caps lock bit.
+            * `tcod.event.KMOD_MODE`
+                AltGr key bit.
 
             For example, if shift is held then
             ``event.mod & tcod.event.KMOD_SHIFT`` will evaluate to a true
