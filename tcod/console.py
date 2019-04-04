@@ -97,8 +97,15 @@ class Console:
                 Added an alpha channel to the color types.
     """
 
-    DTYPE = np.dtype(  # type: Any
-        [("ch", np.intc), ("fg", "(4,)u1"), ("bg", "(4,)u1")]
+    DTYPE = np.dtype([("ch", np.intc), ("fg", "(4,)u1"), ("bg", "(4,)u1")])
+
+    # A structured arrays type with the added "fg_rgb" and "bg_rgb" fields.
+    _DTYPE_RGB = np.dtype(
+        {
+            "names": ["ch", "fg", "bg", "fg_rgb", "bg_rgb"],
+            "formats": [np.int32, "(4,)u1", "(4,)u1", "(3,)u1", "(3,)u1"],
+            "offsets": [0, 4, 8, 4, 8],
+        }
     )
 
     def __init__(
