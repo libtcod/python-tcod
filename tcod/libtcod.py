@@ -8,10 +8,22 @@ from typing import Any  # noqa: F401
 
 from tcod import __path__  # type: ignore
 
+__sdl_version__ = ""
+
 
 def get_architecture() -> str:
     """Return the Windows architecture, one of "x86" or "x64"."""
     return "x86" if platform.architecture()[0] == "32bit" else "x64"
+
+
+def get_sdl_version() -> str:
+    sdl_version = ffi.new("SDL_version*")
+    lib.SDL_GetVersion(sdl_version)
+    return "%s.%s.%s" % (
+        sdl_version.major,
+        sdl_version.minor,
+        sdl_version.patch,
+    )
 
 
 if sys.platform == "win32":
@@ -68,5 +80,6 @@ else:
                 file=sys.stderr,
             )
         raise
+    __sdl_version__ = get_sdl_version()
 
 __all__ = ["ffi", "lib"]

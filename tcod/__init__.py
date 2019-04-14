@@ -15,7 +15,7 @@
     Bring any issues or requests to GitHub:
     https://github.com/HexDecimal/libtcod-cffi
 """
-from tcod.libtcod import lib, ffi  # noqa: F4
+from tcod.libtcod import lib, ffi, __sdl_version__  # noqa: F4
 from tcod.libtcodpy import *  # noqa: F4
 
 try:
