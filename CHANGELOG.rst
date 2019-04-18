@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Fixed horizontal alignment for TrueType fonts.
+ - Fixed taking screenshots with the older SDL renderer.
 
 10.0.0 - 2019-03-29
 -------------------

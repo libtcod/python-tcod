@@ -16,6 +16,6 @@ float _pycall_path_swap_src_dest(int x1, int y1,
                                  int x2, int y2, void *user_data);
 float _pycall_path_dest_only(int x1, int y1, int x2, int y2, void *user_data);
 
-void _pycall_sdl_hook(void *);
+void _pycall_sdl_hook(struct SDL_Surface*);
 
 }
