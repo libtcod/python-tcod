@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Resolved Color warning when importing tcod.
 
 10.0.1 - 2019-04-19
 -------------------

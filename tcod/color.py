@@ -17,8 +17,8 @@ class Color(List[int]):
         b (int): Blue value, from 0 to 255.
     """
 
-    def __init__(self, r: int = 0, g: int = 0, b: int = 0):
-        self[:] = (r & 0xFF, g & 0xFF, b & 0xFF)
+    def __init__(self, r: int = 0, g: int = 0, b: int = 0) -> "Color":
+        list.__setitem__(self, slice(None), (r & 0xFF, g & 0xFF, b & 0xFF))
 
     @property
     def r(self) -> int:
