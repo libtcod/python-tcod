@@ -6,6 +6,7 @@ from setuptools import setup
 
 from subprocess import check_output
 import platform
+import warnings
 
 from distutils.unixccompiler import UnixCCompiler
 
@@ -49,8 +50,15 @@ def get_version():
         open("tcod/version.py", "w").write('__version__ = "%s"\n' % version)
         return version
     except:
-        exec(open("tcod/version.py").read(), globals())
-        return __version__
+        try:
+            exec(open("tcod/version.py").read(), globals())
+            return __version__
+        except FileNotFoundError:
+            warnings.warn(
+                "Unknown version: "
+                "Not in a Git repository and not from a sdist bundle or wheel."
+            )
+            return "0.0.0"
 
 
 is_pypy = platform.python_implementation() == "PyPy"
