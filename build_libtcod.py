@@ -233,7 +233,8 @@ class CustomPostParser(c_ast.NodeVisitor):
         elif (
             node.name
             and "vsprint" in node.name
-            or node.name in ["SDL_vsscanf", "SDL_vsnprintf", "SDL_LogMessageV"]
+            or node.name
+            in ["SDL_vsscanf", "SDL_vsnprintf", "SDL_LogMessageV", "alloca"]
         ):
             # exclude va_list related functions
             self.ast.ext.remove(node)
