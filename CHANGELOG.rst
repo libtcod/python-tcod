@@ -8,8 +8,12 @@ v2.0.0
 
 Unreleased
 ------------------
+
+10.0.2 - 2019-04-26
+-------------------
 Fixed
- - Resolved Color warning when importing tcod.
+ - Resolved Color warnings when importing tcod.
+ - When compiling, fixed a name conflict with endianness macros on FreeBSD.
 
 10.0.1 - 2019-04-19
 -------------------
