@@ -1,4 +1,4 @@
 cffi>=1.8.1,<2
-numpy>=1.10,<2;
+numpy>=1.10,<2,!=1.16.3;
 pycparser>=2.14,<3
 setuptools>=36.0.1
