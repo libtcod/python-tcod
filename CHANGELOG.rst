@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Corrected bounding box issues with the `Console.print_box` method.
 
 10.0.2 - 2019-04-26
 -------------------
