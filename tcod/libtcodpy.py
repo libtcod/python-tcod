@@ -929,7 +929,8 @@ def console_init_root(
             DeprecationWarning,
             stacklevel=2,
         )
-    lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
+    if lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer):
+        raise RuntimeError(ffi.string(lib.TCOD_get_error()).decode())
     console = tcod.console.Console._get_root(order)
     console.clear()
     return console
@@ -966,9 +967,10 @@ def console_set_custom_font(
         raise RuntimeError(
             "File not found:\n\t%s" % (os.path.realpath(fontFile),)
         )
-    lib.TCOD_console_set_custom_font(
+    if lib.TCOD_console_set_custom_font(
         _bytes(fontFile), flags, nb_char_horiz, nb_char_vertic
-    )
+    ):
+        raise RuntimeError(ffi.string(lib.TCOD_get_error()).decode())
 
 
 @deprecate("Check `con.width` instead.")

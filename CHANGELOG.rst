@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - `tcod.console_init_root` and `tcod.console_set_custom_font` can now raise
+   exceptions instead of crashing.
 
 10.0.3 - 2019-05-10
 -------------------
