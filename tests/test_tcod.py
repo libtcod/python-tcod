@@ -225,3 +225,9 @@ def test_mouse_repr():
     mouse_copy = eval(repr(mouse))
     assert mouse.x == mouse_copy.x
     assert mouse.lbutton == mouse_copy.lbutton
+
+
+def test_cffi_structs():
+    # Make sure cffi structures are the correct size.
+    tcod.ffi.new("SDL_Event*")
+    tcod.ffi.new("SDL_AudioCVT*")

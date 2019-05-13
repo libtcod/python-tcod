@@ -15,6 +15,8 @@ import subprocess
 import platform
 import zipfile
 
+import parse_sdl2
+
 try:
     from urllib import urlretrieve
 except ImportError:
@@ -24,8 +26,6 @@ except ImportError:
 SDL2_PARSE_VERSION = os.environ.get("SDL_VERSION", "2.0.5")
 # The SDL2 version to include in binary distributions.
 SDL2_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "2.0.9")
-
-TDL_NO_SDL2_EXPORTS = os.environ.get("TDL_NO_SDL2_EXPORTS", "0") == "1"
 
 CFFI_HEADER = "tcod/cffi.h"
 CFFI_EXTRA_CDEFS = "tcod/cdef.h"
@@ -106,9 +106,6 @@ sources += ["libtcod/src/vendor/lodepng.cpp"]
 sources += ["libtcod/src/vendor/utf8proc/utf8proc.c"]
 sources += glob.glob("libtcod/src/vendor/zlib/*.c")
 
-if TDL_NO_SDL2_EXPORTS:
-    extra_parse_args.append("-DTDL_NO_SDL2_EXPORTS")
-
 if sys.platform == "win32":
     libraries += ["User32", "OpenGL32"]
     define_macros.append(("TCODLIB_API", ""))
@@ -131,7 +128,21 @@ if sys.platform in ["win32", "darwin"]:
     include_dirs.append("libtcod/src/zlib/")
 
 if sys.platform == "win32":
-    include_dirs.append(os.path.join(SDL2_PARSE_PATH, "include"))
+    SDL2_INCLUDE = os.path.join(SDL2_PARSE_PATH, "include")
+elif sys.platform == "darwin":
+    SDL2_INCLUDE = os.path.join(SDL2_PARSE_PATH, "Versions/A/Headers")
+else:
+    match = re.match(
+        r".*-I(\S+)",
+        subprocess.check_output(
+            ["sdl2-config", "--cflags"], universal_newlines=True
+        )
+    )
+    assert match
+    SDL2_INCLUDE, = match.groups()
+
+if sys.platform == "win32":
+    include_dirs.append(SDL2_INCLUDE)
     ARCH_MAPPING = {"32bit": "x86", "64bit": "x64"}
     SDL2_LIB_DIR = os.path.join(SDL2_BUNDLE_PATH, "lib/",
                                 ARCH_MAPPING[BITSIZE])
@@ -324,11 +335,13 @@ else:
         extra_link_args.append("-fopenmp")
 
 ffi = FFI()
+parse_sdl2.add_to_ffi(ffi, SDL2_INCLUDE)
+#ffi.include(parse_sdl2.get_ffi(SDL2_INCLUDE))
 ffi.cdef(get_cdef())
 ffi.cdef(open(CFFI_EXTRA_CDEFS, "r").read())
 ffi.set_source(
     module_name,
-    "#include <tcod/cffi.h>",
+    "#include <tcod/cffi.h>\n#include <SDL.h>",
     include_dirs=include_dirs,
     library_dirs=library_dirs,
     sources=sources,

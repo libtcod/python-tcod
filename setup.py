@@ -125,7 +125,7 @@ setup(
     package_data={"tdl": ["*.png"], "tcod": get_package_data()},
     python_requires=">=3.5",
     install_requires=[
-        "cffi>=1.8.1,<2",
+        "cffi>=1.12.0,<2",
         "numpy>=1.10,<2" if not is_pypy else "",
     ],
     cffi_modules=["build_libtcod.py:ffi"],
