@@ -23,10 +23,6 @@ if ($env:WEB_PYTHON) {
 & $env:PYTHON -m pip install --no-warn-script-location "virtualenv>=16"
 & $env:PYTHON -m virtualenv venv
 
-if ($env:PYPY) {
-    $env:ACTIVATE_VENV='venv\bin\activate.bat'
-} else {
-    $env:ACTIVATE_VENV='venv\Scripts\activate.bat'
-}
+$env:ACTIVATE_VENV='venv\Scripts\activate.bat'
 
 if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode )  }

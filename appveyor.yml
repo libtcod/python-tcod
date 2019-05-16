@@ -30,9 +30,6 @@ matrix:
     - PYPY3: pypy3.6-v7.1.0
 clone_depth: 50
 
-cache:
-  - '%localappdata%\pip\cache -> setup.py'
-
 init:
 - cmd: "if %APPVEYOR_REPO_TAG%==false if %DEPLOY_ONLY%==true exit /b 1"
 
@@ -40,8 +37,10 @@ install:
 - cmd: "git submodule update --init --recursive"
 - ps: ". .appveyor/install_python.ps1"
 - cmd: "%ACTIVATE_VENV%"
-- cmd: "python --version"
+- cmd: "set PATH=%APPVEYOR_BUILD_FOLDER%\\venv\\bin;%PATH%"
 - cmd: "set PATH=%PATH%;C:\\MinGW\\bin"
+- cmd: "python --version"
+- cmd: "pip --version"
 - cmd: "pip install --upgrade setuptools"
 - cmd: "pip install --requirement requirements.txt"
 - cmd: "python setup.py build sdist develop bdist_wheel"
