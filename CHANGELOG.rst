@@ -8,12 +8,15 @@ v2.0.0
 
 Unreleased
 ------------------
+
+10.0.4 - 2019-05-17
+-------------------
 Changed
  - Now depends on cffi 0.12 or later.
 
 Fixed
- - `tcod.console_init_root` and `tcod.console_set_custom_font` can now raise
-   exceptions instead of crashing.
+ - `tcod.console_init_root` and `tcod.console_set_custom_font` will raise
+   exceptions instead of terminating.
  - Fixed issues preventing `tcod.event` from working on 32-bit Windows.
 
 10.0.3 - 2019-05-10
