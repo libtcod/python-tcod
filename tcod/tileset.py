@@ -129,9 +129,10 @@ def load_truetype_font(
     """
     if not os.path.exists(path):
         raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(path),))
-    return Tileset._claim(
-        lib.TCOD_load_truetype_font_(path.encode(), tile_width, tile_height)
-    )
+    cdata = lib.TCOD_load_truetype_font_(path.encode(), tile_width, tile_height)
+    if not cdata:
+        raise RuntimeError(ffi.string(lib.TCOD_get_error()))
+    return Tileset._claim(cdata)
 
 
 def set_truetype_font(path: str, tile_width: int, tile_height: int) -> None:
@@ -154,4 +155,5 @@ def set_truetype_font(path: str, tile_width: int, tile_height: int) -> None:
     """
     if not os.path.exists(path):
         raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(path),))
-    lib.TCOD_tileset_load_truetype_(path.encode(), tile_width, tile_height)
+    if lib.TCOD_tileset_load_truetype_(path.encode(), tile_width, tile_height):
+        raise RuntimeError(ffi.string(lib.TCOD_get_error()))
