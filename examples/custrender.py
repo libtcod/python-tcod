@@ -54,18 +54,24 @@ def get_viewport(
     sdl_renderer = tcod.lib.TCOD_sys_get_sdl_renderer()
     assert sdl_renderer
     tileset = tcod.tileset.get_default()
-    aspect = (console.width * tileset.tile_width,
-              console.height * tileset.tile_height)
+    aspect = (
+        console.width * tileset.tile_width,
+        console.height * tileset.tile_height,
+    )
     renderer_size = get_renderer_size()
     scale = renderer_size[0] / aspect[0], renderer_size[1] / aspect[1]
     if correct_aspect:
         scale = min(scale), min(scale)
     if integer_scale:
-        scale = (int(scale[0]) if scale[0] >= 1 else scale[0],
-                 int(scale[1]) if scale[1] >= 1 else scale[1])
+        scale = (
+            int(scale[0]) if scale[0] >= 1 else scale[0],
+            int(scale[1]) if scale[1] >= 1 else scale[1],
+        )
     view_size = aspect[0] * scale[0], aspect[1] * scale[1]
-    view_offset = ((renderer_size[0] - view_size[0]) // 2,
-                   (renderer_size[1] - view_size[1]) // 2)
+    view_offset = (
+        (renderer_size[0] - view_size[0]) // 2,
+        (renderer_size[1] - view_size[1]) // 2,
+    )
     return tuple(int(x) for x in (*view_offset, *view_size))  # type: ignore
     # https://github.com/python/mypy/issues/224
 
@@ -110,8 +116,10 @@ def accumulate(
     This function depends on a provisional function of the libtcod API.  You
     may want to pin your exact version of python-tcod to prevent a break.
     """
-    assert tcod.sys_get_renderer() \
-        in (tcod.RENDERER_SDL2, tcod.RENDERER_OPENGL2)
+    assert tcod.sys_get_renderer() in (
+        tcod.RENDERER_SDL2,
+        tcod.RENDERER_OPENGL2,
+    )
     if viewport is None:
         viewport = tcod.ffi.NULL
     else:
