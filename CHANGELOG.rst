@@ -9,6 +9,11 @@ v2.0.0
 Unreleased
 ------------------
 
+10.0.5 - 2019-05-17
+-------------------
+ - Fixed shader compilation issues in the OPENGL2 renderer.
+ - Fallback fonts should fail less on Linux.
+
 10.0.4 - 2019-05-17
 -------------------
 Changed

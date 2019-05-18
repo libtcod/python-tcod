@@ -19,7 +19,7 @@ import tcod
 import tcod.tileset
 import tcod.event
 
-assert tcod.__version__ > "10.0.3", tcod.__version__
+assert tcod.__version__ > "10.0.4", tcod.__version__
 
 
 def get_renderer_size() -> Tuple[int, int]:
@@ -128,7 +128,7 @@ def accumulate(
 
 
 def main() -> None:
-    """An example of of the use of this module."""
+    """An example for the use of this module."""
     with tcod.console_init_root(20, 4, renderer=tcod.RENDERER_SDL2) as console:
         TEXT = "Console with a fixed aspect ratio and integer scaling."
         console.print_box(0, 0, 0, 0, TEXT)
