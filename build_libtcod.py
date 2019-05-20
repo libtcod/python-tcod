@@ -312,7 +312,7 @@ MSVC_CFLAGS = {"DEBUG": ["/Od"], "RELEASE": ["/GL", "/O2", "/GS-"]}
 MSVC_LDFLAGS = {"DEBUG": [], "RELEASE": ["/LTCG"]}
 GCC_CFLAGS = {
     "DEBUG": ["-Og", "-g", "-fPIC"],
-    "RELEASE": ["-flto", "-O3", "-g", "-fPIC"],
+    "RELEASE": ["-flto", "-O3", "-g", "-fPIC", "-Wno-deprecated-declarations"],
 }
 
 if sys.platform == "win32" and "--compiler=mingw32" not in sys.argv:
