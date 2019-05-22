@@ -8,9 +8,12 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - `tcod.console_init_root` now has an optional `vsync` parameter.
 
 10.0.5 - 2019-05-17
 -------------------
+Fixed
  - Fixed shader compilation issues in the OPENGL2 renderer.
  - Fallback fonts should fail less on Linux.
 

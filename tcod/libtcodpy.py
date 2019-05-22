@@ -870,6 +870,7 @@ def console_init_root(
     fullscreen: bool = False,
     renderer: Optional[int] = None,
     order: str = "C",
+    vsync: Optional[bool] = None,
 ) -> tcod.console.Console:
     """Set up the primary display and return the root console.
 
@@ -901,6 +902,11 @@ def console_init_root(
     `order` will affect how the array attributes of the returned root console
     are indexed.  `order='C'` is the default, but `order='F'` is recommended.
 
+    If `vsync` is True then the frame-rate will be synchronized to the monitors
+    vertical refresh rate.  This prevents screen tearing and avoids wasting
+    computing power on overdraw.  If `vsync` is False then the frame-rate will
+    be uncapped.  The default is False but will change to True in the future.
+
     .. versionchanged:: 4.3
         Added `order` parameter.
         `title` parameter is now optional.
@@ -908,6 +914,9 @@ def console_init_root(
     .. versionchanged:: 8.0
         The default `renderer` is now automatic instead of always being
         `RENDERER_SDL`.
+
+    .. versionchanged:: 10.1
+        Added the `vsync` parameter.
     """
     if title is None:
         # Use the scripts filename as the title.
@@ -929,7 +938,17 @@ def console_init_root(
             DeprecationWarning,
             stacklevel=2,
         )
-    if lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer):
+    if vsync is None:
+        vsync = False
+        warnings.warn(
+            "vsync defaults to False, but the default will change to True in "
+            "the future.  Provide a value for vsync to suppress this warning.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+    if lib.TCOD_console_init_root_(
+        w, h, _bytes(title), fullscreen, renderer, vsync
+    ):
         raise RuntimeError(ffi.string(lib.TCOD_get_error()).decode())
     console = tcod.console.Console._get_root(order)
     console.clear()
