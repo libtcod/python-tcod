@@ -129,7 +129,9 @@ def accumulate(
 
 def main() -> None:
     """An example for the use of this module."""
-    with tcod.console_init_root(20, 4, renderer=tcod.RENDERER_SDL2) as console:
+    with tcod.console_init_root(
+        20, 4, renderer=tcod.RENDERER_SDL2, vsync=True
+    ) as console:
         TEXT = "Console with a fixed aspect ratio and integer scaling."
         console.print_box(0, 0, 0, 0, TEXT)
         while True:
