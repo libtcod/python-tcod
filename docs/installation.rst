@@ -46,9 +46,13 @@ Linux (Debian-based)
 On Linux python-tcod will need to be built from source.
 You can run this command to download python-tcod's dependencies with apt::
 
-    sudo apt install g++ python3-dev python3-pip python3-numpy libsdl2-dev libffi-dev libomp5
+    sudo apt install build-essential python3-dev python3-pip python3-numpy libsdl2-dev libffi-dev libomp5
 
-Then you can build and install python-tcod using pip in a user environment::
+If your GCC version is less than 6.1, or your SDL version is less than 2.0.5,
+then you will need to perform a distribution upgrade before continuing.
+
+Once dependences are resolved you can build and install python-tcod using pip
+in a user environment::
 
     python3 -m pip install --user tcod
 
