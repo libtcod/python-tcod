@@ -1,26 +1,19 @@
 PyInstaller Example
 ===================
 
-First, install the packages: ``tdl`` and ``PyInstaller``.
+First, install the packages: ``tcod`` and ``PyInstaller``.
 
 On Windows you must also install the ``pywin32`` package
 (named ``pypiwin32`` if you're using pip install.)
 
-Next, download the `hook-tcod.py` and `hook-tdl.py` files from this repository.
-Give PyInstaller the location of these files with the `--additional-hooks-dir`
-argument.
-
-`hook-tcod.py` is always needed.  `hook-tdl.py` only installs the default
-font used by the tdl module and is optional if a custom font is used.
-
 Then run the PyInstaller script with this command::
 
-    PyInstaller hello_world.py --additional-hooks-dir=.
+    PyInstaller hello_world.py --add-data "terminal8x8_gs_ro.png;."
 
-The finished build will be placed at ``dist/hello_world``. You should see references to the `hook-tdl` in the output.
+The finished build will be placed in the ``dist/`` directory.
 
-You can also build to one file with the command::
+You can also build to one executable file using the following command::
 
-    PyInstaller hello_world.py --additional-hooks-dir=. -F
+    PyInstaller hello_world.py --add-data "terminal8x8_gs_ro.png;." --onefile
 
 The PyInstaller manual can be found at: https://pythonhosted.org/PyInstaller/
