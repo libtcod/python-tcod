@@ -8,7 +8,10 @@ v2.0.0
 
 Unreleased
 ------------------
-Changed
+
+10.1.0 - 2019-05-24
+-------------------
+Added
  - `tcod.console_init_root` now has an optional `vsync` parameter.
 
 10.0.5 - 2019-05-17
