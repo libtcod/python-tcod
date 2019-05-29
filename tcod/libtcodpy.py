@@ -906,6 +906,8 @@ def console_init_root(
     vertical refresh rate.  This prevents screen tearing and avoids wasting
     computing power on overdraw.  If `vsync` is False then the frame-rate will
     be uncapped.  The default is False but will change to True in the future.
+    This option only works with the SDL2 or OPENGL2 renderers, any other
+    renderer will always have `vsync` disabled.
 
     .. versionchanged:: 4.3
         Added `order` parameter.
@@ -938,7 +940,11 @@ def console_init_root(
             DeprecationWarning,
             stacklevel=2,
         )
-    if vsync is None:
+    NEW_RENDERER = renderer in (
+        tcod.constants.RENDERER_SDL2,
+        tcod.constants.RENDERER_OPENGL2,
+    )
+    if vsync is None and NEW_RENDERER:
         vsync = False
         warnings.warn(
             "vsync defaults to False, but the default will change to True in "
@@ -946,6 +952,8 @@ def console_init_root(
             DeprecationWarning,
             stacklevel=2,
         )
+    if not NEW_RENDERER:
+        vsync = False
     if lib.TCOD_console_init_root_(
         w, h, _bytes(title), fullscreen, renderer, vsync
     ):
