@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-
+# To the extent possible under law, the libtcod maintainers have waived all
+# copyright and related or neighboring rights for this example.  This work is
+# published from: United States.
+# https://creativecommons.org/publicdomain/zero/1.0/
+"""An demonstration of event handling using the tcod.event module.
+"""
 import tcod
 import tcod.event
 
