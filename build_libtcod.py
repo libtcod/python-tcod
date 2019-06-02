@@ -399,7 +399,7 @@ def parse_sdl_attrs(prefix: str, all_names: List[str]) -> Tuple[str, str]:
     ):
         all_names.append(name)
         names.append("%s = %s" % (name, value))
-        lookup.append('%s: "tcod.event.%s"' % (value, name))
+        lookup.append('%s: "%s"' % (value, name))
     names = "\n".join(names)
     lookup = "{\n    %s,\n}" % (",\n    ".join(lookup),)
     return names, lookup

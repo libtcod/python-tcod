@@ -18,4 +18,5 @@ float _pycall_path_dest_only(int x1, int y1, int x2, int y2, void *user_data);
 
 void _pycall_sdl_hook(struct SDL_Surface*);
 
+int _pycall_event_watch(void* userdata, union SDL_Event* event);
 }

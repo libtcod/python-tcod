@@ -15,26 +15,40 @@ implied by ``import tcod``.
 
 .. versionadded:: 8.4
 """
-from typing import Any, Dict, NamedTuple, Optional, Iterator, Tuple
+from typing import Any, Dict, Mapping, NamedTuple, Optional, Iterator, Tuple
 
 import tcod
 import tcod.event_constants
 from tcod.event_constants import *  # noqa: F4
+from tcod.event_constants import KMOD_SHIFT, KMOD_CTRL, KMOD_ALT, KMOD_GUI
+
+
+class _ConstantsWithPrefix(Mapping[int, str]):
+    def __init__(self, constants: Mapping[int, str]):
+        self.constants = constants
+
+    def __getitem__(self, key: int) -> str:
+        return "tcod.event." + self.constants[key]
+
+    def __len__(self) -> int:
+        return len(self.constants)
+
+    def __iter__(self) -> Iterator[int]:
+        return iter(self.constants)
 
 
 def _describe_bitmask(
-    bits: int, table: Dict[Any, str], default: str = "0"
+    bits: int, table: Mapping[int, str], default: str = "0"
 ) -> str:
-    """Returns a bitmask in human readable form.
+    """Return a bitmask in human readable form.
 
     This is a private function, used internally.
 
-    Args:
-        bits (int): The bitmask to be represented.
-        table (Dict[Any,str]): A reverse lookup table.
-        default (Any): A default return value when bits is 0.
+    `bits` is the bitmask to be represented.
 
-    Returns: str: A printable version of the bits variable.
+    `table` is a reverse lookup table.
+
+    `default` is returned when no other bits can be represented.
     """
     result = []
     for bit, name in table.items():
@@ -55,40 +69,53 @@ def _pixel_to_tile(x: float, y: float) -> Tuple[float, float]:
 Point = NamedTuple("Point", [("x", float), ("y", float)])
 
 # manually define names for SDL macros
-BUTTON_LEFT = 1
-BUTTON_MIDDLE = 2
-BUTTON_RIGHT = 3
-BUTTON_X1 = 4
-BUTTON_X2 = 5
-BUTTON_LMASK = 0x01
-BUTTON_MMASK = 0x02
-BUTTON_RMASK = 0x04
-BUTTON_X1MASK = 0x08
-BUTTON_X2MASK = 0x10
-
-KMOD_SHIFT = (
-    tcod.event_constants.KMOD_LSHIFT | tcod.event_constants.KMOD_RSHIFT
-)
-KMOD_CTRL = tcod.event_constants.KMOD_LCTRL | tcod.event_constants.KMOD_RCTRL
-KMOD_ALT = tcod.event_constants.KMOD_LALT | tcod.event_constants.KMOD_RALT
-KMOD_GUI = tcod.event_constants.KMOD_LGUI | tcod.event_constants.KMOD_RGUI
+BUTTON_LEFT = tcod.lib.SDL_BUTTON_LEFT
+BUTTON_MIDDLE = tcod.lib.SDL_BUTTON_MIDDLE
+BUTTON_RIGHT = tcod.lib.SDL_BUTTON_RIGHT
+BUTTON_X1 = tcod.lib.SDL_BUTTON_X1
+BUTTON_X2 = tcod.lib.SDL_BUTTON_X2
+BUTTON_LMASK = tcod.lib.SDL_BUTTON_LMASK
+BUTTON_MMASK = tcod.lib.SDL_BUTTON_MMASK
+BUTTON_RMASK = tcod.lib.SDL_BUTTON_RMASK
+BUTTON_X1MASK = tcod.lib.SDL_BUTTON_X1MASK
+BUTTON_X2MASK = tcod.lib.SDL_BUTTON_X2MASK
 
 # reverse tables are used to get the tcod.event name from the value.
 _REVERSE_BUTTON_TABLE = {
-    BUTTON_LEFT: "tcod.event.BUTTON_LEFT",
-    BUTTON_MIDDLE: "tcod.event.BUTTON_MIDDLE",
-    BUTTON_RIGHT: "tcod.event.BUTTON_RIGHT",
-    BUTTON_X1: "tcod.event.BUTTON_X1",
-    BUTTON_X2: "tcod.event.BUTTON_X2",
+    BUTTON_LEFT: "BUTTON_LEFT",
+    BUTTON_MIDDLE: "BUTTON_MIDDLE",
+    BUTTON_RIGHT: "BUTTON_RIGHT",
+    BUTTON_X1: "BUTTON_X1",
+    BUTTON_X2: "BUTTON_X2",
 }
 
 _REVERSE_BUTTON_MASK_TABLE = {
-    BUTTON_LMASK: "tcod.event.BUTTON_LMASK",
-    BUTTON_MMASK: "tcod.event.BUTTON_MMASK",
-    BUTTON_RMASK: "tcod.event.BUTTON_RMASK",
-    BUTTON_X1MASK: "tcod.event.BUTTON_X1MASK",
-    BUTTON_X2MASK: "tcod.event.BUTTON_X2MASK",
+    BUTTON_LMASK: "BUTTON_LMASK",
+    BUTTON_MMASK: "BUTTON_MMASK",
+    BUTTON_RMASK: "BUTTON_RMASK",
+    BUTTON_X1MASK: "BUTTON_X1MASK",
+    BUTTON_X2MASK: "BUTTON_X2MASK",
 }
+
+_REVERSE_BUTTON_TABLE_PREFIX = _ConstantsWithPrefix(_REVERSE_BUTTON_TABLE)
+_REVERSE_BUTTON_MASK_TABLE_PREFIX = _ConstantsWithPrefix(
+    _REVERSE_BUTTON_MASK_TABLE
+)
+_REVERSE_SCANCODE_TABLE_PREFIX = _ConstantsWithPrefix(
+    tcod.event_constants._REVERSE_SCANCODE_TABLE
+)
+_REVERSE_SYM_TABLE_PREFIX = _ConstantsWithPrefix(
+    tcod.event_constants._REVERSE_SYM_TABLE
+)
+
+
+_REVERSE_MOD_TABLE = tcod.event_constants._REVERSE_MOD_TABLE.copy()
+del _REVERSE_MOD_TABLE[KMOD_SHIFT]
+del _REVERSE_MOD_TABLE[KMOD_CTRL]
+del _REVERSE_MOD_TABLE[KMOD_ALT]
+del _REVERSE_MOD_TABLE[KMOD_GUI]
+
+_REVERSE_MOD_TABLE_PREFIX = _ConstantsWithPrefix(_REVERSE_MOD_TABLE)
 
 
 class Event:
@@ -111,6 +138,9 @@ class Event:
         """Return a class instance from a python-cffi 'SDL_Event*' pointer."""
         raise NotImplementedError()
 
+    def __str__(self) -> str:
+        return "<type=%r>" % (self.type,)
+
 
 class Quit(Event):
     """An application quit request event.
@@ -129,7 +159,7 @@ class Quit(Event):
         return self
 
     def __repr__(self) -> str:
-        return "tcod.event.%s()" % self.__class__.__name__
+        return "tcod.event.%s()" % (self.__class__.__name__,)
 
 
 class KeyboardEvent(Event):
@@ -202,12 +232,19 @@ class KeyboardEvent(Event):
     def __repr__(self) -> str:
         return "tcod.event.%s(scancode=%s, sym=%s, mod=%s%s)" % (
             self.__class__.__name__,
+            _REVERSE_SCANCODE_TABLE_PREFIX[self.scancode],
+            _REVERSE_SYM_TABLE_PREFIX[self.sym],
+            _describe_bitmask(self.mod, _REVERSE_MOD_TABLE_PREFIX),
+            ", repeat=True" if self.repeat else "",
+        )
+
+    def __str__(self) -> str:
+        return "<%s, scancode=%s, sym=%s, mod=%s, repeat=%r>" % (
+            super().__str__().strip("<>"),
             tcod.event_constants._REVERSE_SCANCODE_TABLE[self.scancode],
             tcod.event_constants._REVERSE_SYM_TABLE[self.sym],
-            _describe_bitmask(
-                self.mod, tcod.event_constants._REVERSE_MOD_TABLE
-            ),
-            ", repeat=True" if self.repeat else "",
+            _describe_bitmask(self.mod, _REVERSE_MOD_TABLE),
+            self.repeat,
         )
 
 
@@ -252,8 +289,16 @@ class MouseState(Event):
     def __repr__(self) -> str:
         return ("tcod.event.%s(pixel=%r, tile=%r, state=%s)") % (
             self.__class__.__name__,
-            self.pixel,
-            self.tile,
+            tuple(self.pixel),
+            tuple(self.tile),
+            _describe_bitmask(self.state, _REVERSE_BUTTON_MASK_TABLE_PREFIX),
+        )
+
+    def __str__(self) -> str:
+        return ("<%s, pixel=(x=%i, y=%i), tile=(x=%i, y=%i), state=%s>") % (
+            super().__str__().strip("<>"),
+            *self.pixel,
+            *self.tile,
             _describe_bitmask(self.state, _REVERSE_BUTTON_MASK_TABLE),
         )
 
@@ -311,11 +356,20 @@ class MouseMotion(MouseState):
             "tile=%r, tile_motion=%r, state=%s)"
         ) % (
             self.__class__.__name__,
-            self.pixel,
-            self.pixel_motion,
-            self.tile,
-            self.tile_motion,
-            _describe_bitmask(self.state, _REVERSE_BUTTON_MASK_TABLE),
+            tuple(self.pixel),
+            tuple(self.pixel_motion),
+            tuple(self.tile),
+            tuple(self.tile_motion),
+            _describe_bitmask(self.state, _REVERSE_BUTTON_MASK_TABLE_PREFIX),
+        )
+
+    def __str__(self) -> str:
+        return (
+            "<%s, pixel_motion=(x=%i, y=%i), tile_motion=(x=%i, y=%i)>"
+        ) % (
+            super().__str__().strip("<>"),
+            *self.pixel_motion,
+            *self.tile_motion,
         )
 
 
@@ -366,9 +420,20 @@ class MouseButtonEvent(MouseState):
     def __repr__(self) -> str:
         return "tcod.event.%s(pixel=%r, tile=%r, button=%s)" % (
             self.__class__.__name__,
-            self.pixel,
-            self.tile,
-            _REVERSE_BUTTON_TABLE[self.button],
+            tuple(self.pixel),
+            tuple(self.tile),
+            _REVERSE_BUTTON_TABLE_PREFIX[self.button],
+        )
+
+    def __str__(self) -> str:
+        return (
+            "<type=%r, pixel=(x=%i, y=%i), tile=(x=%i, y=%i), button=%s)"
+            % (
+                self.type,
+                *self.pixel,
+                *self.tile,
+                _REVERSE_BUTTON_TABLE[self.button],
+            )
         )
 
 
@@ -413,6 +478,14 @@ class MouseWheel(Event):
             ", flipped=True" if self.flipped else "",
         )
 
+    def __str__(self) -> str:
+        return "<%s, x=%i, y=%i, flipped=%r)" % (
+            super().__str__().strip("<>"),
+            self.x,
+            self.y,
+            self.flipped,
+        )
+
 
 class TextInput(Event):
     """
@@ -433,6 +506,9 @@ class TextInput(Event):
 
     def __repr__(self) -> str:
         return "tcod.event.%s(text=%r)" % (self.__class__.__name__, self.text)
+
+    def __str__(self) -> str:
+        return "<%s, text=%r)" % (super().__str__().strip("<>"), self.text)
 
 
 class WindowEvent(Event):
@@ -505,6 +581,13 @@ class WindowMoved(WindowEvent):
             self.y,
         )
 
+    def __str__(self) -> str:
+        return "<%s, x=%r, y=%r)" % (
+            super().__str__().strip("<>"),
+            self.x,
+            self.y,
+        )
+
 
 class WindowResized(WindowEvent):
     """
@@ -523,6 +606,13 @@ class WindowResized(WindowEvent):
         return "tcod.event.%s(type=%r, width=%r, height=%r)" % (
             self.__class__.__name__,
             self.type,
+            self.width,
+            self.height,
+        )
+
+    def __str__(self) -> str:
+        return "<%s, width=%r, height=%r)" % (
+            super().__str__().strip("<>"),
             self.width,
             self.height,
         )
@@ -755,6 +845,11 @@ def get_mouse_state() -> MouseState:
     buttons = tcod.lib.SDL_GetMouseState(xy, xy + 1)
     x, y = _pixel_to_tile(*xy)
     return MouseState((xy[0], xy[1]), (int(x), int(y)), buttons)
+
+
+@tcod.ffi.def_extern()  # type: ignore
+def _pycall_event_watch(userdata: Any, sdl_event: Any) -> int:
+    return 0
 
 
 __all__ = [

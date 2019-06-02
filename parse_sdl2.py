@@ -16,14 +16,21 @@ RE_REMOVALS = re.compile(
     re.DOTALL,
 )
 RE_DEFINE = re.compile(r"#define \w+(?!\() (?:.*?(?:\\\n)?)*$", re.MULTILINE)
-RE_TYPEDEF = re.compile(r"typedef[^{;#]*?(?:{[^}]*\n}[^;]*)?;", re.MULTILINE)
+RE_TYPEDEF = re.compile(r"^typedef[^{;#]*?(?:{[^}]*\n}[^;]*)?;", re.MULTILINE)
+RE_ENUM = re.compile(r"^enum[^{;#]*?(?:{[^}]*\n}[^;]*)?;", re.MULTILINE)
 RE_DECL = re.compile(r"^extern[^#\n]*\([^#]*?\);$", re.MULTILINE | re.DOTALL)
 RE_ENDIAN = re.compile(
     r"#if SDL_BYTEORDER == SDL_LIL_ENDIAN(.*?)#else(.*?)#endif", re.DOTALL
 )
+RE_ENDIAN2 = re.compile(
+    r"#if SDL_BYTEORDER == SDL_BIG_ENDIAN(.*?)#else(.*?)#endif", re.DOTALL
+)
 RE_DEFINE_TRUNCATE = re.compile(r"(#define\s+\w+\s+).+$", flags=re.DOTALL)
 RE_TYPEDEF_TRUNCATE = re.compile(
     r"(typedef\s+\w+\s+\w+)\s*{.*\n}(?=.*;$)", flags=re.DOTALL | re.MULTILINE
+)
+RE_ENUM_TRUNCATE = re.compile(
+    r"(\w+\s*=).+?(?=,$|})(?![^(']*\))", re.MULTILINE | re.DOTALL
 )
 
 
@@ -39,6 +46,10 @@ def get_header(name: str) -> str:
     header = RE_ENDIAN.sub(
         r"\1" if sys.byteorder == "little" else r"\2", header
     )
+    header = RE_ENDIAN2.sub(
+        r"\1" if sys.byteorder != "little" else r"\2", header
+    )
+
     # Ignore bad ARM compiler typedef.
     header = header.replace("typedef int SDL_bool;", "")
     return header
@@ -86,6 +97,9 @@ def parse(header: str, NEEDS_PACK4: bool) -> Iterator[str]:
         if NEEDS_PACK4 and "typedef struct SDL_DollarGestureEvent" in typedef:
             typedef = RE_TYPEDEF_TRUNCATE.sub(r"\1 { ...; }", typedef)
         yield typedef
+
+    for enum in RE_ENUM.findall(header):
+        yield RE_ENUM_TRUNCATE.sub(r"\1 ...", enum)
 
     for decl in RE_DECL.findall(header):
         if "SDL_RWops" in decl:
