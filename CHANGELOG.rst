@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+10.1.1 - 2019-06-02
+-------------------
 Fixed
  - Fixed regressions in text alignment for non-rectangle print functions.
 
