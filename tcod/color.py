@@ -17,7 +17,7 @@ class Color(List[int]):
         b (int): Blue value, from 0 to 255.
     """
 
-    def __init__(self, r: int = 0, g: int = 0, b: int = 0) -> "Color":
+    def __init__(self, r: int = 0, g: int = 0, b: int = 0) -> None:
         list.__setitem__(self, slice(None), (r & 0xFF, g & 0xFF, b & 0xFF))
 
     @property
@@ -27,7 +27,7 @@ class Color(List[int]):
         .. deprecated:: 9.2
             Color attributes will not be mutable in the future.
         """
-        return self[0]
+        return int(self[0])
 
     @r.setter  # type: ignore
     @deprecate("Setting color attributes has been deprecated.")
@@ -41,7 +41,7 @@ class Color(List[int]):
         .. deprecated:: 9.2
             Color attributes will not be mutable in the future.
         """
-        return self[1]
+        return int(self[1])
 
     @g.setter  # type: ignore
     @deprecate("Setting color attributes has been deprecated.")
@@ -55,7 +55,7 @@ class Color(List[int]):
         .. deprecated:: 9.2
             Color attributes will not be mutable in the future.
         """
-        return self[2]
+        return int(self[2])
 
     @b.setter  # type: ignore
     @deprecate("Setting color attributes has been deprecated.")
@@ -67,7 +67,7 @@ class Color(List[int]):
         """new in libtcod-cffi"""
         return cls(cdata.r, cdata.g, cdata.b)
 
-    def __getitem__(self, index: Any) -> int:  # type: ignore
+    def __getitem__(self, index: Any) -> Any:
         """
         .. deprecated:: 9.2
             Accessing colors via a letter index is deprecated.
@@ -133,7 +133,7 @@ class Color(List[int]):
 
     def __repr__(self) -> str:
         """Return a printable representation of the current color."""
-        return "%s(%i, %i, %i)" % (
+        return "%s(%r, %r, %r)" % (
             self.__class__.__name__,
             self.r,
             self.g,
