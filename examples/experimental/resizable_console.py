@@ -4,6 +4,8 @@
 # published from: United States.
 # https://creativecommons.org/publicdomain/zero/1.0/
 """An example showing the console being resized to fit the window."""
+from typing import Tuple
+
 import tcod
 import tcod.event
 import tcod.tileset
@@ -11,10 +13,22 @@ import tcod.tileset
 import custrender  # Using the custom renderer engine.
 
 
+def fit_console(width: int, height: int) -> Tuple[int, int]:
+    """Return a console resolution the fits the given pixel resolution."""
+    # Use the current active tileset as a reference.
+    tileset = tcod.tileset.get_default()
+    return width // tileset.tile_width, height // tileset.tile_height
+
+
 def main() -> None:
-    with tcod.console_init_root(
-        20, 4, renderer=tcod.RENDERER_SDL2, vsync=True
-    ) as console:
+    window_flags = (
+        tcod.lib.SDL_WINDOW_RESIZABLE | tcod.lib.SDL_WINDOW_MAXIMIZED
+    )
+    renderer_flags = tcod.lib.SDL_RENDERER_PRESENTVSYNC
+    with custrender.init_sdl2(640, 480, None, window_flags, renderer_flags):
+        console = tcod.console.Console(
+            *fit_console(*custrender.get_renderer_size())
+        )
         TEXT = "Resizable console with no stretching."
         while True:
             console.clear()
@@ -36,12 +50,9 @@ def main() -> None:
                 if event.type == "QUIT":
                     raise SystemExit()
                 elif event.type == "WINDOWRESIZED":
-                    # Use the current active tileset as a reference.
-                    tileset = tcod.tileset.get_default()
                     # Replace `console` with a new one of the correct size.
                     console = tcod.console.Console(
-                        event.width // tileset.tile_width,
-                        event.height // tileset.tile_height,
+                        *fit_console(event.width, event.height)
                     )
 
 

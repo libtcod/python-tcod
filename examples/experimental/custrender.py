@@ -13,13 +13,63 @@ It can be extend to allow arbitrary rendering on top of the SDL renderer.
 It is also designed to be copied into your own project and imported as a
 module.
 """
-from typing import Optional, Tuple
+import os
+import sys
+
+from typing import Any, Optional, Tuple
 
 import tcod
 import tcod.tileset
 import tcod.event
 
-assert tcod.__version__ > "10.0.4", tcod.__version__
+assert tcod.__version__ > "10.1.1", tcod.__version__
+
+
+class LibtcodScope:
+    """When this context is exited, libtcod shuts down."""
+
+    def __enter__(self) -> None:
+        return None
+
+    def __exit__(self, type: Any, value: Any, traceback: Any) -> None:
+        tcod.lib.TCOD_console_delete(tcod.ffi.NULL)
+
+
+def init_sdl2(
+    width: int,
+    height: int,
+    title: Optional[str] = None,
+    window_flags: int = 0,
+    renderer_flags: int = 0,
+) -> LibtcodScope:
+    """Setup libtcod to use a customized SDL2 display.
+
+    `width` and `height` are the pixel resolution to use.
+
+    `title` is the window title bar text, if None the title will be the name
+    of the running script.
+
+    `window_flags` is a bit-field of SDL2 window flags such as
+    `tcod.lib.SDL_WINDOW_RESIZABLE`.  See the SDL2 docs for more flags:
+    https://wiki.libsdl.org/SDL_WindowFlags
+
+    `renderer_flags` is a bit-field of SDL2 renderer flags such as
+    `tcod.lib.SDL_RENDERER_PRESENTVSYNC`.  See the SDL2 docs for more flags:
+    https://wiki.libsdl.org/SDL_RendererFlags
+    Target texture support will always be requested regardless of the given
+    flags.
+
+    This function should be used with the `with` statement so that the display
+    will properly exit when your script exits.
+    """
+    if title is None:
+        title = os.path.basename(sys.argv[0])
+    error = tcod.lib.TCOD_sys_init_sdl2_renderer_(
+        width, height, title.encode("utf-8"), window_flags, renderer_flags
+    )
+    if error < 0:
+        raise RuntimeError(tcod.ffi.string(tcod.lib.TCOD_get_error()).decode())
+    return LibtcodScope()
 
 
 def get_renderer_size() -> Tuple[int, int]:
@@ -129,9 +179,12 @@ def accumulate(
 
 def main() -> None:
     """An example for the use of this module."""
-    with tcod.console_init_root(
-        20, 4, renderer=tcod.RENDERER_SDL2, vsync=True
-    ) as console:
+    window_flags = (
+        tcod.lib.SDL_WINDOW_RESIZABLE | tcod.lib.SDL_WINDOW_MAXIMIZED
+    )
+    renderer_flags = tcod.lib.SDL_RENDERER_PRESENTVSYNC
+    with init_sdl2(640, 480, None, window_flags, renderer_flags):
+        console = tcod.console.Console(20, 4)
         TEXT = "Console with a fixed aspect ratio and integer scaling."
         console.print_box(0, 0, 0, 0, TEXT)
         while True:
@@ -150,7 +203,7 @@ def main() -> None:
                 elif event.type == "WINDOWRESIZED":
                     # You can change to a console of a different size in
                     # response to a WINDOWRESIZED event if you want.
-                    ...
+                    ...  # See resizable_console.py
 
 
 if __name__ == "__main__":
