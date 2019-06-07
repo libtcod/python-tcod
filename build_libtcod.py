@@ -136,7 +136,7 @@ else:
         r".*-I(\S+)",
         subprocess.check_output(
             ["sdl2-config", "--cflags"], universal_newlines=True
-        )
+        ),
     )
     assert match
     SDL2_INCLUDE, = match.groups()
@@ -144,8 +144,9 @@ else:
 if sys.platform == "win32":
     include_dirs.append(SDL2_INCLUDE)
     ARCH_MAPPING = {"32bit": "x86", "64bit": "x64"}
-    SDL2_LIB_DIR = os.path.join(SDL2_BUNDLE_PATH, "lib/",
-                                ARCH_MAPPING[BITSIZE])
+    SDL2_LIB_DIR = os.path.join(
+        SDL2_BUNDLE_PATH, "lib/", ARCH_MAPPING[BITSIZE]
+    )
     library_dirs.append(SDL2_LIB_DIR)
     SDL2_LIB_DEST = os.path.join("tcod", ARCH_MAPPING[BITSIZE])
     if not os.path.exists(SDL2_LIB_DEST):
@@ -308,7 +309,7 @@ except Exception:
 
 tdl_build = os.environ.get("TDL_BUILD", "RELEASE").upper()
 
-MSVC_CFLAGS = {"DEBUG": ["/Od"], "RELEASE": ["/GL", "/O2", "/GS-"]}
+MSVC_CFLAGS = {"DEBUG": ["/Od"], "RELEASE": ["/GL", "/O2", "/GS-", "/wd4996"]}
 MSVC_LDFLAGS = {"DEBUG": [], "RELEASE": ["/LTCG"]}
 GCC_CFLAGS = {
     "DEBUG": ["-Og", "-g", "-fPIC"],
@@ -336,7 +337,6 @@ else:
 
 ffi = FFI()
 parse_sdl2.add_to_ffi(ffi, SDL2_INCLUDE)
-#ffi.include(parse_sdl2.get_ffi(SDL2_INCLUDE))
 ffi.cdef(get_cdef())
 ffi.cdef(open(CFFI_EXTRA_CDEFS, "r").read())
 ffi.set_source(
