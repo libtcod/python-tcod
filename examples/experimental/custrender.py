@@ -16,6 +16,7 @@ module.
 import os
 import sys
 
+import math
 from typing import Any, Optional, Tuple
 
 import tcod
@@ -177,6 +178,38 @@ def accumulate(
     tcod.lib.TCOD_sys_accumulate_console_(console.console_c, viewport)
 
 
+def pixel_to_subtile(
+    pixel: Tuple[float, float],
+    console: tcod.console.Console,
+    viewport: Tuple[int, int, int, int],
+) -> Tuple[float, float]:
+    """Covert pixel coordinates to floating point tile coordinates.
+
+    Parameters are the same as `pixel_to_tile`.
+    """
+    return (
+        (pixel[0] - viewport[0]) / viewport[2] * console.width,
+        (pixel[1] - viewport[1]) / viewport[3] * console.height,
+    )
+
+
+def pixel_to_tile(
+    pixel: Tuple[float, float],
+    console: tcod.console.Console,
+    viewport: Tuple[int, int, int, int],
+) -> Tuple[int, int]:
+    """Covert pixel coordinates to integer tile coordinates.
+
+    `pixel` are the pixel coordinates to use such as the ones returned by a
+    `event.type=="MOUSEMOTION"`'s `event.pixel` attribute.
+
+    `console` and `viewport` should be the same arguments previously passed to
+    `accumulate`.  They are used as references to convert from pixels to tiles.
+    """
+    x, y = pixel_to_subtile(pixel, console, viewport)
+    return math.floor(x), math.floor(y)
+
+
 def main() -> None:
     """An example for the use of this module."""
     window_flags = (
@@ -184,14 +217,15 @@ def main() -> None:
     )
     renderer_flags = tcod.lib.SDL_RENDERER_PRESENTVSYNC
     with init_sdl2(640, 480, None, window_flags, renderer_flags):
-        console = tcod.console.Console(20, 4)
+        console = tcod.console.Console(20, 4, order="F")
         TEXT = "Console with a fixed aspect ratio and integer scaling."
         console.print_box(0, 0, 0, 0, TEXT)
         while True:
             # Clear background with white.
             clear((255, 255, 255))
             # Draw the console to SDL's buffer.
-            accumulate(console, get_viewport(console, True, True))
+            viewport = get_viewport(console, True, True)
+            accumulate(console, viewport)
             # If you want you can use the FFI to do additional drawing here:
             ...
             # Present the SDL2 renderer to the display.
@@ -200,6 +234,15 @@ def main() -> None:
             for event in tcod.event.wait():
                 if event.type == "QUIT":
                     raise SystemExit()
+                elif event.type == "MOUSEMOTION":
+                    # Mouse pixel coordinates will need to be converted to
+                    # tiles using the console and viewport as a reference.
+                    x, y = pixel_to_tile(event.pixel, console, viewport)
+                    console.tiles["bg"] = (0, 0, 0, 255)
+                    console.tiles["fg"] = (255, 255, 255, 255)
+                    if 0 <= x < console.width and 0 <= y < console.height:
+                        console.tiles["bg"][x, y] = (255, 255, 255, 255)
+                        console.tiles["fg"][x, y] = (0, 0, 0, 255)
                 elif event.type == "WINDOWRESIZED":
                     # You can change to a console of a different size in
                     # response to a WINDOWRESIZED event if you want.
