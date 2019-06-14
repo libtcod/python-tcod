@@ -2,7 +2,7 @@
 
 
 """
-from typing import Any
+from typing import Any, Tuple
 
 import numpy as np
 
@@ -146,8 +146,7 @@ class Map(object):
 
 def compute_fov(
     transparency: np.array,
-    x: int,
-    y: int,
+    pov: Tuple[int, int],
     radius: int = 0,
     light_walls: bool = True,
     algorithm: int = tcod.constants.FOV_RESTRICTIVE,
@@ -158,10 +157,11 @@ def compute_fov(
     considered transparent.  The returned array will match the shape of this
     array.
 
-    `x` and `y` are the 1st and 2nd coordinates of the origin point.  Areas
-    are visible when they can be seen from this point-of-view.
+    `pov` is the point-of-view origin point.  Areas are visible if they can
+    be seen from this position.  The axes of the `pov` should match the axes
+    of the `transparency` array.
 
-    `radius` is the maximum view distance from `x`/`y`.  If this is zero then
+    `radius` is the maximum view distance from `pov`.  If this is zero then
     the maximum distance is used.
 
     If `light_walls` is True then visible obstacles will be returned, otherwise
@@ -182,8 +182,10 @@ def compute_fov(
 
     .. versionadded:: 9.3
 
-    Example::
+    .. versionchanged:: 11.0
+        The parameters `x` and `y` have been changed to `pov`.
 
+    Example:
         >>> explored = np.zeros((3, 5), dtype=bool, order="F")
         >>> transparency = np.ones((3, 5), dtype=bool, order="F")
         >>> transparency[:2, 2] = False
@@ -191,19 +193,25 @@ def compute_fov(
         array([[ True,  True, False,  True,  True],
                [ True,  True, False,  True,  True],
                [ True,  True,  True,  True,  True]]...)
-        >>> visible = tcod.map.compute_fov(transparency, 0, 0)
+        >>> visible = tcod.map.compute_fov(transparency, (0, 0))
         >>> visible  # Visible area.
         array([[ True,  True,  True, False, False],
                [ True,  True,  True, False, False],
                [ True,  True,  True,  True, False]]...)
         >>> explored |= visible  # Keep track of an explored area.
     """
+    transparency = np.asarray(transparency)
     if len(transparency.shape) != 2:
         raise TypeError(
             "transparency must be an array of 2 dimensions"
             " (shape is %r)" % transparency.shape
         )
+    if isinstance(pov, int):
+        raise TypeError(
+            "The tcod.map.compute_fov function has changed.  The `x` and `y`"
+            " parameters should now be given as a single tuple."
+        )
     map_ = Map(transparency.shape[1], transparency.shape[0])
     map_.transparent[...] = transparency
-    map_.compute_fov(x, y, radius, light_walls, algorithm)
+    map_.compute_fov(pov[1], pov[0], radius, light_walls, algorithm)
     return map_.fov

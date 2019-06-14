@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - `tcod.map.compute_fov` now takes a 2-item tuple instead of separate `x` and
+   `y` parameters.  This causes less confusion over how axes are aligned.
 
 10.1.1 - 2019-06-02
 -------------------
