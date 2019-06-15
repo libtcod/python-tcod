@@ -151,7 +151,7 @@ def compute_fov(
     light_walls: bool = True,
     algorithm: int = tcod.constants.FOV_RESTRICTIVE,
 ) -> np.array:
-    """Return the visible area of a field-of-view computation.
+    """Return a boolean mask of the area covered by a field-of-view.
 
     `transparency` is a 2 dimensional array where all non-zero values are
     considered transparent.  The returned array will match the shape of this
@@ -199,6 +199,11 @@ def compute_fov(
                [ True,  True,  True, False, False],
                [ True,  True,  True,  True, False]]...)
         >>> explored |= visible  # Keep track of an explored area.
+
+    .. seealso::
+        :any:`numpy.nonzero`
+        :any:`numpy.choose`
+        :any:`numpy.select`
     """
     transparency = np.asarray(transparency)
     if len(transparency.shape) != 2:

@@ -129,7 +129,9 @@ def load_truetype_font(
     """
     if not os.path.exists(path):
         raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(path),))
-    cdata = lib.TCOD_load_truetype_font_(path.encode(), tile_width, tile_height)
+    cdata = lib.TCOD_load_truetype_font_(
+        path.encode(), tile_width, tile_height
+    )
     if not cdata:
         raise RuntimeError(ffi.string(lib.TCOD_get_error()))
     return Tileset._claim(cdata)

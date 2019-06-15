@@ -788,6 +788,9 @@ class Console:
 
         This is useful for some Python IDE's like IDLE, where the window would
         not be closed on its own otherwise.
+
+        .. seealso::
+            :any:`tcod.console_init_root`
         """
         if self.console_c != ffi.NULL:
             raise NotImplementedError("Only the root console has a context.")
@@ -796,14 +799,14 @@ class Console:
     def __exit__(self, *args: Any) -> None:
         """Closes the graphical window on exit.
 
-        Some tcod functions may have undefined behaviour after this point.
+        Some tcod functions may have undefined behavior after this point.
         """
         lib.TCOD_console_delete(self.console_c)
 
     def __bool__(self) -> bool:
         """Returns False if this is the root console.
 
-        This mimics libtcodpy behaviour.
+        This mimics libtcodpy behavior.
         """
         return bool(self.console_c != ffi.NULL)
 
@@ -940,7 +943,7 @@ class Console:
         may change in future versions.
 
         `width` and `height` determine the bounds of the rectangle, the text
-        will automatically be broken to fit within these bounds.
+        will automatically be word-wrapped to fit within these bounds.
 
         `string` is a Unicode string which may include color control
         characters.
