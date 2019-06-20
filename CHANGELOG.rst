@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - Better runtime checks for Windows dependencies.
 
 11.0.0 - 2019-06-14
 -------------------
