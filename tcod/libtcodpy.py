@@ -3156,7 +3156,7 @@ def line_iter(xo: int, yo: int, xd: int, yd: int) -> Iterator[Tuple[int, int]]:
 
 def line_where(
     x1: int, y1: int, x2: int, y2: int, inclusive: bool = True
-) -> Tuple[np.array, np.array]:
+) -> Tuple[np.ndarray, np.ndarray]:
     """Return a NumPy index array following a Bresenham line.
 
     If `inclusive` is true then the start point is included in the result.

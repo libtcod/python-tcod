@@ -82,17 +82,17 @@ class Map(object):
         )
 
     @property
-    def transparent(self) -> np.array:
+    def transparent(self) -> np.ndarray:
         buffer = self.__buffer[:, :, 0]
         return buffer.T if self._order == "F" else buffer
 
     @property
-    def walkable(self) -> np.array:
+    def walkable(self) -> np.ndarray:
         buffer = self.__buffer[:, :, 1]
         return buffer.T if self._order == "F" else buffer
 
     @property
-    def fov(self) -> np.array:
+    def fov(self) -> np.ndarray:
         buffer = self.__buffer[:, :, 2]
         return buffer.T if self._order == "F" else buffer
 
@@ -145,12 +145,12 @@ class Map(object):
 
 
 def compute_fov(
-    transparency: np.array,
+    transparency: np.ndarray,
     pov: Tuple[int, int],
     radius: int = 0,
     light_walls: bool = True,
     algorithm: int = tcod.constants.FOV_RESTRICTIVE,
-) -> np.array:
+) -> np.ndarray:
     """Return a boolean mask of the area covered by a field-of-view.
 
     `transparency` is a 2 dimensional array where all non-zero values are

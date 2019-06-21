@@ -113,7 +113,7 @@ class Console:
         width: int,
         height: int,
         order: str = "C",
-        buffer: Optional[np.array] = None,
+        buffer: Optional[np.ndarray] = None,
     ):
         self._key_color = None  # type: Optional[Tuple[int, int, int]]
         self._order = tcod._internal.verify_order(order)
@@ -206,7 +206,7 @@ class Console:
         return lib.TCOD_console_get_height(self.console_c)  # type: ignore
 
     @property
-    def bg(self) -> np.array:
+    def bg(self) -> np.ndarray:
         """A uint8 array with the shape (height, width, 3).
 
         You can change the consoles background colors by using this array.
@@ -221,7 +221,7 @@ class Console:
         return bg
 
     @property
-    def fg(self) -> np.array:
+    def fg(self) -> np.ndarray:
         """A uint8 array with the shape (height, width, 3).
 
         You can change the consoles foreground colors by using this array.
@@ -235,7 +235,7 @@ class Console:
         return fg
 
     @property
-    def ch(self) -> np.array:
+    def ch(self) -> np.ndarray:
         """An integer array with the shape (height, width).
 
         You can change the consoles character codes by using this array.
@@ -246,7 +246,7 @@ class Console:
         return self._tiles["ch"].T if self._order == "F" else self._tiles["ch"]
 
     @property
-    def tiles(self) -> np.array:
+    def tiles(self) -> np.ndarray:
         """An array of this consoles tile data.
 
         This acts as a combination of the `ch`, `fg`, and `bg` attributes.

@@ -156,7 +156,7 @@ class NodeCostArray(np.ndarray):  # type: ignore
         np.uint32: ("uint32_t*", _get_pathcost_func("PathCostArrayUInt32")),
     }
 
-    def __new__(cls, array: np.array) -> "NodeCostArray":
+    def __new__(cls, array: np.ndarray) -> "NodeCostArray":
         """Validate a numpy array and setup a C callback."""
         self = np.asarray(array).view(cls)
         return self  # type: ignore

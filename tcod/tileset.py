@@ -52,7 +52,7 @@ class Tileset:
             == 0
         )
 
-    def get_tile(self, codepoint: int) -> np.array:
+    def get_tile(self, codepoint: int) -> np.ndarray:
         """Return a copy of a tile for the given codepoint.
 
         If the tile does not exist yet then a blank array will be returned.
@@ -69,7 +69,7 @@ class Tileset:
         )
         return tile
 
-    def set_tile(self, codepoint: int, tile: np.array) -> None:
+    def set_tile(self, codepoint: int, tile: np.ndarray) -> None:
         """Upload a tile into this array.
 
         The tile can be in 32-bit color (height, width, rgba), or grey-scale

@@ -159,7 +159,7 @@ class Noise(object):
         """
         return float(lib.NoiseGetSample(self._tdl_noise_c, (x, y, z, w)))
 
-    def sample_mgrid(self, mgrid: np.array) -> np.array:
+    def sample_mgrid(self, mgrid: np.ndarray) -> np.ndarray:
         """Sample a mesh-grid array and return the result.
 
         The :any:`sample_ogrid` method performs better as there is a lot of
@@ -195,7 +195,7 @@ class Noise(object):
         )
         return out
 
-    def sample_ogrid(self, ogrid: np.array) -> np.array:
+    def sample_ogrid(self, ogrid: np.ndarray) -> np.ndarray:
         """Sample an open mesh-grid array and return the result.
 
         Args

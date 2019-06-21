@@ -11,6 +11,9 @@ Unreleased
 Changed
  - Better runtime checks for Windows dependencies.
 
+Fixed
+ - Resolved NumPy type hints which could cause issues.
+
 11.0.0 - 2019-06-14
 -------------------
 Changed
