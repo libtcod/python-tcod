@@ -107,15 +107,11 @@ sources += ["libtcod/src/vendor/utf8proc/utf8proc.c"]
 sources += glob.glob("libtcod/src/vendor/zlib/*.c")
 
 if sys.platform == "win32":
-    libraries += ["User32", "OpenGL32"]
+    libraries += ["User32"]
     define_macros.append(("TCODLIB_API", ""))
     define_macros.append(("_CRT_SECURE_NO_WARNINGS", None))
 
-if "linux" in sys.platform:
-    libraries += ["GL"]
-
 if sys.platform == "darwin":
-    extra_link_args += ["-framework", "OpenGL"]
     extra_link_args += ["-framework", "SDL2"]
 else:
     libraries += ["SDL2"]

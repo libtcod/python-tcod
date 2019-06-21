@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - You no longer need OpenGL to build python-tcod.
 
 11.0.1 - 2019-06-21
 -------------------
