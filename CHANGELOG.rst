@@ -8,11 +8,16 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.0.1 - 2019-06-21
+-------------------
 Changed
- - Better runtime checks for Windows dependencies.
+ - Better runtime checks for Windows dependencies should now give different
+   errors depending on if the issue is SDL2 or missing redistributables.
 
 Fixed
- - Resolved NumPy type hints which could cause issues.
+ - Changed NumPy type hints from `np.array` to `np.ndarray` which should
+   resolve issues.
 
 11.0.0 - 2019-06-14
 -------------------
