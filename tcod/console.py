@@ -696,9 +696,9 @@ class Console:
         """Blit from this console onto the ``dest`` console.
 
         Args:
-            dest (Console): The destintaion console to blit onto.
-            dest_x (int): Leftmost coordinate of the destintaion console.
-            dest_y (int): Topmost coordinate of the destintaion console.
+            dest (Console): The destination console to blit onto.
+            dest_x (int): Leftmost coordinate of the destination console.
+            dest_y (int): Topmost coordinate of the destination console.
             src_x (int): X coordinate from this console to blit, from the left.
             src_y (int): Y coordinate from this console to blit, from the top.
             width (int): The width of the region to blit.
