@@ -8,13 +8,16 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.0.2 - 2019-06-21
+-------------------
 Changed
  - You no longer need OpenGL to build python-tcod.
 
 11.0.1 - 2019-06-21
 -------------------
 Changed
- - Better runtime checks for Windows dependencies should now give different
+ - Better runtime checks for Windows dependencies should now give distinct
    errors depending on if the issue is SDL2 or missing redistributables.
 
 Fixed
