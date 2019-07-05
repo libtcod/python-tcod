@@ -2,6 +2,8 @@ import functools
 from typing import Any, Callable, TypeVar, cast
 import warnings
 
+from tcod.libtcod import lib, ffi
+
 FuncType = Callable[..., Any]
 F = TypeVar("F", bound=FuncType)
 
@@ -49,3 +51,9 @@ def handle_order(shape: Any, order: str) -> Any:
         return shape
     else:
         return tuple(reversed(shape))
+
+
+def _check(error: int) -> None:
+    """Detect and convert a libtcod error code it into an exception."""
+    if error < 0:
+        raise RuntimeError(ffi.string(lib.TCOD_get_error()).decode())

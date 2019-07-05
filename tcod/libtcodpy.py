@@ -37,7 +37,7 @@ from tcod.constants import (
     KEY_RELEASED,
 )
 
-from tcod._internal import deprecate, pending_deprecate
+from tcod._internal import deprecate, pending_deprecate, _check
 
 from tcod.tcod import _int, _unpack_char_p
 from tcod.tcod import _bytes, _unicode, _fmt
@@ -954,10 +954,11 @@ def console_init_root(
         )
     if not NEW_RENDERER:
         vsync = False
-    if lib.TCOD_console_init_root_(
-        w, h, _bytes(title), fullscreen, renderer, vsync
-    ):
-        raise RuntimeError(ffi.string(lib.TCOD_get_error()).decode())
+    _check(
+        lib.TCOD_console_init_root_(
+            w, h, _bytes(title), fullscreen, renderer, vsync
+        )
+    )
     console = tcod.console.Console._get_root(order)
     console.clear()
     return console
@@ -994,10 +995,11 @@ def console_set_custom_font(
         raise RuntimeError(
             "File not found:\n\t%s" % (os.path.realpath(fontFile),)
         )
-    if lib.TCOD_console_set_custom_font(
-        _bytes(fontFile), flags, nb_char_horiz, nb_char_vertic
-    ):
-        raise RuntimeError(ffi.string(lib.TCOD_get_error()).decode())
+    _check(
+        lib.TCOD_console_set_custom_font(
+            _bytes(fontFile), flags, nb_char_horiz, nb_char_vertic
+        )
+    )
 
 
 @deprecate("Check `con.width` instead.")
@@ -4005,7 +4007,7 @@ def sys_set_renderer(renderer: int) -> None:
     .. deprecated:: 2.0
        RENDERER_GLSL and RENDERER_OPENGL are not currently available.
     """
-    lib.TCOD_sys_set_renderer(renderer)
+    _check(lib.TCOD_sys_set_renderer(renderer))
     if tcod.console._root_console is not None:
         tcod.console.Console._get_root()
 

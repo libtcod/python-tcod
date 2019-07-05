@@ -8,6 +8,17 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - You can now set the `TCOD_RENDERER` and `TCOD_VSYNC` environment variables to
+   force specific options to be used.
+   Example: ``TCOD_RENDERER=sdl2 TCOD_VSYNC=1``
+
+Changed
+ - `tcod.sys_set_renderer` now raises an exception if it fails.
+
+Fixed
+ - `tcod.console_map_ascii_code_to_font` functions will now work when called
+   before `tcod.console_init_root`.
 
 11.0.2 - 2019-06-21
 -------------------
