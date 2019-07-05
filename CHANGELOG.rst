@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.1.0 - 2019-07-05
+-------------------
 Added
  - You can now set the `TCOD_RENDERER` and `TCOD_VSYNC` environment variables to
    force specific options to be used.
