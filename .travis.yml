@@ -30,7 +30,7 @@ matrix:
     env: PYPY3_VERSION=pypy3.5-v7.0.0
   - os: osx
     language: generic
-    env: PYPY3_VERSION=pypy3.6-v7.1.0
+    env: PYPY3_VERSION=pypy3.6-v7.1.1
   allow_failures:
   - python: nightly
   - python: pypy3.5-7.0
@@ -68,7 +68,7 @@ install:
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-wheel -v dist/*.whl; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-listdeps --all dist/*.whl; fi'
 before_script:
-- pip install --upgrade pytest pytest-cov pytest-faulthandler
+- pip install --upgrade pytest pytest-cov
 script:
 - pytest -v
 after_success:
