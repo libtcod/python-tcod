@@ -1,4 +1,7 @@
 """Tileset and font related functions.
+
+Remember to add the line ``import tcod.tileset``, as importing this module is
+not implied by ``import tcod``.
 """
 import os
 
