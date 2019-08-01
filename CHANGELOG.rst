@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Changing the tiles of an active tileset will now work correctly.
 
 11.1.0 - 2019-07-05
 -------------------
