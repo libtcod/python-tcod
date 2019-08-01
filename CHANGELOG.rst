@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.1.1 - 2019-08-01
+-------------------
 Deprecated
  - Using an out-of-bounds index for field-of-view operations now raises a
    warning, which will later become an error.
