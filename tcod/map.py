@@ -3,6 +3,7 @@
 
 """
 from typing import Any, Tuple
+import warnings
 
 import numpy as np
 
@@ -118,6 +119,15 @@ class Map(object):
         If you already have transparency in a NumPy array then you could use
         :any:`tcod.map_compute_fov` instead.
         """
+        if not (0 <= x < self.width and 0 <= y < self.height):
+            warnings.warn(
+                "Index (%r, %r) is outside of this maps shape (%r, %r)."
+                "\nThis will raise an error in future versions."
+                % (x, y, self.width, self.height),
+                RuntimeWarning,
+                stacklevel=2,
+            )
+
         lib.TCOD_map_compute_fov(
             self.map_c, x, y, radius, light_walls, algorithm
         )
@@ -158,8 +168,9 @@ def compute_fov(
     array.
 
     `pov` is the point-of-view origin point.  Areas are visible if they can
-    be seen from this position.  The axes of the `pov` should match the axes
-    of the `transparency` array.
+    be seen from this position.  `pov` should be a 2D index matching the axes
+    of the `transparency` array, and must be within the bounds of the
+    `transparency` array.
 
     `radius` is the maximum view distance from `pov`.  If this is zero then
     the maximum distance is used.
@@ -216,7 +227,20 @@ def compute_fov(
             "The tcod.map.compute_fov function has changed.  The `x` and `y`"
             " parameters should now be given as a single tuple."
         )
+    if not (
+        0 <= pov[0] < transparency.shape[0]
+        and 0 <= pov[1] < transparency.shape[1]
+    ):
+        warnings.warn(
+            "Given pov index %r is outside the array of shape %r."
+            "\nThis will raise an error in future versions."
+            % (pov, transparency.shape),
+            RuntimeWarning,
+            stacklevel=2,
+        )
     map_ = Map(transparency.shape[1], transparency.shape[0])
     map_.transparent[...] = transparency
-    map_.compute_fov(pov[1], pov[0], radius, light_walls, algorithm)
+    lib.TCOD_map_compute_fov(
+        map_.map_c, pov[1], pov[0], radius, light_walls, algorithm
+    )
     return map_.fov

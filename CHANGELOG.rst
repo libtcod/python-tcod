@@ -8,6 +8,10 @@ v2.0.0
 
 Unreleased
 ------------------
+Deprecated
+ - Using an out-of-bounds index for field-of-view operations now raises a
+   warning, which will later become an error.
+
 Fixed
  - Changing the tiles of an active tileset will now work correctly.
 
