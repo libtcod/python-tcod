@@ -25,7 +25,7 @@ except ImportError:
 # The SDL2 version to parse and export symbols from.
 SDL2_PARSE_VERSION = os.environ.get("SDL_VERSION", "2.0.5")
 # The SDL2 version to include in binary distributions.
-SDL2_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "2.0.9")
+SDL2_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "2.0.10")
 
 CFFI_HEADER = "tcod/cffi.h"
 CFFI_EXTRA_CDEFS = "tcod/cdef.h"

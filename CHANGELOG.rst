@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - Now bundles SDL 2.0.10 for Windows/MacOS.
+
 Fixed
  - Can now parse SDL 2.0.10 headers.
 
