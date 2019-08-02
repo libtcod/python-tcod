@@ -8,11 +8,14 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.1.2 - 2019-08-02
+-------------------
 Changed
  - Now bundles SDL 2.0.10 for Windows/MacOS.
 
 Fixed
- - Can now parse SDL 2.0.10 headers.
+ - Can now parse SDL 2.0.10 headers during installation without crashing.
 
 11.1.1 - 2019-08-01
 -------------------
