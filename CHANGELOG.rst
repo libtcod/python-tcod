@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Can now parse SDL 2.0.10 headers.
 
 11.1.1 - 2019-08-01
 -------------------

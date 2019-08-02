@@ -17,7 +17,7 @@ RE_REMOVALS = re.compile(
 )
 RE_DEFINE = re.compile(r"#define \w+(?!\() (?:.*?(?:\\\n)?)*$", re.MULTILINE)
 RE_TYPEDEF = re.compile(r"^typedef[^{;#]*?(?:{[^}]*\n}[^;]*)?;", re.MULTILINE)
-RE_ENUM = re.compile(r"^enum[^{;#]*?(?:{[^}]*\n}[^;]*)?;", re.MULTILINE)
+RE_ENUM = re.compile(r"^(?:typedef )?enum[^{;#]*?(?:{[^}]*\n}[^;]*)?;", re.MULTILINE)
 RE_DECL = re.compile(r"^extern[^#\n]*\([^#]*?\);$", re.MULTILINE | re.DOTALL)
 RE_ENDIAN = re.compile(
     r"#if SDL_BYTEORDER == SDL_LIL_ENDIAN(.*?)#else(.*?)#endif", re.DOTALL
@@ -74,6 +74,10 @@ def parse(header: str, NEEDS_PACK4: bool) -> Iterator[str]:
         # Replace various definitions with "..." since cffi is limited here.
         yield RE_DEFINE_TRUNCATE.sub(r"\1 ...", define)
 
+    for enum in RE_ENUM.findall(header):
+        yield RE_ENUM_TRUNCATE.sub(r"\1 ...", enum)
+        header = header.replace(enum, "")
+
     for typedef in RE_TYPEDEF.findall(header):
         # Special case for SDL window flags enum.
         if "SDL_WINDOW_FULLSCREEN_DESKTOP" in typedef:
@@ -97,9 +101,6 @@ def parse(header: str, NEEDS_PACK4: bool) -> Iterator[str]:
         if NEEDS_PACK4 and "typedef struct SDL_DollarGestureEvent" in typedef:
             typedef = RE_TYPEDEF_TRUNCATE.sub(r"\1 { ...; }", typedef)
         yield typedef
-
-    for enum in RE_ENUM.findall(header):
-        yield RE_ENUM_TRUNCATE.sub(r"\1 ...", enum)
 
     for decl in RE_DECL.findall(header):
         if "SDL_RWops" in decl:
