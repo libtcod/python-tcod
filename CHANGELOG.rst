@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Changing the tiles of an active tileset on OPENGL2 will no longer leave
+   temporary artifact tiles.
 
 11.1.2 - 2019-08-02
 -------------------
