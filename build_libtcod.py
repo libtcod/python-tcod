@@ -128,14 +128,19 @@ if sys.platform == "win32":
 elif sys.platform == "darwin":
     SDL2_INCLUDE = os.path.join(SDL2_PARSE_PATH, "Versions/A/Headers")
 else:
-    match = re.match(
-        r".*-I(\S+)",
+    matches = re.findall(
+        r"-I(\S+)",
         subprocess.check_output(
             ["sdl2-config", "--cflags"], universal_newlines=True
         ),
     )
-    assert match
-    SDL2_INCLUDE, = match.groups()
+    assert matches
+
+    SDL2_INCLUDE = None
+    for match in matches:
+        if os.path.isfile(os.path.join(match, 'SDL_stdinc.h')):
+            SDL2_INCLUDE = match
+    assert SDL2_INCLUDE
 
 if sys.platform == "win32":
     include_dirs.append(SDL2_INCLUDE)
