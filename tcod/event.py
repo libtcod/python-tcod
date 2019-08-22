@@ -17,8 +17,8 @@ implied by ``import tcod``.
 """
 from typing import Any, Dict, Mapping, NamedTuple, Optional, Iterator, Tuple
 
-import tcod
 import tcod.event_constants
+from tcod.loader import ffi, lib
 from tcod.event_constants import *  # noqa: F4
 from tcod.event_constants import KMOD_SHIFT, KMOD_CTRL, KMOD_ALT, KMOD_GUI
 
@@ -61,24 +61,24 @@ def _describe_bitmask(
 
 def _pixel_to_tile(x: float, y: float) -> Tuple[float, float]:
     """Convert pixel coordinates to tile coordinates."""
-    xy = tcod.ffi.new("double[2]", (x, y))
-    tcod.lib.TCOD_sys_pixel_to_tile(xy, xy + 1)
+    xy = ffi.new("double[2]", (x, y))
+    lib.TCOD_sys_pixel_to_tile(xy, xy + 1)
     return xy[0], xy[1]
 
 
 Point = NamedTuple("Point", [("x", float), ("y", float)])
 
 # manually define names for SDL macros
-BUTTON_LEFT = tcod.lib.SDL_BUTTON_LEFT
-BUTTON_MIDDLE = tcod.lib.SDL_BUTTON_MIDDLE
-BUTTON_RIGHT = tcod.lib.SDL_BUTTON_RIGHT
-BUTTON_X1 = tcod.lib.SDL_BUTTON_X1
-BUTTON_X2 = tcod.lib.SDL_BUTTON_X2
-BUTTON_LMASK = tcod.lib.SDL_BUTTON_LMASK
-BUTTON_MMASK = tcod.lib.SDL_BUTTON_MMASK
-BUTTON_RMASK = tcod.lib.SDL_BUTTON_RMASK
-BUTTON_X1MASK = tcod.lib.SDL_BUTTON_X1MASK
-BUTTON_X2MASK = tcod.lib.SDL_BUTTON_X2MASK
+BUTTON_LEFT = lib.SDL_BUTTON_LEFT
+BUTTON_MIDDLE = lib.SDL_BUTTON_MIDDLE
+BUTTON_RIGHT = lib.SDL_BUTTON_RIGHT
+BUTTON_X1 = lib.SDL_BUTTON_X1
+BUTTON_X2 = lib.SDL_BUTTON_X2
+BUTTON_LMASK = lib.SDL_BUTTON_LMASK
+BUTTON_MMASK = lib.SDL_BUTTON_MMASK
+BUTTON_RMASK = lib.SDL_BUTTON_RMASK
+BUTTON_X1MASK = lib.SDL_BUTTON_X1MASK
+BUTTON_X2MASK = lib.SDL_BUTTON_X2MASK
 
 # reverse tables are used to get the tcod.event name from the value.
 _REVERSE_BUTTON_TABLE = {
@@ -500,7 +500,7 @@ class TextInput(Event):
 
     @classmethod
     def from_sdl_event(cls, sdl_event: Any) -> "TextInput":
-        self = cls(tcod.ffi.string(sdl_event.text.text, 32).decode("utf8"))
+        self = cls(ffi.string(sdl_event.text.text, 32).decode("utf8"))
         self.sdl_event = sdl_event
         return self
 
@@ -523,11 +523,11 @@ class WindowEvent(Event):
             return Undefined.from_sdl_event(sdl_event)
         event_type = cls.__WINDOW_TYPES[sdl_event.window.event].upper()
         self = None  # type: Any
-        if sdl_event.window.event == tcod.lib.SDL_WINDOWEVENT_MOVED:
+        if sdl_event.window.event == lib.SDL_WINDOWEVENT_MOVED:
             self = WindowMoved(sdl_event.window.data1, sdl_event.window.data2)
         elif sdl_event.window.event in (
-            tcod.lib.SDL_WINDOWEVENT_RESIZED,
-            tcod.lib.SDL_WINDOWEVENT_SIZE_CHANGED,
+            lib.SDL_WINDOWEVENT_RESIZED,
+            lib.SDL_WINDOWEVENT_SIZE_CHANGED,
         ):
             self = WindowResized(
                 event_type, sdl_event.window.data1, sdl_event.window.data2
@@ -541,22 +541,22 @@ class WindowEvent(Event):
         return "tcod.event.%s(type=%r)" % (self.__class__.__name__, self.type)
 
     __WINDOW_TYPES = {
-        tcod.lib.SDL_WINDOWEVENT_SHOWN: "WindowShown",
-        tcod.lib.SDL_WINDOWEVENT_HIDDEN: "WindowHidden",
-        tcod.lib.SDL_WINDOWEVENT_EXPOSED: "WindowExposed",
-        tcod.lib.SDL_WINDOWEVENT_MOVED: "WindowMoved",
-        tcod.lib.SDL_WINDOWEVENT_RESIZED: "WindowResized",
-        tcod.lib.SDL_WINDOWEVENT_SIZE_CHANGED: "WindowSizeChanged",
-        tcod.lib.SDL_WINDOWEVENT_MINIMIZED: "WindowMinimized",
-        tcod.lib.SDL_WINDOWEVENT_MAXIMIZED: "WindowMaximized",
-        tcod.lib.SDL_WINDOWEVENT_RESTORED: "WindowRestored",
-        tcod.lib.SDL_WINDOWEVENT_ENTER: "WindowEnter",
-        tcod.lib.SDL_WINDOWEVENT_LEAVE: "WindowLeave",
-        tcod.lib.SDL_WINDOWEVENT_FOCUS_GAINED: "WindowFocusGained",
-        tcod.lib.SDL_WINDOWEVENT_FOCUS_LOST: "WindowFocusLost",
-        tcod.lib.SDL_WINDOWEVENT_CLOSE: "WindowClose",
-        tcod.lib.SDL_WINDOWEVENT_TAKE_FOCUS: "WindowTakeFocus",
-        tcod.lib.SDL_WINDOWEVENT_HIT_TEST: "WindowHitTest",
+        lib.SDL_WINDOWEVENT_SHOWN: "WindowShown",
+        lib.SDL_WINDOWEVENT_HIDDEN: "WindowHidden",
+        lib.SDL_WINDOWEVENT_EXPOSED: "WindowExposed",
+        lib.SDL_WINDOWEVENT_MOVED: "WindowMoved",
+        lib.SDL_WINDOWEVENT_RESIZED: "WindowResized",
+        lib.SDL_WINDOWEVENT_SIZE_CHANGED: "WindowSizeChanged",
+        lib.SDL_WINDOWEVENT_MINIMIZED: "WindowMinimized",
+        lib.SDL_WINDOWEVENT_MAXIMIZED: "WindowMaximized",
+        lib.SDL_WINDOWEVENT_RESTORED: "WindowRestored",
+        lib.SDL_WINDOWEVENT_ENTER: "WindowEnter",
+        lib.SDL_WINDOWEVENT_LEAVE: "WindowLeave",
+        lib.SDL_WINDOWEVENT_FOCUS_GAINED: "WindowFocusGained",
+        lib.SDL_WINDOWEVENT_FOCUS_LOST: "WindowFocusLost",
+        lib.SDL_WINDOWEVENT_CLOSE: "WindowClose",
+        lib.SDL_WINDOWEVENT_TAKE_FOCUS: "WindowTakeFocus",
+        lib.SDL_WINDOWEVENT_HIT_TEST: "WindowHitTest",
     }
 
 
@@ -639,15 +639,15 @@ class Undefined(Event):
 
 
 _SDL_TO_CLASS_TABLE = {
-    tcod.lib.SDL_QUIT: Quit,
-    tcod.lib.SDL_KEYDOWN: KeyDown,
-    tcod.lib.SDL_KEYUP: KeyUp,
-    tcod.lib.SDL_MOUSEMOTION: MouseMotion,
-    tcod.lib.SDL_MOUSEBUTTONDOWN: MouseButtonDown,
-    tcod.lib.SDL_MOUSEBUTTONUP: MouseButtonUp,
-    tcod.lib.SDL_MOUSEWHEEL: MouseWheel,
-    tcod.lib.SDL_TEXTINPUT: TextInput,
-    tcod.lib.SDL_WINDOWEVENT: WindowEvent,
+    lib.SDL_QUIT: Quit,
+    lib.SDL_KEYDOWN: KeyDown,
+    lib.SDL_KEYUP: KeyUp,
+    lib.SDL_MOUSEMOTION: MouseMotion,
+    lib.SDL_MOUSEBUTTONDOWN: MouseButtonDown,
+    lib.SDL_MOUSEBUTTONUP: MouseButtonUp,
+    lib.SDL_MOUSEWHEEL: MouseWheel,
+    lib.SDL_TEXTINPUT: TextInput,
+    lib.SDL_WINDOWEVENT: WindowEvent,
 }  # type: Dict[int, Any]
 
 
@@ -672,8 +672,8 @@ def get() -> Iterator[Any]:
             else:
                 print(event)
     """
-    sdl_event = tcod.ffi.new("SDL_Event*")
-    while tcod.lib.SDL_PollEvent(sdl_event):
+    sdl_event = ffi.new("SDL_Event*")
+    while lib.SDL_PollEvent(sdl_event):
         if sdl_event.type in _SDL_TO_CLASS_TABLE:
             yield _SDL_TO_CLASS_TABLE[sdl_event.type].from_sdl_event(sdl_event)
         else:
@@ -704,9 +704,9 @@ def wait(timeout: Optional[float] = None) -> Iterator[Any]:
                 print(event)
     """
     if timeout is not None:
-        tcod.lib.SDL_WaitEventTimeout(tcod.ffi.NULL, int(timeout * 1000))
+        lib.SDL_WaitEventTimeout(ffi.NULL, int(timeout * 1000))
     else:
-        tcod.lib.SDL_WaitEvent(tcod.ffi.NULL)
+        lib.SDL_WaitEvent(ffi.NULL)
     return get()
 
 
@@ -841,13 +841,13 @@ def get_mouse_state() -> MouseState:
 
     .. addedversion:: 9.3
     """
-    xy = tcod.ffi.new("int[2]")
-    buttons = tcod.lib.SDL_GetMouseState(xy, xy + 1)
+    xy = ffi.new("int[2]")
+    buttons = lib.SDL_GetMouseState(xy, xy + 1)
     x, y = _pixel_to_tile(*xy)
     return MouseState((xy[0], xy[1]), (int(x), int(y)), buttons)
 
 
-@tcod.ffi.def_extern()  # type: ignore
+@ffi.def_extern()  # type: ignore
 def _pycall_event_watch(userdata: Any, sdl_event: Any) -> int:
     return 0
 

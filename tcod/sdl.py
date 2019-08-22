@@ -27,7 +27,7 @@ class _TempSurface:
                 "NumPy array must have RGB or RGBA channels. (got %r)"
                 % (self._array.shape,)
             )
-        self.p: Any = ffi.gc(
+        self.p = ffi.gc(
             lib.SDL_CreateRGBSurfaceFrom(
                 ffi.cast("void*", self._array.ctypes.data),
                 self._array.shape[1],  # Width.

@@ -192,7 +192,7 @@ class _PathFinder(object):
     def __init__(self, cost: Any, diagonal: float = 1.41):
         self.cost = cost
         self.diagonal = diagonal
-        self._path_c = None
+        self._path_c = None  # type: Any
         self._callback = self._userdata = None
 
         if hasattr(self.cost, "map_c"):
