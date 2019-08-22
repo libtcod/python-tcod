@@ -25,7 +25,7 @@ Example::
 """
 from typing import Any, Iterator, List, Optional, Tuple, Union  # noqa: F401
 
-from tcod.libtcod import lib, ffi
+from tcod.loader import lib, ffi
 from tcod._internal import deprecate
 import tcod.random
 

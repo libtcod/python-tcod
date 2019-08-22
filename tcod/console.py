@@ -31,7 +31,7 @@ import warnings
 import numpy as np
 
 import tcod.constants
-from tcod.libtcod import ffi, lib
+from tcod.loader import ffi, lib
 import tcod._internal
 from tcod._internal import deprecate
 

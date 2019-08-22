@@ -44,7 +44,7 @@ from typing import Any, Callable, List, Tuple, Union  # noqa: F401
 
 import numpy as np
 
-from tcod.libtcod import lib, ffi
+from tcod.loader import lib, ffi
 import tcod.map  # noqa: F401
 
 

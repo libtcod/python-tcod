@@ -5,7 +5,7 @@ from typing import Any, List
 import warnings
 
 from tcod._internal import deprecate
-from tcod.libtcod import lib
+from tcod.loader import lib
 
 
 class Color(List[int]):

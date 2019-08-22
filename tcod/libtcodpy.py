@@ -22,7 +22,7 @@ import warnings
 
 import numpy as np
 
-from tcod.libtcod import ffi, lib
+from tcod.loader import ffi, lib
 
 from tcod.constants import *  # noqa: F4
 from tcod.constants import (
@@ -39,11 +39,11 @@ from tcod.constants import (
 
 from tcod._internal import deprecate, pending_deprecate, _check
 
-from tcod.tcod import _int, _unpack_char_p
-from tcod.tcod import _bytes, _unicode, _fmt
-from tcod.tcod import _CDataWrapper
-from tcod.tcod import _PropagateException
-from tcod.tcod import _console
+from tcod._internal import _int, _unpack_char_p
+from tcod._internal import _bytes, _unicode, _fmt
+from tcod._internal import _CDataWrapper
+from tcod._internal import _PropagateException
+from tcod._internal import _console
 
 import tcod.bsp
 from tcod.color import Color

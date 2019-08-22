@@ -3,8 +3,8 @@ from typing import Any, Tuple
 import numpy as np
 
 import tcod.console
-from tcod.libtcod import ffi, lib
-from tcod.tcod import _console
+from tcod.loader import ffi, lib
+from tcod._internal import _console
 
 
 class _ImageBufferArray(np.ndarray):  # type: ignore

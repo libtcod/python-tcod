@@ -11,6 +11,7 @@ Unreleased
 Fixed
  - Changing the tiles of an active tileset on OPENGL2 will no longer leave
    temporary artifact tiles.
+ - It's now harder to accidentally import tcod's internal modules.
 
 11.1.2 - 2019-08-02
 -------------------
