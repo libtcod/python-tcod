@@ -40,11 +40,12 @@ Example::
     All path-finding functions now respect the NumPy array shape (if a NumPy
     array is used.)
 """
-from typing import Any, Callable, List, Tuple, Union  # noqa: F401
+from typing import Any, Callable, List, Optional, Tuple, Union  # noqa: F401
 
 import numpy as np
 
 from tcod.loader import lib, ffi
+from tcod._internal import _check
 import tcod.map  # noqa: F401
 
 
@@ -306,3 +307,156 @@ class Dijkstra(_PathFinder):
         while lib.TCOD_dijkstra_path_walk(self._path_c, pointer_x, pointer_y):
             path.append((pointer_x[0], pointer_y[0]))
         return path
+
+_INT_TYPES = {
+    np.int8: lib.np_int8,
+    np.int16: lib.np_int16,
+    np.int32: lib.np_int32,
+    np.int64: lib.np_int64,
+    np.uint8: lib.np_uint8,
+    np.uint16: lib.np_uint16,
+    np.uint32: lib.np_uint32,
+    np.uint64: lib.np_uint64,
+}
+
+def maxarray(shape: Tuple[int, ...], dtype: Any = int, order: str = "C") -> np.array:
+    """Return a new array filled with the maximum finite value for `dtype`.
+
+    `shape` is of the new array.  Same as other NumPy array initializers.
+
+    `dtype` should be a single NumPy integer type.
+
+    `order` can be "C" or "F".
+
+    This works the same as
+    ``np.full(shape, np.iinfo(dtype).max, dtype, order)``.
+
+    This kind of array is an ideal starting point for distance maps.  Just set
+    any point to a lower value such as 0 and then pass this array to a
+    function such as :any:`dijkstra2d`.
+    """
+    return np.full(shape, np.iinfo(dtype).max, dtype, order)
+
+def _export(array: np.array) -> Any:
+    """Convert a NumPy array into a ctype object."""
+    return ffi.new(
+        "struct NArray4*",
+        (
+            _INT_TYPES[array.dtype.type],
+            ffi.cast("void*", array.ctypes.data),
+            array.shape,
+            array.strides,
+        ),
+    )
+
+def dijkstra2d(
+    distance: np.array,
+    cost: np.array,
+    cardinal: Optional[int],
+    diagonal: Optional[int],
+) -> None:
+    """Return the computed distance of all nodes on a 2D Dijkstra grid.
+
+    `distance` is an input/output array of node distances.  Is this often an
+    array filled with maximum finite values and 1 or more points with a low
+    value such as 0.  Distance will flow from these low values to adjacent
+    nodes based the cost to reach those nodes.  This array is modified
+    in-place.
+
+    `cost` is an array of node costs.  Any node with a cost less than or equal
+    to 0 is considered blocked off.  Positive values are the distance needed to
+    reach that node.
+
+    `cardinal` and `diagonal` are the cost multipliers for edges in those
+    directions.  A value of None or 0 will disable those directions.  Typical
+    values could be: ``1, None``, ``1, 1``, ``2, 3``, etc.
+
+    `out` is the output array and can be the same as `distance`.
+
+    Example:
+
+        >>> import numpy as np
+        >>> import tcod.path
+        >>> cost = np.ones((3, 3), dtype=np.uint8)
+        >>> cost[:2, 1] = 0
+        >>> cost
+        array([[1, 0, 1],
+               [1, 0, 1],
+               [1, 1, 1]], dtype=uint8)
+        >>> dist = tcod.path.maxarray((3, 3), dtype=np.int32)
+        >>> dist[0, 0] = 0
+        >>> dist
+        array([[         0, 2147483647, 2147483647],
+               [2147483647, 2147483647, 2147483647],
+               [2147483647, 2147483647, 2147483647]]...)
+        >>> tcod.path.dijkstra2d(dist, cost, 2, 3)
+        >>> dist
+        array([[         0, 2147483647,         10],
+               [         2, 2147483647,          8],
+               [         4,          5,          7]]...)
+        >>> path = tcod.path.hillclimb2d(dist, (2, 2), True, True)
+        >>> path
+        array([[2, 2],
+               [2, 1],
+               [1, 0],
+               [0, 0]], dtype=int32)
+        >>> path = list(path[::-1])
+        >>> while path:
+        ...     print(path.pop(0))
+        [0 0]
+        [1 0]
+        [2 1]
+        [2 2]
+
+    .. versionadded:: 11.2
+    """
+    dist = distance
+    cost = np.asarray(cost)
+    if dist.shape != cost.shape:
+        raise TypeError("distance and cost must have the same shape %r != %r" % (dist.shape, cost.shape))
+    if cardinal is None:
+        cardinal = 0
+    if diagonal is None:
+        diagonal = 0
+    _check(lib.dijkstra2d(_export(dist), _export(cost), cardinal, diagonal))
+
+def hillclimb2d(
+    distance: np.array,
+    start: Tuple[int, int],
+    cardinal: bool,
+    diagonal: bool,
+) -> np.array:
+    """Return a path on a grid from `start` to the lowest point.
+
+    `distance` should be a fully computed distance array.  This kind of array
+    is returned by :any:`dijkstra2d`.
+
+    `start` is a 2-item tuple with starting coordinates.  The axes if these
+    coordinates should match the axis of the `distance` array.  An out-of-bounds
+    `start` index will raise an IndexError.
+
+    At each step nodes adjacent toe current will be checked for a value lower
+    than the current one.  Which directions are checked is decided by the
+    boolean values `cardinal` and `diagonal`.  This process is repeated until
+    all adjacent nodes are equal to or larger than the last point on the path.
+
+    The returned array is a 2D NumPy array with the shape: (length, axis).
+    This array always includes both the starting and ending point and will
+    always have at least one item.
+
+    Typical uses of the returned array will be to either convert it into a list
+    which can be popped from, or transpose it and convert it into a tuple which
+    can be used to index other arrays using NumPy's advanced indexing rules.
+
+    .. versionadded:: 11.2
+    """
+    x, y = start
+    dist = np.asarray(distance)
+    if not (0 <= x < dist.shape[0] and 0 <= y < dist.shape[1]):
+        raise IndexError("Starting point %r not in shape %r" % (start, dist.shape))
+    c_dist = _export(dist)
+    length = _check(lib.hillclimb2d(c_dist, x, y, cardinal, diagonal, ffi.NULL))
+    path = np.ndarray((length, 2), dtype=np.intc)
+    c_path = ffi.cast("int*", path.ctypes.data)
+    _check(lib.hillclimb2d(c_dist, x, y, cardinal, diagonal, c_path))
+    return path

@@ -66,6 +66,20 @@ float PathCostArrayInt16(int x1, int y1, int x2, int y2,
 float PathCostArrayInt32(int x1, int y1, int x2, int y2,
                          const struct PathCostArray *map);
 
+int dijkstra2d(
+    struct NArray4* dist,
+    const struct NArray4* cost,
+    int cardinal,
+    int diagonal);
+
+int hillclimb2d(
+    const struct NArray4* dist,
+    int x,
+    int y,
+    bool cardinal,
+    bool diagonal,
+    int* out);
+
 #ifdef __cplusplus
 }
 #endif

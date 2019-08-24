@@ -55,10 +55,11 @@ def handle_order(shape: Any, order: str) -> Any:
         return tuple(reversed(shape))
 
 
-def _check(error: int) -> None:
+def _check(error: int) -> int:
     """Detect and convert a libtcod error code it into an exception."""
     if error < 0:
         raise RuntimeError(ffi.string(lib.TCOD_get_error()).decode())
+    return error
 
 
 def _unpack_char_p(char_p: Any) -> str:

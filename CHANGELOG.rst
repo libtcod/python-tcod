@@ -8,6 +8,11 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - `tcod.path.dijkstra2d`: Computes Dijkstra from an arbitrary initial state.
+ - `tcod.path.hillclimb2d`: Returns a path from a distance array.
+ - `tcod.path.maxarray`: Creates arrays filled with maximum finite values.
+
 Fixed
  - Changing the tiles of an active tileset on OPENGL2 will no longer leave
    temporary artifact tiles.
