@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.2.0 - 2019-08-24
+-------------------
 Added
  - `tcod.path.dijkstra2d`: Computes Dijkstra from an arbitrary initial state.
  - `tcod.path.hillclimb2d`: Returns a path from a distance array.
