@@ -308,6 +308,7 @@ class Dijkstra(_PathFinder):
             path.append((pointer_x[0], pointer_y[0]))
         return path
 
+
 _INT_TYPES = {
     np.int8: lib.np_int8,
     np.int16: lib.np_int16,
@@ -319,7 +320,10 @@ _INT_TYPES = {
     np.uint64: lib.np_uint64,
 }
 
-def maxarray(shape: Tuple[int, ...], dtype: Any = int, order: str = "C") -> np.array:
+
+def maxarray(
+    shape: Tuple[int, ...], dtype: Any = int, order: str = "C"
+) -> np.array:
     """Return a new array filled with the maximum finite value for `dtype`.
 
     `shape` is of the new array.  Same as other NumPy array initializers.
@@ -337,6 +341,7 @@ def maxarray(shape: Tuple[int, ...], dtype: Any = int, order: str = "C") -> np.a
     """
     return np.full(shape, np.iinfo(dtype).max, dtype, order)
 
+
 def _export(array: np.array) -> Any:
     """Convert a NumPy array into a ctype object."""
     return ffi.new(
@@ -348,6 +353,7 @@ def _export(array: np.array) -> Any:
             array.strides,
         ),
     )
+
 
 def dijkstra2d(
     distance: np.array,
@@ -413,18 +419,19 @@ def dijkstra2d(
     dist = distance
     cost = np.asarray(cost)
     if dist.shape != cost.shape:
-        raise TypeError("distance and cost must have the same shape %r != %r" % (dist.shape, cost.shape))
+        raise TypeError(
+            "distance and cost must have the same shape %r != %r"
+            % (dist.shape, cost.shape)
+        )
     if cardinal is None:
         cardinal = 0
     if diagonal is None:
         diagonal = 0
     _check(lib.dijkstra2d(_export(dist), _export(cost), cardinal, diagonal))
 
+
 def hillclimb2d(
-    distance: np.array,
-    start: Tuple[int, int],
-    cardinal: bool,
-    diagonal: bool,
+    distance: np.array, start: Tuple[int, int], cardinal: bool, diagonal: bool
 ) -> np.array:
     """Return a path on a grid from `start` to the lowest point.
 
@@ -453,9 +460,13 @@ def hillclimb2d(
     x, y = start
     dist = np.asarray(distance)
     if not (0 <= x < dist.shape[0] and 0 <= y < dist.shape[1]):
-        raise IndexError("Starting point %r not in shape %r" % (start, dist.shape))
+        raise IndexError(
+            "Starting point %r not in shape %r" % (start, dist.shape)
+        )
     c_dist = _export(dist)
-    length = _check(lib.hillclimb2d(c_dist, x, y, cardinal, diagonal, ffi.NULL))
+    length = _check(
+        lib.hillclimb2d(c_dist, x, y, cardinal, diagonal, ffi.NULL)
+    )
     path = np.ndarray((length, 2), dtype=np.intc)
     c_path = ffi.cast("int*", path.ctypes.data)
     _check(lib.hillclimb2d(c_dist, x, y, cardinal, diagonal, c_path))
