@@ -29,9 +29,7 @@ void SDL_GetVersion(SDL_version * ver);
 def verify_dependencies() -> None:
     """Try to make sure dependencies exist on this system."""
     if sys.platform == "win32":
-        lib_test = ffi_check.dlopen(  # Make sure SDL2.dll is here.
-            os.path.join(__path__[0], get_architecture(), "SDL2.dll")
-        )
+        lib_test = ffi_check.dlopen("SDL2")  # Make sure SDL2.dll is here.
         version = ffi_check.new("struct SDL_version*")
         lib_test.SDL_GetVersion(version)  # Need to check this version.
         version = version.major, version.minor, version.patch
