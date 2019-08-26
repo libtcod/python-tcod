@@ -9,10 +9,13 @@ v2.0.0
 Unreleased
 ------------------
 
-11.2.1 - 2019-08-25
+11.2.2 - 2019-08-25
 -------------------
 Fixed
- - Fixed a regression preventing PyInstaller distributions from loading SDL.
+ - Fixed a regression preventing PyInstaller distributions from loading SDL2.
+
+11.2.1 - 2019-08-25
+-------------------
 
 11.2.0 - 2019-08-24
 -------------------
