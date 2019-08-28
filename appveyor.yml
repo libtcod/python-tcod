@@ -1,8 +1,8 @@
 environment:
   TWINE_USERNAME:
-    secure: 6EhNSnUl0yOO26EeQ5WG1pQx8v/vp99/u24NRpZvF0k=
+    secure: sUo+lYht329nQC5JCxEB8w==
   TWINE_PASSWORD:
-    secure: PwPzzV8DPqw/+5M66FJQ5tbiF7rlOIK+bQIl8dFdF34=
+    secure: mjSxOmR8POpeVSL9mwOnH2XQAn9Trj5wn6dbmCIwgTSr2qjfm/y1UoQ2XkYV9QpATp1xLUKalIDc62bORmIMKe6GkhDayUymLC6RM8KRZqM93aPoNXst9c5YfdUVbJuubk1QsJ/wE8KZrr6jrcXM3H7rfiq9Z8NtEud1XDD/d8MKbR9LkL4Y9ACI12jfayQ+uwaTOMhs9/1XlT92FEPGqy0Qlr/zXLd7TixOkAB/cyqYJdD3B6+fyvqxFxPVrA+iWhldv60ERQmlXW/j7WbPCw==
   CODACY_PROJECT_TOKEN:
     secure: xprpiCGL823NKrs/K2Cps1UVBEmpezXReLxcfLyU1M43ZBBOK91xvjdIJamYKi8D
   DEPLOY_ONLY: false
