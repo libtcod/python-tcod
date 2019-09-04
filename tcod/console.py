@@ -368,6 +368,28 @@ class Console:
         """
         lib.TCOD_console_put_char(self.console_c, x, y, ch, bg_blend)
 
+    def put_char_ex(
+        self,
+        x: int,
+        y: int,
+        ch: int,
+        fg: Tuple[int, int, int]
+        bg: Tuple[int, int, int]
+    ) -> None:
+        """Draw the character c at x,y using the colors fg and bg.
+
+        Args:
+            con (Console): Any Console instance.
+            x (int): Character x position from the left.
+            y (int): Character y position from the top.
+            ch (int): Character code to draw. Must be in integer form.
+            fg (Union[Tuple[int, int, int], Sequence[int]]):
+                An (r, g, b) sequence or Color instance.
+            bg (Union[Tuple[int, int, int], Sequence[int]]):
+                An (r, g, b) sequence or Color instance.
+        """
+        lib.TCOD_console_put_char_ex(self.console_c, x, y, ch, fg, bg)
+
     __ALIGNMENT_LOOKUP = {0: "tcod.LEFT", 1: "tcod.RIGHT", 2: "tcod.CENTER"}
 
     __BG_BLEND_LOOKUP = {
