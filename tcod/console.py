@@ -102,9 +102,10 @@ class Console:
     # A structured arrays type with the added "fg_rgb" and "bg_rgb" fields.
     _DTYPE_RGB = np.dtype(
         {
-            "names": ["ch", "fg", "bg", "fg_rgb", "bg_rgb"],
-            "formats": [np.int32, "(4,)u1", "(4,)u1", "(3,)u1", "(3,)u1"],
-            "offsets": [0, 4, 8, 4, 8],
+            "names": ["ch", "fg", "bg"],
+            "formats": [np.int32, "(3,)u1", "(3,)u1"],
+            "offsets": [0, 4, 8],
+            "itemsize": 12,
         }
     )
 
@@ -247,13 +248,13 @@ class Console:
 
     @property
     def tiles(self) -> np.ndarray:
-        """An array of this consoles tile data.
+        """An array of this consoles raw tile data.
 
         This acts as a combination of the `ch`, `fg`, and `bg` attributes.
         Colors include an alpha channel but how alpha works is currently
         undefined.
 
-        Example::
+        Example:
             >>> con = tcod.console.Console(10, 2, order="F")
             >>> con.tiles[0, 0] = (
             ...     ord("X"),
@@ -266,6 +267,23 @@ class Console:
         .. versionadded:: 10.0
         """
         return self._tiles.T if self._order == "F" else self._tiles
+
+    @property
+    def tiles2(self) -> np.ndarray:
+        """An array of this consoles tile data without the alpha channel.
+
+        Example:
+            >>> con = tcod.console.Console(10, 2, order="F")
+            >>> con.tiles2[0, 0] = ord("@"), tcod.yellow, tcod.black
+            >>> con.tiles2[0, 0]
+            (64, [255, 255,   0], [0, 0, 0])
+            >>> con.tiles2["bg"] = tcod.blue
+            >>> con.tiles2[0, 0]
+            (64, [255, 255,   0], [  0,   0, 255])
+
+        .. versionadded:: 11.3
+        """
+        return self.tiles.view(self._DTYPE_RGB)
 
     @property
     def default_bg(self) -> Tuple[int, int, int]:
