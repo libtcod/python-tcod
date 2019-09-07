@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.3.0 - 2019-09-06
+-------------------
 Added
  - New attribute `Console.tiles2` is similar to `Console.tiles` but without an
    alpha channel.
