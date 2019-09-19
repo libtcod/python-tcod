@@ -1,6 +1,11 @@
 """
-An alternative, more direct implementation of event handling based on using
-cffi calls to SDL functions.  The current code is partially incomplete.
+A light-weight implementation of event handling built on calls to SDL.
+
+Many event constants are derived directly from SDL.
+For example: ``tcod.event.K_UP`` and ``tcod.event.SCANCODE_A`` refer to
+SDL's ``SDLK_UP`` and ``SDL_SCANCODE_A`` respectfully.
+`See this table for all of SDL's keyboard constants.
+<https://wiki.libsdl.org/SDL_Keycode>`_
 
 Printing any event will tell you its attributes in a human readable format.
 An events type attribute if omitted is just the classes name with all letters
