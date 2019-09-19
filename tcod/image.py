@@ -1,4 +1,4 @@
-from typing import Any, Tuple
+from typing import Any, Dict, Tuple
 
 import numpy as np
 
@@ -292,3 +292,56 @@ class Image(object):
             filename (Text): File path to same this Image.
         """
         lib.TCOD_image_save(self.image_c, filename.encode("utf-8"))
+
+    @property
+    def __array_interface__(self) -> Dict[str, Any]:
+        """Return an interface for this images pixel buffer.
+
+        Use :any:`numpy.asarray` to get the read-write array of this Image.
+
+        This will often return an RGB array, but could also return an RGBA
+        array or fail silently.  Future versions might change what type of
+        array is returned.
+
+        You can use ``dtype=numpy.uint8`` to ensure that errors are not ignored
+        by NumPy.
+
+        .. versionadded:: 11.4
+        """
+        strides = None
+        if self.image_c.mipmaps:  # Libtcod RGB array.
+            depth = 3
+            data = int(ffi.cast("size_t", self.image_c.mipmaps[0].buf))
+        elif self.image_c.sys_img:  # SDL Surface.
+            data = int(ffi.cast("size_t", self.image_c.sys_img.pixels))
+            format = self.image_c.sys_img.format.format
+            if format == lib.SDL_PIXELFORMAT_RGB24:
+                depth = 3
+            elif format == lib.SDL_PIXELFORMAT_RGBA32:
+                depth = 4
+            else:
+                raise TypeError(
+                    "Can't interface with format: %s"
+                    % (_get_format_name(format),)
+                )
+            strides = (self.image_c.sys_img.pitch, depth, 1)
+        else:
+            raise TypeError("Image has no initialized data.")
+        return {
+            "shape": (self.height, self.width, depth),
+            "typestr": "|u1",
+            "data": (data, False),
+            "strides": strides,
+            "version": 3,
+        }
+
+
+def _get_format_name(format: int) -> str:
+    """Return the SDL_PIXELFORMAT_X name for this format, if possible."""
+    for attr in dir(lib):
+        if not attr.startswith("SDL_PIXELFORMAT"):
+            continue
+        if not getattr(lib, attr) == format:
+            continue
+        return attr
+    return str(format)

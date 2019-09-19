@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+- Added __array_interface__ to the Image class.
 
 11.3.0 - 2019-09-06
 -------------------
