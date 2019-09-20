@@ -246,8 +246,23 @@ class Console:
         """
         return self._tiles["ch"].T if self._order == "F" else self._tiles["ch"]
 
-    @property
+    @property  # type: ignore
+    @deprecate(
+        "The `tiles` attribute has been renamed to `buffer`. "
+        "This attribute will later be changed to be the same as tiles2."
+    )
     def tiles(self) -> np.ndarray:
+        """An array of this consoles raw tile data.
+
+        .. versionadded:: 10.0
+
+        .. deprecated:: 11.4
+            This has been renamed to :any:`Console.buffer`.
+        """
+        return self._tiles.T if self._order == "F" else self._tiles
+
+    @property
+    def buffer(self) -> np.ndarray:
         """An array of this consoles raw tile data.
 
         This acts as a combination of the `ch`, `fg`, and `bg` attributes.
@@ -256,15 +271,15 @@ class Console:
 
         Example:
             >>> con = tcod.console.Console(10, 2, order="F")
-            >>> con.tiles[0, 0] = (
+            >>> con.buffer[0, 0] = (
             ...     ord("X"),
             ...     (*tcod.white, 255),
             ...     (*tcod.black, 255),
             ... )
-            >>> con.tiles[0, 0]
+            >>> con.buffer[0, 0]
             (88, [255, 255, 255, 255], [  0,   0,   0, 255])
 
-        .. versionadded:: 10.0
+        .. versionadded:: 11.4
         """
         return self._tiles.T if self._order == "F" else self._tiles
 

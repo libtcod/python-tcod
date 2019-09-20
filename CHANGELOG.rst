@@ -15,6 +15,12 @@ Added
  - `Image.from_array` class method creates an Image from an array-like object.
  - `tcod.image.load` loads a PNG file as an RGBA array.
 
+Changed
+ - `Console.tiles` is now named `Console.buffer`.
+
+Deprecated
+ - `Console.tiles` behavior will be changed to be like `Console.tiles2`.
+
 11.3.0 - 2019-09-06
 -------------------
 Added
