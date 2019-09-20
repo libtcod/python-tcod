@@ -364,3 +364,28 @@ def _get_format_name(format: int) -> str:
             continue
         return attr
     return str(format)
+
+
+def load(filename: str) -> np.ndarray:
+    """Load a PNG file as an RGBA array.
+
+    `filename` is the name of the file to load.
+
+    The returned array is in the shape: `(height, width, RGBA)`.
+
+    .. versionadded:: 11.4
+    """
+    image = Image._from_cdata(
+        ffi.gc(lib.TCOD_image_load(filename.encode()), lib.TCOD_image_delete)
+    )
+    array = np.asarray(image, dtype=np.uint8)
+    height, width, depth = array.shape
+    if depth == 3:
+        array = np.concatenate(
+            (
+                array,
+                np.full((height, width, 1), fill_value=255, dtype=np.uint8),
+            ),
+            axis=2,
+        )
+    return array
