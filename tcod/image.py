@@ -57,12 +57,22 @@ class Image(object):
         return self
 
     @classmethod
-    def _from_array(cls, array: Any) -> "Image":
+    def from_array(cls, array: Any) -> "Image":
+        """Create a new Image from a copy of an array-like object.
+
+        Example:
+            >>> import numpy as np
+            >>> import tcod.image
+            >>> array = np.zeros((5, 5, 3), dtype=np.uint8)
+            >>> image = tcod.image.Image.from_array(array)
+
+        .. versionadded:: 11.4
+        """
         array = np.asarray(array)
         height, width, depth = array.shape
         image = cls(width, height)
         image_array = np.asarray(image)
-        image_array[:] = array[:, :, :3]
+        image_array[...] = array
         return image
 
     def clear(self, color: Tuple[int, int, int]) -> None:

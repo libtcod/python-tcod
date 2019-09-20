@@ -12,6 +12,7 @@ Added
 - Added __array_interface__ to the Image class.
 - Added `Console.draw_semigraphics` as a replacement for blit_2x functions.
   `draw_semigraphics` can handle array-like objects.
+- `Image.from_array` class method creates an Image from an array-like object.
 
 11.3.0 - 2019-09-06
 -------------------
