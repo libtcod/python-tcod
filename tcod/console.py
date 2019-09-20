@@ -1101,6 +1101,22 @@ class Console:
             bg_blend,
         )
 
+    def draw_semigraphics(self, pixels: Any, x: int = 0, y: int = 0) -> None:
+        """Draw a block of 2x2 semi-graphics into this console.
+
+        `pixels` is an Image or an array-like object.  It will be down-sampled
+        into 2x2 blocks when drawn.  Array-like objects must be in the shape of
+        `(height, width, RGB)` and should have a `dtype` of `numpy.uint8`.
+
+        `x` and `y` is the upper-left tile position to start drawing.
+
+        .. versionadded:: 11.4
+        """
+        image = tcod._internal._asimage(pixels)
+        lib.TCOD_image_blit_2x(
+            image.image_c, self.console_c, x, y, 0, 0, -1, -1
+        )
+
 
 def get_height_rect(width: int, string: str) -> int:
     """Return the number of lines which would be printed from these parameters.

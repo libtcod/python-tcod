@@ -121,3 +121,10 @@ def test_console_clear():
     console.clear(fg=(7, 8, 9), bg=(10, 11, 12))
     assert console.fg[0, 0].tolist() == [7, 8, 9]
     assert console.bg[0, 0].tolist() == [10, 11, 12]
+
+
+def test_console_semigraphics():
+    console = tcod.console.Console(1, 1)
+    console.draw_semigraphics(
+        [[[255, 255, 255], [255, 255, 255]], [[255, 255, 255], [0, 0, 0]]],
+    )

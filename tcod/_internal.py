@@ -4,6 +4,8 @@ import functools
 from typing import Any, AnyStr, Callable, TypeVar, cast
 import warnings
 
+import numpy as np
+
 from tcod.loader import lib, ffi
 
 FuncType = Callable[..., Any]
@@ -207,3 +209,44 @@ def _console(console: Any) -> Any:
             stacklevel=3,
         )
         return ffi.NULL
+
+
+class TempImage(object):
+    """An Image-like container for NumPy arrays."""
+
+    def __init__(self, array: Any):
+        self._array = np.ascontiguousarray(array, dtype=np.uint8)
+        height, width, depth = self._array.shape
+        if depth != 3:
+            raise TypeError(
+                "Array must have RGB channels.  Shape is: %r"
+                % (self._array.shape,)
+            )
+        self._buffer = ffi.from_buffer("TCOD_color_t[]", self._array)
+        self._mipmaps = ffi.new(
+            "struct TCOD_mipmap_*",
+            {
+                "width": width,
+                "height": height,
+                "fwidth": width,
+                "fheight": height,
+                "buf": self._buffer,
+                "dirty": True,
+            },
+        )
+        self.image_c = ffi.new(
+            "TCOD_Image*",
+            {
+                "sys_img": ffi.NULL,
+                "nb_mipmaps": 1,
+                "mipmaps": self._mipmaps,
+                "has_key_color": False,
+            },
+        )
+
+
+def _asimage(image: Any) -> TempImage:
+    """Convert this input into an Image-like object."""
+    if hasattr(image, "image_c"):
+        return image  # type: ignore
+    return TempImage(image)

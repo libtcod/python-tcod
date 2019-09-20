@@ -56,6 +56,15 @@ class Image(object):
         self.width, self.height = self._get_size()
         return self
 
+    @classmethod
+    def _from_array(cls, array: Any) -> "Image":
+        array = np.asarray(array)
+        height, width, depth = array.shape
+        image = cls(width, height)
+        image_array = np.asarray(image)
+        image_array[:] = array[:, :, :3]
+        return image
+
     def clear(self, color: Tuple[int, int, int]) -> None:
         """Fill this entire Image with color.
 

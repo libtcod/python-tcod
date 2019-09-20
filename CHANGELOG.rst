@@ -10,6 +10,8 @@ Unreleased
 ------------------
 Added
 - Added __array_interface__ to the Image class.
+- Added `Console.draw_semigraphics` as a replacement for blit_2x functions.
+  `draw_semigraphics` can handle array-like objects.
 
 11.3.0 - 2019-09-06
 -------------------

@@ -393,7 +393,7 @@ class NoiseSample(Sample):
         recth = 13
         if self.implementation == tcod.noise.SIMPLE:
             recth = 10
-        self.img.blit_2x(sample_console, 0, 0)
+        sample_console.draw_semigraphics(self.img)
         sample_console.draw_rect(
             2,
             2,
