@@ -298,7 +298,7 @@ class Console:
 
         .. versionadded:: 11.3
         """
-        return self.tiles.view(self._DTYPE_RGB)
+        return self.buffer.view(self._DTYPE_RGB)
 
     @property
     def default_bg(self) -> Tuple[int, int, int]:
@@ -885,7 +885,7 @@ class Console:
         return (
             "tcod.console.Console(width=%i, height=%i, "
             "order=%r,buffer=\n%r)"
-            % (self.width, self.height, self._order, self.tiles)
+            % (self.width, self.height, self._order, self.buffer)
         )
 
     def __str__(self) -> str:
