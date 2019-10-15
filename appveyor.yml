@@ -19,6 +19,10 @@ environment:
     platform: x64
   - PYTHON: C:\Python37\python.exe
     platform: Any CPU
+  - WEB_PYTHON: "https://www.python.org/ftp/python/3.8.0/python-3.8.0-amd64-webinstall.exe"
+    platform: x64
+  - WEB_PYTHON: "https://www.python.org/ftp/python/3.8.0/python-3.8.0-webinstall.exe"
+    platform: Any CPU
   - PYPY3: pypy3.5-v7.0.0
     platform: Any CPU
   - PYPY3: pypy3.6-v7.1.1
