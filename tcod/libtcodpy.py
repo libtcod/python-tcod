@@ -993,7 +993,7 @@ def console_set_custom_font(
     """
     if not os.path.exists(fontFile):
         raise RuntimeError(
-            "File not found:\n\t%s" % (os.path.realpath(fontFile),)
+            "File not found:\n\t%s" % (str(os.path.realpath(fontFile)),)
         )
     _check(
         lib.TCOD_console_set_custom_font(

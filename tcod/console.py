@@ -351,11 +351,11 @@ class Console:
             stacklevel=3,
         )
 
-    def clear(  # type: ignore
+    def clear(
         self,
         ch: int = ord(" "),
-        fg: Tuple[int, int, int] = ...,
-        bg: Tuple[int, int, int] = ...,
+        fg: Tuple[int, int, int] = ...,  # type: ignore
+        bg: Tuple[int, int, int] = ...,  # type: ignore
     ) -> None:
         """Reset all values in this console to a single value.
 
@@ -761,7 +761,15 @@ class Console:
                 dest,  # type: ignore
                 dest_x,
                 dest_y,
-            ) = (dest, dest_x, dest_y, src_x, src_y, width, height)
+            ) = (
+                dest,  # type: ignore
+                dest_x,
+                dest_y,
+                src_x,
+                src_y,  # type: ignore
+                width,
+                height,
+            )
             warnings.warn(
                 "Parameter names have been moved around, see documentation.",
                 DeprecationWarning,
