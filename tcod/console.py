@@ -287,6 +287,9 @@ class Console:
     def tiles2(self) -> np.ndarray:
         """An array of this consoles tile data without the alpha channel.
 
+        The dtype of this array is effectively:
+        ``[("ch", np.intc), ("fg", "(3,)u1"), ("bg", "(3,)u1")]``
+
         Example:
             >>> con = tcod.console.Console(10, 2, order="F")
             >>> con.tiles2[0, 0] = ord("@"), tcod.yellow, tcod.black
