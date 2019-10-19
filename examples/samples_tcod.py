@@ -86,10 +86,6 @@ class TrueColorSample(Sample):
         )
         # corner indexes
         self.corners = np.array([0, 1, 2, 3])
-        # sample screen interpolation mesh-grid
-        self.interp_x, self.interp_y = np.mgrid[
-            0 : 1 : SAMPLE_SCREEN_WIDTH * 1j, 0 : 1 : SAMPLE_SCREEN_HEIGHT * 1j
-        ]
 
     def on_enter(self):
         tcod.sys_set_fps(0)
@@ -116,14 +112,9 @@ class TrueColorSample(Sample):
 
     def interpolate_corner_colors(self):
         # interpolate corner colors across the sample console
-        for i in range(3):  # for each color channel
-            left = (
-                self.colors[2, i] - self.colors[0, i]
-            ) * self.interp_y + self.colors[0, i]
-            right = (
-                self.colors[3, i] - self.colors[1, i]
-            ) * self.interp_y + self.colors[1, i]
-            sample_console.bg[:, :, i] = (right - left) * self.interp_x + left
+        left = np.linspace(self.colors[0], self.colors[2], SAMPLE_SCREEN_HEIGHT)
+        right = np.linspace(self.colors[1], self.colors[3], SAMPLE_SCREEN_HEIGHT)
+        sample_console.bg[:] = np.linspace(left, right, SAMPLE_SCREEN_WIDTH)
 
     def darken_background_characters(self):
         # darken background characters
