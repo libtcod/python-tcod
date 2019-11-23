@@ -8,6 +8,12 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - Quarter block elements are now rendered using Unicode instead of a custom
+   encoding.
+
+Fixed
+ - `OPENGL` and `GLSL` renderers were not properly clearing space characters.
 
 11.4.1 - 2019-10-15
 -------------------
