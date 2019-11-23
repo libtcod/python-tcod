@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.5.0 - 2019-11-22
+-------------------
 Changed
  - Quarter block elements are now rendered using Unicode instead of a custom
    encoding.
