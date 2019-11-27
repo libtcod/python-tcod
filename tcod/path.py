@@ -377,8 +377,6 @@ def dijkstra2d(
     directions.  A value of None or 0 will disable those directions.  Typical
     values could be: ``1, None``, ``1, 1``, ``2, 3``, etc.
 
-    `out` is the output array and can be the same as `distance`.
-
     Example:
 
         >>> import numpy as np
