@@ -7,31 +7,6 @@ from tcod.loader import ffi, lib
 from tcod._internal import _console
 
 
-class _ImageBufferArray(np.ndarray):  # type: ignore
-    def __new__(cls, image: Any) -> "_ImageBufferArray":
-        size = image.height * image.width
-        self = np.frombuffer(
-            ffi.buffer(lib.TCOD_image_get_colors()[size]), np.uint8
-        )
-        self = self.reshape((image.height, image.width, 3)).view(cls)
-        self._image_c = image.cdata
-        return self  # type: ignore
-
-    def __array_finalize__(self, obj: Any) -> None:
-        if obj is None:
-            return
-        self._image_c = getattr(obj, "_image_c", None)
-
-    def __repr__(self) -> str:
-        return repr(self.view(np.ndarray))
-
-    def __setitem__(self, index: Any, value: Any) -> None:
-        """Must invalidate mipmaps on any write."""
-        np.ndarray.__setitem__(self, index, value)
-        if self._image_c is not None:
-            lib.TCOD_image_invalidate_mipmaps(self._image_c)
-
-
 class Image(object):
     """
     Args:
