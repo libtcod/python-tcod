@@ -404,13 +404,13 @@ def dijkstra2d(
                [2, 1],
                [1, 0],
                [0, 0]], dtype=int32)
-        >>> path = list(path[::-1])
+        >>> path = path[::-1].tolist()
         >>> while path:
         ...     print(path.pop(0))
-        [0 0]
-        [1 0]
-        [2 1]
-        [2 2]
+        [0, 0]
+        [1, 0]
+        [2, 1]
+        [2, 2]
 
     .. versionadded:: 11.2
     """
