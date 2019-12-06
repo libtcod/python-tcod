@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.6.0 - 2019-12-05
+-------------------
 Changed
  - Console blit operations now perform per-cell alpha transparency.
 
