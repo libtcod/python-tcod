@@ -753,6 +753,11 @@ class Console:
 
             Previously they were:
             `(x, y, width, height, dest, dest_x, dest_y, *)`
+
+        .. versionchanged:: 11.6
+            Now supports per-cell alpha transparency.
+
+            Use :any:`Console.buffer` to set tile alpha before blit.
         """
         # The old syntax is easy to detect and correct.
         if hasattr(src_y, "console_c"):
