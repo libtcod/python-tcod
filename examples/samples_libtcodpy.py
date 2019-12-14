@@ -6,17 +6,22 @@
 #
 from __future__ import division
 
-import math
+import sys
 import os
+
+import math
+import warnings
 
 import tcod as libtcod
 
-# Import Psyco if available
-try:
+try:  # Import Psyco if available
     import psyco
     psyco.full()
 except ImportError:
     pass
+
+if not sys.warnoptions:
+    warnings.simplefilter("ignore")  # Prevent flood of deprecation warnings.
 
 SAMPLE_SCREEN_WIDTH = 46
 SAMPLE_SCREEN_HEIGHT = 20

@@ -5,17 +5,21 @@ This code demonstrates various usages of python-tcod.
 # To the extent possible under law, the libtcod maintainers have waived all
 # copyright and related or neighboring rights to these samples.
 # https://creativecommons.org/publicdomain/zero/1.0/
-
+import sys
 import os
 
 import copy
 import math
 import random
 import time
+import warnings
 
 import numpy as np
 import tcod
 import tcod.event
+
+if not sys.warnoptions:
+    warnings.simplefilter("default")  # Show all warnings.
 
 SAMPLE_SCREEN_WIDTH = 46
 SAMPLE_SCREEN_HEIGHT = 20
