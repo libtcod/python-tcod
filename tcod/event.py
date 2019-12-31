@@ -886,6 +886,7 @@ __all__ = [  # noqa: F405
     "Undefined",
     "get",
     "wait",
+    "get_mouse_state",
     "EventDispatch",
     # --- From event_constants.py ---
     "SCANCODE_UNKNOWN",
