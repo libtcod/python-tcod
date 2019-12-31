@@ -52,7 +52,7 @@ test_script:
 - ps: "pytest -v"
 
 on_success:
-- pip install codacy-coverage python-coveralls
+- pip install codacy-coverage
 - coverage xml
 - if defined CODACY_PROJECT_TOKEN python-codacy-coverage -r coverage.xml || cd .
 
