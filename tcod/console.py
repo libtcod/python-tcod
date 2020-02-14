@@ -1159,4 +1159,6 @@ def get_height_rect(width: int, string: str) -> int:
     .. versionadded:: 9.2
     """
     string_ = string.encode("utf-8")  # type: bytes
-    return int(lib.TCOD_console_get_height_rect_wn(width, len(string_), string_))
+    return int(
+        lib.TCOD_console_get_height_rect_wn(width, len(string_), string_)
+    )

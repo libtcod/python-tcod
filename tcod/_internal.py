@@ -64,6 +64,17 @@ def _check(error: int) -> int:
     return error
 
 
+def _check_warn(error: int, stacklevel: int = 2) -> int:
+    """Like _check, but raises a warning on positive error codes."""
+    if _check(error) > 0:
+        warnings.warn(
+            ffi.string(lib.TCOD_get_error()).decode(),
+            RuntimeWarning,
+            stacklevel=stacklevel + 1,
+        )
+    return error
+
+
 def _unpack_char_p(char_p: Any) -> str:
     if char_p == ffi.NULL:
         return ""

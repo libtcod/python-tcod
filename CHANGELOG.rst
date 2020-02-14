@@ -10,9 +10,11 @@ Unreleased
 ------------------
 Changed
  - Using libtcod 1.16.0-alpha.1;
- - Console blit operations now perform per-cell alpha transparency.
  - When a renderer fails to load it will now fallback to a different one.
    The order is: OPENGL2 -> OPENGL -> SDL2.
+ - The default renderer is now SDL2.
+ - The SDL and OPENGL renderers are no longer deprecated, but they now point to
+   slightly different backward compatible implementations.
 
 Deprecated
  - The use of `libtcod.cfg` or `terminal.png` is deprecated.

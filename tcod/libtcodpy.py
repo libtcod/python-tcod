@@ -37,7 +37,7 @@ from tcod.constants import (
     KEY_RELEASED,
 )
 
-from tcod._internal import deprecate, pending_deprecate, _check
+from tcod._internal import deprecate, pending_deprecate, _check, _check_warn
 
 from tcod._internal import _int, _unpack_char_p
 from tcod._internal import _bytes, _unicode, _fmt
@@ -887,9 +887,9 @@ def console_init_root(
     Options are:
 
     * `tcod.RENDERER_SDL`:
-      A deprecated software/SDL2 renderer.
+      Forces the SDL2 renderer into software mode.
     * `tcod.RENDERER_OPENGL`:
-      A deprecated SDL2/OpenGL1 renderer.
+      An OpenGL 1 implementation.
     * `tcod.RENDERER_GLSL`:
       A deprecated SDL2/OpenGL2 renderer.
     * `tcod.RENDERER_SDL2`:
@@ -924,27 +924,14 @@ def console_init_root(
         # Use the scripts filename as the title.
         title = os.path.basename(sys.argv[0])
     if renderer is None:
+        renderer = tcod.constants.RENDERER_SDL2
+    elif renderer == tcod.constants.RENDERER_GLSL:
         warnings.warn(
-            "A renderer should be given, see the online documentation.",
+            "The GLSL renderer is deprecated.",
             DeprecationWarning,
             stacklevel=2,
         )
-        renderer = tcod.constants.RENDERER_SDL
-    elif renderer in (
-        tcod.constants.RENDERER_SDL,
-        tcod.constants.RENDERER_OPENGL,
-        tcod.constants.RENDERER_GLSL,
-    ):
-        warnings.warn(
-            "The SDL, OPENGL, and GLSL renderers are deprecated.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-    NEW_RENDERER = renderer in (
-        tcod.constants.RENDERER_SDL2,
-        tcod.constants.RENDERER_OPENGL2,
-    )
-    if vsync is None and NEW_RENDERER:
+    if vsync is None:
         vsync = False
         warnings.warn(
             "vsync defaults to False, but the default will change to True in "
@@ -952,9 +939,7 @@ def console_init_root(
             DeprecationWarning,
             stacklevel=2,
         )
-    if not NEW_RENDERER:
-        vsync = False
-    _check(
+    _check_warn(
         lib.TCOD_console_init_root_(
             w, h, _bytes(title), fullscreen, renderer, vsync
         )
