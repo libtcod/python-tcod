@@ -579,8 +579,8 @@ class Console:
         """
         string_ = string.encode("utf-8")
         return int(
-            lib.get_height_rect(
-                self.console_c, x, y, width, height, string_, len(string_)
+            lib.TCOD_console_get_height_rect_n(
+                self.console_c, x, y, width, height, len(string_), string_
             )
         )
 
@@ -960,12 +960,12 @@ class Console:
         """
         x, y = self._pythonic_index(x, y)
         string_ = string.encode("utf-8")  # type: bytes
-        lib.console_print(
+        lib.TCOD_console_printn(
             self.console_c,
             x,
             y,
-            string_,
             len(string_),
+            string_,
             (fg,) if fg is not None else ffi.NULL,
             (bg,) if bg is not None else ffi.NULL,
             bg_blend,
@@ -1016,14 +1016,14 @@ class Console:
         x, y = self._pythonic_index(x, y)
         string_ = string.encode("utf-8")  # type: bytes
         return int(
-            lib.print_rect(
+            lib.TCOD_console_printn_rect(
                 self.console_c,
                 x,
                 y,
                 width,
                 height,
-                string_,
                 len(string_),
+                string_,
                 (fg,) if fg is not None else ffi.NULL,
                 (bg,) if bg is not None else ffi.NULL,
                 bg_blend,
@@ -1070,14 +1070,14 @@ class Console:
         """
         x, y = self._pythonic_index(x, y)
         title_ = title.encode("utf-8")  # type: bytes
-        lib.print_frame(
+        lib.TCOD_console_printn_frame(
             self.console_c,
             x,
             y,
             width,
             height,
-            title_,
             len(title_),
+            title_,
             (fg,) if fg is not None else ffi.NULL,
             (bg,) if bg is not None else ffi.NULL,
             bg_blend,
@@ -1120,7 +1120,7 @@ class Console:
             `fg` and `bg` now default to `None` instead of white-on-black.
         """
         x, y = self._pythonic_index(x, y)
-        lib.draw_rect(
+        lib.TCOD_console_draw_rect_rgb(
             self.console_c,
             x,
             y,
@@ -1159,4 +1159,4 @@ def get_height_rect(width: int, string: str) -> int:
     .. versionadded:: 9.2
     """
     string_ = string.encode("utf-8")  # type: bytes
-    return int(lib.get_height_rect2(width, string_, len(string_)))
+    return int(lib.TCOD_console_get_height_rect_wn(width, len(string_), string_))

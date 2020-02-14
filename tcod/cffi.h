@@ -3,7 +3,7 @@
 #include "../libtcod/src/libtcod/libtcod.h"
 #include "../libtcod/src/libtcod/libtcod_int.h"
 #include "../libtcod/src/libtcod/wrappers.h"
-#include "../libtcod/src/libtcod/tileset/truetype.h"
+#include "../libtcod/src/libtcod/tileset_truetype.h"
 
 #include "noise.h"
 #include "path.h"

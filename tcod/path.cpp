@@ -4,7 +4,7 @@
 #include <exception>
 
 #include <SDL_stdinc.h>
-#include "../libtcod/src/libtcod/engine/error.h"
+#include "../libtcod/src/libtcod/error.h"
 #include "../libtcod/src/libtcod/pathfinding/generic.h"
 #include "../libtcod/src/libtcod/pathfinding/dijkstra.h"
 #include "../libtcod/src/libtcod/pathfinding/hill-climb.h"

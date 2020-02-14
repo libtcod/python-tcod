@@ -8,6 +8,18 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - Using libtcod 1.16.0-alpha.1;
+ - Console blit operations now perform per-cell alpha transparency.
+ - When a renderer fails to load it will now fallback to a different one.
+   The order is: OPENGL2 -> OPENGL -> SDL2.
+
+Deprecated
+ - The use of `libtcod.cfg` or `terminal.png` is deprecated.
+ - `tcod.sys_update_char` now works with the newer renderers.
+ - Fixed buffer overflow in name generator.
+ - `tcod.image_from_console` now works with the newer renderers.
+ - New renderers now auto-load fonts from `libtcod.cfg` or `terminal.png`.
 
 11.6.0 - 2019-12-05
 -------------------
