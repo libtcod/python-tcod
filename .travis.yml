@@ -13,11 +13,6 @@ matrix:
     sudo: required
     env: CC=gcc-8 CXX=g++-8
   - os: linux
-    python: pypy3.5-7.0
-    dist: xenial
-    sudo: required
-    env: CC=gcc-8 CXX=g++-8
-  - os: linux
     python: nightly
     dist: xenial
     sudo: required
@@ -27,17 +22,10 @@ matrix:
     env: MB_PYTHON_VERSION=3.7.1
   - os: osx
     language: generic
-    env: PYPY3_VERSION=pypy3.6-v7.1.1
-  - os: osx
-    language: generic
-    env: PYPY3_VERSION=pypy3.6-v7.2.0
-  - os: osx
-    language: generic
     env: PYPY3_VERSION=pypy3.6-v7.3.0
   allow_failures:
   - python: nightly
   - python: pypy3.5-7.0
-  - env: PYPY3_VERSION=pypy3.6-v7.2.0
 
   fast_finish: true
 
