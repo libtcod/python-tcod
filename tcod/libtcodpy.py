@@ -1948,7 +1948,7 @@ def console_from_xp(filename: str) -> tcod.console.Console:
 
 
 def console_list_load_xp(
-    filename: str
+    filename: str,
 ) -> Optional[List[tcod.console.Console]]:
     """Return a list of consoles from a REXPaint `.xp` file."""
     tcod_list = lib.TCOD_console_list_from_xp(filename.encode("utf-8"))
@@ -2215,7 +2215,7 @@ def dijkstra_is_empty(p: tcod.path.Dijkstra) -> bool:
 
 @pending_deprecate()
 def dijkstra_path_walk(
-    p: tcod.path.Dijkstra
+    p: tcod.path.Dijkstra,
 ) -> Union[Tuple[int, int], Tuple[None, None]]:
     x = ffi.new("int *")
     y = ffi.new("int *")
@@ -4205,7 +4205,7 @@ def _atexit_verify() -> None:
         lib.TCOD_console_delete(ffi.NULL)
 
 
-__all__ = [
+__all__ = [  # noqa: F405
     "Color",
     "Bsp",
     "NB_FOV_ALGORITHMS",

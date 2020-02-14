@@ -81,7 +81,7 @@ def _pycall_path_dest_only(
 
 
 def _get_pathcost_func(
-    name: str
+    name: str,
 ) -> Callable[[int, int, int, int, Any], float]:
     """Return a properly cast PathCostArray callback."""
     return ffi.cast(  # type: ignore
@@ -211,9 +211,11 @@ class _PathFinder(object):
             )
             self.cost = NodeCostArray(self.cost)
 
-        self._callback, self._userdata, self.shape = (
-            self.cost.get_tcod_path_ffi()
-        )
+        (
+            self._callback,
+            self._userdata,
+            self.shape,
+        ) = self.cost.get_tcod_path_ffi()
         self._path_c = ffi.gc(
             self._path_new_using_function(
                 self.cost.shape[0],
@@ -437,8 +439,8 @@ def hillclimb2d(
     is returned by :any:`dijkstra2d`.
 
     `start` is a 2-item tuple with starting coordinates.  The axes if these
-    coordinates should match the axis of the `distance` array.  An out-of-bounds
-    `start` index will raise an IndexError.
+    coordinates should match the axis of the `distance` array.
+    An out-of-bounds `start` index will raise an IndexError.
 
     At each step nodes adjacent toe current will be checked for a value lower
     than the current one.  Which directions are checked is decided by the
