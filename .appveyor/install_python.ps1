@@ -1,7 +1,6 @@
 $env:ACTIVATE_VENV='venv\Scripts\activate.bat'
 
 if ($env:PYPY -or $env:PYPY3) {
-    $env:ACTIVATE_VENV='venv\bin\activate.bat'
     if($env:PYPY3){
         $env:PYPY_EXE='pypy3.exe'
         $env:PYPY=$env:PYPY3
@@ -23,7 +22,7 @@ if ($env:WEB_PYTHON) {
     $env:PYTHON = 'C:\UserPython\python.exe'
 }
 & $env:PYTHON -m pip install --disable-pip-version-check --upgrade pip
-& $env:PYTHON -m pip install --no-warn-script-location "virtualenv>=16"
+& $env:PYTHON -m pip install --no-warn-script-location "virtualenv>=20"
 & $env:PYTHON -m virtualenv venv
 
 if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode )  }
