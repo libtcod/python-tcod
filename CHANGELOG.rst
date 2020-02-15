@@ -8,8 +8,11 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.7.0 - 2020-02-14
+-------------------
 Changed
- - Using libtcod 1.16.0-alpha.1;
+ - Using `libtcod 1.16.0-alpha.2`.
  - When a renderer fails to load it will now fallback to a different one.
    The order is: OPENGL2 -> OPENGL -> SDL2.
  - The default renderer is now SDL2.
@@ -17,7 +20,9 @@ Changed
    slightly different backward compatible implementations.
 
 Deprecated
- - The use of `libtcod.cfg` or `terminal.png` is deprecated.
+ - The use of `libtcod.cfg` and `terminal.png` is deprecated.
+
+Fixed
  - `tcod.sys_update_char` now works with the newer renderers.
  - Fixed buffer overflow in name generator.
  - `tcod.image_from_console` now works with the newer renderers.
