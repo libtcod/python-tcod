@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.7.2 - 2020-02-16
+-------------------
 Fixed
  - Fixed regression in `tcod.console_clear`.
 
