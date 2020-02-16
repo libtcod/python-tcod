@@ -284,6 +284,7 @@ def get_ast():
         filename=CFFI_HEADER,
         use_cpp=True,
         cpp_args=[
+            r"-std=c99",
             r"-Idependencies/fake_libc_include",
             r"-DDECLSPEC=",
             r"-DSDLCALL=",
