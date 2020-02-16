@@ -283,7 +283,9 @@ def get_ast():
     ast = parse_file(
         filename=CFFI_HEADER,
         use_cpp=True,
+        cpp_path="gcc",
         cpp_args=[
+            r"-E",
             r"-std=c99",
             r"-Idependencies/fake_libc_include",
             r"-DDECLSPEC=",
