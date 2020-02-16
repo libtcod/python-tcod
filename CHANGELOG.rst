@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.7.1 - 2020-02-16
+-------------------
 Fixed
  - Fixed regression in `Console.draw_frame`.
  - The wavelet noise generator now excludes -1.0f and 1.0f as return values.
