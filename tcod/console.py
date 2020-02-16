@@ -137,6 +137,7 @@ class Console:
             {
                 "w": width,
                 "h": height,
+                "length": width * height,
                 "tiles": ffi.cast(
                     "struct TCOD_ConsoleTile*", self._tiles.ctypes.data
                 ),
