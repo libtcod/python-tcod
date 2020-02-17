@@ -353,6 +353,7 @@ ffi.set_source(
     extra_compile_args=extra_compile_args,
     extra_link_args=extra_link_args,
     define_macros=define_macros,
+    py_limited_api=35,
 )
 
 CONSTANT_MODULE_HEADER = '''"""
