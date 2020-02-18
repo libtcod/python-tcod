@@ -33,10 +33,12 @@ CFFI_EXTRA_CDEFS = "tcod/cdef.h"
 BITSIZE, LINKAGE = platform.architecture()
 
 
-def walk_sources(directory):
+def walk_sources(directory, cpp):
     for path, dirs, files in os.walk(directory):
         for source in files:
-            if source.endswith(".c") or source.endswith(".cpp"):
+            if source.endswith(".c"):
+                yield os.path.join(path, source)
+            elif cpp and source.endswith(".cpp"):
                 yield os.path.join(path, source)
 
 
@@ -97,9 +99,8 @@ libraries = []
 library_dirs = []
 define_macros = []
 
-sources += walk_sources("tcod/")
-sources += walk_sources("tdl/")
-sources += walk_sources("libtcod/src/libtcod/")
+sources += walk_sources("tcod/", cpp=True)
+sources += walk_sources("libtcod/src/libtcod/", cpp=False)
 sources += ["libtcod/src/vendor/stb.c"]
 sources += ["libtcod/src/vendor/glad.c"]
 sources += ["libtcod/src/vendor/lodepng.c"]
@@ -297,7 +298,7 @@ def get_ast():
             r"-DDOXYGEN_SHOULD_IGNORE_THIS",
             r"-DMAC_OS_X_VERSION_MIN_REQUIRED=1060",
             r"-D__attribute__(x)=",
-            r"-D_PSTDINT_H_INCLUDED",
+            r"-DLIBTCOD_SDL2_EVENT_H_",  # Skip libtocd/sdl2/event.h
         ]
         + extra_parse_args,
     )
