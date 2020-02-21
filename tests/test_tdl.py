@@ -51,8 +51,7 @@ class TDLTemplate(unittest.TestCase):
 
     def flush(self):
         'Pump events and refresh screen so show progress'
-        #tdl.event.get() # no longer needed
-        tdl.flush()
+        pass  # There are no important side-effects from flushing.
 
     def get_random_character(self):
         "returns a tuple with a random character and colors (ch, fg, bg)"
