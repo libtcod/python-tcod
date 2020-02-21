@@ -8,6 +8,17 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - Added `tcod.console.recommended_size` for when you want to change your main
+   console size at runtime.
+
+Changed
+ - Added parameters to `tcod.console_flush`, you can now manually provide a
+   console and adjust how it is presented.
+
+Fixed
+ - Fixed keyboard state and mouse state functions losing state when events were
+   flushed.
 
 11.7.2 - 2020-02-16
 -------------------

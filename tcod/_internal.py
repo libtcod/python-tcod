@@ -248,7 +248,6 @@ class TempImage(object):
         self.image_c = ffi.new(
             "TCOD_Image*",
             {
-                "sys_img": ffi.NULL,
                 "nb_mipmaps": 1,
                 "mipmaps": self._mipmaps,
                 "has_key_color": False,

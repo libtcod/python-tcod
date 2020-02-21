@@ -306,19 +306,6 @@ class Image(object):
         if self.image_c.mipmaps:  # Libtcod RGB array.
             depth = 3
             data = int(ffi.cast("size_t", self.image_c.mipmaps[0].buf))
-        elif self.image_c.sys_img:  # SDL Surface.
-            data = int(ffi.cast("size_t", self.image_c.sys_img.pixels))
-            format = self.image_c.sys_img.format.format
-            if format == lib.SDL_PIXELFORMAT_RGB24:
-                depth = 3
-            elif format == lib.SDL_PIXELFORMAT_RGBA32:
-                depth = 4
-            else:
-                raise TypeError(
-                    "Can't interface with format: %s"
-                    % (_get_format_name(format),)
-                )
-            strides = (self.image_c.sys_img.pitch, depth, 1)
         else:
             raise TypeError("Image has no initialized data.")
         return {

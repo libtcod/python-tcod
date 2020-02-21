@@ -231,3 +231,7 @@ def test_cffi_structs():
     # Make sure cffi structures are the correct size.
     tcod.ffi.new("SDL_Event*")
     tcod.ffi.new("SDL_AudioCVT*")
+
+
+def test_recommended_size(console):
+    tcod.console.recommended_size()

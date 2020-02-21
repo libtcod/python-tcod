@@ -1144,9 +1144,61 @@ def console_credits_render(x: int, y: int, alpha: bool) -> bool:
     return bool(lib.TCOD_console_credits_render(x, y, alpha))
 
 
-def console_flush() -> None:
-    """Update the display to represent the root consoles current state."""
-    lib.TCOD_console_flush()
+def console_flush(
+    console: Optional[tcod.console.Console] = None,
+    *,
+    keep_aspect: bool = False,
+    integer_scaling: bool = False,
+    snap_to_integer: bool = True,
+    clear_color: Tuple[int, int, int, int] = (0, 0, 0, 255),
+    align: Tuple[float, float] = (0.5, 0.5)
+) -> None:
+    """Update the display to represent the root consoles current state.
+
+    `console` is the console you want to present.  If not given the root
+    console will be used.
+
+    If `keep_aspect` is True when the console aspect will be preserved with
+    a letterbox.  Otherwise the console will be stretched to fill the screen.
+
+    If `integer_scaling` is True then the console will be scaled in integer
+    increments.  This will have no effect if the console must be shrunk.
+
+    If `snap_to_integer` is True then if the console has a close enough fit
+    to the screen then a small border will be added instead of stretching
+    the console to fix the remaining area.  You can use
+    :any:`tcod.console.recommended_size` to create a console which would be
+    close enough to not need any scaling.
+
+    `clear_color` is the color used to clear the screen before the console
+    is presented, this will normally affect the border/letterbox color.
+
+    `align` determines where the console will be placed when letter-boxing
+    exists.  Values of 0 will put the console at the upper-left corner.
+    Values of 0.5 will center the console.
+
+    .. versionchanged:: 11.8
+        The parameters `console`, `keep_aspect`, `integer_scaling`,
+        `snap_to_integer`, `clear_color`, and `align` were added.
+
+    .. seealso::
+        :any:`tcod.console_init_root`
+        :any:`tcod.console.recommended_size`
+    """
+    options = {
+        "keep_aspect": keep_aspect,
+        "integer_scaling": integer_scaling,
+        "snap_to_integer": snap_to_integer,
+        "clear_color": clear_color,
+        "align_x": align[0],
+        "align_y": align[1],
+    }
+    if console is None:
+        console_p = ffi.NULL
+    else:
+        console_p = console.console_c
+    with ffi.new("struct TCOD_ViewportOptions*", options) as viewport_opts:
+        _check(lib.TCOD_console_flush_ex(console_p, viewport_opts))
 
 
 # drawing on a console

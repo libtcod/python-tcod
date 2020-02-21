@@ -22,8 +22,8 @@ def session_console(request):
     RENDERER = getattr(tcod, 'RENDERER_' + request.param)
 
     tcod.console_set_custom_font(FONT_FILE)
-    with tcod.console_init_root(WIDTH, HEIGHT,
-                                TITLE, FULLSCREEN, RENDERER) as con:
+    with tcod.console_init_root(
+            WIDTH, HEIGHT, TITLE, FULLSCREEN, RENDERER, vsync=False) as con:
         yield con
 
 @pytest.fixture(scope="function")

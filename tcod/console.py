@@ -137,7 +137,7 @@ class Console:
             {
                 "w": width,
                 "h": height,
-                "length": width * height,
+                "elements": width * height,
                 "tiles": ffi.cast(
                     "struct TCOD_ConsoleTile*", self._tiles.ctypes.data
                 ),
@@ -1155,3 +1155,30 @@ def get_height_rect(width: int, string: str) -> int:
     return int(
         lib.TCOD_console_get_height_rect_wn(width, len(string_), string_)
     )
+
+
+def recommended_size() -> Tuple[int, int]:
+    """Return the recommended size of a console for the current active window.
+
+    The return value from this function can be passed to :any:`Console`.
+
+    This function will raise RuntimeError if libtcod has not been initialized.
+
+    .. versionadded:: 11.8
+
+    .. seealso::
+        :any:`tcod.console_init_root`
+        :any:`tcod.console_flush`
+    """
+    if not lib.TCOD_ctx.engine:
+        raise RuntimeError("The libtcod engine was not initialized first.")
+    window = lib.TCOD_sys_get_sdl_window()
+    renderer = lib.TCOD_sys_get_sdl_renderer()
+    with ffi.new("int[2]") as xy:
+        if renderer:
+            lib.SDL_GetRendererOutputSize(renderer, xy, xy + 1)
+        else:  # Assume OpenGL if a renderer does not exist.
+            lib.SDL_GL_GetDrawableSize(window, xy, xy + 1)
+        w = max(1, xy[0] // lib.TCOD_ctx.tileset.tile_width)
+        h = max(1, xy[1] // lib.TCOD_ctx.tileset.tile_height)
+    return w, h

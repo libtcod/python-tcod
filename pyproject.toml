@@ -9,3 +9,4 @@ requires = [
 [tool.black]
 line-length = 79
 py36 = false
+target-version = ["py35"]
