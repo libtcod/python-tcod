@@ -11,10 +11,16 @@ Unreleased
 Added
  - Added `tcod.console.recommended_size` for when you want to change your main
    console size at runtime.
+ - Added `Console.tiles_rgb` as a replacement for `Console.tiles2`.
 
 Changed
  - Added parameters to `tcod.console_flush`, you can now manually provide a
    console and adjust how it is presented.
+
+Deprecated
+ - `Console.tiles2` is deprecated in favour of `Console.tiles_rgb`.
+ - `Console.buffer` is now deprecated in favour of `Console.tiles`, instead of
+   the other way around.
 
 Fixed
  - Fixed keyboard state and mouse state functions losing state when events were
@@ -86,9 +92,6 @@ Added
 
 Changed
  - `Console.tiles` is now named `Console.buffer`.
-
-Deprecated
- - `Console.tiles` behavior will be changed to be like `Console.tiles2`.
 
 11.3.0 - 2019-09-06
 -------------------
