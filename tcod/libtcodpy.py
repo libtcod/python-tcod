@@ -1196,7 +1196,7 @@ def console_flush(
     if console is None:
         console_p = ffi.NULL
     else:
-        console_p = console.console_c
+        console_p = _console(console)
     with ffi.new("struct TCOD_ViewportOptions*", options) as viewport_opts:
         _check(lib.TCOD_console_flush_ex(console_p, viewport_opts))
 

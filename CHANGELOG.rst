@@ -14,6 +14,7 @@ Added
  - Added `Console.tiles_rgb` as a replacement for `Console.tiles2`.
 
 Changed
+ - Using `libtcod 1.16.0-alpha.3`.
  - Added parameters to `tcod.console_flush`, you can now manually provide a
    console and adjust how it is presented.
 
