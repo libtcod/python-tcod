@@ -8,6 +8,11 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - Using `libtcod 1.16.0-alpha.4`.
+
+Fixed
+ - Mouse tile coordinates are now correct on any resized window.
 
 11.8.0 - 2020-02-21
 -------------------
