@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.8.0 - 2020-02-21
+-------------------
 Added
  - Added `tcod.console.recommended_size` for when you want to change your main
    console size at runtime.
