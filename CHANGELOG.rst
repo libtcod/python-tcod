@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Prevent KeyError when representing unusual keyboard symbol constants.
 
 11.8.1 - 2020-02-22
 -------------------

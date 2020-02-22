@@ -234,11 +234,25 @@ class KeyboardEvent(Event):
         self.sdl_event = sdl_event
         return self
 
+    def _scancode_constant(self, table: Dict[int, str]) -> str:
+        """Return the constant name for this scan-code from a table."""
+        try:
+            return table[self.scancode]
+        except KeyError:
+            return str(self.scancode)
+
+    def _sym_constant(self, table: Dict[int, str]) -> str:
+        """Return the constant name for this symbol from a table."""
+        try:
+            return table[self.sym]
+        except KeyError:
+            return str(self.sym)
+
     def __repr__(self) -> str:
         return "tcod.event.%s(scancode=%s, sym=%s, mod=%s%s)" % (
             self.__class__.__name__,
-            _REVERSE_SCANCODE_TABLE_PREFIX[self.scancode],
-            _REVERSE_SYM_TABLE_PREFIX[self.sym],
+            self._scancode_constant(_REVERSE_SCANCODE_TABLE_PREFIX),
+            self._sym_constant(_REVERSE_SYM_TABLE_PREFIX),
             _describe_bitmask(self.mod, _REVERSE_MOD_TABLE_PREFIX),
             ", repeat=True" if self.repeat else "",
         )
@@ -246,8 +260,10 @@ class KeyboardEvent(Event):
     def __str__(self) -> str:
         return "<%s, scancode=%s, sym=%s, mod=%s, repeat=%r>" % (
             super().__str__().strip("<>"),
-            tcod.event_constants._REVERSE_SCANCODE_TABLE[self.scancode],
-            tcod.event_constants._REVERSE_SYM_TABLE[self.sym],
+            self._scancode_constant(
+                tcod.event_constants._REVERSE_SCANCODE_TABLE
+            ),
+            self._sym_constant(tcod.event_constants._REVERSE_SYM_TABLE),
             _describe_bitmask(self.mod, _REVERSE_MOD_TABLE),
             self.repeat,
         )
