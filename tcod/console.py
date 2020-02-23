@@ -247,11 +247,7 @@ class Console:
         """
         return self._tiles["ch"].T if self._order == "F" else self._tiles["ch"]
 
-    @property  # type: ignore
-    @deprecate(
-        "The `tiles` attribute has been renamed to `buffer`. "
-        "This attribute will later be changed to be the same as tiles2."
-    )
+    @property
     def tiles(self) -> np.ndarray:
         """An array of this consoles raw tile data.
 
