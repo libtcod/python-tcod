@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - New method `Tileset.render` renders an RGBA NumPy array from a tileset and
+   a console.
 
 11.8.2 - 2020-02-22
 -------------------

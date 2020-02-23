@@ -18,7 +18,7 @@ RE_REMOVALS = re.compile(
 RE_DEFINE = re.compile(r"#define \w+(?!\() (?:.*?(?:\\\n)?)*$", re.MULTILINE)
 RE_TYPEDEF = re.compile(r"^typedef[^{;#]*?(?:{[^}]*\n}[^;]*)?;", re.MULTILINE)
 RE_ENUM = re.compile(r"^(?:typedef )?enum[^{;#]*?(?:{[^}]*\n}[^;]*)?;", re.MULTILINE)
-RE_DECL = re.compile(r"^extern[^#\n]*\([^#]*?\);$", re.MULTILINE | re.DOTALL)
+RE_DECL = re.compile(r"^extern[^#(]*\([^#]*?\);$", re.MULTILINE | re.DOTALL)
 RE_ENDIAN = re.compile(
     r"#if SDL_BYTEORDER == SDL_LIL_ENDIAN(.*?)#else(.*?)#endif", re.DOTALL
 )
@@ -89,7 +89,7 @@ def parse(header: str, NEEDS_PACK4: bool) -> Iterator[str]:
         typedef = typedef.replace("SDL_TEXTEDITINGEVENT_TEXT_SIZE", "...")
         typedef = typedef.replace("SDL_AUDIOCVT_MAX_FILTERS + 1", "...")
 
-        typedef = typedef.replace("SDLCALL ", "")
+        typedef = typedef.replace("SDLCALL", " ")
         typedef = typedef.replace("SDL_AUDIOCVT_PACKED ", "")
 
         if NEEDS_PACK4 and "typedef struct SDL_AudioCVT" in typedef:
@@ -109,7 +109,7 @@ def parse(header: str, NEEDS_PACK4: bool) -> Iterator[str]:
             continue
         decl = re.sub(r"SDL_PRINTF_VARARG_FUNC\(\w*\)", "", decl)
         decl = decl.replace("extern DECLSPEC ", "")
-        decl = decl.replace("SDLCALL ", "")
+        decl = decl.replace("SDLCALL", " ")
         yield decl.replace("SDL_PRINTF_FORMAT_STRING ", "")
 
 
@@ -129,7 +129,6 @@ HEADERS = [
     "SDL_hints.h",
     "SDL_joystick.h",
     "SDL_haptic.h",
-    "SDL_gamecontroller.h",
     "SDL_power.h",
     "SDL_log.h",
     "SDL_messagebox.h",

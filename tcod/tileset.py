@@ -10,6 +10,8 @@ from typing import Any, Tuple
 import numpy as np
 
 from tcod.loader import lib, ffi
+import tcod.console
+from tcod._internal import _check, _console
 
 
 class Tileset:
@@ -98,6 +100,46 @@ class Tileset:
             codepoint,
             ffi.cast("struct TCOD_ColorRGBA*", tile.ctypes.data),
         )
+
+    def render(self, console: tcod.console.Console) -> np.ndarray:
+        """Render an RGBA array, using console with this tileset.
+
+        `console` is the Console object to render, this can not be the root
+        console.
+
+        The output array will be a np.uint8 array with the shape of:
+        ``(con_height * tile_height, con_width * tile_width, 4)``.
+
+        .. versionadded:: 11.9
+        """
+        if not console:
+            raise ValueError("'console' must not be the root console.")
+        width = console.width * self.tile_width
+        height = console.height * self.tile_height
+        out = np.empty((height, width, 4), np.uint8)
+        out[:] = 9
+        surface_p = ffi.gc(
+            lib.SDL_CreateRGBSurfaceWithFormatFrom(
+                ffi.cast("void*", out.ctypes.data),
+                width,
+                height,
+                32,
+                out.strides[0],
+                lib.SDL_PIXELFORMAT_RGBA32,
+            ),
+            lib.SDL_FreeSurface,
+        )
+        with surface_p:
+            with ffi.new("SDL_Surface**", surface_p) as surface_p_p:
+                _check(
+                    lib.TCOD_tileset_render_to_surface(
+                        self._tileset_p,
+                        _console(console),
+                        ffi.NULL,
+                        surface_p_p,
+                    )
+                )
+        return out
 
 
 def get_default() -> Tileset:
