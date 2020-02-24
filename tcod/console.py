@@ -299,7 +299,7 @@ class Console:
 
         .. versionadded:: 11.8
         """
-        return self.buffer.view(self._DTYPE_RGB)
+        return self.tiles.view(self._DTYPE_RGB)
 
     @property
     @deprecate("This attribute has been renamed to `tiles_rgb`.")
