@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.9.1 - 2020-02-28
+-------------------
 Changed
  - Using `libtcod 1.16.0-alpha.5`.
  - Mouse tile coordinates are now always zero before the first call to
