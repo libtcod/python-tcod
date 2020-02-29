@@ -8,6 +8,10 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - Using `libtcod 1.16.0-alpha.5`.
+ - Mouse tile coordinates are now always zero before the first call to
+   `tcod.console_flush`.
 
 11.9.0 - 2020-02-22
 -------------------
