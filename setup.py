@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import os.path
 
 from setuptools import setup
 
@@ -107,6 +108,11 @@ if sys.version_info < (3, 5):
     )
 
     print(error)
+    sys.exit(1)
+
+if not os.path.exists("libtcod/src"):
+    print("Libtcod submodule is uninitialized.")
+    print("Did you forget to run 'git submodule update --init'?")
     sys.exit(1)
 
 needs_pytest = {"pytest", "test", "ptr"}.intersection(sys.argv)
