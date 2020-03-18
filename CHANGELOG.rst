@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.9.2 - 2020-03-17
+-------------------
 Fixed
  - Fixed segfault after the Tileset returned by `tcod.tileset.get_default` goes
    out of scope.
