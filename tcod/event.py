@@ -293,7 +293,7 @@ class MouseState(Event):
             * tcod.event.BUTTON_X1MASK
             * tcod.event.BUTTON_X2MASK
 
-    .. addedversion:: 9.3
+    .. versionadded:: 9.3
     """
 
     def __init__(
@@ -860,7 +860,7 @@ class EventDispatch:
 def get_mouse_state() -> MouseState:
     """Return the current state of the mouse.
 
-    .. addedversion:: 9.3
+    .. versionadded:: 9.3
     """
     xy = ffi.new("int[2]")
     buttons = lib.SDL_GetMouseState(xy, xy + 1)

@@ -276,7 +276,7 @@ class Console:
 
         .. versionadded:: 11.4
 
-        .. depreacated:: 11.8
+        .. deprecated:: 11.8
             Use :any:`Console.tiles` instead.
         """
         return self._tiles.T if self._order == "F" else self._tiles
@@ -308,7 +308,7 @@ class Console:
 
         .. versionadded:: 11.3
 
-        .. depreacated:: 11.8
+        .. deprecated:: 11.8
             Use :any:`Console.tiles_rgb` instead.
         """
         return self.tiles_rgb
