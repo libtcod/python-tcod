@@ -56,6 +56,35 @@ in a user environment::
 
     python3 -m pip install --user tcod
 
+PyCharm
+-------
+PyCharm will often run your project in a virtual environment, hiding any modules
+you installed system-wide.  You must install python-tcod inside of the virtual
+environment in order for it to be importable in your projects scripts.
+
+By default the bottom bar of PyCharm will have a tab labeled `terminal`.
+Open this tab and you should see a prompt with ``(venv)`` on it.
+This means your commands will run in the virtual environment of your project.
+
+With a new project and virtual environment you should upgrade pip before
+installing python-tcod.  You can do this by running the command::
+
+    python -m pip install --upgrade pip
+
+If this for some reason failed, you may fall back on using `easy_install`::
+
+    easy_install --upgrade pip
+
+After pip is upgraded you can install tcod with the following command::
+
+    pip install tcod
+
+You can now use ``import tcod``.
+
+If you are working with multiple people or computers then it's recommend to pin
+the tcod version in a `requirements.txt file <https://pip.pypa.io/en/stable/user_guide/#requirements-files>`_.
+PyCharm will automatically update the virtual environment from these files.
+
 Upgrading python-tcod
 ---------------------
 python-tcod is updated often, you can re-run pip with the ``--upgrade`` flag
