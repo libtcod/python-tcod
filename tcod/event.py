@@ -234,14 +234,14 @@ class KeyboardEvent(Event):
         self.sdl_event = sdl_event
         return self
 
-    def _scancode_constant(self, table: Dict[int, str]) -> str:
+    def _scancode_constant(self, table: Mapping[int, str]) -> str:
         """Return the constant name for this scan-code from a table."""
         try:
             return table[self.scancode]
         except KeyError:
             return str(self.scancode)
 
-    def _sym_constant(self, table: Dict[int, str]) -> str:
+    def _sym_constant(self, table: Mapping[int, str]) -> str:
         """Return the constant name for this symbol from a table."""
         try:
             return table[self.sym]

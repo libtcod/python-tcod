@@ -269,7 +269,7 @@ class Console:
         """
         return self._tiles.T if self._order == "F" else self._tiles
 
-    @property
+    @property  # type: ignore
     @deprecate("This attribute has been renamed to `tiles`.")
     def buffer(self) -> np.ndarray:
         """An array of this consoles raw tile data.
@@ -301,7 +301,7 @@ class Console:
         """
         return self.tiles.view(self._DTYPE_RGB)
 
-    @property
+    @property  # type: ignore
     @deprecate("This attribute has been renamed to `tiles_rgb`.")
     def tiles2(self) -> np.ndarray:
         """This name is deprecated in favour of :any:`tiles_rgb`.
