@@ -8,6 +8,10 @@ v2.0.0
 
 Unreleased
 ------------------
+Deprecated
+ - The `snap_to_integer` parameter in `tcod.console_flush` has been deprecated
+   since it can cause minor scaling issues which don't exist when using
+   `integer_scaling` instead.
 
 11.9.2 - 2020-03-17
 -------------------

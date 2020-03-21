@@ -1149,7 +1149,7 @@ def console_flush(
     *,
     keep_aspect: bool = False,
     integer_scaling: bool = False,
-    snap_to_integer: bool = True,
+    snap_to_integer: Optional[bool] = None,
     clear_color: Tuple[int, int, int, int] = (0, 0, 0, 255),
     align: Tuple[float, float] = (0.5, 0.5)
 ) -> None:
@@ -1163,12 +1163,8 @@ def console_flush(
 
     If `integer_scaling` is True then the console will be scaled in integer
     increments.  This will have no effect if the console must be shrunk.
-
-    If `snap_to_integer` is True then if the console has a close enough fit
-    to the screen then a small border will be added instead of stretching
-    the console to fix the remaining area.  You can use
-    :any:`tcod.console.recommended_size` to create a console which would be
-    close enough to not need any scaling.
+    You can use :any:`tcod.console.recommended_size` to create a console which
+    will fit the window without needing to be scaled.
 
     `clear_color` is the color used to clear the screen before the console
     is presented, this will normally affect the border/letterbox color.
@@ -1176,6 +1172,9 @@ def console_flush(
     `align` determines where the console will be placed when letter-boxing
     exists.  Values of 0 will put the console at the upper-left corner.
     Values of 0.5 will center the console.
+
+    `snap_to_integer` is deprecated and setting it will have no effect.
+    It will be removed in a later version.
 
     .. versionchanged:: 11.8
         The parameters `console`, `keep_aspect`, `integer_scaling`,
@@ -1185,10 +1184,16 @@ def console_flush(
         :any:`tcod.console_init_root`
         :any:`tcod.console.recommended_size`
     """
+    if snap_to_integer is not None:
+        warnings.warn(
+            "The snap_to_integer parameter is deprecated and will be removed.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
     options = {
         "keep_aspect": keep_aspect,
         "integer_scaling": integer_scaling,
-        "snap_to_integer": snap_to_integer,
+        "snap_to_integer": False,
         "clear_color": clear_color,
         "align_x": align[0],
         "align_y": align[1],
