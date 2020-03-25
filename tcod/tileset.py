@@ -145,7 +145,7 @@ class Tileset:
 def get_default() -> Tileset:
     """Return a reference to the default Tileset.
 
-    This function is provisional.  The API may change.
+    .. versionadded:: 11.10
     """
     return Tileset._claim(lib.TCOD_get_default_tileset())
 
@@ -155,9 +155,7 @@ def set_default(tileset: Tileset) -> None:
 
     The display will use this new tileset immediately.
 
-    This function only affects the `SDL2` and `OPENGL2` renderers.
-
-    This function is provisional.  The API may change.
+    .. versionadded:: 11.10
     """
     lib.TCOD_set_default_tileset(tileset._tileset_p)
 
@@ -204,3 +202,24 @@ def set_truetype_font(path: str, tile_width: int, tile_height: int) -> None:
         raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(path),))
     if lib.TCOD_tileset_load_truetype_(path.encode(), tile_width, tile_height):
         raise RuntimeError(ffi.string(lib.TCOD_get_error()))
+
+
+def load_bdf(path: str) -> Tileset:
+    """Return a new Tileset from a `.bdf` file.
+
+    For the best results the font should be monospace, cell-based, and
+    single-width.  As an example, a good set of fonts would be the
+    `Unicode fonts and tools for X11 <https://www.cl.cam.ac.uk/~mgk25/ucs-fonts.html>`_
+    package.
+
+    Pass the returned Tileset to :any:`tcod.tileset.set_default` and it will
+    take effect when `tcod.console_init_root` is called.
+
+    .. versionadded:: 11.10
+    """
+    if not os.path.exists(path):
+        raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(path),))
+    cdata = lib.TCOD_load_bdf(path.encode())
+    if not cdata:
+        raise RuntimeError(ffi.string(lib.TCOD_get_error()).decode())
+    return Tileset._claim(cdata)

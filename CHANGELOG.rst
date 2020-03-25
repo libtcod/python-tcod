@@ -8,6 +8,10 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - Added `tcod.tileset.load_bdf`, you can now load BDF fonts.
+ - `tcod.tileset.set_default` and `tcod.tileset.get_default` are now stable.
+
 Deprecated
  - The `snap_to_integer` parameter in `tcod.console_flush` has been deprecated
    since it can cause minor scaling issues which don't exist when using
