@@ -6,11 +6,18 @@ environment:
   CODACY_PROJECT_TOKEN:
     secure: xprpiCGL823NKrs/K2Cps1UVBEmpezXReLxcfLyU1M43ZBBOK91xvjdIJamYKi8D
   DEPLOY_ONLY: false
+  EXTRA_SETUP_ARGS: ""
   matrix:
   - PYTHON: C:\Python35-x64\python.exe
     platform: x64
   - PYTHON: C:\Python35\python.exe
     platform: Any CPU
+  - PYTHON: C:\Python35-x64\python.exe
+    platform: x64
+    EXTRA_SETUP_ARGS: "--py-limited-api cp35"
+  - PYTHON: C:\Python35\python.exe
+    platform: Any CPU
+    EXTRA_SETUP_ARGS: "--py-limited-api cp35"
   - PYTHON: C:\Python36-x64\python.exe
     platform: x64
   - PYTHON: C:\Python36\python.exe
@@ -46,7 +53,7 @@ install:
 - cmd: "pip --version"
 - cmd: "pip install --upgrade setuptools"
 - cmd: "pip install --requirement requirements.txt"
-- cmd: "python setup.py build sdist develop bdist_wheel"
+- cmd: "python -O setup.py build sdist develop bdist_wheel %EXTRA_SETUP_ARGS%"
 build: off
 before_test:
 - cmd: "pip install pytest pytest-cov"
