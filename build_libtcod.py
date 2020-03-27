@@ -97,7 +97,7 @@ sources = []
 
 libraries = []
 library_dirs = []
-define_macros = []
+define_macros = [("Py_LIMITED_API", 0x03050000)]
 
 sources += walk_sources("tcod/", cpp=True)
 sources += walk_sources("libtcod/src/libtcod/", cpp=False)
@@ -354,7 +354,7 @@ ffi.set_source(
     extra_compile_args=extra_compile_args,
     extra_link_args=extra_link_args,
     define_macros=define_macros,
-    py_limited_api=35,
+    py_limited_api=True,
 )
 
 CONSTANT_MODULE_HEADER = '''"""
