@@ -16,10 +16,6 @@ use with pycparser.
 
 - Install [Microsoft Visual Studio](https://www.visualstudio.com/vs/community/)
   - When asked, choose to install the Python development tools.
-- Install [MinGW](http://www.mingw.org/) or [MSYS2](https://www.msys2.org/).
-  - The MinGW installer is [here](https://sourceforge.net/projects/mingw/files/latest/download).
-  - Add the binary folder (default MinGW folder is `C:\MinGW\bin`) to your user
-    environment PATH variable.
 - Open a command prompt in the cloned git directory.
 - Make sure the libtcod submodule is downloaded with this command:
   `git submodule update --init`

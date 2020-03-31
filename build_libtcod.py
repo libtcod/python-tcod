@@ -5,10 +5,9 @@ import sys
 
 import glob
 import re
-from typing import List, Tuple, Any, Dict, Iterator
+from typing import List, Tuple, Any, Dict, Iterable, Iterator, Set
 
-from cffi import FFI
-from pycparser import c_parser, c_ast, parse_file, c_generator
+from cffi import FFI  # type: ignore
 
 import shutil
 import subprocess
@@ -18,7 +17,7 @@ import zipfile
 import parse_sdl2
 
 try:
-    from urllib import urlretrieve
+    from urllib import urlretrieve  # type: ignore
 except ImportError:
     from urllib.request import urlretrieve
 
@@ -27,13 +26,118 @@ SDL2_PARSE_VERSION = os.environ.get("SDL_VERSION", "2.0.5")
 # The SDL2 version to include in binary distributions.
 SDL2_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "2.0.10")
 
-CFFI_HEADER = "tcod/cffi.h"
-CFFI_EXTRA_CDEFS = "tcod/cdef.h"
+HEADER_PARSE_PATHS = ("tcod/", "libtcod/src/libtcod/")
+HEADER_PARSE_EXCLUDES = ("gl2_ext_.h", "renderer_gl_internal.h", "event.h")
 
 BITSIZE, LINKAGE = platform.architecture()
 
+# Regular expressions to parse the headers for cffi.
+RE_COMMENT = re.compile(r"\s*/\*.*?\*/|\s*//*?$", re.DOTALL | re.MULTILINE)
+RE_CPLUSPLUS = re.compile(
+    r"#ifdef __cplusplus.*?#endif.*?$", re.DOTALL | re.MULTILINE
+)
+RE_PREPROCESSOR = re.compile(
+    r"(?!#define\s+\w+\s+\d+$)#.*?(?<!\\)$", re.DOTALL | re.MULTILINE
+)
+RE_INCLUDE = re.compile(r'#include "([^"]*)"')
+RE_TAGS = re.compile(
+    r"TCODLIB_C?API|TCOD_PUBLIC|TCOD_NODISCARD|TCOD_DEPRECATED_NOMESSAGE"
+    r"|(TCOD_DEPRECATED|TCODLIB_FORMAT)\([^)]*\)"
+)
+RE_VAFUNC = re.compile(r".*\(.*va_list.*\);")
+RE_INLINE = re.compile(
+    r"(^.*?inline.*?\(.*?\))\s*\{.*?\}$", re.DOTALL | re.MULTILINE
+)
 
-def walk_sources(directory, cpp):
+
+class ParsedHeader:
+    """Header manager class for parsing headers.
+
+    Holds parsed sources and keeps information needed to resolve header order.
+    """
+
+    # Class dictionary of all parsed headers.
+    all_headers = {}  # type: Dict[str, "ParsedHeader"]
+
+    def __init__(self, path: str) -> None:
+        self.path = path = os.path.normpath(path)
+        directory = os.path.dirname(path)
+        depends = set()
+        with open(self.path, "r") as f:
+            header = f.read()
+        header = RE_COMMENT.sub("", header)
+        header = RE_CPLUSPLUS.sub("", header)
+        for dependancy in RE_INCLUDE.findall(header):
+            depends.add(os.path.normpath(os.path.join(directory, dependancy)))
+        header = RE_PREPROCESSOR.sub("", header)
+        header = RE_TAGS.sub("", header)
+        header = RE_VAFUNC.sub("", header)
+        header = RE_INLINE.sub(r"\1;", header)
+        self.header = header.strip()
+        self.depends = frozenset(depends)
+        self.all_headers[self.path] = self
+
+    def parsed_depends(self) -> Iterator["ParsedHeader"]:
+        """Return dependencies excluding ones that were not loaded."""
+        for dep in self.depends:
+            try:
+                yield self.all_headers[dep]
+            except KeyError:
+                pass
+
+    def __str__(self) -> str:
+        return "Parsed harder at '%s'\n Depends on: %s" % (
+            self.path,
+            "\n\t".join(self.depends),
+        )
+
+    def __repr__(self) -> str:
+        return "ParsedHeader(%s)" % (self.path,)
+
+
+def walk_includes(directory: str) -> Iterator[ParsedHeader]:
+    """Parse all the include files in a directory and subdirectories."""
+    for path, dirs, files in os.walk(directory):
+        for file in files:
+            if file in HEADER_PARSE_EXCLUDES:
+                continue
+            if file.endswith(".h"):
+                yield ParsedHeader(os.path.join(path, file))
+
+
+def resolve_dependencies(
+    includes: Iterable[ParsedHeader],
+) -> List[ParsedHeader]:
+    """Sort headers by their correct include order."""
+    unresolved = set(includes)
+    resolved = set()  # type: Set[ParsedHeader]
+    result = []
+    while unresolved:
+        for item in unresolved:
+            if frozenset(item.parsed_depends()).issubset(resolved):
+                resolved.add(item)
+                result.append(item)
+        if not unresolved & resolved:
+            raise RuntimeError(
+                "Could not resolve header load order.\n"
+                "Possible cyclic dependency with the unresolved headers:\n%s"
+                % (unresolved,)
+            )
+        unresolved -= resolved
+    return result
+
+
+def parse_includes() -> List[ParsedHeader]:
+    """Collect all parsed header files and return them.
+
+    Reads HEADER_PARSE_PATHS and HEADER_PARSE_EXCLUDES."""
+    includes = []  # type: List[ParsedHeader]
+    for dirpath in HEADER_PARSE_PATHS:
+        includes.extend(walk_includes(dirpath))
+    return resolve_dependencies(includes)
+
+
+def walk_sources(directory: str, cpp: bool) -> Iterator[str]:
     for path, dirs, files in os.walk(directory):
         for source in files:
             if source.endswith(".c"):
@@ -42,7 +146,7 @@ def walk_sources(directory, cpp):
                 yield os.path.join(path, source)
 
 
-def find_sources(directory):
+def find_sources(directory: str) -> List[str]:
     return [
         os.path.join(directory, source)
         for source in os.listdir(directory)
@@ -50,7 +154,7 @@ def find_sources(directory):
     ]
 
 
-def get_sdl2_file(version):
+def get_sdl2_file(version: str) -> str:
     if sys.platform == "win32":
         sdl2_file = "SDL2-devel-%s-VC.zip" % (version,)
     else:
@@ -60,11 +164,12 @@ def get_sdl2_file(version):
     sdl2_remote_file = "https://www.libsdl.org/release/%s" % sdl2_file
     if not os.path.exists(sdl2_local_file):
         print("Downloading %s" % sdl2_remote_file)
+        os.makedirs("dependencies/", exist_ok=True)
         urlretrieve(sdl2_remote_file, sdl2_local_file)
     return sdl2_local_file
 
 
-def unpack_sdl2(version):
+def unpack_sdl2(version: str) -> str:
     sdl2_path = "dependencies/SDL2-%s" % (version,)
     if sys.platform == "darwin":
         sdl2_dir = sdl2_path
@@ -87,17 +192,19 @@ def unpack_sdl2(version):
     return sdl2_path
 
 
+includes = parse_includes()
+
 module_name = "tcod._libtcod"
 include_dirs = [".", "libtcod/src/vendor/", "libtcod/src/vendor/zlib/"]
 
 extra_parse_args = []
 extra_compile_args = []
 extra_link_args = []
-sources = []
+sources = []  # type: List[str]
 
 libraries = []
 library_dirs = []
-define_macros = [("Py_LIMITED_API", 0x03050000)]
+define_macros = [("Py_LIMITED_API", 0x03050000)]  # type: List[Tuple[str, Any]]
 
 sources += walk_sources("tcod/", cpp=True)
 sources += walk_sources("libtcod/src/libtcod/", cpp=False)
@@ -139,7 +246,7 @@ else:
 
     SDL2_INCLUDE = None
     for match in matches:
-        if os.path.isfile(os.path.join(match, 'SDL_stdinc.h')):
+        if os.path.isfile(os.path.join(match, "SDL_stdinc.h")):
             SDL2_INCLUDE = match
     assert SDL2_INCLUDE
 
@@ -156,7 +263,7 @@ if sys.platform == "win32":
     shutil.copy(os.path.join(SDL2_LIB_DIR, "SDL2.dll"), SDL2_LIB_DEST)
 
 
-def fix_header(filepath):
+def fix_header(filepath: str) -> None:
     """Removes leading whitespace from a MacOS header file.
 
     This whitespace is causing issues with directives on some platforms.
@@ -197,115 +304,6 @@ if sys.platform not in ["win32", "darwin"]:
         .split()
     )
 
-
-class CustomPostParser(c_ast.NodeVisitor):
-    def __init__(self):
-        self.ast = None
-        self.typedefs = []
-        self.removeable_typedefs = []
-        self.funcdefs = []
-
-    def parse(self, ast):
-        self.ast = ast
-        self.visit(ast)
-        for node in self.funcdefs:
-            ast.ext.remove(node)
-        for node in self.removeable_typedefs:
-            ast.ext.remove(node)
-        return ast
-
-    def visit_Typedef(self, node):
-        if node.name in ["wchar_t", "size_t"]:
-            # remove fake typedef placeholders
-            self.removeable_typedefs.append(node)
-        else:
-            self.generic_visit(node)
-            if node.name in self.typedefs:
-                print("warning: %s redefined" % node.name)
-                self.removeable_typedefs.append(node)
-            self.typedefs.append(node.name)
-
-    def visit_EnumeratorList(self, node):
-        """Replace enumerator expressions with '...' stubs."""
-        for type, enum in node.children():
-            if enum.value is None:
-                pass
-            elif isinstance(enum.value, (c_ast.BinaryOp, c_ast.UnaryOp)):
-                enum.value = c_ast.Constant("int", "...")
-            elif hasattr(enum.value, "type"):
-                enum.value = c_ast.Constant(enum.value.type, "...")
-
-    def visit_ArrayDecl(self, node):
-        if not node.dim:
-            return
-        if isinstance(node.dim, (c_ast.BinaryOp, c_ast.UnaryOp)):
-            node.dim = c_ast.Constant("int", "...")
-
-    def visit_Decl(self, node):
-        if node.name is None:
-            self.generic_visit(node)
-        elif (
-            node.name
-            and "vsprint" in node.name
-            or node.name
-            in ["SDL_vsscanf", "SDL_vsnprintf", "SDL_LogMessageV", "alloca"]
-        ):
-            # exclude va_list related functions
-            self.ast.ext.remove(node)
-        elif node.name in ["screen"]:
-            # exclude outdated 'extern SDL_Surface* screen;' line
-            self.ast.ext.remove(node)
-        else:
-            self.generic_visit(node)
-
-    def visit_FuncDef(self, node):
-        """Exclude function definitions.  Should be declarations only."""
-        self.funcdefs.append(node)
-
-
-def get_cdef():
-    generator = c_generator.CGenerator()
-    cdef = generator.visit(get_ast())
-    cdef = re.sub(
-        pattern=r"typedef int (ptrdiff_t);",
-        repl=r"typedef int... \1;",
-        string=cdef,
-    )
-    return cdef
-
-
-def get_ast():
-    global extra_parse_args
-    if "win32" in sys.platform:
-        extra_parse_args += [r"-I%s/include" % SDL2_PARSE_PATH]
-    if "darwin" in sys.platform:
-        extra_parse_args += [r"-I%s/Headers" % SDL2_PARSE_PATH]
-
-    ast = parse_file(
-        filename=CFFI_HEADER,
-        use_cpp=True,
-        cpp_path="gcc",
-        cpp_args=[
-            r"-E",
-            r"-std=c99",
-            r"-Idependencies/fake_libc_include",
-            r"-DDECLSPEC=",
-            r"-DSDLCALL=",
-            r"-DTCODLIB_API=",
-            r"-DSDL_FORCE_INLINE=",
-            r"-U__GNUC__",
-            r"-D_SDL_thread_h",
-            r"-DDOXYGEN_SHOULD_IGNORE_THIS",
-            r"-DMAC_OS_X_VERSION_MIN_REQUIRED=1060",
-            r"-D__attribute__(x)=",
-            r"-DLIBTCOD_SDL2_EVENT_H_",  # Skip libtocd/sdl2/event.h
-        ]
-        + extra_parse_args,
-    )
-    ast = CustomPostParser().parse(ast)
-    return ast
-
-
 # Can force the use of OpenMP with this variable.
 try:
     USE_OPENMP = eval(os.environ.get("USE_OPENMP", "None").title())
@@ -342,8 +340,15 @@ else:
 
 ffi = FFI()
 parse_sdl2.add_to_ffi(ffi, SDL2_INCLUDE)
-ffi.cdef(get_cdef())
-ffi.cdef(open(CFFI_EXTRA_CDEFS, "r").read())
+for include in includes:
+    try:
+        ffi.cdef(include.header)
+    except Exception:
+        # Print the source, for debugging.
+        print("Error with: %s" % include.path)
+        for i, line in enumerate(include.header.split("\n"), 1):
+            print("%03i %s" % (i, line))
+        raise
 ffi.set_source(
     module_name,
     "#include <tcod/cffi.h>\n#include <SDL.h>",
@@ -379,7 +384,7 @@ def find_sdl_attrs(prefix: str) -> Iterator[Tuple[str, Any]]:
 
     `prefix` is used to filter out which names to copy.
     """
-    from tcod._libtcod import lib
+    from tcod._libtcod import lib  # type: ignore
 
     if prefix.startswith("SDL_"):
         name_starts_at = 4
@@ -411,7 +416,24 @@ def parse_sdl_attrs(prefix: str, all_names: List[str]) -> Tuple[str, str]:
     return names, lookup
 
 
-def write_library_constants():
+EXCLUDE_CONSTANTS = [
+    "TCOD_MAJOR_VERSION",
+    "TCOD_MINOR_VERSION",
+    "TCOD_PATCHLEVEL",
+    "TCOD_PATHFINDER_MAX_DIMENSIONS",
+    "TCOD_KEY_TEXT_SIZE",
+    "TCOD_NOISE_MAX_DIMENSIONS",
+    "TCOD_NOISE_MAX_OCTAVES",
+]
+
+EXCLUDE_CONSTANT_PREFIXES = [
+    "TCOD_E_",
+    "TCOD_HEAP_",
+    "TCOD_LEX_",
+]
+
+
+def write_library_constants() -> None:
     """Write libtcod constants into the tcod.constants module."""
     from tcod._libtcod import lib, ffi
     import tcod.color
@@ -420,6 +442,14 @@ def write_library_constants():
         all_names = []
         f.write(CONSTANT_MODULE_HEADER)
         for name in dir(lib):
+            if name.endswith("_"):
+                continue
+            if name in EXCLUDE_CONSTANTS:
+                continue
+            if any(
+                name.startswith(prefix) for prefix in EXCLUDE_CONSTANT_PREFIXES
+            ):
+                continue
             value = getattr(lib, name)
             if name[:5] == "TCOD_":
                 if name.isupper():  # const names

@@ -1,6 +1,7 @@
 #ifndef PYTHON_TCOD_RANDOM_H_
 #define PYTHON_TCOD_RANDOM_H_
 
+#include "../libtcod/src/libtcod/mersenne.h"
 /* define libtcod random functions */
 
 int TCOD_random_get_i(TCOD_random_t mersenne, int min, int max);

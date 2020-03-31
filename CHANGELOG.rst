@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - GCC is no longer needed to compile the library on Windows.
 
 11.10.0 - 2020-03-26
 --------------------
