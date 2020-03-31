@@ -99,11 +99,11 @@ collaborate with developers across multiple operating systems, or to distribute
 to those platforms.
 New API features are only available on `python-tcod`.
 
-You can recognise a libtcodpy program because it includes this file structure::
+You can recognize a libtcodpy program because it includes this file structure::
 
-    libtcodpy/
-    libtcod.dll
-    SDL2.dll
+    libtcodpy/ (or libtcodpy.py)
+    libtcod.dll (or libtcod-mingw.dll)
+    SDL2.dll (or SDL.dll)
 
 First make sure your libtcodpy project works in Python 3.  libtcodpy
 already supports both 2 and 3 so you don't need to worry about updating it,
@@ -111,12 +111,16 @@ but you will need to worry about bit-size.  If you're using a
 32-bit version of Python 2 then you'll need to upgrade to a 32-bit version of
 Python 3 until libtcodpy can be completely removed.
 
-Once you've installed python-tcod you can safely delete the ``libtcodpy/``
-folder and all DLL files of a libtcodpy program, python-tcod will
-seamlessly take the place of libtcodpy's API.
+For Python 3 you'll want the latest version of `tcod`, for Python 2 you'll need
+to install ``tcod==6.0.7`` instead, see the Python 2.7 instructions below.
 
-From then on anyone can follow the instructions to install python-tcod and your
-project will work for them regardless of their platform or bit-size.
+Once you've installed python-tcod you can safely delete the ``libtcodpy/``
+folder, the ``libtcodpy.py`` script, and all the DLL files of a libtcodpy
+program, python-tcod will seamlessly and immediately take the place of
+libtcodpy's API.
+
+From then on anyone can follow the instructions in this guide to install
+python-tcod and your project will work for them regardless of their platform.
 
 Distributing
 ------------
@@ -128,9 +132,9 @@ Python 2.7
 While it's not recommended, you can still install `python-tcod` on
 `Python 2.7`.
 
-`Keep in mind the Python 2's end-of-life is the year 2020.  You should not be
+`Keep in mind that Python 2's end-of-life has already passed.  You should not be
 starting any new projects in Python 2!
-<https://pythonclock.org/>`_
+<https://www.python.org/doc/sunset-python-2/>`_
 
 Follow the instructions for your platform normally.  When it comes to
 install with pip, tell it to get python-tcod version 6::
