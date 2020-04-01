@@ -1169,7 +1169,8 @@ def get_height_rect(width: int, string: str) -> int:
 def recommended_size() -> Tuple[int, int]:
     """Return the recommended size of a console for the current active window.
 
-    The return value from this function can be passed to :any:`Console`.
+    The return is determined from the active tileset size and active window
+    size.  This result should be used create an :any:`Console` instance.
 
     This function will raise RuntimeError if libtcod has not been initialized.
 
