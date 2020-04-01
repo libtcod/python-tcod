@@ -167,7 +167,7 @@ class AStar(tcod.path.AStar):
     .. deprecated:: 3.2
         See :any:`tcod.path`.
 
-    Before crating this instance you should make one of two types of
+    Before creating this instance you should make one of two types of
     callbacks:
 
     - A function that returns the cost to move to (x, y)
