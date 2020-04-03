@@ -15,6 +15,7 @@ Added
 Changed
  - GCC is no longer needed to compile the library on Windows.
  - Using `libtcod 1.16.0-alpha.7`.
+ - `tcod.console_flush` will now accept an RGB tuple as a `clear_color`.
 
 Fixed
  - Changing the active tileset will now properly show it on the next render.

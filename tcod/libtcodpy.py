@@ -1150,7 +1150,11 @@ def console_flush(
     keep_aspect: bool = False,
     integer_scaling: bool = False,
     snap_to_integer: Optional[bool] = None,
-    clear_color: Tuple[int, int, int, int] = (0, 0, 0, 255),
+    clear_color: Union[Tuple[int, int, int], Tuple[int, int, int, int]] = (
+        0,
+        0,
+        0,
+    ),
     align: Tuple[float, float] = (0.5, 0.5)
 ) -> None:
     """Update the display to represent the root consoles current state.
@@ -1166,8 +1170,8 @@ def console_flush(
     You can use :any:`tcod.console.recommended_size` to create a console which
     will fit the window without needing to be scaled.
 
-    `clear_color` is the color used to clear the screen before the console
-    is presented, this will normally affect the border/letterbox color.
+    `clear_color` is an RGB or RGBA tuple used to clear the screen before the
+    console is presented, this will normally affect the border/letterbox color.
 
     `align` determines where the console will be placed when letter-boxing
     exists.  Values of 0 will put the console at the upper-left corner.
@@ -1180,6 +1184,9 @@ def console_flush(
         The parameters `console`, `keep_aspect`, `integer_scaling`,
         `snap_to_integer`, `clear_color`, and `align` were added.
 
+    .. versionchanged:: 11.11
+        `clear_color` can now be an RGB tuple.
+
     .. seealso::
         :any:`tcod.console_init_root`
         :any:`tcod.console.recommended_size`
@@ -1190,6 +1197,8 @@ def console_flush(
             DeprecationWarning,
             stacklevel=2,
         )
+    if len(clear_color) == 3:
+        clear_color = clear_color[0], clear_color[1], clear_color[2], 255
     options = {
         "keep_aspect": keep_aspect,
         "integer_scaling": integer_scaling,
