@@ -847,12 +847,26 @@ class Console:
             raise NotImplementedError("Only the root console has a context.")
         return self
 
+    def close(self) -> None:
+        """Close the active window managed by libtcod.
+
+        This must only be called on the root console, which is returned from
+        :any:`tcod.console_init_root`.
+
+        .. versionadded:: 11.11.0
+        """
+        if self.console_c != ffi.NULL:
+            raise NotImplementedError(
+                "Only the root console can be used to close libtcod's window."
+            )
+        lib.TCOD_console_delete(self.console_c)
+
     def __exit__(self, *args: Any) -> None:
         """Closes the graphical window on exit.
 
         Some tcod functions may have undefined behavior after this point.
         """
-        lib.TCOD_console_delete(self.console_c)
+        self.close()
 
     def __bool__(self) -> bool:
         """Returns False if this is the root console.

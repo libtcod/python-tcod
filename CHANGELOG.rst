@@ -8,6 +8,10 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - Added `Console.close` as a more obvious way to close the active window of a
+   root console.
+
 Changed
  - GCC is no longer needed to compile the library on Windows.
  - Using `libtcod 1.16.0-alpha.7`.

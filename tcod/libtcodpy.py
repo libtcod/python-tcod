@@ -1828,8 +1828,9 @@ def console_delete(con: tcod.console.Console) -> None:
     if con == ffi.NULL:
         lib.TCOD_console_delete(con)
         warnings.warn(
-            "Instead of this call you should use a with statement to ensure"
-            " the root console closes, for example:"
+            "Instead of this call you should use Console.close,"
+            " or use a with statement to ensure the root console closes,"
+            " for example:"
             "\n    with tcod.console_init_root(...) as root_console:"
             "\n        ...",
             DeprecationWarning,
@@ -4255,7 +4256,9 @@ def _atexit_verify() -> None:
         warnings.warn(
             "The libtcod root console was implicitly deleted.\n"
             "Make sure the 'with' statement is used with the root console to"
-            " ensure that it closes properly.",
+            " ensure that it closes properly.\n"
+            "Alternatively, call the root console's close method as the"
+            " program exits.",
             ResourceWarning,
             stacklevel=2,
         )
