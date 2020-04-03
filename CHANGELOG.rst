@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.11.0 - 2020-04-02
+--------------------
 Added
  - Added `Console.close` as a more obvious way to close the active window of a
    root console.

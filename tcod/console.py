@@ -853,7 +853,7 @@ class Console:
         This must only be called on the root console, which is returned from
         :any:`tcod.console_init_root`.
 
-        .. versionadded:: 11.11.0
+        .. versionadded:: 11.11
         """
         if self.console_c != ffi.NULL:
             raise NotImplementedError(
