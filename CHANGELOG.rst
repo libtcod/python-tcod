@@ -10,6 +10,10 @@ Unreleased
 ------------------
 Changed
  - GCC is no longer needed to compile the library on Windows.
+ - Using `libtcod 1.16.0-alpha.7`.
+
+Fixed
+ - Changing the active tileset will now properly show it on the next render.
 
 11.10.0 - 2020-03-26
 --------------------
