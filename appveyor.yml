@@ -51,7 +51,6 @@ install:
 - cmd: "set PATH=%PATH%;C:\\MinGW\\bin"
 - cmd: "python --version"
 - cmd: "pip --version"
-- cmd: "pip install --upgrade setuptools"
 - cmd: "pip install --requirement requirements.txt"
 - cmd: "python -O setup.py build sdist develop bdist_wheel %EXTRA_SETUP_ARGS%"
 build: off
