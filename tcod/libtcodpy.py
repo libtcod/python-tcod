@@ -909,6 +909,17 @@ def console_init_root(
     This option only works with the SDL2 or OPENGL2 renderers, any other
     renderer will always have `vsync` disabled.
 
+    The returned object is the root console.  You don't need to use this object
+    but you should at least close it when you're done with the libtcod window.
+    You can do this by calling :any:`Console.close` or by using this function
+    in a context, like in the following example:
+
+    .. code-block:: python
+
+        with tcod.console_init_root(80, 50, vsync=True) as root_console:
+            ...  # Put your game loop here.
+        ...  # Window closes at the end of the above block.
+
     .. versionchanged:: 4.3
         Added `order` parameter.
         `title` parameter is now optional.
