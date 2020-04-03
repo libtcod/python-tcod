@@ -8,6 +8,11 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - Using `libtcod 1.16.0-alpha.8`.
+
+Fixed
+ - Changing the active tileset now redraws tiles correctly on the next frame.
 
 11.11.0 - 2020-04-02
 --------------------
