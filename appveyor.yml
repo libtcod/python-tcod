@@ -34,6 +34,8 @@ environment:
     platform: Any CPU
   - PYPY3: pypy3.6-v7.3.0
     platform: Any CPU
+  - PYPY3: pypy3.6-v7.3.1
+    platform: Any CPU
 
 matrix:
   allow_failures:
