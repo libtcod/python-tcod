@@ -55,7 +55,7 @@ before_install:
 - pip install --requirement requirements.txt
 install:
 - if [[ -z "$TRAVIS_TAG" ]]; then export BUILD_FLAGS="-g"; fi
-- python setup.py build $BUILD_FLAGS develop bdist_wheel --py-limited-api=cp35 || (sleep 5; exit 1)
+- python setup.py build $BUILD_FLAGS sdist develop bdist_wheel --py-limited-api=cp35 || (sleep 5; exit 1)
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python -m pip install delocate; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-wheel -v dist/*.whl; fi'
 - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then delocate-listdeps --all dist/*.whl; fi'
