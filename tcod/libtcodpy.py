@@ -1213,7 +1213,6 @@ def console_flush(
     options = {
         "keep_aspect": keep_aspect,
         "integer_scaling": integer_scaling,
-        "snap_to_integer": False,
         "clear_color": clear_color,
         "align_x": align[0],
         "align_y": align[1],

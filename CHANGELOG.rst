@@ -8,6 +8,14 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - Using `libtcod 1.16.0-alpha.9`.
+
+Fixed
+ - `FOV_DIAMOND` and `FOV_RESTRICTIVE` algorithms are now reentrant.
+   `libtcod#48 <https://github.com/libtcod/libtcod/pull/48>`_
+ - The `TCOD_VSYNC` environment variable was being ignored.
+ - Fixed characters being dropped when color codes were used.
 
 11.11.2 - 2020-04-22
 --------------------
