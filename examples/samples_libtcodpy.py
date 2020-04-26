@@ -23,11 +23,18 @@ except ImportError:
 if not sys.warnoptions:
     warnings.simplefilter("ignore")  # Prevent flood of deprecation warnings.
 
+
+def get_data(path: str) -> str:
+    """Return the path to a resource in the libtcod data directory,"""
+    SCRIPT_DIR = os.path.dirname(__file__)
+    DATA_DIR = os.path.join(SCRIPT_DIR, "../libtcod/data")
+    return os.path.join(DATA_DIR, path)
+
 SAMPLE_SCREEN_WIDTH = 46
 SAMPLE_SCREEN_HEIGHT = 20
 SAMPLE_SCREEN_X = 20
 SAMPLE_SCREEN_Y = 10
-font = os.path.join(b'data', b'fonts', b'consolas10x10_gs_tc.png')
+font = get_data("fonts/consolas10x10_gs_tc.png")
 libtcod.console_set_custom_font(font, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 libtcod.console_init_root(80, 50, b'libtcod python sample', False)
 sample_console = libtcod.console_new(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
@@ -66,7 +73,7 @@ if True:
 
     # default listener
     print ('***** Default listener *****')
-    libtcod.parser_run(parser, os.path.join(b'data', b'cfg', b'sample.cfg'))
+    libtcod.parser_run(parser, get_data('cfg/sample.cfg'))
     print ('bool_field : ', \
           libtcod.parser_get_bool_property(parser, b'myStruct.bool_field'))
     print ('char_field : ', \
@@ -129,7 +136,7 @@ if True:
         def error(self,msg):
             print ('error : ', msg)
             return True
-    libtcod.parser_run(parser, os.path.join(b'data',b'cfg',b'sample.cfg'), MyListener())
+    libtcod.parser_run(parser, get_data('cfg/sample.cfg'), MyListener())
 #############################################
 # end of parser unit test
 #############################################
@@ -1157,9 +1164,9 @@ img_green = libtcod.Color(0, 255, 0)
 def render_image(first, key, mouse):
     global img,img_circle,img_blue,img_green
     if img is None:
-        img = libtcod.image_load(os.path.join(b'data',b'img',b'skull.png'))
+        img = libtcod.image_load(get_data('img/skull.png'))
         libtcod.image_set_key_color(img,libtcod.black)
-        img_circle = libtcod.image_load(os.path.join(b'data',b'img',b'circle.png'))
+        img_circle = libtcod.image_load(get_data(('img/circle.png')))
     if first:
         libtcod.sys_set_fps(30)
     libtcod.console_set_default_background(sample_console, libtcod.black)
@@ -1269,9 +1276,9 @@ def render_name(first, key, mouse):
     global ng_sets
     if ng_nbsets == 0:
         # parse all *.cfg files in data/namegen
-        for file in os.listdir(b'data/namegen') :
+        for file in os.listdir(get_data('namegen')) :
             if file.find(b'.cfg') > 0 :
-                libtcod.namegen_parse(os.path.join(b'data',b'namegen',file))
+                libtcod.namegen_parse(get_data(os.path.join('namegen',file)))
         # get the sets list
         ng_sets=libtcod.namegen_get_sets()
         print (ng_sets)

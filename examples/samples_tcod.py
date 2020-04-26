@@ -21,11 +21,18 @@ import tcod.event
 if not sys.warnoptions:
     warnings.simplefilter("default")  # Show all warnings.
 
+
+def get_data(path: str) -> str:
+    """Return the path to a resource in the libtcod data directory,"""
+    SCRIPT_DIR = os.path.dirname(__file__)
+    DATA_DIR = os.path.join(SCRIPT_DIR, "../libtcod/data")
+    return os.path.join(DATA_DIR, path)
+
 SAMPLE_SCREEN_WIDTH = 46
 SAMPLE_SCREEN_HEIGHT = 20
 SAMPLE_SCREEN_X = 20
 SAMPLE_SCREEN_Y = 10
-FONT = "data/fonts/consolas10x10_gs_tc.png"
+FONT = get_data("fonts/consolas10x10_gs_tc.png")
 
 root_console = None
 sample_console = tcod.console.Console(
@@ -1108,9 +1115,9 @@ class ImageSample(Sample):
     def __init__(self):
         self.name = "Image toolkit"
 
-        self.img = tcod.image_load("data/img/skull.png")
+        self.img = tcod.image_load(get_data("img/skull.png"))
         self.img.set_key_color(tcod.black)
-        self.circle = tcod.image_load("data/img/circle.png")
+        self.circle = tcod.image_load(get_data("img/circle.png"))
 
     def on_enter(self):
         tcod.sys_set_fps(0)
@@ -1243,9 +1250,9 @@ class NameGeneratorSample(Sample):
     def on_draw(self):
         if self.nbsets == 0:
             # parse all *.cfg files in data/namegen
-            for file in os.listdir("data/namegen"):
+            for file in os.listdir(get_data("namegen")):
                 if file.find(".cfg") > 0:
-                    tcod.namegen_parse(os.path.join("data/namegen", file))
+                    tcod.namegen_parse(get_data(os.path.join("namegen", file)))
             # get the sets list
             self.sets = tcod.namegen_get_sets()
             print(self.sets)
