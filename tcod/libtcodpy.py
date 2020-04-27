@@ -1173,7 +1173,7 @@ def console_flush(
     `console` is the console you want to present.  If not given the root
     console will be used.
 
-    If `keep_aspect` is True when the console aspect will be preserved with
+    If `keep_aspect` is True then the console aspect will be preserved with
     a letterbox.  Otherwise the console will be stretched to fill the screen.
 
     If `integer_scaling` is True then the console will be scaled in integer

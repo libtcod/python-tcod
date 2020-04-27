@@ -29,6 +29,7 @@ Contents:
 
    tcod/bsp
    tcod/console
+   tcod/context
    tcod/event
    tcod/image
    tcod/map

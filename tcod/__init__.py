@@ -18,6 +18,21 @@
 from tcod.loader import lib, ffi, __sdl_version__  # noqa: F4
 from tcod.libtcodpy import *  # noqa: F4
 
+from tcod import (
+    bsp,
+    color,
+    console,
+    context,
+    event,
+    image,
+    map,
+    noise,
+    path,
+    random,
+    tileset,
+)
+from tcod.console import Console  # noqa: F401
+
 try:
     from tcod.version import __version__
 except ImportError:  # Gets imported without version.py by ReadTheDocs
@@ -25,6 +40,19 @@ except ImportError:  # Gets imported without version.py by ReadTheDocs
 
 __all__ = [  # noqa: F405
     "__version__",
+    "bsp",
+    "color",
+    "console",
+    "context",
+    "event",
+    "tileset",
+    "image",
+    "map",
+    "noise",
+    "path",
+    "random",
+    "tileset",
+    "Console",
     # --- From libtcodpy.py ---
     "Color",
     "Bsp",

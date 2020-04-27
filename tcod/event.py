@@ -81,12 +81,14 @@ def _describe_bitmask(
 
 def _pixel_to_tile(x: float, y: float) -> Tuple[float, float]:
     """Convert pixel coordinates to tile coordinates."""
+    if not lib.TCOD_ctx.engine:
+        return 0, 0
     xy = ffi.new("double[2]", (x, y))
     lib.TCOD_sys_pixel_to_tile(xy, xy + 1)
     return xy[0], xy[1]
 
 
-Point = NamedTuple("Point", [("x", float), ("y", float)])
+Point = NamedTuple("Point", [("x", int), ("y", int)])
 
 # manually define names for SDL macros
 BUTTON_LEFT = lib.SDL_BUTTON_LEFT

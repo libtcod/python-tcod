@@ -1,7 +1,7 @@
 """This module internal helper functions used by the rest of the library.
 """
 import functools
-from typing import Any, AnyStr, Callable, TypeVar, cast
+from typing import Any, AnyStr, Callable, NoReturn, TypeVar, cast
 import warnings
 
 import numpy as np
@@ -57,10 +57,15 @@ def handle_order(shape: Any, order: str) -> Any:
         return tuple(reversed(shape))
 
 
+def _raise_tcod_error() -> NoReturn:
+    """Raise an error from libtcod, this function assumes an error exists."""
+    raise RuntimeError(ffi.string(lib.TCOD_get_error()).decode("utf-8"))
+
+
 def _check(error: int) -> int:
     """Detect and convert a libtcod error code it into an exception."""
     if error < 0:
-        raise RuntimeError(ffi.string(lib.TCOD_get_error()).decode())
+        _raise_tcod_error()
     return error
 
 
