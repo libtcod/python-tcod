@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - `EventDispatch.dispatch` can now return the values returned by the `ev_*`
+   methods.  The class is now generic to support type checking these values.
 
 11.11.4 - 2020-04-26
 --------------------

@@ -20,12 +20,27 @@ implied by ``import tcod``.
 
 .. versionadded:: 8.4
 """
-from typing import Any, Dict, Mapping, NamedTuple, Optional, Iterator, Tuple
+import warnings
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Mapping,
+    NamedTuple,
+    Optional,
+    Iterator,
+    Tuple,
+    TypeVar,
+)
 
 import tcod.event_constants
 from tcod.loader import ffi, lib
 from tcod.event_constants import *  # noqa: F4
 from tcod.event_constants import KMOD_SHIFT, KMOD_CTRL, KMOD_ALT, KMOD_GUI
+
+
+T = TypeVar("T")
 
 
 class _ConstantsWithPrefix(Mapping[int, str]):
@@ -731,47 +746,141 @@ def wait(timeout: Optional[float] = None) -> Iterator[Any]:
     return get()
 
 
-class EventDispatch:
-    """This class dispatches events to methods depending on the events type
+class EventDispatch(Generic[T]):
+    '''This class dispatches events to methods depending on the events type
     attribute.
 
     To use this class, make a sub-class and override the relevant `ev_*`
     methods.  Then send events to the dispatch method.
+
+    .. versionchanged:: 11.12
+        This is now a generic class.  The type hists at the return value of
+        :any:`dispatch` and the `ev_*` methods.
 
     Example::
 
         import tcod
         import tcod.event
 
-        class State(tcod.event.EventDispatch):
-            def ev_quit(self, event):
+        MOVE_KEYS = {  # key_symbol: (x, y)
+            # Arrow keys.
+            tcod.event.K_LEFT: (-1, 0),
+            tcod.event.K_RIGHT: (1, 0),
+            tcod.event.K_UP: (0, -1),
+            tcod.event.K_DOWN: (0, 1),
+            tcod.event.K_HOME: (-1, -1),
+            tcod.event.K_END: (-1, 1),
+            tcod.event.K_PAGEUP: (1, -1),
+            tcod.event.K_PAGEDOWN: (1, 1),
+            tcod.event.K_PERIOD: (0, 0),
+            # Numpad keys.
+            tcod.event.K_KP_1: (-1, 1),
+            tcod.event.K_KP_2: (0, 1),
+            tcod.event.K_KP_3: (1, 1),
+            tcod.event.K_KP_4: (-1, 0),
+            tcod.event.K_KP_5: (0, 0),
+            tcod.event.K_KP_6: (1, 0),
+            tcod.event.K_KP_7: (-1, -1),
+            tcod.event.K_KP_8: (0, -1),
+            tcod.event.K_KP_9: (1, -1),
+            tcod.event.K_CLEAR: (0, 0),  # Numpad `clear` key.
+            # Vi Keys.
+            tcod.event.K_h: (-1, 0),
+            tcod.event.K_j: (0, 1),
+            tcod.event.K_k: (0, -1),
+            tcod.event.K_l: (1, 0),
+            tcod.event.K_y: (-1, -1),
+            tcod.event.K_u: (1, -1),
+            tcod.event.K_b: (-1, 1),
+            tcod.event.K_n: (1, 1),
+        }
+
+        COMMAND_KEYS = {  # key_symbol: command_name
+            tcod.event.K_ESCAPE: "escape",
+        }
+
+
+        class State(tcod.event.EventDispatch[None]):
+            """A state-based superclass that converts `events` into `commands`.
+
+            The configuration used to convert events to commands are hard-coded
+            in this example, but could be modified to be user controlled.
+
+            Subclasses will override the `cmd_*` methods with their own
+            functionality.  There could be a subclass for every individual state
+            of your game.
+            """
+
+            def ev_quit(self, event: tcod.event.Quit) -> None:
+                """The window close button was clicked or Alt+F$ was pressed."""
+                print(event)
+                self.cmd_quit()
+
+            def ev_keydown(self, event: tcod.event.KeyDown) -> None:
+                """A key was pressed.""
+                print(event)
+                if event.sym in MOVE_KEYS:
+                    # Send movement keys to the cmd_move method with parameters.
+                    self.cmd_move(*MOVE_KEYS[event.sym])
+                elif event.sym in COMMAND_KEYS:
+                    # Send command keys to their respective cmd_X method.
+                    func = getattr(self, "cmd_" + COMMAND_KEYS[event.sym])
+                    func()
+
+            def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> None:
+                """The window was clicked.""
+                print(event)
+
+            def ev_mousemotion(self, event: tcod.event.MouseMotion) -> None:
+                """The mouse has moved within the window."""
+                print(event)
+
+            def cmd_move(self, x: int, y: int) -> None:
+                """Intent to move: `x` and `y` is the direction, both may be 0."""
+                print("Command move: " + str((x, y)))
+
+            def cmd_escape(self) -> None:
+                """Intent to exit this state."""
+                print("Command escape.")
+                self.cmd_quit()
+
+            def cmd_quit(self) -> None:
+                """Intent to exit the game.""
+                print("Command quit.")
                 raise SystemExit()
 
-            def ev_keydown(self, event):
-                print(event)
-
-            def ev_mousebuttondown(self, event):
-                print(event)
-
-            def ev_mousemotion(self, event):
-                print(event)
 
         root_console = tcod.console_init_root(80, 60)
         state = State()
         while True:
-            for event in tcod.event.wait()
+            tcod.console_flush()
+            for event in tcod.event.wait():
                 state.dispatch(event)
-    """
+    '''  # noqa: E501
 
-    def dispatch(self, event: Any) -> None:
+    def dispatch(self, event: Any) -> Optional[T]:
         """Send an event to an `ev_*` method.
 
-        `*` will be the events type converted to lower-case.
+        `*` will be the `event.type` attribute converted to lower-case.
 
-        If `event.type` is an empty string or None then it will be ignored.
+        Values returned by `ev_*` calls will be returned by this function.
+        This value always defaults to None for any non-overridden method.
+
+        .. versionchanged:: 11.12
+            Now returns the return value of `ev_*` methods.
+            `event.type` values of None are deprecated.
         """
-        if event.type:
-            getattr(self, "ev_%s" % (event.type.lower(),))(event)
+        if event.type is None:
+            warnings.warn(
+                "`event.type` attribute should not be None.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            return None
+        func = getattr(
+            self, "ev_%s" % (event.type.lower(),)
+        )  # type: Callable[[Any], Optional[T]]
+        return func(event)
 
     def event_get(self) -> None:
         for event in get():
@@ -781,79 +890,82 @@ class EventDispatch:
         wait(timeout)
         self.event_get()
 
-    def ev_quit(self, event: Quit) -> None:
+    def ev_quit(self, event: Quit) -> T:
         """Called when the termination of the program is requested."""
 
-    def ev_keydown(self, event: KeyDown) -> None:
+    def ev_keydown(self, event: KeyDown) -> T:
         """Called when a keyboard key is pressed or repeated."""
 
-    def ev_keyup(self, event: KeyUp) -> None:
+    def ev_keyup(self, event: KeyUp) -> T:
         """Called when a keyboard key is released."""
 
-    def ev_mousemotion(self, event: MouseMotion) -> None:
+    def ev_mousemotion(self, event: MouseMotion) -> T:
         """Called when the mouse is moved."""
 
-    def ev_mousebuttondown(self, event: MouseButtonDown) -> None:
+    def ev_mousebuttondown(self, event: MouseButtonDown) -> T:
         """Called when a mouse button is pressed."""
 
-    def ev_mousebuttonup(self, event: MouseButtonUp) -> None:
+    def ev_mousebuttonup(self, event: MouseButtonUp) -> T:
         """Called when a mouse button is released."""
 
-    def ev_mousewheel(self, event: MouseWheel) -> None:
+    def ev_mousewheel(self, event: MouseWheel) -> T:
         """Called when the mouse wheel is scrolled."""
 
-    def ev_textinput(self, event: TextInput) -> None:
+    def ev_textinput(self, event: TextInput) -> T:
         """Called to handle Unicode input."""
 
-    def ev_windowshown(self, event: WindowEvent) -> None:
+    def ev_windowshown(self, event: WindowEvent) -> T:
         """Called when the window is shown."""
 
-    def ev_windowhidden(self, event: WindowEvent) -> None:
+    def ev_windowhidden(self, event: WindowEvent) -> T:
         """Called when the window is hidden."""
 
-    def ev_windowexposed(self, event: WindowEvent) -> None:
+    def ev_windowexposed(self, event: WindowEvent) -> T:
         """Called when a window is exposed, and needs to be refreshed.
 
         This usually means a call to :any:`tcod.console_flush` is necessary.
         """
 
-    def ev_windowmoved(self, event: WindowMoved) -> None:
+    def ev_windowmoved(self, event: WindowMoved) -> T:
         """Called when the window is moved."""
 
-    def ev_windowresized(self, event: WindowResized) -> None:
+    def ev_windowresized(self, event: WindowResized) -> T:
         """Called when the window is resized."""
 
-    def ev_windowsizechanged(self, event: WindowResized) -> None:
+    def ev_windowsizechanged(self, event: WindowResized) -> T:
         """Called when the system or user changes the size of the window."""
 
-    def ev_windowminimized(self, event: WindowEvent) -> None:
+    def ev_windowminimized(self, event: WindowEvent) -> T:
         """Called when the window is minimized."""
 
-    def ev_windowmaximized(self, event: WindowEvent) -> None:
+    def ev_windowmaximized(self, event: WindowEvent) -> T:
         """Called when the window is maximized."""
 
-    def ev_windowrestored(self, event: WindowEvent) -> None:
+    def ev_windowrestored(self, event: WindowEvent) -> T:
         """Called when the window is restored."""
 
-    def ev_windowenter(self, event: WindowEvent) -> None:
+    def ev_windowenter(self, event: WindowEvent) -> T:
         """Called when the window gains mouse focus."""
 
-    def ev_windowleave(self, event: WindowEvent) -> None:
+    def ev_windowleave(self, event: WindowEvent) -> T:
         """Called when the window loses mouse focus."""
 
-    def ev_windowfocusgained(self, event: WindowEvent) -> None:
+    def ev_windowfocusgained(self, event: WindowEvent) -> T:
         """Called when the window gains keyboard focus."""
 
-    def ev_windowfocuslost(self, event: WindowEvent) -> None:
+    def ev_windowfocuslost(self, event: WindowEvent) -> T:
         """Called when the window loses keyboard focus."""
 
-    def ev_windowclose(self, event: WindowEvent) -> None:
+    def ev_windowclose(self, event: WindowEvent) -> T:
         """Called when the window manager requests the window to be closed."""
 
-    def ev_windowtakefocus(self, event: WindowEvent) -> None:
+    def ev_windowtakefocus(self, event: WindowEvent) -> T:
         pass
 
-    def ev_windowhittest(self, event: WindowEvent) -> None:
+    def ev_windowhittest(self, event: WindowEvent) -> T:
+        pass
+
+    def ev_(self, event: Any) -> T:
         pass
 
 
