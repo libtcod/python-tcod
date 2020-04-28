@@ -1036,9 +1036,7 @@ def console_map_ascii_code_to_font(
 ) -> None:
     """Set a character code to new coordinates on the tile-set.
 
-    `asciiCode` must be within the bounds created during the initialization of
-    the loaded tile-set.  For example, you can't use 255 here unless you have a
-    256 tile tile-set loaded.  This applies to all functions in this group.
+    `asciiCode` should be any Unicode codepoint.
 
     Args:
         asciiCode (int): The character code to change.

@@ -11,6 +11,9 @@ Unreleased
 Added
  - Added `tcod.context` module.  You now have more options for making libtcod
    controlled contexts.
+ - `tcod.tileset.load_tilesheet`: Load a simple tilesheet as a Tileset.
+ - `Tileset.remap`: Reassign codepoints to tiles on a Tileset.
+ - `tcod.tileset.CHARMAP_CP437`: Character mapping for `load_tilesheet`.
 
 Changed
  - `EventDispatch.dispatch` can now return the values returned by the `ev_*`
