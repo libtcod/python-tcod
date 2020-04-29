@@ -26,7 +26,12 @@ def get_data(path: str) -> str:
     """Return the path to a resource in the libtcod data directory,"""
     SCRIPT_DIR = os.path.dirname(__file__)
     DATA_DIR = os.path.join(SCRIPT_DIR, "../libtcod/data")
+    assert os.path.exists(DATA_DIR), (
+        "Data directory is missing,"
+        " did you forget to run `git submodule update --init`?"
+    )
     return os.path.join(DATA_DIR, path)
+
 
 SAMPLE_SCREEN_WIDTH = 46
 SAMPLE_SCREEN_HEIGHT = 20
