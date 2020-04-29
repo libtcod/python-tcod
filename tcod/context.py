@@ -188,10 +188,11 @@ class Context:
             return xy[0], xy[1]
 
     def convert_event(
-        self, event: Union[tcod.event.MouseState, tcod.event.MouseMotion]
+        self, event: tcod.event.Event
     ) -> None:
         """Fill in the tile coordinates of a mouse event using this context."""
-        event.tile = tcod.event.Point(*self.pixel_to_tile(*event.pixel))
+        if isinstance(event, (tcod.event.MouseState, tcod.event.MouseMotion)):
+            event.tile = tcod.event.Point(*self.pixel_to_tile(*event.pixel))
         if isinstance(event, tcod.event.MouseMotion):
             prev_tile = self.pixel_to_tile(
                 event.pixel[0] - event.pixel_motion[0],
@@ -235,7 +236,7 @@ class Context:
                     self._context_p, size, size + 1
                 )
             )
-            return max(min_columns, size[0]), max(min_rows, 1)
+            return max(min_columns, size[0]), max(min_rows, size[1])
 
     @property
     def renderer_type(self) -> int:

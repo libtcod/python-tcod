@@ -5,36 +5,50 @@
 # https://creativecommons.org/publicdomain/zero/1.0/
 """An demonstration of event handling using the tcod.event module.
 """
+from typing import List
+
 import tcod
-import tcod.event
 
 
-def main():
+WIDTH, HEIGHT = 720, 480
+FLAGS = tcod.context.SDL_WINDOW_RESIZABLE | tcod.context.SDL_WINDOW_MAXIMIZED
+
+
+def main() -> None:
     """Example program for tcod.event"""
-    WIDTH, HEIGHT = 120, 40
-    TITLE = None
 
-    with tcod.console_init_root(
-        WIDTH,
-        HEIGHT,
-        TITLE,
-        order="F",
-        renderer=tcod.RENDERER_SDL2,
-        vsync=True,
-    ) as console:
+    event_log: List[str] = []
+    motion_desc = ""
+
+    with tcod.context.new_window(
+        WIDTH, HEIGHT, sdl_window_flags=FLAGS
+    ) as context:
+        console = tcod.Console(*context.recommended_console_size())
         while True:
-            tcod.console_flush()
+            # Display all event items.
+            console.clear()
+            console.print(0, console.height - 1, motion_desc)
+            for i, item in enumerate(event_log[::-1]):
+                y = console.height - 3 - i
+                if y < 0:
+                    break
+                console.print(0, y, item)
+            context.present(console, integer_scaling=True)
+
+            # Handle events.
             for event in tcod.event.wait():
+                context.convert_event(event)  # Set tile coordinates for event.
                 print(repr(event))
                 if event.type == "QUIT":
                     raise SystemExit()
-                elif event.type == "MOUSEMOTION":
-                    console.ch[:, -1] = 0
-                    console.print(0, HEIGHT - 1, str(event))
+                if event.type == "WINDOWRESIZED":
+                    console = tcod.Console(
+                        *context.recommended_console_size()
+                    )
+                if event.type == "MOUSEMOTION":
+                    motion_desc = str(event)
                 else:
-                    console.blit(console, 0, 0, 0, 1, WIDTH, HEIGHT - 2)
-                    console.ch[:, -3] = 0
-                    console.print(0, HEIGHT - 3, str(event))
+                    event_log.append(str(event))
 
 
 if __name__ == "__main__":

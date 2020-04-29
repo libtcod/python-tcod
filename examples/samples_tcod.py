@@ -32,7 +32,7 @@ SAMPLE_SCREEN_WIDTH = 46
 SAMPLE_SCREEN_HEIGHT = 20
 SAMPLE_SCREEN_X = 20
 SAMPLE_SCREEN_Y = 10
-FONT = get_data("fonts/consolas10x10_gs_tc.png")
+FONT = get_data("fonts/dejavu10x10_gs_tc.png")
 
 root_console = None
 sample_console = tcod.console.Console(
