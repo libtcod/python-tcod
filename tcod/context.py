@@ -1,6 +1,41 @@
 """This module is used to create and handle libtcod contexts.
 
+:any:`Context`'s are intended to replace several libtcod functions such as
+:any:`tcod.console_init_root`, :any:`tcod.console_flush`,
+:any:`tcod.console.recommended_size`, and many other functions which rely on
+hidden global objects within libtcod.  If you use begin using contexts then
+most of these functions will no longer work properly.
+
+Instead of calling :any:`tcod.console_init_root` you can call either
+:any:`tcod.context.new_window` or :any:`tcod.context.new_terminal` depending
+on how you plan to setup the size of the console.  You should use
+:any:`tcod.tileset` to load the font for a context.
+
 .. versionadded:: 11.12
+
+Example::
+
+    WIDTH, HEIGHT = 720, 480
+    FLAGS = tcod.context.SDL_WINDOW_RESIZABLE | tcod.context.SDL_WINDOW_MAXIMIZED
+
+    with tcod.context.new_window(
+        WIDTH, HEIGHT, sdl_window_flags=FLAGS
+    ) as context:
+        console = tcod.Console(*context.recommended_console_size())
+        while True:
+            # Display the console.
+            console.clear()
+            console.print(0, 0, "Hello World")
+            context.present(console, integer_scaling=True)
+
+            # Handle events.
+            for event in tcod.event.wait():
+                context.convert_event(event)  # Set tile coordinates for an event.
+                print(event)
+                if event.type == "QUIT":
+                    raise SystemExit()
+                if event.type == "WINDOWRESIZED":
+                    console = tcod.Console(*context.recommended_console_size())
 """
 import sys
 import os
@@ -289,6 +324,10 @@ def new_window(
     https://wiki.libsdl.org/SDL_CreateWindow#Remarks
 
     `title` is the desired title of the window.
+
+    After the context is created you can use
+    :any:`Context.recommended_console_size` to figure out the size of the
+    console for the context.
     """
     context_pp = ffi.new("TCOD_Context**")
     if renderer is None:
@@ -327,6 +366,10 @@ def new_terminal(
     `columns` and `rows` are the desired size of the console.
 
     The remaining parameters are the same as :any:`new_window`.
+
+    You can use this instead of :any:`new_window` if you plan on using a
+    :any:`tcod.Console` of a fixed size.  This function is the most similar to
+    :any:`tcod.console_init_root`.
     """
     context_pp = ffi.new("TCOD_Context**")
     if renderer is None:

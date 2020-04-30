@@ -209,8 +209,6 @@ def set_truetype_font(path: str, tile_width: int, tile_height: int) -> None:
     tileset.  The font will be scaled to fit the given `tile_height` and
     `tile_width`.
 
-    This function will only affect the `SDL2` and `OPENGL2` renderers.
-
     This function must be called before :any:`tcod.console_init_root`.  Once
     the root console is setup you may call this funtion again to change the
     font.  The tileset can be changed but the window will not be resized
