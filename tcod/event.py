@@ -796,10 +796,6 @@ class EventDispatch(Generic[T]):
             tcod.event.K_n: (1, 1),
         }
 
-        COMMAND_KEYS = {  # key_symbol: command_name
-            tcod.event.K_ESCAPE: "escape",
-        }
-
 
         class State(tcod.event.EventDispatch[None]):
             """A state-based superclass that converts `events` into `commands`.
@@ -823,10 +819,8 @@ class EventDispatch(Generic[T]):
                 if event.sym in MOVE_KEYS:
                     # Send movement keys to the cmd_move method with parameters.
                     self.cmd_move(*MOVE_KEYS[event.sym])
-                elif event.sym in COMMAND_KEYS:
-                    # Send command keys to their respective cmd_X method.
-                    func = getattr(self, "cmd_" + COMMAND_KEYS[event.sym])
-                    func()
+                elif event.sym == tcod.event.K_ESCAPE:
+                    self.cmd_escape()
 
             def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> None:
                 """The window was clicked.""
