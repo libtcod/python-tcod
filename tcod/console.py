@@ -7,7 +7,6 @@ Example::
 
     # Make sure 'arial10x10.png' is in the same directory as this script.
     import tcod
-    import tcod.event
 
     # Setup the font.
     tcod.console_set_custom_font(

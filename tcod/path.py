@@ -3,7 +3,7 @@
 Example::
 
     >>> import numpy as np
-    >>> import tcod.path
+    >>> import tcod
     >>> dungeon = np.array(
     ...     [
     ...         [1, 0, 1, 1, 1],
@@ -382,7 +382,7 @@ def dijkstra2d(
     Example:
 
         >>> import numpy as np
-        >>> import tcod.path
+        >>> import tcod
         >>> cost = np.ones((3, 3), dtype=np.uint8)
         >>> cost[:2, 1] = 0
         >>> cost

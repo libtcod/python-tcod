@@ -4,7 +4,7 @@ assumes `create_room` and `connect_rooms` will be replaced by custom code.
 
 Example::
 
-    import tcod.bsp
+    import tcod
 
     bsp = tcod.bsp.BSP(x=0, y=0, width=80, height=60)
     bsp.split_recursive(

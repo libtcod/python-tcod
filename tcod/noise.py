@@ -8,7 +8,6 @@ Example::
 
     import numpy as np
     import tcod
-    import tcod.noise
 
     noise = tcod.noise.Noise(
         dimensions=2,

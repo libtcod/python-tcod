@@ -762,7 +762,6 @@ class EventDispatch(Generic[T]):
     Example::
 
         import tcod
-        import tcod.event
 
         MOVE_KEYS = {  # key_symbol: (x, y)
             # Arrow keys.

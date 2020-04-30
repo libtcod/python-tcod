@@ -37,7 +37,7 @@ class Image(object):
 
         Example:
             >>> import numpy as np
-            >>> import tcod.image
+            >>> import tcod
             >>> array = np.zeros((5, 5, 3), dtype=np.uint8)
             >>> image = tcod.image.Image.from_array(array)
 

@@ -16,7 +16,6 @@ import warnings
 
 import numpy as np
 import tcod
-import tcod.event
 
 if not sys.warnoptions:
     warnings.simplefilter("default")  # Show all warnings.

@@ -35,7 +35,7 @@ class Map(object):
 
     Example::
 
-        >>> import tcod.map
+        >>> import tcod
         >>> m = tcod.map.Map(width=3, height=4)
         >>> m.walkable
         array([[False, False, False],

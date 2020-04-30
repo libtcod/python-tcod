@@ -7,7 +7,6 @@ import sys
 import os.path
 
 import tcod
-import tcod.event
 
 WIDTH, HEIGHT = 80, 60
 
