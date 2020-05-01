@@ -14,6 +14,7 @@ Added
  - `tcod.tileset.load_tilesheet`: Load a simple tilesheet as a Tileset.
  - `Tileset.remap`: Reassign codepoints to tiles on a Tileset.
  - `tcod.tileset.CHARMAP_CP437`: Character mapping for `load_tilesheet`.
+ - `tcod.tileset.CHARMAP_TCOD`: Older libtcod layout.
 
 Changed
  - `EventDispatch.dispatch` can now return the values returned by the `ev_*`
