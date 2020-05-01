@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.12.0 - 2020-04-30
+--------------------
 Added
  - Added `tcod.context` module.  You now have more options for making libtcod
    controlled contexts.
