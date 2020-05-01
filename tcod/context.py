@@ -36,11 +36,11 @@ Example::
                     raise SystemExit()
                 if event.type == "WINDOWRESIZED":
                     console = tcod.Console(*context.recommended_console_size())
-"""
+"""  # noqa: E501
 import sys
 import os
 
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Tuple
 
 import tcod
 from tcod._internal import _check, _check_warn
@@ -222,9 +222,7 @@ class Context:
             )
             return xy[0], xy[1]
 
-    def convert_event(
-        self, event: tcod.event.Event
-    ) -> None:
+    def convert_event(self, event: tcod.event.Event) -> None:
         """Fill in the tile coordinates of a mouse event using this context."""
         if isinstance(event, (tcod.event.MouseState, tcod.event.MouseMotion)):
             event.tile = tcod.event.Point(*self.pixel_to_tile(*event.pixel))
