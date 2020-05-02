@@ -814,7 +814,7 @@ class EventDispatch(Generic[T]):
                 self.cmd_quit()
 
             def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-                """A key was pressed.""
+                """A key was pressed."""
                 print(event)
                 if event.sym in MOVE_KEYS:
                     # Send movement keys to the cmd_move method with parameters.
@@ -823,7 +823,7 @@ class EventDispatch(Generic[T]):
                     self.cmd_escape()
 
             def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> None:
-                """The window was clicked.""
+                """The window was clicked."""
                 print(event)
 
             def ev_mousemotion(self, event: tcod.event.MouseMotion) -> None:
@@ -840,7 +840,7 @@ class EventDispatch(Generic[T]):
                 self.cmd_quit()
 
             def cmd_quit(self) -> None:
-                """Intent to exit the game.""
+                """Intent to exit the game."""
                 print("Command quit.")
                 raise SystemExit()
 
