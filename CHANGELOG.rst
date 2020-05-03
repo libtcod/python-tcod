@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.12.1 - 2020-05-02
+--------------------
 Fixed
  - Prevent adding non-existent 2nd halves to potential double-wide charterers.
 
