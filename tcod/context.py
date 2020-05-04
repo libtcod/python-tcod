@@ -3,13 +3,45 @@
 :any:`Context`'s are intended to replace several libtcod functions such as
 :any:`tcod.console_init_root`, :any:`tcod.console_flush`,
 :any:`tcod.console.recommended_size`, and many other functions which rely on
-hidden global objects within libtcod.  If you use begin using contexts then
+hidden global objects within libtcod.  If you begin using contexts then
 most of these functions will no longer work properly.
 
 Instead of calling :any:`tcod.console_init_root` you can call either
 :any:`tcod.context.new_window` or :any:`tcod.context.new_terminal` depending
 on how you plan to setup the size of the console.  You should use
 :any:`tcod.tileset` to load the font for a context.
+
+.. note::
+    If you use contexts then you should expect the following functions to no
+    longer be available, because these functions rely on a global console,
+    tileset, or some other kind of global state:
+
+    :any:`tcod.console_init_root`,
+    :any:`tcod.console_set_custom_font`,
+    :any:`tcod.console_flush`,
+    :any:`tcod.console_is_fullscreen`,
+    :any:`tcod.console_is_window_closed`,
+    :any:`tcod.console_set_fade`,
+    :any:`tcod.console_set_fullscreen`,
+    :any:`tcod.console_set_window_title`,
+    :any:`tcod.sys_set_fps`,
+    :any:`tcod.sys_get_last_frame_length`,
+    :any:`tcod.sys_set_renderer`,
+    :any:`tcod.sys_save_screenshot`,
+    :any:`tcod.sys_force_fullscreen_resolution`,
+    :any:`tcod.sys_get_current_resolution`,
+    :any:`tcod.sys_register_SDL_renderer`,
+    :any:`tcod.console_map_ascii_code_to_font`,
+    :any:`tcod.sys_get_char_size`,
+    :any:`tcod.sys_update_char`,
+    :any:`tcod.console.recommended_size`,
+    :any:`tcod.tileset.get_default`,
+    :any:`tcod.tileset.set_default`.
+
+    Some event functions can no longer return tile coordinates for the mouse:
+    :any:`tcod.sys_check_for_event`,
+    :any:`tcod.sys_wait_for_event`,
+    :any:`tcod.mouse_get_status`.
 
 .. versionadded:: 11.12
 
