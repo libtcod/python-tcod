@@ -310,17 +310,32 @@ class Context:
 
     @property
     def sdl_window_p(self) -> Any:
-        """Return a cffi SDL_Window pointer.
-
-        TypeError will be raised if this context does not have an SDL window.
+        '''A cffi `SDL_Window*` pointer.  This pointer might be NULL.
 
         This pointer will become invalid if the context is closed or goes out
         of scope.
-        """
-        sdl_window_p = lib.TCOD_context_get_sdl_window(self._context_p)
-        if not sdl_window_p:
-            raise TypeError("This context does not have an SDL window.")
-        return sdl_window_p
+
+        Python-tcod's FFI provides most SDL functions.  So it's possible for
+        anyone with the SDL2 documentation to work directly with SDL's
+        pointers.
+
+        Example::
+
+            import tcod
+
+            def toggle_fullscreen(context: tcod.context.Context) -> None:
+                """Toggle a context window between fullscreen and windowed modes."""
+                if not context.sdl_window_p:
+                    return
+                fullscreen = tcod.lib.SDL_GetWindowFlags(context.sdl_window_p) & (
+                    tcod.lib.SDL_WINDOW_FULLSCREEN | tcod.lib.SDL_WINDOW_FULLSCREEN_DESKTOP
+                )
+                tcod.lib.SDL_SetWindowFullscreen(
+                    context.sdl_window_p,
+                    0 if fullscreen else tcod.lib.SDL_WINDOW_FULLSCREEN_DESKTOP,
+                )
+        '''  # noqa: E501
+        return lib.TCOD_context_get_sdl_window(self._context_p)
 
 
 def new_window(
