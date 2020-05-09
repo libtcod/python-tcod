@@ -1,6 +1,4 @@
 
-#include <string>
-
 #include "tcod.h"
 
 #include "../libtcod/src/libtcod/bresenham.h"
