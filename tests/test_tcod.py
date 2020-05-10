@@ -235,3 +235,19 @@ def test_cffi_structs():
 
 def test_recommended_size(console):
     tcod.console.recommended_size()
+
+
+def test_context():
+    with tcod.context.new_window(32, 32, renderer=tcod.RENDERER_SDL2):
+        pass
+    WIDTH, HEIGHT = 16, 4
+    with tcod.context.new_terminal(
+        WIDTH, HEIGHT, renderer=tcod.RENDERER_SDL2
+    ) as context:
+        console = tcod.Console(*context.recommended_console_size())
+        context.present(console)
+        context.sdl_window_p
+        context.renderer_type
+        context.change_tileset(tcod.tileset.Tileset(16, 16))
+        context.pixel_to_tile(0, 0)
+        context.pixel_to_subtile(0, 0)
