@@ -306,9 +306,9 @@ if sys.platform not in ["win32", "darwin"]:
 
 # Can force the use of OpenMP with this variable.
 try:
-    USE_OPENMP = eval(os.environ.get("USE_OPENMP", "None").title())
+    USE_OPENMP = eval(os.environ.get("USE_OPENMP", "False").title())
 except Exception:
-    USE_OPENMP = None
+    USE_OPENMP = False
 
 tdl_build = os.environ.get("TDL_BUILD", "RELEASE").upper()
 
