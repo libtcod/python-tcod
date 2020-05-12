@@ -70,10 +70,24 @@ float PathCostArrayInt32(
 int dijkstra2d(
     struct NArray4* dist,
     const struct NArray4* cost,
+    int edges_2d_n,
+    int* edges_2d);
+
+int dijkstra2d_basic(
+    struct NArray4* dist,
+    const struct NArray4* cost,
     int cardinal,
     int diagonal);
 
 int hillclimb2d(
+    const struct NArray4* dist_array,
+    int start_i,
+    int start_j,
+    int edges_2d_n,
+    int* edges_2d,
+    int* out);
+
+int hillclimb2d_basic(
     const struct NArray4* dist,
     int x,
     int y,

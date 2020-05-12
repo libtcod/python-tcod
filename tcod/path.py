@@ -40,6 +40,7 @@ Example::
     All path-finding functions now respect the NumPy array shape (if a NumPy
     array is used.)
 """
+import functools
 from typing import Any, Callable, List, Optional, Tuple, Union  # noqa: F401
 
 import numpy as np
@@ -324,7 +325,7 @@ _INT_TYPES = {
 
 
 def maxarray(
-    shape: Tuple[int, ...], dtype: Any = int, order: str = "C"
+    shape: Tuple[int, ...], dtype: Any = np.int32, order: str = "C"
 ) -> np.array:
     """Return a new array filled with the maximum finite value for `dtype`.
 
@@ -357,11 +358,35 @@ def _export(array: np.array) -> Any:
     )
 
 
+def _compile_cost_edges(edge_map: Any) -> Tuple[Any, int]:
+    """Return an edge_cost array using an integer map."""
+    edge_map = np.copy(edge_map)
+    if edge_map.ndim != 2:
+        raise ValueError(
+            "edge_map must be 2 dimensional. (Got %i)" % edge_map.ndim
+        )
+    edge_center = edge_map.shape[0] // 2, edge_map.shape[1] // 2
+    edge_map[edge_center] = 0
+    edge_map[edge_map < 0] = 0
+    edge_nz = edge_map.nonzero()
+    edge_array = np.transpose(edge_nz)
+    edge_array -= edge_center
+    c_edges = ffi.new("int[]", len(edge_array) * 3)
+    edges = np.frombuffer(ffi.buffer(c_edges), dtype=np.intc).reshape(
+        len(edge_array), 3
+    )
+    edges[:, :2] = edge_array
+    edges[:, 2] = edge_map[edge_nz]
+    return c_edges, len(edge_array)
+
+
 def dijkstra2d(
     distance: np.array,
     cost: np.array,
-    cardinal: Optional[int],
-    diagonal: Optional[int],
+    cardinal: Optional[int] = None,
+    diagonal: Optional[int] = None,
+    *,
+    edge_map: Any = None
 ) -> None:
     """Return the computed distance of all nodes on a 2D Dijkstra grid.
 
@@ -379,7 +404,12 @@ def dijkstra2d(
     directions.  A value of None or 0 will disable those directions.  Typical
     values could be: ``1, None``, ``1, 1``, ``2, 3``, etc.
 
-    Example:
+    `edge_map` is a 2D array of edge costs with the origin point centered on
+    the array.  This can be used to define the edges used from one node to
+    another.  This parameter can be hard to understand so you should see how
+    it's used in the examples.
+
+    Example::
 
         >>> import numpy as np
         >>> import tcod
@@ -414,7 +444,58 @@ def dijkstra2d(
         [2, 1]
         [2, 2]
 
+    `edge_map` is used for more complicated graphs.  The following example
+    uses a 'knight move' edge map.
+
+    Example::
+
+        >>> import numpy as np
+        >>> import tcod
+        >>> knight_moves = [
+        ...     [0, 1, 0, 1, 0],
+        ...     [1, 0, 0, 0, 1],
+        ...     [0, 0, 0, 0, 0],
+        ...     [1, 0, 0, 0, 1],
+        ...     [0, 1, 0, 1, 0],
+        ... ]
+        >>> dist = tcod.path.maxarray((8, 8))
+        >>> dist[0,0] = 0
+        >>> cost = np.ones((8, 8), int)
+        >>> tcod.path.dijkstra2d(dist, cost, edge_map=knight_moves)
+        >>> dist
+        array([[0, 3, 2, 3, 2, 3, 4, 5],
+               [3, 4, 1, 2, 3, 4, 3, 4],
+               [2, 1, 4, 3, 2, 3, 4, 5],
+               [3, 2, 3, 2, 3, 4, 3, 4],
+               [2, 3, 2, 3, 4, 3, 4, 5],
+               [3, 4, 3, 4, 3, 4, 5, 4],
+               [4, 3, 4, 3, 4, 5, 4, 5],
+               [5, 4, 5, 4, 5, 4, 5, 6]]...)
+        >>> tcod.path.hillclimb2d(dist, (7, 7), edge_map=knight_moves)
+        array([[7, 7],
+               [5, 6],
+               [3, 5],
+               [1, 4],
+               [0, 2],
+               [2, 1],
+               [0, 0]], dtype=int32)
+
+    `edge_map` can also be used to define a hex-grid.
+    See https://www.redblobgames.com/grids/hexagons/ for more info.
+    The following example is using axial coordinates.
+
+    Example::
+
+        hex_edges = [
+            [0, 1, 1],
+            [1, 0, 1],
+            [1, 1, 0],
+        ]
+
     .. versionadded:: 11.2
+
+    .. versionchanged:: 11.13
+        Added the `edge_map` parameter.
     """
     dist = distance
     cost = np.asarray(cost)
@@ -423,15 +504,40 @@ def dijkstra2d(
             "distance and cost must have the same shape %r != %r"
             % (dist.shape, cost.shape)
         )
-    if cardinal is None:
-        cardinal = 0
-    if diagonal is None:
-        diagonal = 0
-    _check(lib.dijkstra2d(_export(dist), _export(cost), cardinal, diagonal))
+    c_dist = _export(dist)
+    if edge_map is not None:
+        if cardinal is not None or diagonal is not None:
+            raise TypeError(
+                "`edge_map` can not be set at the same time as"
+                " `cardinal` or `diagonal`."
+            )
+        c_edges, n_edges = _compile_cost_edges(edge_map)
+        _check(lib.dijkstra2d(c_dist, _export(cost), n_edges, c_edges))
+    else:
+        if cardinal is None:
+            cardinal = 0
+        if diagonal is None:
+            diagonal = 0
+        _check(lib.dijkstra2d_basic(c_dist, _export(cost), cardinal, diagonal))
+
+
+def _compile_bool_edges(edge_map: Any) -> Tuple[Any, int]:
+    """Return an edge array using a boolean map."""
+    edge_map = np.copy(edge_map)
+    edge_center = edge_map.shape[0] // 2, edge_map.shape[1] // 2
+    edge_map[edge_center] = 0
+    edge_array = np.transpose(edge_map.nonzero())
+    edge_array -= edge_center
+    return ffi.new("int[]", list(edge_array.flat)), len(edge_array)
 
 
 def hillclimb2d(
-    distance: np.array, start: Tuple[int, int], cardinal: bool, diagonal: bool
+    distance: np.array,
+    start: Tuple[int, int],
+    cardinal: Optional[bool] = None,
+    diagonal: Optional[bool] = None,
+    *,
+    edge_map: Any = None
 ) -> np.array:
     """Return a path on a grid from `start` to the lowest point.
 
@@ -447,6 +553,10 @@ def hillclimb2d(
     boolean values `cardinal` and `diagonal`.  This process is repeated until
     all adjacent nodes are equal to or larger than the last point on the path.
 
+    If `edge_map` was used with :any:`tcod.path.dijkstra2d` then it should be
+    reused for this function.  Keep in mind that `edge_map` must be
+    bidirectional since hill-climbing will traverse the map backwards.
+
     The returned array is a 2D NumPy array with the shape: (length, axis).
     This array always includes both the starting and ending point and will
     always have at least one item.
@@ -456,6 +566,9 @@ def hillclimb2d(
     can be used to index other arrays using NumPy's advanced indexing rules.
 
     .. versionadded:: 11.2
+
+    .. versionchanged:: 11.13
+        Added `edge_map` parameter.
     """
     x, y = start
     dist = np.asarray(distance)
@@ -464,10 +577,22 @@ def hillclimb2d(
             "Starting point %r not in shape %r" % (start, dist.shape)
         )
     c_dist = _export(dist)
-    length = _check(
-        lib.hillclimb2d(c_dist, x, y, cardinal, diagonal, ffi.NULL)
-    )
+    if edge_map is not None:
+        if cardinal is not None or diagonal is not None:
+            raise TypeError(
+                "`edge_map` can not be set at the same time as"
+                " `cardinal` or `diagonal`."
+            )
+        c_edges, n_edges = _compile_bool_edges(edge_map)
+        func = functools.partial(
+            lib.hillclimb2d, c_dist, x, y, n_edges, c_edges
+        )
+    else:
+        func = functools.partial(
+            lib.hillclimb2d_basic, c_dist, x, y, cardinal, diagonal
+        )
+    length = _check(func(ffi.NULL))
     path = np.ndarray((length, 2), dtype=np.intc)
     c_path = ffi.cast("int*", path.ctypes.data)
-    _check(lib.hillclimb2d(c_dist, x, y, cardinal, diagonal, c_path))
+    _check(func(c_path))
     return path

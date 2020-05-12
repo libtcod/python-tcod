@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - Added `edge_map` parameter to `tcod.path.dijkstra2d` and
+   `tcod.path.hillclimb2d`.
 
 11.12.1 - 2020-05-02
 --------------------

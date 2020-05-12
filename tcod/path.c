@@ -168,7 +168,37 @@ static void dijkstra2d_add_edge(
   set_array2d_int(dist_array, index[0], index[1], distance);
   TCOD_frontier_push(frontier, index, distance, distance);
 }
+
 int dijkstra2d(
+    struct NArray4* dist_array,
+    const struct NArray4* cost,
+    int edges_2d_n,
+    int* edges_2d)
+{
+  struct TCOD_Frontier* frontier = TCOD_frontier_new(2);
+  if (!frontier) { return TCOD_E_ERROR; }
+  for (int i = 0; i < dist_array->shape[0]; ++i) {
+    for (int j = 0; j < dist_array->shape[1]; ++j) {
+      if (get_array2d_is_max(dist_array, i, j)) { continue; }
+      const int index[2] = {i, j};
+      int dist = get_array2d_int(dist_array, i, j);
+      TCOD_frontier_push(frontier, index, dist, dist);
+    }
+  }
+  while (TCOD_frontier_size(frontier)) {
+    TCOD_frontier_pop(frontier);
+    int distance_here = get_array2d_int(
+        dist_array, frontier->active_index[0], frontier->active_index[1]);
+    if (frontier->active_dist != distance_here) { continue; }
+    for (int i = 0; i < edges_2d_n; ++i) {
+      dijkstra2d_add_edge(
+          frontier, dist_array, cost, edges_2d[i * 3 + 2], &edges_2d[i * 3]);
+    }
+  }
+  return TCOD_E_OK;
+}
+
+int dijkstra2d_basic(
     struct NArray4* dist_array,
     const struct NArray4* cost,
     int cardinal,
@@ -222,15 +252,45 @@ static void hillclimb2d_check_edge(
 }
 int hillclimb2d(
     const struct NArray4* dist_array,
-    int i,
-    int j,
+    int start_i,
+    int start_j,
+    int edges_2d_n,
+    int* edges_2d,
+    int* out)
+{
+  int old_dist = get_array2d_int(dist_array, start_i, start_j);
+  int new_dist = old_dist;
+  int next[2] = {start_i, start_j};
+  int length = 0;
+  while (1) {
+    ++length;
+    if (out) {
+      out[0] = next[0];
+      out[1] = next[1];
+      out += 2;
+    }
+    const int origin[2] = {next[0], next[1]};
+    for (int i = 0; i < edges_2d_n; ++i) {
+      hillclimb2d_check_edge(
+          dist_array, &new_dist, origin, &edges_2d[i * 2], next);
+    }
+    if (old_dist == new_dist) {
+      return length;
+    }
+    old_dist = new_dist;
+  }
+}
+int hillclimb2d_basic(
+    const struct NArray4* dist_array,
+    int start_i,
+    int start_j,
     bool cardinal,
     bool diagonal,
     int* out)
 {
-  int old_dist = get_array2d_int(dist_array, i, j);
+  int old_dist = get_array2d_int(dist_array, start_i, start_j);
   int new_dist = old_dist;
-  int next[2] = {i, j};
+  int next[2] = {start_i, start_j};
   int length = 0;
   while (1) {
     ++length;
