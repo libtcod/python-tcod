@@ -3,20 +3,20 @@ matrix:
   include:
   - os: linux
     python: 3.5
-    env: CC=gcc-8 CXX=g++-8
+    env: CC=gcc-8 CXX=g++-8 LDSHARED="gcc-8 -shared"
   - os: linux
     python: 3.6
-    env: CC=gcc-8 CXX=g++-8
+    env: CC=gcc-8 CXX=g++-8 LDSHARED="gcc-8 -shared"
   - os: linux
     python: 3.7
     dist: xenial
     sudo: required
-    env: CC=gcc-8 CXX=g++-8
+    env: CC=gcc-8 CXX=g++-8 LDSHARED="gcc-8 -shared"
   - os: linux
     python: nightly
     dist: xenial
     sudo: required
-    env: CC=gcc-8 CXX=g++-8
+    env: CC=gcc-8 CXX=g++-8 LDSHARED="gcc-8 -shared"
   - os: osx
     language: generic
     env: MB_PYTHON_VERSION=3.7.1
