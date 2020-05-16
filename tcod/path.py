@@ -41,7 +41,8 @@ Example::
     array is used.)
 """
 import functools
-from typing import Any, Callable, List, Optional, Tuple, Union  # noqa: F401
+import itertools
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -316,6 +317,7 @@ _INT_TYPES = {
     np.int8: lib.np_int8,
     np.int16: lib.np_int16,
     np.int32: lib.np_int32,
+    np.intc: lib.np_int32,
     np.int64: lib.np_int64,
     np.uint8: lib.np_uint8,
     np.uint16: lib.np_uint16,
@@ -345,17 +347,19 @@ def maxarray(
     return np.full(shape, np.iinfo(dtype).max, dtype, order)
 
 
+def _export_dict(array: np.array) -> Dict[str, Any]:
+    """Convert a NumPy array into a format compatible with CFFI."""
+    return {
+            "type": _INT_TYPES[array.dtype.type],
+            "ndim": array.ndim,
+            "data": ffi.cast("void*", array.ctypes.data),
+            "shape": array.shape,
+            "strides": array.strides,
+    }
+
 def _export(array: np.array) -> Any:
     """Convert a NumPy array into a ctype object."""
-    return ffi.new(
-        "struct NArray4*",
-        (
-            _INT_TYPES[array.dtype.type],
-            ffi.cast("void*", array.ctypes.data),
-            array.shape,
-            array.strides,
-        ),
-    )
+    return ffi.new("struct NArray*", _export_dict(array))
 
 
 def _compile_cost_edges(edge_map: Any) -> Tuple[Any, int]:
@@ -596,3 +600,212 @@ def hillclimb2d(
     c_path = ffi.cast("int*", path.ctypes.data)
     _check(func(c_path))
     return path
+
+
+def _world_array(shape: Tuple[int, ...], dtype: Any = np.int32) -> np.ndarray:
+    return np.ascontiguousarray(
+        np.transpose(
+            np.meshgrid(
+                *(np.arange(i, dtype=np.int32) for i in shape),
+                indexing="xy",
+                copy=False,
+            )
+        )
+    )
+
+
+def _as_hashable(obj: Any) -> Any:
+    if obj is None:
+        return obj
+    return obj.ctypes.data, tuple(obj.shape), tuple(obj.strides)
+
+
+class Graph:
+    """
+    Example::
+
+        >>> import tcod
+        >>> graph = tcod.path.Graph((5, 5))
+        >>> cost = np.ones((5, 5), dtype=np.int8)
+        >>> CARDINAL = [
+        ...     [0, 1, 0],
+        ...     [1, 0, 1],
+        ...     [0, 1, 0],
+        ... ]
+        >>> graph.add_edges(edge_map=CARDINAL, cost=cost)
+        >>> pf = tcod.path.Pathfinder(graph)
+        >>> pf.add_root((0, 0))
+        >>> pf.resolve()
+        >>> pf.distance
+        array([[0, 1, 2, 3, 4],
+               [1, 2, 3, 4, 5],
+               [2, 3, 4, 5, 6],
+               [3, 4, 5, 6, 7],
+               [4, 5, 6, 7, 8]]...)
+        >>> pf.path_to((3, 3))
+        array([[0, 0],
+               [0, 1],
+               [1, 1],
+               [2, 1],
+               [2, 2],
+               [2, 3],
+               [3, 3]]...)
+
+    .. versionadded:: 11.13
+    """
+
+    def __init__(self, shape: Tuple[int, ...]):
+        self._shape = tuple(shape)
+        self._ndim = len(self._shape)
+        assert 0 < self._ndim <= 4
+        self._graph = {}  # type: Dict[Tuple[Any, ...], Dict[str, Any]]
+        self._edge_rules_keep_alive = []  # type: List[Any]
+        self._edge_rules_p = None  # type: Any
+
+    @property
+    def ndim(self) -> int:
+        return self._ndim
+
+    @property
+    def shape(self) -> Tuple[int, ...]:
+        return self._shape
+
+    def add_edge(
+        self,
+        edge_dir: Tuple[int, ...],
+        edge_cost: int = 1,
+        *,
+        cost: np.ndarray,
+        condition: Optional[np.ndarray] = None
+    ) -> None:
+        self._edge_rules_p = None
+        edge_dir = tuple(edge_dir)
+        assert len(edge_dir) == self._ndim
+        cost = np.asarray(cost)
+        if condition is not None:
+            condition = np.asarray(condition)
+        key = (_as_hashable(cost), _as_hashable(condition))
+        try:
+            rule = self._graph[key]
+        except KeyError:
+            rule = self._graph[key] = {
+                "cost": cost,
+                "edge_list" : [],
+            }
+            if condition is not None:
+                rule["condition"] = condition
+        edge = edge_dir + (edge_cost,)
+        if edge not in rule["edge_list"]:
+            rule["edge_list"].append(edge)
+
+    def add_edges(
+        self,
+        *,
+        edge_map: Any,
+        cost: np.ndarray,
+        condition: Optional[np.ndarray] = None
+    ) -> None:
+        edge_map = np.copy(edge_map)
+        if edge_map.ndim != self._ndim:
+            raise ValueError(
+                "edge_map must must match graph dimensions (%i). (Got %i)" % (self.ndim, edge_map.ndim)
+            )
+        edge_center = tuple(i // 2 for i in edge_map.shape)
+        edge_map[edge_center] = 0
+        edge_map[edge_map < 0] = 0
+        edge_nz = edge_map.nonzero()
+        edge_array = np.transpose(edge_nz)
+        edge_array -= edge_center
+        for edge in edge_array:
+            edge = tuple(edge)
+            self.add_edge(edge, edge_map[edge], cost=cost, condition=condition)
+
+    def _compile_rules(self) -> Any:
+        if not self._edge_rules_p:
+            self._edge_rules_keep_alive = []
+            rules = []
+            for rule_ in self._graph.values():
+                rule = rule_.copy()
+                rule["edge_count"] = len(rule["edge_list"])
+                # Edge rule format: [i, j, cost, ...] etc.
+                edge_obj = ffi.new("int[]", len(rule["edge_list"]) * (self._ndim + 1))
+                edge_obj[0 : len(edge_obj)] = itertools.chain(*rule["edge_list"])
+                self._edge_rules_keep_alive.append(edge_obj)
+                rule["edge_array"] = edge_obj
+                self._edge_rules_keep_alive.append(rule["cost"])
+                rule["cost"] = _export_dict(rule["cost"])
+                if "condition" in rule:
+                    self._edge_rules_keep_alive.append(rule["condition"])
+                    rule["condition"] = _export_dict(rule["condition"])
+                del rule["edge_list"]
+                rules.append(rule)
+            self._edge_rules_p = ffi.new("struct PathfinderRule[]", rules)
+        return self._edge_rules_p, self._edge_rules_keep_alive
+
+
+class Pathfinder:
+    """
+    .. versionadded:: 11.13
+    """
+    def __init__(self, graph: Graph):
+        self._graph = graph
+        self._frontier_p = ffi.gc(
+            lib.TCOD_frontier_new(self._graph._ndim), lib.TCOD_frontier_delete
+        )
+        self._distance = maxarray(self._graph._shape)
+        self._travel = _world_array(self._graph._shape)
+        assert self._travel.flags["C_CONTIGUOUS"]
+        self._distance_p = _export(self._distance)
+        self._travel_p = _export(self._travel)
+
+    @property
+    def distance(self) -> np.ndarray:
+        return self._distance
+
+    def clear(self) -> None:
+        self._distance[...] = np.iinfo(self._distance.dtype).max
+        self._travel = _world_array(self._graph._shape)
+
+    def add_root(self, index: Tuple[int, ...], value: int = 0) -> None:
+        index_ = tuple(index)
+        assert len(index_) == self._distance.ndim
+        self._distance[index_] = value
+        lib.TCOD_frontier_clear(self._frontier_p)
+        lib.TCOD_frontier_push(self._frontier_p, index_, value, value)
+
+    def resolve(self) -> None:
+        rules, keep_alive = self._graph._compile_rules()
+        _check(
+            lib.path_compute(
+                self._frontier_p,
+                self._distance_p,
+                self._travel_p,
+                len(rules),
+                rules,
+            )
+        )
+
+    def path_from(self, index: Tuple[int, ...]) -> np.ndarray:
+        self.resolve()
+        assert len(index) == self._graph._ndim
+        length = _check(
+            lib.get_travel_path(
+                self._graph._ndim,
+                self._travel_p,
+                index,
+                ffi.NULL,
+            )
+        )
+        path = np.ndarray((length, self._graph._ndim), dtype=np.intc)
+        _check(
+            lib.get_travel_path(
+                self._graph._ndim,
+                self._travel_p,
+                index,
+                ffi.cast("int*", path.ctypes.data),
+            )
+        )
+        return path
+
+    def path_to(self, index: Tuple[int, ...]) -> np.ndarray:
+        return self.path_from(index)[::-1]

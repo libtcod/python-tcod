@@ -3,6 +3,9 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
+
+#include "../libtcod/src/libtcod/pathfinder_frontier.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,18 +30,30 @@ enum NP_Type {
 /**
  *  A simple 4D NumPy array ctype.
  */
-struct NArray4 {
+struct NArray {
   enum NP_Type type;
+  int8_t ndim;
   char *data;
-  ptrdiff_t shape[4];
-  ptrdiff_t strides[4];
+  ptrdiff_t shape[5]; // TCOD_PATHFINDER_MAX_DIMENSIONS + 1
+  ptrdiff_t strides[5]; // TCOD_PATHFINDER_MAX_DIMENSIONS + 1
 };
 
-struct EdgeRule {
-  int vector[4];
-  int cost;
-  struct NArray4 dest_cost;
-  struct NArray4 staging;
+struct PathfinderRule {
+  /** Rule condition, could be uninitialized zeros. */
+  struct NArray condition;
+  /** Edge cost map, required. */
+  struct NArray cost;
+  /** Number of edge rules in `edge_array`. */
+  int edge_count;
+  /** Example of 2D edges: [i, j, cost, i_2, j_2, cost_2, ...] */
+  int* edge_array;
+};
+
+struct PathfinderHeuristic {
+  int cardinal;
+  int diagonal;
+  int z;
+  int w;
 };
 
 struct PathCostArray {
@@ -68,33 +83,55 @@ float PathCostArrayInt32(
     int x1, int y1, int x2, int y2, const struct PathCostArray *map);
 
 int dijkstra2d(
-    struct NArray4* dist,
-    const struct NArray4* cost,
+    struct NArray* dist,
+    const struct NArray* cost,
     int edges_2d_n,
-    int* edges_2d);
+    const int* edges_2d);
 
 int dijkstra2d_basic(
-    struct NArray4* dist,
-    const struct NArray4* cost,
+    struct NArray* dist,
+    const struct NArray* cost,
     int cardinal,
     int diagonal);
 
 int hillclimb2d(
-    const struct NArray4* dist_array,
+    const struct NArray* dist_array,
     int start_i,
     int start_j,
     int edges_2d_n,
-    int* edges_2d,
+    const int* edges_2d,
     int* out);
 
 int hillclimb2d_basic(
-    const struct NArray4* dist,
+    const struct NArray* dist,
     int x,
     int y,
     bool cardinal,
     bool diagonal,
     int* out);
 
+int path_compute_step(
+    struct TCOD_Frontier* frontier,
+    struct NArray* dist_map,
+    struct NArray* travel_map,
+    int n,
+    const struct PathfinderRule* rules);
+
+int path_compute(
+    struct TCOD_Frontier* frontier,
+    struct NArray* dist_map,
+    struct NArray* travel_map,
+    int n,
+    const struct PathfinderRule* rules);
+/**
+    Find and get a path along `travel_map`.
+
+    Returns the length of the path, `out` must be NULL or `out[n*ndim]`.
+    Where `n` is the value return from a previous call with the same
+    parameters.
+ */
+size_t get_travel_path(
+    int8_t ndim, const struct NArray* travel_map, const int* start, int* out);
 #ifdef __cplusplus
 }
 #endif
