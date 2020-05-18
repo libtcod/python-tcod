@@ -54,6 +54,7 @@ struct PathfinderHeuristic {
   int diagonal;
   int z;
   int w;
+  int target[TCOD_PATHFINDER_MAX_DIMENSIONS];
 };
 
 struct PathCostArray {
@@ -82,6 +83,15 @@ float PathCostArrayInt16(
 float PathCostArrayInt32(
     int x1, int y1, int x2, int y2, const struct PathCostArray *map);
 
+/**
+    Return the value to add to the distance to sort nodes by A*.
+
+    `heuristic` can be NULL.
+
+    `index[ndim]` must not be NULL.
+ */
+int compute_heuristic(
+    const struct PathfinderHeuristic* heuristic, int ndim, const int* index);
 int dijkstra2d(
     struct NArray* dist,
     const struct NArray* cost,
@@ -115,14 +125,16 @@ int path_compute_step(
     struct NArray* dist_map,
     struct NArray* travel_map,
     int n,
-    const struct PathfinderRule* rules);
+    const struct PathfinderRule* rules, // rules[n]
+    const struct PathfinderHeuristic* heuristic);
 
 int path_compute(
     struct TCOD_Frontier* frontier,
     struct NArray* dist_map,
     struct NArray* travel_map,
     int n,
-    const struct PathfinderRule* rules);
+    const struct PathfinderRule* rules, // rules[n]
+    const struct PathfinderHeuristic* heuristic);
 /**
     Find and get a path along `travel_map`.
 

@@ -3,9 +3,11 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "../libtcod/src/libtcod/error.h"
 #include "../libtcod/src/libtcod/pathfinder_frontier.h"
+#include "../libtcod/src/libtcod/utility.h"
 
 static void* pick_array_pointer(const struct PathCostArray *map, int i, int j)
 {
@@ -333,12 +335,43 @@ int hillclimb2d_basic(
     old_dist = new_dist;
   }
 }
+int compute_heuristic(
+    const struct PathfinderHeuristic* heuristic, int ndim, const int* index)
+{
+  if (!heuristic) { return 0; }
+  int x = 0;
+  int y = 0;
+  int z = 0;
+  int w = 0;
+  switch(ndim) {
+    case 4:
+      w = abs(index[ndim - 4] - heuristic->target[ndim - 4]);
+      //@fallthrough@
+    case 3:
+      z = abs(index[ndim - 3] - heuristic->target[ndim - 3]);
+      //@fallthrough@
+    case 2:
+      y = abs(index[ndim - 2] - heuristic->target[ndim - 2]);
+      //@fallthrough@
+    case 1:
+      x = abs(index[ndim - 1] - heuristic->target[ndim - 1]);
+      break;
+    default:
+      return 0;
+  }
+  int diagonal = heuristic->diagonal != 0 ? MIN(x, y) : 0;
+  int straight = MAX(x, y) - diagonal;
+  return (straight * heuristic->cardinal + diagonal * heuristic->diagonal
+          + w * heuristic->w + z * heuristic->z);
+
+}
 void path_compute_add_edge(
     struct TCOD_Frontier* frontier,
     struct NArray* dist_map,
     struct NArray* travel_map,
     const struct NArray* cost_map,
-    const int* edge_rule)
+    const int* edge_rule,
+    const struct PathfinderHeuristic* heuristic)
 {
   int dest[TCOD_PATHFINDER_MAX_DIMENSIONS];
   for (int i = 0; i < frontier->ndim; ++i) {
@@ -355,7 +388,8 @@ void path_compute_add_edge(
   for (int i = 0; i < frontier->ndim; ++i) {
     path[i] = frontier->active_index[i];
   }
-  TCOD_frontier_push(frontier, dest, distance, distance);
+  int priority = distance + compute_heuristic(heuristic, frontier->ndim, dest);
+  TCOD_frontier_push(frontier, dest, distance, priority);
 }
 
 int path_compute_step(
@@ -363,7 +397,8 @@ int path_compute_step(
     struct NArray* dist_map,
     struct NArray* travel_map,
     int n,
-    const struct PathfinderRule* rules)
+    const struct PathfinderRule* rules,
+    const struct PathfinderHeuristic* heuristic)
 {
   if (!frontier) {
     return TCOD_set_errorv("Missing frontier.");
@@ -393,7 +428,8 @@ int path_compute_step(
           dist_map,
           travel_map,
           &rules[i].cost,
-          &rules[i].edge_array[edge_i * (frontier->ndim + 1)]);
+          &rules[i].edge_array[edge_i * (frontier->ndim + 1)],
+          heuristic);
     }
   }
   return 0;
@@ -403,7 +439,8 @@ int path_compute(
     struct NArray* dist_map,
     struct NArray* travel_map,
     int n,
-    const struct PathfinderRule* rules)
+    const struct PathfinderRule* rules,
+    const struct PathfinderHeuristic* heuristic)
 {
   if (!frontier) {
     return TCOD_set_errorv("Missing frontier.");
@@ -414,7 +451,8 @@ int path_compute(
         dist_map,
         travel_map,
         n,
-        rules);
+        rules,
+        heuristic);
     if (err < 0) { return err; }
   }
   return 0;

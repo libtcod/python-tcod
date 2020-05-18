@@ -782,6 +782,7 @@ class Pathfinder:
                 self._travel_p,
                 len(rules),
                 rules,
+                ffi.NULL,
             )
         )
 
