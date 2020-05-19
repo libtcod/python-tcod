@@ -15,6 +15,10 @@ Changed
  - Added `edge_map` parameter to `tcod.path.dijkstra2d` and
    `tcod.path.hillclimb2d`.
 
+Fixed
+ - tcod.console_init_root` and context initializing functions were not
+   raising exceptions on failure.
+
 11.12.1 - 2020-05-02
 --------------------
 Fixed
