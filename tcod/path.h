@@ -144,6 +144,12 @@ int path_compute(
  */
 size_t get_travel_path(
     int8_t ndim, const struct NArray* travel_map, const int* start, int* out);
+/**
+    Update the priority of nodes on the frontier and sort them.
+ */
+int update_frontier_heuristic(
+    struct TCOD_Frontier* frontier,
+    const struct PathfinderHeuristic* heuristic);
 #ifdef __cplusplus
 }
 #endif

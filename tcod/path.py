@@ -350,12 +350,13 @@ def maxarray(
 def _export_dict(array: np.array) -> Dict[str, Any]:
     """Convert a NumPy array into a format compatible with CFFI."""
     return {
-            "type": _INT_TYPES[array.dtype.type],
-            "ndim": array.ndim,
-            "data": ffi.cast("void*", array.ctypes.data),
-            "shape": array.shape,
-            "strides": array.strides,
+        "type": _INT_TYPES[array.dtype.type],
+        "ndim": array.ndim,
+        "data": ffi.cast("void*", array.ctypes.data),
+        "shape": array.shape,
+        "strides": array.strides,
     }
+
 
 def _export(array: np.array) -> Any:
     """Convert a NumPy array into a ctype object."""
@@ -661,6 +662,7 @@ class Graph:
         self._graph = {}  # type: Dict[Tuple[Any, ...], Dict[str, Any]]
         self._edge_rules_keep_alive = []  # type: List[Any]
         self._edge_rules_p = None  # type: Any
+        self._heuristic = None  # type: Optional[Tuple[int, int, int, int]]
 
     @property
     def ndim(self) -> int:
@@ -690,7 +692,7 @@ class Graph:
         except KeyError:
             rule = self._graph[key] = {
                 "cost": cost,
-                "edge_list" : [],
+                "edge_list": [],
             }
             if condition is not None:
                 rule["condition"] = condition
@@ -708,7 +710,8 @@ class Graph:
         edge_map = np.copy(edge_map)
         if edge_map.ndim != self._ndim:
             raise ValueError(
-                "edge_map must must match graph dimensions (%i). (Got %i)" % (self.ndim, edge_map.ndim)
+                "edge_map must must match graph dimensions (%i). (Got %i)"
+                % (self.ndim, edge_map.ndim)
             )
         edge_center = tuple(i // 2 for i in edge_map.shape)
         edge_map[edge_center] = 0
@@ -720,6 +723,20 @@ class Graph:
             edge = tuple(edge)
             self.add_edge(edge, edge_map[edge], cost=cost, condition=condition)
 
+    def set_heuristic(
+        self, *, cardinal: int = 0, diagonal: int = 0, z: int = 0, w: int = 0
+    ) -> None:
+        """Sets a pathfinder heuristic so that pathfinding can done with A*."""
+        if 0 == cardinal == diagonal == z == w:
+            self._heuristic = None
+        if diagonal and cardinal > diagonal:
+            raise ValueError(
+                "Diagonal parameter can not be lower than cardinal."
+            )
+        if cardinal < 0 or diagonal < 0 or z < 0 or w < 0:
+            raise ValueError("Parameters can not be set to negative values..")
+        self._heuristic = (cardinal, diagonal, z, w)
+
     def _compile_rules(self) -> Any:
         if not self._edge_rules_p:
             self._edge_rules_keep_alive = []
@@ -728,8 +745,12 @@ class Graph:
                 rule = rule_.copy()
                 rule["edge_count"] = len(rule["edge_list"])
                 # Edge rule format: [i, j, cost, ...] etc.
-                edge_obj = ffi.new("int[]", len(rule["edge_list"]) * (self._ndim + 1))
-                edge_obj[0 : len(edge_obj)] = itertools.chain(*rule["edge_list"])
+                edge_obj = ffi.new(
+                    "int[]", len(rule["edge_list"]) * (self._ndim + 1)
+                )
+                edge_obj[0 : len(edge_obj)] = itertools.chain(
+                    *rule["edge_list"]
+                )
                 self._edge_rules_keep_alive.append(edge_obj)
                 rule["edge_array"] = edge_obj
                 self._edge_rules_keep_alive.append(rule["cost"])
@@ -747,6 +768,7 @@ class Pathfinder:
     """
     .. versionadded:: 11.13
     """
+
     def __init__(self, graph: Graph):
         self._graph = graph
         self._frontier_p = ffi.gc(
@@ -757,14 +779,25 @@ class Pathfinder:
         assert self._travel.flags["C_CONTIGUOUS"]
         self._distance_p = _export(self._distance)
         self._travel_p = _export(self._travel)
+        self._heuristic = (
+            None
+        )  # type: Optional[Tuple[int, int, int, int, Tuple[int, ...]]]
+        self._heuristic_p = ffi.NULL  # type: Any
 
     @property
     def distance(self) -> np.ndarray:
         return self._distance
 
     def clear(self) -> None:
+        """Reset the pathfinder to its initial state.
+
+        This sets all values on the :any:`distance` array to their maximum
+        values.  Use :any:`numpy.iinfo` if you need to check these.
+
+        """
         self._distance[...] = np.iinfo(self._distance.dtype).max
         self._travel = _world_array(self._graph._shape)
+        lib.TCOD_frontier_clear(self._frontier_p)
 
     def add_root(self, index: Tuple[int, ...], value: int = 0) -> None:
         index_ = tuple(index)
@@ -772,8 +805,34 @@ class Pathfinder:
         self._distance[index_] = value
         lib.TCOD_frontier_clear(self._frontier_p)
         lib.TCOD_frontier_push(self._frontier_p, index_, value, value)
+        self._heuristic = None  # Reevaluate heuristic on next resolve call.
 
-    def resolve(self) -> None:
+    def _update_heuristic(self, goal: Optional[Tuple[int, ...]]) -> bool:
+        """Update the active heuristic.  Return True if the heuristic changed.
+        """
+        if self._graph._heuristic is None or goal is None:
+            heuristic = None
+        else:
+            heuristic = (*self._graph._heuristic, goal)
+        if self._heuristic == heuristic:
+            return False  # Frontier does not need updating.
+        self._heuristic = heuristic
+        if heuristic is None:
+            self._heuristic_p = ffi.NULL
+        else:
+            self._heuristic_p = ffi.new(
+                "struct PathfinderHeuristic*", heuristic
+            )
+        return True  # Frontier must be updated.
+
+    def resolve(self, goal: Optional[Tuple[int, ...]] = None) -> None:
+        """Manually run the pathfinder algorithm."""
+        if goal is not None:
+            assert len(goal) == self._distance.ndim
+            if self._distance[goal] != np.iinfo(self._distance.dtype).max:
+                return
+        if self._update_heuristic(goal):
+            lib.update_frontier_heuristic(self._frontier_p, self._heuristic_p)
         rules, keep_alive = self._graph._compile_rules()
         _check(
             lib.path_compute(
@@ -782,19 +841,28 @@ class Pathfinder:
                 self._travel_p,
                 len(rules),
                 rules,
-                ffi.NULL,
+                self._heuristic_p,
             )
         )
 
     def path_from(self, index: Tuple[int, ...]) -> np.ndarray:
-        self.resolve()
+        """Return the shortest path from `index` to the nearest root.
+
+        The return value is inclusive, including both the starting and ending
+        points on the path.  If the root point is unreachable or `index` is
+        already at a root then `index` will be the only point returned.
+
+        This automatically calls :any:`resolve` if the pathfinder has not
+        yet reached `index`.
+
+        A common usage is to slice off the starting point and convert the array
+        into a list.
+        """
+        self.resolve(index)
         assert len(index) == self._graph._ndim
         length = _check(
             lib.get_travel_path(
-                self._graph._ndim,
-                self._travel_p,
-                index,
-                ffi.NULL,
+                self._graph._ndim, self._travel_p, index, ffi.NULL,
             )
         )
         path = np.ndarray((length, self._graph._ndim), dtype=np.intc)
@@ -809,4 +877,8 @@ class Pathfinder:
         return path
 
     def path_to(self, index: Tuple[int, ...]) -> np.ndarray:
+        """Return the shortest path from the nearest root to `index`.
+
+        This is an alias for ``path_from(...)[::-1]``.
+        """
         return self.path_from(index)[::-1]

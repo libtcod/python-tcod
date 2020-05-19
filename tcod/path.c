@@ -495,3 +495,20 @@ size_t get_travel_path(
   }
   return length;
 }
+int update_frontier_heuristic(
+    struct TCOD_Frontier* frontier,
+    const struct PathfinderHeuristic* heuristic)
+{
+  if (!frontier) {
+    return TCOD_set_errorv("Missing frontier.");
+  }
+  for (int i = 0; i < frontier->heap.size; ++i) {
+    unsigned char* heap_ptr = (unsigned char*)frontier->heap.heap;
+    heap_ptr += frontier->heap.node_size * i;
+    struct TCOD_HeapNode* heap_node = (void*)heap_ptr;
+    heap_node->priority =
+        compute_heuristic(heuristic, frontier->ndim, (int*)heap_node->data);
+  }
+  TCOD_minheap_heapify(&frontier->heap);
+  return 0;
+}
