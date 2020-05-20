@@ -786,6 +786,16 @@ class Pathfinder:
 
     @property
     def distance(self) -> np.ndarray:
+        """The distance values of the pathfinder.
+
+        This array is stored in row-major "C" order.
+
+        Unreachable or unresolved points will be at their maximum values.
+        You can use :any:`numpy.iinfo` if you need to check for these.
+
+        You may edit this array manually, but the pathfinder won't know of
+        your changes until :any:`rebuild_frontier` is called.
+        """
         return self._distance
 
     def clear(self) -> None:
@@ -793,19 +803,25 @@ class Pathfinder:
 
         This sets all values on the :any:`distance` array to their maximum
         values.  Use :any:`numpy.iinfo` if you need to check these.
-
         """
         self._distance[...] = np.iinfo(self._distance.dtype).max
         self._travel = _world_array(self._graph._shape)
         lib.TCOD_frontier_clear(self._frontier_p)
 
     def add_root(self, index: Tuple[int, ...], value: int = 0) -> None:
+        """Add a root node and insert it into the pathfinder frontier.
+
+        `index` is the root point to insert.  The length of `index` must match
+        the dimensions of the graph.  `index` must also be in 'ij' order.
+
+        `value` is the distance to use for this root.  Zero is typical, but
+        if multiple roots are added they can be given different weights.
+        """
         index_ = tuple(index)
         assert len(index_) == self._distance.ndim
         self._distance[index_] = value
-        lib.TCOD_frontier_clear(self._frontier_p)
+        self._update_heuristic(None)
         lib.TCOD_frontier_push(self._frontier_p, index_, value, value)
-        self._heuristic = None  # Reevaluate heuristic on next resolve call.
 
     def _update_heuristic(self, goal: Optional[Tuple[int, ...]]) -> bool:
         """Update the active heuristic.  Return True if the heuristic changed.
@@ -823,7 +839,23 @@ class Pathfinder:
             self._heuristic_p = ffi.new(
                 "struct PathfinderHeuristic*", heuristic
             )
-        return True  # Frontier must be updated.
+        lib.update_frontier_heuristic(self._frontier_p, self._heuristic_p)
+        return True  # Frontier was updated.
+
+    def rebuild_frontier(self) -> None:
+        """Reconstruct the frontier using the current distance array.
+
+        This is needed if the :any:`distance` array is changed manually.
+        After you are finished editing :any:`distance` you must call this
+        function before calling :any:`resolve`, :any:`path_from`, etc.
+        """
+        lib.TCOD_frontier_clear(self._frontier_p)
+        self._update_heuristic(None)
+        _check(
+            lib.rebuild_frontier_from_distance(
+                self._frontier_p, self._distance_p
+            )
+        )
 
     def resolve(self, goal: Optional[Tuple[int, ...]] = None) -> None:
         """Manually run the pathfinder algorithm."""
@@ -831,8 +863,7 @@ class Pathfinder:
             assert len(goal) == self._distance.ndim
             if self._distance[goal] != np.iinfo(self._distance.dtype).max:
                 return
-        if self._update_heuristic(goal):
-            lib.update_frontier_heuristic(self._frontier_p, self._heuristic_p)
+        self._update_heuristic(goal)
         rules, keep_alive = self._graph._compile_rules()
         _check(
             lib.path_compute(

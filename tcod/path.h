@@ -150,6 +150,13 @@ size_t get_travel_path(
 int update_frontier_heuristic(
     struct TCOD_Frontier* frontier,
     const struct PathfinderHeuristic* heuristic);
+/**
+    Update a frontier from a distance array.
+
+    Assumes no heuristic is active.
+ */
+int rebuild_frontier_from_distance(
+    struct TCOD_Frontier* frontier, const struct NArray* dist_map);
 #ifdef __cplusplus
 }
 #endif

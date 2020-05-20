@@ -512,3 +512,34 @@ int update_frontier_heuristic(
   TCOD_minheap_heapify(&frontier->heap);
   return 0;
 }
+static int update_frontier_from_distance_terator(
+    struct TCOD_Frontier* frontier, const struct NArray* dist_map,
+    int dimension,
+    int* index)
+{
+  if (dimension == frontier->ndim) {
+    if (get_array_is_max(dist_map, dimension, index)) { return 0; }
+    int dist = get_array_int(dist_map, dimension, index);
+    return TCOD_frontier_push(frontier, index, dist, dist);
+  }
+  for (int i = 0; i < dist_map->shape[dimension]; ) {
+    index[dimension] = i;
+    int err = update_frontier_from_distance_terator(
+        frontier, dist_map, dimension + 1, index);
+    if (err) { return err; }
+  }
+  return 0;
+}
+int rebuild_frontier_from_distance(
+    struct TCOD_Frontier* frontier, const struct NArray* dist_map)
+{
+  if (!frontier) {
+    return TCOD_set_errorv("Missing frontier.");
+  }
+  if (!dist_map) {
+    return TCOD_set_errorv("Missing dist_map.");
+  }
+  TCOD_frontier_clear(frontier);
+  int index[TCOD_PATHFINDER_MAX_DIMENSIONS];
+  return update_frontier_from_distance_terator(frontier, dist_map, 0, index);
+}
