@@ -604,6 +604,7 @@ def hillclimb2d(
 
 
 def _world_array(shape: Tuple[int, ...], dtype: Any = np.int32) -> np.ndarray:
+    """Return an array where ``ij == arr[ij]``."""
     return np.ascontiguousarray(
         np.transpose(
             np.meshgrid(
@@ -615,14 +616,16 @@ def _world_array(shape: Tuple[int, ...], dtype: Any = np.int32) -> np.ndarray:
     )
 
 
-def _as_hashable(obj: Any) -> Any:
+def _as_hashable(obj: Optional[np.ndarray]) -> Optional[Any]:
+    """Return NumPy arrays as a more hashable form."""
     if obj is None:
         return obj
     return obj.ctypes.data, tuple(obj.shape), tuple(obj.strides)
 
 
 class Graph:
-    """
+    """A modular graph defining how a pathfinder traverses the world.
+
     Example::
 
         >>> import tcod
@@ -765,7 +768,8 @@ class Graph:
 
 
 class Pathfinder:
-    """
+    """A generic modular pathfinder.
+
     .. versionadded:: 11.13
     """
 
@@ -793,16 +797,47 @@ class Pathfinder:
         Unreachable or unresolved points will be at their maximum values.
         You can use :any:`numpy.iinfo` if you need to check for these.
 
+        Example::
+
+            pf  # Resolved Pathfinder instance.
+            reachable = pf.distance != numpy.iinfo(pf.distance.dtype).max
+            reachable  # A boolean array of reachable area.
+
         You may edit this array manually, but the pathfinder won't know of
         your changes until :any:`rebuild_frontier` is called.
         """
         return self._distance
 
+    @property
+    def traversal(self) -> np.ndarray:
+        """An array used to generate paths from any point to the nearest root.
+
+        This array is stored in row-major "C" order.  It has an extra
+        dimension which includes the index of the next path.
+
+        Example::
+
+            # This example demonstrates the purpose of the traversal array.
+            # In real code Pathfinder.path_from(...) should be used instead.
+            pf  # Resolved 2D Pathfinder instance.
+            i, j = (3, 3)  # Starting index.
+            path = [(i, j)]  # List of nodes from the start to the root.
+            while not (pf.traversal[i, j] == (i, j)).all():
+                i, j = pf.traversal[i, j]
+                path.append((i, j))
+
+        The above example is slow and will not detect infinite loops.  Use
+        :any:`path_from` or :any:`path_to` when you need to get a path.
+
+        As the pathfinder is resolved this array is filled
+        """
+        return self._travel
+
     def clear(self) -> None:
         """Reset the pathfinder to its initial state.
 
         This sets all values on the :any:`distance` array to their maximum
-        values.  Use :any:`numpy.iinfo` if you need to check these.
+        value.
         """
         self._distance[...] = np.iinfo(self._distance.dtype).max
         self._travel = _world_array(self._graph._shape)
