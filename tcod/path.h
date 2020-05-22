@@ -142,7 +142,7 @@ int path_compute(
     Where `n` is the value return from a previous call with the same
     parameters.
  */
-size_t get_travel_path(
+ptrdiff_t get_travel_path(
     int8_t ndim, const struct NArray* travel_map, const int* start, int* out);
 /**
     Update the priority of nodes on the frontier and sort them.

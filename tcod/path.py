@@ -608,10 +608,11 @@ def _world_array(shape: Tuple[int, ...], dtype: Any = np.int32) -> np.ndarray:
     return np.ascontiguousarray(
         np.transpose(
             np.meshgrid(
-                *(np.arange(i, dtype=np.int32) for i in shape),
-                indexing="xy",
+                *(np.arange(i, dtype=dtype) for i in shape),
+                indexing="ij",
                 copy=False,
-            )
+            ),
+            axes=(*range(1, len(shape) + 1), 0),
         )
     )
 
@@ -623,13 +624,28 @@ def _as_hashable(obj: Optional[np.ndarray]) -> Optional[Any]:
     return obj.ctypes.data, tuple(obj.shape), tuple(obj.strides)
 
 
-class Graph:
-    """A modular graph defining how a pathfinder traverses the world.
+class CustomGraph:
+    """A customizable graph defining how a pathfinder traverses the world.
+
+    The graph is created with a `shape` defining the size and number of
+    dimensions of the graph.  The `shape` can only be 4 dimensions or lower.
+
+    After this graph is created you'll need to add edges which define the
+    rules of the pathfinder.  These rules usually define movement in the
+    cardinal and diagonal directions, but can also include stairway type edges.
+
+    After all edge rules are added the graph can be used to make one or more
+    :any:`Pathfinder` instances.
+
+    Because the arrays used are in row-major order the indexes used in the
+    examples be reversed from what you expect.
+    A 2D edge or index is ``(y, x)`` and a 3D they are ``(z, y, x)``.
 
     Example::
 
+        >>> import numpy as np
         >>> import tcod
-        >>> graph = tcod.path.Graph((5, 5))
+        >>> graph = tcod.path.CustomGraph((5, 5))
         >>> cost = np.ones((5, 5), dtype=np.int8)
         >>> CARDINAL = [
         ...     [0, 1, 0],
@@ -669,10 +685,12 @@ class Graph:
 
     @property
     def ndim(self) -> int:
+        """The number of dimensions."""
         return self._ndim
 
     @property
     def shape(self) -> Tuple[int, ...]:
+        """The shape of this graph."""
         return self._shape
 
     def add_edge(
@@ -683,9 +701,57 @@ class Graph:
         cost: np.ndarray,
         condition: Optional[np.ndarray] = None
     ) -> None:
+        """Add a single edge rule.
+
+        `edge_dir` is a tuple with the same length as the graphs dimensions.
+        The edge is relative to any node.
+
+        `edge_cost` is the cost multiplier of the edge. Its multiplied with the
+        `cost` array to the edges actual cost.
+
+        `cost` is a NumPy array where each node has the cost for movement into
+        that node.  Zero or negative values are used to mark blocked areas.
+
+        `condition` is an optional array to mark which nodes have this edge.
+        If the node in `condition` is zero then the edge will be skipped.
+        This is useful to mark portals or stairs for some edges.
+
+        Example::
+
+            >>> import numpy as np
+            >>> graph3d = tcod.path.CustomGraph((2, 5, 5))
+            >>> cost = np.ones((3, 5, 5), dtype=np.int8)
+            >>> up_stairs = np.zeros((3, 5, 5), dtype=np.int8)
+            >>> down_stairs = np.zeros((3, 5, 5), dtype=np.int8)
+            >>> up_stairs[0, 0, 4] = 1
+            >>> down_stairs[1, 0, 4] = 1
+            >>> CARDINAL = [[0, 1, 0], [1, 0, 1], [0, 1, 0]]
+            >>> graph3d.add_edges(edge_map=CARDINAL, cost=cost)
+            >>> graph3d.add_edge((1, 0, 0), 1, cost=cost, condition=up_stairs)
+            >>> graph3d.add_edge((-1, 0, 0), 1, cost=cost, condition=down_stairs)
+            >>> pf3d = tcod.path.Pathfinder(graph3d)
+            >>> pf3d.add_root((0, 1, 1))
+            >>> pf3d.path_to((1, 2, 2))
+            array([[0, 1, 1],
+                   [0, 1, 2],
+                   [0, 1, 3],
+                   [0, 0, 3],
+                   [0, 0, 4],
+                   [1, 0, 4],
+                   [1, 1, 4],
+                   [1, 1, 3],
+                   [1, 2, 3],
+                   [1, 2, 2]]...)
+
+        Note in the above example that both sets of up/down stairs were added,
+        but bidirectional edges are not a requirement for the graph.
+        One directional edges such as pits can be added which will
+        only allow movement outwards from the root nodes of the pathfinder.
+        """  # noqa: E501
         self._edge_rules_p = None
         edge_dir = tuple(edge_dir)
         assert len(edge_dir) == self._ndim
+        assert edge_cost > 0, (edge_dir, edge_cost)
         cost = np.asarray(cost)
         if condition is not None:
             condition = np.asarray(condition)
@@ -710,7 +776,96 @@ class Graph:
         cost: np.ndarray,
         condition: Optional[np.ndarray] = None
     ) -> None:
+        """Add a rule with multiple edges.
+
+        `edge_map` is a NumPy array mapping the edges and their costs.
+        This is easier to understand by looking at the examples below.
+        Edges are relative to center of the array.  The center most value is
+        always ignored.  If `edge_map` has fewer dimensions than the graph then
+        it will apply to the right-most axes of the graph.
+
+        `cost` is a NumPy array where each node has the cost for movement into
+        that node.  Zero or negative values are used to mark blocked areas.
+
+        `condition` is an optional array to mark which nodes have this edge.
+        See :any:`add_edge`.
+        If `condition` is the same array as `cost` then the pathfinder will
+        not move into open area from a non-open ones.
+
+        Example::
+
+            # 2D edge maps:
+            CARDINAL = [  # Simple arrow-key moves.  Manhattan distance.
+                [0, 1, 0],
+                [1, 0, 1],
+                [0, 1, 0],
+            ]
+            CHEBYSHEV = [  # Chess king moves.  Chebyshev distance.
+                [1, 1, 1],
+                [1, 0, 1],
+                [1, 1, 1],
+            ]
+            EUCLIDEAN = [  # Approximate euclidean distance.
+                [99, 70, 99],
+                [70, 0, 70],
+                [99, 70, 99],
+            ]
+            EUCLIDEAN_SIMPLE = [  # Very approximate euclidean distance.
+                [3, 2, 3],
+                [2, 0, 2],
+                [3, 2, 3],
+            ]
+            KNIGHT_MOVE = [  # Chess knight L-moves.
+                [0, 1, 0, 1, 0],
+                [1, 0, 0, 0, 1],
+                [0, 0, 0, 0, 0],
+                [1, 0, 0, 0, 1],
+                [0, 1, 0, 1, 0],
+            ]
+            AXIAL = [  # https://www.redblobgames.com/grids/hexagons/
+                [0, 1, 1],
+                [1, 0, 1],
+                [1, 1, 0],
+            ]
+            # 3D edge maps:
+            CARDINAL_PLUS_Z = [  # Cardinal movement with Z up/down edges.
+                [
+                    [0, 0, 0],
+                    [0, 1, 0],
+                    [0, 0, 0],
+                ],
+                [
+                    [0, 1, 0],
+                    [1, 0, 1],
+                    [0, 1, 0],
+                ],
+                [
+                    [0, 0, 0],
+                    [0, 1, 0],
+                    [0, 0, 0],
+                ],
+            ]
+            CHEBYSHEV_3D = [  # Chebyshev distance, but in 3D.
+                [
+                    [1, 1, 1],
+                    [1, 1, 1],
+                    [1, 1, 1],
+                ],
+                [
+                    [1, 1, 1],
+                    [1, 0, 1],
+                    [1, 1, 1],
+                ],
+                [
+                    [1, 1, 1],
+                    [1, 1, 1],
+                    [1, 1, 1],
+                ],
+            ]
+        """
         edge_map = np.copy(edge_map)
+        if edge_map.ndim < self._ndim:
+            edge_map = edge_map[(np.newaxis,) * (self._ndim - edge_map.ndim)]
         if edge_map.ndim != self._ndim:
             raise ValueError(
                 "edge_map must must match graph dimensions (%i). (Got %i)"
@@ -720,11 +875,12 @@ class Graph:
         edge_map[edge_center] = 0
         edge_map[edge_map < 0] = 0
         edge_nz = edge_map.nonzero()
+        edge_costs = edge_map[edge_nz]
         edge_array = np.transpose(edge_nz)
         edge_array -= edge_center
-        for edge in edge_array:
+        for edge, edge_cost in zip(edge_array, edge_costs):
             edge = tuple(edge)
-            self.add_edge(edge, edge_map[edge], cost=cost, condition=condition)
+            self.add_edge(edge, edge_cost, cost=cost, condition=condition)
 
     def set_heuristic(
         self, *, cardinal: int = 0, diagonal: int = 0, z: int = 0, w: int = 0
@@ -770,10 +926,13 @@ class Graph:
 class Pathfinder:
     """A generic modular pathfinder.
 
+    How the pathfinder functions depends on the graph provided. see
+    :any:`CustomGraph` for how to set these up.
+
     .. versionadded:: 11.13
     """
 
-    def __init__(self, graph: Graph):
+    def __init__(self, graph: CustomGraph):
         self._graph = graph
         self._frontier_p = ffi.gc(
             lib.TCOD_frontier_new(self._graph._ndim), lib.TCOD_frontier_delete

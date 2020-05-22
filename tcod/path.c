@@ -457,7 +457,7 @@ int path_compute(
   }
   return 0;
 }
-size_t get_travel_path(
+ptrdiff_t get_travel_path(
     int8_t ndim, const struct NArray* travel_map, const int* start, int* out)
 {
   if (ndim <= 0 || ndim > TCOD_PATHFINDER_MAX_DIMENSIONS) {
@@ -474,9 +474,9 @@ size_t get_travel_path(
   }
   const int* next = get_array_ptr(travel_map, ndim, start);
   const int* current = start;
-  size_t max_loops = 1;
-  size_t length = 0;
-  for (int i = 0; i < ndim; ++i) { max_loops *= (size_t)travel_map->shape[i]; }
+  ptrdiff_t max_loops = 1;
+  ptrdiff_t length = 0;
+  for (int i = 0; i < ndim; ++i) { max_loops *= travel_map->shape[i]; }
   while (current != next) {
     ++length;
     if (out) {
@@ -485,8 +485,22 @@ size_t get_travel_path(
     }
     current = next;
     if (!array_in_range(travel_map, ndim, next)) {
-      return TCOD_set_errorvf(
-          "Index (%i, %i) is out of range.", next[0], next[1]);
+      switch (ndim) {
+        case 1:
+          return TCOD_set_errorvf(
+              "Index (%i) is out of range.", next[0]);
+        case 2:
+          return TCOD_set_errorvf(
+              "Index (%i, %i) is out of range.", next[0], next[1]);
+        case 3:
+          return TCOD_set_errorvf(
+              "Index (%i, %i, %i) is out of range.",
+              next[0], next[1], next[2]);
+        case 4:
+          return TCOD_set_errorvf(
+              "Index (%i, %i, %i, %i) is out of range.",
+              next[0], next[1], next[2], next[3]);
+      }
     }
     next = get_array_ptr(travel_map, ndim, next);
     if (!out && length == max_loops) {

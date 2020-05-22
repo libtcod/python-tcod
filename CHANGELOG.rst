@@ -9,7 +9,7 @@ v2.0.0
 Unreleased
 ------------------
 Added
- - `tcod.path`: New Pathfinder and Graph classes.
+ - `tcod.path`: New Pathfinder and CustomGraph classes.
 
 Changed
  - Added `edge_map` parameter to `tcod.path.dijkstra2d` and
