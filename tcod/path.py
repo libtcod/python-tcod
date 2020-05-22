@@ -897,6 +897,7 @@ class CustomGraph:
         self._heuristic = (cardinal, diagonal, z, w)
 
     def _compile_rules(self) -> Any:
+        """Compile this graph into a C struct array."""
         if not self._edge_rules_p:
             self._edge_rules_keep_alive = []
             rules = []
@@ -921,6 +922,20 @@ class CustomGraph:
                 rules.append(rule)
             self._edge_rules_p = ffi.new("struct PathfinderRule[]", rules)
         return self._edge_rules_p, self._edge_rules_keep_alive
+
+    def _resolve(self, pathfinder: "Pathfinder") -> None:
+        """Run the pathfinding algorithm for this graph."""
+        rules, keep_alive = self._compile_rules()
+        _check(
+            lib.path_compute(
+                pathfinder._frontier_p,
+                pathfinder._distance_p,
+                pathfinder._travel_p,
+                len(rules),
+                rules,
+                pathfinder._heuristic_p,
+            )
+        )
 
 
 class Pathfinder:
@@ -1058,17 +1073,7 @@ class Pathfinder:
             if self._distance[goal] != np.iinfo(self._distance.dtype).max:
                 return
         self._update_heuristic(goal)
-        rules, keep_alive = self._graph._compile_rules()
-        _check(
-            lib.path_compute(
-                self._frontier_p,
-                self._distance_p,
-                self._travel_p,
-                len(rules),
-                rules,
-                self._heuristic_p,
-            )
-        )
+        self._graph._resolve(self)
 
     def path_from(self, index: Tuple[int, ...]) -> np.ndarray:
         """Return the shortest path from `index` to the nearest root.
