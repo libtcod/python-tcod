@@ -633,13 +633,15 @@ class CustomGraph:
     After this graph is created you'll need to add edges which define the
     rules of the pathfinder.  These rules usually define movement in the
     cardinal and diagonal directions, but can also include stairway type edges.
+    :any:`set_heuristic` should also be called so that the pathfinder will use
+    A*.
 
     After all edge rules are added the graph can be used to make one or more
     :any:`Pathfinder` instances.
 
     Because the arrays used are in row-major order the indexes used in the
     examples be reversed from what you expect.
-    A 2D edge or index is ``(y, x)`` and a 3D they are ``(z, y, x)``.
+    A 2D edge or index is ``(y, x)`` and in 3D it is ``(z, y, x)``.
 
     Example::
 
@@ -719,6 +721,7 @@ class CustomGraph:
         Example::
 
             >>> import numpy as np
+            >>> import tcod
             >>> graph3d = tcod.path.CustomGraph((2, 5, 5))
             >>> cost = np.ones((3, 5, 5), dtype=np.int8)
             >>> up_stairs = np.zeros((3, 5, 5), dtype=np.int8)
@@ -753,6 +756,7 @@ class CustomGraph:
         assert len(edge_dir) == self._ndim
         assert edge_cost > 0, (edge_dir, edge_cost)
         cost = np.asarray(cost)
+        assert cost.ndim == self.ndim
         if condition is not None:
             condition = np.asarray(condition)
         key = (_as_hashable(cost), _as_hashable(condition))
@@ -885,7 +889,55 @@ class CustomGraph:
     def set_heuristic(
         self, *, cardinal: int = 0, diagonal: int = 0, z: int = 0, w: int = 0
     ) -> None:
-        """Sets a pathfinder heuristic so that pathfinding can done with A*."""
+        """Sets a pathfinder heuristic so that pathfinding can done with A*.
+
+        `cardinal`, `diagonal`, `z, and `w` are the lower-bound cost of
+        movement in those directions.  Values above the lower-bound can be
+        used to create a greedy heuristic, which will be faster at the cost of
+        accuracy.
+
+        Example::
+
+            >>> import numpy as np
+            >>> import tcod
+            >>> graph = tcod.path.CustomGraph((5, 5))
+            >>> cost = np.ones((5, 5), dtype=np.int8)
+            >>> EUCLIDEAN = [[99, 70, 99], [70, 0, 70], [99, 70, 99]]
+            >>> graph.add_edges(edge_map=EUCLIDEAN, cost=cost)
+            >>> graph.set_heuristic(cardinal=70, diagonal=99)
+            >>> pf = tcod.path.Pathfinder(graph)
+            >>> pf.add_root((0, 0))
+            >>> pf.path_to((4, 4))
+            array([[0, 0],
+                   [1, 1],
+                   [2, 2],
+                   [3, 3],
+                   [4, 4]]...)
+            >>> pf.distance
+            array([[         0,         70,        198, 2147483647, 2147483647],
+                   [        70,         99,        169,        297, 2147483647],
+                   [       198,        169,        198,        268,        396],
+                   [2147483647,        297,        268,        297,        367],
+                   [2147483647, 2147483647,        396,        367,        396]]...)
+            >>> pf.path_to((2, 0))
+            array([[0, 0],
+                   [1, 0],
+                   [2, 0]]...)
+            >>> pf.distance
+            array([[         0,         70,        198, 2147483647, 2147483647],
+                   [        70,         99,        169,        297, 2147483647],
+                   [       140,        169,        198,        268,        396],
+                   [       210,        239,        268,        297,        367],
+                   [2147483647, 2147483647,        396,        367,        396]]...)
+
+        Without a heuristic the above example would need to evaluate the entire
+        array to reach the opposite side of it.
+        With a heuristic several nodes can be skipped, which will process
+        faster.  Some of the distances in the above example look incorrect,
+        that's because those nodes are only partially evaluated, but
+        pathfinding to those nodes will work correctly as long as the heuristic
+        isn't greedy.
+        """  # noqa: E501
         if 0 == cardinal == diagonal == z == w:
             self._heuristic = None
         if diagonal and cardinal > diagonal:
@@ -1035,8 +1087,10 @@ class Pathfinder:
     def _update_heuristic(self, goal: Optional[Tuple[int, ...]]) -> bool:
         """Update the active heuristic.  Return True if the heuristic changed.
         """
-        if self._graph._heuristic is None or goal is None:
+        if goal is None:
             heuristic = None
+        elif self._graph._heuristic is None:
+            heuristic = (0, 0, 0, 0, goal)
         else:
             heuristic = (*self._graph._heuristic, goal)
         if self._heuristic == heuristic:
@@ -1071,7 +1125,8 @@ class Pathfinder:
         if goal is not None:
             assert len(goal) == self._distance.ndim
             if self._distance[goal] != np.iinfo(self._distance.dtype).max:
-                return
+                if not lib.frontier_has_index(self._frontier_p, goal):
+                    return
         self._update_heuristic(goal)
         self._graph._resolve(self)
 

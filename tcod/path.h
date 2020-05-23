@@ -57,6 +57,11 @@ struct PathfinderHeuristic {
   int target[TCOD_PATHFINDER_MAX_DIMENSIONS];
 };
 
+struct FrontierNode {
+  int distance;
+  int index[];
+};
+
 struct PathCostArray {
     char *array;
     long long strides[2];
@@ -157,6 +162,12 @@ int update_frontier_heuristic(
  */
 int rebuild_frontier_from_distance(
     struct TCOD_Frontier* frontier, const struct NArray* dist_map);
+/**
+    Return true if `index[frontier->ndim]` is a node in `frontier`.
+ */
+int frontier_has_index(
+    const struct TCOD_Frontier* frontier,
+    const int* index);
 #ifdef __cplusplus
 }
 #endif

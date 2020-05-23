@@ -391,7 +391,19 @@ void path_compute_add_edge(
   int priority = distance + compute_heuristic(heuristic, frontier->ndim, dest);
   TCOD_frontier_push(frontier, dest, distance, priority);
 }
-
+/**
+    Returns true if the heuristic target has been reached by the active_node.
+ */
+static bool path_compute_at_goal(
+    const struct TCOD_Frontier* frontier,
+    const struct PathfinderHeuristic* heuristic)
+{
+  if (!heuristic) { return 0; }
+  for (int i = 0; i < frontier->ndim; ++i) {
+    if (frontier->active_index[i] != heuristic->target[i]) { return 0; }
+  }
+  return 1;
+}
 int path_compute_step(
     struct TCOD_Frontier* frontier,
     struct NArray* dist_map,
@@ -432,6 +444,9 @@ int path_compute_step(
           heuristic);
     }
   }
+  if (path_compute_at_goal(frontier, heuristic)) {
+    return 1; // Heuristic target reached.
+  }
   return 0;
 }
 int path_compute(
@@ -453,7 +468,7 @@ int path_compute(
         n,
         rules,
         heuristic);
-    if (err < 0) { return err; }
+    if (err != 0) { return err; }
   }
   return 0;
 }
@@ -520,8 +535,11 @@ int update_frontier_heuristic(
     unsigned char* heap_ptr = (unsigned char*)frontier->heap.heap;
     heap_ptr += frontier->heap.node_size * i;
     struct TCOD_HeapNode* heap_node = (void*)heap_ptr;
-    heap_node->priority =
-        compute_heuristic(heuristic, frontier->ndim, (int*)heap_node->data);
+    struct FrontierNode* fnode = (struct FrontierNode*)heap_node->data;
+    heap_node->priority = (
+        fnode->distance
+        + compute_heuristic(heuristic, frontier->ndim, fnode->index)
+    );
   }
   TCOD_minheap_heapify(&frontier->heap);
   return 0;
@@ -556,4 +574,30 @@ int rebuild_frontier_from_distance(
   TCOD_frontier_clear(frontier);
   int index[TCOD_PATHFINDER_MAX_DIMENSIONS];
   return update_frontier_from_distance_terator(frontier, dist_map, 0, index);
+}
+int frontier_has_index(
+    const struct TCOD_Frontier* frontier,
+    const int* index) // index[frontier->ndim]
+{
+  if (!frontier) {
+    return TCOD_set_errorv("Missing frontier.");
+  }
+  if (!index) {
+    return TCOD_set_errorv("Missing index.");
+  }
+  for (int i = 0; i < frontier->heap.size; ++i) {
+    const unsigned char* heap_ptr = (const unsigned char*)frontier->heap.heap;
+    heap_ptr += frontier->heap.node_size * i;
+    const struct TCOD_HeapNode* heap_node = (const void*)heap_ptr;
+    const struct FrontierNode* fnode = (const void*)heap_node->data;
+    bool found = 1;
+    for (int j = 0; j < frontier->ndim; ++j) {
+      if (index[j] != fnode->index[j]) {
+        found = 0;
+        break;
+      }
+    }
+    if (found) { return 1; }
+  }
+  return 0;
 }
