@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - `tcod.event.EventDispatch`: `ev_*` methods now allow `Optional[T]` return
+   types.
 
 11.13.0 - 2020-05-22
 --------------------
