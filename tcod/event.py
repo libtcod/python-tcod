@@ -694,6 +694,8 @@ def get() -> Iterator[Any]:
 
     Events are processed as the iterator is consumed.  Breaking out of, or
     discarding the iterator will leave the remaining events on the event queue.
+    It is also safe to call this function inside of a loop that is already
+    handling events (the event iterator is reentrant.)
 
     Example::
 
@@ -709,6 +711,7 @@ def get() -> Iterator[Any]:
                 print(event)
             else:
                 print(event)
+        # For loop exits after all current events are processed.
     """
     sdl_event = ffi.new("SDL_Event*")
     while lib.SDL_PollEvent(sdl_event):
@@ -740,6 +743,7 @@ def wait(timeout: Optional[float] = None) -> Iterator[Any]:
                 print(event)
             else:
                 print(event)
+        # For loop exits on timeout or after at least one event is processed.
     """
     if timeout is not None:
         lib.SDL_WaitEventTimeout(ffi.NULL, int(timeout * 1000))
