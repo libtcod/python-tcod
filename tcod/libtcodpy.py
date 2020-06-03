@@ -1891,9 +1891,9 @@ def console_fill_foreground(
         r_ = np.ascontiguousarray(r, dtype=np.intc)
         g_ = np.ascontiguousarray(g, dtype=np.intc)
         b_ = np.ascontiguousarray(b, dtype=np.intc)
-        cr = ffi.cast("int *", r_.ctypes.data)
-        cg = ffi.cast("int *", g_.ctypes.data)
-        cb = ffi.cast("int *", b_.ctypes.data)
+        cr = ffi.from_buffer("int *", r_)
+        cg = ffi.from_buffer("int *", g_)
+        cb = ffi.from_buffer("int *", b_)
     else:
         # otherwise convert using ffi arrays
         cr = ffi.new("int[]", r)
@@ -1932,9 +1932,9 @@ def console_fill_background(
         r_ = np.ascontiguousarray(r, dtype=np.intc)
         g_ = np.ascontiguousarray(g, dtype=np.intc)
         b_ = np.ascontiguousarray(b, dtype=np.intc)
-        cr = ffi.cast("int *", r_.ctypes.data)
-        cg = ffi.cast("int *", g_.ctypes.data)
-        cb = ffi.cast("int *", b_.ctypes.data)
+        cr = ffi.from_buffer("int *", r_)
+        cg = ffi.from_buffer("int *", g_)
+        cb = ffi.from_buffer("int *", b_)
     else:
         # otherwise convert using ffi arrays
         cr = ffi.new("int[]", r)
@@ -1957,7 +1957,7 @@ def console_fill_char(con: tcod.console.Console, arr: Sequence[int]) -> None:
     if isinstance(arr, np.ndarray):
         # numpy arrays, use numpy's ctypes functions
         np_array = np.ascontiguousarray(arr, dtype=np.intc)
-        carr = ffi.cast("int *", np_array.ctypes.data)
+        carr = ffi.from_buffer("int *", np_array)
     else:
         # otherwise convert using the ffi module
         carr = ffi.new("int[]", arr)
@@ -2319,7 +2319,7 @@ def _heightmap_cdata(array: np.ndarray) -> ffi.CData:
     if array.dtype != np.float32:
         raise ValueError("array dtype must be float32, not %r" % array.dtype)
     width, height = array.shape
-    pointer = ffi.cast("float *", array.ctypes.data)
+    pointer = ffi.from_buffer("float *", array)
     return ffi.new("TCOD_heightmap_t *", (width, height, pointer))
 
 
@@ -3240,8 +3240,8 @@ def line_where(
     """
     length = max(abs(x1 - x2), abs(y1 - y2)) + 1
     array = np.ndarray((2, length), dtype=np.intc)
-    x = ffi.cast("int*", array[0].ctypes.data)
-    y = ffi.cast("int*", array[1].ctypes.data)
+    x = ffi.from_buffer("int*", array[0])
+    y = ffi.from_buffer("int*", array[1])
     lib.LineWhere(x1, y1, x2, y2, x, y)
     if not inclusive:
         array = array[:, 1:]

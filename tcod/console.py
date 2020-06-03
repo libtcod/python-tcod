@@ -137,8 +137,8 @@ class Console:
                 "w": width,
                 "h": height,
                 "elements": width * height,
-                "tiles": ffi.cast(
-                    "struct TCOD_ConsoleTile*", self._tiles.ctypes.data
+                "tiles": ffi.from_buffer(
+                    "struct TCOD_ConsoleTile*", self._tiles
                 ),
                 "bkgnd_flag": default_bg_blend,
                 "alignment": default_alignment,
@@ -904,8 +904,8 @@ class Console:
             del state["_bg"]
 
         self.__dict__.update(state)
-        self._console_data["tiles"] = ffi.cast(
-            "struct TCOD_ConsoleTile*", self._tiles.ctypes.data
+        self._console_data["tiles"] = ffi.from_buffer(
+            "struct TCOD_ConsoleTile*", self._tiles
         )
         self._console_data = self.console_c = ffi.new(
             "struct TCOD_Console*", self._console_data

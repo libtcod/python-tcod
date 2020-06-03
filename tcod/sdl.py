@@ -29,7 +29,7 @@ class _TempSurface:
             )
         self.p = ffi.gc(
             lib.SDL_CreateRGBSurfaceFrom(
-                ffi.cast("void*", self._array.ctypes.data),
+                ffi.from_buffer("void*", self._array),
                 self._array.shape[1],  # Width.
                 self._array.shape[0],  # Height.
                 self._array.shape[2] * 8,  # Bit depth.

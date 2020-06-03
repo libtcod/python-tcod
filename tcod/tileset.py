@@ -68,7 +68,7 @@ class Tileset:
         lib.TCOD_tileset_get_tile_(
             self._tileset_p,
             codepoint,
-            ffi.cast("struct TCOD_ColorRGBA*", tile.ctypes.data),
+            ffi.from_buffer("struct TCOD_ColorRGBA*", tile),
         )
         return tile
 
@@ -96,7 +96,7 @@ class Tileset:
         lib.TCOD_tileset_set_tile_(
             self._tileset_p,
             codepoint,
-            ffi.cast("struct TCOD_ColorRGBA*", tile.ctypes.data),
+            ffi.from_buffer("struct TCOD_ColorRGBA*", tile),
         )
 
     def render(self, console: tcod.console.Console) -> np.ndarray:
@@ -118,7 +118,7 @@ class Tileset:
         out[:] = 9
         surface_p = ffi.gc(
             lib.SDL_CreateRGBSurfaceWithFormatFrom(
-                ffi.cast("void*", out.ctypes.data),
+                ffi.from_buffer("void*", out),
                 width,
                 height,
                 32,

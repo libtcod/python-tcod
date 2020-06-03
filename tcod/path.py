@@ -598,7 +598,7 @@ def hillclimb2d(
         )
     length = _check(func(ffi.NULL))
     path = np.ndarray((length, 2), dtype=np.intc)
-    c_path = ffi.cast("int*", path.ctypes.data)
+    c_path = ffi.from_buffer("int*", path)
     _check(func(c_path))
     return path
 
@@ -1156,7 +1156,7 @@ class Pathfinder:
                 self._graph._ndim,
                 self._travel_p,
                 index,
-                ffi.cast("int*", path.ctypes.data),
+                ffi.from_buffer("int*", path),
             )
         )
         return path

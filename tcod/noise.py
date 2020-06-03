@@ -189,8 +189,8 @@ class Noise(object):
         lib.NoiseSampleMeshGrid(
             self._tdl_noise_c,
             out.size,
-            ffi.cast("float*", mgrid.ctypes.data),
-            ffi.cast("float*", out.ctypes.data),
+            ffi.from_buffer("float*", mgrid),
+            ffi.from_buffer("float*", out),
         )
         return out
 
@@ -218,8 +218,8 @@ class Noise(object):
             self._tdl_noise_c,
             len(ogrids),
             out.shape,
-            [ffi.cast("float*", array.ctypes.data) for array in ogrids],
-            ffi.cast("float*", out.ctypes.data),
+            [ffi.from_buffer("float*", array) for array in ogrids],
+            ffi.from_buffer("float*", out),
         )
         return out
 

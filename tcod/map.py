@@ -78,7 +78,7 @@ class Map(object):
                 self.width,
                 self.height,
                 self.width * self.height,
-                ffi.cast("struct TCOD_MapCell*", self.__buffer.ctypes.data),
+                ffi.from_buffer("struct TCOD_MapCell*", self.__buffer),
             ),
         )
 
