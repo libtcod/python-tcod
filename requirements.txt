@@ -1,4 +1,4 @@
-cffi>=1.12.0,<2
+cffi~=1.13.0
 numpy>=1.10,<2,!=1.16.3;
-pycparser>=2.14,<3
+pycparser>=2.14
 setuptools>=36.0.1

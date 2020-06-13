@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - `cffi` requirement has been updated to version `1.13.0`.
+   The older versions raise TypeError's.
 
 11.13.2 - 2020-06-12
 --------------------
