@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - SDL related errors during package installation are now more readable.
 
 11.13.1 - 2020-05-30
 --------------------

@@ -9,6 +9,8 @@ from subprocess import check_output
 import platform
 import warnings
 
+SDL_VERSION_NEEDED = (2, 0, 5)
+
 
 def get_version():
     """Get the current version from a git tag, or by reading tcod/version.py"""
@@ -75,6 +77,30 @@ def get_long_description():
     return "\n".join([readme, changelog])
 
 
+def check_sdl_version():
+    """Check the local SDL version on Linux distributions."""
+    if not sys.platform.startswith("linux"):
+        return
+    needed_version = "%i.%i.%i" % SDL_VERSION_NEEDED
+    try:
+        sdl_version_str = check_output(
+            ["sdl2-config", "--version"], universal_newlines=True
+        ).strip()
+    except FileNotFoundError:
+        raise RuntimeError(
+            "libsdl2-dev or equivalent must be installed on your system"
+            " and must be at least version %s."
+            "\nsdl2-config must be on PATH." % (needed_version,)
+        )
+    print("Found SDL %s." % (sdl_version_str,))
+    sdl_version = tuple(int(s) for s in sdl_version_str.split("."))
+    if sdl_version < SDL_VERSION_NEEDED:
+        raise RuntimeError(
+            "SDL version must be at least %s, (found %s)"
+            % (needed_version, sdl_version_str)
+        )
+
+
 if sys.version_info < (3, 5):
     error = """
     This version of python-tcod only supports Python 3.5 and above.
@@ -95,6 +121,8 @@ if not os.path.exists("libtcod/src"):
     print("Libtcod submodule is uninitialized.")
     print("Did you forget to run 'git submodule update --init'?")
     sys.exit(1)
+
+check_sdl_version()
 
 needs_pytest = {"pytest", "test", "ptr"}.intersection(sys.argv)
 pytest_runner = ["pytest-runner"] if needs_pytest else []
