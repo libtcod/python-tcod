@@ -140,8 +140,8 @@ setup(
     package_data={"tdl": ["*.png"], "tcod": get_package_data()},
     python_requires=">=3.5",
     install_requires=[
-        "cffi~=1.13.0",
-        "numpy>=1.10,<2" if not is_pypy else "",
+        "cffi~=1.13",
+        "numpy~=1.10" if not is_pypy else "",
     ],
     cffi_modules=["build_libtcod.py:ffi"],
     setup_requires=["cffi~=1.13.0", "pycparser>=2.14"] + pytest_runner,
