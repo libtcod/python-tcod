@@ -2,8 +2,8 @@
 requires = [
     "setuptools",
     "wheel",
-    "cffi>=1.12.0,<2",
-    "pycparser>=2.14,<3",
+    "cffi~=1.13",
+    "pycparser>=2.14",
 ]
 
 [tool.black]
