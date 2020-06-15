@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.13.5 - 2020-06-15
+--------------------
 Fixed
  - Install requirements will no longer try to downgrade `cffi`.
 
