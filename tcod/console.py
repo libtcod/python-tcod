@@ -1067,12 +1067,13 @@ class Console:
 
         `width` and `height` determine the size of the frame.
 
-        `title` is a Unicode string.
+        `title` is a Unicode string.  The title is drawn with `bg` as the text
+        color and `fg` as the background.
 
         If `clear` is True than the region inside of the frame will be cleared.
 
-        `fg` and `bg` are the foreground text color and background tile color
-        respectfully.  This is a 3-item tuple with (r, g, b) color values from
+        `fg` and `bg` are the foreground and background colors for the frame
+        border.  This is a 3-item tuple with (r, g, b) color values from
         0 to 255.  These parameters can also be set to `None` to leave the
         colors unchanged.
 
