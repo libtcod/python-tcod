@@ -13,38 +13,38 @@ Welcome to the python-tcod documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-   installation
-   glossary
-
-.. toctree::
-   :maxdepth: 1
-
-   changelog
+    installation
+    glossary
 
 .. toctree::
-   :maxdepth: 2
-   :caption: python-tcod API
+    :maxdepth: 1
 
-   tcod/getting-started
-   tcod/bsp
-   tcod/console
-   tcod/context
-   tcod/event
-   tcod/image
-   tcod/map
-   tcod/noise
-   tcod/path
-   tcod/random
-   tcod/tileset
-   libtcodpy
+    changelog
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Legacy tdl API
+    :maxdepth: 2
+    :caption: python-tcod API
 
-   tdl
+    tcod/getting-started
+    tcod/bsp
+    tcod/console
+    tcod/context
+    tcod/event
+    tcod/image
+    tcod/map
+    tcod/noise
+    tcod/path
+    tcod/random
+    tcod/tileset
+    libtcodpy
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Legacy tdl API
+
+    tdl
 
 Indices and tables
 ==================
