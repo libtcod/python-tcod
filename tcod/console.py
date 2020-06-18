@@ -1,27 +1,7 @@
 """
-libtcod works with a special 'root' console.  You create this console using
-the :any:`tcod.console_init_root` function.  Usually after setting the font
-with :any:`console_set_custom_font` first.
-
-Example::
-
-    # Make sure 'arial10x10.png' is in the same directory as this script.
-    import tcod
-
-    # Setup the font.
-    tcod.console_set_custom_font(
-        "arial10x10.png",
-        tcod.FONT_LAYOUT_TCOD | tcod.FONT_TYPE_GREYSCALE,
-    )
-    # Initialize the root console in a context.
-    with tcod.console_init_root(80, 60, order="F") as root_console:
-        root_console.print_(x=0, y=0, string='Hello World!')
-        while True:
-            tcod.console_flush()  # Show the console.
-            for event in tcod.event.wait():
-                if event.type == "QUIT":
-                    raise SystemExit()
-        # The libtcod window will be closed at the end of this with-block.
+Libtcod consoles are a strictly tile-based representation of text and color.
+To render a console you need a tileset and a window to render to.
+See :ref:`getting-started` for info on how to set those up.
 """
 
 from typing import Any, Optional, Tuple  # noqa: F401

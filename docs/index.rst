@@ -27,6 +27,7 @@ Contents:
    :maxdepth: 2
    :caption: python-tcod API
 
+   tcod/getting-started
    tcod/bsp
    tcod/console
    tcod/context

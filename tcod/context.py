@@ -1,5 +1,7 @@
 """This module is used to create and handle libtcod contexts.
 
+See :ref:`getting-started` for beginner examples on how to use this module.
+
 :any:`Context`'s are intended to replace several libtcod functions such as
 :any:`tcod.console_init_root`, :any:`tcod.console_flush`,
 :any:`tcod.console.recommended_size`, and many other functions which rely on
@@ -44,30 +46,6 @@ on how you plan to setup the size of the console.  You should use
     :any:`tcod.mouse_get_status`.
 
 .. versionadded:: 11.12
-
-Example::
-
-    WIDTH, HEIGHT = 720, 480
-    FLAGS = tcod.context.SDL_WINDOW_RESIZABLE | tcod.context.SDL_WINDOW_MAXIMIZED
-
-    with tcod.context.new_window(
-        WIDTH, HEIGHT, sdl_window_flags=FLAGS
-    ) as context:
-        console = tcod.Console(*context.recommended_console_size())
-        while True:
-            # Display the console.
-            console.clear()
-            console.print(0, 0, "Hello World")
-            context.present(console, integer_scaling=True)
-
-            # Handle events.
-            for event in tcod.event.wait():
-                context.convert_event(event)  # Set tile coordinates for an event.
-                print(event)
-                if event.type == "QUIT":
-                    raise SystemExit()
-                if event.type == "WINDOWRESIZED":
-                    console = tcod.Console(*context.recommended_console_size())
 """  # noqa: E501
 import sys
 import os

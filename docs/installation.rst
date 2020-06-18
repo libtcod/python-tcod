@@ -1,3 +1,5 @@
+.. _installation:
+
 Installation
 ============
 Once installed, you'll be able to import the `tcod` and `libtcodpy` modules,
