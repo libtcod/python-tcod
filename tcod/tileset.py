@@ -9,7 +9,7 @@ import numpy as np
 
 from tcod.loader import lib, ffi
 import tcod.console
-from tcod._internal import _check, _console, _raise_tcod_error
+from tcod._internal import _check, _console, _raise_tcod_error, deprecate
 
 
 class Tileset:
@@ -162,20 +162,30 @@ class Tileset:
         )
 
 
+@deprecate("Using the default tileset is deprecated.")
 def get_default() -> Tileset:
     """Return a reference to the default Tileset.
 
     .. versionadded:: 11.10
+
+    .. deprecated:: 11.13
+        The default tileset is deprecated.
+        With contexts this is no longer needed.
     """
     return Tileset._claim(lib.TCOD_get_default_tileset())
 
 
+@deprecate("Using the default tileset is deprecated.")
 def set_default(tileset: Tileset) -> None:
     """Set the default tileset.
 
     The display will use this new tileset immediately.
 
     .. versionadded:: 11.10
+
+    .. deprecated:: 11.13
+        The default tileset is deprecated.
+        With contexts this is no longer needed.
     """
     lib.TCOD_set_default_tileset(tileset._tileset_p)
 
@@ -200,6 +210,7 @@ def load_truetype_font(
     return Tileset._claim(cdata)
 
 
+@deprecate("Accessing the default tileset is deprecated.")
 def set_truetype_font(path: str, tile_width: int, tile_height: int) -> None:
     """Set the default tileset from a `.ttf` or `.otf` file.
 
@@ -215,6 +226,10 @@ def set_truetype_font(path: str, tile_width: int, tile_height: int) -> None:
     automatically.
 
     .. versionadded:: 9.2
+
+    .. deprecated:: 11.13
+        This function does not support contexts.
+        Use :any:`load_truetype_font` instead.
     """
     if not os.path.exists(path):
         raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(path),))

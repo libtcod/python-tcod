@@ -11,6 +11,8 @@ Unreleased
 Deprecated
  - `console_init_root` and `console_set_custom_font` have been replaced by the
    modern API.
+ - All functions which handle SDL windows without a context are deprecated.
+ - All functions which modify a globally active tileset are deprecated.
 
 11.13.5 - 2020-06-15
 --------------------

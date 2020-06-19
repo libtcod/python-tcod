@@ -1160,6 +1160,7 @@ def get_height_rect(width: int, string: str) -> int:
     )
 
 
+@deprecate("This function does not support contexts.")
 def recommended_size() -> Tuple[int, int]:
     """Return the recommended size of a console for the current active window.
 
@@ -1173,6 +1174,10 @@ def recommended_size() -> Tuple[int, int]:
     .. seealso::
         :any:`tcod.console_init_root`
         :any:`tcod.console_flush`
+
+    .. deprecated:: 11.13
+        This function does not support contexts.
+        Use :any:`Context.recommended_console_size` instead.
     """
     if not lib.TCOD_ctx.engine:
         raise RuntimeError("The libtcod engine was not initialized first.")

@@ -1048,7 +1048,7 @@ def console_get_height(con: tcod.console.Console) -> int:
     return int(lib.TCOD_console_get_height(_console(con)))
 
 
-@pending_deprecate()
+@deprecate("Setup fonts using the tcod.tileset module.")
 def console_map_ascii_code_to_font(
     asciiCode: int, fontCharX: int, fontCharY: int
 ) -> None:
@@ -1062,13 +1062,17 @@ def console_map_ascii_code_to_font(
                          0 is the leftmost tile.
         fontCharY (int): The Y tile coordinate on the loaded tileset.
                          0 is the topmost tile.
+
+    .. deprecated:: 11.13
+        Setup fonts using the :any:`tcod.tileset` module.
+        :any:`Tileset.remap` replaces this function.
     """
     lib.TCOD_console_map_ascii_code_to_font(
         _int(asciiCode), fontCharX, fontCharY
     )
 
 
-@pending_deprecate()
+@deprecate("Setup fonts using the tcod.tileset module.")
 def console_map_ascii_codes_to_font(
     firstAsciiCode: int, nbCodes: int, fontCharX: int, fontCharY: int
 ) -> None:
@@ -1086,13 +1090,17 @@ def console_map_ascii_codes_to_font(
         fontCharY (int): The starting Y tile coordinate on the loaded tileset.
                          0 is the topmost tile.
 
+    .. deprecated:: 11.13
+        Setup fonts using the :any:`tcod.tileset` module.
+        :any:`Tileset.remap` replaces this function.
+
     """
     lib.TCOD_console_map_ascii_codes_to_font(
         _int(firstAsciiCode), nbCodes, fontCharX, fontCharY
     )
 
 
-@pending_deprecate()
+@deprecate("Setup fonts using the tcod.tileset module.")
 def console_map_string_to_font(s: str, fontCharX: int, fontCharY: int) -> None:
     """Remap a string of codes to a contiguous set of tiles.
 
@@ -1104,25 +1112,37 @@ def console_map_string_to_font(s: str, fontCharX: int, fontCharY: int) -> None:
                          0 is the leftmost tile.
         fontCharY (int): The starting Y tile coordinate on the loaded tileset.
                          0 is the topmost tile.
+
+    .. deprecated:: 11.13
+        Setup fonts using the :any:`tcod.tileset` module.
+        :any:`Tileset.remap` replaces this function.
     """
     lib.TCOD_console_map_string_to_font_utf(_unicode(s), fontCharX, fontCharY)
 
 
+@deprecate("This function is not supported if contexts are being used.")
 def console_is_fullscreen() -> bool:
     """Returns True if the display is fullscreen.
 
     Returns:
         bool: True if the display is fullscreen, otherwise False.
+
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
     """
     return bool(lib.TCOD_console_is_fullscreen())
 
 
+@deprecate("This function is not supported if contexts are being used.")
 def console_set_fullscreen(fullscreen: bool) -> None:
     """Change the display to be fullscreen or windowed.
 
     Args:
         fullscreen (bool): Use True to change to fullscreen.
                            Use False to change to windowed.
+
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
     """
     lib.TCOD_console_set_fullscreen(fullscreen)
 
@@ -1137,23 +1157,35 @@ def console_is_window_closed() -> bool:
     return bool(lib.TCOD_console_is_window_closed())
 
 
-@pending_deprecate()
+@deprecate("This function is not supported if contexts are being used.")
 def console_has_mouse_focus() -> bool:
-    """Return True if the window has mouse focus."""
+    """Return True if the window has mouse focus.
+
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
+    """
     return bool(lib.TCOD_console_has_mouse_focus())
 
 
-@pending_deprecate()
+@deprecate("This function is not supported if contexts are being used.")
 def console_is_active() -> bool:
-    """Return True if the window has keyboard focus."""
+    """Return True if the window has keyboard focus.
+
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
+    """
     return bool(lib.TCOD_console_is_active())
 
 
+@deprecate("This function is not supported if contexts are being used.")
 def console_set_window_title(title: str) -> None:
     """Change the current title bar string.
 
     Args:
         title (AnyStr): A string to change the title bar to.
+
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
     """
     lib.TCOD_console_set_window_title(_bytes(title))
 
@@ -1171,6 +1203,7 @@ def console_credits_render(x: int, y: int, alpha: bool) -> bool:
     return bool(lib.TCOD_console_credits_render(x, y, alpha))
 
 
+@deprecate("This function is not supported if contexts are being used.")
 def console_flush(
     console: Optional[tcod.console.Console] = None,
     *,
@@ -1217,6 +1250,9 @@ def console_flush(
     .. seealso::
         :any:`tcod.console_init_root`
         :any:`tcod.console.recommended_size`
+
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
     """
     if snap_to_integer is not None:
         warnings.warn(
@@ -1727,18 +1763,30 @@ def console_get_char(con: tcod.console.Console, x: int, y: int) -> int:
     return lib.TCOD_console_get_char(_console(con), x, y)  # type: ignore
 
 
-@pending_deprecate()
+@deprecate("This function is not supported if contexts are being used.")
 def console_set_fade(fade: int, fadingColor: Tuple[int, int, int]) -> None:
+    """
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
+    """
     lib.TCOD_console_set_fade(fade, fadingColor)
 
 
-@pending_deprecate()
+@deprecate("This function is not supported if contexts are being used.")
 def console_get_fade() -> int:
+    """
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
+    """
     return int(lib.TCOD_console_get_fade())
 
 
-@pending_deprecate()
+@deprecate("This function is not supported if contexts are being used.")
 def console_get_fading_color() -> Color:
+    """
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
+    """
     return Color._new_from_cdata(lib.TCOD_console_get_fading_color())
 
 
@@ -1846,6 +1894,7 @@ def console_set_key_color(
         con.set_key_color(col)
 
 
+@deprecate("This function is no longer needed.")
 def console_delete(con: tcod.console.Console) -> None:
     """Closes the window if `con` is the root console.
 
@@ -4006,6 +4055,9 @@ def struct_get_type(struct, name):  # type: ignore
 
 
 # high precision time functions
+
+
+@deprecate("This function is not supported if contexts are being used.")
 def sys_set_fps(fps: int) -> None:
     """Set the maximum frame rate.
 
@@ -4013,10 +4065,14 @@ def sys_set_fps(fps: int) -> None:
 
     Args:
         fps (int): A frame rate limit (i.e. 60)
+
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
     """
     lib.TCOD_sys_set_fps(fps)
 
 
+@deprecate("This function is not supported if contexts are being used.")
 def sys_get_fps() -> int:
     """Return the current frames per second.
 
@@ -4027,15 +4083,22 @@ def sys_get_fps() -> int:
 
     Returns:
         int: The currently measured frame rate.
+
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
     """
     return int(lib.TCOD_sys_get_fps())
 
 
+@deprecate("This function is not supported if contexts are being used.")
 def sys_get_last_frame_length() -> float:
     """Return the delta time of the last rendered frame in seconds.
 
     Returns:
         float: The delta time of the last rendered frame.
+
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
     """
     return float(lib.TCOD_sys_get_last_frame_length())
 
@@ -4079,25 +4142,31 @@ def sys_elapsed_seconds() -> float:
     return float(lib.TCOD_sys_elapsed_seconds())
 
 
+@deprecate("This function is not supported if contexts are being used.")
 def sys_set_renderer(renderer: int) -> None:
     """Change the current rendering mode to renderer.
 
-    .. deprecated:: 2.0
-       RENDERER_GLSL and RENDERER_OPENGL are not currently available.
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
     """
     _check(lib.TCOD_sys_set_renderer(renderer))
     if tcod.console._root_console is not None:
         tcod.console.Console._get_root()
 
 
+@deprecate("This function is not supported if contexts are being used.")
 def sys_get_renderer() -> int:
     """Return the current rendering mode.
 
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
+        Check :any:`Context.renderer_type` instead.
     """
     return int(lib.TCOD_sys_get_renderer())
 
 
 # easy screenshots
+@deprecate("This function is not supported if contexts are being used.")
 def sys_save_screenshot(name: Optional[str] = None) -> None:
     """Save a screenshot to a file.
 
@@ -4109,6 +4178,10 @@ def sys_save_screenshot(name: Optional[str] = None) -> None:
 
     Args:
         file Optional[AnyStr]: File path to save screenshot.
+
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
+        Use :any:`Context.save_screenshot` instead.
     """
     lib.TCOD_sys_save_screenshot(
         _bytes(name) if name is not None else ffi.NULL
@@ -4116,7 +4189,7 @@ def sys_save_screenshot(name: Optional[str] = None) -> None:
 
 
 # custom fullscreen resolution
-@pending_deprecate()
+@deprecate("This function is not supported if contexts are being used.")
 def sys_force_fullscreen_resolution(width: int, height: int) -> None:
     """Force a specific resolution in fullscreen.
 
@@ -4130,15 +4203,22 @@ def sys_force_fullscreen_resolution(width: int, height: int) -> None:
     Args:
         width (int): The desired resolution width.
         height (int): The desired resolution height.
+
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
     """
     lib.TCOD_sys_force_fullscreen_resolution(width, height)
 
 
+@deprecate("This function is not supported if contexts are being used.")
 def sys_get_current_resolution() -> Tuple[int, int]:
     """Return the current resolution as (width, height)
 
     Returns:
         Tuple[int,int]: The current resolution.
+
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
     """
     w = ffi.new("int *")
     h = ffi.new("int *")
@@ -4146,11 +4226,15 @@ def sys_get_current_resolution() -> Tuple[int, int]:
     return w[0], h[0]
 
 
+@deprecate("This function is not supported if contexts are being used.")
 def sys_get_char_size() -> Tuple[int, int]:
     """Return the current fonts character size as (width, height)
 
     Returns:
         Tuple[int,int]: The current font glyph size in (width, height)
+
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
     """
     w = ffi.new("int *")
     h = ffi.new("int *")
@@ -4159,7 +4243,7 @@ def sys_get_char_size() -> Tuple[int, int]:
 
 
 # update font bitmap
-@pending_deprecate()
+@deprecate("This function is not supported if contexts are being used.")
 def sys_update_char(
     asciiCode: int,
     fontx: int,
@@ -4182,11 +4266,15 @@ def sys_update_char(
         img (Image): An image containing the new character bitmap.
         x (int): Left pixel of the character in the image.
         y (int): Top pixel of the character in the image.
+
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
+        Use :any:`Tileset.set_tile` instead to update tiles.
     """
     lib.TCOD_sys_update_char(_int(asciiCode), fontx, fonty, img, x, y)
 
 
-@pending_deprecate()
+@deprecate("This function is not supported if contexts are being used.")
 def sys_register_SDL_renderer(callback: Callable[[Any], None]) -> None:
     """Register a custom randering function with libtcod.
 
@@ -4201,6 +4289,9 @@ def sys_register_SDL_renderer(callback: Callable[[Any], None]) -> None:
     Args:
         callback Callable[[CData], None]:
             A function which takes a single argument.
+
+    .. deprecated:: 11.13
+        This function is not supported by contexts.
     """
     with _PropagateException() as propagate:
 
