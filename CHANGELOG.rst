@@ -13,6 +13,8 @@ Deprecated
    modern API.
  - All functions which handle SDL windows without a context are deprecated.
  - All functions which modify a globally active tileset are deprecated.
+ - `tcod.map.Map` is deprecated, NumPy arrays should be passed to functions
+   directly instead of through this class.
 
 11.13.5 - 2020-06-15
 --------------------

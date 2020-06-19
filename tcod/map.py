@@ -61,9 +61,19 @@ class Map(object):
                [False, False,  True]]...)
         >>> m.fov[3,1]
         False
+
+    .. deprecated:: 11.13
+        You no longer need to use this class to hold data for field-of-view
+        or pathfinding as those functions can now take NumPy arrays directly.
+        See :any:`tcod.map.compute_fov` and :any:`tcod.path`.
     """
 
     def __init__(self, width: int, height: int, order: str = "C"):
+        warnings.warn(
+            "This class may perform poorly and is no longer needed.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.width = width
         self.height = height
         self._order = tcod._internal.verify_order(order)
@@ -238,9 +248,21 @@ def compute_fov(
             RuntimeWarning,
             stacklevel=2,
         )
-    map_ = Map(transparency.shape[1], transparency.shape[0])
-    map_.transparent[...] = transparency
-    lib.TCOD_map_compute_fov(
-        map_.map_c, pov[1], pov[0], radius, light_walls, algorithm
+    map_buffer = np.empty(
+        transparency.shape,
+        dtype=[("transparent", bool), ("walkable", bool), ("fov", bool)],
     )
-    return map_.fov
+    map_cdata = ffi.new(
+        "struct TCOD_Map*",
+        (
+            map_buffer.shape[1],
+            map_buffer.shape[0],
+            map_buffer.shape[1] * map_buffer.shape[0],
+            ffi.from_buffer("struct TCOD_MapCell*", map_buffer),
+        ),
+    )
+    map_buffer["transparent"] = transparency
+    lib.TCOD_map_compute_fov(
+        map_cdata, pov[1], pov[0], radius, light_walls, algorithm
+    )
+    return map_buffer["fov"]
