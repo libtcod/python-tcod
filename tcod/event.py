@@ -9,8 +9,7 @@ SDL's ``SDLK_UP`` and ``SDL_SCANCODE_A`` respectfully.
 
 Printing any event will tell you its attributes in a human readable format.
 An events type attribute if omitted is just the classes name with all letters
-upper-case.  Do not use :any:`isinstance` to tell events apart as that method
-won't be forward compatible.
+upper-case.
 
 As a general guideline, you should use :any:`KeyboardEvent.sym` for command
 inputs, and :any:`TextInput.text` for name entry fields.

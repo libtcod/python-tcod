@@ -8,7 +8,7 @@ Python 3 and python-tcod must be installed, see :ref:`installation`.
 Fixed-size console
 ------------------
 
-The first example is a hello world script which handles font loading,
+This example is a hello world script which handles font loading,
 fixed-sized consoles, window contexts, and event handling.
 This example requires the
 `dejavu10x10_gs_tc.png <https://github.com/libtcod/python-tcod/blob/11.13.5/fonts/libtcod/dejavu10x10_gs_tc.png>`_
@@ -68,7 +68,7 @@ fallback font will be used.  This is useful for prototyping but it's not
 recommended to release with this font since it can fail to load on some
 platforms.
 
-The `integer_scaling` parameter to :any:`Context.present` presents the console
+The `integer_scaling` parameter to :any:`Context.present` prevents the console
 from being slightly stretched, since the console will rarely be the prefect
 size a small border will exist.
 
