@@ -863,6 +863,11 @@ Color(153, 76, 0), Color(204, 102, 0), Color(255, 128, 0)]
     return [Color._new_from_cdata(cdata) for cdata in cres]
 
 
+@deprecate(
+    """console_init_root is deprecated in favor of using libtcod contexts.
+See the Getting Started documentation:
+https://python-tcod.readthedocs.io/en/latest/tcod/getting-started.html"""
+)
 def console_init_root(
     w: int,
     h: int,
@@ -930,6 +935,10 @@ def console_init_root(
 
     .. versionchanged:: 10.1
         Added the `vsync` parameter.
+
+    .. deprecated:: 11.13
+        Use :any:`tcod.context` for window management.
+        See :ref:`getting-started` for more info.
     """
     if title is None:
         # Use the scripts filename as the title.
@@ -960,6 +969,11 @@ def console_init_root(
     return console
 
 
+@deprecate(
+    """console_set_custom_font is deprecated in favor of using contexts.
+See the Getting Started documentation:
+https://python-tcod.readthedocs.io/en/latest/tcod/getting-started.html"""
+)
 def console_set_custom_font(
     fontFile: AnyStr,
     flags: int = FONT_LAYOUT_ASCII_INCOL,
@@ -986,6 +1000,10 @@ def console_set_custom_font(
 
     `nb_char_horiz` and `nb_char_vertic` are the columns and rows of the font
     file respectfully.
+
+    .. deprecated:: 11.13
+        Load fonts using :any:`tcod.tileset.load_tileheet` instead.
+        See :ref:`getting-started` for more info.
     """
     if not os.path.exists(fontFile):
         raise RuntimeError(

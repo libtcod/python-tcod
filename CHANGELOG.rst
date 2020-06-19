@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Deprecated
+ - `console_init_root` and `console_set_custom_font` have been replaced by the
+   modern API.
 
 11.13.5 - 2020-06-15
 --------------------
