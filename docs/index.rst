@@ -33,6 +33,7 @@ Contents:
     tcod/context
     tcod/event
     tcod/image
+    tcod/los
     tcod/map
     tcod/noise
     tcod/path

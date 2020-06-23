@@ -42,7 +42,7 @@ RE_PREPROCESSOR = re.compile(
 RE_INCLUDE = re.compile(r'#include "([^"]*)"')
 RE_TAGS = re.compile(
     r"TCODLIB_C?API|TCOD_PUBLIC|TCOD_NODISCARD|TCOD_DEPRECATED_NOMESSAGE"
-    r"|(TCOD_DEPRECATED|TCODLIB_FORMAT)\([^)]*\)"
+    r"|(TCOD_DEPRECATED|TCODLIB_FORMAT)\([^)]*\)|__restrict"
 )
 RE_VAFUNC = re.compile(r".*\(.*va_list.*\);")
 RE_INLINE = re.compile(

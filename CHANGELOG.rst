@@ -8,6 +8,12 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - New `tcod.los` module for NumPy-based line-of-sight algorithms.
+   Includes `tcod.los.bresenham`.
+
+Deprecated
+ - `tcod.line_where` and `tcod.line_iter` have been deprecated.
 
 11.13.6 - 2020-06-19
 --------------------

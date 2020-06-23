@@ -49,6 +49,7 @@ import tcod.bsp
 from tcod.color import Color
 import tcod.console
 import tcod.image
+import tcod.los
 import tcod.map
 import tcod.noise
 import tcod.path
@@ -3260,6 +3261,7 @@ def line(
     return False
 
 
+@deprecate("This function has been replaced by tcod.los.bresenham.")
 def line_iter(xo: int, yo: int, xd: int, yd: int) -> Iterator[Tuple[int, int]]:
     """ returns an Iterable
 
@@ -3273,6 +3275,9 @@ def line_iter(xo: int, yo: int, xd: int, yd: int) -> Iterator[Tuple[int, int]]:
 
     Returns:
         Iterable[Tuple[int,int]]: An Iterable of (x,y) points.
+
+    .. deprecated:: 11.14
+        This function was replaced by :any:`tcod.los.bresenham`.
     """
     data = ffi.new("TCOD_bresenham_data_t *")
     lib.TCOD_line_init_mt(xo, yo, xd, yd, data)
@@ -3283,6 +3288,7 @@ def line_iter(xo: int, yo: int, xd: int, yd: int) -> Iterator[Tuple[int, int]]:
         yield (x[0], y[0])
 
 
+@deprecate("This function has been replaced by tcod.los.bresenham.")
 def line_where(
     x1: int, y1: int, x2: int, y2: int, inclusive: bool = True
 ) -> Tuple[np.ndarray, np.ndarray]:
@@ -3304,15 +3310,15 @@ def line_where(
                [0, 0, 0, 0, 0]]...)
 
     .. versionadded:: 4.6
+
+    .. deprecated:: 11.14
+        This function was replaced by :any:`tcod.los.bresenham`.
     """
-    length = max(abs(x1 - x2), abs(y1 - y2)) + 1
-    array = np.ndarray((2, length), dtype=np.intc)
-    x = ffi.from_buffer("int*", array[0])
-    y = ffi.from_buffer("int*", array[1])
-    lib.LineWhere(x1, y1, x2, y2, x, y)
+    array = tcod.los.bresenham((x1, y1), (x2, y2)).T
     if not inclusive:
         array = array[:, 1:]
-    return tuple(array)  # type: ignore
+    i, j = array
+    return i, j
 
 
 @deprecate("Call tcod.map.Map(width, height) instead.")
