@@ -366,11 +366,11 @@ class Console:
             Added the `ch`, `fg`, and `bg` parameters.
             Non-white-on-black default values are deprecated.
         """
-        if fg is ...:
+        if fg is ...:  # type: ignore
             fg = self.default_fg
             if fg != (255, 255, 255):
                 self.__clear_warning("fg", fg)
-        if bg is ...:
+        if bg is ...:  # type: ignore
             bg = self.default_bg
             if bg != (0, 0, 0):
                 self.__clear_warning("bg", bg)

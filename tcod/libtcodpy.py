@@ -1006,7 +1006,7 @@ def console_set_custom_font(
         Load fonts using :any:`tcod.tileset.load_tileheet` instead.
         See :ref:`getting-started` for more info.
     """
-    if not os.path.exists(fontFile):
+    if not os.path.exists(_unicode(fontFile)):
         raise RuntimeError(
             "File not found:\n\t%s" % (str(os.path.realpath(fontFile)),)
         )
