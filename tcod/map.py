@@ -222,9 +222,11 @@ def compute_fov(
         >>> explored |= visible  # Keep track of an explored area.
 
     .. seealso::
-        :any:`numpy.nonzero`
-        :any:`numpy.choose`
-        :any:`numpy.select`
+        :any:`numpy.where`: For selecting between two arrays using a boolean
+        array, like the one returned by this function.
+
+        :any:`numpy.select`: Select between arrays based on multiple
+        conditions.
     """
     transparency = np.asarray(transparency)
     if len(transparency.shape) != 2:
