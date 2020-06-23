@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.14.0 - 2020-06-23
+--------------------
 Added
  - New `tcod.los` module for NumPy-based line-of-sight algorithms.
    Includes `tcod.los.bresenham`.
