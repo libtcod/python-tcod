@@ -16,7 +16,7 @@ jobs:
     env: MB_PYTHON_VERSION=3.7.1
   - os: osx
     language: generic
-    env: PYPY3_VERSION=pypy3.6-v7.3.0
+    env: PYPY3_VERSION=pypy3.6-v7.3.0 CUSTOM_REQUIREMENTS="numpy==1.18"
   allow_failures:
   - python: nightly
   - python: pypy3.5-7.0
@@ -42,6 +42,7 @@ before_install:
 - python get-pip.py
 - pip install --upgrade setuptools
 - pip install --pre --upgrade wheel
+- if [[ -n "$CUSTOM_REQUIREMENTS" ]]; then pip install $CUSTOM_REQUIREMENTS; fi
 - pip install --requirement requirements.txt
 install:
 - if [[ -z "$TRAVIS_TAG" ]]; then export BUILD_FLAGS="-g"; fi
