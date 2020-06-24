@@ -1,8 +1,7 @@
-"""
-The :any:`Noise.sample_mgrid` and :any:`Noise.sample_ogrid` methods are
-multi-threaded operations when the Python runtime supports OpenMP.
-Even when single threaded these methods will perform much better than
-multiple calls to :any:`Noise.get_point`.
+"""Noise map generators are provided by this module.
+
+The :any:`Noise.sample_mgrid` and :any:`Noise.sample_ogrid` methods perform
+much better than multiple calls to :any:`Noise.get_point`.
 
 Example::
 

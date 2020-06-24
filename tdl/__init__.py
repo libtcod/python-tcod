@@ -1,6 +1,8 @@
 """
     .. deprecated:: 8.4
-        This module has been deprecated.
+        The :term:`python-tdl` module has been a total disaster and now exists
+        mainly as a historical curiosity and as a stepping stone for what would
+        eventually become :term:`python-tcod`.
 
     Getting Started
     ===============

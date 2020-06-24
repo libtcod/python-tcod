@@ -1,3 +1,12 @@
+"""Functionality for handling images.
+
+**Python-tcod is unable to render pixels to the screen directly.**
+If your image can't be represented as tiles then you'll need to use
+`an alternative library for graphics rendering
+<https://wiki.python.org/moin/PythonGameLibraries>`_.
+"""
+
+
 from typing import Any, Dict, Tuple
 
 import numpy as np

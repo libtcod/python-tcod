@@ -1,4 +1,14 @@
 """Tileset and font related functions.
+
+Tilesets can be loaded as a whole from tile-sheets or True-Type fonts, or they
+can be put together from multiple tile images by loading them separately
+using :any:`Tileset.set_tile`.
+
+A major restriction with libtcod is that all tiles must be the same size and
+tiles can't overlap when rendered.  For sprite-based rendering it can be
+useful to use `an alternative library for graphics rendering
+<https://wiki.python.org/moin/PythonGameLibraries>`_ while continuing to use
+python-tcod's pathfinding and field-of-view algorithms.
 """
 import os
 

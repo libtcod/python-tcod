@@ -1,5 +1,15 @@
-libtcodpy
-=========
+libtcodpy - Old API Functions
+=============================
+
+This is all the functions included since the start of the Python port.
+This collection is often called :term:`libtcodpy`, the name of the original
+Python port.  These functions are reproduced by python-tcod in their entirely.
+
+**A large majority of these functions are deprecated and will be removed in
+the future.
+In general this entire section should be avoided whenever possible.**
+See :ref:`getting-started` for how to make a new python-tcod project with its
+modern API.
 
 bsp
 ---

@@ -1,4 +1,4 @@
-"""
+"""This module provides a fast configurable pathfinding implementation.
 
 Example::
 
