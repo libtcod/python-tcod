@@ -368,7 +368,7 @@ rst_epilog = ".. include:: /epilog.rst"
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     'https://docs.python.org/3/': None,
-    'https://docs.scipy.org/doc/numpy/': None,
+    'https://numpy.org/doc/stable/': None,
 }
 
 os.environ['READTHEDOCS'] = 'True'
