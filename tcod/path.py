@@ -2,14 +2,14 @@
 
 To get started create a 2D NumPy array of integers where a value of zero is a
 blocked node and any higher value is the cost to move to that node.
-You then pass this array to :any:`BasicGraph`, and then pass that graph to
+You then pass this array to :any:`SimpleGraph`, and then pass that graph to
 :any:`Pathfinder`.
 
 Once you have a :any:`Pathfinder` you call :any:`Pathfinder.add_root` to set
 the root node.  You can then get a path towards or away from the root with
 :any:`Pathfinder.path_from` and :any:`Pathfinder.path_to` respectively.
 
-:any:`BasicGraph` includes a code example of the above process.
+:any:`SimpleGraph` includes a code example of the above process.
 
 .. versionchanged:: 5.0
     All path-finding functions now respect the NumPy array shape (if a NumPy
@@ -603,7 +603,7 @@ class CustomGraph:
     """A customizable graph defining how a pathfinder traverses the world.
 
     If you only need to path over a 2D array with typical edge rules then you
-    should use :any:`BasicGraph`.
+    should use :any:`SimpleGraph`.
     This is an advanced interface for defining custom edge rules which would
     allow things such as 3D movement.
 
@@ -1012,7 +1012,7 @@ class CustomGraph:
         )
 
 
-class BasicGraph:
+class SimpleGraph:
     """A simple 2D graph implementation.
 
     `cost` is a NumPy array where each node has the cost for movement into
@@ -1035,7 +1035,7 @@ class BasicGraph:
         >>> import numpy as np
         >>> import tcod
         >>> cost = np.ones((5, 10), dtype=np.int8, order="F")
-        >>> graph = tcod.path.BasicGraph(cost=cost, cardinal=2, diagonal=3)
+        >>> graph = tcod.path.SimpleGraph(cost=cost, cardinal=2, diagonal=3)
         >>> pf = tcod.path.Pathfinder(graph)
         >>> pf.add_root((2, 4))
         >>> pf.path_to((3, 7)).tolist()
@@ -1087,13 +1087,13 @@ class BasicGraph:
     def set_heuristic(self, *, cardinal: int, diagonal: int) -> None:
         """Change the heuristic for this graph.
 
-        When created a :any:`BasicGraph` will automatically have a heuristic.
+        When created a :any:`SimpleGraph` will automatically have a heuristic.
         So calling this method is often unnecessary.
 
         `cardinal` and `diagonal` are weights for the heuristic.
         Higher values are more greedy.
         The default values are set to ``cardinal * greed`` and
-        ``diagonal * greed`` when the :any:`BasicGraph` is created.
+        ``diagonal * greed`` when the :any:`SimpleGraph` is created.
         """
         self._subgraph.set_heuristic(cardinal=cardinal, diagonal=diagonal)
 
@@ -1105,12 +1105,12 @@ class Pathfinder:
     """A generic modular pathfinder.
 
     How the pathfinder functions depends on the graph provided. see
-    :any:`BasicGraph` for how to set one up.
+    :any:`SimpleGraph` for how to set one up.
 
     .. versionadded:: 11.13
     """
 
-    def __init__(self, graph: Union[CustomGraph, BasicGraph]):
+    def __init__(self, graph: Union[CustomGraph, SimpleGraph]):
         self._graph = graph
         self._order = graph._order
         self._frontier_p = ffi.gc(
