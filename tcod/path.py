@@ -625,10 +625,6 @@ class CustomGraph:
     After all edge rules are added the graph can be used to make one or more
     :any:`Pathfinder` instances.
 
-    Because the arrays used are in row-major order the indexes used in the
-    examples be reversed from what you expect.
-    A 2D edge or index is ``(y, x)`` and in 3D it is ``(z, y, x)``.
-
     Example::
 
         >>> import numpy as np
