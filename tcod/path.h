@@ -33,7 +33,7 @@ enum NP_Type {
 struct NArray {
   enum NP_Type type;
   int8_t ndim;
-  char* data;
+  char* __restrict data;
   ptrdiff_t shape[5];    // TCOD_PATHFINDER_MAX_DIMENSIONS + 1
   ptrdiff_t strides[5];  // TCOD_PATHFINDER_MAX_DIMENSIONS + 1
 };
@@ -46,7 +46,7 @@ struct PathfinderRule {
   /** Number of edge rules in `edge_array`. */
   int edge_count;
   /** Example of 2D edges: [i, j, cost, i_2, j_2, cost_2, ...] */
-  int* edge_array;
+  int* __restrict edge_array;
 };
 
 struct PathfinderHeuristic {
@@ -63,7 +63,7 @@ struct FrontierNode {
 };
 
 struct PathCostArray {
-  char* array;
+  char* __restrict array;
   long long strides[2];
 };
 
@@ -96,50 +96,52 @@ float PathCostArrayInt32(
     `index[ndim]` must not be NULL.
  */
 int compute_heuristic(
-    const struct PathfinderHeuristic* heuristic, int ndim, const int* index);
+    const struct PathfinderHeuristic* __restrict heuristic,
+    int ndim,
+    const int* __restrict index);
 int dijkstra2d(
-    struct NArray* dist,
-    const struct NArray* cost,
+    struct NArray* __restrict dist,
+    const struct NArray* __restrict cost,
     int edges_2d_n,
-    const int* edges_2d);
+    const int* __restrict edges_2d);
 
 int dijkstra2d_basic(
-    struct NArray* dist,
-    const struct NArray* cost,
+    struct NArray* __restrict dist,
+    const struct NArray* __restrict cost,
     int cardinal,
     int diagonal);
 
 int hillclimb2d(
-    const struct NArray* dist_array,
+    const struct NArray* __restrict dist_array,
     int start_i,
     int start_j,
     int edges_2d_n,
-    const int* edges_2d,
-    int* out);
+    const int* __restrict edges_2d,
+    int* __restrict out);
 
 int hillclimb2d_basic(
-    const struct NArray* dist,
+    const struct NArray* __restrict dist,
     int x,
     int y,
     bool cardinal,
     bool diagonal,
-    int* out);
+    int* __restrict out);
 
 int path_compute_step(
-    struct TCOD_Frontier* frontier,
-    struct NArray* dist_map,
-    struct NArray* travel_map,
+    struct TCOD_Frontier* __restrict frontier,
+    struct NArray* __restrict dist_map,
+    struct NArray* __restrict travel_map,
     int n,
-    const struct PathfinderRule* rules,  // rules[n]
+    const struct PathfinderRule* __restrict rules,  // rules[n]
     const struct PathfinderHeuristic* heuristic);
 
 int path_compute(
-    struct TCOD_Frontier* frontier,
-    struct NArray* dist_map,
-    struct NArray* travel_map,
+    struct TCOD_Frontier* __restrict frontier,
+    struct NArray* __restrict dist_map,
+    struct NArray* __restrict travel_map,
     int n,
-    const struct PathfinderRule* rules,  // rules[n]
-    const struct PathfinderHeuristic* heuristic);
+    const struct PathfinderRule* __restrict rules,  // rules[n]
+    const struct PathfinderHeuristic* __restrict heuristic);
 /**
     Find and get a path along `travel_map`.
 
@@ -148,24 +150,30 @@ int path_compute(
     parameters.
  */
 ptrdiff_t get_travel_path(
-    int8_t ndim, const struct NArray* travel_map, const int* start, int* out);
+    int8_t ndim,
+    const struct NArray* __restrict travel_map,
+    const int* __restrict start,
+    int* __restrict out);
 /**
     Update the priority of nodes on the frontier and sort them.
  */
 int update_frontier_heuristic(
-    struct TCOD_Frontier* frontier,
-    const struct PathfinderHeuristic* heuristic);
+    struct TCOD_Frontier* __restrict frontier,
+    const struct PathfinderHeuristic* __restrict heuristic);
 /**
     Update a frontier from a distance array.
 
     Assumes no heuristic is active.
  */
 int rebuild_frontier_from_distance(
-    struct TCOD_Frontier* frontier, const struct NArray* dist_map);
+    struct TCOD_Frontier* __restrict frontier,
+    const struct NArray* __restrict dist_map);
 /**
     Return true if `index[frontier->ndim]` is a node in `frontier`.
  */
-int frontier_has_index(const struct TCOD_Frontier* frontier, const int* index);
+int frontier_has_index(
+    const struct TCOD_Frontier* __restrict frontier,
+    const int* __restrict index);
 #ifdef __cplusplus
 }
 #endif

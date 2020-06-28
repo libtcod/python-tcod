@@ -19,18 +19,21 @@ typedef struct TDLNoise {
 } TDLNoise;
 
 /* Return a single sample from noise. */
-float NoiseGetSample(TDLNoise* noise, float* xyzw);
+float NoiseGetSample(TDLNoise* noise, float* __restrict xyzw);
 
 /* Fill `out` with samples derived from the  mesh-grid `in`. */
 void NoiseSampleMeshGrid(
-    TDLNoise* noise, const long len, const float* in, float* out);
+    TDLNoise* noise,
+    const long len,
+    const float* __restrict in,
+    float* __restrict out);
 
 /* Fill `out` with samples derived from the open mesh-grid `in`. */
 void NoiseSampleOpenMeshGrid(
-    TDLNoise* noise,
+    TDLNoise* __restrict noise,
     const int ndim,
-    const long* shape,
-    const float** ogrid_in,
-    float* out);
+    const long* __restrict shape,
+    const float* __restrict* __restrict ogrid_in,
+    float* __restrict out);
 
 #endif /* PYTHON_TCOD_NOISE_H_ */

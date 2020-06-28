@@ -84,7 +84,10 @@ static int get_array_int(const struct NArray* arr, int n, const int* index) {
   return (int)get_array_int64(arr, n, index);
 }
 static void set_array_int64(
-    struct NArray* arr, int n, const int* index, int64_t value) {
+    struct NArray* __restrict arr,
+    int n,
+    const int* __restrict index,
+    int64_t value) {
   void* ptr = get_array_ptr(arr, n, index);
   switch (arr->type) {
     case np_int8:
@@ -115,15 +118,16 @@ static void set_array_int64(
   }
 }
 static void set_array2d_int64(
-    struct NArray* arr, int i, int j, int64_t value) {
+    struct NArray* __restrict arr, int i, int j, int64_t value) {
   int index[2] = {i, j};
   set_array_int64(arr, 2, index, value);
 }
 static void set_array_int(
-    struct NArray* arr, int n, const int* index, int value) {
+    struct NArray* __restrict arr, int n, const int* index, int value) {
   set_array_int64(arr, n, index, value);
 }
-static void set_array2d_int(struct NArray* arr, int i, int j, int value) {
+static void set_array2d_int(
+    struct NArray* __restrict arr, int i, int j, int value) {
   set_array2d_int64(arr, i, j, value);
 }
 static int64_t get_array_is_max(
@@ -155,11 +159,12 @@ static const int CARDINAL_[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 static const int DIAGONAL_[4][2] = {{-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
 
 static void dijkstra2d_add_edge(
-    struct TCOD_Frontier* frontier,
-    struct NArray* dist_array,
-    const struct NArray* cost,
+    struct TCOD_Frontier* __restrict frontier,
+    struct NArray* __restrict dist_array,
+    const struct NArray* __restrict cost,
     int edge_cost,
-    const int dir[2]) {
+    const int* __restrict dir  // dir[2]
+) {
   const int index[2] = {
       frontier->active_index[0] + dir[0], frontier->active_index[1] + dir[1]};
   if (!array_in_range(dist_array, 2, index)) { return; }
@@ -172,10 +177,10 @@ static void dijkstra2d_add_edge(
 }
 
 int dijkstra2d(
-    struct NArray* dist_array,
-    const struct NArray* cost,
+    struct NArray* __restrict dist_array,
+    const struct NArray* __restrict cost,
     int edges_2d_n,
-    const int* edges_2d) {
+    const int* __restrict edges_2d) {
   struct TCOD_Frontier* frontier = TCOD_frontier_new(2);
   if (!frontier) { return TCOD_E_ERROR; }
   for (int i = 0; i < dist_array->shape[0]; ++i) {
@@ -199,8 +204,8 @@ int dijkstra2d(
 }
 
 int dijkstra2d_basic(
-    struct NArray* dist_array,
-    const struct NArray* cost,
+    struct NArray* __restrict dist_array,
+    const struct NArray* __restrict cost,
     int cardinal,
     int diagonal) {
   struct TCOD_Frontier* frontier = TCOD_frontier_new(2);
@@ -233,11 +238,12 @@ int dijkstra2d_basic(
   return TCOD_E_OK;
 }
 static void hillclimb2d_check_edge(
-    const struct NArray* dist_array,
-    int* distance_in_out,
-    const int origin[2],
-    const int dir[2],
-    int index_out[2]) {
+    const struct NArray* __restrict dist_array,
+    int* __restrict distance_in_out,
+    const int* __restrict origin,  // origin[2]
+    const int* __restrict dir,     // dir[2]
+    int* __restrict index_out      // index_out[2]
+) {
   const int next[2] = {origin[0] + dir[0], origin[1] + dir[1]};
   if (!array_in_range(dist_array, 2, next)) { return; }
   const int next_distance = get_array_int(dist_array, 2, next);
@@ -248,12 +254,12 @@ static void hillclimb2d_check_edge(
   }
 }
 int hillclimb2d(
-    const struct NArray* dist_array,
+    const struct NArray* __restrict dist_array,
     int start_i,
     int start_j,
     int edges_2d_n,
-    const int* edges_2d,
-    int* out) {
+    const int* __restrict edges_2d,
+    int* __restrict out) {
   int next[2] = {start_i, start_j};
   int old_dist = get_array_int(dist_array, 2, next);
   int new_dist = old_dist;
@@ -275,12 +281,12 @@ int hillclimb2d(
   }
 }
 int hillclimb2d_basic(
-    const struct NArray* dist_array,
+    const struct NArray* __restrict dist_array,
     int start_i,
     int start_j,
     bool cardinal,
     bool diagonal,
-    int* out) {
+    int* __restrict out) {
   int next[2] = {start_i, start_j};
   int old_dist = get_array_int(dist_array, 2, next);
   int new_dist = old_dist;
@@ -318,7 +324,9 @@ int hillclimb2d_basic(
   }
 }
 int compute_heuristic(
-    const struct PathfinderHeuristic* heuristic, int ndim, const int* index) {
+    const struct PathfinderHeuristic* __restrict heuristic,
+    int ndim,
+    const int* __restrict index) {
   if (!heuristic) { return 0; }
   int x = 0;
   int y = 0;
@@ -347,12 +355,12 @@ int compute_heuristic(
       w * heuristic->w + z * heuristic->z);
 }
 void path_compute_add_edge(
-    struct TCOD_Frontier* frontier,
-    struct NArray* dist_map,
-    struct NArray* travel_map,
-    const struct NArray* cost_map,
-    const int* edge_rule,
-    const struct PathfinderHeuristic* heuristic) {
+    struct TCOD_Frontier* __restrict frontier,
+    struct NArray* __restrict dist_map,
+    struct NArray* __restrict travel_map,
+    const struct NArray* __restrict cost_map,
+    const int* __restrict edge_rule,
+    const struct PathfinderHeuristic* __restrict heuristic) {
   int dest[TCOD_PATHFINDER_MAX_DIMENSIONS];
   for (int i = 0; i < frontier->ndim; ++i) {
     dest[i] = frontier->active_index[i] + edge_rule[i];
@@ -375,8 +383,8 @@ void path_compute_add_edge(
     Returns true if the heuristic target has been reached by the active_node.
  */
 static bool path_compute_at_goal(
-    const struct TCOD_Frontier* frontier,
-    const struct PathfinderHeuristic* heuristic) {
+    const struct TCOD_Frontier* __restrict frontier,
+    const struct PathfinderHeuristic* __restrict heuristic) {
   if (!heuristic) { return 0; }
   for (int i = 0; i < frontier->ndim; ++i) {
     if (frontier->active_index[i] != heuristic->target[i]) { return 0; }
@@ -384,12 +392,12 @@ static bool path_compute_at_goal(
   return 1;
 }
 int path_compute_step(
-    struct TCOD_Frontier* frontier,
-    struct NArray* dist_map,
-    struct NArray* travel_map,
+    struct TCOD_Frontier* __restrict frontier,
+    struct NArray* __restrict dist_map,
+    struct NArray* __restrict travel_map,
     int n,
-    const struct PathfinderRule* rules,
-    const struct PathfinderHeuristic* heuristic) {
+    const struct PathfinderRule* __restrict rules,
+    const struct PathfinderHeuristic* __restrict heuristic) {
   if (!frontier) { return TCOD_set_errorv("Missing frontier."); }
   if (frontier->ndim <= 0 || frontier->ndim > TCOD_PATHFINDER_MAX_DIMENSIONS) {
     return TCOD_set_errorv("Invalid frontier->ndim.");
@@ -425,12 +433,12 @@ int path_compute_step(
   return 0;
 }
 int path_compute(
-    struct TCOD_Frontier* frontier,
-    struct NArray* dist_map,
-    struct NArray* travel_map,
+    struct TCOD_Frontier* __restrict frontier,
+    struct NArray* __restrict dist_map,
+    struct NArray* __restrict travel_map,
     int n,
-    const struct PathfinderRule* rules,
-    const struct PathfinderHeuristic* heuristic) {
+    const struct PathfinderRule* __restrict rules,
+    const struct PathfinderHeuristic* __restrict heuristic) {
   if (!frontier) { return TCOD_set_errorv("Missing frontier."); }
   while (TCOD_frontier_size(frontier)) {
     int err =
@@ -440,7 +448,10 @@ int path_compute(
   return 0;
 }
 ptrdiff_t get_travel_path(
-    int8_t ndim, const struct NArray* travel_map, const int* start, int* out) {
+    int8_t ndim,
+    const struct NArray* __restrict travel_map,
+    const int* __restrict start,
+    int* __restrict out) {
   if (ndim <= 0 || ndim > TCOD_PATHFINDER_MAX_DIMENSIONS) {
     return TCOD_set_errorv("Invalid ndim.");
   }
@@ -491,8 +502,8 @@ ptrdiff_t get_travel_path(
   return length;
 }
 int update_frontier_heuristic(
-    struct TCOD_Frontier* frontier,
-    const struct PathfinderHeuristic* heuristic) {
+    struct TCOD_Frontier* __restrict frontier,
+    const struct PathfinderHeuristic* __restrict heuristic) {
   if (!frontier) { return TCOD_set_errorv("Missing frontier."); }
   for (int i = 0; i < frontier->heap.size; ++i) {
     unsigned char* heap_ptr = (unsigned char*)frontier->heap.heap;
@@ -507,8 +518,8 @@ int update_frontier_heuristic(
   return 0;
 }
 static int update_frontier_from_distance_iterator(
-    struct TCOD_Frontier* frontier,
-    const struct NArray* dist_map,
+    struct TCOD_Frontier* __restrict frontier,
+    const struct NArray* __restrict dist_map,
     int dimension,
     int* index) {
   if (dimension == frontier->ndim) {
@@ -525,7 +536,8 @@ static int update_frontier_from_distance_iterator(
   return 0;
 }
 int rebuild_frontier_from_distance(
-    struct TCOD_Frontier* frontier, const struct NArray* dist_map) {
+    struct TCOD_Frontier* __restrict frontier,
+    const struct NArray* __restrict dist_map) {
   if (!frontier) { return TCOD_set_errorv("Missing frontier."); }
   if (!dist_map) { return TCOD_set_errorv("Missing dist_map."); }
   TCOD_frontier_clear(frontier);
@@ -533,8 +545,8 @@ int rebuild_frontier_from_distance(
   return update_frontier_from_distance_iterator(frontier, dist_map, 0, index);
 }
 int frontier_has_index(
-    const struct TCOD_Frontier* frontier,
-    const int* index)  // index[frontier->ndim]
+    const struct TCOD_Frontier* __restrict frontier,
+    const int* __restrict index)  // index[frontier->ndim]
 {
   if (!frontier) { return TCOD_set_errorv("Missing frontier."); }
   if (!index) { return TCOD_set_errorv("Missing index."); }

@@ -2,7 +2,7 @@
 
 #include "../libtcod/src/libtcod/libtcod.h"
 
-float NoiseGetSample(TDLNoise* noise, float* xyzw) {
+float NoiseGetSample(TDLNoise* noise, float* __restrict xyzw) {
   switch (noise->implementation) {
     default:
     case kNoiseImplementationSimple:
@@ -16,7 +16,10 @@ float NoiseGetSample(TDLNoise* noise, float* xyzw) {
   }
 }
 void NoiseSampleMeshGrid(
-    TDLNoise* noise, const long len, const float* in, float* out) {
+    TDLNoise* noise,
+    const long len,
+    const float* __restrict in,
+    float* __restrict out) {
 #pragma omp parallel
   {
     long i;
@@ -38,10 +41,10 @@ static long GetSizeFromShape(const int ndim, const long* shape) {
   return size;
 }
 static float GetOpenMeshGridValue(
-    TDLNoise* noise,
+    TDLNoise* __restrict noise,
     const int ndim,
-    const long* shape,
-    const float** ogrid_in,
+    const long* __restrict shape,
+    const float* __restrict* __restrict ogrid_in,
     const long index) {
   int axis = ndim - 1;
   long xyzw_indexes[TCOD_NOISE_MAX_DIMENSIONS];
@@ -56,11 +59,11 @@ static float GetOpenMeshGridValue(
   return NoiseGetSample(noise, xyzw_values);
 }
 void NoiseSampleOpenMeshGrid(
-    TDLNoise* noise,
+    TDLNoise* __restrict noise,
     const int ndim_in,
-    const long* shape,
-    const float** ogrid_in,
-    float* out) {
+    const long* __restrict shape,
+    const float* __restrict* __restrict ogrid_in,
+    float* __restrict out) {
 #pragma omp parallel
   {
     long i;
