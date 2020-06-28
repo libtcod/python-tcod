@@ -10,6 +10,6 @@ extern "C" {
 #endif
 int bresenham(int x1, int y1, int x2, int y2, int n, int* __restrict out);
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif
 #endif /* TCOD_TCOD_H_ */

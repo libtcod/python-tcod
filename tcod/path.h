@@ -33,9 +33,9 @@ enum NP_Type {
 struct NArray {
   enum NP_Type type;
   int8_t ndim;
-  char *data;
-  ptrdiff_t shape[5]; // TCOD_PATHFINDER_MAX_DIMENSIONS + 1
-  ptrdiff_t strides[5]; // TCOD_PATHFINDER_MAX_DIMENSIONS + 1
+  char* data;
+  ptrdiff_t shape[5];    // TCOD_PATHFINDER_MAX_DIMENSIONS + 1
+  ptrdiff_t strides[5];  // TCOD_PATHFINDER_MAX_DIMENSIONS + 1
 };
 
 struct PathfinderRule {
@@ -63,30 +63,30 @@ struct FrontierNode {
 };
 
 struct PathCostArray {
-    char *array;
-    long long strides[2];
+  char* array;
+  long long strides[2];
 };
 
 float PathCostArrayFloat32(
-    int x1, int y1, int x2, int y2, const struct PathCostArray *map);
+    int x1, int y1, int x2, int y2, const struct PathCostArray* map);
 
 float PathCostArrayUInt8(
-    int x1, int y1, int x2, int y2, const struct PathCostArray *map);
+    int x1, int y1, int x2, int y2, const struct PathCostArray* map);
 
 float PathCostArrayUInt16(
-    int x1, int y1, int x2, int y2, const struct PathCostArray *map);
+    int x1, int y1, int x2, int y2, const struct PathCostArray* map);
 
 float PathCostArrayUInt32(
-    int x1, int y1, int x2, int y2, const struct PathCostArray *map);
+    int x1, int y1, int x2, int y2, const struct PathCostArray* map);
 
 float PathCostArrayInt8(
-    int x1, int y1, int x2, int y2, const struct PathCostArray *map);
+    int x1, int y1, int x2, int y2, const struct PathCostArray* map);
 
 float PathCostArrayInt16(
-    int x1, int y1, int x2, int y2, const struct PathCostArray *map);
+    int x1, int y1, int x2, int y2, const struct PathCostArray* map);
 
 float PathCostArrayInt32(
-    int x1, int y1, int x2, int y2, const struct PathCostArray *map);
+    int x1, int y1, int x2, int y2, const struct PathCostArray* map);
 
 /**
     Return the value to add to the distance to sort nodes by A*.
@@ -130,7 +130,7 @@ int path_compute_step(
     struct NArray* dist_map,
     struct NArray* travel_map,
     int n,
-    const struct PathfinderRule* rules, // rules[n]
+    const struct PathfinderRule* rules,  // rules[n]
     const struct PathfinderHeuristic* heuristic);
 
 int path_compute(
@@ -138,7 +138,7 @@ int path_compute(
     struct NArray* dist_map,
     struct NArray* travel_map,
     int n,
-    const struct PathfinderRule* rules, // rules[n]
+    const struct PathfinderRule* rules,  // rules[n]
     const struct PathfinderHeuristic* heuristic);
 /**
     Find and get a path along `travel_map`.
@@ -165,9 +165,7 @@ int rebuild_frontier_from_distance(
 /**
     Return true if `index[frontier->ndim]` is a node in `frontier`.
  */
-int frontier_has_index(
-    const struct TCOD_Frontier* frontier,
-    const int* index);
+int frontier_has_index(const struct TCOD_Frontier* frontier, const int* index);
 #ifdef __cplusplus
 }
 #endif

@@ -2,7 +2,7 @@
 
 #include "../libtcod/src/libtcod/libtcod.h"
 
-float NoiseGetSample(TDLNoise *noise, float *xyzw) {
+float NoiseGetSample(TDLNoise* noise, float* xyzw) {
   switch (noise->implementation) {
     default:
     case kNoiseImplementationSimple:
@@ -16,11 +16,11 @@ float NoiseGetSample(TDLNoise *noise, float *xyzw) {
   }
 }
 void NoiseSampleMeshGrid(
-    TDLNoise *noise, const long len, const float *in, float *out) {
-# pragma omp parallel
+    TDLNoise* noise, const long len, const float* in, float* out) {
+#pragma omp parallel
   {
     long i;
-#   pragma omp for schedule(static)
+#pragma omp for schedule(static)
     for (i = 0; i < len; ++i) {
       int axis;
       float xyzw[TCOD_NOISE_MAX_DIMENSIONS];
@@ -31,18 +31,19 @@ void NoiseSampleMeshGrid(
     }
   }
 }
-static long GetSizeFromShape(const int ndim, const long *shape){
-  long size=1;
+static long GetSizeFromShape(const int ndim, const long* shape) {
+  long size = 1;
   long i;
-  for (i = 0; i < ndim; ++i){
-    size *= shape[i];
-  }
+  for (i = 0; i < ndim; ++i) { size *= shape[i]; }
   return size;
 }
 static float GetOpenMeshGridValue(
-    TDLNoise *noise, const int ndim, const long *shape,
-    const float **ogrid_in, const long index) {
-  int axis=ndim - 1;
+    TDLNoise* noise,
+    const int ndim,
+    const long* shape,
+    const float** ogrid_in,
+    const long index) {
+  int axis = ndim - 1;
   long xyzw_indexes[TCOD_NOISE_MAX_DIMENSIONS];
   float xyzw_values[TCOD_NOISE_MAX_DIMENSIONS];
   /* Convert index -> xyzw_indexes -> xyzw_values */
@@ -54,15 +55,18 @@ static float GetOpenMeshGridValue(
   }
   return NoiseGetSample(noise, xyzw_values);
 }
-void NoiseSampleOpenMeshGrid(TDLNoise *noise, const int ndim_in,
-                             const long *shape,
-                             const float **ogrid_in, float *out) {
-# pragma omp parallel
+void NoiseSampleOpenMeshGrid(
+    TDLNoise* noise,
+    const int ndim_in,
+    const long* shape,
+    const float** ogrid_in,
+    float* out) {
+#pragma omp parallel
   {
     long i;
-    long len=GetSizeFromShape(ndim_in, shape);
-#   pragma omp for schedule(static)
-    for (i = 0; i < len; ++i){
+    long len = GetSizeFromShape(ndim_in, shape);
+#pragma omp for schedule(static)
+    for (i = 0; i < len; ++i) {
       out[i] = GetOpenMeshGridValue(noise, ndim_in, shape, ogrid_in, i);
     }
   }
