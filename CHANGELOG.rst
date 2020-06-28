@@ -8,6 +8,11 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - `tcod.path.BasicGraph` for pathfinding on simple 2D arrays.
+
+Changed
+ - `tcod.path.CustomGraph` now accepts an `order` parameter.
 
 11.14.0 - 2020-06-23
 --------------------

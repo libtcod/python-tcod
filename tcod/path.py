@@ -1,40 +1,15 @@
 """This module provides a fast configurable pathfinding implementation.
 
-Example::
+To get started create a 2D NumPy array of integers where a value of zero is a
+blocked node and any higher value is the cost to move to that node.
+You then pass this array to :any:`BasicGraph`, and then pass that graph to
+:any:`Pathfinder`.
 
-    >>> import numpy as np
-    >>> import tcod
-    >>> dungeon = np.array(
-    ...     [
-    ...         [1, 0, 1, 1, 1],
-    ...         [1, 0, 1, 0, 1],
-    ...         [1, 1, 1, 0, 1],
-    ...     ],
-    ...     dtype=np.int8,
-    ...     )
-    ...
+Once you have a :any:`Pathfinder` you call :any:`Pathfinder.add_root` to set
+the root node.  You can then get a path towards or away from the root with
+:any:`Pathfinder.path_from` and :any:`Pathfinder.path_to` respectively.
 
-    # Create a pathfinder from a numpy array.
-    # This is the recommended way to use the tcod.path module.
-    >>> astar = tcod.path.AStar(dungeon)
-    >>> print(astar.get_path(0, 0, 2, 4))
-    [(1, 0), (2, 1), (1, 2), (0, 3), (1, 4), (2, 4)]
-    >>> astar.cost[0, 1] = 1 # You can access the map array via this attribute.
-    >>> print(astar.get_path(0, 0, 2, 4))
-    [(0, 1), (0, 2), (0, 3), (1, 4), (2, 4)]
-
-    # Create a pathfinder from an edge_cost function.
-    # Calling Python functions from C is known to be very slow.
-    >>> def edge_cost(my_x, my_y, dest_x, dest_y):
-    ...     return dungeon[dest_x, dest_y]
-    ...
-    >>> dijkstra = tcod.path.Dijkstra(
-    ...     tcod.path.EdgeCostCallback(edge_cost, dungeon.shape),
-    ...     )
-    ...
-    >>> dijkstra.set_goal(0, 0)
-    >>> print(dijkstra.get_path(2, 4))
-    [(0, 1), (0, 2), (0, 3), (1, 4), (2, 4)]
+:any:`BasicGraph` includes a code example of the above process.
 
 .. versionchanged:: 5.0
     All path-finding functions now respect the NumPy array shape (if a NumPy
@@ -42,7 +17,7 @@ Example::
 """
 import functools
 import itertools
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
@@ -627,8 +602,19 @@ def _as_hashable(obj: Optional[np.ndarray]) -> Optional[Any]:
 class CustomGraph:
     """A customizable graph defining how a pathfinder traverses the world.
 
+    If you only need to path over a 2D array with typical edge rules then you
+    should use :any:`BasicGraph`.
+    This is an advanced interface for defining custom edge rules which would
+    allow things such as 3D movement.
+
     The graph is created with a `shape` defining the size and number of
     dimensions of the graph.  The `shape` can only be 4 dimensions or lower.
+
+    `order` determines what style of indexing the interface expects.
+    This is inherited by the pathfinder and will affect the `ij/xy` indexing
+    order of all methods in the graph and pathfinder objects.
+    The default order of `"C"` is for `ij` indexing.
+    The `order` can be set to `"F"` for `xy` indexing.
 
     After this graph is created you'll need to add edges which define the
     rules of the pathfinder.  These rules usually define movement in the
@@ -674,12 +660,19 @@ class CustomGraph:
                [3, 3]]...)
 
     .. versionadded:: 11.13
+
+    .. versionchanged:: 11.15
+        Added the `order` parameter.
     """
 
-    def __init__(self, shape: Tuple[int, ...]):
-        self._shape = tuple(shape)
+    def __init__(self, shape: Tuple[int, ...], *, order: str = "C"):
+        self._shape = self._shape_c = tuple(shape)
         self._ndim = len(self._shape)
-        assert 0 < self._ndim <= 4
+        self._order = order
+        if self._order == "F":
+            self._shape_c = self._shape_c[::-1]
+        if not 0 < self._ndim <= 4:
+            raise TypeError("Graph dimensions must be 1 <= n <= 4.")
         self._graph = {}  # type: Dict[Tuple[Any, ...], Dict[str, Any]]
         self._edge_rules_keep_alive = []  # type: List[Any]
         self._edge_rules_p = None  # type: Any
@@ -718,14 +711,17 @@ class CustomGraph:
         If the node in `condition` is zero then the edge will be skipped.
         This is useful to mark portals or stairs for some edges.
 
+        The expected indexing for `edge_dir`, `cost`, and `condition` depend
+        on the graphs `order`.
+
         Example::
 
             >>> import numpy as np
             >>> import tcod
             >>> graph3d = tcod.path.CustomGraph((2, 5, 5))
-            >>> cost = np.ones((3, 5, 5), dtype=np.int8)
-            >>> up_stairs = np.zeros((3, 5, 5), dtype=np.int8)
-            >>> down_stairs = np.zeros((3, 5, 5), dtype=np.int8)
+            >>> cost = np.ones((2, 5, 5), dtype=np.int8)
+            >>> up_stairs = np.zeros((2, 5, 5), dtype=np.int8)
+            >>> down_stairs = np.zeros((2, 5, 5), dtype=np.int8)
             >>> up_stairs[0, 0, 4] = 1
             >>> down_stairs[1, 0, 4] = 1
             >>> CARDINAL = [[0, 1, 0], [1, 0, 1], [0, 1, 0]]
@@ -753,12 +749,34 @@ class CustomGraph:
         """  # noqa: E501
         self._edge_rules_p = None
         edge_dir = tuple(edge_dir)
-        assert len(edge_dir) == self._ndim
-        assert edge_cost > 0, (edge_dir, edge_cost)
         cost = np.asarray(cost)
-        assert cost.ndim == self.ndim
+        if len(edge_dir) != self._ndim:
+            raise TypeError(
+                "edge_dir must have exactly %i items, got %r"
+                % (self._ndim, edge_dir)
+            )
+        if edge_cost <= 0:
+            raise ValueError(
+                "edge_cost must be greater than zero, got %r" % (edge_cost,)
+            )
+        if cost.shape != self._shape:
+            raise TypeError(
+                "cost array must be shape %r, got %r"
+                % (self._shape, cost.shape)
+            )
         if condition is not None:
             condition = np.asarray(condition)
+            if condition.shape != self._shape:
+                raise TypeError(
+                    "condition array must be shape %r, got %r"
+                    % (self._shape, condition.shape)
+                )
+        if self._order == "F":
+            # Inputs need to be converted to C.
+            edge_dir = edge_dir[::-1]
+            cost = cost.T
+            if condition is not None:
+                condition = condition.T
         key = (_as_hashable(cost), _as_hashable(condition))
         try:
             rule = self._graph[key]
@@ -795,6 +813,10 @@ class CustomGraph:
         See :any:`add_edge`.
         If `condition` is the same array as `cost` then the pathfinder will
         not move into open area from a non-open ones.
+
+        The expected indexing for `edge_map`, `cost`, and `condition` depend
+        on the graphs `order`.  You may need to transpose the examples below
+        if you're using `xy` indexing.
 
         Example::
 
@@ -871,10 +893,14 @@ class CustomGraph:
         if edge_map.ndim < self._ndim:
             edge_map = edge_map[(np.newaxis,) * (self._ndim - edge_map.ndim)]
         if edge_map.ndim != self._ndim:
-            raise ValueError(
+            raise TypeError(
                 "edge_map must must match graph dimensions (%i). (Got %i)"
                 % (self.ndim, edge_map.ndim)
             )
+        if self._order == "F":
+            # edge_map needs to be converted into C.
+            # The other parameters are converted by the add_edge method.
+            edge_map = edge_map.T
         edge_center = tuple(i // 2 for i in edge_map.shape)
         edge_map[edge_center] = 0
         edge_map[edge_map < 0] = 0
@@ -990,23 +1016,112 @@ class CustomGraph:
         )
 
 
+class BasicGraph:
+    """A simple 2D graph implementation.
+
+    `cost` is a NumPy array where each node has the cost for movement into
+    that node.  Zero or negative values are used to mark blocked areas.
+    A reference of this array is used.  Any changes to the array will be
+    reflected in the graph.
+
+    `cardinal` and `diagonal` are the cost to move along the edges for those
+    directions.  The total cost to move from one node to another is the `cost`
+    array value multiplied by the edge cost.
+    A value of zero will block that direction.
+
+    `greed` is used to define the heuristic.
+    To get the fastest accurate heuristic `greed` should be the lowest
+    non-zero value on the `cost` array.
+    Higher values may be used for an inaccurate but faster heuristic.
+
+    Example::
+
+        >>> import numpy as np
+        >>> import tcod
+        >>> cost = np.ones((5, 10), dtype=np.int8, order="F")
+        >>> graph = tcod.path.BasicGraph(cost=cost, cardinal=2, diagonal=3)
+        >>> pf = tcod.path.Pathfinder(graph)
+        >>> pf.add_root((2, 4))
+        >>> pf.path_to((3, 7)).tolist()
+        [[2, 4], [2, 5], [2, 6], [3, 7]]
+
+    .. versionadded:: 11.15
+    """
+
+    def __init__(
+        self, *, cost: np.ndarray, cardinal: int, diagonal: int, greed: int = 1
+    ):
+        cost = np.asarray(cost)
+        if cost.ndim != 2:
+            raise TypeError(
+                "The cost array must e 2 dimensional, array of shape %r given."
+                % (cost.shape,)
+            )
+        if greed <= 0:
+            raise ValueError(
+                "Greed must be greater than zero, got %r" % (greed,)
+            )
+        edge_map = (
+            (diagonal, cardinal, diagonal),
+            (cardinal, 0, cardinal),
+            (diagonal, cardinal, diagonal),
+        )
+        self._order = "C" if cost.strides[0] > cost.strides[1] else "F"
+        self._subgraph = CustomGraph(cost.shape, order=self._order)
+        self._ndim = 2
+        self._shape = self._subgraph._shape[0], self._subgraph._shape[1]
+        self._shape_c = self._subgraph._shape_c
+        self._subgraph.add_edges(edge_map=edge_map, cost=cost)
+        self.set_heuristic(
+            cardinal=cardinal * greed, diagonal=diagonal * greed
+        )
+
+    @property
+    def ndim(self) -> int:
+        return 2
+
+    @property
+    def shape(self) -> Tuple[int, int]:
+        return self._shape
+
+    @property
+    def _heuristic(self) -> Optional[Tuple[int, int, int, int]]:
+        return self._subgraph._heuristic
+
+    def set_heuristic(self, *, cardinal: int, diagonal: int) -> None:
+        """Change the heuristic for this graph.
+
+        When created a :any:`BasicGraph` will automatically have a heuristic.
+        So calling this method is often unnecessary.
+
+        `cardinal` and `diagonal` are weights for the heuristic.
+        Higher values are more greedy.
+        The default values are set to ``cardinal * greed`` and
+        ``diagonal * greed`` when the :any:`BasicGraph` is created.
+        """
+        self._subgraph.set_heuristic(cardinal=cardinal, diagonal=diagonal)
+
+    def _resolve(self, pathfinder: "Pathfinder") -> None:
+        self._subgraph._resolve(pathfinder)
+
+
 class Pathfinder:
     """A generic modular pathfinder.
 
     How the pathfinder functions depends on the graph provided. see
-    :any:`CustomGraph` for how to set these up.
+    :any:`BasicGraph` for how to set one up.
 
     .. versionadded:: 11.13
     """
 
-    def __init__(self, graph: CustomGraph):
+    def __init__(self, graph: Union[CustomGraph, BasicGraph]):
         self._graph = graph
+        self._order = graph._order
         self._frontier_p = ffi.gc(
             lib.TCOD_frontier_new(self._graph._ndim), lib.TCOD_frontier_delete
         )
-        self._distance = maxarray(self._graph._shape)
-        self._travel = _world_array(self._graph._shape)
-        assert self._travel.flags["C_CONTIGUOUS"]
+        self._distance = maxarray(self._graph._shape_c)
+        self._travel = _world_array(self._graph._shape_c)
         self._distance_p = _export(self._distance)
         self._travel_p = _export(self._travel)
         self._heuristic = (
@@ -1018,7 +1133,7 @@ class Pathfinder:
     def distance(self) -> np.ndarray:
         """The distance values of the pathfinder.
 
-        This array is stored in row-major "C" order.
+        The array returned from this property maintains the graphs `order`.
 
         Unreachable or unresolved points will be at their maximum values.
         You can use :any:`numpy.iinfo` if you need to check for these.
@@ -1032,14 +1147,14 @@ class Pathfinder:
         You may edit this array manually, but the pathfinder won't know of
         your changes until :any:`rebuild_frontier` is called.
         """
-        return self._distance
+        return self._distance.T if self._order == "F" else self._distance
 
     @property
     def traversal(self) -> np.ndarray:
         """An array used to generate paths from any point to the nearest root.
 
-        This array is stored in row-major "C" order.  It has an extra
-        dimension which includes the index of the next path.
+        The array returned from this property maintains the graphs `order`.
+        It has an extra dimension which includes the index of the next path.
 
         Example::
 
@@ -1057,6 +1172,9 @@ class Pathfinder:
 
         As the pathfinder is resolved this array is filled
         """
+        if self._order == "F":
+            axes = range(self._travel.ndim)
+            return self._travel.transpose((*axes[-2::-1], axes[-1]))[..., ::-1]
         return self._travel
 
     def clear(self) -> None:
@@ -1066,33 +1184,38 @@ class Pathfinder:
         value.
         """
         self._distance[...] = np.iinfo(self._distance.dtype).max
-        self._travel = _world_array(self._graph._shape)
+        self._travel = _world_array(self._graph._shape_c)
         lib.TCOD_frontier_clear(self._frontier_p)
 
     def add_root(self, index: Tuple[int, ...], value: int = 0) -> None:
         """Add a root node and insert it into the pathfinder frontier.
 
         `index` is the root point to insert.  The length of `index` must match
-        the dimensions of the graph.  `index` must also be in 'ij' order.
+        the dimensions of the graph.
 
         `value` is the distance to use for this root.  Zero is typical, but
         if multiple roots are added they can be given different weights.
         """
-        index_ = tuple(index)
-        assert len(index_) == self._distance.ndim
-        self._distance[index_] = value
+        index = tuple(index)  # Check for bad input.
+        if self._order == "F":  # Convert to ij indexing order.
+            index = index[::-1]
+        if len(index) != self._distance.ndim:
+            raise TypeError(
+                "Index must be %i items, got %r" % (self._distance.ndim, index)
+            )
+        self._distance[index] = value
         self._update_heuristic(None)
-        lib.TCOD_frontier_push(self._frontier_p, index_, value, value)
+        lib.TCOD_frontier_push(self._frontier_p, index, value, value)
 
-    def _update_heuristic(self, goal: Optional[Tuple[int, ...]]) -> bool:
+    def _update_heuristic(self, goal_ij: Optional[Tuple[int, ...]]) -> bool:
         """Update the active heuristic.  Return True if the heuristic changed.
         """
-        if goal is None:
+        if goal_ij is None:
             heuristic = None
         elif self._graph._heuristic is None:
-            heuristic = (0, 0, 0, 0, goal)
+            heuristic = (0, 0, 0, 0, goal_ij)
         else:
-            heuristic = (*self._graph._heuristic, goal)
+            heuristic = (*self._graph._heuristic, goal_ij)
         if self._heuristic == heuristic:
             return False  # Frontier does not need updating.
         self._heuristic = heuristic
@@ -1121,9 +1244,30 @@ class Pathfinder:
         )
 
     def resolve(self, goal: Optional[Tuple[int, ...]] = None) -> None:
-        """Manually run the pathfinder algorithm."""
+        """Manually run the pathfinder algorithm.
+
+        The :any:`path_from` and :any:`path_to` methods will automatically
+        call this method on demand.
+
+        If `goal` is `None` then this will attempt to complete the entire
+        :any:`distance` and :any:`traversal` arrays without a heuristic.
+        This is similar to Dijkstra.
+
+        If `goal` is given an index then it will attempt to resolve the
+        :any:`distance` and :any:`traversal` arrays only up to the `goal`.
+        If the graph has set a heuristic then it will be used and this call
+        will be similar to `A*`.
+        """
         if goal is not None:
-            assert len(goal) == self._distance.ndim
+            goal = tuple(goal)  # Check for bad input.
+            if len(goal) != self._distance.ndim:
+                raise TypeError(
+                    "Goal must be %i items, got %r"
+                    % (self._distance.ndim, goal)
+                )
+            if self._order == "F":
+                # Goal is now ij indexed for the rest of this function.
+                goal = goal[::-1]
             if self._distance[goal] != np.iinfo(self._distance.dtype).max:
                 if not lib.frontier_has_index(self._frontier_p, goal):
                     return
@@ -1132,6 +1276,10 @@ class Pathfinder:
 
     def path_from(self, index: Tuple[int, ...]) -> np.ndarray:
         """Return the shortest path from `index` to the nearest root.
+
+        The returned array is of shape `(length, ndim)` where `length` is the
+        total inclusive length of the path and `ndim` is the dimensions of the
+        pathfinder defined by the graph.
 
         The return value is inclusive, including both the starting and ending
         points on the path.  If the root point is unreachable or `index` is
@@ -1143,8 +1291,14 @@ class Pathfinder:
         A common usage is to slice off the starting point and convert the array
         into a list.
         """
+        index = tuple(index)  # Check for bad input.
+        if len(index) != self._graph._ndim:
+            raise TypeError(
+                "Index must be %i items, got %r" % (self._distance.ndim, index)
+            )
         self.resolve(index)
-        assert len(index) == self._graph._ndim
+        if self._order == "F":  # Convert to ij indexing order.
+            index = index[::-1]
         length = _check(
             lib.get_travel_path(
                 self._graph._ndim, self._travel_p, index, ffi.NULL,
@@ -1159,11 +1313,12 @@ class Pathfinder:
                 ffi.from_buffer("int*", path),
             )
         )
-        return path
+        return path[:, ::-1] if self._order == "F" else path
 
     def path_to(self, index: Tuple[int, ...]) -> np.ndarray:
         """Return the shortest path from the nearest root to `index`.
 
+        See :any:`path_from`.
         This is an alias for ``path_from(...)[::-1]``.
         """
         return self.path_from(index)[::-1]

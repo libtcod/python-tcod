@@ -544,7 +544,7 @@ int update_frontier_heuristic(
   TCOD_minheap_heapify(&frontier->heap);
   return 0;
 }
-static int update_frontier_from_distance_terator(
+static int update_frontier_from_distance_iterator(
     struct TCOD_Frontier* frontier, const struct NArray* dist_map,
     int dimension,
     int* index)
@@ -556,7 +556,7 @@ static int update_frontier_from_distance_terator(
   }
   for (int i = 0; i < dist_map->shape[dimension]; ) {
     index[dimension] = i;
-    int err = update_frontier_from_distance_terator(
+    int err = update_frontier_from_distance_iterator(
         frontier, dist_map, dimension + 1, index);
     if (err) { return err; }
   }
@@ -573,7 +573,7 @@ int rebuild_frontier_from_distance(
   }
   TCOD_frontier_clear(frontier);
   int index[TCOD_PATHFINDER_MAX_DIMENSIONS];
-  return update_frontier_from_distance_terator(frontier, dist_map, 0, index);
+  return update_frontier_from_distance_iterator(frontier, dist_map, 0, index);
 }
 int frontier_has_index(
     const struct TCOD_Frontier* frontier,
