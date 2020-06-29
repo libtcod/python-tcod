@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.15.0 - 2020-06-29
+--------------------
 Added
  - `tcod.path.SimpleGraph` for pathfinding on simple 2D arrays.
 
