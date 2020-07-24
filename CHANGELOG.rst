@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - `tcod.event.EventDispatch` now uses the absolute names for event type hints
+   so that IDE's can better auto-complete method overrides.
 
 11.15.0 - 2020-06-29
 --------------------
