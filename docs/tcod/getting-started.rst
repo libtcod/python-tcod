@@ -30,7 +30,7 @@ Example::
 
     def main() -> None:
         """Script entry point."""
-        # Load the font, a 64 by 8 tile font with libtcod's old character layout.
+        # Load the font, a 32 by 8 tile font with libtcod's old character layout.
         tileset = tcod.tileset.load_tilesheet(
             "dejavu10x10_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD,
         )
