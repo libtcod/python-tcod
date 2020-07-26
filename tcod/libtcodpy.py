@@ -2386,7 +2386,7 @@ def _heightmap_cdata(array: np.ndarray) -> ffi.CData:
         raise ValueError("array must be a contiguous segment.")
     if array.dtype != np.float32:
         raise ValueError("array dtype must be float32, not %r" % array.dtype)
-    width, height = array.shape
+    height, width = array.shape
     pointer = ffi.from_buffer("float *", array)
     return ffi.new("TCOD_heightmap_t *", (width, height, pointer))
 

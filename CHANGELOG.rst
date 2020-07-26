@@ -12,6 +12,9 @@ Changed
  - `tcod.event.EventDispatch` now uses the absolute names for event type hints
    so that IDE's can better auto-complete method overrides.
 
+Fixed
+ - Fixed libtcodpy heightmap data alignment issues on non-square maps.
+
 11.15.0 - 2020-06-29
 --------------------
 Added
