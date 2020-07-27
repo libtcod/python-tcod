@@ -537,31 +537,26 @@ class FOVSample(Sample):
     def __init__(self):
         self.name = "Field of view"
 
-        self.px = 20
-        self.py = 10
-        self.recompute = True
+        self.player_x = 20
+        self.player_y = 10
         self.torch = False
-        self.map = None
-        self.noise = None
-        self.torchx = 0.0
         self.light_walls = True
         self.algo_num = 0
-        # 1d noise for the torch flickering
-        self.noise = tcod.noise_new(1, 1.0, 1.0)
+        self.noise = tcod.noise.Noise(1)  # 1D noise for the torch flickering.
 
-        self.map = tcod.map.Map(
-            SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT, order="F"
-        )
-        self.map.walkable[:] = SAMPLE_MAP[:] == " "
-        self.map.transparent[:] = self.map.walkable[:] | (SAMPLE_MAP == "=")
+        map_shape = (SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
 
-        self.light_map_bg = np.full(
-            SAMPLE_MAP.shape + (3,), LIGHT_GROUND, dtype=np.uint8
-        )
+        self.walkable = np.zeros(map_shape, dtype=bool, order="F")
+        self.walkable[:] = SAMPLE_MAP[:] == " "
+
+        self.transparent = np.zeros(map_shape, dtype=bool, order="F")
+        self.transparent[:] = self.walkable[:] | (SAMPLE_MAP == "=")
+
+        # Lit background colors for the map.
+        self.light_map_bg = np.full(SAMPLE_MAP.shape, LIGHT_GROUND, dtype="3B")
         self.light_map_bg[SAMPLE_MAP[:] == "#"] = LIGHT_WALL
-        self.dark_map_bg = np.full(
-            SAMPLE_MAP.shape + (3,), DARK_GROUND, dtype=np.uint8
-        )
+        # Dark background colors for the map.
+        self.dark_map_bg = np.full(SAMPLE_MAP.shape, DARK_GROUND, dtype="3B")
         self.dark_map_bg[SAMPLE_MAP[:] == "#"] = DARK_WALL
 
     def draw_ui(self):
@@ -583,64 +578,64 @@ class FOVSample(Sample):
 
     def on_enter(self):
         tcod.sys_set_fps(60)
-        # we draw the foreground only the first time.
-        #  during the player movement, only the @ is redrawn.
-        #  the rest impacts only the background color
-        # draw the help text & player @
-        sample_console.clear()
-        self.draw_ui()
-        tcod.console_put_char(
-            sample_console, self.px, self.py, "@", tcod.BKGND_NONE
-        )
-        # draw windows
-        sample_console.ch[np.where(SAMPLE_MAP == "=")] = tcod.CHAR_DHLINE
-        sample_console.fg[np.where(SAMPLE_MAP == "=")] = tcod.black
 
     def on_draw(self):
-        dx = 0.0
-        dy = 0.0
-        di = 0.0
-        if self.recompute:
-            self.recompute = False
-            self.map.compute_fov(
-                self.px,
-                self.py,
-                TORCH_RADIUS if self.torch else 0,
-                self.light_walls,
-                self.algo_num,
-            )
-        sample_console.bg[:] = self.dark_map_bg[:]
-        if self.torch:
-            # slightly change the perlin noise parameter
-            self.torchx += 0.1
-            # randomize the light position between -1.5 and 1.5
-            tdx = [self.torchx + 20.0]
-            dx = tcod.noise_get(self.noise, tdx, tcod.NOISE_SIMPLEX) * 1.5
-            tdx[0] += 30.0
-            dy = tcod.noise_get(self.noise, tdx, tcod.NOISE_SIMPLEX) * 1.5
-            di = 0.2 * tcod.noise_get(
-                self.noise, [self.torchx], tcod.NOISE_SIMPLEX
-            )
-            # where_fov = np.where(self.map.fov[:])
-            mgrid = np.mgrid[:SAMPLE_SCREEN_WIDTH, :SAMPLE_SCREEN_HEIGHT]
-            # get squared distance
-            light = (mgrid[0] - self.px + dx) ** 2 + (
-                mgrid[1] - self.py + dy
-            ) ** 2
-            light = light.astype(np.float16)
-            visible = (light < SQUARED_TORCH_RADIUS) & self.map.fov[:]
-            light[...] = SQUARED_TORCH_RADIUS - light
-            light[...] /= SQUARED_TORCH_RADIUS
-            light[...] += di
-            light[...] = light.clip(0, 1)
-            light[~visible] = 0
+        sample_console.clear()
+        # Draw the help text & player @.
+        self.draw_ui()
+        sample_console.print(self.player_x, self.player_y, "@")
+        # Draw windows.
+        sample_console.tiles_rgb["ch"][SAMPLE_MAP == "="] = tcod.CHAR_DHLINE
+        sample_console.tiles_rgb["fg"][SAMPLE_MAP == "="] = tcod.black
 
-            sample_console.bg[...] = (
-                self.light_map_bg.astype(np.float16) - self.dark_map_bg
-            ) * light[..., np.newaxis] + self.dark_map_bg
+        # Get a 2D boolean array of visible cells.
+        fov = tcod.map.compute_fov(
+            transparency=self.transparent,
+            pov=(self.player_x, self.player_y),
+            radius=TORCH_RADIUS if self.torch else 0,
+            light_walls=self.light_walls,
+            algorithm=self.algo_num,
+        )
+
+        if self.torch:
+            # Derive the touch from noise based on the current time.
+            torch_t = time.perf_counter() * 5
+            # Randomize the light position between -1.5 and 1.5
+            torch_x = self.player_x + self.noise.get_point(torch_t) * 1.5
+            torch_y = self.player_y + self.noise.get_point(torch_t + 11) * 1.5
+            # Extra light brightness.
+            brightness = 0.2 * self.noise.get_point(torch_t + 17)
+
+            # Get the squared distance using a mesh grid.
+            x, y = np.mgrid[:SAMPLE_SCREEN_WIDTH, :SAMPLE_SCREEN_HEIGHT]
+            # Center the mesh grid on the torch position.
+            x = x.astype(np.float32) - torch_x
+            y = y.astype(np.float32) - torch_y
+
+            distance_squared = x ** 2 + y ** 2  # 2D squared distance array.
+
+            # Get the currently visible cells.
+            visible = (distance_squared < SQUARED_TORCH_RADIUS) & fov
+
+            # Invert the values, so that the center is the 'brightest' point.
+            light = SQUARED_TORCH_RADIUS - distance_squared
+            light /= SQUARED_TORCH_RADIUS  # Convert into non-squared distance.
+            light += brightness  # Add random brightness.
+            light.clip(0, 1, out=light)  # Clamp values in-place.
+            light[~visible] = 0  # Set non-visible areas to darkness.
+
+            # Setup background colors for floating point math.
+            light_bg = self.light_map_bg.astype(np.float16)
+            dark_bg = self.dark_map_bg.astype(np.float16)
+
+            # Linear interpolation between colors.
+            sample_console.tiles_rgb["bg"] = (
+                dark_bg + (light_bg - dark_bg) * light[..., np.newaxis]
+            )
         else:
-            where_fov = np.where(self.map.fov[:])
-            sample_console.bg[where_fov] = self.light_map_bg[where_fov]
+            sample_console.bg[...] = np.where(
+                fov[:, :, np.newaxis], self.light_map_bg, self.dark_map_bg
+            )
 
     def ev_keydown(self, event: tcod.event.KeyDown):
         MOVE_KEYS = {
@@ -649,32 +644,24 @@ class FOVSample(Sample):
             ord("k"): (0, 1),
             ord("l"): (1, 0),
         }
-        FOV_SELECT_KEYS = {ord("-"): -1, ord("="): 1}
+        FOV_SELECT_KEYS = {
+            ord("-"): -1,
+            ord("="): 1,
+            tcod.event.K_KP_MINUS: -1,
+            tcod.event.K_KP_PLUS: 1,
+        }
         if event.sym in MOVE_KEYS:
             x, y = MOVE_KEYS[event.sym]
-            if SAMPLE_MAP[self.px + x, self.py + y] == " ":
-                tcod.console_put_char(
-                    sample_console, self.px, self.py, " ", tcod.BKGND_NONE
-                )
-                self.px += x
-                self.py += y
-                tcod.console_put_char(
-                    sample_console, self.px, self.py, "@", tcod.BKGND_NONE
-                )
-                self.recompute = True
+            if self.walkable[self.player_x + x, self.player_y + y]:
+                self.player_x += x
+                self.player_y += y
         elif event.sym == ord("t"):
             self.torch = not self.torch
-            self.draw_ui()
-            self.recompute = True
         elif event.sym == ord("w"):
             self.light_walls = not self.light_walls
-            self.draw_ui()
-            self.recompute = True
         elif event.sym in FOV_SELECT_KEYS:
             self.algo_num += FOV_SELECT_KEYS[event.sym]
             self.algo_num %= tcod.NB_FOV_ALGORITHMS
-            self.draw_ui()
-            self.recompute = True
         else:
             super().ev_keydown(event)
 
