@@ -92,6 +92,7 @@ static void set_array_int64(
   switch (arr->type) {
     case np_int8:
       *(int8_t*)ptr = (int8_t)value;
+      return;
     case np_int16:
       *(int16_t*)ptr = (int16_t)value;
       return;

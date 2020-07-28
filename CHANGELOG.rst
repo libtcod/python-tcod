@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - `tcod.path.dijkstra2d`, fixed corrupted output with int8 arrays.
 
 11.15.1 - 2020-07-26
 --------------------
