@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - `tcod.tileset.Tileset.remap`, codepoint and index were swapped.
 
 11.15.2 - 2020-07-27
 --------------------
