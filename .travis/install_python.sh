@@ -38,7 +38,7 @@ set -e
 shell_session_update() { :; }
 
 MACPYTHON_URL=https://www.python.org/ftp/python
-PYPY_URL=https://bitbucket.org/pypy/pypy/downloads
+PYPY_URL=https://downloads.python.org/pypy
 MACPYTHON_PY_PREFIX=/Library/Frameworks/Python.framework/Versions
 WORKING_SDIR=working
 DOWNLOADS_SDIR=/tmp
