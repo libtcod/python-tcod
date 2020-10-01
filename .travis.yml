@@ -16,7 +16,10 @@ jobs:
     env: MB_PYTHON_VERSION=3.7.1
   - os: osx
     language: generic
-    env: PYPY3_VERSION=pypy3.6-v7.3.0 CUSTOM_REQUIREMENTS="numpy==1.18"
+    env: PYPY3_VERSION=pypy3.6-v7.3.2 CUSTOM_REQUIREMENTS="numpy==1.18"
+  - os: osx
+    language: generic
+    env: PYPY3_VERSION=pypy3.7-v7.3.2 CUSTOM_REQUIREMENTS="numpy==1.18"
   allow_failures:
   - python: nightly
   - python: pypy3.5-7.0
