@@ -289,6 +289,7 @@ class Dijkstra(_PathFinder):
 
 
 _INT_TYPES = {
+    np.bool_: lib.np_uint8,
     np.int8: lib.np_int8,
     np.int16: lib.np_int16,
     np.int32: lib.np_int32,
@@ -324,6 +325,11 @@ def maxarray(
 
 def _export_dict(array: np.array) -> Dict[str, Any]:
     """Convert a NumPy array into a format compatible with CFFI."""
+    if array.dtype.type not in _INT_TYPES:
+        raise TypeError(
+            "dtype was %s, but must be one of %s."
+            % (array.dtype.type, tuple(_INT_TYPES.keys()))
+        )
     return {
         "type": _INT_TYPES[array.dtype.type],
         "ndim": array.ndim,

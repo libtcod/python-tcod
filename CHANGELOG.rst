@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Pathfinders will now work with boolean arrays.
 
 11.15.3 - 2020-07-30
 --------------------
