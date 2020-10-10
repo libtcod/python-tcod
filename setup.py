@@ -135,6 +135,10 @@ setup(
     description="Pythonic cffi port of libtcod.",
     long_description=get_long_description(),
     url="https://github.com/libtcod/python-tcod",
+    project_urls={
+        "Documentation": "https://python-tcod.readthedocs.io",
+        "Changelog": "https://github.com/libtcod/python-tcod/blob/develop/CHANGELOG.rst",
+    },
     py_modules=["libtcodpy"],
     packages=["tdl", "tcod"],
     package_data={"tdl": ["*.png"], "tcod": get_package_data()},
