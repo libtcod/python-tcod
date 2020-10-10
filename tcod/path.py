@@ -272,13 +272,11 @@ class Dijkstra(_PathFinder):
     _path_delete = lib.TCOD_dijkstra_delete
 
     def set_goal(self, x: int, y: int) -> None:
-        """Set the goal point and recompute the Dijkstra path-finder.
-        """
+        """Set the goal point and recompute the Dijkstra path-finder."""
         lib.TCOD_dijkstra_compute(self._path_c, x, y)
 
     def get_path(self, x: int, y: int) -> List[Tuple[int, int]]:
-        """Return a list of (x, y) steps to reach the goal point, if possible.
-        """
+        """Return a list of (x, y) steps to reach the goal point, if possible."""
         lib.TCOD_dijkstra_path_set(self._path_c, x, y)
         path = []
         pointer_x = ffi.new("int[2]")
@@ -1210,8 +1208,7 @@ class Pathfinder:
         lib.TCOD_frontier_push(self._frontier_p, index, value, value)
 
     def _update_heuristic(self, goal_ij: Optional[Tuple[int, ...]]) -> bool:
-        """Update the active heuristic.  Return True if the heuristic changed.
-        """
+        """Update the active heuristic.  Return True if the heuristic changed."""
         if goal_ij is None:
             heuristic = None
         elif self._graph._heuristic is None:
@@ -1303,7 +1300,7 @@ class Pathfinder:
             index = index[::-1]
         length = _check(
             lib.get_travel_path(
-                self._graph._ndim, self._travel_p, index, ffi.NULL,
+                self._graph._ndim, self._travel_p, index, ffi.NULL
             )
         )
         path = np.ndarray((length, self._graph._ndim), dtype=np.intc)

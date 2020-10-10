@@ -130,11 +130,11 @@ def _fmt(string: str, stacklevel: int = 2) -> bytes:
 
 
 class _PropagateException:
-    """ context manager designed to propagate exceptions outside of a cffi
-    callback context.  normally cffi suppresses the exception
+    """Context manager designed to propagate exceptions outside of a cffi
+    callback context.  Normally cffi suppresses the exception.
 
-    when propagate is called this class will hold onto the error until the
-    control flow leaves the context, then the error will be raised
+    When propagate is called this class will hold onto the error until the
+    control flow leaves the context, then the error will be raised.
 
     with _PropagateException as propagate:
     # give propagate as onerror parameter for ffi.def_extern
@@ -145,25 +145,25 @@ class _PropagateException:
         self.exc_info = None  # type: Any
 
     def propagate(self, *exc_info: Any) -> None:
-        """ set an exception to be raised once this context exits
+        """Set an exception to be raised once this context exits.
 
-        if multiple errors are caught, only keep the first exception raised
+        If multiple errors are caught, only keep the first exception raised.
         """
         if not self.exc_info:
             self.exc_info = exc_info
 
     def __enter__(self) -> Callable[[Any], None]:
-        """ once in context, only the propagate call is needed to use this
-        class effectively
+        """Once in context, only the propagate call is needed to use this
+        class effectively.
         """
         return self.propagate
 
     def __exit__(self, type: Any, value: Any, traceback: Any) -> None:
-        """ if we're holding on to an exception, raise it now
+        """If we're holding on to an exception, raise it now.
 
-        prefers our held exception over any current raising error
+        Prefers our held exception over any current raising error.
 
-        self.exc_info is reset now in case of nested manager shenanigans
+        self.exc_info is reset now in case of nested manager shenanigans.
         """
         if self.exc_info:
             type, value, traceback = self.exc_info

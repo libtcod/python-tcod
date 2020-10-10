@@ -132,8 +132,7 @@ class Console:
 
     @classmethod
     def _from_cdata(cls, cdata: Any, order: str = "C") -> "Console":
-        """Return a Console instance which wraps this `TCOD_Console*` object.
-        """
+        """Return a Console instance which wraps this `TCOD_Console*` object."""
         if isinstance(cdata, cls):
             return cdata
         self = object.__new__(cls)  # type: Console
@@ -419,8 +418,7 @@ class Console:
         alignment: Any = ...,
         clear: Any = ...,
     ) -> None:
-        """Return the parameters needed to recreate the current default state.
-        """
+        """Return the parameters needed to recreate the current default state."""
         if not __debug__:
             return
 

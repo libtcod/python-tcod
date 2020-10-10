@@ -905,7 +905,9 @@ class EventDispatch(Generic[T]):
     ) -> Optional[T]:
         """Called when a mouse button is pressed."""
 
-    def ev_mousebuttonup(self, event: "tcod.event.MouseButtonUp") -> Optional[T]:
+    def ev_mousebuttonup(
+        self, event: "tcod.event.MouseButtonUp"
+    ) -> Optional[T]:
         """Called when a mouse button is released."""
 
     def ev_mousewheel(self, event: "tcod.event.MouseWheel") -> Optional[T]:
@@ -929,7 +931,9 @@ class EventDispatch(Generic[T]):
     def ev_windowmoved(self, event: "tcod.event.WindowMoved") -> Optional[T]:
         """Called when the window is moved."""
 
-    def ev_windowresized(self, event: "tcod.event.WindowResized") -> Optional[T]:
+    def ev_windowresized(
+        self, event: "tcod.event.WindowResized"
+    ) -> Optional[T]:
         """Called when the window is resized."""
 
     def ev_windowsizechanged(
@@ -937,13 +941,19 @@ class EventDispatch(Generic[T]):
     ) -> Optional[T]:
         """Called when the system or user changes the size of the window."""
 
-    def ev_windowminimized(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowminimized(
+        self, event: "tcod.event.WindowEvent"
+    ) -> Optional[T]:
         """Called when the window is minimized."""
 
-    def ev_windowmaximized(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowmaximized(
+        self, event: "tcod.event.WindowEvent"
+    ) -> Optional[T]:
         """Called when the window is maximized."""
 
-    def ev_windowrestored(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowrestored(
+        self, event: "tcod.event.WindowEvent"
+    ) -> Optional[T]:
         """Called when the window is restored."""
 
     def ev_windowenter(self, event: "tcod.event.WindowEvent") -> Optional[T]:
@@ -957,13 +967,17 @@ class EventDispatch(Generic[T]):
     ) -> Optional[T]:
         """Called when the window gains keyboard focus."""
 
-    def ev_windowfocuslost(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowfocuslost(
+        self, event: "tcod.event.WindowEvent"
+    ) -> Optional[T]:
         """Called when the window loses keyboard focus."""
 
     def ev_windowclose(self, event: "tcod.event.WindowEvent") -> Optional[T]:
         """Called when the window manager requests the window to be closed."""
 
-    def ev_windowtakefocus(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowtakefocus(
+        self, event: "tcod.event.WindowEvent"
+    ) -> Optional[T]:
         pass
 
     def ev_windowhittest(self, event: "tcod.event.WindowEvent") -> Optional[T]:

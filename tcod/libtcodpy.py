@@ -3231,7 +3231,7 @@ def line_step() -> Union[Tuple[int, int], Tuple[None, None]]:
 def line(
     xo: int, yo: int, xd: int, yd: int, py_callback: Callable[[int, int], bool]
 ) -> bool:
-    """ Iterate over a line using a callback function.
+    """Iterate over a line using a callback function.
 
     Your callback function will take x and y parameters and return True to
     continue iteration or False to stop iteration and return.
@@ -3263,7 +3263,7 @@ def line(
 
 @deprecate("This function has been replaced by tcod.los.bresenham.")
 def line_iter(xo: int, yo: int, xd: int, yd: int) -> Iterator[Tuple[int, int]]:
-    """ returns an Iterable
+    """returns an Iterable
 
     This Iterable does not include the origin point.
 
@@ -3627,9 +3627,7 @@ def noise_delete(n: tcod.noise.Noise) -> None:
 
 
 def _unpack_union(type_: int, union: Any) -> Any:
-    """
-        unpack items from parser new_property (value_converter)
-    """
+    """Unpack items from parser new_property (value_converter)"""
     if type_ == lib.TCOD_TYPE_BOOL:
         return bool(union.b)
     elif type_ == lib.TCOD_TYPE_CHAR:
