@@ -8,9 +8,12 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.16.0 - 2020-10-23
+--------------------
 Added
  - Added `tcod.context.new` function.
- - Contexts now have CLI support.
+ - Contexts now support a CLI.
  - You can now provide the window x,y position when making contexts.
  - `tcod.noise.Noise` instances can now be indexed to generate noise maps.
 
