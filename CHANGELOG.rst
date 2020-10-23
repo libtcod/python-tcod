@@ -12,6 +12,7 @@ Added
  - Added `tcod.context.new` function.
  - Contexts now have CLI support.
  - You can now provide the window x,y position when making contexts.
+ - `tcod.noise.Noise` instances can now be indexed to generate noise maps.
 
 Changed
  - Using `libtcod 1.16.0-alpha.13`.

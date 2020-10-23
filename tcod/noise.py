@@ -157,6 +157,61 @@ class Noise(object):
         """
         return float(lib.NoiseGetSample(self._tdl_noise_c, (x, y, z, w)))
 
+    def __getitem__(self, indexes: Any) -> np.ndarray:
+        """Sample a noise map through NumPy indexing.
+
+        This follows NumPy's advanced indexing rules, but allows for floating
+        point values.
+
+        .. versionadded:: 11.16
+        """
+        if not isinstance(indexes, tuple):
+            indexes = (indexes,)
+        if len(indexes) > self.dimensions:
+            raise IndexError(
+                "This noise generator has %i dimensions, but was indexed with %i."
+                % (self.dimensions, len(indexes))
+            )
+        indexes = np.broadcast_arrays(*indexes)
+        c_input = [ffi.NULL, ffi.NULL, ffi.NULL, ffi.NULL]
+        for i, index in enumerate(indexes):
+            if index.dtype.type == np.object_:
+                raise TypeError("Index arrays can not be of dtype np.object_.")
+            indexes[i] = np.ascontiguousarray(index, dtype=np.float32)
+            c_input[i] = ffi.from_buffer("float*", indexes[i])
+
+        out = np.empty(indexes[0].shape, dtype=np.float32)
+        if self.implementation == SIMPLE:
+            lib.TCOD_noise_get_vectorized(
+                self.noise_c,
+                self.algorithm,
+                out.size,
+                *c_input,
+                ffi.from_buffer("float*", out),
+            )
+        elif self.implementation == SIMPLE:
+            lib.TCOD_noise_get_fbm_vectorized(
+                self.noise_c,
+                self.algorithm,
+                self.octaves,
+                out.size,
+                *c_input,
+                ffi.from_buffer("float*", out),
+            )
+        elif self.implementation == TURBULENCE:
+            lib.TCOD_noise_get_turbulence_vectorized(
+                self.noise_c,
+                self.algorithm,
+                self.octaves,
+                out.size,
+                *c_input,
+                ffi.from_buffer("float*", out),
+            )
+        else:
+            raise TypeError("Unexpected %r" % self.implementation)
+
+        return out
+
     def sample_mgrid(self, mgrid: np.ndarray) -> np.ndarray:
         """Sample a mesh-grid array and return the result.
 
