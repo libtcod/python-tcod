@@ -8,8 +8,28 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - Added `tcod.context.new` function.
+ - Contexts now have CLI support.
+ - You can now provide the window x,y position when making contexts.
+
+Changed
+ - Using `libtcod 1.16.0-alpha.13`.
+ - The OpenGL 2 renderer can now use `SDL_HINT_RENDER_SCALE_QUALITY` to
+   determine the tileset upscaling filter.
+ - Improved performance of the FOV_BASIC algorithm.
+
+Deprecated
+ - `tcod.context.new_window` and `tcod.context.new_terminal` have been replaced
+   by `tcod.context.new`.
+
 Fixed
  - Pathfinders will now work with boolean arrays.
+ - Console blits now ignore alpha compositing which would result in division by
+   zero.
+ - `tcod.console_is_key_pressed` should work even if libtcod events are ignored.
+ - The `TCOD_RENDERER` and `TCOD_VSYNC` environment variables should work now.
+ - `FOV_PERMISSIVE` algorithm is now reentrant.
 
 11.15.3 - 2020-07-30
 --------------------

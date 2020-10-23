@@ -8,9 +8,9 @@ See :ref:`getting-started` for beginner examples on how to use this module.
 hidden global objects within libtcod.  If you begin using contexts then
 most of these functions will no longer work properly.
 
-Instead of calling :any:`tcod.console_init_root` you can call either
-:any:`tcod.context.new_window` or :any:`tcod.context.new_terminal` depending
-on how you plan to setup the size of the console.  You should use
+Instead of calling :any:`tcod.console_init_root` you can call
+:any:`tcod.context.new` with different keywords depending on how you plan
+to setup the size of the console.  You should use
 :any:`tcod.tileset` to load the font for a context.
 
 .. note::
@@ -50,10 +50,10 @@ on how you plan to setup the size of the console.  You should use
 import sys
 import os
 
-from typing import Any, Optional, Tuple
+from typing import Any, Iterable, List, Optional, Tuple
 
 import tcod
-from tcod._internal import _check, _check_warn
+from tcod._internal import _check, _check_warn, deprecate
 from tcod.loader import ffi, lib
 import tcod.event
 import tcod.tileset
@@ -129,11 +129,14 @@ def _handle_tileset(tileset: Optional[tcod.tileset.Tileset]) -> Any:
     return tileset._tileset_p if tileset else ffi.NULL
 
 
-def _handle_title(title: Optional[str]) -> str:
-    """Return title, or if title is None then return a decent default title."""
+def _handle_title(title: Optional[str]) -> Any:
+    """Return title as a CFFI string.
+
+    If title is None then return a decent default title is returned.
+    """
     if title is None:
         title = os.path.basename(sys.argv[0])
-    return title
+    return ffi.new("char[]", title.encode("utf-8"))
 
 
 class Context:
@@ -197,20 +200,22 @@ class Context:
         upper-left corner.  Values of 0.5 will center the console.
         """
         clear_rgba = (clear_color[0], clear_color[1], clear_color[2], 255)
-        options = {
-            "keep_aspect": keep_aspect,
-            "integer_scaling": integer_scaling,
-            "clear_color": clear_rgba,
-            "align_x": align[0],
-            "align_y": align[1],
-        }
-        console_p = console.console_c
-        with ffi.new("struct TCOD_ViewportOptions*", options) as viewport_opts:
-            _check(
-                lib.TCOD_context_present(
-                    self._context_p, console_p, viewport_opts
-                )
+        viewport_args = ffi.new(
+            "TCOD_ViewportOptions*",
+            {
+                "tcod_version": lib.TCOD_COMPILEDVERSION,
+                "keep_aspect": keep_aspect,
+                "integer_scaling": integer_scaling,
+                "clear_color": clear_rgba,
+                "align_x": align[0],
+                "align_y": align[1],
+            },
+        )
+        _check(
+            lib.TCOD_context_present(
+                self._context_p, console.console_c, viewport_args
             )
+        )
 
     def pixel_to_tile(self, x: int, y: int) -> Tuple[int, int]:
         """Convert window pixel coordinates to tile coordinates."""
@@ -316,19 +321,39 @@ class Context:
         return lib.TCOD_context_get_sdl_window(self._context_p)
 
 
-def new_window(
-    width: int,
-    height: int,
+@ffi.def_extern()  # type: ignore
+def _pycall_cli_output(catch_reference: Any, output: Any) -> None:
+    """Callback for the libtcod context CLI.  Catches the CLI output."""
+    catch = ffi.from_handle(catch_reference)  # type: List[str]
+    catch.append(ffi.string(output).decode("utf-8"))
+
+
+def new(
     *,
+    x: Optional[int] = None,
+    y: Optional[int] = None,
+    width: Optional[int] = None,
+    height: Optional[int] = None,
+    columns: Optional[int] = None,
+    rows: Optional[int] = None,
     renderer: Optional[int] = None,
     tileset: Optional[tcod.tileset.Tileset] = None,
     vsync: bool = True,
     sdl_window_flags: Optional[int] = None,
-    title: Optional[str] = None
+    title: Optional[str] = None,
+    argv: Optional[Iterable[str]] = None
 ) -> Context:
     """Create a new context with the desired pixel size.
 
-    `width` and `height` is the desired pixel resolution of the window.
+    `x`, `y`, `width`, and `height` are the desired position and size of the
+    window.  If these are None then they will be derived from `columns` and
+    `rows`.  So if you plan on having a console of a fixed size then you should
+    set `columns` and `rows` instead of the window keywords.
+
+    `columns` and `rows` is the desired size of the console.  Can be left as
+    `None` when you're setting a context by a window size instead of a console.
+
+    Providing no size information at all is also acceptable.
 
     `renderer` is the desired libtcod renderer to use.
     Typical options are :any:`tcod.context.RENDERER_OPENGL2` for a faster
@@ -348,32 +373,95 @@ def new_window(
 
     `title` is the desired title of the window.
 
-    After the context is created you can use
-    :any:`Context.recommended_console_size` to figure out the size of the
-    console for the context.
+    `argv` these arguments are passed to libtcod and allow an end-user to make
+    last second changes such as forcing fullscreen or windowed mode, or
+    changing the libtcod renderer.
+    By default this will pass in `sys.argv` but you can disable this feature
+    by providing an empty list instead.
+    Certain commands such as ``-help`` will raise a SystemExit exception from
+    this function with the output message.
+
+    When a window size is given instead of a console size then you can use
+    :any:`Context.recommended_console_size` to automatically find the size of
+    the console which should be used.
+
+    .. versionadded:: 11.16
     """
-    context_pp = ffi.new("TCOD_Context**")
     if renderer is None:
-        renderer = RENDERER_SDL2
+        renderer = RENDERER_OPENGL2
     if sdl_window_flags is None:
         sdl_window_flags = SDL_WINDOW_RESIZABLE
-    tileset_p = _handle_tileset(tileset)
-    title = _handle_title(title)
-    _check_warn(
-        lib.TCOD_context_new_window(
-            width,
-            height,
-            renderer,
-            tileset_p,
-            vsync,
-            sdl_window_flags,
-            title.encode("utf-8"),
-            context_pp,
-        )
+    if argv is None:
+        argv = sys.argv
+    argv_encoded = [  # Needs to be kept alive for argv_c.
+        ffi.new("char[]", arg.encode("utf-8")) for arg in argv
+    ]
+    argv_c = ffi.new("char*[]", argv_encoded)
+
+    catch_msg = []  # type: List[str]
+    catch_handle = ffi.new_handle(catch_msg)  # Keep alive.
+
+    params = ffi.new(
+        "struct TCOD_ContextParams*",
+        {
+            "tcod_version": lib.TCOD_COMPILEDVERSION,
+            "x": x if x is not None else lib.SDL_WINDOWPOS_UNDEFINED,
+            "y": y if y is not None else lib.SDL_WINDOWPOS_UNDEFINED,
+            "pixel_width": width or 0,
+            "pixel_height": height or 0,
+            "columns": columns or 0,
+            "rows": rows or 0,
+            "renderer_type": renderer,
+            "tileset": _handle_tileset(tileset),
+            "vsync": vsync,
+            "sdl_window_flags": sdl_window_flags,
+            "window_title": _handle_title(title),
+            "argc": len(argv_c),
+            "argv": argv_c,
+            "cli_output": ffi.addressof(lib, "_pycall_cli_output"),
+            "cli_userdata": catch_handle,
+        },
     )
+    context_pp = ffi.new("TCOD_Context**")
+    error = lib.TCOD_context_new(params, context_pp)
+    if error == lib.TCOD_E_REQUIRES_ATTENTION:
+        raise SystemExit(catch_msg[0])
+    _check_warn(error)
     return Context._claim(context_pp[0])
 
 
+@deprecate(
+    "Call tcod.context.new with width and height as keyword parameters."
+)
+def new_window(
+    width: int,
+    height: int,
+    *,
+    renderer: Optional[int] = None,
+    tileset: Optional[tcod.tileset.Tileset] = None,
+    vsync: bool = True,
+    sdl_window_flags: Optional[int] = None,
+    title: Optional[str] = None
+) -> Context:
+    """Create a new context with the desired pixel size.
+
+    .. deprecated:: 11.16
+        :any:`tcod.context.new` provides more options, such as window position.
+    """
+    return new(
+        width=width,
+        height=height,
+        renderer=renderer,
+        tileset=tileset,
+        vsync=vsync,
+        sdl_window_flags=sdl_window_flags,
+        title=title,
+    )
+
+
+@deprecate(
+    "Call tcod.context.new with columns and rows as keyword parameters."
+)
 def new_terminal(
     columns: int,
     rows: int,
@@ -386,31 +474,15 @@ def new_terminal(
 ) -> Context:
     """Create a new context with the desired console size.
 
-    `columns` and `rows` are the desired size of the console.
-
-    The remaining parameters are the same as :any:`new_window`.
-
-    You can use this instead of :any:`new_window` if you plan on using a
-    :any:`tcod.Console` of a fixed size.  This function is the most similar to
-    :any:`tcod.console_init_root`.
+    .. deprecated:: 11.16
+        :any:`tcod.context.new` provides more options.
     """
-    context_pp = ffi.new("TCOD_Context**")
-    if renderer is None:
-        renderer = RENDERER_SDL2
-    if sdl_window_flags is None:
-        sdl_window_flags = SDL_WINDOW_RESIZABLE
-    tileset_p = _handle_tileset(tileset)
-    title = _handle_title(title)
-    _check_warn(
-        lib.TCOD_context_new_terminal(
-            columns,
-            rows,
-            renderer,
-            tileset_p,
-            vsync,
-            sdl_window_flags,
-            title.encode("utf-8"),
-            context_pp,
-        )
+    return new(
+        columns=columns,
+        rows=rows,
+        renderer=renderer,
+        tileset=tileset,
+        vsync=vsync,
+        sdl_window_flags=sdl_window_flags,
+        title=title,
     )
-    return Context._claim(context_pp[0])

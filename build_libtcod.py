@@ -356,6 +356,9 @@ for include in includes:
         for i, line in enumerate(include.header.split("\n"), 1):
             print("%03i %s" % (i, line))
         raise
+ffi.cdef("""
+#define TCOD_COMPILEDVERSION ...
+""")
 ffi.set_source(
     module_name,
     "#include <tcod/cffi.h>\n#include <SDL.h>",
