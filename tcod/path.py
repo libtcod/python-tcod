@@ -1159,13 +1159,26 @@ class Pathfinder:
         Example::
 
             # This example demonstrates the purpose of the traversal array.
-            # In real code Pathfinder.path_from(...) should be used instead.
-            pf  # Resolved 2D Pathfinder instance.
-            i, j = (3, 3)  # Starting index.
-            path = [(i, j)]  # List of nodes from the start to the root.
-            while not (pf.traversal[i, j] == (i, j)).all():
-                i, j = pf.traversal[i, j]
-                path.append((i, j))
+            >>> graph = tcod.path.SimpleGraph(
+            ...     cost=np.ones((5, 5), np.int8), cardinal=2, diagonal=3,
+            ... )
+            >>> pf = tcod.path.Pathfinder(graph)
+            >>> pf.add_root((0, 0))
+            >>> pf.resolve()
+            >>> pf.traversal[3, 3].tolist()  # Faster.
+            [2, 2]
+            >>> pf.path_from((3, 3))[1].tolist()  # Slower.
+            [2, 2]
+            >>> i, j = (3, 3)  # Starting index.
+            >>> path = [(i, j)]  # List of nodes from the start to the root.
+            >>> while not (pf.traversal[i, j] == (i, j)).all():
+            ...     i, j = pf.traversal[i, j]
+            ...     path.append((i, j))
+            >>> path  # Slower.
+            [(3, 3), (2, 2), (1, 1), (0, 0)]
+            >>> pf.path_from((3, 3)).tolist()  # Faster.
+            [[3, 3], [2, 2], [1, 1], [0, 0]]
+
 
         The above example is slow and will not detect infinite loops.  Use
         :any:`path_from` or :any:`path_to` when you need to get a path.
@@ -1230,9 +1243,13 @@ class Pathfinder:
     def rebuild_frontier(self) -> None:
         """Reconstruct the frontier using the current distance array.
 
-        This is needed if the :any:`distance` array is changed manually.
+        If you are using :any:`add_root` then you will not need to call this
+        function.  This is only needed if the :any:`distance` array has been
+        modified manually.
+
         After you are finished editing :any:`distance` you must call this
-        function before calling :any:`resolve`, :any:`path_from`, etc.
+        function before calling :any:`resolve` or any function which calls
+        :any:`resolve` implicitly such as :any:`path_from` or :any:`path_to`.
         """
         lib.TCOD_frontier_clear(self._frontier_p)
         self._update_heuristic(None)
@@ -1254,8 +1271,38 @@ class Pathfinder:
 
         If `goal` is given an index then it will attempt to resolve the
         :any:`distance` and :any:`traversal` arrays only up to the `goal`.
-        If the graph has set a heuristic then it will be used and this call
-        will be similar to `A*`.
+        If the graph has set a heuristic then it will be used with a process
+        similar to `A*`.
+
+        Example::
+
+            >>> graph = tcod.path.SimpleGraph(
+            ...     cost=np.ones((4, 4), np.int8), cardinal=2, diagonal=3,
+            ... )
+            >>> pf = tcod.path.Pathfinder(graph)
+            >>> pf.distance
+            array([[2147483647, 2147483647, 2147483647, 2147483647],
+                   [2147483647, 2147483647, 2147483647, 2147483647],
+                   [2147483647, 2147483647, 2147483647, 2147483647],
+                   [2147483647, 2147483647, 2147483647, 2147483647]]...)
+            >>> pf.add_root((0, 0))
+            >>> pf.distance
+            array([[         0, 2147483647, 2147483647, 2147483647],
+                   [2147483647, 2147483647, 2147483647, 2147483647],
+                   [2147483647, 2147483647, 2147483647, 2147483647],
+                   [2147483647, 2147483647, 2147483647, 2147483647]]...)
+            >>> pf.resolve((1, 1))  # Resolve up to (1, 1) as A*.
+            >>> pf.distance  # Partially resolved distance.
+            array([[         0,          2,          6, 2147483647],
+                   [         2,          3,          5, 2147483647],
+                   [         6,          5,          6, 2147483647],
+                   [2147483647, 2147483647, 2147483647, 2147483647]]...)
+            >>> pf.resolve()  # Resolve the full graph as Dijkstra.
+            >>> pf.distance  # Fully resolved distance.
+            array([[0, 2, 4, 6],
+                   [2, 3, 5, 7],
+                   [4, 5, 6, 8],
+                   [6, 7, 8, 9]]...)
         """
         if goal is not None:
             goal = tuple(goal)  # Check for bad input.
@@ -1289,7 +1336,24 @@ class Pathfinder:
 
         A common usage is to slice off the starting point and convert the array
         into a list.
-        """
+
+        Example::
+
+            >>> cost = np.ones((5, 5), dtype=np.int8)
+            >>> cost[:, 3:] = 0
+            >>> graph = tcod.path.SimpleGraph(cost=cost, cardinal=2, diagonal=3)
+            >>> pf = tcod.path.Pathfinder(graph)
+            >>> pf.add_root((0, 0))
+            >>> pf.path_from((2, 2)).tolist()
+            [[2, 2], [1, 1], [0, 0]]
+            >>> pf.path_from((2, 2))[1:].tolist()  # Exclude the starting point by slicing the array.
+            [[1, 1], [0, 0]]
+            >>> pf.path_from((4, 4)).tolist()  # Blocked paths will only have the index point.
+            [[4, 4]]
+            >>> pf.path_from((4, 4))[1:].tolist()  # Exclude the starting point so that a blocked path is an empty list.
+            []
+
+        """  # noqa: E501
         index = tuple(index)  # Check for bad input.
         if len(index) != self._graph._ndim:
             raise TypeError(
@@ -1319,5 +1383,24 @@ class Pathfinder:
 
         See :any:`path_from`.
         This is an alias for ``path_from(...)[::-1]``.
-        """
+
+        This is the method to call when the root is an entity to move to a
+        position rather than a destination itself.
+
+        Example::
+
+            >>> graph = tcod.path.SimpleGraph(
+            ...     cost=np.ones((5, 5), np.int8), cardinal=2, diagonal=3,
+            ... )
+            >>> pf = tcod.path.Pathfinder(graph)
+            >>> pf.add_root((0, 0))
+            >>> pf.path_to((0, 0)).tolist()  # This method always returns at least one point.
+            [[0, 0]]
+            >>> pf.path_to((3, 3)).tolist()  # Always includes both ends on a valid path.
+            [[0, 0], [1, 1], [2, 2], [3, 3]]
+            >>> pf.path_to((3, 3))[1:].tolist()  # Exclude the starting point by slicing the array.
+            [[1, 1], [2, 2], [3, 3]]
+            >>> pf.path_to((0, 0))[1:].tolist()  # Exclude the starting point so that a blocked path is an empty list.
+            []
+        """  # noqa: E501
         return self.path_from(index)[::-1]
