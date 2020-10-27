@@ -53,7 +53,7 @@ import os
 from typing import Any, Iterable, List, Optional, Tuple
 
 import tcod
-from tcod._internal import _check, _check_warn, deprecate
+from tcod._internal import _check, _check_warn, pending_deprecate
 from tcod.loader import ffi, lib
 import tcod.event
 import tcod.tileset
@@ -430,7 +430,7 @@ def new(
     return Context._claim(context_pp[0])
 
 
-@deprecate(
+@pending_deprecate(
     "Call tcod.context.new with width and height as keyword parameters."
 )
 def new_window(
@@ -459,7 +459,7 @@ def new_window(
     )
 
 
-@deprecate(
+@pending_deprecate(
     "Call tcod.context.new with columns and rows as keyword parameters."
 )
 def new_terminal(
