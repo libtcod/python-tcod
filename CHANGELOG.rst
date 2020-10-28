@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.16.1 - 2020-10-28
+--------------------
 Deprecated
  - Changed context deprecations to PendingDeprecationWarning to reduce mass
    panic from tutorial followers.
