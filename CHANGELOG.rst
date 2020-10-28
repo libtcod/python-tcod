@@ -12,6 +12,9 @@ Deprecated
  - Changed context deprecations to PendingDeprecationWarning to reduce mass
    panic from tutorial followers.
 
+Fixed
+ - Fixed garbled titles and crashing on some platforms.
+
 11.16.0 - 2020-10-23
 --------------------
 Added

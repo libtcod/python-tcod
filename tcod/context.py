@@ -401,6 +401,8 @@ def new(
     catch_msg = []  # type: List[str]
     catch_handle = ffi.new_handle(catch_msg)  # Keep alive.
 
+    title_p = _handle_title(title)  # Keep alive.
+
     params = ffi.new(
         "struct TCOD_ContextParams*",
         {
@@ -415,7 +417,7 @@ def new(
             "tileset": _handle_tileset(tileset),
             "vsync": vsync,
             "sdl_window_flags": sdl_window_flags,
-            "window_title": _handle_title(title),
+            "window_title": title_p,
             "argc": len(argv_c),
             "argv": argv_c,
             "cli_output": ffi.addressof(lib, "_pycall_cli_output"),
