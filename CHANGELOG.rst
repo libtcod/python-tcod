@@ -8,6 +8,11 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - Add new FOV implementation: `tcod.FOV_SYMMETRIC_SHADOWCAST`.
+
+Changed
+ - Using `libtcod 1.16.0-alpha.14`.
 
 11.16.1 - 2020-10-28
 --------------------

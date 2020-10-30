@@ -200,11 +200,15 @@ def compute_fov(
     * `tcod.FOV_PERMISSIVE(n)`:
       `n` starts at 0 (most restrictive) and goes up to 8 (most permissive.)
     * `tcod.FOV_RESTRICTIVE`
+    * `tcod.FOV_SYMMETRIC_SHADOWCAST`
 
     .. versionadded:: 9.3
 
     .. versionchanged:: 11.0
         The parameters `x` and `y` have been changed to `pov`.
+
+    .. versionchanged:: 11.17
+        Added `tcod.FOV_SYMMETRIC_SHADOWCAST` option.
 
     Example:
         >>> explored = np.zeros((3, 5), dtype=bool, order="F")

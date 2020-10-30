@@ -527,6 +527,7 @@ FOV_ALGO_NAMES = [
     "PERMISSIVE7",
     "PERMISSIVE8",
     "RESTRICTIVE",
+    "SYMMETRIC_SHADOWCAST",
 ]
 
 TORCH_RADIUS = 10
@@ -661,7 +662,7 @@ class FOVSample(Sample):
             self.light_walls = not self.light_walls
         elif event.sym in FOV_SELECT_KEYS:
             self.algo_num += FOV_SELECT_KEYS[event.sym]
-            self.algo_num %= tcod.NB_FOV_ALGORITHMS
+            self.algo_num %= len(FOV_ALGO_NAMES)
         else:
             super().ev_keydown(event)
 

@@ -430,6 +430,7 @@ EXCLUDE_CONSTANTS = [
     "TCOD_MAJOR_VERSION",
     "TCOD_MINOR_VERSION",
     "TCOD_PATCHLEVEL",
+    "TCOD_COMPILEDVERSION",
     "TCOD_PATHFINDER_MAX_DIMENSIONS",
     "TCOD_KEY_TEXT_SIZE",
     "TCOD_NOISE_MAX_DIMENSIONS",
@@ -440,6 +441,7 @@ EXCLUDE_CONSTANT_PREFIXES = [
     "TCOD_E_",
     "TCOD_HEAP_",
     "TCOD_LEX_",
+    "TCOD_CHARMAP_",
 ]
 
 
@@ -452,6 +454,8 @@ def write_library_constants() -> None:
         all_names = []
         f.write(CONSTANT_MODULE_HEADER)
         for name in dir(lib):
+            # To exclude specific names use either EXCLUDE_CONSTANTS or
+            # EXCLUDE_CONSTANT_PREFIXES before editing this.
             if name.endswith("_"):
                 continue
             if name in EXCLUDE_CONSTANTS:
