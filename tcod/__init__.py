@@ -41,6 +41,8 @@ except ImportError:  # Gets imported without version.py by ReadTheDocs
 
 __all__ = [  # noqa: F405
     "__version__",
+    "lib",
+    "ffi",
     "bsp",
     "color",
     "console",
