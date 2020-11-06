@@ -138,6 +138,8 @@ setup(
     project_urls={
         "Documentation": "https://python-tcod.readthedocs.io",
         "Changelog": "https://github.com/libtcod/python-tcod/blob/develop/CHANGELOG.rst",
+        "Source": "https://github.com/libtcod/python-tcod",
+        "Tracker": "https://github.com/libtcod/python-tcod/issues",
     },
     py_modules=["libtcodpy"],
     packages=["tdl", "tcod"],
