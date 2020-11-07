@@ -37,8 +37,8 @@ Example::
         # Create the main console.
         console = tcod.Console(WIDTH, HEIGHT)
         # Create a window based on this console and tileset.
-        with tcod.context.new_terminal(
-            console.width, console.height, tileset=tileset,
+        with tcod.context.new(  # New window for a console of size columns×rows.
+            columns=console.width, rows=console.height, tileset=tileset,
         ) as context:
             while True:  # Main loop, runs until SystemExit is raised.
                 console.clear()
@@ -88,8 +88,8 @@ Example::
 
     def main() -> None:
         """Script entry point."""
-        with tcod.context.new_window(
-            WIDTH, HEIGHT, sdl_window_flags=FLAGS
+        with tcod.context.new(  # New window with pixel resolution of width×height.
+            width=WIDTH, height=HEIGHT, sdl_window_flags=FLAGS
         ) as context:
             # Create the console based on the context.
             console = tcod.Console(*context.recommended_console_size())

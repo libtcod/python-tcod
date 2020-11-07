@@ -20,8 +20,8 @@ def main() -> None:
     event_log: List[str] = []
     motion_desc = ""
 
-    with tcod.context.new_window(
-        WIDTH, HEIGHT, sdl_window_flags=FLAGS
+    with tcod.context.new(
+        width=WIDTH, height=HEIGHT, sdl_window_flags=FLAGS
     ) as context:
         console = tcod.Console(*context.recommended_console_size())
         while True:
@@ -42,9 +42,7 @@ def main() -> None:
                 if event.type == "QUIT":
                     raise SystemExit()
                 if event.type == "WINDOWRESIZED":
-                    console = tcod.Console(
-                        *context.recommended_console_size()
-                    )
+                    console = tcod.Console(*context.recommended_console_size())
                 if event.type == "MOUSEMOTION":
                     motion_desc = str(event)
                 else:
