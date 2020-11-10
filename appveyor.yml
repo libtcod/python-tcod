@@ -1,3 +1,5 @@
+image: Visual Studio 2019
+
 environment:
   TWINE_USERNAME:
     secure: sUo+lYht329nQC5JCxEB8w==
@@ -16,16 +18,16 @@ environment:
     EXTRA_SETUP_ARGS: "--py-limited-api cp35"
   - PYTHON: C:\Python36-x64\python.exe
     platform: x64
-  - PYTHON: C:\Python36\python.exe
-    platform: Any CPU
+    NO_DEPLOY: true
   - PYTHON: C:\Python37-x64\python.exe
     platform: x64
-  - PYTHON: C:\Python37\python.exe
-    platform: Any CPU
+    NO_DEPLOY: true
   - PYTHON: C:\Python38-x64\python.exe
     platform: x64
-  - PYTHON: C:\Python38\python.exe
-    platform: Any CPU
+    NO_DEPLOY: true
+  - PYTHON: C:\Python39-x64\python.exe
+    platform: x64
+    NO_DEPLOY: true
   - PYPY3: pypy3.6-v7.3.2
     platform: Any CPU
   - PYPY3: pypy3.7-v7.3.2
@@ -61,5 +63,5 @@ on_success:
 - if defined CODACY_PROJECT_TOKEN python-codacy-coverage -r coverage.xml || cd .
 
 deploy_script:
-- "if defined APPVEYOR_REPO_TAG_NAME pip install twine"
-- "if defined APPVEYOR_REPO_TAG_NAME twine upload --skip-existing dist/*"
+- "if defined APPVEYOR_REPO_TAG_NAME if not defined NO_DEPLOY pip install twine"
+- "if defined APPVEYOR_REPO_TAG_NAME if not defined NO_DEPLOY twine upload --skip-existing dist/*"
