@@ -53,7 +53,7 @@ import os
 from typing import Any, Iterable, List, Optional, Tuple
 
 import tcod
-from tcod._internal import _check, _check_warn, pending_deprecate
+from tcod._internal import _check, _check_warn, pending_deprecate, deprecate
 from tcod.loader import ffi, lib
 import tcod.event
 import tcod.tileset
@@ -263,25 +263,61 @@ class Context:
             )
         )
 
-    def recommended_console_size(
-        self, min_columns: int = 1, min_rows: int = 1
-    ) -> Tuple[int, int]:
-        """Return the recommended (columns, rows) of a console for this
-        context.
+    def new_console(
+        self,
+        min_columns: int = 1,
+        min_rows: int = 1,
+        magnification: float = 1.0,
+    ) -> tcod.console.Console:
+        """Return a new console sized for this context.
 
-        The times where it's the most useful to call this method are:
+        `min_columns` and `min_rows` are the minimum size to use for the new
+        console.
+
+        `magnification` determines the apparent size of the tiles on the output
+        display.  A `magnification` larger then 1.0 will output smaller
+        consoles, which will show as larger tiles when presented.
+        `magnification` must be greater than zero.
+
+        The times where it is the most useful to call this method are:
 
         * After the context is created, even if the console was given a
           specific size.
         * After the :any:`change_tileset` method is called.
         * After any window resized event, or any manual resizing of the window.
 
+        .. versionadded:: 11.18
+        """
+        if magnification < 0:
+            raise ValueError(
+                "Magnification must be greater than zero. (Got %f)"
+                % magnification
+            )
+        size = ffi.new("int[2]")
+        _check(
+            lib.TCOD_context_recommended_console_size(
+                self._context_p, magnification, size, size + 1
+            )
+        )
+        width, height = max(min_columns, size[0]), max(min_rows, size[1])
+        return tcod.console.Console(width, height)
+
+    @deprecate("This method has been replaced by Context.new_console.")
+    def recommended_console_size(
+        self, min_columns: int = 1, min_rows: int = 1
+    ) -> Tuple[int, int]:
+        """Return the recommended (columns, rows) of a console for this
+        context.
+
         `min_columns`, `min_rows` are the lowest values which will be returned.
+
+        .. deprecated::
+            This method has been replaced by :any:`Context.new_console`.
         """
         with ffi.new("int[2]") as size:
             _check(
                 lib.TCOD_context_recommended_console_size(
-                    self._context_p, size, size + 1
+                    self._context_p, 1.0, size, size + 1
                 )
             )
             return max(min_columns, size[0]), max(min_rows, size[1])

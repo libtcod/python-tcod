@@ -8,6 +8,12 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - New context method `Context.new_console`.
+
+Deprecated
+ - `Context.recommended_console_size` has been replaced with
+   `Context.new_console`.
 
 11.17.0 - 2020-10-30
 --------------------

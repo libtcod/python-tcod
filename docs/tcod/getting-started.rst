@@ -61,7 +61,7 @@ Dynamically-sized console
 
 The next example shows a more advanced setup.  A maximized window is created
 and the console is dynamically scaled to fit within it.  If the window is
-resized then the console will be replaced by a new dynamically sized console.
+resized then the console will be resized to match it.
 
 Because a tileset wasn't manually loaded in this example an OS dependent
 fallback font will be used.  This is useful for prototyping but it's not
@@ -70,12 +70,17 @@ platforms.
 
 The `integer_scaling` parameter to :any:`Context.present` prevents the console
 from being slightly stretched, since the console will rarely be the prefect
-size a small border will exist.
+size a small border will exist.  This border is black by default but can be
+changed to another color.
 
 You'll need to consider things like the console being too small for your code
 to handle or the tiles being small compared to an extra large monitor
-resolution.  :any:`Context.recommended_console_size` can be given a minimum
-size that it will never go below.
+resolution.  :any:`Context.new_console` can be given a minimum size that it
+will never go below.
+
+You can call :any:`Context.new_console` every frame or only when the window
+is resized.  This example creates a new console every frame instead of
+clearing the console every frame and replacing it only on resizing the window.
 
 Example::
 
@@ -91,10 +96,8 @@ Example::
         with tcod.context.new(  # New window with pixel resolution of width×height.
             width=WIDTH, height=HEIGHT, sdl_window_flags=FLAGS
         ) as context:
-            # Create the console based on the context.
-            console = tcod.Console(*context.recommended_console_size())
             while True:
-                console.clear()
+                console = context.new_console()
                 console.print(0, 0, "Hello World")
                 context.present(console, integer_scaling=True)
 
@@ -104,8 +107,7 @@ Example::
                     if event.type == "QUIT":
                         raise SystemExit()
                     if event.type == "WINDOWRESIZED":
-                        # Replace the console with one that fits the new resolution.
-                        console = tcod.Console(*context.recommended_console_size())
+                        pass  # The next call to context.new_console may return a different size.
 
 
     if __name__ == "__main__":
