@@ -11,6 +11,9 @@ Unreleased
 Added
  - New context method `Context.new_console`.
 
+Changed
+ - Using `libtcod 1.16.0-alpha.15`.
+
 Deprecated
  - `Context.recommended_console_size` has been replaced with
    `Context.new_console`.

@@ -443,8 +443,8 @@ def new(
         "struct TCOD_ContextParams*",
         {
             "tcod_version": lib.TCOD_COMPILEDVERSION,
-            "x": x if x is not None else lib.SDL_WINDOWPOS_UNDEFINED,
-            "y": y if y is not None else lib.SDL_WINDOWPOS_UNDEFINED,
+            "window_x": x if x is not None else lib.SDL_WINDOWPOS_UNDEFINED,
+            "window_y": y if y is not None else lib.SDL_WINDOWPOS_UNDEFINED,
             "pixel_width": width or 0,
             "pixel_height": height or 0,
             "columns": columns or 0,
@@ -458,6 +458,7 @@ def new(
             "argv": argv_c,
             "cli_output": ffi.addressof(lib, "_pycall_cli_output"),
             "cli_userdata": catch_handle,
+            "window_xy_defined": True,
         },
     )
     context_pp = ffi.new("TCOD_Context**")
