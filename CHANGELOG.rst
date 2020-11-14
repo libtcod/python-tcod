@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.18.0 - 2020-11-13
+--------------------
 Added
  - New context method `Context.new_console`.
 
