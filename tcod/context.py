@@ -302,7 +302,6 @@ class Context:
         width, height = max(min_columns, size[0]), max(min_rows, size[1])
         return tcod.console.Console(width, height)
 
-    @deprecate("This method has been replaced by Context.new_console.")
     def recommended_console_size(
         self, min_columns: int = 1, min_rows: int = 1
     ) -> Tuple[int, int]:
@@ -311,8 +310,8 @@ class Context:
 
         `min_columns`, `min_rows` are the lowest values which will be returned.
 
-        .. deprecated::
-            This method has been replaced by :any:`Context.new_console`.
+        If result is only used to create a new console then you may want to
+        call :any:`Context.new_console` instead.
         """
         with ffi.new("int[2]") as size:
             _check(

@@ -14,10 +14,6 @@ Added
 Changed
  - Using `libtcod 1.16.0-alpha.15`.
 
-Deprecated
- - `Context.recommended_console_size` has been replaced with
-   `Context.new_console`.
-
 11.17.0 - 2020-10-30
 --------------------
 Added
