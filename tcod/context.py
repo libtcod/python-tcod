@@ -61,6 +61,7 @@ import tcod.tileset
 
 __all__ = (
     "Context",
+    "new",
     "new_window",
     "new_terminal",
     "SDL_WINDOW_FULLSCREEN",
