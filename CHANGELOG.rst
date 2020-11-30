@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.18.1 - 2020-11-30
+--------------------
 Fixed
  - Code points from the Private Use Area will now print correctly.
 
