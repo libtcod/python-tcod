@@ -1,0 +1,58 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Python package
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8', '3.9']
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Needed for git describe to find tags.
+    - name: Checkout submodules
+      run: |
+        git submodule update --init --recursive --depth 1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install APT dependencies
+      run: |
+        sudo apt update
+        sudo apt install libsdl2-dev
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install flake8 mypy pytest pytest-cov pytest-benchmark black
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Initialize package
+      run: |
+        python setup.py check  # Creates tcod/version.py.
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 tcod/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 tcod/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Check type hints with MyPy
+      run: |
+        mypy tcod/
+    - name: Check formatting with Black
+      run: |
+        black --check tcod/
+    - name: Build package.
+      run: |
+        python setup.py develop  # Install the package in-place.
+    - name: Test with pytest
+      uses: GabrielBB/xvfb-action@v1
+      with:
+        run: |
+          pytest
