@@ -51,7 +51,7 @@ For the most part it's just::
 * Python 3.5+
 * Windows, Linux, or MacOS X 10.9+.
 * On Windows, requires the Visual C++ runtime 2015 or later.
-* On Linux, requires libsdl2 (2.0.5+) and libomp5 to run.
+* On Linux, requires libsdl2 (2.0.5+).
 
 =========
  License

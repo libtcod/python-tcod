@@ -41,7 +41,6 @@ services:
 
 before_install:
 - source .travis/before_install.sh
-- 'if [[ "$TRAVIS_OS_NAME" == "osx" && "$USE_OPENMP" == "true" ]]; then source .travis/install_openmp.sh; fi'
 - source .travis/install_python.sh
 - 'wget https://bootstrap.pypa.io/get-pip.py'
 - python get-pip.py

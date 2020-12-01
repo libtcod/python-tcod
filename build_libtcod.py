@@ -307,12 +307,6 @@ if sys.platform not in ["win32", "darwin"]:
         .split()
     )
 
-# Can force the use of OpenMP with this variable.
-try:
-    USE_OPENMP = eval(os.environ.get("USE_OPENMP", "False").title())
-except Exception:
-    USE_OPENMP = False
-
 tdl_build = os.environ.get("TDL_BUILD", "RELEASE").upper()
 
 MSVC_CFLAGS = {"DEBUG": ["/Od"], "RELEASE": ["/GL", "/O2", "/GS-", "/wd4996"]}
@@ -332,21 +326,9 @@ GCC_CFLAGS = {
 if sys.platform == "win32" and "--compiler=mingw32" not in sys.argv:
     extra_compile_args.extend(MSVC_CFLAGS[tdl_build])
     extra_link_args.extend(MSVC_LDFLAGS[tdl_build])
-
-    if USE_OPENMP is None:
-        USE_OPENMP = sys.version_info[:2] >= (3, 5)
-
-    if USE_OPENMP:
-        extra_compile_args.append("/openmp")
 else:
     extra_compile_args.extend(GCC_CFLAGS[tdl_build])
     extra_link_args.extend(GCC_CFLAGS[tdl_build])
-    if USE_OPENMP is None:
-        USE_OPENMP = sys.platform != "darwin"
-
-    if USE_OPENMP:
-        extra_compile_args.append("-fopenmp")
-        extra_link_args.append("-fopenmp")
 
 ffi = FFI()
 parse_sdl2.add_to_ffi(ffi, SDL2_INCLUDE)

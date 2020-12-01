@@ -20,10 +20,8 @@ void NoiseSampleMeshGrid(
     const long len,
     const float* __restrict in,
     float* __restrict out) {
-#pragma omp parallel
   {
     long i;
-#pragma omp for schedule(static)
     for (i = 0; i < len; ++i) {
       int axis;
       float xyzw[TCOD_NOISE_MAX_DIMENSIONS];
@@ -64,11 +62,9 @@ void NoiseSampleOpenMeshGrid(
     const long* __restrict shape,
     const float* __restrict* __restrict ogrid_in,
     float* __restrict out) {
-#pragma omp parallel
   {
     long i;
     long len = GetSizeFromShape(ndim_in, shape);
-#pragma omp for schedule(static)
     for (i = 0; i < len; ++i) {
       out[i] = GetOpenMeshGridValue(noise, ndim_in, shape, ogrid_in, i);
     }
