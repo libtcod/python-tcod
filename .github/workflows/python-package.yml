@@ -55,4 +55,5 @@ jobs:
       uses: GabrielBB/xvfb-action@v1
       with:
         run: |
-          pytest
+          pytest --cov-report=xml
+    - uses: codecov/codecov-action@v1
