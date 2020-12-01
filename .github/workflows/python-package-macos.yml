@@ -1,0 +1,46 @@
+name: Python package (MacOS)
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ['macos-11.0']
+        python-version: ['3.5']
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Needed for git describe to find tags.
+    - name: Checkout submodules
+      run: |
+        git submodule update --init --recursive --depth 1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pytest pytest-cov pytest-benchmark delocate wheel twine
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Build package.
+      run: |
+        python setup.py sdist develop bdist_wheel --py-limited-api=cp35
+    - name: Package binary files
+      run: |
+        delocate-wheel -v dist/*.whl
+        delocate-listdeps --all dist/*.whl
+    - name: Test with pytest
+      run: |
+        pytest --no-window
+    - name: Upload to PyPI
+      if: startsWith(github.ref, 'refs/tags/')  # Only run on tags.
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        twine upload --skip-existing dist/*

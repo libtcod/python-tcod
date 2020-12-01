@@ -287,6 +287,9 @@ if sys.platform == "darwin":
     extra_link_args += ["-rpath", "%s/.." % SDL2_BUNDLE_PATH]
     extra_link_args += ["-rpath", "/usr/local/opt/llvm/lib/"]
 
+    # Fix "implicit declaration of function 'close'" in zlib.
+    define_macros.append(("HAVE_UNISTD_H", 1))
+
 if sys.platform not in ["win32", "darwin"]:
     extra_parse_args += (
         subprocess.check_output(
