@@ -37,19 +37,6 @@ def verify_dependencies() -> None:
             raise RuntimeError(
                 "Tried to load an old version of SDL %r" % (version,)
             )
-        try:
-            ffi_check.dlopen("vcruntime140.dll")  # Make sure VC++ 2015 exists.
-        except OSError:
-            print(
-                "You will need to install 'vc_redist.{arch}.exe'"
-                " from Microsoft at:\n"
-                "https://support.microsoft.com/en-us/help/2977003/"
-                "the-latest-supported-visual-c-downloads\n".format(
-                    arch=get_architecture()
-                ),
-                file=sys.stderr,
-            )
-            raise
 
 
 def get_architecture() -> str:
