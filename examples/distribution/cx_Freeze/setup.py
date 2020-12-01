@@ -1,7 +1,7 @@
 
 import sys
 
-from cx_Freeze import setup, Executable
+from cx_Freeze import Executable, setup
 
 # cx_Freeze options, see documentation.
 build_exe_options = {

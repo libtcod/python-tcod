@@ -4,15 +4,15 @@ To render a console you need a tileset and a window to render to.
 See :ref:`getting-started` for info on how to set those up.
 """
 
-from typing import Any, Optional, Tuple  # noqa: F401
 import warnings
+from typing import Any, Optional, Tuple  # noqa: F401
 
 import numpy as np
 
-import tcod.constants
-from tcod.loader import ffi, lib
 import tcod._internal
+import tcod.constants
 from tcod._internal import deprecate
+from tcod.loader import ffi, lib
 
 
 def _fmt(string: str) -> bytes:

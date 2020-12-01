@@ -6,6 +6,7 @@ import pytest
 
 import tcod
 
+
 def pytest_addoption(parser):
     parser.addoption("--no-window", action="store_true",
         help="Skip tests which need a rendering context.")

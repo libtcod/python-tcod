@@ -1,8 +1,8 @@
 import pickle
 
 import numpy as np
-from numpy import array
 import pytest
+from numpy import array
 
 import tcod
 

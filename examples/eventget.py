@@ -9,7 +9,6 @@ from typing import List
 
 import tcod
 
-
 WIDTH, HEIGHT = 720, 480
 FLAGS = tcod.context.SDL_WINDOW_RESIZABLE | tcod.context.SDL_WINDOW_MAXIMIZED
 

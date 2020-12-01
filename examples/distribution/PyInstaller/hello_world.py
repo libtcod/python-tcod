@@ -3,8 +3,8 @@
 # copyright and related or neighboring rights for the "hello world" PyInstaller
 # example script.  This work is published from: United States.
 # https://creativecommons.org/publicdomain/zero/1.0/
-import sys
 import os.path
+import sys
 
 import tcod
 

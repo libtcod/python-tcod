@@ -35,10 +35,10 @@ from typing import Any, Optional
 
 import numpy as np
 
-from tcod._internal import deprecate
-from tcod.loader import ffi, lib
 import tcod.constants
 import tcod.random
+from tcod._internal import deprecate
+from tcod.loader import ffi, lib
 
 """Noise implementation constants"""
 SIMPLE = 0

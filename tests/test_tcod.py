@@ -5,8 +5,8 @@ import pickle
 
 import numpy as np
 import pytest
+from common import raise_Exception, tcod
 
-from common import tcod, raise_Exception
 import tcod.noise
 import tcod.path
 

@@ -4,6 +4,7 @@ import pickle
 
 import tcod
 
+
 def test_tcod_random():
     rand = tcod.random.Random(tcod.random.COMPLEMENTARY_MULTIPLY_WITH_CARRY)
     assert 0 <= rand.randint(0, 100) <= 100

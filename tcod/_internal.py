@@ -1,12 +1,12 @@
 """This module internal helper functions used by the rest of the library.
 """
 import functools
-from typing import Any, AnyStr, Callable, NoReturn, TypeVar, cast
 import warnings
+from typing import Any, AnyStr, Callable, NoReturn, TypeVar, cast
 
 import numpy as np
 
-from tcod.loader import lib, ffi
+from tcod.loader import ffi, lib
 
 FuncType = Callable[..., Any]
 F = TypeVar("F", bound=FuncType)

@@ -6,8 +6,8 @@ http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generatin
 This will print the result to the console, so be sure to run this from the
 command line.
 """
-import scipy.signal  # type: ignore
 import numpy as np  # type: ignore
+import scipy.signal  # type: ignore
 
 
 def convolve(tiles: np.array, wall_rule: int = 5) -> np.array:

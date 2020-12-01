@@ -2,7 +2,6 @@
 
 import tdl
 
-
 WIDTH, HEIGHT = 80, 60
 console = None
 

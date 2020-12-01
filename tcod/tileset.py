@@ -10,16 +10,15 @@ useful to use `an alternative library for graphics rendering
 <https://wiki.python.org/moin/PythonGameLibraries>`_ while continuing to use
 python-tcod's pathfinding and field-of-view algorithms.
 """
-import os
-
 import itertools
+import os
 from typing import Any, Iterable, Optional, Tuple
 
 import numpy as np
 
-from tcod.loader import lib, ffi
 import tcod.console
 from tcod._internal import _check, _console, _raise_tcod_error, deprecate
+from tcod.loader import ffi, lib
 
 
 class Tileset:

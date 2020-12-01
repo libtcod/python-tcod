@@ -15,9 +15,6 @@
     Bring any issues or requests to GitHub:
     https://github.com/HexDecimal/libtcod-cffi
 """
-from tcod.loader import lib, ffi, __sdl_version__  # noqa: F4
-from tcod.libtcodpy import *  # noqa: F4
-
 from tcod import (
     bsp,
     color,
@@ -33,6 +30,8 @@ from tcod import (
     tileset,
 )
 from tcod.console import Console  # noqa: F401
+from tcod.libtcodpy import *  # noqa: F4
+from tcod.loader import __sdl_version__, ffi, lib  # noqa: F4
 
 try:
     from tcod.version import __version__

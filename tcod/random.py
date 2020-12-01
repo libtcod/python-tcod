@@ -8,8 +8,8 @@ from the :any:`Noise` and :any:`BSP` classes.
 import random
 from typing import Any, Hashable, Optional
 
-from tcod.loader import ffi, lib
 import tcod.constants
+from tcod.loader import ffi, lib
 
 MERSENNE_TWISTER = tcod.constants.RNG_MT
 COMPLEMENTARY_MULTIPLY_WITH_CARRY = tcod.constants.RNG_CMWC

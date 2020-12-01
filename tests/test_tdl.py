@@ -1,13 +1,12 @@
 #!/usr/bin/env python
-import sys
-import os
-
-import unittest
-import random
-import itertools
 import copy
-import pickle
 import gc
+import itertools
+import os
+import pickle
+import random
+import sys
+import unittest
 
 import tdl
 

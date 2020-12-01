@@ -12,8 +12,8 @@ from typing import Any, Dict, Tuple
 import numpy as np
 
 import tcod.console
-from tcod.loader import ffi, lib
 from tcod._internal import _console
+from tcod.loader import ffi, lib
 
 
 class Image(object):

@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
-import unittest
 import itertools
+import unittest
+
 import pytest
 
 import tdl
+
 
 class MapTests(unittest.TestCase):
 

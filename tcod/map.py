@@ -2,14 +2,14 @@
 
 
 """
-from typing import Any, Tuple
 import warnings
+from typing import Any, Tuple
 
 import numpy as np
 
-from tcod.loader import lib, ffi
 import tcod._internal
 import tcod.constants
+from tcod.loader import ffi, lib
 
 
 class Map(object):

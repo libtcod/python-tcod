@@ -13,16 +13,14 @@ This script tests the viability of running python-tcod tasks in parallel.
 Typically the field-of-view tasks run good but not great, and the path-finding
 tasks run poorly.
 """
-import sys
-
 import concurrent.futures
 import multiprocessing
 import platform
+import sys
 import timeit
-from typing import List, Tuple, Callable
+from typing import Callable, List, Tuple
 
 import tcod
-
 
 THREADS = multiprocessing.cpu_count()
 

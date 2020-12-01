@@ -1,8 +1,8 @@
 """
 
 """
-from typing import Any, List
 import warnings
+from typing import Any, List
 
 from tcod._internal import deprecate
 from tcod.loader import lib

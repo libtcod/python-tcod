@@ -1,11 +1,11 @@
 """This module handles loading of the libtcod cffi API.
 """
-import sys
 import os
+import platform
+import sys
+from typing import Any  # noqa: F401
 
 import cffi  # type: ignore
-import platform
-from typing import Any  # noqa: F401
 
 from tcod import __path__  # type: ignore
 
@@ -108,7 +108,7 @@ if os.environ.get("READTHEDOCS"):
     lib = ffi = _Mock()
 else:
     verify_dependencies()
-    from tcod._libtcod import lib, ffi  # type: ignore # noqa: F401
+    from tcod._libtcod import ffi, lib  # type: ignore # noqa: F401
 
     __sdl_version__ = get_sdl_version()
 

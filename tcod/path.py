@@ -21,9 +21,9 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
-from tcod.loader import lib, ffi
-from tcod._internal import _check
 import tcod.map  # noqa: F401
+from tcod._internal import _check
+from tcod.loader import ffi, lib
 
 
 @ffi.def_extern()  # type: ignore

@@ -7,7 +7,7 @@ from typing import Any, Tuple
 
 import numpy as np
 
-from tcod.loader import lib, ffi
+from tcod.loader import ffi, lib
 
 __all__ = ("Window",)
 

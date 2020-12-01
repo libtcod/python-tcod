@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-import pytest
-
 import numpy
 import numpy as np
-import tcod as libtcodpy
+import pytest
+
 import tcod
+import tcod as libtcodpy
 
 
 def test_console_behaviour(console):

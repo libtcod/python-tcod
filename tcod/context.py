@@ -47,17 +47,15 @@ to setup the size of the console.  You should use
 
 .. versionadded:: 11.12
 """  # noqa: E501
-import sys
 import os
-
+import sys
 from typing import Any, Iterable, List, Optional, Tuple
 
 import tcod
-from tcod._internal import _check, _check_warn, pending_deprecate, deprecate
-from tcod.loader import ffi, lib
 import tcod.event
 import tcod.tileset
-
+from tcod._internal import _check, _check_warn, deprecate, pending_deprecate
+from tcod.loader import ffi, lib
 
 __all__ = (
     "Context",

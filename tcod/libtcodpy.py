@@ -1,10 +1,10 @@
 """This module handles backward compatibility with the ctypes libtcodpy module.
 """
+import atexit
 import os
 import sys
-
-import atexit
 import threading
+import warnings
 from typing import (
     Any,
     AnyStr,
@@ -18,35 +18,10 @@ from typing import (
     Tuple,
     Union,
 )
-import warnings
 
 import numpy as np
 
-from tcod.loader import ffi, lib
-
-from tcod.constants import *  # noqa: F4
-from tcod.constants import (
-    BKGND_DEFAULT,
-    BKGND_SET,
-    BKGND_ALPH,
-    BKGND_ADDA,
-    FONT_LAYOUT_ASCII_INCOL,
-    FOV_RESTRICTIVE,
-    FOV_PERMISSIVE_0,
-    NOISE_DEFAULT,
-    KEY_RELEASED,
-)
-
-from tcod._internal import deprecate, pending_deprecate, _check, _check_warn
-
-from tcod._internal import _int, _unpack_char_p
-from tcod._internal import _bytes, _unicode, _fmt
-from tcod._internal import _CDataWrapper
-from tcod._internal import _PropagateException
-from tcod._internal import _console
-
 import tcod.bsp
-from tcod.color import Color
 import tcod.console
 import tcod.image
 import tcod.los
@@ -54,6 +29,34 @@ import tcod.map
 import tcod.noise
 import tcod.path
 import tcod.random
+from tcod._internal import (
+    _bytes,
+    _CDataWrapper,
+    _check,
+    _check_warn,
+    _console,
+    _fmt,
+    _int,
+    _PropagateException,
+    _unicode,
+    _unpack_char_p,
+    deprecate,
+    pending_deprecate,
+)
+from tcod.color import Color
+from tcod.constants import *  # noqa: F4
+from tcod.constants import (
+    BKGND_ADDA,
+    BKGND_ALPH,
+    BKGND_DEFAULT,
+    BKGND_SET,
+    FONT_LAYOUT_ASCII_INCOL,
+    FOV_PERMISSIVE_0,
+    FOV_RESTRICTIVE,
+    KEY_RELEASED,
+    NOISE_DEFAULT,
+)
+from tcod.loader import ffi, lib
 
 Bsp = tcod.bsp.BSP
 

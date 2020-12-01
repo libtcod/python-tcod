@@ -25,9 +25,9 @@ Example::
 """
 from typing import Any, Iterator, List, Optional, Tuple, Union  # noqa: F401
 
-from tcod.loader import lib, ffi
-from tcod._internal import deprecate
 import tcod.random
+from tcod._internal import deprecate
+from tcod.loader import ffi, lib
 
 
 class BSP(object):

@@ -5,12 +5,11 @@ This code demonstrates various usages of python-tcod.
 # To the extent possible under law, the libtcod maintainers have waived all
 # copyright and related or neighboring rights to these samples.
 # https://creativecommons.org/publicdomain/zero/1.0/
-import sys
-import os
-
 import copy
 import math
+import os
 import random
+import sys
 import time
 import warnings
 
