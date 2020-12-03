@@ -4217,15 +4217,14 @@ def sys_force_fullscreen_resolution(width: int, height: int) -> None:
     lib.TCOD_sys_force_fullscreen_resolution(width, height)
 
 
-@deprecate("This function is not supported if contexts are being used.")
+@deprecate(
+    "This function is deprecated, which monitor is detected is ambiguous."
+)
 def sys_get_current_resolution() -> Tuple[int, int]:
-    """Return the current resolution as (width, height)
-
-    Returns:
-        Tuple[int,int]: The current resolution.
+    """Return a monitors pixel resolution as (width, height).
 
     .. deprecated:: 11.13
-        This function is not supported by contexts.
+        This function is deprecated, which monitor is detected is ambiguous.
     """
     w = ffi.new("int *")
     h = ffi.new("int *")

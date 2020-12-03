@@ -10,6 +10,8 @@ Unreleased
 ------------------
 Fixed
  - Fixed missing `tcod.FOV_SYMMETRIC_SHADOWCAST` constant.
+ - Fixed regression in `tcod.sys_get_current_resolution` behavior.  This
+   function now returns the monitor resolution as was previously expected.
 
 11.18.1 - 2020-11-30
 --------------------
