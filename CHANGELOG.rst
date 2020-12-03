@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.18.2 - 2020-12-03
+--------------------
 Fixed
  - Fixed missing `tcod.FOV_SYMMETRIC_SHADOWCAST` constant.
  - Fixed regression in `tcod.sys_get_current_resolution` behavior.  This
