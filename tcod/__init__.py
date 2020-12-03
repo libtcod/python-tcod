@@ -31,6 +31,7 @@ from tcod import (
 )
 from tcod.console import Console  # noqa: F401
 from tcod.libtcodpy import *  # noqa: F4
+from tcod.constants import *  # noqa: F4
 from tcod.loader import __sdl_version__, ffi, lib  # noqa: F4
 
 try:
@@ -325,6 +326,7 @@ __all__ = [  # noqa: F405
     "FOV_PERMISSIVE_8",
     "FOV_RESTRICTIVE",
     "FOV_SHADOW",
+    "FOV_SYMMETRIC_SHADOWCAST",
     "KEY_0",
     "KEY_1",
     "KEY_2",

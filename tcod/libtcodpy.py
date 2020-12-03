@@ -4667,6 +4667,7 @@ __all__ = [  # noqa: F405
     "FOV_PERMISSIVE_8",
     "FOV_RESTRICTIVE",
     "FOV_SHADOW",
+    "FOV_SYMMETRIC_SHADOWCAST",
     "KEY_0",
     "KEY_1",
     "KEY_2",

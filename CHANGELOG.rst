@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Fixed missing `tcod.FOV_SYMMETRIC_SHADOWCAST` constant.
 
 11.18.1 - 2020-11-30
 --------------------
