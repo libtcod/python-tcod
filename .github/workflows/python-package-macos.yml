@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: ['macos-11.0']
-        python-version: ['3.5']
+        python-version: ['3.7.9']
 
     steps:
     - uses: actions/checkout@v2
@@ -18,10 +18,19 @@ jobs:
     - name: Checkout submodules
       run: |
         git submodule update --init --recursive --depth 1
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+    - name: Set up Mac Python ${{ matrix.python-version }}
+      # actions/setup-python can't be used as it builds less portable extensions.
+      env:
+        MB_PYTHON_VERSION: ${{ matrix.python-version }}
+      run: |
+        source .travis/install_python.sh
+        install_python
+        $PYTHON_EXE -m venv venv
+        source venv/bin/activate
+        echo "$PATH" >> $GITHUB_PATH
+    - name: Print Python version
+      run: |
+        python -VV
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
