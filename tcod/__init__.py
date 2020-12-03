@@ -807,4 +807,5 @@ __all__ = [  # noqa: F405
     "violet",
     "white",
     "yellow",
+    # --- End constants.py ---
 ]

@@ -430,6 +430,20 @@ EXCLUDE_CONSTANT_PREFIXES = [
 ]
 
 
+def update_module_all(filename: str, new_all: str) -> None:
+    """Update the __all__ of a file with the constants from new_all."""
+    RE_CONSTANTS_ALL = re.compile(
+        r"(.*# --- From constants.py ---).*(# --- End constants.py ---.*)",
+        re.DOTALL,
+    )
+    with open(filename, "r") as f:
+        match = RE_CONSTANTS_ALL.match(f.read())
+    assert match, "Can't determine __all__ subsection in %s!" % (filename,)
+    header, footer = match.groups()
+    with open(filename, "w") as f:
+        f.write("%s\n    %s,\n    %s" % (header, new_all, footer))
+
+
 def write_library_constants() -> None:
     """Write libtcod constants into the tcod.constants module."""
     from tcod._libtcod import lib, ffi
@@ -476,6 +490,8 @@ def write_library_constants() -> None:
 
         all_names = ",\n    ".join('"%s"' % name for name in all_names)
         f.write("\n__all__ = [\n    %s,\n]\n" % (all_names,))
+        update_module_all("tcod/__init__.py", all_names)
+        update_module_all("tcod/libtcodpy.py", all_names)
 
     with open("tcod/event_constants.py", "w") as f:
         all_names = []
