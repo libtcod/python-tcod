@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-import os.path
+import os
 
 from setuptools import setup
 
@@ -14,6 +14,8 @@ SDL_VERSION_NEEDED = (2, 0, 5)
 
 def get_version():
     """Get the current version from a git tag, or by reading tcod/version.py"""
+    if os.environ.get("TCOD_TAG"):
+        return os.environ["TCOD_TAG"]
     try:
         tag = check_output(
             ["git", "describe", "--abbrev=0"], universal_newlines=True
