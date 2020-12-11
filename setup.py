@@ -103,22 +103,6 @@ def check_sdl_version():
         )
 
 
-if sys.version_info < (3, 5):
-    error = """
-    This version of python-tcod only supports Python 3.5 and above.
-    The last version supporting Python 2.7/3.4 was 'tcod==6.0.7'.
-
-    The end-of-life for Python 2 is the year 2020.
-    https://pythonclock.org/
-
-    Python {py} detected.
-    """.format(
-        py=".".join([str(v) for v in sys.version_info[:3]])
-    )
-
-    print(error)
-    sys.exit(1)
-
 if not os.path.exists("libtcod/src"):
     print("Libtcod submodule is uninitialized.")
     print("Did you forget to run 'git submodule update --init'?")
@@ -133,8 +117,8 @@ setup(
     name="tcod",
     version=get_version(),
     author="Kyle Stewart",
-    author_email="4B796C65+tdl@gmail.com",
-    description="Pythonic cffi port of libtcod.",
+    author_email="4b796c65+tcod@gmail.com",
+    description="The official Python port of libtcod.",
     long_description=get_long_description(),
     url="https://github.com/libtcod/python-tcod",
     project_urls={
@@ -178,7 +162,7 @@ setup(
         "Topic :: Multimedia :: Graphics",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    keywords="roguelike cffi Unicode libtcod fov heightmap namegen",
+    keywords="roguelike cffi Unicode libtcod field-of-view pathfinding",
     platforms=["Windows", "MacOS", "Linux"],
     license="Simplified BSD License",
 )
