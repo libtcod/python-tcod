@@ -142,6 +142,7 @@ setup(
         "Changelog": "https://github.com/libtcod/python-tcod/blob/develop/CHANGELOG.rst",
         "Source": "https://github.com/libtcod/python-tcod",
         "Tracker": "https://github.com/libtcod/python-tcod/issues",
+        "Forum": "https://github.com/libtcod/python-tcod/discussions",
     },
     py_modules=["libtcodpy"],
     packages=["tdl", "tcod"],
