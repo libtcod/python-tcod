@@ -33,6 +33,7 @@ from tcod._internal import (
     _bytes,
     _CDataWrapper,
     _check,
+    _check_p,
     _check_warn,
     _console,
     _fmt,
@@ -1853,8 +1854,12 @@ def console_from_file(filename: str) -> tcod.console.Console:
 
     Returns: A new :any`Console` instance.
     """
+    if not os.path.exists(filename):
+        raise RuntimeError(
+            "File not found:\n\t%s" % (os.path.realpath(filename),)
+        )
     return tcod.console.Console._from_cdata(
-        lib.TCOD_console_from_file(filename.encode("utf-8"))
+        _check_p(lib.TCOD_console_from_file(filename.encode("utf-8")))
     )
 
 
@@ -2068,8 +2073,14 @@ def console_save_apf(con: tcod.console.Console, filename: str) -> bool:
     )
 
 
+@deprecate("Use tcod.console_from_xp to load this file.")
 def console_load_xp(con: tcod.console.Console, filename: str) -> bool:
-    """Update a console from a REXPaint `.xp` file."""
+    """Update a console from a REXPaint `.xp` file.
+
+    .. deprecated:: 11.18
+        Functions modifying console objects in-place are deprecated.
+        Use :any:`tcod.console_from_xp` to load a Console from a file.
+    """
     return bool(
         lib.TCOD_console_load_xp(_console(con), filename.encode("utf-8"))
     )
@@ -2088,8 +2099,12 @@ def console_save_xp(
 
 def console_from_xp(filename: str) -> tcod.console.Console:
     """Return a single console from a REXPaint `.xp` file."""
+    if not os.path.exists(filename):
+        raise RuntimeError(
+            "File not found:\n\t%s" % (os.path.realpath(filename),)
+        )
     return tcod.console.Console._from_cdata(
-        lib.TCOD_console_from_xp(filename.encode("utf-8"))
+        _check_p(lib.TCOD_console_from_xp(filename.encode("utf-8")))
     )
 
 
@@ -2097,6 +2112,10 @@ def console_list_load_xp(
     filename: str,
 ) -> Optional[List[tcod.console.Console]]:
     """Return a list of consoles from a REXPaint `.xp` file."""
+    if not os.path.exists(filename):
+        raise RuntimeError(
+            "File not found:\n\t%s" % (os.path.realpath(filename),)
+        )
     tcod_list = lib.TCOD_console_list_from_xp(filename.encode("utf-8"))
     if tcod_list == ffi.NULL:
         return None

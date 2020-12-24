@@ -8,6 +8,12 @@ v2.0.0
 
 Unreleased
 ------------------
+Deprecated
+ - `tcod.console_load_xp` has been deprecated, `tcod.console_from_xp` can load
+   these files without modifying an existing console.
+
+Fixed
+ - `tcod.console_from_xp` now has better error handling (instead of crashing.)
 
 11.18.2 - 2020-12-03
 --------------------

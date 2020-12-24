@@ -63,10 +63,17 @@ def _raise_tcod_error() -> NoReturn:
 
 
 def _check(error: int) -> int:
-    """Detect and convert a libtcod error code it into an exception."""
+    """Detect and convert a libtcod error code into an exception."""
     if error < 0:
         _raise_tcod_error()
     return error
+
+
+def _check_p(pointer: Any) -> Any:
+    """Treats NULL pointers as errors and raises a libtcod exception."""
+    if not pointer:
+        _raise_tcod_error()
+    return pointer
 
 
 def _check_warn(error: int, stacklevel: int = 2) -> int:
