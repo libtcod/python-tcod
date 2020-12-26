@@ -15,7 +15,7 @@ __all__ = ("Window",)
 class _TempSurface:
     """Holds a temporary surface derived from a NumPy array."""
 
-    def __init__(self, pixels: np.array) -> None:
+    def __init__(self, pixels: np.ndarray) -> None:
         self._array = np.ascontiguousarray(pixels, dtype=np.uint8)
         if len(self._array) != 3:
             raise TypeError(
@@ -33,7 +33,7 @@ class _TempSurface:
                 self._array.shape[1],  # Width.
                 self._array.shape[0],  # Height.
                 self._array.shape[2] * 8,  # Bit depth.
-                self._array.stride[1],  # Pitch.
+                self._array.strides[1],  # Pitch.
                 0x000000FF,
                 0x0000FF00,
                 0x00FF0000,
@@ -59,7 +59,7 @@ class Window:
     def __eq__(self, other: Any) -> bool:
         return bool(self.p == other.p)
 
-    def set_icon(self, image: np.array) -> None:
+    def set_icon(self, image: np.ndarray) -> None:
         """Set the window icon from an image.
 
         `image` is a C memory order RGB or RGBA NumPy array.

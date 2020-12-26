@@ -302,7 +302,7 @@ _INT_TYPES = {
 
 def maxarray(
     shape: Tuple[int, ...], dtype: Any = np.int32, order: str = "C"
-) -> np.array:
+) -> np.ndarray:
     """Return a new array filled with the maximum finite value for `dtype`.
 
     `shape` is of the new array.  Same as other NumPy array initializers.
@@ -321,7 +321,7 @@ def maxarray(
     return np.full(shape, np.iinfo(dtype).max, dtype, order)
 
 
-def _export_dict(array: np.array) -> Dict[str, Any]:
+def _export_dict(array: np.ndarray) -> Dict[str, Any]:
     """Convert a NumPy array into a format compatible with CFFI."""
     if array.dtype.type not in _INT_TYPES:
         raise TypeError(
@@ -337,7 +337,7 @@ def _export_dict(array: np.array) -> Dict[str, Any]:
     }
 
 
-def _export(array: np.array) -> Any:
+def _export(array: np.ndarray) -> Any:
     """Convert a NumPy array into a ctype object."""
     return ffi.new("struct NArray*", _export_dict(array))
 
@@ -365,8 +365,8 @@ def _compile_cost_edges(edge_map: Any) -> Tuple[Any, int]:
 
 
 def dijkstra2d(
-    distance: np.array,
-    cost: np.array,
+    distance: np.ndarray,
+    cost: np.ndarray,
     cardinal: Optional[int] = None,
     diagonal: Optional[int] = None,
     *,
@@ -516,13 +516,13 @@ def _compile_bool_edges(edge_map: Any) -> Tuple[Any, int]:
 
 
 def hillclimb2d(
-    distance: np.array,
+    distance: np.ndarray,
     start: Tuple[int, int],
     cardinal: Optional[bool] = None,
     diagonal: Optional[bool] = None,
     *,
     edge_map: Any = None
-) -> np.array:
+) -> np.ndarray:
     """Return a path on a grid from `start` to the lowest point.
 
     `distance` should be a fully computed distance array.  This kind of array
