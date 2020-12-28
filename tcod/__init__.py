@@ -15,6 +15,9 @@
     Bring any issues or requests to GitHub:
     https://github.com/HexDecimal/libtcod-cffi
 """
+import sys
+import warnings
+
 from tcod import (
     bsp,
     color,
@@ -38,6 +41,13 @@ try:
     from tcod.version import __version__
 except ImportError:  # Gets imported without version.py by ReadTheDocs
     __version__ = ""
+
+if sys.version_info < (3, 6):
+    warnings.warn(
+        "Support for Python 3.5 is being dropped from python-tcod.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
 __all__ = [  # noqa: F405
     "__version__",

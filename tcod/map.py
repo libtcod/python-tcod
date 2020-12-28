@@ -3,9 +3,10 @@
 
 """
 import warnings
-from typing import Any, Tuple
+from typing import Any, Tuple, Union
 
 import numpy as np
+from typing_extensions import Literal
 
 import tcod._internal
 import tcod.constants
@@ -68,7 +69,12 @@ class Map(object):
         See :any:`tcod.map.compute_fov` and :any:`tcod.path`.
     """
 
-    def __init__(self, width: int, height: int, order: str = "C"):
+    def __init__(
+        self,
+        width: int,
+        height: int,
+        order: Union[Literal["C"], Literal["F"]] = "C",
+    ):
         warnings.warn(
             "This class may perform poorly and is no longer needed.",
             DeprecationWarning,
@@ -94,17 +100,17 @@ class Map(object):
 
     @property
     def transparent(self) -> np.ndarray:
-        buffer = self.__buffer[:, :, 0]
+        buffer = self.__buffer[:, :, 0]  # type: np.ndarray
         return buffer.T if self._order == "F" else buffer
 
     @property
     def walkable(self) -> np.ndarray:
-        buffer = self.__buffer[:, :, 1]
+        buffer = self.__buffer[:, :, 1]  # type: np.ndarray
         return buffer.T if self._order == "F" else buffer
 
     @property
     def fov(self) -> np.ndarray:
-        buffer = self.__buffer[:, :, 2]
+        buffer = self.__buffer[:, :, 2]  # type: np.ndarray
         return buffer.T if self._order == "F" else buffer
 
     def compute_fov(

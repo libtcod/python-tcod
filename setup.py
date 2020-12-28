@@ -135,6 +135,7 @@ setup(
     install_requires=[
         "cffi~=1.13",  # Also required by pyproject.toml.
         "numpy~=1.10" if not is_pypy else "",
+        "typing_extensions",
     ],
     cffi_modules=["build_libtcod.py:ffi"],
     setup_requires=pytest_runner,

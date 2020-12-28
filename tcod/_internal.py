@@ -2,9 +2,10 @@
 """
 import functools
 import warnings
-from typing import Any, AnyStr, Callable, NoReturn, TypeVar, cast
+from typing import Any, AnyStr, Callable, TypeVar, Union, cast
 
 import numpy as np
+from typing_extensions import Literal, NoReturn
 
 from tcod.loader import ffi, lib
 
@@ -42,19 +43,13 @@ def pending_deprecate(
     return deprecate(message, category, stacklevel)
 
 
-def verify_order(order: str) -> str:
-    order = order.upper()
+def verify_order(
+    order: Union[Literal["C"], Literal["F"]]
+) -> Union[Literal["C"], Literal["F"]]:
+    order = order.upper()  # type: ignore
     if order not in ("C", "F"):
         raise TypeError("order must be 'C' or 'F', not %r" % (order,))
     return order
-
-
-def handle_order(shape: Any, order: str) -> Any:
-    order = verify_order(order)
-    if order == "C":
-        return shape
-    else:
-        return tuple(reversed(shape))
 
 
 def _raise_tcod_error() -> NoReturn:

@@ -20,6 +20,7 @@ import itertools
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
+from typing_extensions import Literal
 
 import tcod.map  # noqa: F401
 from tcod._internal import _check
@@ -301,7 +302,9 @@ _INT_TYPES = {
 
 
 def maxarray(
-    shape: Tuple[int, ...], dtype: Any = np.int32, order: str = "C"
+    shape: Tuple[int, ...],
+    dtype: Any = np.int32,
+    order: Union[Literal["C"], Literal["F"]] = "C",
 ) -> np.ndarray:
     """Return a new array filled with the maximum finite value for `dtype`.
 

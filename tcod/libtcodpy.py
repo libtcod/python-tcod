@@ -20,6 +20,7 @@ from typing import (
 )
 
 import numpy as np
+from typing_extensions import Literal
 
 import tcod.bsp
 import tcod.console
@@ -879,7 +880,7 @@ def console_init_root(
     title: Optional[str] = None,
     fullscreen: bool = False,
     renderer: Optional[int] = None,
-    order: str = "C",
+    order: Union[Literal["C"], Literal["F"]] = "C",
     vsync: Optional[bool] = None,
 ) -> tcod.console.Console:
     """Set up the primary display and return the root console.

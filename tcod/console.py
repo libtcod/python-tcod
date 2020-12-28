@@ -5,9 +5,10 @@ See :ref:`getting-started` for info on how to set those up.
 """
 
 import warnings
-from typing import Any, Optional, Tuple  # noqa: F401
+from typing import Any, Optional, Tuple, Union  # noqa: F401
 
 import numpy as np
+from typing_extensions import Literal
 
 import tcod._internal
 import tcod.constants
@@ -92,7 +93,7 @@ class Console:
         self,
         width: int,
         height: int,
-        order: str = "C",
+        order: Union[Literal["C"], Literal["F"]] = "C",
         buffer: Optional[np.ndarray] = None,
     ):
         self._key_color = None  # type: Optional[Tuple[int, int, int]]
@@ -131,7 +132,9 @@ class Console:
             self.clear()
 
     @classmethod
-    def _from_cdata(cls, cdata: Any, order: str = "C") -> "Console":
+    def _from_cdata(
+        cls, cdata: Any, order: Union[Literal["C"], Literal["F"]] = "C"
+    ) -> "Console":
         """Return a Console instance which wraps this `TCOD_Console*` object."""
         if isinstance(cdata, cls):
             return cdata
@@ -141,7 +144,9 @@ class Console:
         return self
 
     @classmethod
-    def _get_root(cls, order: Optional[str] = None) -> "Console":
+    def _get_root(
+        cls, order: Optional[Union[Literal["C"], Literal["F"]]] = None
+    ) -> "Console":
         """Return a root console singleton with valid buffers.
 
         This function will also update an already active root console.
@@ -156,7 +161,9 @@ class Console:
         self._init_setup_console_data(self._order)
         return self
 
-    def _init_setup_console_data(self, order: str = "C") -> None:
+    def _init_setup_console_data(
+        self, order: Union[Literal["C"], Literal["F"]] = "C"
+    ) -> None:
         """Setup numpy arrays over libtcod data buffers."""
         global _root_console
         self._key_color = None
@@ -195,7 +202,7 @@ class Console:
         ``console.bg[x, y, channel]  # order='F'``.
 
         """
-        bg = self._tiles["bg"][..., :3]
+        bg = self._tiles["bg"][..., :3]  # type: np.ndarray
         if self._order == "F":
             bg = bg.transpose(1, 0, 2)
         return bg
@@ -209,7 +216,7 @@ class Console:
         Index this array with ``console.fg[i, j, channel]  # order='C'`` or
         ``console.fg[x, y, channel]  # order='F'``.
         """
-        fg = self._tiles["fg"][..., :3]
+        fg = self._tiles["fg"][..., :3]  # type: np.ndarray
         if self._order == "F":
             fg = fg.transpose(1, 0, 2)
         return fg
