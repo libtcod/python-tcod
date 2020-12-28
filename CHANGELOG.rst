@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - Now bundles SDL 2.0.14 for Windows/MacOS.
+
 Deprecated
  - `tcod.console_load_xp` has been deprecated, `tcod.console_from_xp` can load
    these files without modifying an existing console.
@@ -15,6 +18,7 @@ Deprecated
 
 Fixed
  - `tcod.console_from_xp` now has better error handling (instead of crashing.)
+ - Can now compile with SDL 2.0.14 headers.
 
 11.18.2 - 2020-12-03
 --------------------

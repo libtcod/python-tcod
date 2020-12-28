@@ -61,6 +61,7 @@ DEFINE_BLACKLIST = [
     "SDL_BlitScaled",
     "SDL_BlitSurface",
     "SDL_Colour",
+    "SDL_IPHONE_MAX_GFORCE",
 ]
 
 
