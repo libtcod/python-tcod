@@ -12,9 +12,9 @@ Changed
  - Now bundles SDL 2.0.14 for Windows/MacOS.
 
 Deprecated
+ - Support for Python 3.5 will be dropped.
  - `tcod.console_load_xp` has been deprecated, `tcod.console_from_xp` can load
    these files without modifying an existing console.
- - Support for Python 3.5 will be dropped soon.
 
 Fixed
  - `tcod.console_from_xp` now has better error handling (instead of crashing.)

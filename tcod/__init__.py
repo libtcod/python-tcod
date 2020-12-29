@@ -44,7 +44,7 @@ except ImportError:  # Gets imported without version.py by ReadTheDocs
 
 if sys.version_info < (3, 6):
     warnings.warn(
-        "Support for Python 3.5 is being dropped from python-tcod.",
+        "Support for Python 3.5 has been dropped from python-tcod.",
         DeprecationWarning,
         stacklevel=2,
     )
