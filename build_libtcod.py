@@ -320,6 +320,7 @@ GCC_CFLAGS = {
         "-g",
         "-fPIC",
         "-Wno-deprecated-declarations",
+        "-Wno-discarded-qualifiers",  # Ignore discarded restrict qualifiers.
     ],
 }
 
