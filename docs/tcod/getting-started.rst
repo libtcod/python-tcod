@@ -35,7 +35,7 @@ Example::
             "dejavu10x10_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD,
         )
         # Create the main console.
-        console = tcod.Console(WIDTH, HEIGHT)
+        console = tcod.Console(WIDTH, HEIGHT, order="F")
         # Create a window based on this console and tileset.
         with tcod.context.new(  # New window for a console of size columns×rows.
             columns=console.width, rows=console.height, tileset=tileset,
@@ -97,7 +97,7 @@ Example::
             width=WIDTH, height=HEIGHT, sdl_window_flags=FLAGS
         ) as context:
             while True:
-                console = context.new_console()
+                console = context.new_console(order="F")
                 console.print(0, 0, "Hello World")
                 context.present(console, integer_scaling=True)
 

@@ -49,7 +49,9 @@ to setup the size of the console.  You should use
 """  # noqa: E501
 import os
 import sys
-from typing import Any, Iterable, List, Optional, Tuple
+from typing import Any, Iterable, List, Optional, Tuple, Union
+
+from typing_extensions import Literal
 
 import tcod
 import tcod.event
@@ -267,6 +269,7 @@ class Context:
         min_columns: int = 1,
         min_rows: int = 1,
         magnification: float = 1.0,
+        order: Union[Literal["C"], Literal["F"]] = "C",
     ) -> tcod.console.Console:
         """Return a new console sized for this context.
 
@@ -278,6 +281,9 @@ class Context:
         consoles, which will show as larger tiles when presented.
         `magnification` must be greater than zero.
 
+        `order` is passed to :any:`tcod.console.Console` to determine the
+        memory order of its NumPy attributes.
+
         The times where it is the most useful to call this method are:
 
         * After the context is created, even if the console was given a
@@ -286,6 +292,12 @@ class Context:
         * After any window resized event, or any manual resizing of the window.
 
         .. versionadded:: 11.18
+
+        .. versionchanged:: 11.19
+            Added `order` parameter.
+
+        .. seealso::
+            :any:`tcod.console.Console`
         """
         if magnification < 0:
             raise ValueError(
@@ -299,7 +311,7 @@ class Context:
             )
         )
         width, height = max(min_columns, size[0]), max(min_rows, size[1])
-        return tcod.console.Console(width, height)
+        return tcod.console.Console(width, height, order=order)
 
     def recommended_console_size(
         self, min_columns: int = 1, min_rows: int = 1
