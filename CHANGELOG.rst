@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.19.2 - 2020-12-30
+--------------------
 Changed
  - Now bundles SDL 2.0.10 for MacOS and SDL 2.0.14 for Windows.
 
