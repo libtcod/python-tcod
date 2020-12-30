@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.19.0 - 2020-12-29
+--------------------
 Added
  - Added the important `order` parameter to `Context.new_console`.
 
