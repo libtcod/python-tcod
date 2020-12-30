@@ -4,7 +4,7 @@ on:
   push:
   pull_request:
   release:
-    types: [created, published, released]
+    types: [created]
 
 jobs:
   build:
