@@ -9,6 +9,11 @@ v2.0.0
 Unreleased
 ------------------
 
+11.19.1 - 2020-12-29
+--------------------
+Fixed
+ - MacOS wheels failed to deploy for the previous version.
+
 11.19.0 - 2020-12-29
 --------------------
 Added
