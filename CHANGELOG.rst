@@ -8,6 +8,11 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - Now bundles SDL 2.0.10 for MacOS and SDL 2.0.14 for Windows.
+
+Fixed
+ - MacOS wheels were failing to bundle dependencies for SDL2.
 
 11.19.1 - 2020-12-29
 --------------------
