@@ -116,7 +116,7 @@ pytest_runner = ["pytest-runner"] if needs_pytest else []
 setup(
     name="tcod",
     version=get_version(),
-    author="Kyle Stewart",
+    author="Kyle Benesch",
     author_email="4b796c65+tcod@gmail.com",
     description="The official Python port of libtcod.",
     long_description=get_long_description(),

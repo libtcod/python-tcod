@@ -56,8 +56,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'python-tcod'
-copyright = u'2009-2020, Kyle Stewart'
-author = u'Kyle Stewart'
+copyright = u'2009-2021, Kyle Benesch'
+author = u'Kyle Benesch'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
