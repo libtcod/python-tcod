@@ -2,3 +2,4 @@ cffi~=1.13
 numpy~=1.10,!=1.16.3;
 pycparser>=2.14
 setuptools>=36.0.1
+typing_extensions
