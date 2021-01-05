@@ -28,6 +28,7 @@ Contents:
     :caption: python-tcod API
 
     tcod/getting-started
+    tcod/charmap-reference
     tcod/bsp
     tcod/console
     tcod/context

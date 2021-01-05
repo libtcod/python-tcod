@@ -153,9 +153,10 @@ class Tileset:
 
         `codepoint` is the Unicode codepoint to assign.
 
-        `x` and `y` is the position on the tilesheet to assign to `codepoint`.
-        Large values of `x` will wrap to the next row, so `y` isn't necessary
-        if you think of the tilesheet as a 1D array.
+        `x` and `y` is the position of the tilesheet to assign to `codepoint`.
+        This is the tile position itself, not the pixel position of the tile.
+        Large values of `x` will wrap to the next row, so using `x` by itself
+        is equivalent to `Tile Index` in the :any:`charmap-reference`.
 
         This is normally used on loaded tilesheets.  Other methods of Tileset
         creation won't have reliable tile indexes.
@@ -567,9 +568,9 @@ CHARMAP_CP437 = [
     0x25A0,
     0x00A0,
 ]
-"""This is one of the more common character mappings.
+"""A code page 437 character mapping.
 
-https://en.wikipedia.org/wiki/Code_page_437
+See :ref:`code-page-437` for more info and a table of glyphs.
 
 .. versionadded:: 11.12
 """
@@ -739,10 +740,13 @@ CHARMAP_TCOD = [
 """The layout used by older libtcod fonts, in Unicode.
 
 This layout is non-standard, and it's not recommend to make a font for it, but
-you might need it to load an existing font.
+you might need it to load an existing font made for libtcod.
 
 This character map is in Unicode, so old code using the non-Unicode
 `tcod.CHAR_*` constants will need to be updated.
+
+See :ref:`deprecated-tcod-layout` for a table of glyphs used in this character
+map.
 
 .. versionadded:: 11.12
 """
