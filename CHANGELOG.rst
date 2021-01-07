@@ -8,8 +8,11 @@ v2.0.0
 
 Unreleased
 ------------------
+
+11.19.3 - 2021-01-07
+--------------------
 Fixed
- - MacOS wheels had broken version metadata.
+ - Some wheels had broken version metadata.
 
 11.19.2 - 2020-12-30
 --------------------
