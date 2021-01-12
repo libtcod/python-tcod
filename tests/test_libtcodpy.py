@@ -7,13 +7,18 @@ import pytest
 import tcod
 import tcod as libtcodpy
 
+pytestmark = [
+    pytest.mark.filterwarnings("ignore::DeprecationWarning"),
+    pytest.mark.filterwarnings("ignore::PendingDeprecationWarning"),
+]
+
 
 def test_console_behaviour(console):
     assert not console
 
 
 @pytest.mark.skip('takes too long')
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_credits_long(console):
     libtcodpy.console_credits()
 
@@ -36,7 +41,7 @@ def assert_char(console, x, y, ch=None, fg=None, bg=None):
         assert (console.bg[y, x] == bg).all()
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_defaults(console, fg, bg):
     libtcodpy.console_set_default_foreground(console, fg)
     libtcodpy.console_set_default_background(console, bg)
@@ -44,37 +49,37 @@ def test_console_defaults(console, fg, bg):
     assert_char(console, 0, 0, None, fg, bg)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_set_char_background(console, bg):
     libtcodpy.console_set_char_background(console, 0, 0, bg, libtcodpy.BKGND_SET)
     assert_char(console, 0, 0, bg=bg)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_set_char_foreground(console, fg):
     libtcodpy.console_set_char_foreground(console, 0, 0, fg)
     assert_char(console, 0, 0, fg=fg)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_set_char(console, ch):
     libtcodpy.console_set_char(console, 0, 0, ch)
     assert_char(console, 0, 0, ch=ch)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_put_char(console, ch):
     libtcodpy.console_put_char(console, 0, 0, ch, libtcodpy.BKGND_SET)
     assert_char(console, 0, 0, ch=ch)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def console_put_char_ex(console, ch, fg, bg):
     libtcodpy.console_put_char_ex(console, 0, 0, ch, fg, bg)
     assert_char(console, 0, 0, ch=ch, fg=fg, bg=bg)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_printing(console, fg, bg):
     libtcodpy.console_set_background_flag(console,
                                           libtcodpy.BKGND_SET)
@@ -103,23 +108,23 @@ def test_console_printing(console, fg, bg):
     libtcodpy.console_set_color_control(libtcodpy.COLCTRL_1, fg, bg)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_rect(console):
     libtcodpy.console_rect(console, 0, 0, 4, 4, False, libtcodpy.BKGND_SET)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_lines(console):
     libtcodpy.console_hline(console, 0, 0, 4)
     libtcodpy.console_vline(console, 0, 0, 4)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_print_frame(console):
     libtcodpy.console_print_frame(console, 0, 0, 9, 9)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_fade(console):
     libtcodpy.console_set_fade(0, libtcodpy.Color(0, 0, 0))
     libtcodpy.console_get_fade()
@@ -132,7 +137,7 @@ def assertConsolesEqual(a, b):
             (a.ch[:] == b.ch[:]).all())
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_blit(console, offscreen):
     libtcodpy.console_print(offscreen, 0, 0, 'test')
     libtcodpy.console_blit(offscreen, 0, 0, 0, 0, console, 0, 0, 1, 1)
@@ -140,7 +145,7 @@ def test_console_blit(console, offscreen):
     libtcodpy.console_set_key_color(offscreen, libtcodpy.black)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_asc_read_write(console, offscreen, tmpdir):
     libtcodpy.console_print(console, 0, 0, 'test')
 
@@ -150,7 +155,7 @@ def test_console_asc_read_write(console, offscreen, tmpdir):
     assertConsolesEqual(console, offscreen)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_apf_read_write(console, offscreen, tmpdir):
     libtcodpy.console_print(console, 0, 0, 'test')
 
@@ -160,7 +165,7 @@ def test_console_apf_read_write(console, offscreen, tmpdir):
     assertConsolesEqual(console, offscreen)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_rexpaint_load_test_file(console):
     xp_console = libtcodpy.console_from_xp('libtcod/data/rexpaint/test.xp')
     assert xp_console
@@ -174,7 +179,7 @@ def test_console_rexpaint_load_test_file(console):
             libtcodpy.Color(0, 0, 255))
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_rexpaint_save_load(console, tmpdir, ch, fg, bg):
     libtcodpy.console_print(console, 0, 0, 'test')
     libtcodpy.console_put_char_ex(console, 1, 1, ch, fg, bg)
@@ -187,7 +192,7 @@ def test_console_rexpaint_save_load(console, tmpdir, ch, fg, bg):
     assertConsolesEqual(console, xp_console)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_rexpaint_list_save_load(console, tmpdir):
     con1 = libtcodpy.console_new(8, 2)
     con2 = libtcodpy.console_new(8, 2)
@@ -201,25 +206,25 @@ def test_console_rexpaint_list_save_load(console, tmpdir):
         libtcodpy.console_delete(b)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_fullscreen(console):
     libtcodpy.console_set_fullscreen(False)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_key_input(console):
     libtcodpy.console_check_for_keypress()
     libtcodpy.console_is_key_pressed(libtcodpy.KEY_ENTER)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_fill_errors(console):
     with pytest.raises(TypeError):
         libtcodpy.console_fill_background(console, [0], [], [])
     with pytest.raises(TypeError):
         libtcodpy.console_fill_foreground(console, [0], [], [])
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_fill(console):
     width = libtcodpy.console_get_width(console)
     height = libtcodpy.console_get_height(console)
@@ -240,7 +245,7 @@ def test_console_fill(console):
     assert fill == ch
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_fill_numpy(console):
     width = libtcodpy.console_get_width(console)
     height = libtcodpy.console_get_height(console)
@@ -266,7 +271,7 @@ def test_console_fill_numpy(console):
     assert fill == fg.tolist()
     assert fill == ch.tolist()
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_buffer(console):
     buffer = libtcodpy.ConsoleBuffer(
         libtcodpy.console_get_width(console),
@@ -284,13 +289,13 @@ def test_console_buffer_error(console):
     with pytest.raises(ValueError):
         buffer.blit(console)
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_font_mapping(console):
     libtcodpy.console_map_ascii_code_to_font('@', 1, 1)
     libtcodpy.console_map_ascii_codes_to_font('@', 1, 0, 0)
     libtcodpy.console_map_string_to_font('@', 0, 0)
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_mouse(console):
     libtcodpy.mouse_show_cursor(True)
     libtcodpy.mouse_is_cursor_visible()
@@ -298,7 +303,7 @@ def test_mouse(console):
     repr(mouse)
     libtcodpy.mouse_move(0, 0)
 
-@pytest.mark.filterwarnings("ignore:Use Python's standard 'time' module")
+@pytest.mark.filterwarnings("ignore")
 def test_sys_time(console):
     libtcodpy.sys_set_fps(0)
     libtcodpy.sys_get_fps()
@@ -307,11 +312,11 @@ def test_sys_time(console):
     libtcodpy.sys_elapsed_milli()
     libtcodpy.sys_elapsed_seconds()
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_sys_screenshot(console, tmpdir):
     libtcodpy.sys_save_screenshot(tmpdir.join('test.png').strpath)
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_sys_custom_render(console):
     if libtcodpy.sys_get_renderer() != libtcodpy.RENDERER_SDL:
         pytest.xfail(reason='Only supports SDL')
@@ -324,7 +329,7 @@ def test_sys_custom_render(console):
     libtcodpy.console_flush()
     assert escape, 'proof that sdl_callback was called'
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_image(console, tmpdir):
     img = libtcodpy.image_new(16, 16)
     libtcodpy.image_clear(img, libtcodpy.Color(0, 0, 0))
@@ -356,7 +361,7 @@ def test_image(console, tmpdir):
 
 @pytest.mark.parametrize('sample', ['@', u'\u2603']) # Unicode snowman
 @pytest.mark.xfail(reason='Unreliable')
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_clipboard(console, sample):
     saved = libtcodpy.sys_clipboard_get()
     try:
@@ -373,7 +378,7 @@ EXCLUSIVE_RESULTS = [(-4, 1), (-3, 2), (-2, 3), (-1, 4), (0, 5), (1, 6),
 INCLUSIVE_RESULTS = [(-5, 0)] + EXCLUSIVE_RESULTS
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_line_step():
     """
     libtcodpy.line_init and libtcodpy.line_step
@@ -384,7 +389,7 @@ def test_line_step():
     assert libtcodpy.line_step() == (None, None)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_line():
     """
     tests normal use, lazy evaluation, and error propagation
@@ -406,6 +411,7 @@ def test_line():
     assert test_result == INCLUSIVE_RESULTS[:1]
 
 
+@pytest.mark.filterwarnings("ignore")
 def test_line_iter():
     """
     libtcodpy.line_iter
@@ -413,7 +419,7 @@ def test_line_iter():
     assert list(libtcodpy.line_iter(*LINE_ARGS)) == INCLUSIVE_RESULTS
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_bsp():
     """
     commented out statements work in libtcod-cffi
@@ -476,7 +482,7 @@ def test_bsp():
     libtcodpy.bsp_delete(bsp)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_map():
     map = libtcodpy.map_new(16, 16)
     assert libtcodpy.map_get_width(map) == 16
@@ -490,7 +496,7 @@ def test_map():
     libtcodpy.map_delete(map)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_color():
     color_a = libtcodpy.Color(0, 1, 2)
     assert list(color_a) == [0, 1, 2]
@@ -519,7 +525,7 @@ def test_color_repr():
     assert eval(repr(col)) == col
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_color_math():
     color_a = libtcodpy.Color(0, 1, 2)
     color_b = libtcodpy.Color(0, 10, 20)
@@ -530,14 +536,14 @@ def test_color_math():
     assert color_a * 100 == libtcodpy.Color(0, 100, 200)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_color_gen_map():
     colors = libtcodpy.color_gen_map([(0, 0, 0), (255, 255, 255)], [0, 8])
     assert colors[0] == libtcodpy.Color(0, 0, 0)
     assert colors[-1] == libtcodpy.Color(255, 255, 255)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_namegen_parse():
     libtcodpy.namegen_parse('libtcod/data/namegen/jice_celtic.cfg')
     assert libtcodpy.namegen_generate('Celtic female')
@@ -545,7 +551,7 @@ def test_namegen_parse():
     libtcodpy.namegen_destroy()
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_noise():
     noise = libtcodpy.noise_new(1)
     libtcodpy.noise_set_type(noise, libtcodpy.NOISE_SIMPLEX)
@@ -555,7 +561,7 @@ def test_noise():
     libtcodpy.noise_delete(noise)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_random():
     rand = libtcodpy.random_get_instance()
     rand = libtcodpy.random_new()
@@ -576,7 +582,7 @@ def test_random():
     libtcodpy.random_delete(backup)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_heightmap():
     hmap = libtcodpy.heightmap_new(16, 16)
     repr(hmap)
@@ -658,12 +664,12 @@ def path_callback(map_):
     return callback
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_map_fov(map_):
     libtcodpy.map_compute_fov(map_, *POINT_A)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_astar(map_):
     astar = libtcodpy.path_new_using_map(map_)
 
@@ -689,7 +695,7 @@ def test_astar(map_):
     libtcodpy.path_delete(astar)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_astar_callback(map_, path_callback):
     astar = libtcodpy.path_new_using_function(
         libtcodpy.map_get_width(map_),
@@ -700,7 +706,7 @@ def test_astar_callback(map_, path_callback):
     libtcodpy.path_delete(astar)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_dijkstra(map_):
     path = libtcodpy.dijkstra_new(map_)
 
@@ -724,7 +730,7 @@ def test_dijkstra(map_):
     libtcodpy.dijkstra_delete(path)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_dijkstra_callback(map_, path_callback):
     path = libtcodpy.dijkstra_new_using_function(
         libtcodpy.map_get_width(map_),
@@ -735,7 +741,7 @@ def test_dijkstra_callback(map_, path_callback):
     libtcodpy.dijkstra_delete(path)
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_alpha_blend(console):
     for i in range(256):
         libtcodpy.console_put_char(console, 0, 0, 'x',

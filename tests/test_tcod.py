@@ -54,6 +54,7 @@ def test_tcod_bsp():
 
 
 @pytest.mark.filterwarnings("ignore:Use map.+ to check for this")
+@pytest.mark.filterwarnings("ignore:This class may perform poorly")
 def test_tcod_map_set_bits():
     map_ = tcod.map.Map(2,2)
 
@@ -69,17 +70,20 @@ def test_tcod_map_set_bits():
     assert tcod.map_is_in_fov(map_, 0, 1) == True
 
 
+@pytest.mark.filterwarnings("ignore:This class may perform poorly")
 def test_tcod_map_get_bits():
     map_ = tcod.map.Map(2,2)
     map_.transparent[0]
 
 
+@pytest.mark.filterwarnings("ignore:This class may perform poorly")
 def test_tcod_map_copy():
     map_ = tcod.map.Map(3, 3)
     map_.transparent[:] = True
     assert (map_.transparent.tolist() == copy.copy(map_).transparent.tolist())
 
 
+@pytest.mark.filterwarnings("ignore:This class may perform poorly")
 def test_tcod_map_pickle():
     map_ = tcod.map.Map(3, 3)
     map_.transparent[:] = True
@@ -87,6 +91,7 @@ def test_tcod_map_pickle():
     assert (map_.transparent[:].tolist() == map2.transparent[:].tolist())
 
 
+@pytest.mark.filterwarnings("ignore:This class may perform poorly")
 def test_tcod_map_pickle_fortran():
     map_ = tcod.map.Map(2, 3, order='F')
     map2 = pickle.loads(pickle.dumps(copy.copy(map_)))
@@ -152,7 +157,7 @@ def test_noise_copy():
             noise2.sample_ogrid(np.ogrid[:3,:1])).all()
 
 
-@pytest.mark.filterwarnings("ignore:.*")
+@pytest.mark.filterwarnings("ignore")
 def test_color_class():
     assert tcod.black == tcod.black
     assert tcod.black == (0, 0, 0)
@@ -233,16 +238,18 @@ def test_cffi_structs():
     tcod.ffi.new("SDL_AudioCVT*")
 
 
+@pytest.mark.filterwarnings("ignore")
 def test_recommended_size(console):
     tcod.console.recommended_size()
 
 
+@pytest.mark.filterwarnings("ignore")
 def test_context():
     with tcod.context.new_window(32, 32, renderer=tcod.RENDERER_SDL2):
         pass
     WIDTH, HEIGHT = 16, 4
     with tcod.context.new_terminal(
-        WIDTH, HEIGHT, renderer=tcod.RENDERER_SDL2
+        columns=WIDTH, rows=HEIGHT, renderer=tcod.RENDERER_SDL2
     ) as context:
         console = tcod.Console(*context.recommended_console_size())
         context.present(console)

@@ -901,7 +901,7 @@ class Console:
         return (
             "tcod.console.Console(width=%i, height=%i, "
             "order=%r,buffer=\n%r)"
-            % (self.width, self.height, self._order, self.buffer)
+            % (self.width, self.height, self._order, self.tiles)
         )
 
     def __str__(self) -> str:

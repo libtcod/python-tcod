@@ -39,7 +39,7 @@ def test_array_read_write():
     assert tuple(tcod.console_get_char_background(console, 2, 1)) == BG
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_defaults():
     console = tcod.console.Console(width=12, height=10)
 
@@ -58,6 +58,7 @@ def test_console_defaults():
 
 @pytest.mark.filterwarnings("ignore:Parameter names have been moved around,")
 @pytest.mark.filterwarnings("ignore:Pass the key color to Console.blit instea")
+@pytest.mark.filterwarnings("ignore:.*default values have been deprecated")
 def test_console_methods():
     console = tcod.console.Console(width=12, height=10)
     console.put_char(0, 0, ord('@'))
@@ -97,7 +98,7 @@ def test_console_repr():
     eval(repr(tcod.console.Console(10, 2)))
 
 
-@pytest.mark.filterwarnings("ignore:.")
+@pytest.mark.filterwarnings("ignore")
 def test_console_str():
     console = tcod.console.Console(10, 2)
     console.print_(0, 0, "Test")
