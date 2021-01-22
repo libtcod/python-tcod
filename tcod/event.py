@@ -601,7 +601,7 @@ class WindowMoved(WindowEvent):
     Attributes:
         type (str): Always "WINDOWMOVED".
         x (int): Movement on the x-axis.
-        x (int): Movement on the y-axis.
+        y (int): Movement on the y-axis.
     """
 
     def __init__(self, x: int, y: int) -> None:

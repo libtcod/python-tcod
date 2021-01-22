@@ -56,3 +56,9 @@ Glossary
         So if you come across a project using the original `libtcodpy` you can
         delete the `libtcodpy/` folder and then :term:`python-tcod` will load
         instead.
+
+    color control
+    color controls
+        Libtcod's old system which assigns colors to specific codepoints.
+        This is deprecated in favor of the codes which set the foreground and
+        background colors directly.

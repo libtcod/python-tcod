@@ -1008,7 +1008,7 @@ def console_set_custom_font(
     file respectfully.
 
     .. deprecated:: 11.13
-        Load fonts using :any:`tcod.tileset.load_tileheet` instead.
+        Load fonts using :any:`tcod.tileset.load_tilesheet` instead.
         See :ref:`getting-started` for more info.
     """
     if not os.path.exists(_unicode(fontFile)):
@@ -1692,7 +1692,7 @@ def console_print_frame(
 def console_set_color_control(
     con: int, fore: Tuple[int, int, int], back: Tuple[int, int, int]
 ) -> None:
-    """Configure :any:`color controls`.
+    """Configure :term:`color controls`.
 
     Args:
         con (int): :any:`Color control` constant to modify.
@@ -2426,7 +2426,7 @@ def heightmap_new(w: int, h: int, order: str = "C") -> np.ndarray:
     following are true::
     * The array is 2 dimensional.
     * The array has the C_CONTIGUOUS or F_CONTIGUOUS flag.
-    * The array's dtype is :any:`dtype.float32`.
+    * The array's dtype is `dtype.float32`.
 
     The returned NumPy array will fit all these conditions.
 
@@ -3576,10 +3576,10 @@ def noise_get(
 ) -> float:
     """Return the noise value sampled from the ``f`` coordinate.
 
-    ``f`` should be a tuple or list with a length matching
-    :any:`Noise.dimensions`.
-    If ``f`` is shoerter than :any:`Noise.dimensions` the missing coordinates
-    will be filled with zeros.
+    ``f`` should be a tuple or list with a length matching the `dimensions`
+    attribute of :any:`Noise`.
+    If ``f`` is shorter than `dimensions` the missing coordinates will be
+    filled with zeros.
 
     Args:
         n (Noise): A Noise instance.
@@ -4151,7 +4151,7 @@ def sys_elapsed_milli() -> int:
         int: Time since the progeam has started in milliseconds.
 
     .. deprecated:: 2.0
-       Use :any:`time.clock` instead.
+       Use Python's :mod:`time` module instead.
     """
     return int(lib.TCOD_sys_elapsed_milli())
 
@@ -4164,7 +4164,7 @@ def sys_elapsed_seconds() -> float:
         float: Time since the progeam has started in seconds.
 
     .. deprecated:: 2.0
-       Use :any:`time.clock` instead.
+       Use Python's :mod:`time` module instead.
     """
     return float(lib.TCOD_sys_elapsed_seconds())
 
@@ -4307,8 +4307,8 @@ def sys_register_SDL_renderer(callback: Callable[[Any], None]) -> None:
     Note:
         This callback will only be called by the SDL renderer.
 
-    The callack will receive a :any:`CData <ffi-cdata>` void* to an
-    SDL_Surface* struct.
+    The callback will receive a CData `void*` pointer to an
+    `SDL_Surface*` struct.
 
     The callback is called on every call to :any:`tcod.console_flush`.
 
