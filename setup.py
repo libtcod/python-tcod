@@ -134,8 +134,8 @@ setup(
         "Forum": "https://github.com/libtcod/python-tcod/discussions",
     },
     py_modules=["libtcodpy"],
-    packages=["tdl", "tcod"],
-    package_data={"tdl": ["*.png"], "tcod": get_package_data()},
+    packages=["tcod"],
+    package_data={"tcod": get_package_data()},
     python_requires=">=3.6",
     install_requires=[
         "cffi~=1.13",  # Also required by pyproject.toml.

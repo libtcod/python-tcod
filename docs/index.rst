@@ -42,12 +42,6 @@ Contents:
     tcod/tileset
     libtcodpy
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Legacy tdl API
-
-    tdl
-
 Indices and tables
 ==================
 
