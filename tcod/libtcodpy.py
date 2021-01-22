@@ -4404,7 +4404,7 @@ def sys_clipboard_get() -> str:
 @atexit.register
 def _atexit_verify() -> None:
     """Warns if the libtcod root console is implicitly deleted."""
-    if lib.TCOD_ctx.root:
+    if lib and lib.TCOD_ctx.root:
         warnings.warn(
             "The libtcod root console was implicitly deleted.\n"
             "Make sure the 'with' statement is used with the root console to"

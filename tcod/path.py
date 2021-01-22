@@ -62,6 +62,8 @@ def _get_pathcost_func(
     name: str,
 ) -> Callable[[int, int, int, int, Any], float]:
     """Return a properly cast PathCostArray callback."""
+    if not ffi:
+        return lambda x1, y1, x2, y2, _: 0
     return ffi.cast(  # type: ignore
         "TCOD_path_func_t", ffi.addressof(lib, name)
     )
@@ -162,7 +164,7 @@ class NodeCostArray(np.ndarray):
             "struct PathCostArray*",
             (ffi.cast("char*", self.ctypes.data), self.strides),
         )
-        return callback, userdata, self.shape
+        return callback, userdata, (self.shape[0], self.shape[1])
 
 
 class _PathFinder(object):

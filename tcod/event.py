@@ -89,16 +89,16 @@ def _pixel_to_tile(x: float, y: float) -> Tuple[float, float]:
 Point = NamedTuple("Point", [("x", int), ("y", int)])
 
 # manually define names for SDL macros
-BUTTON_LEFT = lib.SDL_BUTTON_LEFT
-BUTTON_MIDDLE = lib.SDL_BUTTON_MIDDLE
-BUTTON_RIGHT = lib.SDL_BUTTON_RIGHT
-BUTTON_X1 = lib.SDL_BUTTON_X1
-BUTTON_X2 = lib.SDL_BUTTON_X2
-BUTTON_LMASK = lib.SDL_BUTTON_LMASK
-BUTTON_MMASK = lib.SDL_BUTTON_MMASK
-BUTTON_RMASK = lib.SDL_BUTTON_RMASK
-BUTTON_X1MASK = lib.SDL_BUTTON_X1MASK
-BUTTON_X2MASK = lib.SDL_BUTTON_X2MASK
+BUTTON_LEFT = 1
+BUTTON_MIDDLE = 2
+BUTTON_RIGHT = 3
+BUTTON_X1 = 4
+BUTTON_X2 = 5
+BUTTON_LMASK = 0x1
+BUTTON_MMASK = 0x2
+BUTTON_RMASK = 0x4
+BUTTON_X1MASK = 0x8
+BUTTON_X2MASK = 0x10
 
 # reverse tables are used to get the tcod.event name from the value.
 _REVERSE_BUTTON_TABLE = {
