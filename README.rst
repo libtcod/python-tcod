@@ -52,6 +52,13 @@ For the most part it's just::
 * Windows, Linux, or MacOS X 10.9+.
 * On Linux, requires libsdl2 (2.0.5+).
 
+===========
+ Changelog
+===========
+
+You can find the most recent changelog
+`here <https://github.com/libtcod/python-tcod/blob/develop/CHANGELOG.rst>`_.
+
 =========
  License
 =========

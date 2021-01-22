@@ -77,11 +77,7 @@ def get_package_data():
 def get_long_description():
     """Return this projects description."""
     with open("README.rst", "r") as f:
-        readme = f.read()
-    with open("CHANGELOG.rst", "r") as f:
-        changelog = f.read()
-        changelog = changelog.replace("\nUnreleased\n------------------", "")
-    return "\n".join([readme, changelog])
+        return f.read()
 
 
 def check_sdl_version():
