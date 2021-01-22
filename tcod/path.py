@@ -117,7 +117,7 @@ class EdgeCostCallback(_EdgeCostFunc):
         super(EdgeCostCallback, self).__init__(callback, shape)
 
 
-class NodeCostArray(np.ndarray):  # type: ignore
+class NodeCostArray(np.ndarray):
     """Calculate cost from a numpy array of nodes.
 
     `array` is a NumPy array holding the path-cost of each node.
@@ -138,7 +138,7 @@ class NodeCostArray(np.ndarray):  # type: ignore
     def __new__(cls, array: np.ndarray) -> "NodeCostArray":
         """Validate a numpy array and setup a C callback."""
         self = np.asarray(array).view(cls)
-        return self  # type: ignore
+        return self
 
     def __repr__(self) -> str:
         return "%s(%r)" % (
@@ -373,7 +373,7 @@ def dijkstra2d(
     cardinal: Optional[int] = None,
     diagonal: Optional[int] = None,
     *,
-    edge_map: Any = None
+    edge_map: Any = None,
 ) -> None:
     """Return the computed distance of all nodes on a 2D Dijkstra grid.
 
@@ -524,7 +524,7 @@ def hillclimb2d(
     cardinal: Optional[bool] = None,
     diagonal: Optional[bool] = None,
     *,
-    edge_map: Any = None
+    edge_map: Any = None,
 ) -> np.ndarray:
     """Return a path on a grid from `start` to the lowest point.
 
@@ -697,7 +697,7 @@ class CustomGraph:
         edge_cost: int = 1,
         *,
         cost: np.ndarray,
-        condition: Optional[np.ndarray] = None
+        condition: Optional[np.ndarray] = None,
     ) -> None:
         """Add a single edge rule.
 
@@ -799,7 +799,7 @@ class CustomGraph:
         *,
         edge_map: Any,
         cost: np.ndarray,
-        condition: Optional[np.ndarray] = None
+        condition: Optional[np.ndarray] = None,
     ) -> None:
         """Add a rule with multiple edges.
 
@@ -1190,7 +1190,7 @@ class Pathfinder:
         """
         if self._order == "F":
             axes = range(self._travel.ndim)
-            return self._travel.transpose((*axes[-2::-1], axes[-1]))[..., ::-1]
+            return self._travel.transpose((*axes[-2::-1], axes[-1]))[..., ::-1]  # type: ignore
         return self._travel
 
     def clear(self) -> None:
@@ -1379,7 +1379,7 @@ class Pathfinder:
                 ffi.from_buffer("int*", path),
             )
         )
-        return path[:, ::-1] if self._order == "F" else path
+        return path[:, ::-1] if self._order == "F" else path  # type: ignore
 
     def path_to(self, index: Tuple[int, ...]) -> np.ndarray:
         """Return the shortest path from the nearest root to `index`.
@@ -1406,4 +1406,4 @@ class Pathfinder:
             >>> pf.path_to((0, 0))[1:].tolist()  # Exclude the starting point so that a blocked path is an empty list.
             []
         """  # noqa: E501
-        return self.path_from(index)[::-1]
+        return self.path_from(index)[::-1]  # type: ignore

@@ -48,7 +48,7 @@ jobs:
       env:
         TCOD_TAG: ${{ github.event.release.tag_name }}
       run: |
-        python setup.py sdist develop bdist_wheel --py-limited-api=cp35
+        python setup.py sdist develop bdist_wheel --py-limited-api=cp36
     - name: Test with pytest
       run: |
         pytest --no-window --cov-report=xml

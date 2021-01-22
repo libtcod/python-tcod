@@ -207,7 +207,7 @@ sources = []  # type: List[str]
 
 libraries = []
 library_dirs = []
-define_macros = [("Py_LIMITED_API", 0x03050000)]  # type: List[Tuple[str, Any]]
+define_macros = [("Py_LIMITED_API", 0x03060000)]  # type: List[Tuple[str, Any]]
 
 sources += walk_sources("tcod/", cpp=True)
 sources += walk_sources("libtcod/src/libtcod/", cpp=False)

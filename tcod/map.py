@@ -277,4 +277,4 @@ def compute_fov(
     lib.TCOD_map_compute_fov(
         map_cdata, pov[1], pov[0], radius, light_walls, algorithm
     )
-    return map_buffer["fov"]
+    return map_buffer["fov"]  # type: ignore

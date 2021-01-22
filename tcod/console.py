@@ -230,7 +230,7 @@ class Console:
         Index this array with ``console.ch[i, j]  # order='C'`` or
         ``console.ch[x, y]  # order='F'``.
         """
-        return self._tiles["ch"].T if self._order == "F" else self._tiles["ch"]
+        return self._tiles["ch"].T if self._order == "F" else self._tiles["ch"]  # type: ignore
 
     @property
     def tiles(self) -> np.ndarray:

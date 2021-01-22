@@ -10,15 +10,12 @@ environment:
   DEPLOY_ONLY: false
   EXTRA_SETUP_ARGS: ""
   matrix:
-  - PYTHON: C:\Python35-x64\python.exe
-    platform: x64
-    EXTRA_SETUP_ARGS: "--py-limited-api cp35"
-  - PYTHON: C:\Python35\python.exe
-    platform: Any CPU
-    EXTRA_SETUP_ARGS: "--py-limited-api cp35"
   - PYTHON: C:\Python36-x64\python.exe
     platform: x64
-    NO_DEPLOY: true
+    EXTRA_SETUP_ARGS: "--py-limited-api cp36"
+  - PYTHON: C:\Python36\python.exe
+    platform: Any CPU
+    EXTRA_SETUP_ARGS: "--py-limited-api cp36"
   - PYTHON: C:\Python37-x64\python.exe
     platform: x64
     NO_DEPLOY: true

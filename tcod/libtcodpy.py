@@ -492,7 +492,7 @@ class Mouse(_CDataWrapper):
         cy: int = 0,
         dcx: int = 0,
         dcy: int = 0,
-        **kargs: Any
+        **kargs: Any,
     ):
         if isinstance(x, ffi.CData):
             self.cdata = x
@@ -1221,7 +1221,7 @@ def console_flush(
         0,
         0,
     ),
-    align: Tuple[float, float] = (0.5, 0.5)
+    align: Tuple[float, float] = (0.5, 0.5),
 ) -> None:
     """Update the display to represent the root consoles current state.
 

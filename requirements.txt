@@ -1,5 +1,6 @@
 cffi~=1.13
-numpy~=1.10,!=1.16.3;
+numpy>=1.20.0rc1; python_version >= '3.7'
+numpy>=1.19.5; python_version <= '3.6'
 pycparser>=2.14
 setuptools>=36.0.1
 typing_extensions

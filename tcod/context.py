@@ -178,7 +178,7 @@ class Context:
         keep_aspect: bool = False,
         integer_scaling: bool = False,
         clear_color: Tuple[int, int, int] = (0, 0, 0),
-        align: Tuple[float, float] = (0.5, 0.5)
+        align: Tuple[float, float] = (0.5, 0.5),
     ) -> None:
         """Present a console to this context's display.
 
@@ -387,7 +387,7 @@ def new(
     vsync: bool = True,
     sdl_window_flags: Optional[int] = None,
     title: Optional[str] = None,
-    argv: Optional[Iterable[str]] = None
+    argv: Optional[Iterable[str]] = None,
 ) -> Context:
     """Create a new context with the desired pixel size.
 
@@ -490,7 +490,7 @@ def new_window(
     tileset: Optional[tcod.tileset.Tileset] = None,
     vsync: bool = True,
     sdl_window_flags: Optional[int] = None,
-    title: Optional[str] = None
+    title: Optional[str] = None,
 ) -> Context:
     """Create a new context with the desired pixel size.
 
@@ -519,7 +519,7 @@ def new_terminal(
     tileset: Optional[tcod.tileset.Tileset] = None,
     vsync: bool = True,
     sdl_window_flags: Optional[int] = None,
-    title: Optional[str] = None
+    title: Optional[str] = None,
 ) -> Context:
     """Create a new context with the desired console size.
 

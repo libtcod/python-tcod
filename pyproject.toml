@@ -8,11 +8,11 @@ requires = [
 
 [tool.black]
 line-length = 79
-py36 = false
-target-version = ["py35"]
+py36 = true
+target-version = ["py36"]
 
 [tool.isort]
 profile= "black"
-py_version = "35"
+py_version = "36"
 skip_gitignore = true
 line_length = 79

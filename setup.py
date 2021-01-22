@@ -136,7 +136,7 @@ setup(
     py_modules=["libtcodpy"],
     packages=["tdl", "tcod"],
     package_data={"tdl": ["*.png"], "tcod": get_package_data()},
-    python_requires=">=3.5",
+    python_requires=">=3.6",
     install_requires=[
         "cffi~=1.13",  # Also required by pyproject.toml.
         "numpy~=1.10" if not is_pypy else "",
@@ -157,7 +157,6 @@ setup(
         "Operating System :: MacOS :: MacOS X",
         "Operating System :: Microsoft :: Windows",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",

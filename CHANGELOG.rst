@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Removed
+ - Python 3.5 is no longer supported.
 
 11.19.3 - 2021-01-07
 --------------------
