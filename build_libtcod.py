@@ -25,8 +25,6 @@ except ImportError:
 SDL2_PARSE_VERSION = os.environ.get("SDL_VERSION", "2.0.5")
 
 # The SDL2 version to include in binary distributions.
-# MacOS delocate-wheel will fail without throwing an error when bundling
-# modern versions of SDL.
 SDL2_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "2.0.14")
 
 HEADER_PARSE_PATHS = ("tcod/", "libtcod/src/libtcod/")

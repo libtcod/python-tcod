@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - Now bundles SDL 2.0.14 for MacOS.
+
 Removed
  - Python 3.5 is no longer supported.
  - The `tdl` module has been dropped.
