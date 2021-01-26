@@ -5,6 +5,8 @@ This code demonstrates various usages of python-tcod.
 # To the extent possible under law, the libtcod maintainers have waived all
 # copyright and related or neighboring rights to these samples.
 # https://creativecommons.org/publicdomain/zero/1.0/
+from __future__ import annotations
+
 import copy
 import math
 import os
@@ -37,10 +39,16 @@ SAMPLE_SCREEN_X = 20
 SAMPLE_SCREEN_Y = 10
 FONT = get_data("fonts/dejavu10x10_gs_tc.png")
 
-root_console = None
+# Mutable global names.
+context: tcod.context.Context
+tileset: tcod.tileset.Tileset
+root_console = tcod.Console(80, 50, order="F")
 sample_console = tcod.console.Console(
     SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT, order="F"
 )
+cur_sample = 0  # Current selected sample.
+frame_times = [time.perf_counter()]
+frame_length = [0.0]
 
 
 class Sample(tcod.event.EventDispatch):
@@ -54,7 +62,7 @@ class Sample(tcod.event.EventDispatch):
         pass
 
     def ev_keydown(self, event: tcod.event.KeyDown):
-        global cur_sample
+        global cur_sample, context
         if event.sym == tcod.event.K_DOWN:
             cur_sample = (cur_sample + 1) % len(SAMPLES)
             SAMPLES[cur_sample].on_enter()
@@ -71,7 +79,7 @@ class Sample(tcod.event.EventDispatch):
         elif event.sym == tcod.event.K_PRINTSCREEN or event.sym == ord("p"):
             print("screenshot")
             if event.mod & tcod.event.KMOD_LALT:
-                tcod.console_save_apf(None, "samples.apf")
+                tcod.console_save_apf(root_console, "samples.apf")
                 print("apf")
             else:
                 tcod.sys_save_screenshot()
@@ -79,8 +87,9 @@ class Sample(tcod.event.EventDispatch):
         elif event.sym == tcod.event.K_ESCAPE:
             raise SystemExit()
         elif event.sym in RENDERER_KEYS:
-            tcod.sys_set_renderer(RENDERER_KEYS[event.sym])
-            draw_renderer_menu()
+            # Swap the active context for one with a different renderer.
+            context.close()
+            context = init_context(RENDERER_KEYS[event.sym])
 
     def ev_quit(self, event: tcod.event.Quit):
         raise SystemExit()
@@ -100,9 +109,6 @@ class TrueColorSample(Sample):
         )
         # corner indexes
         self.corners = np.array([0, 1, 2, 3])
-
-    def on_enter(self):
-        tcod.sys_set_fps(0)
 
     def on_draw(self):
         self.slide_corner_colors()
@@ -200,7 +206,6 @@ class OffscreenConsoleSample(Sample):
 
     def on_enter(self):
         self.counter = time.perf_counter()
-        tcod.sys_set_fps(0)
         # get a "screenshot" of the current sample screen
         sample_console.blit(dest=self.screenshot)
 
@@ -272,9 +277,6 @@ class LineDrawingSample(Sample):
                 self.bk_flag = tcod.BKGND_NONE
         else:
             super().ev_keydown(event)
-
-    def on_enter(self):
-        tcod.sys_set_fps(0)
 
     def on_draw(self):
         alpha = 0.0
@@ -377,9 +379,6 @@ class NoiseSample(Sample):
             self.octaves,
             seed=None,
         )
-
-    def on_enter(self):
-        tcod.sys_set_fps(0)
 
     def on_draw(self):
         self.dx = time.perf_counter() * 0.25
@@ -487,7 +486,7 @@ LIGHT_WALL = (130, 110, 50)
 DARK_GROUND = (50, 50, 150)
 LIGHT_GROUND = (200, 180, 50)
 
-SAMPLE_MAP = [
+SAMPLE_MAP_ = [
     "##############################################",
     "#######################      #################",
     "#####################    #     ###############",
@@ -510,7 +509,7 @@ SAMPLE_MAP = [
     "##############################################",
 ]
 
-SAMPLE_MAP = np.array([list(line) for line in SAMPLE_MAP]).transpose()
+SAMPLE_MAP = np.array([list(line) for line in SAMPLE_MAP_]).transpose()
 
 FOV_ALGO_NAMES = [
     "BASIC      ",
@@ -575,9 +574,6 @@ class FOVSample(Sample):
             fg=tcod.white,
             bg=None,
         )
-
-    def on_enter(self):
-        tcod.sys_set_fps(60)
 
     def on_draw(self):
         sample_console.clear()
@@ -696,7 +692,6 @@ class PathfindingSample(Sample):
         self.dijk = tcod.dijkstra_new(self.map)
 
     def on_enter(self):
-        tcod.sys_set_fps(60)
         # we draw the foreground only the first time.
         #  during the player movement, only the @ is redrawn.
         #  the rest impacts only the background color
@@ -785,7 +780,7 @@ class PathfindingSample(Sample):
                 )
 
         # move the creature
-        self.busy -= tcod.sys_get_last_frame_length()
+        self.busy -= frame_length[-1]
         if self.busy <= 0.0:
             self.busy = 0.2
             if self.using_astar:
@@ -1110,9 +1105,6 @@ class ImageSample(Sample):
         self.img.set_key_color(tcod.black)
         self.circle = tcod.image_load(get_data("img/circle.png"))
 
-    def on_enter(self):
-        tcod.sys_set_fps(0)
-
     def on_draw(self):
         sample_console.clear()
         x = sample_console.width / 2 + math.cos(time.time()) * 10.0
@@ -1162,7 +1154,6 @@ class MouseSample(Sample):
     def on_enter(self):
         tcod.mouse_move(320, 200)
         tcod.mouse_show_cursor(True)
-        tcod.sys_set_fps(60)
 
     def ev_mousemotion(self, event: tcod.event.MouseMotion):
         self.motion = event
@@ -1188,9 +1179,9 @@ class MouseSample(Sample):
         sample_console.print(
             1,
             1,
-            "Mouse position : %4dx%4d\n"
-            "Mouse cell     : %4dx%4d\n"
-            "Mouse movement : %4dx%4d\n"
+            "Pixel position : %4dx%4d\n"
+            "Tile position  : %4dx%4d\n"
+            "Tile movement  : %4dx%4d\n"
             "Left button    : %s\n"
             "Right button   : %s\n"
             "Middle button  : %s\n"
@@ -1235,9 +1226,6 @@ class NameGeneratorSample(Sample):
         self.names = []
         self.sets = None
 
-    def on_enter(self):
-        tcod.sys_set_fps(60)
-
     def on_draw(self):
         if self.nbsets == 0:
             # parse all *.cfg files in data/namegen
@@ -1268,7 +1256,7 @@ class NameGeneratorSample(Sample):
                 bg=None,
                 alignment=tcod.RIGHT,
             )
-        self.delay += tcod.sys_get_last_frame_length()
+        self.delay += frame_length[-1]
         if self.delay > 0.5:
             self.delay -= 0.5
             self.names.append(tcod.namegen_generate(self.sets[self.curset]))
@@ -1341,7 +1329,6 @@ class FastRenderSample(Sample):
 
     def on_enter(self):
         global frac_t, abs_t, lights, tex_r, tex_g, tex_b
-        tcod.sys_set_fps(0)
         sample_console.clear()  # render status message
         sample_console.print(
             1, SCREEN_H - 3, "Renderer: NumPy", fg=tcod.white, bg=None
@@ -1358,7 +1345,7 @@ class FastRenderSample(Sample):
         global use_numpy, frac_t, abs_t, lights, tex_r, tex_g, tex_b, xc, yc
         global texture, texture2, brightness2, R2, G2, B2
 
-        time_delta = tcod.sys_get_last_frame_length() * SPEED  # advance time
+        time_delta = frame_length[-1] * SPEED  # advance time
         frac_t += time_delta  # increase fractional (always < 1.0) time
         abs_t += time_delta  # increase absolute elapsed time
         # integer time units that passed this frame (number of texture pixels
@@ -1508,41 +1495,70 @@ SAMPLES = (
     FastRenderSample(),
 )
 
-cur_sample = 0
+def init_context(renderer: int) -> tcod.context.Context:
+    """Return a new context with common parameters set.
+
+    This function exists to more easily switch between renderers.
+    """
+    libtcod_version = "%i.%i.%i" % (
+        tcod.lib.TCOD_MAJOR_VERSION,
+        tcod.lib.TCOD_MINOR_VERSION,
+        tcod.lib.TCOD_PATCHLEVEL,
+    )
+    return tcod.context.new(
+        columns=root_console.width,
+        rows=root_console.height,
+        title=f"python-tcod samples"
+        f" (python-tcod {tcod.__version__}, libtcod {libtcod_version})",
+        renderer=renderer,
+        vsync=False,  # VSync turned off since this is for benchmarking.
+        tileset=tileset,
+    )
 
 
 def main():
-    global cur_sample, root_console
-    tcod.console_set_custom_font(
-        FONT, tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD
+    global context, tileset
+    tileset = tcod.tileset.load_tilesheet(
+        FONT, 32, 8, tcod.tileset.CHARMAP_TCOD
     )
-    root_console = tcod.console_init_root(
-        80, 50, "python-tcod samples", False, tcod.RENDERER_SDL2, order="F"
-    )
-    credits_end = False
-    SAMPLES[cur_sample].on_enter()
-    draw_samples_menu()
-    draw_renderer_menu()
+    context = init_context(tcod.RENDERER_SDL2)
+    try:
+        credits_end = False
+        SAMPLES[cur_sample].on_enter()
 
-    while not tcod.console_is_window_closed():
-        root_console.clear()
-        draw_samples_menu()
-        draw_renderer_menu()
-        # render credits
-        if not credits_end:
-            credits_end = tcod.console_credits_render(60, 43, 0)
+        while True:
+            root_console.clear()
+            draw_samples_menu()
+            draw_renderer_menu()
 
-        # render the sample
-        SAMPLES[cur_sample].on_draw()
-        sample_console.blit(root_console, SAMPLE_SCREEN_X, SAMPLE_SCREEN_Y)
-        draw_stats()
-        tcod.console_flush()
-        handle_events()
+            # render the sample
+            SAMPLES[cur_sample].on_draw()
+            sample_console.blit(root_console, SAMPLE_SCREEN_X, SAMPLE_SCREEN_Y)
+            draw_stats()
+            context.present(root_console)
+            handle_time()
+            handle_events()
+    finally:
+        # Normally context would be used in a with block and closed
+        # automatically. but since this context might be switched to one with a
+        # different renderer it is closed manually here.
+        context.close()
+
+
+def handle_time():
+    if len(frame_times) > 100:
+        frame_times.pop(0)
+        frame_length.pop(0)
+    frame_times.append(time.perf_counter())
+    frame_length.append(frame_times[-1] - frame_times[-2])
 
 
 def handle_events():
     for event in tcod.event.get():
+        context.convert_event(event)
         SAMPLES[cur_sample].dispatch(event)
+        if isinstance(event, tcod.event.Quit):
+            raise SystemExit()
 
 
 def draw_samples_menu():
@@ -1564,28 +1580,29 @@ def draw_samples_menu():
 
 
 def draw_stats():
+    try:
+        fps = 1 / (sum(frame_length) / len(frame_length))
+    except ZeroDivisionError:
+        fps = 0
+
+    style = {"fg": tcod.grey, "bg": None, "alignment": tcod.RIGHT}
     root_console.print(
         79,
         46,
-        " last frame : %3d ms (%3d fps)"
-        % (tcod.sys_get_last_frame_length() * 1000.0, tcod.sys_get_fps()),
-        fg=tcod.grey,
-        bg=None,
-        alignment=tcod.RIGHT,
+        "last frame :%5.1f ms (%4d fps)"
+        % (frame_length[-1] * 1000.0, fps),
+        **style,
     )
     root_console.print(
         79,
         47,
-        "elapsed : %8d ms %4.2fs"
+        "elapsed : %8d ms %5.2fs"
         % (time.perf_counter() * 1000, time.perf_counter()),
-        fg=tcod.grey,
-        bg=None,
-        alignment=tcod.RIGHT,
+        **style,
     )
 
 
 def draw_renderer_menu():
-    current_renderer = tcod.sys_get_renderer()
     root_console.print(
         42,
         46 - (tcod.NB_RENDERERS + 1),
@@ -1594,7 +1611,7 @@ def draw_renderer_menu():
         bg=tcod.black,
     )
     for i, name in enumerate(RENDERER_NAMES):
-        if i == current_renderer:
+        if i == context.renderer_type:
             fg = tcod.white
             bg = tcod.light_blue
         else:
