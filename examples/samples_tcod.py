@@ -14,6 +14,7 @@ import random
 import sys
 import time
 import warnings
+from typing import List
 
 import numpy as np
 import tcod
@@ -33,6 +34,12 @@ def get_data(path: str) -> str:
     return os.path.join(DATA_DIR, path)
 
 
+WHITE = (255, 255, 255)
+GREY = (127, 127, 127)
+BLACK = (0, 0, 0)
+LIGHT_BLUE = (63, 63, 255)
+LIGHT_YELLOW = (255, 255, 63)
+
 SAMPLE_SCREEN_WIDTH = 46
 SAMPLE_SCREEN_HEIGHT = 20
 SAMPLE_SCREEN_X = 20
@@ -51,17 +58,17 @@ frame_times = [time.perf_counter()]
 frame_length = [0.0]
 
 
-class Sample(tcod.event.EventDispatch):
-    def __init__(self, name: str = ""):
+class Sample(tcod.event.EventDispatch[None]):
+    def __init__(self, name: str = "") -> None:
         self.name = name
 
-    def on_enter(self):
+    def on_enter(self) -> None:
         pass
 
-    def on_draw(self):
+    def on_draw(self) -> None:
         pass
 
-    def ev_keydown(self, event: tcod.event.KeyDown):
+    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         global cur_sample, context
         if event.sym == tcod.event.K_DOWN:
             cur_sample = (cur_sample + 1) % len(SAMPLES)
@@ -91,12 +98,12 @@ class Sample(tcod.event.EventDispatch):
             context.close()
             context = init_context(RENDERER_KEYS[event.sym])
 
-    def ev_quit(self, event: tcod.event.Quit):
+    def ev_quit(self, event: tcod.event.Quit) -> None:
         raise SystemExit()
 
 
 class TrueColorSample(Sample):
-    def __init__(self):
+    def __init__(self) -> None:
         self.name = "True colors"
         # corner colors
         self.colors = np.array(
@@ -110,14 +117,14 @@ class TrueColorSample(Sample):
         # corner indexes
         self.corners = np.array([0, 1, 2, 3])
 
-    def on_draw(self):
+    def on_draw(self) -> None:
         self.slide_corner_colors()
         self.interpolate_corner_colors()
         self.darken_background_characters()
         self.randomize_sample_conole()
         self.print_banner()
 
-    def slide_corner_colors(self):
+    def slide_corner_colors(self) -> None:
         # pick random RGB channels for each corner
         rand_channels = np.random.randint(low=0, high=3, size=4)
 
@@ -130,18 +137,22 @@ class TrueColorSample(Sample):
         self.slide_dir[self.colors[:] == 255] = -1
         self.slide_dir[self.colors[:] == 0] = 1
 
-    def interpolate_corner_colors(self):
+    def interpolate_corner_colors(self) -> None:
         # interpolate corner colors across the sample console
-        left = np.linspace(self.colors[0], self.colors[2], SAMPLE_SCREEN_HEIGHT)
-        right = np.linspace(self.colors[1], self.colors[3], SAMPLE_SCREEN_HEIGHT)
+        left = np.linspace(
+            self.colors[0], self.colors[2], SAMPLE_SCREEN_HEIGHT
+        )
+        right = np.linspace(
+            self.colors[1], self.colors[3], SAMPLE_SCREEN_HEIGHT
+        )
         sample_console.bg[:] = np.linspace(left, right, SAMPLE_SCREEN_WIDTH)
 
-    def darken_background_characters(self):
+    def darken_background_characters(self) -> None:
         # darken background characters
         sample_console.fg[:] = sample_console.bg[:]
         sample_console.fg[:] //= 2
 
-    def randomize_sample_conole(self):
+    def randomize_sample_conole(self) -> None:
         # randomize sample console characters
         sample_console.ch[:] = np.random.randint(
             low=ord("a"),
@@ -150,7 +161,7 @@ class TrueColorSample(Sample):
             dtype=np.intc,
         ).reshape(sample_console.ch.shape)
 
-    def print_banner(self):
+    def print_banner(self) -> None:
         # print text on top of samples
         sample_console.print_box(
             x=1,
@@ -159,15 +170,15 @@ class TrueColorSample(Sample):
             height=sample_console.height - 1,
             string="The Doryen library uses 24 bits colors, for both "
             "background and foreground.",
-            fg=tcod.white,
-            bg=tcod.grey,
+            fg=WHITE,
+            bg=GREY,
             bg_blend=tcod.BKGND_MULTIPLY,
             alignment=tcod.CENTER,
         )
 
 
 class OffscreenConsoleSample(Sample):
-    def __init__(self):
+    def __init__(self) -> None:
         self.name = "Offscreen console"
         self.secondary = tcod.console.Console(
             sample_console.width // 2, sample_console.height // 2
@@ -175,7 +186,7 @@ class OffscreenConsoleSample(Sample):
         self.screenshot = tcod.console.Console(
             sample_console.width, sample_console.height
         )
-        self.counter = 0
+        self.counter = 0.0
         self.x = 0
         self.y = 0
         self.xdir = 1
@@ -188,8 +199,8 @@ class OffscreenConsoleSample(Sample):
             sample_console.height // 2,
             "Offscreen console",
             False,
-            fg=tcod.white,
-            bg=tcod.black,
+            fg=WHITE,
+            bg=BLACK,
         )
 
         self.secondary.print_box(
@@ -199,17 +210,17 @@ class OffscreenConsoleSample(Sample):
             sample_console.height // 2,
             "You can render to an offscreen console and blit in on another "
             "one, simulating alpha transparency.",
-            fg=tcod.white,
+            fg=WHITE,
             bg=None,
             alignment=tcod.CENTER,
         )
 
-    def on_enter(self):
+    def on_enter(self) -> None:
         self.counter = time.perf_counter()
         # get a "screenshot" of the current sample screen
         sample_console.blit(dest=self.screenshot)
 
-    def on_draw(self):
+    def on_draw(self) -> None:
         if time.perf_counter() - self.counter >= 1:
             self.counter = time.perf_counter()
             self.x += self.xdir
@@ -254,7 +265,7 @@ class LineDrawingSample(Sample):
         "BKGND_ALPHA",
     ]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.name = "Line drawing"
         self.mk_flag = tcod.BKGND_SET
         self.bk_flag = tcod.BKGND_SET
@@ -270,7 +281,7 @@ class LineDrawingSample(Sample):
         ) / 2
         self.bk.ch[:] = ord(" ")
 
-    def ev_keydown(self, event: tcod.event.KeyDown):
+    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym in (tcod.event.K_RETURN, tcod.event.K_KP_ENTER):
             self.bk_flag += 1
             if (self.bk_flag & 0xFF) > tcod.BKGND_ALPH:
@@ -278,23 +289,24 @@ class LineDrawingSample(Sample):
         else:
             super().ev_keydown(event)
 
-    def on_draw(self):
+    def on_draw(self) -> None:
         alpha = 0.0
         if (self.bk_flag & 0xFF) == tcod.BKGND_ALPH:
             # for the alpha mode, update alpha every frame
             alpha = (1.0 + math.cos(time.time() * 2)) / 2.0
-            self.bk_flag = tcod.BKGND_ALPHA(alpha)
+            self.bk_flag = tcod.BKGND_ALPHA(int(alpha))
         elif (self.bk_flag & 0xFF) == tcod.BKGND_ADDA:
             # for the add alpha mode, update alpha every frame
             alpha = (1.0 + math.cos(time.time() * 2)) / 2.0
-            self.bk_flag = tcod.BKGND_ADDALPHA(alpha)
+            self.bk_flag = tcod.BKGND_ADDALPHA(int(alpha))
 
         self.bk.blit(sample_console)
         recty = int(
             (sample_console.height - 2) * ((1.0 + math.cos(time.time())) / 2.0)
         )
         for x in range(sample_console.width):
-            col = [x * 255 // sample_console.width] * 3
+            value = x * 255 // sample_console.width
+            col = (value, value, value)
             tcod.console_set_char_background(
                 sample_console, x, recty, col, self.bk_flag
             )
@@ -323,31 +335,31 @@ class LineDrawingSample(Sample):
                 and 0 <= y < sample_console.height
             ):
                 tcod.console_set_char_background(
-                    sample_console, x, y, tcod.light_blue, self.bk_flag
+                    sample_console, x, y, LIGHT_BLUE, self.bk_flag
                 )
         sample_console.print(
             2,
             2,
             "%s (ENTER to change)" % self.FLAG_NAMES[self.bk_flag & 0xFF],
-            fg=tcod.white,
+            fg=WHITE,
             bg=None,
         )
 
 
 class NoiseSample(Sample):
-    NOISE_OPTIONS = [  # [name, algorithm, implementation],
-        ["perlin noise", tcod.NOISE_PERLIN, tcod.noise.SIMPLE],
-        ["simplex noise", tcod.NOISE_SIMPLEX, tcod.noise.SIMPLE],
-        ["wavelet noise", tcod.NOISE_WAVELET, tcod.noise.SIMPLE],
-        ["perlin fbm", tcod.NOISE_PERLIN, tcod.noise.FBM],
-        ["perlin turbulence", tcod.NOISE_PERLIN, tcod.noise.TURBULENCE],
-        ["simplex fbm", tcod.NOISE_SIMPLEX, tcod.noise.FBM],
-        ["simplex turbulence", tcod.NOISE_SIMPLEX, tcod.noise.TURBULENCE],
-        ["wavelet fbm", tcod.NOISE_WAVELET, tcod.noise.FBM],
-        ["wavelet turbulence", tcod.NOISE_WAVELET, tcod.noise.TURBULENCE],
+    NOISE_OPTIONS = [  # (name, algorithm, implementation)
+        ("perlin noise", tcod.NOISE_PERLIN, tcod.noise.SIMPLE),
+        ("simplex noise", tcod.NOISE_SIMPLEX, tcod.noise.SIMPLE),
+        ("wavelet noise", tcod.NOISE_WAVELET, tcod.noise.SIMPLE),
+        ("perlin fbm", tcod.NOISE_PERLIN, tcod.noise.FBM),
+        ("perlin turbulence", tcod.NOISE_PERLIN, tcod.noise.TURBULENCE),
+        ("simplex fbm", tcod.NOISE_SIMPLEX, tcod.noise.FBM),
+        ("simplex turbulence", tcod.NOISE_SIMPLEX, tcod.noise.TURBULENCE),
+        ("wavelet fbm", tcod.NOISE_WAVELET, tcod.noise.FBM),
+        ("wavelet turbulence", tcod.NOISE_WAVELET, tcod.noise.TURBULENCE),
     ]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.name = "Noise"
         self.func = 0
         self.dx = 0.0
@@ -362,14 +374,14 @@ class NoiseSample(Sample):
         )
 
     @property
-    def algorithm(self):
+    def algorithm(self) -> int:
         return self.NOISE_OPTIONS[self.func][1]
 
     @property
-    def implementation(self):
+    def implementation(self) -> int:
         return self.NOISE_OPTIONS[self.func][2]
 
-    def get_noise(self):
+    def get_noise(self) -> tcod.noise.Noise:
         return tcod.noise.Noise(
             2,
             self.algorithm,
@@ -380,7 +392,7 @@ class NoiseSample(Sample):
             seed=None,
         )
 
-    def on_draw(self):
+    def on_draw(self) -> None:
         self.dx = time.perf_counter() * 0.25
         self.dy = time.perf_counter() * 0.25
         for y in range(2 * sample_console.height):
@@ -405,50 +417,48 @@ class NoiseSample(Sample):
             recth,
             ch=0,
             fg=None,
-            bg=tcod.grey,
+            bg=GREY,
             bg_blend=tcod.BKGND_MULTIPLY,
         )
         sample_console.fg[2 : 2 + rectw, 2 : 2 + recth] = (
-            sample_console.fg[2 : 2 + rectw, 2 : 2 + recth] * tcod.grey / 255
+            sample_console.fg[2 : 2 + rectw, 2 : 2 + recth] * GREY / 255
         )
 
         for curfunc in range(len(self.NOISE_OPTIONS)):
             text = "%i : %s" % (curfunc + 1, self.NOISE_OPTIONS[curfunc][0])
             if curfunc == self.func:
                 sample_console.print(
-                    2, 2 + curfunc, text, fg=tcod.white, bg=tcod.light_blue
+                    2, 2 + curfunc, text, fg=WHITE, bg=LIGHT_BLUE
                 )
             else:
-                sample_console.print(
-                    2, 2 + curfunc, text, fg=tcod.grey, bg=None
-                )
+                sample_console.print(2, 2 + curfunc, text, fg=GREY, bg=None)
         sample_console.print(
-            2, 11, "Y/H : zoom (%2.1f)" % self.zoom, fg=tcod.white, bg=None
+            2, 11, "Y/H : zoom (%2.1f)" % self.zoom, fg=WHITE, bg=None
         )
         if self.implementation != tcod.noise.SIMPLE:
             sample_console.print(
                 2,
                 12,
                 "E/D : hurst (%2.1f)" % self.hurst,
-                fg=tcod.white,
+                fg=WHITE,
                 bg=None,
             )
             sample_console.print(
                 2,
                 13,
                 "R/F : lacunarity (%2.1f)" % self.lacunarity,
-                fg=tcod.white,
+                fg=WHITE,
                 bg=None,
             )
             sample_console.print(
                 2,
                 14,
                 "T/G : octaves (%2.1f)" % self.octaves,
-                fg=tcod.white,
+                fg=WHITE,
                 bg=None,
             )
 
-    def ev_keydown(self, event: tcod.event.KeyDown):
+    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if ord("9") >= event.sym >= ord("1"):
             self.func = event.sym - ord("1")
             self.noise = self.get_noise()
@@ -533,7 +543,7 @@ SQUARED_TORCH_RADIUS = TORCH_RADIUS * TORCH_RADIUS
 
 
 class FOVSample(Sample):
-    def __init__(self):
+    def __init__(self) -> None:
         self.name = "Field of view"
 
         self.player_x = 20
@@ -558,7 +568,7 @@ class FOVSample(Sample):
         self.dark_map_bg = np.full(SAMPLE_MAP.shape, DARK_GROUND, dtype="3B")
         self.dark_map_bg[SAMPLE_MAP[:] == "#"] = DARK_WALL
 
-    def draw_ui(self):
+    def draw_ui(self) -> None:
         sample_console.print(
             1,
             1,
@@ -571,18 +581,18 @@ class FOVSample(Sample):
                 "on " if self.light_walls else "off",
                 FOV_ALGO_NAMES[self.algo_num],
             ),
-            fg=tcod.white,
+            fg=WHITE,
             bg=None,
         )
 
-    def on_draw(self):
+    def on_draw(self) -> None:
         sample_console.clear()
         # Draw the help text & player @.
         self.draw_ui()
         sample_console.print(self.player_x, self.player_y, "@")
         # Draw windows.
         sample_console.tiles_rgb["ch"][SAMPLE_MAP == "="] = tcod.CHAR_DHLINE
-        sample_console.tiles_rgb["fg"][SAMPLE_MAP == "="] = tcod.black
+        sample_console.tiles_rgb["fg"][SAMPLE_MAP == "="] = BLACK
 
         # Get a 2D boolean array of visible cells.
         fov = tcod.map.compute_fov(
@@ -633,7 +643,7 @@ class FOVSample(Sample):
                 fov[:, :, np.newaxis], self.light_map_bg, self.dark_map_bg
             )
 
-    def ev_keydown(self, event: tcod.event.KeyDown):
+    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         MOVE_KEYS = {
             ord("i"): (0, -1),
             ord("j"): (-1, 0),
@@ -663,18 +673,15 @@ class FOVSample(Sample):
 
 
 class PathfindingSample(Sample):
-    def __init__(self):
+    def __init__(self) -> None:
         self.name = "Path finding"
 
         self.px = 20
         self.py = 10
         self.dx = 24
         self.dy = 1
-        self.map = None
-        self.path = None
         self.dijk_dist = 0.0
         self.using_astar = True
-        self.dijk = None
         self.recalculate = False
         self.busy = 0.0
         self.oldchar = " "
@@ -691,24 +698,24 @@ class PathfindingSample(Sample):
         self.path = tcod.path_new_using_map(self.map)
         self.dijk = tcod.dijkstra_new(self.map)
 
-    def on_enter(self):
+    def on_enter(self) -> None:
         # we draw the foreground only the first time.
         #  during the player movement, only the @ is redrawn.
         #  the rest impacts only the background color
         # draw the help text & player @
         sample_console.clear()
         sample_console.ch[self.dx, self.dy] = ord("+")
-        sample_console.fg[self.dx, self.dy] = tcod.white
+        sample_console.fg[self.dx, self.dy] = WHITE
         sample_console.ch[self.px, self.py] = ord("@")
-        sample_console.fg[self.px, self.py] = tcod.white
+        sample_console.fg[self.px, self.py] = WHITE
         sample_console.print(
             1,
             1,
             "IJKL / mouse :\nmove destination\nTAB : A*/dijkstra",
-            fg=tcod.white,
+            fg=WHITE,
             bg=None,
         )
-        sample_console.print(1, 4, "Using : A*", fg=tcod.white, bg=None)
+        sample_console.print(1, 4, "Using : A*", fg=WHITE, bg=None)
         # draw windows
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
@@ -718,7 +725,7 @@ class PathfindingSample(Sample):
                     )
         self.recalculate = True
 
-    def on_draw(self):
+    def on_draw(self) -> None:
         if self.recalculate:
             if self.using_astar:
                 tcod.path_compute(
@@ -803,7 +810,7 @@ class PathfindingSample(Sample):
                     )
                     self.recalculate = True
 
-    def ev_keydown(self, event: tcod.event.KeyDown):
+    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym == ord("i") and self.dy > 0:
             # destination move north
             tcod.console_put_char(
@@ -862,7 +869,7 @@ class PathfindingSample(Sample):
         else:
             super().ev_keydown(event)
 
-    def ev_mousemotion(self, event: tcod.event.MouseMotion):
+    def ev_mousemotion(self, event: tcod.event.MouseMotion) -> None:
         mx = event.tile.x - SAMPLE_SCREEN_X
         my = event.tile.y - SAMPLE_SCREEN_Y
         if (
@@ -895,51 +902,51 @@ bsp_room_walls = True
 
 
 # draw a vertical line
-def vline(m, x, y1, y2):
+def vline(m: np.ndarray, x: int, y1: int, y2: int) -> None:
     if y1 > y2:
         y1, y2 = y2, y1
     for y in range(y1, y2 + 1):
-        m[x][y] = True
+        m[x, y] = True
 
 
 # draw a vertical line up until we reach an empty space
-def vline_up(m, x, y):
-    while y >= 0 and not m[x][y]:
-        m[x][y] = True
+def vline_up(m: np.ndarray, x: int, y: int) -> None:
+    while y >= 0 and not m[x, y]:
+        m[x, y] = True
         y -= 1
 
 
 # draw a vertical line down until we reach an empty space
-def vline_down(m, x, y):
-    while y < SAMPLE_SCREEN_HEIGHT and not m[x][y]:
-        m[x][y] = True
+def vline_down(m: np.ndarray, x: int, y: int) -> None:
+    while y < SAMPLE_SCREEN_HEIGHT and not m[x, y]:
+        m[x, y] = True
         y += 1
 
 
 # draw a horizontal line
-def hline(m, x1, y, x2):
+def hline(m: np.ndarray, x1: int, y: int, x2: int) -> None:
     if x1 > x2:
         x1, x2 = x2, x1
     for x in range(x1, x2 + 1):
-        m[x][y] = True
+        m[x, y] = True
 
 
 # draw a horizontal line left until we reach an empty space
-def hline_left(m, x, y):
-    while x >= 0 and not m[x][y]:
-        m[x][y] = True
+def hline_left(m: np.ndarray, x: int, y: int) -> None:
+    while x >= 0 and not m[x, y]:
+        m[x, y] = True
         x -= 1
 
 
 # draw a horizontal line right until we reach an empty space
-def hline_right(m, x, y):
-    while x < SAMPLE_SCREEN_WIDTH and not m[x][y]:
-        m[x][y] = True
+def hline_right(m: np.ndarray, x: int, y: int) -> None:
+    while x < SAMPLE_SCREEN_WIDTH and not m[x, y]:
+        m[x, y] = True
         x += 1
 
 
 # the class building the dungeon from the bsp nodes
-def traverse_node(bsp_map, node):
+def traverse_node(bsp_map: np.ndarray, node: tcod.bsp.BSP) -> None:
     if not node.children:
         # calculate the room size
         if bsp_room_walls:
@@ -956,9 +963,9 @@ def traverse_node(bsp_map, node):
             node.y += random.randint(0, node.height - new_height)
             node.width, node.height = new_width, new_height
         # dig the room
-        for x in range(node.x, node.x + node.width):
-            for y in range(node.y, node.y + node.height):
-                bsp_map[x][y] = True
+        bsp_map[
+            node.x : node.x + node.width, node.y : node.y + node.height
+        ] = True
     else:
         # resize the node to fit its sons
         left, right = node.children
@@ -1001,11 +1008,10 @@ def traverse_node(bsp_map, node):
                 y = random.randint(miny, maxy)
                 hline_left(bsp_map, right.x - 1, y)
                 hline_right(bsp_map, right.x, y)
-    return True
 
 
 class BSPSample(Sample):
-    def __init__(self):
+    def __init__(self) -> None:
         self.name = "Bsp toolkit"
         self.bsp = tcod.bsp.BSP(
             1, 1, SAMPLE_SCREEN_WIDTH - 1, SAMPLE_SCREEN_HEIGHT - 1
@@ -1015,7 +1021,7 @@ class BSPSample(Sample):
         )
         self.bsp_generate()
 
-    def bsp_generate(self):
+    def bsp_generate(self) -> None:
         self.bsp.children = ()
         if bsp_room_walls:
             self.bsp.split_recursive(
@@ -1031,12 +1037,12 @@ class BSPSample(Sample):
             )
         self.bsp_refresh()
 
-    def bsp_refresh(self):
+    def bsp_refresh(self) -> None:
         self.bsp_map[...] = False
         for node in copy.deepcopy(self.bsp).inverted_level_order():
             traverse_node(self.bsp_map, node)
 
-    def on_draw(self):
+    def on_draw(self) -> None:
         sample_console.clear()
         rooms = "OFF"
         if bsp_random_room:
@@ -1049,7 +1055,7 @@ class BSPSample(Sample):
             "+-: bsp depth %d\n"
             "*/: room size %d\n"
             "1 : random room size %s" % (bsp_depth, bsp_min_room_size, rooms),
-            fg=tcod.white,
+            fg=WHITE,
             bg=None,
         )
         if bsp_random_room:
@@ -1057,7 +1063,7 @@ class BSPSample(Sample):
             if bsp_room_walls:
                 walls = "ON"
             sample_console.print(
-                1, 6, "2 : room walls %s" % walls, fg=tcod.white, bg=None
+                1, 6, "2 : room walls %s" % walls, fg=WHITE, bg=None
             )
         # render the level
         for y in range(SAMPLE_SCREEN_HEIGHT):
@@ -1067,7 +1073,7 @@ class BSPSample(Sample):
                     sample_console, x, y, color, tcod.BKGND_SET
                 )
 
-    def ev_keydown(self, event: tcod.event.KeyDown):
+    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         global bsp_random_room, bsp_room_walls, bsp_depth, bsp_min_room_size
         if event.sym in (tcod.event.K_RETURN, tcod.event.K_KP_ENTER):
             self.bsp_generate()
@@ -1098,14 +1104,14 @@ class BSPSample(Sample):
 
 
 class ImageSample(Sample):
-    def __init__(self):
+    def __init__(self) -> None:
         self.name = "Image toolkit"
 
         self.img = tcod.image_load(get_data("img/skull.png"))
-        self.img.set_key_color(tcod.black)
+        self.img.set_key_color(BLACK)
         self.circle = tcod.image_load(get_data("img/circle.png"))
 
-    def on_draw(self):
+    def on_draw(self) -> None:
         sample_console.clear()
         x = sample_console.width / 2 + math.cos(time.time()) * 10.0
         y = sample_console.height / 2
@@ -1144,21 +1150,21 @@ class ImageSample(Sample):
 
 
 class MouseSample(Sample):
-    def __init__(self):
+    def __init__(self) -> None:
         self.name = "Mouse support"
 
         self.motion = tcod.event.MouseMotion()
         self.lbut = self.mbut = self.rbut = 0
-        self.log = []
+        self.log: List[str] = []
 
-    def on_enter(self):
+    def on_enter(self) -> None:
         tcod.mouse_move(320, 200)
         tcod.mouse_show_cursor(True)
 
-    def ev_mousemotion(self, event: tcod.event.MouseMotion):
+    def ev_mousemotion(self, event: tcod.event.MouseMotion) -> None:
         self.motion = event
 
-    def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown):
+    def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> None:
         if event.button == tcod.event.BUTTON_LEFT:
             self.lbut = True
         elif event.button == tcod.event.BUTTON_MIDDLE:
@@ -1166,7 +1172,7 @@ class MouseSample(Sample):
         elif event.button == tcod.event.BUTTON_RIGHT:
             self.rbut = True
 
-    def ev_mousebuttonup(self, event: tcod.event.MouseButtonUp):
+    def ev_mousebuttonup(self, event: tcod.event.MouseButtonUp) -> None:
         if event.button == tcod.event.BUTTON_LEFT:
             self.lbut = False
         elif event.button == tcod.event.BUTTON_MIDDLE:
@@ -1174,8 +1180,8 @@ class MouseSample(Sample):
         elif event.button == tcod.event.BUTTON_RIGHT:
             self.rbut = False
 
-    def on_draw(self):
-        sample_console.clear(bg=tcod.grey)
+    def on_draw(self) -> None:
+        sample_console.clear(bg=GREY)
         sample_console.print(
             1,
             1,
@@ -1196,18 +1202,18 @@ class MouseSample(Sample):
                 ("OFF", "ON")[self.rbut],
                 ("OFF", "ON")[self.mbut],
             ),
-            fg=tcod.light_yellow,
+            fg=LIGHT_YELLOW,
             bg=None,
         )
         sample_console.print(
             1,
             10,
             "1 : Hide cursor\n2 : Show cursor",
-            fg=tcod.light_yellow,
+            fg=LIGHT_YELLOW,
             bg=None,
         )
 
-    def ev_keydown(self, event: tcod.event.KeyDown):
+    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym == ord("1"):
             tcod.mouse_show_cursor(False)
         elif event.sym == ord("2"):
@@ -1217,16 +1223,16 @@ class MouseSample(Sample):
 
 
 class NameGeneratorSample(Sample):
-    def __init__(self):
+    def __init__(self) -> None:
         self.name = "Name generator"
 
         self.curset = 0
         self.nbsets = 0
         self.delay = 0.0
-        self.names = []
-        self.sets = None
+        self.names: List[str] = []
+        self.sets: List[str] = []
 
-    def on_draw(self):
+    def on_draw(self) -> None:
         if self.nbsets == 0:
             # parse all *.cfg files in data/namegen
             for file in os.listdir(get_data("namegen")):
@@ -1238,13 +1244,13 @@ class NameGeneratorSample(Sample):
             self.nbsets = len(self.sets)
         while len(self.names) > 15:
             self.names.pop(0)
-        sample_console.clear(bg=tcod.grey)
+        sample_console.clear(bg=GREY)
         sample_console.print(
             1,
             1,
             "%s\n\n+ : next generator\n- : prev generator"
             % self.sets[self.curset],
-            fg=tcod.white,
+            fg=WHITE,
             bg=None,
         )
         for i in range(len(self.names)):
@@ -1252,7 +1258,7 @@ class NameGeneratorSample(Sample):
                 SAMPLE_SCREEN_WIDTH - 2,
                 2 + i,
                 self.names[i],
-                fg=tcod.white,
+                fg=WHITE,
                 bg=None,
                 alignment=tcod.RIGHT,
             )
@@ -1261,7 +1267,7 @@ class NameGeneratorSample(Sample):
             self.delay -= 0.5
             self.names.append(tcod.namegen_generate(self.sets[self.curset]))
 
-    def ev_keydown(self, event: tcod.event.KeyDown):
+    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym == ord("="):
             self.curset += 1
             if self.curset == self.nbsets:
@@ -1291,14 +1297,14 @@ RES_V = 80
 TEX_STRETCH = 5  # texture stretching with tunnel depth
 SPEED = 15
 LIGHT_BRIGHTNESS = (
-    3.5
-)  # brightness multiplier for all lights (changes their radius)
+    3.5  # brightness multiplier for all lights (changes their radius)
+)
 LIGHTS_CHANCE = 0.07  # chance of a light appearing
 MAX_LIGHTS = 6
 MIN_LIGHT_STRENGTH = 0.2
 LIGHT_UPDATE = (
-    0.05
-)  # how much the ambient light changes to reflect current light sources
+    0.05  # how much the ambient light changes to reflect current light sources
+)
 AMBIENT_LIGHT = 0.8  # brightness of tunnel texture
 
 # the coordinates of all tiles in the screen, as numpy arrays.
@@ -1317,58 +1323,68 @@ if numpy_available:  # the texture starts empty
 
 
 class Light:
-    def __init__(self, x, y, z, r, g, b, strength):
+    def __init__(
+        self,
+        x: float,
+        y: float,
+        z: float,
+        r: int,
+        g: int,
+        b: int,
+        strength: float,
+    ) -> None:
         self.x, self.y, self.z = x, y, z  # pos.
         self.r, self.g, self.b = r, g, b  # color
         self.strength = strength  # between 0 and 1, defines brightness
 
 
 class FastRenderSample(Sample):
-    def __init__(self):
+    def __init__(self) -> None:
         self.name = "Python fast render"
 
-    def on_enter(self):
-        global frac_t, abs_t, lights, tex_r, tex_g, tex_b
+    def on_enter(self) -> None:
         sample_console.clear()  # render status message
         sample_console.print(
-            1, SCREEN_H - 3, "Renderer: NumPy", fg=tcod.white, bg=None
+            1, SCREEN_H - 3, "Renderer: NumPy", fg=WHITE, bg=None
         )
 
         # time is represented in number of pixels of the texture, start later
         # in time to initialize texture
-        frac_t = RES_V - 1
-        abs_t = RES_V - 1
-        lights = []  # lights list, and current color of the tunnel texture
-        tex_r, tex_g, tex_b = 0, 0, 0
+        self.frac_t: float = RES_V - 1
+        self.abs_t: float = RES_V - 1
+        # light and current color of the tunnel texture
+        self.lights: List[Light] = []
+        self.tex_r = 0.0
+        self.tex_g = 0.0
+        self.tex_b = 0.0
 
-    def on_draw(self):
-        global use_numpy, frac_t, abs_t, lights, tex_r, tex_g, tex_b, xc, yc
-        global texture, texture2, brightness2, R2, G2, B2
+    def on_draw(self) -> None:
+        global texture
 
         time_delta = frame_length[-1] * SPEED  # advance time
-        frac_t += time_delta  # increase fractional (always < 1.0) time
-        abs_t += time_delta  # increase absolute elapsed time
+        self.frac_t += time_delta  # increase fractional (always < 1.0) time
+        self.abs_t += time_delta  # increase absolute elapsed time
         # integer time units that passed this frame (number of texture pixels
         # to advance)
-        int_t = int(frac_t)
-        frac_t -= int_t  # keep this < 1.0
+        int_t = int(self.frac_t)
+        self.frac_t %= 1.0  # keep this < 1.0
 
         # change texture color according to presence of lights (basically, sum
         # them to get ambient light and smoothly change the current color into
         # that)
         ambient_r = AMBIENT_LIGHT * sum(
-            light.r * light.strength for light in lights
+            light.r * light.strength for light in self.lights
         )
         ambient_g = AMBIENT_LIGHT * sum(
-            light.g * light.strength for light in lights
+            light.g * light.strength for light in self.lights
         )
         ambient_b = AMBIENT_LIGHT * sum(
-            light.b * light.strength for light in lights
+            light.b * light.strength for light in self.lights
         )
         alpha = LIGHT_UPDATE * time_delta
-        tex_r = tex_r * (1 - alpha) + ambient_r * alpha
-        tex_g = tex_g * (1 - alpha) + ambient_g * alpha
-        tex_b = tex_b * (1 - alpha) + ambient_b * alpha
+        self.tex_r = self.tex_r * (1 - alpha) + ambient_r * alpha
+        self.tex_g = self.tex_g * (1 - alpha) + ambient_g * alpha
+        self.tex_b = self.tex_b * (1 - alpha) + ambient_b * alpha
 
         if int_t >= 1:
             # roll texture (ie, advance in tunnel) according to int_t
@@ -1376,7 +1392,7 @@ class FastRenderSample(Sample):
             # time_delta is large)
             int_t = int_t % RES_V
             # new pixels are based on absolute elapsed time
-            int_abs_t = int(abs_t)
+            int_abs_t = int(self.abs_t)
 
             texture = np.roll(texture, -int_t, 1)
             # replace new stretch of texture with new values
@@ -1395,24 +1411,24 @@ class FastRenderSample(Sample):
         sqr_dist = sqr_dist.clip(1.0 / RES_V, RES_V ** 2)
 
         # one coordinate into the texture, represents depth in the tunnel
-        v = TEX_STRETCH * float(RES_V) / sqr_dist + frac_t
-        v = v.clip(0, RES_V - 1)
+        vv = TEX_STRETCH * float(RES_V) / sqr_dist + self.frac_t
+        vv = vv.clip(0, RES_V - 1)
 
         # another coordinate, represents rotation around the tunnel
-        u = np.mod(RES_U * (np.arctan2(yc, xc) / (2 * np.pi) + 0.5), RES_U)
+        uu = np.mod(RES_U * (np.arctan2(yc, xc) / (2 * np.pi) + 0.5), RES_U)
 
         # retrieve corresponding pixels from texture
-        brightness = texture[u.astype(int), v.astype(int)] / 4.0 + 0.5
+        brightness = texture[uu.astype(int), vv.astype(int)] / 4.0 + 0.5
 
         # use the brightness map to compose the final color of the tunnel
-        R = brightness * tex_r
-        G = brightness * tex_g
-        B = brightness * tex_b
+        R = brightness * self.tex_r
+        G = brightness * self.tex_g
+        B = brightness * self.tex_b
 
         # create new light source
         if (
             random.random() <= time_delta * LIGHTS_CHANCE
-            and len(lights) < MAX_LIGHTS
+            and len(self.lights) < MAX_LIGHTS
         ):
             x = random.uniform(-0.5, 0.5)
             y = random.uniform(-0.5, 0.5)
@@ -1421,16 +1437,18 @@ class FastRenderSample(Sample):
             color = tcod.Color(0, 0, 0)  # create bright colors with random hue
             hue = random.uniform(0, 360)
             tcod.color_set_hsv(color, hue, 0.5, strength)
-            lights.append(
+            self.lights.append(
                 Light(x, y, TEX_STRETCH, color.r, color.g, color.b, strength)
             )
 
         # eliminate lights that are going to be out of view
-        lights = [
-            light for light in lights if light.z - time_delta > 1.0 / RES_V
+        self.lights = [
+            light
+            for light in self.lights
+            if light.z - time_delta > 1.0 / RES_V
         ]
 
-        for light in lights:  # render lights
+        for light in self.lights:  # render lights
             # move light's Z coordinate with time, then project its XYZ
             # coordinates to screen-space
             light.z -= float(time_delta) / TEX_STRETCH
@@ -1495,6 +1513,7 @@ SAMPLES = (
     FastRenderSample(),
 )
 
+
 def init_context(renderer: int) -> tcod.context.Context:
     """Return a new context with common parameters set.
 
@@ -1516,14 +1535,13 @@ def init_context(renderer: int) -> tcod.context.Context:
     )
 
 
-def main():
+def main() -> None:
     global context, tileset
     tileset = tcod.tileset.load_tilesheet(
         FONT, 32, 8, tcod.tileset.CHARMAP_TCOD
     )
     context = init_context(tcod.RENDERER_SDL2)
     try:
-        credits_end = False
         SAMPLES[cur_sample].on_enter()
 
         while True:
@@ -1545,7 +1563,7 @@ def main():
         context.close()
 
 
-def handle_time():
+def handle_time() -> None:
     if len(frame_times) > 100:
         frame_times.pop(0)
         frame_length.pop(0)
@@ -1553,7 +1571,7 @@ def handle_time():
     frame_length.append(frame_times[-1] - frame_times[-2])
 
 
-def handle_events():
+def handle_events() -> None:
     for event in tcod.event.get():
         context.convert_event(event)
         SAMPLES[cur_sample].dispatch(event)
@@ -1561,14 +1579,14 @@ def handle_events():
             raise SystemExit()
 
 
-def draw_samples_menu():
+def draw_samples_menu() -> None:
     for i, sample in enumerate(SAMPLES):
         if i == cur_sample:
-            fg = tcod.white
-            bg = tcod.light_blue
+            fg = WHITE
+            bg = LIGHT_BLUE
         else:
-            fg = tcod.grey
-            bg = tcod.black
+            fg = GREY
+            bg = BLACK
         root_console.print(
             2,
             46 - (len(SAMPLES) - i),
@@ -1579,44 +1597,43 @@ def draw_samples_menu():
         )
 
 
-def draw_stats():
+def draw_stats() -> None:
     try:
         fps = 1 / (sum(frame_length) / len(frame_length))
     except ZeroDivisionError:
         fps = 0
-
-    style = {"fg": tcod.grey, "bg": None, "alignment": tcod.RIGHT}
     root_console.print(
         79,
         46,
-        "last frame :%5.1f ms (%4d fps)"
-        % (frame_length[-1] * 1000.0, fps),
-        **style,
+        "last frame :%5.1f ms (%4d fps)" % (frame_length[-1] * 1000.0, fps),
+        fg=GREY,
+        alignment=tcod.RIGHT,
     )
     root_console.print(
         79,
         47,
         "elapsed : %8d ms %5.2fs"
         % (time.perf_counter() * 1000, time.perf_counter()),
-        **style,
+        fg=GREY,
+        alignment=tcod.RIGHT,
     )
 
 
-def draw_renderer_menu():
+def draw_renderer_menu() -> None:
     root_console.print(
         42,
         46 - (tcod.NB_RENDERERS + 1),
         "Renderer :",
-        fg=tcod.grey,
-        bg=tcod.black,
+        fg=GREY,
+        bg=BLACK,
     )
     for i, name in enumerate(RENDERER_NAMES):
         if i == context.renderer_type:
-            fg = tcod.white
-            bg = tcod.light_blue
+            fg = WHITE
+            bg = LIGHT_BLUE
         else:
-            fg = tcod.grey
-            bg = tcod.black
+            fg = GREY
+            bg = BLACK
         root_console.print(42, 46 - tcod.NB_RENDERERS + i, name, fg, bg)
 
 
