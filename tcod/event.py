@@ -77,16 +77,34 @@ def _describe_bitmask(
     return "|".join(result)
 
 
-def _pixel_to_tile(x: float, y: float) -> Tuple[float, float]:
+def _pixel_to_tile(x: float, y: float) -> Optional[Tuple[float, float]]:
     """Convert pixel coordinates to tile coordinates."""
     if not lib.TCOD_ctx.engine:
-        return 0, 0
+        return None
     xy = ffi.new("double[2]", (x, y))
     lib.TCOD_sys_pixel_to_tile(xy, xy + 1)
     return xy[0], xy[1]
 
 
 Point = NamedTuple("Point", [("x", int), ("y", int)])
+
+
+def _verify_tile_coordinates(xy: Optional[Point]) -> Point:
+    """Check if an events tile coordinate is initialized and warn if not.
+
+    Always returns a valid Point object for backwards compatibility.
+    """
+    if xy is not None:
+        return xy
+    warnings.warn(
+        "This events tile coordinates are uninitialized!"
+        "\nYou MUST pass this event to `Context.convert_event` before you can"
+        " read its tile attributes.",
+        RuntimeWarning,
+        stacklevel=3,  # Called within other functions, never directly.
+    )
+    return Point(0, 0)
+
 
 # manually define names for SDL macros
 BUTTON_LEFT = 1
@@ -314,13 +332,21 @@ class MouseState(Event):
     def __init__(
         self,
         pixel: Tuple[int, int] = (0, 0),
-        tile: Tuple[int, int] = (0, 0),
+        tile: Optional[Tuple[int, int]] = (0, 0),
         state: int = 0,
     ):
         super().__init__()
         self.pixel = Point(*pixel)
-        self.tile = Point(*tile)
+        self.__tile = Point(*tile) if tile is not None else None
         self.state = state
+
+    @property
+    def tile(self) -> Point:
+        return _verify_tile_coordinates(self.__tile)
+
+    @tile.setter
+    def tile(self, xy: Tuple[int, int]) -> None:
+        self.__tile = Point(*xy)
 
     def __repr__(self) -> str:
         return ("tcod.event.%s(pixel=%r, tile=%r, state=%s)") % (
@@ -362,13 +388,23 @@ class MouseMotion(MouseState):
         self,
         pixel: Tuple[int, int] = (0, 0),
         pixel_motion: Tuple[int, int] = (0, 0),
-        tile: Tuple[int, int] = (0, 0),
-        tile_motion: Tuple[int, int] = (0, 0),
+        tile: Optional[Tuple[int, int]] = (0, 0),
+        tile_motion: Optional[Tuple[int, int]] = (0, 0),
         state: int = 0,
     ):
         super().__init__(pixel, tile, state)
         self.pixel_motion = Point(*pixel_motion)
-        self.tile_motion = Point(*tile_motion)
+        self.__tile_motion = (
+            Point(*tile_motion) if tile_motion is not None else None
+        )
+
+    @property
+    def tile_motion(self) -> Point:
+        return _verify_tile_coordinates(self.__tile_motion)
+
+    @tile_motion.setter
+    def tile_motion(self, xy: Tuple[int, int]) -> None:
+        self.__tile_motion = Point(*xy)
 
     @classmethod
     def from_sdl_event(cls, sdl_event: Any) -> "MouseMotion":
@@ -377,12 +413,15 @@ class MouseMotion(MouseState):
         pixel = motion.x, motion.y
         pixel_motion = motion.xrel, motion.yrel
         subtile = _pixel_to_tile(*pixel)
-        tile = int(subtile[0]), int(subtile[1])
-        prev_pixel = pixel[0] - pixel_motion[0], pixel[1] - pixel_motion[1]
-        prev_subtile = _pixel_to_tile(*prev_pixel)
-        prev_tile = int(prev_subtile[0]), int(prev_subtile[1])
-        tile_motion = tile[0] - prev_tile[0], tile[1] - prev_tile[1]
-        self = cls(pixel, pixel_motion, tile, tile_motion, motion.state)
+        if subtile is None:
+            self = cls(pixel, pixel_motion, None, None, motion.state)
+        else:
+            tile = int(subtile[0]), int(subtile[1])
+            prev_pixel = pixel[0] - pixel_motion[0], pixel[1] - pixel_motion[1]
+            prev_subtile = _pixel_to_tile(*prev_pixel) or (0, 0)
+            prev_tile = int(prev_subtile[0]), int(prev_subtile[1])
+            tile_motion = tile[0] - prev_tile[0], tile[1] - prev_tile[1]
+            self = cls(pixel, pixel_motion, tile, tile_motion, motion.state)
         self.sdl_event = sdl_event
         return self
 
@@ -430,7 +469,7 @@ class MouseButtonEvent(MouseState):
     def __init__(
         self,
         pixel: Tuple[int, int] = (0, 0),
-        tile: Tuple[int, int] = (0, 0),
+        tile: Optional[Tuple[int, int]] = (0, 0),
         button: int = 0,
     ):
         super().__init__(pixel, tile, button)
@@ -448,7 +487,10 @@ class MouseButtonEvent(MouseState):
         button = sdl_event.button
         pixel = button.x, button.y
         subtile = _pixel_to_tile(*pixel)
-        tile = int(subtile[0]), int(subtile[1])
+        if subtile is None:
+            tile: Optional[Tuple[int, int]] = None
+        else:
+            tile = int(subtile[0]), int(subtile[1])
         self = cls(pixel, tile, button.button)
         self.sdl_event = sdl_event
         return self
@@ -993,8 +1035,10 @@ def get_mouse_state() -> MouseState:
     """
     xy = ffi.new("int[2]")
     buttons = lib.SDL_GetMouseState(xy, xy + 1)
-    x, y = _pixel_to_tile(*xy)
-    return MouseState((xy[0], xy[1]), (int(x), int(y)), buttons)
+    tile = _pixel_to_tile(*xy)
+    if tile is None:
+        return MouseState((xy[0], xy[1]), None, buttons)
+    return MouseState((xy[0], xy[1]), (int(tile[0]), int(tile[1])), buttons)
 
 
 @ffi.def_extern()  # type: ignore

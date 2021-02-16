@@ -10,6 +10,8 @@ Unreleased
 ------------------
 Changed
  - Now bundles SDL 2.0.14 for MacOS.
+ - `tcod.event` can now detect and will warn about uninitialized tile
+   attributes on mouse events.
 
 Removed
  - Python 3.5 is no longer supported.
