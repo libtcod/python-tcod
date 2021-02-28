@@ -8,6 +8,10 @@ v2.0.0
 
 Unreleased
 ------------------
+Deprecated
+ - The Random class will now warn if the seed it's given will not used
+   deterministically. It will no longer accept non-integer seeds in the future.
+
 Changed
  - Now bundles SDL 2.0.14 for MacOS.
  - `tcod.event` can now detect and will warn about uninitialized tile

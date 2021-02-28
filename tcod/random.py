@@ -5,7 +5,9 @@ instead of this one.
 However, you will need to use these generators to get deterministic results
 from the :any:`Noise` and :any:`BSP` classes.
 """
+import os
 import random
+import warnings
 from typing import Any, Hashable, Optional
 
 import tcod.constants
@@ -31,6 +33,11 @@ class Random(object):
     Attributes:
         random_c (CData): A cffi pointer to a TCOD_random_t object.
 
+    .. warning::
+        A non-integer seed is only deterministic if the environment variable
+        ``PYTHONHASHSEED`` is set.  In the future this function will only
+        accept `int`'s as a seed.
+
     .. versionchanged:: 9.1
         Added `tcod.random.MULTIPLY_WITH_CARRY` constant.
         `algorithm` parameter now defaults to `tcod.random.MERSENNE_TWISTER`.
@@ -44,12 +51,30 @@ class Random(object):
         """Create a new instance using this algorithm and seed."""
         if seed is None:
             seed = random.getrandbits(32)
+        elif not isinstance(seed, int):
+            warnings.warn(
+                "In the future this class will only accept integer seeds.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            if __debug__ and "PYTHONHASHSEED" not in os.environ:
+                warnings.warn(
+                    "Python's hash algorithm is not configured to be"
+                    " deterministic so this non-integer seed will not be"
+                    " deterministic."
+                    "\nYou should do one of the following to fix this error:"
+                    "\n* Use an integer as a seed instead (recommended.)"
+                    "\n* Set the PYTHONHASHSEED environment variable before"
+                    " starting Python.",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
+            seed = hash(seed)
+
         self.random_c = ffi.gc(
             ffi.cast(
                 "mersenne_data_t*",
-                lib.TCOD_random_new_from_seed(
-                    algorithm, hash(seed) % (1 << 32)
-                ),
+                lib.TCOD_random_new_from_seed(algorithm, seed & 0xFFFFFFFF),
             ),
             lib.TCOD_random_delete,
         )
