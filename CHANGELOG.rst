@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+12.0.0 - 2021-03-05
+-------------------
 Deprecated
  - The Random class will now warn if the seed it's given will not used
    deterministically. It will no longer accept non-integer seeds in the future.
