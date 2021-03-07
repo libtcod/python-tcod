@@ -20,7 +20,7 @@ def convolve(tiles: np.array, wall_rule: int = 5) -> np.array:
     """
     # Use convolve2d, the 2nd input is a 3x3 ones array.
     neighbors = scipy.signal.convolve2d(
-        ~tiles, [[1, 1, 1], [1, 1, 1], [1, 1, 1]], "same"
+        tiles == 0, [[1, 1, 1], [1, 1, 1], [1, 1, 1]], "same"
     )
     return neighbors < wall_rule  # Apply the wall rule.
 
