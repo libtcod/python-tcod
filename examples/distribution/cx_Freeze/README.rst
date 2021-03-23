@@ -1,11 +1,14 @@
 cx_Freeze Example
 =================
 
-First, install the packages: ``tdl`` and ``cx_Freeze``.
+It's recommended to use a virtual environment to package Python executables.
+Use the following guide on how to set one up:
+https://docs.python.org/3/tutorial/venv.html
 
-Then run the command::
+Once the virtual environment is active you should install `tcod` and `cx_Freeze` from the `requirements.txt` file, then build using `setup.py`:
 
-    python setup.py build_exe
+    pip install -r requirements.txt
+    python setup.py build
 
 An executable package will be placed in ``build/<platform>/``
 
