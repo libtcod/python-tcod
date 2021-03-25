@@ -130,7 +130,7 @@ setup(
         "Forum": "https://github.com/libtcod/python-tcod/discussions",
     },
     py_modules=["libtcodpy"],
-    packages=["tcod"],
+    packages=["tcod", "tcod.__pyinstaller"],
     package_data={"tcod": get_package_data()},
     python_requires=">=3.6",
     install_requires=[
