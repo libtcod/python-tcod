@@ -16,9 +16,12 @@ jobs:
         python-version: ['3.7.9']
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0  # Needed for git describe to find tags.
+    - name: Clone ${{github.repository}}
+      # actions/checkout breaks `git describe` so a manual clone is needed.
+      # https://github.com/actions/checkout/issues/272
+      run: |
+        git clone https://github.com/${{github.repository}}.git ${{github.workspace}}
+        git checkout ${{github.sha}}
     - name: Checkout submodules
       run: |
         git submodule update --init --recursive --depth 1
@@ -45,8 +48,6 @@ jobs:
         python -m pip install git+https://github.com/HexDecimal/delocate.git@loader_path
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Build package.
-      env:
-        TCOD_TAG: ${{ github.event.release.tag_name }}
       run: |
         python setup.py sdist develop bdist_wheel --py-limited-api=cp36
     - name: Test with pytest

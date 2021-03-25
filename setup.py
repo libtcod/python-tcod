@@ -14,12 +14,6 @@ SDL_VERSION_NEEDED = (2, 0, 5)
 
 def get_version():
     """Get the current version from a git tag, or by reading tcod/version.py"""
-    if os.environ.get("TCOD_TAG"):
-        # Force a tag version from an environment variable.
-        # Needed to work with GitHub Actions.
-        with open("tcod/version.py", "w") as f:
-            f.write('__version__ = "%s"\n' % os.environ["TCOD_TAG"])
-        return os.environ["TCOD_TAG"]
     try:
         tag = check_output(
             ["git", "describe", "--abbrev=0"], universal_newlines=True
