@@ -138,21 +138,11 @@ def parse_includes() -> List[ParsedHeader]:
     return resolve_dependencies(includes)
 
 
-def walk_sources(directory: str, cpp: bool) -> Iterator[str]:
+def walk_sources(directory: str) -> Iterator[str]:
     for path, dirs, files in os.walk(directory):
         for source in files:
             if source.endswith(".c"):
                 yield os.path.join(path, source)
-            elif cpp and source.endswith(".cpp"):
-                yield os.path.join(path, source)
-
-
-def find_sources(directory: str) -> List[str]:
-    return [
-        os.path.join(directory, source)
-        for source in os.listdir(directory)
-        if source.endswith(".c")
-    ]
 
 
 def get_sdl2_file(version: str) -> str:
@@ -207,8 +197,8 @@ libraries = []
 library_dirs = []
 define_macros = [("Py_LIMITED_API", 0x03060000)]  # type: List[Tuple[str, Any]]
 
-sources += walk_sources("tcod/", cpp=True)
-sources += walk_sources("libtcod/src/libtcod/", cpp=False)
+sources += walk_sources("tcod/")
+sources += walk_sources("libtcod/src/libtcod/")
 sources += ["libtcod/src/vendor/stb.c"]
 sources += ["libtcod/src/vendor/glad.c"]
 sources += ["libtcod/src/vendor/lodepng.c"]

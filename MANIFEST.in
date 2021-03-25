@@ -2,7 +2,7 @@ include *.py *.cfg *.txt *.rst
 
 recursive-include tcod *.py *.c *.h
 
-recursive-include libtcod/src *.glsl* *.c *.h  *.cpp *.hpp
+recursive-include libtcod/src *.glsl* *.c *.h
 include libtcod/*.txt libtcod/*.md
 
 exclude tcod/*/SDL2.dll
