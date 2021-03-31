@@ -11,6 +11,14 @@ Unreleased
 Added
  - Added package-level PyInstaller hook.
 
+Changed
+ - Using `libtcod 1.16.7`.
+
+Fixed
+ - Fixed crashes from loading tilesets with non-square tile sizes.
+ - Tilesets with a size of 0 should no longer crash when used.
+ - Prevent division by zero from recommended-console-size functions.
+
 12.0.0 - 2021-03-05
 -------------------
 Deprecated

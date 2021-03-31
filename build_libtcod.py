@@ -186,7 +186,7 @@ def unpack_sdl2(version: str) -> str:
 includes = parse_includes()
 
 module_name = "tcod._libtcod"
-include_dirs = [".", "libtcod/src/vendor/", "libtcod/src/vendor/zlib/"]
+include_dirs = [".", "libtcod/src/vendor/", "libtcod/src/vendor/utf8proc", "libtcod/src/vendor/zlib/"]
 
 extra_parse_args = []
 extra_compile_args = []
