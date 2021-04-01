@@ -13,6 +13,10 @@ Added
 
 Changed
  - Using `libtcod 1.16.7`.
+ - `tcod.path.dijkstra2d` now returns the output and accepts an `out` parameter.
+
+Deprecated
+ - In the future `tcod.path.dijkstra2d` will no longer modify the input by default.  Until then an `out` parameter must be given.
 
 Fixed
  - Fixed crashes from loading tilesets with non-square tile sizes.

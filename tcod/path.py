@@ -17,6 +17,7 @@ the root node.  You can then get a path towards or away from the root with
 """
 import functools
 import itertools
+import warnings
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
@@ -25,6 +26,11 @@ from typing_extensions import Literal
 import tcod.map  # noqa: F401
 from tcod._internal import _check
 from tcod.loader import ffi, lib
+
+try:
+    from numpy.typing import ArrayLike
+except ImportError:  # Python < 3.7, Numpy < 1.20
+    from typing import Any as ArrayLike
 
 
 @ffi.def_extern()  # type: ignore
@@ -137,7 +143,7 @@ class NodeCostArray(np.ndarray):
         np.uint32: ("uint32_t*", _get_pathcost_func("PathCostArrayUInt32")),
     }
 
-    def __new__(cls, array: np.ndarray) -> "NodeCostArray":
+    def __new__(cls, array: ArrayLike) -> "NodeCostArray":
         """Validate a numpy array and setup a C callback."""
         self = np.asarray(array).view(cls)
         return self
@@ -370,20 +376,20 @@ def _compile_cost_edges(edge_map: Any) -> Tuple[Any, int]:
 
 
 def dijkstra2d(
-    distance: np.ndarray,
-    cost: np.ndarray,
+    distance: ArrayLike,
+    cost: ArrayLike,
     cardinal: Optional[int] = None,
     diagonal: Optional[int] = None,
     *,
     edge_map: Any = None,
-) -> None:
+    out: Optional[np.ndarray] = ...,  # type: ignore
+) -> np.ndarray:
     """Return the computed distance of all nodes on a 2D Dijkstra grid.
 
-    `distance` is an input/output array of node distances.  Is this often an
+    `distance` is an input array of node distances.  Is this often an
     array filled with maximum finite values and 1 or more points with a low
     value such as 0.  Distance will flow from these low values to adjacent
-    nodes based the cost to reach those nodes.  This array is modified
-    in-place.
+    nodes based the cost to reach those nodes.
 
     `cost` is an array of node costs.  Any node with a cost less than or equal
     to 0 is considered blocked off.  Positive values are the distance needed to
@@ -397,6 +403,11 @@ def dijkstra2d(
     the array.  This can be used to define the edges used from one node to
     another.  This parameter can be hard to understand so you should see how
     it's used in the examples.
+
+    `out` is the array to fill with the computed Dijkstra distance map.
+    Having `out` be the same as `distance` will modify the array in-place,
+    which is normally the fastest option.
+    If `out` is `None` then the result is returned as a new array.
 
     Example::
 
@@ -414,8 +425,7 @@ def dijkstra2d(
         array([[         0, 2147483647, 2147483647],
                [2147483647, 2147483647, 2147483647],
                [2147483647, 2147483647, 2147483647]]...)
-        >>> tcod.path.dijkstra2d(dist, cost, 2, 3)
-        >>> dist
+        >>> tcod.path.dijkstra2d(dist, cost, 2, 3, out=dist)
         array([[         0, 2147483647,         10],
                [         2, 2147483647,          8],
                [         4,          5,          7]]...)
@@ -450,8 +460,7 @@ def dijkstra2d(
         >>> dist = tcod.path.maxarray((8, 8))
         >>> dist[0,0] = 0
         >>> cost = np.ones((8, 8), int)
-        >>> tcod.path.dijkstra2d(dist, cost, edge_map=knight_moves)
-        >>> dist
+        >>> tcod.path.dijkstra2d(dist, cost, edge_map=knight_moves, out=dist)
         array([[0, 3, 2, 3, 2, 3, 4, 5],
                [3, 4, 1, 2, 3, 4, 3, 4],
                [2, 1, 4, 3, 2, 3, 4, 5],
@@ -485,15 +494,39 @@ def dijkstra2d(
 
     .. versionchanged:: 11.13
         Added the `edge_map` parameter.
+
+    .. versionchanged:: 12.1
+        Added `out` parameter.  Now returns the output array.
     """
-    dist = distance
+    dist = np.asarray(distance)
+    if out is ...:  # type: ignore
+        out = dist
+        warnings.warn(
+            "No `out` parameter was given. "
+            "Currently this modifies the distance array in-place, but this "
+            "will change in the future to return a copy instead. "
+            "To ensure the existing behavior is kept you must add an `out` "
+            "parameter with the same array as the `distance` parameter.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+    elif out is None:
+        out = np.copy(distance)
+    else:
+        out[...] = dist
+
+    if dist.shape != out.shape:
+        raise TypeError(
+            "distance and output must have the same shape %r != %r"
+            % (dist.shape, out.shape)
+        )
     cost = np.asarray(cost)
     if dist.shape != cost.shape:
         raise TypeError(
-            "distance and cost must have the same shape %r != %r"
-            % (dist.shape, cost.shape)
+            "output and cost must have the same shape %r != %r"
+            % (out.shape, cost.shape)
         )
-    c_dist = _export(dist)
+    c_dist = _export(out)
     if edge_map is not None:
         if cardinal is not None or diagonal is not None:
             raise TypeError(
@@ -508,6 +541,7 @@ def dijkstra2d(
         if diagonal is None:
             diagonal = 0
         _check(lib.dijkstra2d_basic(c_dist, _export(cost), cardinal, diagonal))
+    return out
 
 
 def _compile_bool_edges(edge_map: Any) -> Tuple[Any, int]:
@@ -521,7 +555,7 @@ def _compile_bool_edges(edge_map: Any) -> Tuple[Any, int]:
 
 
 def hillclimb2d(
-    distance: np.ndarray,
+    distance: ArrayLike,
     start: Tuple[int, int],
     cardinal: Optional[bool] = None,
     diagonal: Optional[bool] = None,
