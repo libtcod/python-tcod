@@ -2,7 +2,7 @@
 """Print the description used for GitHub Releases."""
 import re
 
-TAG_BANNER = r"\d+\.\d+\.\d+\S* - \d+-\d+-\d+\n--------------------\n"
+TAG_BANNER = r"\d+\.\d+\.\d+\S* - \d+-\d+-\d+\n-+\n"
 
 RE_BODY = re.compile(fr".*?{TAG_BANNER}(.*?){TAG_BANNER}", re.DOTALL)
 RE_SECTION = re.compile(r"^(\w+)$", re.MULTILINE)
