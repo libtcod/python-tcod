@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+12.1.0 - 2021-04-01
+-------------------
 Added
  - Added package-level PyInstaller hook.
 
