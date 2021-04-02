@@ -96,4 +96,8 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    tcod_version = tuple(
+        int(n) for n in tcod.__version__.split(".") if n.isdigit()
+    )
+    assert tcod_version[:2] >= (12, 1), "Must be using tcod 12.1 or later."
     main()
