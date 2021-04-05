@@ -189,7 +189,7 @@ class Noise(object):
                 *c_input,
                 ffi.from_buffer("float*", out),
             )
-        elif self.implementation == SIMPLE:
+        elif self.implementation == FBM:
             lib.TCOD_noise_get_fbm_vectorized(
                 self.noise_c,
                 self.algorithm,

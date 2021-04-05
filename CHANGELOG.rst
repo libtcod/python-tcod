@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Indexing Noise classes now works with the FBM implementation.
 
 12.1.0 - 2021-04-01
 -------------------
