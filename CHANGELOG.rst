@@ -8,6 +8,12 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - Added `tcod.noise.Algorithm` and `tcod.noise.Implementation` enums.
+
+Deprecated
+ - The non-enum noise implementation names have been deprecated.
+
 Fixed
  - Indexing Noise classes now works with the FBM implementation.
 

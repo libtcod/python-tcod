@@ -10,8 +10,8 @@ Example::
 
     noise = tcod.noise.Noise(
         dimensions=2,
-        algorithm=tcod.NOISE_SIMPLEX,
-        implementation=tcod.noise.TURBULENCE,
+        algorithm=tcod.noise.Algorithm.SIMPLEX,
+        implementation=tcod.noise.Implementation.TURBULENCE,
         hurst=0.5,
         lacunarity=2.0,
         octaves=4,
@@ -31,7 +31,9 @@ Example::
     samples = noise.sample_ogrid(ogrid)
     print(samples)
 """
-from typing import Any, Optional
+import enum
+import warnings
+from typing import Any, Optional, Sequence, Union
 
 import numpy as np
 
@@ -40,10 +42,63 @@ import tcod.random
 from tcod._internal import deprecate
 from tcod.loader import ffi, lib
 
-"""Noise implementation constants"""
-SIMPLE = 0
-FBM = 1
-TURBULENCE = 2
+try:
+    from numpy.typing import ArrayLike
+except ImportError:  # Python < 3.7, Numpy < 1.20
+    from typing import Any as ArrayLike
+
+
+class Algorithm(enum.IntEnum):
+    """Libtcod noise algorithms.
+
+    .. versionadded:: 12.2
+    """
+
+    PERLIN = 1
+    """Perlin noise."""
+
+    SIMPLEX = 2
+    """Simplex noise."""
+
+    WAVELET = 4
+    """Wavelet noise."""
+
+    def __repr__(self) -> str:
+        return f"tcod.noise.Algorithm.{self.name}"
+
+
+class Implementation(enum.IntEnum):
+    """Noise implementations.
+
+    .. versionadded:: 12.2
+    """
+
+    SIMPLE = 0
+    """Generate plain noise."""
+
+    FBM = 1
+    """Fractional Brownian motion.
+
+    https://en.wikipedia.org/wiki/Fractional_Brownian_motion
+    """
+
+    TURBULENCE = 2
+    """Turbulence noise implementation."""
+
+    def __repr__(self) -> str:
+        return f"tcod.noise.Implementation.{self.name}"
+
+
+def __getattr__(name: str) -> Implementation:
+    if hasattr(Implementation, name):
+        warnings.warn(
+            f"'tcod.noise.{name}' is deprecated,"
+            f" use 'tcod.noise.Implementation.{name}' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return Implementation[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 
 class Noise(object):
@@ -59,8 +114,9 @@ class Noise(object):
 
     Args:
         dimensions (int): Must be from 1 to 4.
-        algorithm (int): Defaults to NOISE_SIMPLEX
-        implementation (int): Defaults to tcod.noise.SIMPLE
+        algorithm (int): Defaults to :any:`tcod.noise.Algorithm.SIMPLEX`
+        implementation (int):
+            Defaults to :any:`tcod.noise.Implementation.SIMPLE`
         hurst (float): The hurst exponent.  Should be in the 0.0-1.0 range.
         lacunarity (float): The noise lacunarity.
         octaves (float): The level of detail on fBm and turbulence
@@ -74,21 +130,21 @@ class Noise(object):
     def __init__(
         self,
         dimensions: int,
-        algorithm: int = 2,
-        implementation: int = SIMPLE,
+        algorithm: int = Algorithm.SIMPLEX,
+        implementation: int = Implementation.SIMPLE,
         hurst: float = 0.5,
         lacunarity: float = 2.0,
         octaves: float = 4,
-        seed: Optional[tcod.random.Random] = None,
+        seed: Optional[Union[int, tcod.random.Random]] = None,
     ):
         if not 0 < dimensions <= 4:
             raise ValueError(
                 "dimensions must be in range 0 < n <= 4, got %r"
                 % (dimensions,)
             )
-        self._random = seed
-        _random_c = seed.random_c if seed else ffi.NULL
-        self._algorithm = algorithm
+        self._seed = seed
+        self._random = self.__rng_from_seed(seed)
+        _random_c = self._random.random_c
         self.noise_c = ffi.gc(
             ffi.cast(
                 "struct TCOD_Noise*",
@@ -99,7 +155,34 @@ class Noise(object):
         self._tdl_noise_c = ffi.new(
             "TDLNoise*", (self.noise_c, dimensions, 0, octaves)
         )
+        self.algorithm = algorithm
         self.implementation = implementation  # sanity check
+
+    @staticmethod
+    def __rng_from_seed(
+        seed: Union[None, int, tcod.random.Random]
+    ) -> tcod.random.Random:
+        if seed is None or isinstance(seed, int):
+            return tcod.random.Random(
+                seed=seed, algorithm=tcod.random.MERSENNE_TWISTER
+            )
+        return seed
+
+    def __repr__(self) -> str:
+        parameters = [
+            f"dimensions={self.dimensions}",
+            f"algorithm={self.algorithm!r}",
+            f"implementation={Implementation(self.implementation)!r}",
+        ]
+        if self.hurst != 0.5:
+            parameters.append(f"hurst={self.hurst}")
+        if self.lacunarity != 2:
+            parameters.append(f"lacunarity={self.lacunarity}")
+        if self.octaves != 4:
+            parameters.append(f"octaves={self.octaves}")
+        if self._seed is not None:
+            parameters.append(f"seed={self._seed}")
+        return f"tcod.noise.Noise({', '.join(parameters)})"
 
     @property
     def dimensions(self) -> int:
@@ -112,7 +195,8 @@ class Noise(object):
 
     @property
     def algorithm(self) -> int:
-        return int(self.noise_c.noise_type)
+        noise_type = self.noise_c.noise_type
+        return Algorithm(noise_type) if noise_type else Algorithm.SIMPLEX
 
     @algorithm.setter
     def algorithm(self, value: int) -> None:
@@ -120,7 +204,7 @@ class Noise(object):
 
     @property
     def implementation(self) -> int:
-        return int(self._tdl_noise_c.implementation)
+        return Implementation(self._tdl_noise_c.implementation)
 
     @implementation.setter
     def implementation(self, value: int) -> None:
@@ -181,7 +265,7 @@ class Noise(object):
             c_input[i] = ffi.from_buffer("float*", indexes[i])
 
         out = np.empty(indexes[0].shape, dtype=np.float32)
-        if self.implementation == SIMPLE:
+        if self.implementation == Implementation.SIMPLE:
             lib.TCOD_noise_get_vectorized(
                 self.noise_c,
                 self.algorithm,
@@ -189,7 +273,7 @@ class Noise(object):
                 *c_input,
                 ffi.from_buffer("float*", out),
             )
-        elif self.implementation == FBM:
+        elif self.implementation == Implementation.FBM:
             lib.TCOD_noise_get_fbm_vectorized(
                 self.noise_c,
                 self.algorithm,
@@ -198,7 +282,7 @@ class Noise(object):
                 *c_input,
                 ffi.from_buffer("float*", out),
             )
-        elif self.implementation == TURBULENCE:
+        elif self.implementation == Implementation.TURBULENCE:
             lib.TCOD_noise_get_turbulence_vectorized(
                 self.noise_c,
                 self.algorithm,
@@ -212,7 +296,7 @@ class Noise(object):
 
         return out
 
-    def sample_mgrid(self, mgrid: np.ndarray) -> np.ndarray:
+    def sample_mgrid(self, mgrid: ArrayLike) -> np.ndarray:
         """Sample a mesh-grid array and return the result.
 
         The :any:`sample_ogrid` method performs better as there is a lot of
@@ -248,7 +332,7 @@ class Noise(object):
         )
         return out
 
-    def sample_ogrid(self, ogrid: np.ndarray) -> np.ndarray:
+    def sample_ogrid(self, ogrid: Sequence[ArrayLike]) -> np.ndarray:
         """Sample an open mesh-grid array and return the result.
 
         Args
