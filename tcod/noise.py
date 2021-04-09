@@ -27,8 +27,12 @@ Example::
            [0.24613297, 0.3678193 , 0.6222316 , 0.8195127 , 0.79614234],
            [0.17527187, 0.4373501 , 0.76734173, 0.9020113 , 0.76327705]],
           dtype=float32)
-
-
+    >>> ((samples + 1.0) * (256 / 2)).astype(np.uint8)  # Or as 8-bit unsigned bytes.
+    array([[128,  57,  30,  37,  40],
+           [ 92,  35,  33,  71,  90],
+           [ 76,  54,  85, 144, 164],
+           [ 63,  94, 159, 209, 203],
+           [ 44, 111, 196, 230, 195]], dtype=uint8)
 """  # noqa: E501
 import enum
 import warnings
@@ -89,7 +93,7 @@ class Implementation(enum.IntEnum):
 
 
 def __getattr__(name: str) -> Implementation:
-    if hasattr(Implementation, name):
+    if name in Implementation.__members__:
         warnings.warn(
             f"'tcod.noise.{name}' is deprecated,"
             f" use 'tcod.noise.Implementation.{name}' instead.",
