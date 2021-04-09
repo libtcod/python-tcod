@@ -3,7 +3,7 @@
 
 """
 import warnings
-from typing import Any, Tuple, Union
+from typing import Any, Tuple
 
 import numpy as np
 from typing_extensions import Literal
@@ -73,7 +73,7 @@ class Map(object):
         self,
         width: int,
         height: int,
-        order: Union[Literal["C"], Literal["F"]] = "C",
+        order: Literal["C", "F"] = "C",
     ):
         warnings.warn(
             "This class may perform poorly and is no longer needed.",

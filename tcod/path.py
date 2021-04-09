@@ -312,7 +312,7 @@ _INT_TYPES = {
 def maxarray(
     shape: Tuple[int, ...],
     dtype: Any = np.int32,
-    order: Union[Literal["C"], Literal["F"]] = "C",
+    order: Literal["C", "F"] = "C",
 ) -> np.ndarray:
     """Return a new array filled with the maximum finite value for `dtype`.
 

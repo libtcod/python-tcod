@@ -49,7 +49,7 @@ to setup the size of the console.  You should use
 """  # noqa: E501
 import os
 import sys
-from typing import Any, Iterable, List, Optional, Tuple, Union
+from typing import Any, Iterable, List, Optional, Tuple
 
 from typing_extensions import Literal
 
@@ -269,7 +269,7 @@ class Context:
         min_columns: int = 1,
         min_rows: int = 1,
         magnification: float = 1.0,
-        order: Union[Literal["C"], Literal["F"]] = "C",
+        order: Literal["C", "F"] = "C",
     ) -> tcod.console.Console:
         """Return a new console sized for this context.
 

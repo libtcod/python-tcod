@@ -93,7 +93,7 @@ class Console:
         self,
         width: int,
         height: int,
-        order: Union[Literal["C"], Literal["F"]] = "C",
+        order: Literal["C", "F"] = "C",
         buffer: Optional[np.ndarray] = None,
     ):
         self._key_color = None  # type: Optional[Tuple[int, int, int]]
@@ -133,7 +133,7 @@ class Console:
 
     @classmethod
     def _from_cdata(
-        cls, cdata: Any, order: Union[Literal["C"], Literal["F"]] = "C"
+        cls, cdata: Any, order: Literal["C", "F"] = "C"
     ) -> "Console":
         """Return a Console instance which wraps this `TCOD_Console*` object."""
         if isinstance(cdata, cls):
@@ -144,9 +144,7 @@ class Console:
         return self
 
     @classmethod
-    def _get_root(
-        cls, order: Optional[Union[Literal["C"], Literal["F"]]] = None
-    ) -> "Console":
+    def _get_root(cls, order: Optional[Literal["C", "F"]] = None) -> "Console":
         """Return a root console singleton with valid buffers.
 
         This function will also update an already active root console.
@@ -161,9 +159,7 @@ class Console:
         self._init_setup_console_data(self._order)
         return self
 
-    def _init_setup_console_data(
-        self, order: Union[Literal["C"], Literal["F"]] = "C"
-    ) -> None:
+    def _init_setup_console_data(self, order: Literal["C", "F"] = "C") -> None:
         """Setup numpy arrays over libtcod data buffers."""
         global _root_console
         self._key_color = None

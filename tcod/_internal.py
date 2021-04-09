@@ -2,7 +2,7 @@
 """
 import functools
 import warnings
-from typing import Any, AnyStr, Callable, TypeVar, Union, cast
+from typing import Any, AnyStr, Callable, TypeVar, cast
 
 import numpy as np
 from typing_extensions import Literal, NoReturn
@@ -43,9 +43,7 @@ def pending_deprecate(
     return deprecate(message, category, stacklevel)
 
 
-def verify_order(
-    order: Union[Literal["C"], Literal["F"]]
-) -> Union[Literal["C"], Literal["F"]]:
+def verify_order(order: Literal["C", "F"]) -> Literal["C", "F"]:
     order = order.upper()  # type: ignore
     if order not in ("C", "F"):
         raise TypeError("order must be 'C' or 'F', not %r" % (order,))

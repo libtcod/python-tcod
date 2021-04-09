@@ -442,7 +442,7 @@ def grid(
     shape: Tuple[int, ...],
     scale: Union[Tuple[float, ...], float],
     origin: Optional[Tuple[int, ...]] = None,
-    indexing: Union[Literal["ij"], Literal["xy"]] = "xy",
+    indexing: Literal["ij", "xy"] = "xy",
 ) -> Tuple[np.ndarray, ...]:
     """A helper function for generating a grid of noise samples.
 

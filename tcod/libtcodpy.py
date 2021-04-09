@@ -880,7 +880,7 @@ def console_init_root(
     title: Optional[str] = None,
     fullscreen: bool = False,
     renderer: Optional[int] = None,
-    order: Union[Literal["C"], Literal["F"]] = "C",
+    order: Literal["C", "F"] = "C",
     vsync: Optional[bool] = None,
 ) -> tcod.console.Console:
     """Set up the primary display and return the root console.
