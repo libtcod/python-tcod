@@ -5,35 +5,34 @@ much better than multiple calls to :any:`Noise.get_point`.
 
 Example::
 
-    import numpy as np
-    import tcod
+    >>> import numpy as np
+    >>> import tcod
+    >>> noise = tcod.noise.Noise(
+    ...     dimensions=2,
+    ...     algorithm=tcod.noise.Algorithm.SIMPLEX,
+    ...     seed=42,
+    ... )
+    >>> samples = noise[tcod.noise.grid(shape=(5, 5), scale=0.25, origin=(0, 0))]
+    >>> samples  # Samples are a grid of floats between -1.0 and 1.0
+    array([[ 0.        , -0.55046356, -0.76072866, -0.7088647 , -0.68165785],
+           [-0.27523372, -0.7205134 , -0.74057037, -0.43919194, -0.29195625],
+           [-0.40398532, -0.57662135, -0.33160293,  0.12860827,  0.2864191 ],
+           [-0.50773406, -0.2643614 ,  0.24446318,  0.6390255 ,  0.5922846 ],
+           [-0.64945626, -0.12529983,  0.5346834 ,  0.80402255,  0.52655405]],
+          dtype=float32)
+    >>> (samples + 1.0) * 0.5  # You can normalize samples to 0.0 - 1.0
+    array([[0.5       , 0.22476822, 0.11963567, 0.14556766, 0.15917107],
+           [0.36238313, 0.1397433 , 0.12971482, 0.28040403, 0.35402188],
+           [0.29800734, 0.21168932, 0.33419853, 0.5643041 , 0.6432096 ],
+           [0.24613297, 0.3678193 , 0.6222316 , 0.8195127 , 0.79614234],
+           [0.17527187, 0.4373501 , 0.76734173, 0.9020113 , 0.76327705]],
+          dtype=float32)
 
-    noise = tcod.noise.Noise(
-        dimensions=2,
-        algorithm=tcod.noise.Algorithm.SIMPLEX,
-        implementation=tcod.noise.Implementation.TURBULENCE,
-        hurst=0.5,
-        lacunarity=2.0,
-        octaves=4,
-        seed=None,
-        )
 
-    # Create a 5x5 open multi-dimensional mesh-grid.
-    ogrid = [np.arange(5, dtype=np.float32),
-             np.arange(5, dtype=np.float32)]
-    print(ogrid)
-
-    # Scale the grid.
-    ogrid[0] *= 0.25
-    ogrid[1] *= 0.25
-
-    # Return the sampled noise from this grid of points.
-    samples = noise.sample_ogrid(ogrid)
-    print(samples)
-"""
+"""  # noqa: E501
 import enum
 import warnings
-from typing import Any, Optional, Sequence, Union
+from typing import Any, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
@@ -432,3 +431,55 @@ class Noise(object):
         self._tdl_noise_c = ffi.new(
             "TDLNoise*", (self.noise_c, self.noise_c.ndim, state[1], state[2])
         )
+
+
+def grid(
+    shape: Tuple[int, ...],
+    scale: Union[Tuple[float, ...], float],
+    origin: Optional[Tuple[int, ...]] = None,
+) -> Tuple[np.ndarray, ...]:
+    """A helper function for generating a grid of noise samples.
+
+    `shape` is the shape of the returned mesh grid.  This can be any number of
+    dimensions, but :class:`Noise` classes only support up to 4.
+
+    `scale` is the step size of indexes away from `origin`.
+    This can be a single float, or it can be a tuple of floats with one float
+    for each axis in `shape`.  A lower scale gives smoother transitions
+    between noise values.
+
+    `origin` is the first sample of the grid.
+    If `None` then the `origin` will be zero on each axis.
+    `origin` is not scaled by the `scale` parameter.
+
+    Example::
+
+        >>> noise = tcod.noise.Noise(dimensions=2, seed=42)
+        >>> noise[tcod.noise.grid(shape=(5, 5), scale=0.25)]
+        array([[ 0.        , -0.55046356, -0.76072866, -0.7088647 , -0.68165785],
+               [-0.27523372, -0.7205134 , -0.74057037, -0.43919194, -0.29195625],
+               [-0.40398532, -0.57662135, -0.33160293,  0.12860827,  0.2864191 ],
+               [-0.50773406, -0.2643614 ,  0.24446318,  0.6390255 ,  0.5922846 ],
+               [-0.64945626, -0.12529983,  0.5346834 ,  0.80402255,  0.52655405]],
+              dtype=float32)
+        >>> noise[tcod.noise.grid(shape=(5, 5), scale=(0.5, 0.25), origin=(1, 1))]
+        array([[ 0.52655405, -0.5037453 , -0.81221616, -0.7057655 ,  0.24630858],
+               [ 0.25038874, -0.75348294, -0.6379566 , -0.5817767 , -0.02789652],
+               [-0.03488023, -0.73630923, -0.12449139, -0.22774395, -0.22243626],
+               [-0.18455243, -0.35063767,  0.4495706 ,  0.02399864, -0.42226675],
+               [-0.16333057,  0.18149695,  0.7547447 , -0.07006818, -0.6546707 ]],
+              dtype=float32)
+    """  # noqa: E501
+    if isinstance(scale, float):
+        scale = (scale,) * len(shape)
+    if origin is None:
+        origin = (0,) * len(shape)
+    if len(shape) != len(scale):
+        raise TypeError("shape must have the same length as scale")
+    if len(shape) != len(origin):
+        raise TypeError("shape must have the same length as origin")
+    indexes = (
+        np.arange(i_shape) * i_scale + i_origin
+        for i_shape, i_scale, i_origin in zip(shape, scale, origin)
+    )
+    return tuple(np.meshgrid(*indexes, copy=False, sparse=True, indexing="xy"))

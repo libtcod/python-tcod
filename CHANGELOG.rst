@@ -10,6 +10,7 @@ Unreleased
 ------------------
 Added
  - Added `tcod.noise.Algorithm` and `tcod.noise.Implementation` enums.
+ - Added `tcod.noise.grid` helper function.
 
 Deprecated
  - The non-enum noise implementation names have been deprecated.
