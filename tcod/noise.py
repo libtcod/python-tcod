@@ -39,6 +39,7 @@ import warnings
 from typing import Any, Optional, Sequence, Tuple, Union
 
 import numpy as np
+from typing_extensions import Literal
 
 import tcod.constants
 import tcod.random
@@ -441,6 +442,7 @@ def grid(
     shape: Tuple[int, ...],
     scale: Union[Tuple[float, ...], float],
     origin: Optional[Tuple[int, ...]] = None,
+    indexing: Union[Literal["ij"], Literal["xy"]] = "xy",
 ) -> Tuple[np.ndarray, ...]:
     """A helper function for generating a grid of noise samples.
 
@@ -455,6 +457,8 @@ def grid(
     `origin` is the first sample of the grid.
     If `None` then the `origin` will be zero on each axis.
     `origin` is not scaled by the `scale` parameter.
+
+    `indexing` is passed to :any:`numpy.meshgrid`.
 
     Example::
 
@@ -486,4 +490,6 @@ def grid(
         np.arange(i_shape) * i_scale + i_origin
         for i_shape, i_scale, i_origin in zip(shape, scale, origin)
     )
-    return tuple(np.meshgrid(*indexes, copy=False, sparse=True, indexing="xy"))
+    return tuple(
+        np.meshgrid(*indexes, copy=False, sparse=True, indexing=indexing)
+    )
