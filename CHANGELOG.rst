@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+12.2.0 - 2021-04-09
+-------------------
 Added
  - Added `tcod.noise.Algorithm` and `tcod.noise.Implementation` enums.
  - Added `tcod.noise.grid` helper function.

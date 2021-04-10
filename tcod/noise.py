@@ -477,6 +477,8 @@ def grid(
                [-0.18455243, -0.35063767,  0.4495706 ,  0.02399864, -0.42226675],
                [-0.16333057,  0.18149695,  0.7547447 , -0.07006818, -0.6546707 ]],
               dtype=float32)
+
+    .. versionadded:: 12.2
     """  # noqa: E501
     if isinstance(scale, float):
         scale = (scale,) * len(shape)
