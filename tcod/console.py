@@ -295,6 +295,16 @@ class Console:
         return self.tiles_rgb
 
     @property
+    def rgba(self) -> np.ndarray:
+        # This attribute is provisional and may be changed at anytime.
+        return self.tiles
+
+    @property
+    def rgb(self) -> np.ndarray:
+        # This attribute is provisional and may be changed at anytime.
+        return self.tiles_rgb
+
+    @property
     def default_bg(self) -> Tuple[int, int, int]:
         """Tuple[int, int, int]: The default background color."""
         color = self._console_data.back
