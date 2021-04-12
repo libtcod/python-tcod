@@ -13,21 +13,22 @@ WIDTH, HEIGHT = 80, 60
 # The base directory, this is sys._MEIPASS when in one-file mode.
 BASE_DIR = getattr(sys, "_MEIPASS", ".")
 
-FONT_PATH = os.path.join(BASE_DIR, "terminal8x8_gs_ro.png")
+FONT_PATH = os.path.join(BASE_DIR, "data/terminal8x8_gs_ro.png")
 
 
 def main():
-    tcod.console_set_custom_font(FONT_PATH, tcod.FONT_LAYOUT_CP437)
-    with tcod.console_init_root(
-        WIDTH, HEIGHT, renderer=tcod.RENDERER_SDL2, vsync=True
-    ) as console:
+    tileset = tcod.tileset.load_tilesheet(
+        FONT_PATH, 16, 16, tcod.tileset.CHARMAP_CP437
+    )
+    with tcod.context.new(
+        columns=WIDTH, rows=HEIGHT, tileset=tileset
+    ) as context:
         while True:
-            console.clear()
+            console = tcod.console.Console(WIDTH, HEIGHT)
             console.print(0, 0, "Hello World")
-            tcod.console_flush()
-
+            context.present(console)
             for event in tcod.event.wait():
-                if event.type == "QUIT":
+                if isinstance(event, tcod.event.Quit):
                     raise SystemExit()
 
 
