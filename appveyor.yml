@@ -1,10 +1,6 @@
 image: Visual Studio 2019
 
 environment:
-  TWINE_USERNAME:
-    secure: sUo+lYht329nQC5JCxEB8w==
-  TWINE_PASSWORD:
-    secure: mjSxOmR8POpeVSL9mwOnH2XQAn9Trj5wn6dbmCIwgTSr2qjfm/y1UoQ2XkYV9QpATp1xLUKalIDc62bORmIMKe6GkhDayUymLC6RM8KRZqM93aPoNXst9c5YfdUVbJuubk1QsJ/wE8KZrr6jrcXM3H7rfiq9Z8NtEud1XDD/d8MKbR9LkL4Y9ACI12jfayQ+uwaTOMhs9/1XlT92FEPGqy0Qlr/zXLd7TixOkAB/cyqYJdD3B6+fyvqxFxPVrA+iWhldv60ERQmlXW/j7WbPCw==
   CODACY_PROJECT_TOKEN:
     secure: xprpiCGL823NKrs/K2Cps1UVBEmpezXReLxcfLyU1M43ZBBOK91xvjdIJamYKi8D
   DEPLOY_ONLY: false
@@ -25,10 +21,6 @@ environment:
   - PYTHON: C:\Python39-x64\python.exe
     platform: x64
     NO_DEPLOY: true
-  - PYPY3: pypy3.6-v7.3.2
-    platform: Any CPU
-  - PYPY3: pypy3.7-v7.3.2
-    platform: Any CPU
 
 matrix:
   allow_failures:
@@ -58,7 +50,3 @@ on_success:
 - pip install codacy-coverage
 - coverage xml
 - if defined CODACY_PROJECT_TOKEN python-codacy-coverage -r coverage.xml || cd .
-
-deploy_script:
-- "if defined APPVEYOR_REPO_TAG_NAME if not defined NO_DEPLOY pip install twine"
-- "if defined APPVEYOR_REPO_TAG_NAME if not defined NO_DEPLOY twine upload --skip-existing dist/*"
