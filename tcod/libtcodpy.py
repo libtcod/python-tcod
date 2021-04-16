@@ -1628,7 +1628,7 @@ def console_hline(
     con: tcod.console.Console,
     x: int,
     y: int,
-    l: int,
+    l: int,  # noqa: E741
     flag: int = BKGND_DEFAULT,
 ) -> None:
     """Draw a horizontal line on the console.
@@ -1646,7 +1646,7 @@ def console_vline(
     con: tcod.console.Console,
     x: int,
     y: int,
-    l: int,
+    l: int,  # noqa: E741
     flag: int = BKGND_DEFAULT,
 ) -> None:
     """Draw a vertical line on the console.

@@ -42,29 +42,11 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install flake8 mypy pytest pytest-cov pytest-benchmark black isort wheel
+        python -m pip install pytest pytest-cov pytest-benchmark wheel
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Initialize package
       run: |
         python setup.py check  # Creates tcod/version.py.
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 tcod/ --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 tcod/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Check type hints with MyPy
-      if: ${{ matrix.python-version != '3.6' }}
-      run: |
-        mypy tcod/
-    - name: Check formatting with Black
-      run: |
-        black --check tcod/
-    - name: Check import order
-      run: |
-        isort tcod/ --check --diff
-        isort tests/ --check --diff
-        isort examples/ --check --diff --thirdparty tcod
     - name: Build package.
       run: |
         python setup.py build sdist develop bdist_wheel --py-limited-api cp36  # Install the package in-place.

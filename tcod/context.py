@@ -56,7 +56,7 @@ from typing_extensions import Literal
 import tcod
 import tcod.event
 import tcod.tileset
-from tcod._internal import _check, _check_warn, deprecate, pending_deprecate
+from tcod._internal import _check, _check_warn, pending_deprecate
 from tcod.loader import ffi, lib
 
 __all__ = (
