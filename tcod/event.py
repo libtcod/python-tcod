@@ -33,6 +33,8 @@ from typing import (
     TypeVar,
 )
 
+import numpy as np
+
 import tcod.event_constants
 from tcod.event_constants import *  # noqa: F4
 from tcod.event_constants import KMOD_ALT, KMOD_CTRL, KMOD_GUI, KMOD_SHIFT
@@ -1046,6 +1048,69 @@ def _pycall_event_watch(userdata: Any, sdl_event: Any) -> int:
     return 0
 
 
+def get_keyboard_state() -> np.ndarray:
+    """Return a boolean array with the current keyboard state.
+
+    Index this array with a scancode.  The value will be True if the key is
+    currently held.
+
+    Example::
+
+        state = tcod.event.get_keyboard_state()
+        is_w_held = state[tcod.event.SCANCODE_W]
+
+    .. versionadded:: 12.3
+    """
+    numkeys = ffi.new("int[1]")
+    keyboard_state = lib.SDL_GetKeyboardState(numkeys)
+    out: np.ndarray = np.frombuffer(
+        ffi.buffer(keyboard_state[0 : numkeys[0]]), dtype=bool
+    )
+    out.flags["WRITEABLE"] = False  # This buffer is supposed to be const.
+    return out
+
+
+def get_modifier_state() -> int:
+    """Return a bitmask of the active keyboard modifiers.
+
+    .. versionadded:: 12.3
+    """
+    return int(lib.SDL_GetModState())
+
+
+def key_from_scancode(scancode: int) -> int:
+    """Return a keycode from a scancode.  Based on the current keyboard layout.
+
+    .. versionadded:: 12.3
+    """
+    return int(lib.SDL_GetKeyFromScancode(scancode))
+
+
+def scancode_from_key(keycode: int) -> int:
+    """Return a scancode from a keycode.  Based on the current keyboard layout.
+
+    .. versionadded:: 12.3
+    """
+    return int(lib.SDL_GetScancodeFromKey(keycode))
+
+
+def get_key_name(keycode: int) -> str:
+    """Return a human-readable name of a keycode.
+
+    Returns "" if the keycode doesn't have a name.
+
+    Example::
+
+        >>> tcod.event.get_key_name(tcod.event.K_F1)
+        'F1'
+        >>> tcod.event.get_key_name(tcod.event.K_BACKSPACE)
+        'Backspace'
+
+    .. versionadded:: 12.3
+    """
+    return str(ffi.string(lib.SDL_GetKeyName(keycode)), encoding="utf-8")
+
+
 __all__ = [  # noqa: F405
     "Point",
     "BUTTON_LEFT",
@@ -1077,6 +1142,11 @@ __all__ = [  # noqa: F405
     "wait",
     "get_mouse_state",
     "EventDispatch",
+    "get_keyboard_state",
+    "get_modifier_state",
+    "key_from_scancode",
+    "scancode_from_key",
+    "get_key_name",
     # --- From event_constants.py ---
     "SCANCODE_UNKNOWN",
     "SCANCODE_A",
