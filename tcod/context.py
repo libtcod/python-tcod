@@ -48,10 +48,11 @@ to setup the size of the console.  You should use
 .. versionadded:: 11.12
 """  # noqa: E501
 import os
+import pickle
 import sys
 from typing import Any, Iterable, List, Optional, Tuple
 
-from typing_extensions import Literal
+from typing_extensions import Literal, NoReturn
 
 import tcod
 import tcod.event
@@ -365,6 +366,12 @@ class Context:
                 )
         '''  # noqa: E501
         return lib.TCOD_context_get_sdl_window(self._context_p)
+
+    def __reduce__(self) -> NoReturn:
+        """Contexts can not be pickled, so this class will raise
+        :class:`pickle.PicklingError`.
+        """
+        raise pickle.PicklingError("Python-tcod contexts can not be pickled.")
 
 
 @ffi.def_extern()  # type: ignore

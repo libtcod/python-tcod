@@ -8,12 +8,16 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
  - Added some keyboard functions:
    - `tcod.event.get_keyboard_state`
    - `tcod.event.get_modifier_state`
    - `tcod.event.key_from_scancode`
    - `tcod.event.scancode_from_key`
    - `tcod.event.get_key_name`
+
+Fixed
+ - Contexts now give a more useful error when pickled.
 
 12.2.0 - 2021-04-09
 -------------------
