@@ -19,6 +19,7 @@ implied by ``import tcod``.
 
 .. versionadded:: 8.4
 """
+import enum
 import warnings
 from typing import (
     Any,
@@ -106,6 +107,42 @@ def _verify_tile_coordinates(xy: Optional[Point]) -> Point:
         stacklevel=3,  # Called within other functions, never directly.
     )
     return Point(0, 0)
+
+
+class Modifier(enum.IntFlag):
+    """Keyboard modifiers."""
+
+    NONE = 0
+    LSHIFT = 1
+    """Left shift."""
+    RSHIFT = 2
+    """Right shift."""
+    SHIFT = LSHIFT | RSHIFT
+    """LSHIFT | RSHIFT"""
+    LCTRL = 64
+    """Left control."""
+    RCTRL = 128
+    """Right control."""
+    CTRL = LCTRL | RCTRL
+    """LCTRL | RCTRL"""
+    LALT = 256
+    """Left alt."""
+    RALT = 512
+    """Right alt."""
+    ALT = LALT | RALT
+    """LALT | RALT"""
+    LGUI = 1024
+    """Left meta key."""
+    RGUI = 2048
+    """Right meta key."""
+    GUI = LGUI | RGUI
+    """LGUI | RGUI"""
+    NUM = 4096
+    """Numpad lock."""
+    CAPS = 8192
+    """Caps lock."""
+    MODE = 16384
+    """Alt graph."""
 
 
 # manually define names for SDL macros
@@ -1057,7 +1094,11 @@ def get_keyboard_state() -> np.ndarray:
     Example::
 
         state = tcod.event.get_keyboard_state()
-        is_w_held = state[tcod.event.SCANCODE_W]
+        is_w_held = state[tcod.event.Scancode.W]
+
+        # Get a WASD vector:
+        x = int(state[tcod.event.Scancode.E]) - int(state[tcod.event.Scancode.A])
+        y = int(state[tcod.event.Scancode.S]) - int(state[tcod.event.Scancode.W])
 
     .. versionadded:: 12.3
     """
@@ -1070,48 +1111,1077 @@ def get_keyboard_state() -> np.ndarray:
     return out
 
 
-def get_modifier_state() -> int:
+def get_modifier_state() -> Modifier:
     """Return a bitmask of the active keyboard modifiers.
 
     .. versionadded:: 12.3
     """
-    return int(lib.SDL_GetModState())
+    return Modifier(lib.SDL_GetModState())
 
 
-def key_from_scancode(scancode: int) -> int:
-    """Return a keycode from a scancode.  Based on the current keyboard layout.
+class Scancode(enum.IntEnum):
+    """A Scancode represents the physical location of a key.
 
-    .. versionadded:: 12.3
+    For example the scan codes for WASD remain in the same physical location
+    regardless of the actual keyboard layout.
+
+    These names are derived from SDL expect for the numbers which are prefixed
+    with ``N`` (since raw numbers can not be a Python name.)
+
+    ==================  ===
+    UNKNOWN               0
+    A                     4
+    B                     5
+    C                     6
+    D                     7
+    E                     8
+    F                     9
+    G                    10
+    H                    11
+    I                    12
+    J                    13
+    K                    14
+    L                    15
+    M                    16
+    N                    17
+    O                    18
+    P                    19
+    Q                    20
+    R                    21
+    S                    22
+    T                    23
+    U                    24
+    V                    25
+    W                    26
+    X                    27
+    Y                    28
+    Z                    29
+    N1                   30
+    N2                   31
+    N3                   32
+    N4                   33
+    N5                   34
+    N6                   35
+    N7                   36
+    N8                   37
+    N9                   38
+    N0                   39
+    RETURN               40
+    ESCAPE               41
+    BACKSPACE            42
+    TAB                  43
+    SPACE                44
+    MINUS                45
+    EQUALS               46
+    LEFTBRACKET          47
+    RIGHTBRACKET         48
+    BACKSLASH            49
+    NONUSHASH            50
+    SEMICOLON            51
+    APOSTROPHE           52
+    GRAVE                53
+    COMMA                54
+    PERIOD               55
+    SLASH                56
+    CAPSLOCK             57
+    F1                   58
+    F2                   59
+    F3                   60
+    F4                   61
+    F5                   62
+    F6                   63
+    F7                   64
+    F8                   65
+    F9                   66
+    F10                  67
+    F11                  68
+    F12                  69
+    PRINTSCREEN          70
+    SCROLLLOCK           71
+    PAUSE                72
+    INSERT               73
+    HOME                 74
+    PAGEUP               75
+    DELETE               76
+    END                  77
+    PAGEDOWN             78
+    RIGHT                79
+    LEFT                 80
+    DOWN                 81
+    UP                   82
+    NUMLOCKCLEAR         83
+    KP_DIVIDE            84
+    KP_MULTIPLY          85
+    KP_MINUS             86
+    KP_PLUS              87
+    KP_ENTER             88
+    KP_1                 89
+    KP_2                 90
+    KP_3                 91
+    KP_4                 92
+    KP_5                 93
+    KP_6                 94
+    KP_7                 95
+    KP_8                 96
+    KP_9                 97
+    KP_0                 98
+    KP_PERIOD            99
+    NONUSBACKSLASH      100
+    APPLICATION         101
+    POWER               102
+    KP_EQUALS           103
+    F13                 104
+    F14                 105
+    F15                 106
+    F16                 107
+    F17                 108
+    F18                 109
+    F19                 110
+    F20                 111
+    F21                 112
+    F22                 113
+    F23                 114
+    F24                 115
+    EXECUTE             116
+    HELP                117
+    MENU                118
+    SELECT              119
+    STOP                120
+    AGAIN               121
+    UNDO                122
+    CUT                 123
+    COPY                124
+    PASTE               125
+    FIND                126
+    MUTE                127
+    VOLUMEUP            128
+    VOLUMEDOWN          129
+    KP_COMMA            133
+    KP_EQUALSAS400      134
+    INTERNATIONAL1      135
+    INTERNATIONAL2      136
+    INTERNATIONAL3      137
+    INTERNATIONAL4      138
+    INTERNATIONAL5      139
+    INTERNATIONAL6      140
+    INTERNATIONAL7      141
+    INTERNATIONAL8      142
+    INTERNATIONAL9      143
+    LANG1               144
+    LANG2               145
+    LANG3               146
+    LANG4               147
+    LANG5               148
+    LANG6               149
+    LANG7               150
+    LANG8               151
+    LANG9               152
+    ALTERASE            153
+    SYSREQ              154
+    CANCEL              155
+    CLEAR               156
+    PRIOR               157
+    RETURN2             158
+    SEPARATOR           159
+    OUT                 160
+    OPER                161
+    CLEARAGAIN          162
+    CRSEL               163
+    EXSEL               164
+    KP_00               176
+    KP_000              177
+    THOUSANDSSEPARATOR  178
+    DECIMALSEPARATOR    179
+    CURRENCYUNIT        180
+    CURRENCYSUBUNIT     181
+    KP_LEFTPAREN        182
+    KP_RIGHTPAREN       183
+    KP_LEFTBRACE        184
+    KP_RIGHTBRACE       185
+    KP_TAB              186
+    KP_BACKSPACE        187
+    KP_A                188
+    KP_B                189
+    KP_C                190
+    KP_D                191
+    KP_E                192
+    KP_F                193
+    KP_XOR              194
+    KP_POWER            195
+    KP_PERCENT          196
+    KP_LESS             197
+    KP_GREATER          198
+    KP_AMPERSAND        199
+    KP_DBLAMPERSAND     200
+    KP_VERTICALBAR      201
+    KP_DBLVERTICALBAR   202
+    KP_COLON            203
+    KP_HASH             204
+    KP_SPACE            205
+    KP_AT               206
+    KP_EXCLAM           207
+    KP_MEMSTORE         208
+    KP_MEMRECALL        209
+    KP_MEMCLEAR         210
+    KP_MEMADD           211
+    KP_MEMSUBTRACT      212
+    KP_MEMMULTIPLY      213
+    KP_MEMDIVIDE        214
+    KP_PLUSMINUS        215
+    KP_CLEAR            216
+    KP_CLEARENTRY       217
+    KP_BINARY           218
+    KP_OCTAL            219
+    KP_DECIMAL          220
+    KP_HEXADECIMAL      221
+    LCTRL               224
+    LSHIFT              225
+    LALT                226
+    LGUI                227
+    RCTRL               228
+    RSHIFT              229
+    RALT                230
+    RGUI                231
+    MODE                257
+    AUDIONEXT           258
+    AUDIOPREV           259
+    AUDIOSTOP           260
+    AUDIOPLAY           261
+    AUDIOMUTE           262
+    MEDIASELECT         263
+    WWW                 264
+    MAIL                265
+    CALCULATOR          266
+    COMPUTER            267
+    AC_SEARCH           268
+    AC_HOME             269
+    AC_BACK             270
+    AC_FORWARD          271
+    AC_STOP             272
+    AC_REFRESH          273
+    AC_BOOKMARKS        274
+    BRIGHTNESSDOWN      275
+    BRIGHTNESSUP        276
+    DISPLAYSWITCH       277
+    KBDILLUMTOGGLE      278
+    KBDILLUMDOWN        279
+    KBDILLUMUP          280
+    EJECT               281
+    SLEEP               282
+    APP1                283
+    APP2                284
+    ==================  ===
+
     """
-    return int(lib.SDL_GetKeyFromScancode(scancode))
+
+    # --- SDL scancodes ---
+    UNKNOWN = 0
+    A = 4
+    B = 5
+    C = 6
+    D = 7
+    E = 8
+    F = 9
+    G = 10
+    H = 11
+    I = 12  # noqa: E741
+    J = 13
+    K = 14
+    L = 15
+    M = 16
+    N = 17
+    O = 18  # noqa: E741
+    P = 19
+    Q = 20
+    R = 21
+    S = 22
+    T = 23
+    U = 24
+    V = 25
+    W = 26
+    X = 27
+    Y = 28
+    Z = 29
+    N1 = 30
+    N2 = 31
+    N3 = 32
+    N4 = 33
+    N5 = 34
+    N6 = 35
+    N7 = 36
+    N8 = 37
+    N9 = 38
+    N0 = 39
+    RETURN = 40
+    ESCAPE = 41
+    BACKSPACE = 42
+    TAB = 43
+    SPACE = 44
+    MINUS = 45
+    EQUALS = 46
+    LEFTBRACKET = 47
+    RIGHTBRACKET = 48
+    BACKSLASH = 49
+    NONUSHASH = 50
+    SEMICOLON = 51
+    APOSTROPHE = 52
+    GRAVE = 53
+    COMMA = 54
+    PERIOD = 55
+    SLASH = 56
+    CAPSLOCK = 57
+    F1 = 58
+    F2 = 59
+    F3 = 60
+    F4 = 61
+    F5 = 62
+    F6 = 63
+    F7 = 64
+    F8 = 65
+    F9 = 66
+    F10 = 67
+    F11 = 68
+    F12 = 69
+    PRINTSCREEN = 70
+    SCROLLLOCK = 71
+    PAUSE = 72
+    INSERT = 73
+    HOME = 74
+    PAGEUP = 75
+    DELETE = 76
+    END = 77
+    PAGEDOWN = 78
+    RIGHT = 79
+    LEFT = 80
+    DOWN = 81
+    UP = 82
+    NUMLOCKCLEAR = 83
+    KP_DIVIDE = 84
+    KP_MULTIPLY = 85
+    KP_MINUS = 86
+    KP_PLUS = 87
+    KP_ENTER = 88
+    KP_1 = 89
+    KP_2 = 90
+    KP_3 = 91
+    KP_4 = 92
+    KP_5 = 93
+    KP_6 = 94
+    KP_7 = 95
+    KP_8 = 96
+    KP_9 = 97
+    KP_0 = 98
+    KP_PERIOD = 99
+    NONUSBACKSLASH = 100
+    APPLICATION = 101
+    POWER = 102
+    KP_EQUALS = 103
+    F13 = 104
+    F14 = 105
+    F15 = 106
+    F16 = 107
+    F17 = 108
+    F18 = 109
+    F19 = 110
+    F20 = 111
+    F21 = 112
+    F22 = 113
+    F23 = 114
+    F24 = 115
+    EXECUTE = 116
+    HELP = 117
+    MENU = 118
+    SELECT = 119
+    STOP = 120
+    AGAIN = 121
+    UNDO = 122
+    CUT = 123
+    COPY = 124
+    PASTE = 125
+    FIND = 126
+    MUTE = 127
+    VOLUMEUP = 128
+    VOLUMEDOWN = 129
+    KP_COMMA = 133
+    KP_EQUALSAS400 = 134
+    INTERNATIONAL1 = 135
+    INTERNATIONAL2 = 136
+    INTERNATIONAL3 = 137
+    INTERNATIONAL4 = 138
+    INTERNATIONAL5 = 139
+    INTERNATIONAL6 = 140
+    INTERNATIONAL7 = 141
+    INTERNATIONAL8 = 142
+    INTERNATIONAL9 = 143
+    LANG1 = 144
+    LANG2 = 145
+    LANG3 = 146
+    LANG4 = 147
+    LANG5 = 148
+    LANG6 = 149
+    LANG7 = 150
+    LANG8 = 151
+    LANG9 = 152
+    ALTERASE = 153
+    SYSREQ = 154
+    CANCEL = 155
+    CLEAR = 156
+    PRIOR = 157
+    RETURN2 = 158
+    SEPARATOR = 159
+    OUT = 160
+    OPER = 161
+    CLEARAGAIN = 162
+    CRSEL = 163
+    EXSEL = 164
+    KP_00 = 176
+    KP_000 = 177
+    THOUSANDSSEPARATOR = 178
+    DECIMALSEPARATOR = 179
+    CURRENCYUNIT = 180
+    CURRENCYSUBUNIT = 181
+    KP_LEFTPAREN = 182
+    KP_RIGHTPAREN = 183
+    KP_LEFTBRACE = 184
+    KP_RIGHTBRACE = 185
+    KP_TAB = 186
+    KP_BACKSPACE = 187
+    KP_A = 188
+    KP_B = 189
+    KP_C = 190
+    KP_D = 191
+    KP_E = 192
+    KP_F = 193
+    KP_XOR = 194
+    KP_POWER = 195
+    KP_PERCENT = 196
+    KP_LESS = 197
+    KP_GREATER = 198
+    KP_AMPERSAND = 199
+    KP_DBLAMPERSAND = 200
+    KP_VERTICALBAR = 201
+    KP_DBLVERTICALBAR = 202
+    KP_COLON = 203
+    KP_HASH = 204
+    KP_SPACE = 205
+    KP_AT = 206
+    KP_EXCLAM = 207
+    KP_MEMSTORE = 208
+    KP_MEMRECALL = 209
+    KP_MEMCLEAR = 210
+    KP_MEMADD = 211
+    KP_MEMSUBTRACT = 212
+    KP_MEMMULTIPLY = 213
+    KP_MEMDIVIDE = 214
+    KP_PLUSMINUS = 215
+    KP_CLEAR = 216
+    KP_CLEARENTRY = 217
+    KP_BINARY = 218
+    KP_OCTAL = 219
+    KP_DECIMAL = 220
+    KP_HEXADECIMAL = 221
+    LCTRL = 224
+    LSHIFT = 225
+    LALT = 226
+    LGUI = 227
+    RCTRL = 228
+    RSHIFT = 229
+    RALT = 230
+    RGUI = 231
+    MODE = 257
+    AUDIONEXT = 258
+    AUDIOPREV = 259
+    AUDIOSTOP = 260
+    AUDIOPLAY = 261
+    AUDIOMUTE = 262
+    MEDIASELECT = 263
+    WWW = 264
+    MAIL = 265
+    CALCULATOR = 266
+    COMPUTER = 267
+    AC_SEARCH = 268
+    AC_HOME = 269
+    AC_BACK = 270
+    AC_FORWARD = 271
+    AC_STOP = 272
+    AC_REFRESH = 273
+    AC_BOOKMARKS = 274
+    BRIGHTNESSDOWN = 275
+    BRIGHTNESSUP = 276
+    DISPLAYSWITCH = 277
+    KBDILLUMTOGGLE = 278
+    KBDILLUMDOWN = 279
+    KBDILLUMUP = 280
+    EJECT = 281
+    SLEEP = 282
+    APP1 = 283
+    APP2 = 284
+    # --- end ---
+
+    @property
+    def label(self) -> str:
+        """Return a human-readable name of a key based on a scancode.
+
+        .. seealso::
+            :any:`KeySym.label`
+
+        .. versionadded:: 12.3
+        """
+        return self.keysym.label
+
+    @property
+    def keysym(self) -> "KeySym":
+        """Return a :class:`KeySym` from a scancode.
+
+        Based on the current keyboard layout.
+
+        .. versionadded:: 12.3
+        """
+        return KeySym(lib.SDL_GetKeyFromScancode(self.value))
+
+    @property
+    def scancode(self) -> "Scancode":
+        """Return a scancode from a keycode.
+
+        Returns itself since it is already a :class:`Scancode`.
+
+        .. seealso::
+            :any:`KeySym.scancode`
+
+        .. versionadded:: 12.3
+        """
+        return self
 
 
-def scancode_from_key(keycode: int) -> int:
-    """Return a scancode from a keycode.  Based on the current keyboard layout.
+class KeySym(enum.IntEnum):
+    """Key syms
 
-    .. versionadded:: 12.3
+    ==================  ==========
+    UNKNOWN                      0
+    BACKSPACE                    8
+    TAB                          9
+    RETURN                      13
+    ESCAPE                      27
+    SPACE                       32
+    EXCLAIM                     33
+    QUOTEDBL                    34
+    HASH                        35
+    DOLLAR                      36
+    PERCENT                     37
+    AMPERSAND                   38
+    QUOTE                       39
+    LEFTPAREN                   40
+    RIGHTPAREN                  41
+    ASTERISK                    42
+    PLUS                        43
+    COMMA                       44
+    MINUS                       45
+    PERIOD                      46
+    SLASH                       47
+    N0                          48
+    N1                          49
+    N2                          50
+    N3                          51
+    N4                          52
+    N5                          53
+    N6                          54
+    N7                          55
+    N8                          56
+    N9                          57
+    COLON                       58
+    SEMICOLON                   59
+    LESS                        60
+    EQUALS                      61
+    GREATER                     62
+    QUESTION                    63
+    AT                          64
+    LEFTBRACKET                 91
+    BACKSLASH                   92
+    RIGHTBRACKET                93
+    CARET                       94
+    UNDERSCORE                  95
+    BACKQUOTE                   96
+    a                           97
+    b                           98
+    c                           99
+    d                          100
+    e                          101
+    f                          102
+    g                          103
+    h                          104
+    i                          105
+    j                          106
+    k                          107
+    l                          108
+    m                          109
+    n                          110
+    o                          111
+    p                          112
+    q                          113
+    r                          114
+    s                          115
+    t                          116
+    u                          117
+    v                          118
+    w                          119
+    x                          120
+    y                          121
+    z                          122
+    DELETE                     127
+    SCANCODE_MASK       1073741824
+    CAPSLOCK            1073741881
+    F1                  1073741882
+    F2                  1073741883
+    F3                  1073741884
+    F4                  1073741885
+    F5                  1073741886
+    F6                  1073741887
+    F7                  1073741888
+    F8                  1073741889
+    F9                  1073741890
+    F10                 1073741891
+    F11                 1073741892
+    F12                 1073741893
+    PRINTSCREEN         1073741894
+    SCROLLLOCK          1073741895
+    PAUSE               1073741896
+    INSERT              1073741897
+    HOME                1073741898
+    PAGEUP              1073741899
+    END                 1073741901
+    PAGEDOWN            1073741902
+    RIGHT               1073741903
+    LEFT                1073741904
+    DOWN                1073741905
+    UP                  1073741906
+    NUMLOCKCLEAR        1073741907
+    KP_DIVIDE           1073741908
+    KP_MULTIPLY         1073741909
+    KP_MINUS            1073741910
+    KP_PLUS             1073741911
+    KP_ENTER            1073741912
+    KP_1                1073741913
+    KP_2                1073741914
+    KP_3                1073741915
+    KP_4                1073741916
+    KP_5                1073741917
+    KP_6                1073741918
+    KP_7                1073741919
+    KP_8                1073741920
+    KP_9                1073741921
+    KP_0                1073741922
+    KP_PERIOD           1073741923
+    APPLICATION         1073741925
+    POWER               1073741926
+    KP_EQUALS           1073741927
+    F13                 1073741928
+    F14                 1073741929
+    F15                 1073741930
+    F16                 1073741931
+    F17                 1073741932
+    F18                 1073741933
+    F19                 1073741934
+    F20                 1073741935
+    F21                 1073741936
+    F22                 1073741937
+    F23                 1073741938
+    F24                 1073741939
+    EXECUTE             1073741940
+    HELP                1073741941
+    MENU                1073741942
+    SELECT              1073741943
+    STOP                1073741944
+    AGAIN               1073741945
+    UNDO                1073741946
+    CUT                 1073741947
+    COPY                1073741948
+    PASTE               1073741949
+    FIND                1073741950
+    MUTE                1073741951
+    VOLUMEUP            1073741952
+    VOLUMEDOWN          1073741953
+    KP_COMMA            1073741957
+    KP_EQUALSAS400      1073741958
+    ALTERASE            1073741977
+    SYSREQ              1073741978
+    CANCEL              1073741979
+    CLEAR               1073741980
+    PRIOR               1073741981
+    RETURN2             1073741982
+    SEPARATOR           1073741983
+    OUT                 1073741984
+    OPER                1073741985
+    CLEARAGAIN          1073741986
+    CRSEL               1073741987
+    EXSEL               1073741988
+    KP_00               1073742000
+    KP_000              1073742001
+    THOUSANDSSEPARATOR  1073742002
+    DECIMALSEPARATOR    1073742003
+    CURRENCYUNIT        1073742004
+    CURRENCYSUBUNIT     1073742005
+    KP_LEFTPAREN        1073742006
+    KP_RIGHTPAREN       1073742007
+    KP_LEFTBRACE        1073742008
+    KP_RIGHTBRACE       1073742009
+    KP_TAB              1073742010
+    KP_BACKSPACE        1073742011
+    KP_A                1073742012
+    KP_B                1073742013
+    KP_C                1073742014
+    KP_D                1073742015
+    KP_E                1073742016
+    KP_F                1073742017
+    KP_XOR              1073742018
+    KP_POWER            1073742019
+    KP_PERCENT          1073742020
+    KP_LESS             1073742021
+    KP_GREATER          1073742022
+    KP_AMPERSAND        1073742023
+    KP_DBLAMPERSAND     1073742024
+    KP_VERTICALBAR      1073742025
+    KP_DBLVERTICALBAR   1073742026
+    KP_COLON            1073742027
+    KP_HASH             1073742028
+    KP_SPACE            1073742029
+    KP_AT               1073742030
+    KP_EXCLAM           1073742031
+    KP_MEMSTORE         1073742032
+    KP_MEMRECALL        1073742033
+    KP_MEMCLEAR         1073742034
+    KP_MEMADD           1073742035
+    KP_MEMSUBTRACT      1073742036
+    KP_MEMMULTIPLY      1073742037
+    KP_MEMDIVIDE        1073742038
+    KP_PLUSMINUS        1073742039
+    KP_CLEAR            1073742040
+    KP_CLEARENTRY       1073742041
+    KP_BINARY           1073742042
+    KP_OCTAL            1073742043
+    KP_DECIMAL          1073742044
+    KP_HEXADECIMAL      1073742045
+    LCTRL               1073742048
+    LSHIFT              1073742049
+    LALT                1073742050
+    LGUI                1073742051
+    RCTRL               1073742052
+    RSHIFT              1073742053
+    RALT                1073742054
+    RGUI                1073742055
+    MODE                1073742081
+    AUDIONEXT           1073742082
+    AUDIOPREV           1073742083
+    AUDIOSTOP           1073742084
+    AUDIOPLAY           1073742085
+    AUDIOMUTE           1073742086
+    MEDIASELECT         1073742087
+    WWW                 1073742088
+    MAIL                1073742089
+    CALCULATOR          1073742090
+    COMPUTER            1073742091
+    AC_SEARCH           1073742092
+    AC_HOME             1073742093
+    AC_BACK             1073742094
+    AC_FORWARD          1073742095
+    AC_STOP             1073742096
+    AC_REFRESH          1073742097
+    AC_BOOKMARKS        1073742098
+    BRIGHTNESSDOWN      1073742099
+    BRIGHTNESSUP        1073742100
+    DISPLAYSWITCH       1073742101
+    KBDILLUMTOGGLE      1073742102
+    KBDILLUMDOWN        1073742103
+    KBDILLUMUP          1073742104
+    EJECT               1073742105
+    SLEEP               1073742106
+    ==================  ==========
     """
-    return int(lib.SDL_GetScancodeFromKey(keycode))
 
+    # --- SDL keyboard symbols ---
+    UNKNOWN = 0
+    BACKSPACE = 8
+    TAB = 9
+    RETURN = 13
+    ESCAPE = 27
+    SPACE = 32
+    EXCLAIM = 33
+    QUOTEDBL = 34
+    HASH = 35
+    DOLLAR = 36
+    PERCENT = 37
+    AMPERSAND = 38
+    QUOTE = 39
+    LEFTPAREN = 40
+    RIGHTPAREN = 41
+    ASTERISK = 42
+    PLUS = 43
+    COMMA = 44
+    MINUS = 45
+    PERIOD = 46
+    SLASH = 47
+    N0 = 48
+    N1 = 49
+    N2 = 50
+    N3 = 51
+    N4 = 52
+    N5 = 53
+    N6 = 54
+    N7 = 55
+    N8 = 56
+    N9 = 57
+    COLON = 58
+    SEMICOLON = 59
+    LESS = 60
+    EQUALS = 61
+    GREATER = 62
+    QUESTION = 63
+    AT = 64
+    LEFTBRACKET = 91
+    BACKSLASH = 92
+    RIGHTBRACKET = 93
+    CARET = 94
+    UNDERSCORE = 95
+    BACKQUOTE = 96
+    a = 97
+    b = 98
+    c = 99
+    d = 100
+    e = 101
+    f = 102
+    g = 103
+    h = 104
+    i = 105
+    j = 106
+    k = 107
+    l = 108  # noqa: E741
+    m = 109
+    n = 110
+    o = 111
+    p = 112
+    q = 113
+    r = 114
+    s = 115
+    t = 116
+    u = 117
+    v = 118
+    w = 119
+    x = 120
+    y = 121
+    z = 122
+    DELETE = 127
+    SCANCODE_MASK = 1073741824
+    CAPSLOCK = 1073741881
+    F1 = 1073741882
+    F2 = 1073741883
+    F3 = 1073741884
+    F4 = 1073741885
+    F5 = 1073741886
+    F6 = 1073741887
+    F7 = 1073741888
+    F8 = 1073741889
+    F9 = 1073741890
+    F10 = 1073741891
+    F11 = 1073741892
+    F12 = 1073741893
+    PRINTSCREEN = 1073741894
+    SCROLLLOCK = 1073741895
+    PAUSE = 1073741896
+    INSERT = 1073741897
+    HOME = 1073741898
+    PAGEUP = 1073741899
+    END = 1073741901
+    PAGEDOWN = 1073741902
+    RIGHT = 1073741903
+    LEFT = 1073741904
+    DOWN = 1073741905
+    UP = 1073741906
+    NUMLOCKCLEAR = 1073741907
+    KP_DIVIDE = 1073741908
+    KP_MULTIPLY = 1073741909
+    KP_MINUS = 1073741910
+    KP_PLUS = 1073741911
+    KP_ENTER = 1073741912
+    KP_1 = 1073741913
+    KP_2 = 1073741914
+    KP_3 = 1073741915
+    KP_4 = 1073741916
+    KP_5 = 1073741917
+    KP_6 = 1073741918
+    KP_7 = 1073741919
+    KP_8 = 1073741920
+    KP_9 = 1073741921
+    KP_0 = 1073741922
+    KP_PERIOD = 1073741923
+    APPLICATION = 1073741925
+    POWER = 1073741926
+    KP_EQUALS = 1073741927
+    F13 = 1073741928
+    F14 = 1073741929
+    F15 = 1073741930
+    F16 = 1073741931
+    F17 = 1073741932
+    F18 = 1073741933
+    F19 = 1073741934
+    F20 = 1073741935
+    F21 = 1073741936
+    F22 = 1073741937
+    F23 = 1073741938
+    F24 = 1073741939
+    EXECUTE = 1073741940
+    HELP = 1073741941
+    MENU = 1073741942
+    SELECT = 1073741943
+    STOP = 1073741944
+    AGAIN = 1073741945
+    UNDO = 1073741946
+    CUT = 1073741947
+    COPY = 1073741948
+    PASTE = 1073741949
+    FIND = 1073741950
+    MUTE = 1073741951
+    VOLUMEUP = 1073741952
+    VOLUMEDOWN = 1073741953
+    KP_COMMA = 1073741957
+    KP_EQUALSAS400 = 1073741958
+    ALTERASE = 1073741977
+    SYSREQ = 1073741978
+    CANCEL = 1073741979
+    CLEAR = 1073741980
+    PRIOR = 1073741981
+    RETURN2 = 1073741982
+    SEPARATOR = 1073741983
+    OUT = 1073741984
+    OPER = 1073741985
+    CLEARAGAIN = 1073741986
+    CRSEL = 1073741987
+    EXSEL = 1073741988
+    KP_00 = 1073742000
+    KP_000 = 1073742001
+    THOUSANDSSEPARATOR = 1073742002
+    DECIMALSEPARATOR = 1073742003
+    CURRENCYUNIT = 1073742004
+    CURRENCYSUBUNIT = 1073742005
+    KP_LEFTPAREN = 1073742006
+    KP_RIGHTPAREN = 1073742007
+    KP_LEFTBRACE = 1073742008
+    KP_RIGHTBRACE = 1073742009
+    KP_TAB = 1073742010
+    KP_BACKSPACE = 1073742011
+    KP_A = 1073742012
+    KP_B = 1073742013
+    KP_C = 1073742014
+    KP_D = 1073742015
+    KP_E = 1073742016
+    KP_F = 1073742017
+    KP_XOR = 1073742018
+    KP_POWER = 1073742019
+    KP_PERCENT = 1073742020
+    KP_LESS = 1073742021
+    KP_GREATER = 1073742022
+    KP_AMPERSAND = 1073742023
+    KP_DBLAMPERSAND = 1073742024
+    KP_VERTICALBAR = 1073742025
+    KP_DBLVERTICALBAR = 1073742026
+    KP_COLON = 1073742027
+    KP_HASH = 1073742028
+    KP_SPACE = 1073742029
+    KP_AT = 1073742030
+    KP_EXCLAM = 1073742031
+    KP_MEMSTORE = 1073742032
+    KP_MEMRECALL = 1073742033
+    KP_MEMCLEAR = 1073742034
+    KP_MEMADD = 1073742035
+    KP_MEMSUBTRACT = 1073742036
+    KP_MEMMULTIPLY = 1073742037
+    KP_MEMDIVIDE = 1073742038
+    KP_PLUSMINUS = 1073742039
+    KP_CLEAR = 1073742040
+    KP_CLEARENTRY = 1073742041
+    KP_BINARY = 1073742042
+    KP_OCTAL = 1073742043
+    KP_DECIMAL = 1073742044
+    KP_HEXADECIMAL = 1073742045
+    LCTRL = 1073742048
+    LSHIFT = 1073742049
+    LALT = 1073742050
+    LGUI = 1073742051
+    RCTRL = 1073742052
+    RSHIFT = 1073742053
+    RALT = 1073742054
+    RGUI = 1073742055
+    MODE = 1073742081
+    AUDIONEXT = 1073742082
+    AUDIOPREV = 1073742083
+    AUDIOSTOP = 1073742084
+    AUDIOPLAY = 1073742085
+    AUDIOMUTE = 1073742086
+    MEDIASELECT = 1073742087
+    WWW = 1073742088
+    MAIL = 1073742089
+    CALCULATOR = 1073742090
+    COMPUTER = 1073742091
+    AC_SEARCH = 1073742092
+    AC_HOME = 1073742093
+    AC_BACK = 1073742094
+    AC_FORWARD = 1073742095
+    AC_STOP = 1073742096
+    AC_REFRESH = 1073742097
+    AC_BOOKMARKS = 1073742098
+    BRIGHTNESSDOWN = 1073742099
+    BRIGHTNESSUP = 1073742100
+    DISPLAYSWITCH = 1073742101
+    KBDILLUMTOGGLE = 1073742102
+    KBDILLUMDOWN = 1073742103
+    KBDILLUMUP = 1073742104
+    EJECT = 1073742105
+    SLEEP = 1073742106
+    # --- end ---
 
-def get_key_name(keycode: int) -> str:
-    """Return a human-readable name of a keycode.
+    @property
+    def label(self) -> str:
+        """A human-readable name of a keycode.
 
-    Returns "" if the keycode doesn't have a name.
+        Returns "" if the keycode doesn't have a name.
 
-    Example::
+        Example::
 
-        >>> tcod.event.get_key_name(tcod.event.K_F1)
-        'F1'
-        >>> tcod.event.get_key_name(tcod.event.K_BACKSPACE)
-        'Backspace'
+            >>> tcod.event.KeySym.F1.label
+            'F1'
+            >>> tcod.event.KeySym.BACKSPACE.label
+            'Backspace'
 
-    .. versionadded:: 12.3
-    """
-    return str(ffi.string(lib.SDL_GetKeyName(keycode)), encoding="utf-8")
+        .. versionadded:: 12.3
+        """
+        return str(
+            ffi.string(lib.SDL_GetKeyName(self.value)), encoding="utf-8"
+        )
+
+    @property
+    def keysym(self) -> "KeySym":
+        """Return a keycode from a scancode.
+
+        Returns itself since it is already a :class:`KeySym`.
+
+        .. seealso::
+            :any:`Scancode.keysym`
+
+        .. versionadded:: 12.3
+        """
+        return self
+
+    @property
+    def scancode(self) -> Scancode:
+        """Return a scancode from a keycode.
+
+        Based on the current keyboard layout.
+
+        .. versionadded:: 12.3
+        """
+        return Scancode(lib.SDL_GetScancodeFromKey(self.value))
 
 
 __all__ = [  # noqa: F405
+    "Modifier",
     "Point",
     "BUTTON_LEFT",
     "BUTTON_MIDDLE",
@@ -1144,9 +2214,8 @@ __all__ = [  # noqa: F405
     "EventDispatch",
     "get_keyboard_state",
     "get_modifier_state",
-    "key_from_scancode",
-    "scancode_from_key",
-    "get_key_name",
+    "Scancode",
+    "KeySym",
     # --- From event_constants.py ---
     "SCANCODE_UNKNOWN",
     "SCANCODE_A",

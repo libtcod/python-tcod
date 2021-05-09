@@ -436,6 +436,21 @@ def update_module_all(filename: str, new_all: str) -> None:
         f.write("%s\n    %s,\n    %s" % (header, new_all, footer))
 
 
+def generate_enums(prefix: str) -> Iterator[str]:
+    """Generate attribute assignments suitable for a Python enum."""
+    prefix_len = len(prefix) - len("SDL_") + 1
+    for name, value in sorted(
+        find_sdl_attrs(prefix), key=lambda item: item[1]
+    ):
+        name = name.split("_", 1)[1]
+        if name.isdigit():
+            name = f"N{name}"
+        if name in "IOl":  # Handle Flake8 warnings.
+            yield f"{name} = {value}  # noqa: E741"
+        else:
+            yield f"{name} = {value}"
+
+
 def write_library_constants() -> None:
     """Write libtcod constants into the tcod.constants module."""
     from tcod._libtcod import lib, ffi
@@ -513,6 +528,25 @@ def write_library_constants() -> None:
         )
         all_names = ",\n    ".join('"%s"' % name for name in all_names)
         f.write("\n__all__ = [\n    %s,\n]\n" % (all_names,))
+
+    with open("tcod/event.py", "r") as f:
+        event_py = f.read()
+
+    event_py = re.sub(
+        r"(?<=# --- SDL scancodes ---\n    ).*?(?=\n    # --- end ---\n)",
+        "\n    ".join(generate_enums("SDL_SCANCODE")),
+        event_py,
+        flags=re.DOTALL,
+    )
+    event_py = re.sub(
+        r"(?<=# --- SDL keyboard symbols ---\n    ).*?(?=\n    # --- end ---\n)",
+        "\n    ".join(generate_enums("SDLK")),
+        event_py,
+        flags=re.DOTALL,
+    )
+
+    with open("tcod/event.py", "w") as f:
+        f.write(event_py)
 
 
 if __name__ == "__main__":
