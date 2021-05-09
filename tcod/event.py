@@ -1094,11 +1094,14 @@ def get_keyboard_state() -> np.ndarray:
     Example::
 
         state = tcod.event.get_keyboard_state()
-        is_w_held = state[tcod.event.Scancode.W]
 
-        # Get a WASD vector:
+        # Get a WASD movement vector:
         x = int(state[tcod.event.Scancode.E]) - int(state[tcod.event.Scancode.A])
         y = int(state[tcod.event.Scancode.S]) - int(state[tcod.event.Scancode.W])
+
+        # Key with 'z' glyph is held:
+        is_z_held = state[tcod.event.KeySym.z.scancode]
+
 
     .. versionadded:: 12.3
     """
