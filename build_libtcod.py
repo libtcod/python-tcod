@@ -186,7 +186,12 @@ def unpack_sdl2(version: str) -> str:
 includes = parse_includes()
 
 module_name = "tcod._libtcod"
-include_dirs = [".", "libtcod/src/vendor/", "libtcod/src/vendor/utf8proc", "libtcod/src/vendor/zlib/"]
+include_dirs = [
+    ".",
+    "libtcod/src/vendor/",
+    "libtcod/src/vendor/utf8proc",
+    "libtcod/src/vendor/zlib/",
+]
 
 extra_parse_args = []
 extra_compile_args = []
@@ -333,9 +338,11 @@ for include in includes:
         for i, line in enumerate(include.header.split("\n"), 1):
             print("%03i %s" % (i, line))
         raise
-ffi.cdef("""
+ffi.cdef(
+    """
 #define TCOD_COMPILEDVERSION ...
-""")
+"""
+)
 ffi.set_source(
     module_name,
     "#include <tcod/cffi.h>\n#include <SDL.h>",
