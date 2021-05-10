@@ -16,6 +16,7 @@ Added
  - New functions:
    - `tcod.event.get_keyboard_state`
    - `tcod.event.get_modifier_state`
+ - Added `tcod.console.rgb_graphic` and `tcod.console.rgba_graphic` dtypes.
 
 Fixed
  - Contexts now give a more useful error when pickled.

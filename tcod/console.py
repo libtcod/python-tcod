@@ -23,6 +23,17 @@ def _fmt(string: str) -> bytes:
 
 _root_console = None
 
+rgba_graphic = np.dtype([("ch", np.intc), ("fg", "4u1"), ("bg", "4u1")])
+"""A NumPy :any:`dtype` compatible with :any:`Console.buffer`.
+
+.. versionadded:: 12.3
+"""
+
+rgb_graphic = np.dtype([("ch", np.intc), ("fg", "3u1"), ("bg", "3u1")])
+"""A NumPy :any:`dtype` compatible with :any:`Console.tiles_rgb`.
+
+.. versionadded:: 12.3
+"""
 
 class Console:
     """A console object containing a grid of characters with
@@ -77,13 +88,13 @@ class Console:
                 Added an alpha channel to the color types.
     """
 
-    DTYPE = np.dtype([("ch", np.intc), ("fg", "(4,)u1"), ("bg", "(4,)u1")])
+    DTYPE = np.dtype([("ch", np.intc), ("fg", "4u1"), ("bg", "4u1")])
 
     # A structured arrays type with the added "fg_rgb" and "bg_rgb" fields.
     _DTYPE_RGB = np.dtype(
         {
             "names": ["ch", "fg", "bg"],
-            "formats": [np.int32, "(3,)u1", "(3,)u1"],
+            "formats": [np.int32, "3u1", "3u1"],
             "offsets": [0, 4, 8],
             "itemsize": 12,
         }
