@@ -116,7 +116,7 @@ def main() -> None:
         desired_fps = 50
         while True:
             console = context.new_console(order="F")
-            console.rgb["bg"][line_x % console.width, :] = (255, 0, 0)
+            console.tiles_rgb["bg"][line_x % console.width, :] = (255, 0, 0)
             console.print(
                 1,
                 1,
