@@ -17,11 +17,8 @@ Contents:
 
     installation
     glossary
-
-.. toctree::
-    :maxdepth: 1
-
     changelog
+    faq
 
 .. toctree::
     :maxdepth: 2
