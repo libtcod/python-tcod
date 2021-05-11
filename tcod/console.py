@@ -12,7 +12,7 @@ from typing_extensions import Literal
 
 import tcod._internal
 import tcod.constants
-from tcod._internal import deprecate
+from tcod._internal import _check, deprecate
 from tcod.loader import ffi, lib
 
 
@@ -34,6 +34,7 @@ rgb_graphic = np.dtype([("ch", np.intc), ("fg", "3u1"), ("bg", "3u1")])
 
 .. versionadded:: 12.3
 """
+
 
 class Console:
     """A console object containing a grid of characters with
@@ -723,8 +724,10 @@ class Console:
         """
         self.__deprecate_defaults("draw_frame", bg_blend)
         string = _fmt(string) if string else ffi.NULL
-        lib.TCOD_console_printf_frame(
-            self.console_c, x, y, width, height, clear, bg_blend, string
+        _check(
+            lib.TCOD_console_printf_frame(
+                self.console_c, x, y, width, height, clear, bg_blend, string
+            )
         )
 
     def blit(

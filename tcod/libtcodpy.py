@@ -1685,7 +1685,11 @@ def console_print_frame(
         Use :any:`Console.print_frame` instead.
     """
     fmt = _fmt(fmt) if fmt else ffi.NULL
-    lib.TCOD_console_printf_frame(_console(con), x, y, w, h, clear, flag, fmt)
+    _check(
+        lib.TCOD_console_printf_frame(
+            _console(con), x, y, w, h, clear, flag, fmt
+        )
+    )
 
 
 @pending_deprecate()

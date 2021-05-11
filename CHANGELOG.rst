@@ -20,6 +20,8 @@ Added
 
 Fixed
  - Contexts now give a more useful error when pickled.
+ - Fixed regressions with `tcod.console_print_frame` and `Console.print_frame`
+   when given empty strings as the banner.
 
 12.2.0 - 2021-04-09
 -------------------
