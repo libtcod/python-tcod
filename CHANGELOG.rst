@@ -17,6 +17,11 @@ Added
    - `tcod.event.get_keyboard_state`
    - `tcod.event.get_modifier_state`
  - Added `tcod.console.rgb_graphic` and `tcod.console.rgba_graphic` dtypes.
+ - Another name for the Console array attributes: `Console.rgb` and `Console.rgba`.
+
+Deprecated
+ - `Console_tiles_rgb` is being renamed to `Console.rgb`.
+ - `Console_tiles` being renamed to `Console.rgba`.
 
 Fixed
  - Contexts now give a more useful error when pickled.

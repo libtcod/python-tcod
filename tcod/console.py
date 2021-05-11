@@ -240,7 +240,8 @@ class Console:
         """
         return self._tiles["ch"].T if self._order == "F" else self._tiles["ch"]  # type: ignore
 
-    @property
+    @property  # type: ignore
+    @deprecate("This attribute has been renamed to `rgba`.")
     def tiles(self) -> np.ndarray:
         """An array of this consoles raw tile data.
 
@@ -248,73 +249,85 @@ class Console:
         Colors include an alpha channel but how alpha works is currently
         undefined.
 
-        Example:
-            >>> con = tcod.console.Console(10, 2)
-            >>> con.tiles[0, 0] = (
-            ...     ord("X"),
-            ...     (*tcod.white, 255),
-            ...     (*tcod.black, 255),
-            ... )
-            >>> con.tiles[0, 0]
-            (88, [255, 255, 255, 255], [  0,   0,   0, 255])
-
         .. versionadded:: 10.0
+
+        .. deprecated:: 12.3
+            Use :any:`Console.rgba` instead.
         """
-        return self._tiles.T if self._order == "F" else self._tiles
+        return self.rgba
 
     @property  # type: ignore
-    @deprecate("This attribute has been renamed to `tiles`.")
+    @deprecate("This attribute has been renamed to `rgba`.")
     def buffer(self) -> np.ndarray:
         """An array of this consoles raw tile data.
 
         .. versionadded:: 11.4
 
         .. deprecated:: 11.8
-            Use :any:`Console.tiles` instead.
+            Use :any:`Console.rgba` instead.
         """
-        return self._tiles.T if self._order == "F" else self._tiles
-
-    @property
-    def tiles_rgb(self) -> np.ndarray:
-        """An array of this consoles tile data without the alpha channel.
-
-        The dtype of this array is effectively:
-        ``[("ch", np.intc), ("fg", "(3,)u1"), ("bg", "(3,)u1")]``
-
-        Example:
-            >>> con = tcod.console.Console(10, 2)
-            >>> con.tiles_rgb[0, 0] = ord("@"), tcod.yellow, tcod.black
-            >>> con.tiles_rgb[0, 0]
-            (64, [255, 255,   0], [0, 0, 0])
-            >>> con.tiles_rgb["bg"] = tcod.blue
-            >>> con.tiles_rgb[0, 0]
-            (64, [255, 255,   0], [  0,   0, 255])
-
-        .. versionadded:: 11.8
-        """
-        return self.tiles.view(self._DTYPE_RGB)
+        return self.rgba
 
     @property  # type: ignore
-    @deprecate("This attribute has been renamed to `tiles_rgb`.")
+    @deprecate("This attribute has been renamed to `rgb`.")
+    def tiles_rgb(self) -> np.ndarray:
+        """An array of this consoles data without the alpha channel.
+
+        .. versionadded:: 11.8
+
+        .. deprecated:: 12.3
+            Use :any:`Console.rgb` instead.
+        """
+        return self.rgb
+
+    @property  # type: ignore
+    @deprecate("This attribute has been renamed to `rgb`.")
     def tiles2(self) -> np.ndarray:
-        """This name is deprecated in favour of :any:`tiles_rgb`.
+        """This name is deprecated in favour of :any:`rgb`.
 
         .. versionadded:: 11.3
 
         .. deprecated:: 11.8
-            Use :any:`Console.tiles_rgb` instead.
+            Use :any:`Console.rgb` instead.
         """
-        return self.tiles_rgb
+        return self.rgb
 
     @property
     def rgba(self) -> np.ndarray:
-        # This attribute is provisional and may be changed at anytime.
-        return self.tiles
+        """An array of this consoles raw tile data.
+
+        Example:
+            >>> con = tcod.console.Console(10, 2)
+            >>> con.rgba[0, 0] = (
+            ...     ord("X"),
+            ...     (*tcod.white, 255),
+            ...     (*tcod.black, 255),
+            ... )
+            >>> con.rgba[0, 0]
+            (88, [255, 255, 255, 255], [  0,   0,   0, 255])
+
+        .. versionadded:: 12.3
+        """
+        return self._tiles.T if self._order == "F" else self._tiles
 
     @property
     def rgb(self) -> np.ndarray:
-        # This attribute is provisional and may be changed at anytime.
-        return self.tiles_rgb
+        """An array of this consoles data without the alpha channel.
+
+        The :any:`rgb_graphic` can be used to make arrays
+
+        Example:
+            >>> con = tcod.console.Console(10, 2)
+            >>> con.rgb[0, 0] = ord("@"), tcod.yellow, tcod.black
+            >>> con.rgb[0, 0]
+            (64, [255, 255,   0], [0, 0, 0])
+            >>> con.rgb["bg"] = tcod.blue
+            >>> con.rgb[0, 0]
+            (64, [255, 255,   0], [  0,   0, 255])
+
+        .. versionadded:: 12.3
+        """
+        return self.rgba.view(self._DTYPE_RGB)
 
     @property
     def default_bg(self) -> Tuple[int, int, int]:
