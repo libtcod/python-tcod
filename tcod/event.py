@@ -1655,6 +1655,14 @@ class Scancode(enum.IntEnum):
         """
         return self
 
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, KeySym):
+            raise TypeError(
+                "Scancode and KeySym enums can not be compared directly."
+                " Convert one or the other to the same type."
+            )
+        return super().__eq__(other)
+
 
 class KeySym(enum.IntEnum):
     """Key syms
@@ -2181,6 +2189,14 @@ class KeySym(enum.IntEnum):
         .. versionadded:: 12.3
         """
         return Scancode(lib.SDL_GetScancodeFromKey(self.value))
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, Scancode):
+            raise TypeError(
+                "Scancode and KeySym enums can not be compared directly."
+                " Convert one or the other to the same type."
+            )
+        return super().__eq__(other)
 
 
 __all__ = [  # noqa: F405
