@@ -109,8 +109,23 @@ def _verify_tile_coordinates(xy: Optional[Point]) -> Point:
     return Point(0, 0)
 
 
+_is_sdl_video_initialized = False
+
+
+def _init_sdl_video() -> None:
+    """Keyboard layout stuff needs SDL to be initialized first."""
+    global _is_sdl_video_initialized
+    if _is_sdl_video_initialized:
+        return
+    lib.SDL_InitSubSystem(lib.SDL_INIT_VIDEO)
+    _is_sdl_video_initialized = True
+
+
 class Modifier(enum.IntFlag):
-    """Keyboard modifiers."""
+    """Keyboard modifier flags.
+
+    .. versionadded:: 12.3
+    """
 
     NONE = 0
     LSHIFT = 1
@@ -1131,6 +1146,8 @@ class Scancode(enum.IntEnum):
     These names are derived from SDL expect for the numbers which are prefixed
     with ``N`` (since raw numbers can not be a Python name.)
 
+    .. versionadded:: 12.3
+
     ==================  ===
     UNKNOWN               0
     A                     4
@@ -1623,12 +1640,13 @@ class Scancode(enum.IntEnum):
 
     @property
     def label(self) -> str:
-        """Return a human-readable name of a key based on a scancode.
+        """Return a human-readable name of a key based on its scancode.
+
+        Be sure not to confuse this with ``.name``, which will return the enum
+        name rather than the human-readable name.
 
         .. seealso::
             :any:`KeySym.label`
-
-        .. versionadded:: 12.3
         """
         return self.keysym.label
 
@@ -1637,9 +1655,8 @@ class Scancode(enum.IntEnum):
         """Return a :class:`KeySym` from a scancode.
 
         Based on the current keyboard layout.
-
-        .. versionadded:: 12.3
         """
+        _init_sdl_video()
         return KeySym(lib.SDL_GetKeyFromScancode(self.value))
 
     @property
@@ -1650,8 +1667,6 @@ class Scancode(enum.IntEnum):
 
         .. seealso::
             :any:`KeySym.scancode`
-
-        .. versionadded:: 12.3
         """
         return self
 
@@ -1665,7 +1680,12 @@ class Scancode(enum.IntEnum):
 
 
 class KeySym(enum.IntEnum):
-    """Key syms
+    """Keyboard constants based on their symbol.
+
+    These names are derived from SDL expect for the numbers which are prefixed
+    with ``N`` (since raw numbers can not be a Python name.)
+
+    .. versionadded:: 12.3
 
     ==================  ==========
     UNKNOWN                      0
@@ -2154,14 +2174,15 @@ class KeySym(enum.IntEnum):
 
         Returns "" if the keycode doesn't have a name.
 
+        Be sure not to confuse this with ``.name``, which will return the enum
+        name rather than the human-readable name.
+
         Example::
 
             >>> tcod.event.KeySym.F1.label
             'F1'
             >>> tcod.event.KeySym.BACKSPACE.label
             'Backspace'
-
-        .. versionadded:: 12.3
         """
         return str(
             ffi.string(lib.SDL_GetKeyName(self.value)), encoding="utf-8"
@@ -2175,8 +2196,6 @@ class KeySym(enum.IntEnum):
 
         .. seealso::
             :any:`Scancode.keysym`
-
-        .. versionadded:: 12.3
         """
         return self
 
@@ -2185,9 +2204,8 @@ class KeySym(enum.IntEnum):
         """Return a scancode from a keycode.
 
         Based on the current keyboard layout.
-
-        .. versionadded:: 12.3
         """
+        _init_sdl_video()
         return Scancode(lib.SDL_GetScancodeFromKey(self.value))
 
     def __eq__(self, other: Any) -> bool:
