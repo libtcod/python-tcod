@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+12.3.0 - 2021-05-13
+-------------------
 Added
  - New keyboard enums:
    - `tcod.event.KeySym`
