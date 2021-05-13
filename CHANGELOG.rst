@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+12.3.1 - 2021-05-13
+-------------------
 Fixed
  - Fix Windows deployment.
 
