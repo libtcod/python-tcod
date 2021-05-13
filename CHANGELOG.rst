@@ -19,6 +19,9 @@ Added
  - Added `tcod.console.rgb_graphic` and `tcod.console.rgba_graphic` dtypes.
  - Another name for the Console array attributes: `Console.rgb` and `Console.rgba`.
 
+Changed
+ - Using `libtcod 1.17.0`.
+
 Deprecated
  - `Console_tiles_rgb` is being renamed to `Console.rgb`.
  - `Console_tiles` being renamed to `Console.rgba`.
