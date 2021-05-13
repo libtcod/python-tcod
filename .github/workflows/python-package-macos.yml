@@ -16,12 +16,9 @@ jobs:
         python-version: ['3.7.9']
 
     steps:
-    - name: Clone ${{github.repository}}
-      # actions/checkout breaks `git describe` so a manual clone is needed.
-      # https://github.com/actions/checkout/issues/272
-      run: |
-        git clone https://github.com/${{github.repository}}.git ${{github.workspace}}
-        git checkout ${{github.sha}}
+    # v2 breaks `git describe` so v1 is needed.
+    # https://github.com/actions/checkout/issues/272
+    - uses: actions/checkout@v1
     - name: Checkout submodules
       run: |
         git submodule update --init --recursive --depth 1
@@ -44,8 +41,8 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install pytest pytest-cov pytest-benchmark wheel twine
-        python -m pip install git+https://github.com/HexDecimal/delocate.git@loader_path
+        pip install pytest pytest-cov pytest-benchmark wheel twine
+        pip install git+https://github.com/HexDecimal/delocate.git@loader_path
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Build package.
       run: |

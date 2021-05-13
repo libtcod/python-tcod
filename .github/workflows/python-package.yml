@@ -23,10 +23,9 @@ jobs:
       fail-fast: false
 
     steps:
-    - name: Checkout code
-      # v2 breaks `git describe` so v1 is needed.
-      # https://github.com/actions/checkout/issues/272
-      uses: actions/checkout@v1
+    # v2 breaks `git describe` so v1 is needed.
+    # https://github.com/actions/checkout/issues/272
+    - uses: actions/checkout@v1
     - name: Checkout submodules
       run: |
         git submodule update --init --recursive --depth 1
@@ -42,7 +41,7 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install pytest pytest-cov pytest-benchmark wheel
+        pip install pytest pytest-cov pytest-benchmark wheel twine
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Initialize package
       run: |
