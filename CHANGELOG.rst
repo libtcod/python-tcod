@@ -9,6 +9,14 @@ v2.0.0
 Unreleased
 ------------------
 
+12.3.2 - 2021-05-15
+-------------------
+Changed
+ - Using `libtcod 1.17.1`.
+
+Fixed
+ - Fixed regression with loading PNG images.
+
 12.3.1 - 2021-05-13
 -------------------
 Fixed
