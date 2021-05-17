@@ -8,6 +8,13 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - Added modernized REXPaint saving/loading functions.
+   - `tcod.console.load_xp`
+   - `tcod.console.save_xp`
+
+Changed
+ - Using `libtcod 1.18.0`.
 
 12.3.2 - 2021-05-15
 -------------------

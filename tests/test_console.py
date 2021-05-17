@@ -129,3 +129,15 @@ def test_console_semigraphics():
     console.draw_semigraphics(
         [[[255, 255, 255], [255, 255, 255]], [[255, 255, 255], [0, 0, 0]]],
     )
+
+def test_rexpaint(tmp_path) -> None:
+    xp_path = tmp_path / "test.xp"
+    consoles = tcod.Console(80, 24, order="F"), tcod.Console(8, 8, order="F")
+    tcod.console.save_xp(xp_path, consoles, compress_level=0)
+    loaded = tcod.console.load_xp(xp_path, order="F")
+    assert len(consoles) == len(loaded)
+    assert loaded[0].rgba.flags["F_CONTIGUOUS"]
+    assert consoles[0].rgb.shape == loaded[0].rgb.shape
+    assert consoles[1].rgb.shape == loaded[1].rgb.shape
+    with pytest.raises(FileNotFoundError):
+        tcod.console.load_xp(tmp_path / "non_existant")

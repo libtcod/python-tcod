@@ -3,9 +3,10 @@ Libtcod consoles are a strictly tile-based representation of text and color.
 To render a console you need a tileset and a window to render to.
 See :ref:`getting-started` for info on how to set those up.
 """
-
+import os
+import pathlib
 import warnings
-from typing import Any, Optional, Tuple, Union  # noqa: F401
+from typing import Any, Iterable, Optional, Tuple, Union
 
 import numpy as np
 from typing_extensions import Literal
@@ -1229,3 +1230,102 @@ def recommended_size() -> Tuple[int, int]:
         w = max(1, xy[0] // lib.TCOD_ctx.tileset.tile_width)
         h = max(1, xy[1] // lib.TCOD_ctx.tileset.tile_height)
     return w, h
+
+
+def load_xp(
+    path: Union[str, pathlib.Path], order: Literal["C", "F"] = "C"
+) -> Tuple[Console, ...]:
+    """Load a REXPaint file as a tuple of consoles.
+
+    `path` is the name of the REXPaint file to load.
+    Usually ending with `.xp`.
+
+    `order` is the memory order of the Console's array buffer,
+    see :any:`tcod.console.Console`.
+
+    .. versionadded:: 12.4
+
+    Example::
+        import tcod
+        from numpy import np
+
+        path = "example.xp"  # REXPaint file with one layer.
+
+        # Load a REXPaint file with a single layer.
+        # The comma after console is used to unpack a single item tuple.
+        console, = tcod.console.load_xp(path, order="F")
+
+        # Convert from REXPaint's encoding to Unicode.
+        CP437_TO_UNICODE = np.asarray(tcod.tileset.CHARMAP_CP437)
+        console.ch[:] = CP437_TO_UNICODE[console.ch]
+
+        # Apply REXPaint's alpha key color.
+        KEY_COLOR = (255, 0, 255)
+        is_transparent = console.rgb["bg"] == KEY_COLOR
+        console.rgba[is_transparent] = (ord(" "), (0,), (0,))
+    """
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"File not found:\n\t{os.path.abspath(path)}")
+    layers = _check(
+        tcod.lib.TCOD_load_xp(str(path).encode("utf-8"), 0, ffi.NULL)
+    )
+    consoles = ffi.new("TCOD_Console*[]", layers)
+    _check(tcod.lib.TCOD_load_xp(str(path).encode("utf-8"), layers, consoles))
+    return tuple(
+        Console._from_cdata(console_p, order=order) for console_p in consoles
+    )
+
+
+def save_xp(
+    path: Union[str, pathlib.Path],
+    consoles: Iterable[Console],
+    compress_level: int = 9,
+) -> None:
+    """Save tcod Consoles to a REXPaint file.
+
+    `path` is where to save the file.
+
+    `consoles` are the :any:`tcod.console.Console` objects to be saved.
+
+    `compress_level` is the zlib compression level to be used.
+
+    Color alpha will be lost during saving.
+
+    Consoles will be saved as-is as much as possible.  You may need to convert
+    characters from Unicode to CP437 if you want to load the file in REXPaint.
+
+    .. versionadded:: 12.4
+
+    Example::
+        import tcod
+        from numpy import np
+
+        console = tcod.Console(80, 24)  # Example console.
+
+        # Load a REXPaint file with a single layer.
+        # The comma after console is used to unpack a single item tuple.
+        console, = tcod.console.load_xp(path, order="F")
+
+        # Convert from Unicode to REXPaint's encoding.
+        # Required to load this console correctly in the REXPaint tool.
+        CP437_TO_UNICODE = np.asarray(tcod.tileset.CHARMAP_CP437)
+        UNICODE_TO_CP437 = np.full(0x1FFFF, fill_value=ord("?"))
+        UNICODE_TO_CP437[CP437_TO_UNICODE] = np.arange(len(CP437_TO_UNICODE))
+        console.ch[:] = UNICODE_TO_CP437[console.ch]
+
+        # Convert console alpha into REXPaint's alpha key color.
+        KEY_COLOR = (255, 0, 255)
+        is_transparent = console.rgba["bg"][:, :, 3] == 0
+        console.rgb["bg"][is_transparent] = KEY_COLOR
+
+        tcod.console.save_xp("example.xp", [console])
+    """
+    consoles_c = ffi.new("TCOD_Console*[]", [c.console_c for c in consoles])
+    _check(
+        tcod.lib.TCOD_save_xp(
+            len(consoles_c),
+            consoles_c,
+            str(path).encode("utf-8"),
+            compress_level,
+        )
+    )

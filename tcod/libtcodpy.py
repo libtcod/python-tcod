@@ -2078,7 +2078,7 @@ def console_save_apf(con: tcod.console.Console, filename: str) -> bool:
     )
 
 
-@deprecate("Use tcod.console_from_xp to load this file.")
+@deprecate("Use tcod.console.load_xp to load this file.")
 def console_load_xp(con: tcod.console.Console, filename: str) -> bool:
     """Update a console from a REXPaint `.xp` file.
 
@@ -2091,6 +2091,7 @@ def console_load_xp(con: tcod.console.Console, filename: str) -> bool:
     )
 
 
+@deprecate("Use tcod.console.save_xp to save this console.")
 def console_save_xp(
     con: tcod.console.Console, filename: str, compress_level: int = 9
 ) -> bool:
@@ -2102,6 +2103,7 @@ def console_save_xp(
     )
 
 
+@deprecate("Use tcod.console.load_xp to load this file.")
 def console_from_xp(filename: str) -> tcod.console.Console:
     """Return a single console from a REXPaint `.xp` file."""
     if not os.path.exists(filename):
@@ -2113,6 +2115,7 @@ def console_from_xp(filename: str) -> tcod.console.Console:
     )
 
 
+@deprecate("Use tcod.console.load_xp to load this file.")
 def console_list_load_xp(
     filename: str,
 ) -> Optional[List[tcod.console.Console]]:
@@ -2136,6 +2139,7 @@ def console_list_load_xp(
         lib.TCOD_list_delete(tcod_list)
 
 
+@deprecate("Use tcod.console.save_xp to save these consoles.")
 def console_list_save_xp(
     console_list: Sequence[tcod.console.Console],
     filename: str,
