@@ -6,11 +6,11 @@ http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generatin
 This will print the result to the console, so be sure to run this from the
 command line.
 """
-import numpy as np  # type: ignore
-import scipy.signal  # type: ignore
+import numpy as np
+import scipy.signal
 
 
-def convolve(tiles: np.array, wall_rule: int = 5) -> np.array:
+def convolve(tiles: np.ndarray, wall_rule: int = 5) -> np.ndarray:
     """Return the next step of the cave generation algorithm.
 
     `tiles` is the input array. (0: wall, 1: floor)
@@ -25,7 +25,7 @@ def convolve(tiles: np.array, wall_rule: int = 5) -> np.array:
     return neighbors < wall_rule  # Apply the wall rule.
 
 
-def show(tiles: np.array) -> None:
+def show(tiles: np.ndarray) -> None:
     """Print out the tiles of an array."""
     for line in tiles:
         print("".join("# "[int(cell)] for cell in line))

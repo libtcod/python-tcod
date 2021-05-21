@@ -8,7 +8,7 @@
 import statistics
 import time
 from collections import deque
-from typing import Deque, List, Optional, Tuple
+from typing import Deque, Optional
 
 import tcod
 

@@ -1257,8 +1257,8 @@ def load_xp(
 
     Example::
 
+        import numpy as np
         import tcod
-        from numpy import np
 
         path = "example.xp"  # REXPaint file with one layer.
 
@@ -1311,8 +1311,8 @@ def save_xp(
 
     Example::
 
+        import numpy as np
         import tcod
-        from numpy import np
 
         console = tcod.Console(80, 24)  # Example console.
 
