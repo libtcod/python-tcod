@@ -43,9 +43,12 @@ class Console:
 
     `width` and `height` are the size of the console (in tiles.)
 
-    `order` determines how the axes of NumPy array attributes are arraigned.
+    `order` determines how the axes of NumPy array attributes are arranged.
+    With the default setting of `"C"` you use [y, x] to index a consoles
+    arrays such as :any:`Console.rgb`.
     `order="F"` will swap the first two axes which allows for more intuitive
-    `[x, y]` indexing.
+    `[x, y]` indexing.  To be consistent you may have to do this for every
+    NumPy array to create.
 
     With `buffer` the console can be initialized from another array. The
     `buffer` should be compatible with the `width`, `height`, and `order`
@@ -297,6 +300,9 @@ class Console:
     def rgba(self) -> np.ndarray:
         """An array of this consoles raw tile data.
 
+        The axes of this array is affected by the `order` parameter given to
+        initialize the console.
+
         Example:
             >>> con = tcod.console.Console(10, 2)
             >>> con.rgba[0, 0] = (
@@ -315,7 +321,11 @@ class Console:
     def rgb(self) -> np.ndarray:
         """An array of this consoles data without the alpha channel.
 
-        The :any:`rgb_graphic` can be used to make arrays
+        The axes of this array is affected by the `order` parameter given to
+        initialize the console.
+
+        The :any:`rgb_graphic` can be used to make arrays similar to these
+        independent of a :any:`Console`.
 
         Example:
             >>> con = tcod.console.Console(10, 2)
@@ -1256,9 +1266,10 @@ def load_xp(
         # The comma after console is used to unpack a single item tuple.
         console, = tcod.console.load_xp(path, order="F")
 
-        # Convert from REXPaint's encoding to Unicode.
+        # Convert tcod's Code Page 437 character mapping into a NumPy array.
         CP437_TO_UNICODE = np.asarray(tcod.tileset.CHARMAP_CP437)
 
+        # Convert from REXPaint's CP437 encoding to Unicode in-place.
         console.ch[:] = CP437_TO_UNICODE[console.ch]
 
         # Apply REXPaint's alpha key color.
@@ -1307,10 +1318,18 @@ def save_xp(
 
         # Convert from Unicode to REXPaint's encoding.
         # Required to load this console correctly in the REXPaint tool.
+
+        # Convert tcod's Code Page 437 character mapping into a NumPy array.
         CP437_TO_UNICODE = np.asarray(tcod.tileset.CHARMAP_CP437)
-        UNICODE_TO_CP437 = np.full(0x1FFFF, fill_value=ord("?"))
+
+        # Initialize a Unicode-to-CP437 array.
+        # 0x20000 is the current full range of Unicode.
+        # fill_value=ord("?") means that "?" will be the result of any unknown codepoint.
+        UNICODE_TO_CP437 = np.full(0x20000, fill_value=ord("?"))
+        # Assign the CP437 mappings.
         UNICODE_TO_CP437[CP437_TO_UNICODE] = np.arange(len(CP437_TO_UNICODE))
 
+        # Convert from Unicode to CP437 in-place.
         console.ch[:] = UNICODE_TO_CP437[console.ch]
 
         # Convert console alpha into REXPaint's alpha key color.
