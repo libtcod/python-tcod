@@ -8,13 +8,16 @@ v2.0.0
 
 Unreleased
 ------------------
+
+12.4.0 - 2021-05-21
+-------------------
 Added
  - Added modernized REXPaint saving/loading functions.
    - `tcod.console.load_xp`
    - `tcod.console.save_xp`
 
 Changed
- - Using `libtcod 1.18.0`.
+ - Using `libtcod 1.18.1`.
 
 Fixed
  - `tcod.event.KeySym` and `tcod.event.Scancode ` can now be hashed.

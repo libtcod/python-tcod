@@ -1257,6 +1257,7 @@ def load_xp(
 
         # Convert from REXPaint's encoding to Unicode.
         CP437_TO_UNICODE = np.asarray(tcod.tileset.CHARMAP_CP437)
+
         console.ch[:] = CP437_TO_UNICODE[console.ch]
 
         # Apply REXPaint's alpha key color.
@@ -1302,15 +1303,12 @@ def save_xp(
 
         console = tcod.Console(80, 24)  # Example console.
 
-        # Load a REXPaint file with a single layer.
-        # The comma after console is used to unpack a single item tuple.
-        console, = tcod.console.load_xp(path, order="F")
-
         # Convert from Unicode to REXPaint's encoding.
         # Required to load this console correctly in the REXPaint tool.
         CP437_TO_UNICODE = np.asarray(tcod.tileset.CHARMAP_CP437)
         UNICODE_TO_CP437 = np.full(0x1FFFF, fill_value=ord("?"))
         UNICODE_TO_CP437[CP437_TO_UNICODE] = np.arange(len(CP437_TO_UNICODE))
+
         console.ch[:] = UNICODE_TO_CP437[console.ch]
 
         # Convert console alpha into REXPaint's alpha key color.
