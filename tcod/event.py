@@ -1678,6 +1678,10 @@ class Scancode(enum.IntEnum):
             )
         return super().__eq__(other)
 
+    def __hash__(self) -> int:
+        # __eq__ was defined, so __hash__ must be defined.
+        return super().__hash__()
+
 
 class KeySym(enum.IntEnum):
     """Keyboard constants based on their symbol.
@@ -2215,6 +2219,10 @@ class KeySym(enum.IntEnum):
                 " Convert one or the other to the same type."
             )
         return super().__eq__(other)
+
+    def __hash__(self) -> int:
+        # __eq__ was defined, so __hash__ must be defined.
+        return super().__hash__()
 
 
 __all__ = [  # noqa: F405

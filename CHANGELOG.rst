@@ -16,6 +16,9 @@ Added
 Changed
  - Using `libtcod 1.18.0`.
 
+Fixed
+ - `tcod.event.KeySym` and `tcod.event.Scancode ` can now be hashed.
+
 12.3.2 - 2021-05-15
 -------------------
 Changed
