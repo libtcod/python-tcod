@@ -1246,6 +1246,7 @@ def load_xp(
     .. versionadded:: 12.4
 
     Example::
+
         import tcod
         from numpy import np
 
@@ -1298,6 +1299,7 @@ def save_xp(
     .. versionadded:: 12.4
 
     Example::
+
         import tcod
         from numpy import np
 
