@@ -7,7 +7,7 @@ This will print the result to the console, so be sure to run this from the
 command line.
 """
 import numpy as np
-import scipy.signal
+import scipy.signal  # type: ignore
 
 
 def convolve(tiles: np.ndarray, wall_rule: int = 5) -> np.ndarray:
@@ -19,10 +19,11 @@ def convolve(tiles: np.ndarray, wall_rule: int = 5) -> np.ndarray:
     walls then the tile will become a wall.
     """
     # Use convolve2d, the 2nd input is a 3x3 ones array.
-    neighbors = scipy.signal.convolve2d(
+    neighbors: np.ndarray = scipy.signal.convolve2d(
         tiles == 0, [[1, 1, 1], [1, 1, 1], [1, 1, 1]], "same"
     )
-    return neighbors < wall_rule  # Apply the wall rule.
+    next_tiles: np.ndarray = neighbors < wall_rule  # Apply the wall rule.
+    return next_tiles
 
 
 def show(tiles: np.ndarray) -> None:

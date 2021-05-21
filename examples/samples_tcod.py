@@ -348,15 +348,51 @@ class LineDrawingSample(Sample):
 
 class NoiseSample(Sample):
     NOISE_OPTIONS = [  # (name, algorithm, implementation)
-        ("perlin noise", tcod.NOISE_PERLIN, tcod.noise.SIMPLE),
-        ("simplex noise", tcod.NOISE_SIMPLEX, tcod.noise.SIMPLE),
-        ("wavelet noise", tcod.NOISE_WAVELET, tcod.noise.SIMPLE),
-        ("perlin fbm", tcod.NOISE_PERLIN, tcod.noise.FBM),
-        ("perlin turbulence", tcod.NOISE_PERLIN, tcod.noise.TURBULENCE),
-        ("simplex fbm", tcod.NOISE_SIMPLEX, tcod.noise.FBM),
-        ("simplex turbulence", tcod.NOISE_SIMPLEX, tcod.noise.TURBULENCE),
-        ("wavelet fbm", tcod.NOISE_WAVELET, tcod.noise.FBM),
-        ("wavelet turbulence", tcod.NOISE_WAVELET, tcod.noise.TURBULENCE),
+        (
+            "perlin noise",
+            tcod.noise.Algorithm.PERLIN,
+            tcod.noise.Implementation.SIMPLE,
+        ),
+        (
+            "simplex noise",
+            tcod.noise.Algorithm.SIMPLEX,
+            tcod.noise.Implementation.SIMPLE,
+        ),
+        (
+            "wavelet noise",
+            tcod.noise.Algorithm.WAVELET,
+            tcod.noise.Implementation.SIMPLE,
+        ),
+        (
+            "perlin fbm",
+            tcod.noise.Algorithm.PERLIN,
+            tcod.noise.Implementation.FBM,
+        ),
+        (
+            "perlin turbulence",
+            tcod.noise.Algorithm.PERLIN,
+            tcod.noise.Implementation.TURBULENCE,
+        ),
+        (
+            "simplex fbm",
+            tcod.noise.Algorithm.SIMPLEX,
+            tcod.noise.Implementation.FBM,
+        ),
+        (
+            "simplex turbulence",
+            tcod.noise.Algorithm.SIMPLEX,
+            tcod.noise.Implementation.TURBULENCE,
+        ),
+        (
+            "wavelet fbm",
+            tcod.noise.Algorithm.WAVELET,
+            tcod.noise.Implementation.FBM,
+        ),
+        (
+            "wavelet turbulence",
+            tcod.noise.Algorithm.WAVELET,
+            tcod.noise.Implementation.TURBULENCE,
+        ),
     ]
 
     def __init__(self) -> None:
@@ -407,7 +443,7 @@ class NoiseSample(Sample):
                 self.img.put_pixel(x, y, (c // 2, c // 2, c))
         rectw = 24
         recth = 13
-        if self.implementation == tcod.noise.SIMPLE:
+        if self.implementation == tcod.noise.Implementation.SIMPLE:
             recth = 10
         sample_console.draw_semigraphics(self.img)
         sample_console.draw_rect(
@@ -435,7 +471,7 @@ class NoiseSample(Sample):
         sample_console.print(
             2, 11, "Y/H : zoom (%2.1f)" % self.zoom, fg=WHITE, bg=None
         )
-        if self.implementation != tcod.noise.SIMPLE:
+        if self.implementation != tcod.noise.Implementation.SIMPLE:
             sample_console.print(
                 2,
                 12,
