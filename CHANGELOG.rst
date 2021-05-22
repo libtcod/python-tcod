@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+12.5.0 - 2021-05-21
+-------------------
 Changed
  - `KeyboardEvent`'s '`scancode`, `sym`, and `mod` attributes now use their respective enums.
 
