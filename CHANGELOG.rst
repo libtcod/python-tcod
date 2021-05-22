@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - `KeyboardEvent`'s '`scancode`, `sym`, and `mod` attributes now use their respective enums.
 
 12.4.0 - 2021-05-21
 -------------------
@@ -18,9 +20,7 @@ Added
 
 Changed
  - Using `libtcod 1.18.1`.
-
-Fixed
- - `tcod.event.KeySym` and `tcod.event.Scancode ` can now be hashed.
+ - `tcod.event.KeySym` and `tcod.event.Scancode` can now be hashed.
 
 12.3.2 - 2021-05-15
 -------------------

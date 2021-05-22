@@ -122,7 +122,26 @@ def _init_sdl_video() -> None:
 
 
 class Modifier(enum.IntFlag):
-    """Keyboard modifier flags.
+    """Keyboard modifier flags, a bitfield of held modifier keys.
+
+    Use `bitwise and` to check if a modifier key is held.
+
+    The following example shows some common ways of checking modifiers.
+    All non-zero return values are considered true.
+
+    Example::
+
+        >>> mod = tcod.event.Modifier(4098)
+        >>> mod
+        <Modifier.NUM|RSHIFT: 4098>
+        >>> mod & tcod.event.Modifier.SHIFT  # Check if any shift key is held.
+        <Modifier.RSHIFT: 2>
+        >>> mod & tcod.event.Modifier.LSHIFT  # Check if left shift key is held.
+        <Modifier.NONE: 0>
+        >>> not mod & tcod.event.Modifier.LSHIFT  # Check if left shift key is NOT held.
+        True
+        >>> mod & tcod.event.Modifier.SHIFT and mod & tcod.event.Modifier.CTRL  # Check if Shift+Control is held.
+        <Modifier.NONE: 0>
 
     .. versionadded:: 12.3
     """
@@ -258,58 +277,28 @@ class KeyboardEvent(Event):
     """
     Attributes:
         type (str): Will be "KEYDOWN" or "KEYUP", depending on the event.
-        scancode (int): The keyboard scan-code, this is the physical location
+        scancode (Scancode): The keyboard scan-code, this is the physical location
                         of the key on the keyboard rather than the keys symbol.
-        sym (int): The keyboard symbol.
-        mod (int): A bitmask of the currently held modifier keys.
-
-            You can use the following to check if a modifier key is held:
-
-            * `tcod.event.KMOD_LSHIFT`
-                Left shift bit.
-            * `tcod.event.KMOD_RSHIFT`
-                Right shift bit.
-            * `tcod.event.KMOD_LCTRL`
-                Left control bit.
-            * `tcod.event.KMOD_RCTRL`
-                Right control bit.
-            * `tcod.event.KMOD_LALT`
-                Left alt bit.
-            * `tcod.event.KMOD_RALT`
-                Right alt bit.
-            * `tcod.event.KMOD_LGUI`
-                Left meta key bit.
-            * `tcod.event.KMOD_RGUI`
-                Right meta key bit.
-            * `tcod.event.KMOD_SHIFT`
-                ``tcod.event.KMOD_LSHIFT | tcod.event.KMOD_RSHIFT``
-            * `tcod.event.KMOD_CTRL`
-                ``tcod.event.KMOD_LCTRL | tcod.event.KMOD_RCTRL``
-            * `tcod.event.KMOD_ALT`
-                ``tcod.event.KMOD_LALT | tcod.event.KMOD_RALT``
-            * `tcod.event.KMOD_GUI`
-                ``tcod.event.KMOD_LGUI | tcod.event.KMOD_RGUI``
-            * `tcod.event.KMOD_NUM`
-                Num lock bit.
-            * `tcod.event.KMOD_CAPS`
-                Caps lock bit.
-            * `tcod.event.KMOD_MODE`
-                AltGr key bit.
+        sym (KeySym): The keyboard symbol.
+        mod (Modifier): A bitmask of the currently held modifier keys.
 
             For example, if shift is held then
-            ``event.mod & tcod.event.KMOD_SHIFT`` will evaluate to a true
+            ``event.mod & tcod.event.Modifier.SHIFT`` will evaluate to a true
             value.
 
         repeat (bool): True if this event exists because of key repeat.
+
+    .. versionchanged:: 12.5
+        `scancode`, `sym`, and `mod` now use their respective enums.
     """
 
     def __init__(
         self, scancode: int, sym: int, mod: int, repeat: bool = False
     ):
         super().__init__()
-        self.scancode = scancode
-        self.sym = sym
-        self.mod = mod
+        self.scancode = Scancode(scancode)
+        self.sym = KeySym(sym)
+        self.mod = Modifier(mod)
         self.repeat = repeat
 
     @classmethod
