@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - The setup script should no longer fail silently when cffi is not available.
 
 12.5.0 - 2021-05-21
 -------------------

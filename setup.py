@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 
-import sys
 import os
+import platform
+import sys
+import warnings
+from subprocess import CalledProcessError, check_output
+from typing import List
 
 from setuptools import setup
-
-from subprocess import check_output
-import platform
-import warnings
 
 SDL_VERSION_NEEDED = (2, 0, 5)
 
 
-def get_version():
+def get_version() -> str:
     """Get the current version from a git tag, or by reading tcod/version.py"""
     try:
         tag = check_output(
@@ -31,27 +31,28 @@ def get_version():
             version += ".dev%i" % commits_since_tag
 
         # update tcod/version.py
-        with open("tcod/version.py", "w") as f:
-            f.write('__version__ = "%s"\n' % version)
+        with open("tcod/version.py", "w") as version_file:
+            version_file.write('__version__ = "%s"\n' % version)
         return version
-    except:
+    except CalledProcessError:
         try:
-            exec(open("tcod/version.py").read(), globals())
-            return __version__
+            __version__ = "0.0.0"
+            with open("tcod/version.py") as version_file:
+                exec(version_file.read(), globals())  # Update __version__
         except FileNotFoundError:
             warnings.warn(
                 "Unknown version: "
                 "Not in a Git repository and not from a sdist bundle or wheel."
             )
-            return "0.0.0"
+        return __version__
 
 
 is_pypy = platform.python_implementation() == "PyPy"
 
 
-def get_package_data():
+def get_package_data() -> List[str]:
     """get data files which will be included in the main tcod/ directory"""
-    BITSIZE, LINKAGE = platform.architecture()
+    BITSIZE, _ = platform.architecture()
     files = [
         "py.typed",
         "lib/LIBTCOD-CREDITS.txt",
@@ -68,13 +69,13 @@ def get_package_data():
     return files
 
 
-def get_long_description():
+def get_long_description() -> str:
     """Return this projects description."""
-    with open("README.rst", "r") as f:
-        return f.read()
+    with open("README.rst", "r") as readme_file:
+        return readme_file.read()
 
 
-def check_sdl_version():
+def check_sdl_version() -> None:
     """Check the local SDL version on Linux distributions."""
     if not sys.platform.startswith("linux"):
         return
@@ -127,13 +128,17 @@ setup(
     packages=["tcod", "tcod.__pyinstaller"],
     package_data={"tcod": get_package_data()},
     python_requires=">=3.6",
+    setup_requires=[
+        *pytest_runner,
+        "cffi~=1.13",
+        "pycparser>=2.14",
+    ],
     install_requires=[
         "cffi~=1.13",  # Also required by pyproject.toml.
         "numpy~=1.10" if not is_pypy else "",
         "typing_extensions",
     ],
     cffi_modules=["build_libtcod.py:ffi"],
-    setup_requires=pytest_runner,
     tests_require=["pytest", "pytest-cov", "pytest-benchmark"],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
