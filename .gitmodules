@@ -1,3 +1,4 @@
 [submodule "libtcod"]
 	path = libtcod
 	url = https://github.com/libtcod/libtcod
+	shallow = true
