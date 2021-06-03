@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 
-import os
-import sys
-
 import glob
+import os
+import platform
 import re
-from typing import List, Tuple, Any, Dict, Iterable, Iterator, Set
-
-from cffi import FFI  # type: ignore
-
 import shutil
 import subprocess
-import platform
+import sys
 import zipfile
-
-import parse_sdl2
+from typing import Any, Dict, Iterable, Iterator, List, Set, Tuple
 
 try:
     from urllib import urlretrieve  # type: ignore
 except ImportError:
     from urllib.request import urlretrieve
+
+from cffi import FFI  # type: ignore
+
+sys.path.append(os.path.dirname(__file__))
+
+import parse_sdl2  # noqa: E402
 
 # The SDL2 version to parse and export symbols from.
 SDL2_PARSE_VERSION = os.environ.get("SDL_VERSION", "2.0.5")
@@ -460,8 +460,8 @@ def generate_enums(prefix: str) -> Iterator[str]:
 
 def write_library_constants() -> None:
     """Write libtcod constants into the tcod.constants module."""
-    from tcod._libtcod import lib, ffi
     import tcod.color
+    from tcod._libtcod import ffi, lib
 
     with open("tcod/constants.py", "w") as f:
         all_names = []

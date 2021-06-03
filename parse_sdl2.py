@@ -1,8 +1,7 @@
 import os.path
-import sys
-
 import platform
 import re
+import sys
 from typing import Iterator
 
 import cffi  # type: ignore
