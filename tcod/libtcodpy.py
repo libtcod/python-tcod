@@ -5,19 +5,7 @@ import os
 import sys
 import threading
 import warnings
-from typing import (
-    Any,
-    AnyStr,
-    Callable,
-    Hashable,
-    Iterable,
-    Iterator,
-    List,
-    Optional,
-    Sequence,
-    Tuple,
-    Union,
-)
+from typing import Any, AnyStr, Callable, Hashable, Iterable, Iterator, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from typing_extensions import Literal
@@ -172,9 +160,7 @@ class ConsoleBuffer(object):
         other.char = list(self.char)
         return other
 
-    def set_fore(
-        self, x: int, y: int, r: int, g: int, b: int, char: str
-    ) -> None:
+    def set_fore(self, x: int, y: int, r: int, g: int, b: int, char: str) -> None:
         """Set the character and foreground color of one cell.
 
         Args:
@@ -258,10 +244,7 @@ class ConsoleBuffer(object):
         if not dest:
             dest = tcod.console.Console._from_cdata(ffi.NULL)
         if dest.width != self.width or dest.height != self.height:
-            raise ValueError(
-                "ConsoleBuffer.blit: "
-                "Destination console has an incorrect size."
-            )
+            raise ValueError("ConsoleBuffer.blit: " "Destination console has an incorrect size.")
 
         if fill_back:
             bg = dest.bg.ravel()
@@ -342,11 +325,7 @@ class Dice(_CDataWrapper):
 
 
 # reverse lookup table for KEY_X attributes, used by Key.__repr__
-_LOOKUP_VK = {
-    value: "KEY_%s" % key[6:]
-    for key, value in lib.__dict__.items()
-    if key.startswith("TCODK")
-}
+_LOOKUP_VK = {value: "KEY_%s" % key[6:] for key, value in lib.__dict__.items() if key.startswith("TCODK")}
 
 
 class Key(_CDataWrapper):
@@ -432,9 +411,7 @@ class Key(_CDataWrapper):
     def __repr__(self) -> str:
         """Return a representation of this Key object."""
         params = []
-        params.append(
-            "pressed=%r, vk=tcod.%s" % (self.pressed, _LOOKUP_VK[self.vk])
-        )
+        params.append("pressed=%r, vk=tcod.%s" % (self.pressed, _LOOKUP_VK[self.vk]))
         if self.c:
             params.append("c=ord(%r)" % chr(self.c))
         if self.text:
@@ -555,9 +532,7 @@ def bsp_new_with_size(x: int, y: int, w: int, h: int) -> tcod.bsp.BSP:
 
 
 @deprecate("Call node.split_once instead.")
-def bsp_split_once(
-    node: tcod.bsp.BSP, horizontal: bool, position: int
-) -> None:
+def bsp_split_once(node: tcod.bsp.BSP, horizontal: bool, position: int) -> None:
     """
     .. deprecated:: 2.0
        Use :any:`BSP.split_once` instead.
@@ -579,9 +554,7 @@ def bsp_split_recursive(
     .. deprecated:: 2.0
        Use :any:`BSP.split_recursive` instead.
     """
-    node.split_recursive(
-        nb, minHSize, minVSize, maxHRatio, maxVRatio, randomizer
-    )
+    node.split_recursive(nb, minHSize, minVSize, maxHRatio, maxVRatio, randomizer)
 
 
 @deprecate("Assign values via attribute instead.")
@@ -642,9 +615,7 @@ def bsp_contains(node: tcod.bsp.BSP, cx: int, cy: int) -> bool:
 
 
 @deprecate("Use 'node.find_node' instead.")
-def bsp_find_node(
-    node: tcod.bsp.BSP, cx: int, cy: int
-) -> Optional[tcod.bsp.BSP]:
+def bsp_find_node(node: tcod.bsp.BSP, cx: int, cy: int) -> Optional[tcod.bsp.BSP]:
     """
     .. deprecated:: 2.0
        Use :any:`BSP.find_node` instead.
@@ -720,10 +691,7 @@ def bsp_traverse_level_order(
     _bsp_traverse(node.level_order(), callback, userData)
 
 
-@deprecate(
-    "Iterate over nodes using "
-    "'for n in node.inverted_level_order():' instead."
-)
+@deprecate("Iterate over nodes using " "'for n in node.inverted_level_order():' instead.")
 def bsp_traverse_inverted_level_order(
     node: tcod.bsp.BSP,
     callback: Callable[[tcod.bsp.BSP, Any], None],
@@ -765,9 +733,7 @@ def bsp_delete(node: tcod.bsp.BSP) -> None:
 
 
 @pending_deprecate()
-def color_lerp(
-    c1: Tuple[int, int, int], c2: Tuple[int, int, int], a: float
-) -> Color:
+def color_lerp(c1: Tuple[int, int, int], c2: Tuple[int, int, int], a: float) -> Color:
     """Return the linear interpolation between two colors.
 
     ``a`` is the interpolation value, with 0 returing ``c1``,
@@ -840,9 +806,7 @@ def color_scale_HSV(c: Color, scoef: float, vcoef: float) -> None:
 
 
 @pending_deprecate()
-def color_gen_map(
-    colors: Iterable[Tuple[int, int, int]], indexes: Iterable[int]
-) -> List[Color]:
+def color_gen_map(colors: Iterable[Tuple[int, int, int]], indexes: Iterable[int]) -> List[Color]:
     """Return a smoothly defined scale of colors.
 
     If ``indexes`` is [0, 3, 9] for example, the first color from ``colors``
@@ -965,11 +929,7 @@ def console_init_root(
             DeprecationWarning,
             stacklevel=2,
         )
-    _check_warn(
-        lib.TCOD_console_init_root_(
-            w, h, _bytes(title), fullscreen, renderer, vsync
-        )
-    )
+    _check_warn(lib.TCOD_console_init_root_(w, h, _bytes(title), fullscreen, renderer, vsync))
     console = tcod.console.Console._get_root(order)
     console.clear()
     return console
@@ -1012,14 +972,8 @@ def console_set_custom_font(
         See :ref:`getting-started` for more info.
     """
     if not os.path.exists(_unicode(fontFile)):
-        raise RuntimeError(
-            "File not found:\n\t%s" % (str(os.path.realpath(fontFile)),)
-        )
-    _check(
-        lib.TCOD_console_set_custom_font(
-            _bytes(fontFile), flags, nb_char_horiz, nb_char_vertic
-        )
-    )
+        raise RuntimeError("File not found:\n\t%s" % (str(os.path.realpath(fontFile)),))
+    _check(lib.TCOD_console_set_custom_font(_bytes(fontFile), flags, nb_char_horiz, nb_char_vertic))
 
 
 @deprecate("Check `con.width` instead.")
@@ -1055,9 +1009,7 @@ def console_get_height(con: tcod.console.Console) -> int:
 
 
 @deprecate("Setup fonts using the tcod.tileset module.")
-def console_map_ascii_code_to_font(
-    asciiCode: int, fontCharX: int, fontCharY: int
-) -> None:
+def console_map_ascii_code_to_font(asciiCode: int, fontCharX: int, fontCharY: int) -> None:
     """Set a character code to new coordinates on the tile-set.
 
     `asciiCode` should be any Unicode codepoint.
@@ -1073,15 +1025,11 @@ def console_map_ascii_code_to_font(
         Setup fonts using the :any:`tcod.tileset` module.
         :any:`Tileset.remap` replaces this function.
     """
-    lib.TCOD_console_map_ascii_code_to_font(
-        _int(asciiCode), fontCharX, fontCharY
-    )
+    lib.TCOD_console_map_ascii_code_to_font(_int(asciiCode), fontCharX, fontCharY)
 
 
 @deprecate("Setup fonts using the tcod.tileset module.")
-def console_map_ascii_codes_to_font(
-    firstAsciiCode: int, nbCodes: int, fontCharX: int, fontCharY: int
-) -> None:
+def console_map_ascii_codes_to_font(firstAsciiCode: int, nbCodes: int, fontCharX: int, fontCharY: int) -> None:
     """Remap a contiguous set of codes to a contiguous set of tiles.
 
     Both the tile-set and character codes must be contiguous to use this
@@ -1101,9 +1049,7 @@ def console_map_ascii_codes_to_font(
         :any:`Tileset.remap` replaces this function.
 
     """
-    lib.TCOD_console_map_ascii_codes_to_font(
-        _int(firstAsciiCode), nbCodes, fontCharX, fontCharY
-    )
+    lib.TCOD_console_map_ascii_codes_to_font(_int(firstAsciiCode), nbCodes, fontCharX, fontCharY)
 
 
 @deprecate("Setup fonts using the tcod.tileset module.")
@@ -1285,9 +1231,7 @@ def console_flush(
 
 # drawing on a console
 @deprecate("Set the `con.default_bg` attribute instead.")
-def console_set_default_background(
-    con: tcod.console.Console, col: Tuple[int, int, int]
-) -> None:
+def console_set_default_background(con: tcod.console.Console, col: Tuple[int, int, int]) -> None:
     """Change the default background color for a console.
 
     Args:
@@ -1302,9 +1246,7 @@ def console_set_default_background(
 
 
 @deprecate("Set the `con.default_fg` attribute instead.")
-def console_set_default_foreground(
-    con: tcod.console.Console, col: Tuple[int, int, int]
-) -> None:
+def console_set_default_foreground(con: tcod.console.Console, col: Tuple[int, int, int]) -> None:
     """Change the default foreground color for a console.
 
     Args:
@@ -1401,9 +1343,7 @@ def console_set_char_background(
 
 
 @deprecate("Directly access a consoles foreground color with `console.fg`")
-def console_set_char_foreground(
-    con: tcod.console.Console, x: int, y: int, col: Tuple[int, int, int]
-) -> None:
+def console_set_char_foreground(con: tcod.console.Console, x: int, y: int, col: Tuple[int, int, int]) -> None:
     """Change the foreground color of x,y to col.
 
     Args:
@@ -1421,9 +1361,7 @@ def console_set_char_foreground(
 
 
 @deprecate("Directly access a consoles characters with `console.ch`")
-def console_set_char(
-    con: tcod.console.Console, x: int, y: int, c: Union[int, str]
-) -> None:
+def console_set_char(con: tcod.console.Console, x: int, y: int, c: Union[int, str]) -> None:
     """Change the character at x,y to c, keeping the current colors.
 
     Args:
@@ -1536,9 +1474,7 @@ def console_print_ex(
 
 
 @deprecate("Call the `con.print_rect` method instead.")
-def console_print_rect(
-    con: tcod.console.Console, x: int, y: int, w: int, h: int, fmt: str
-) -> int:
+def console_print_rect(con: tcod.console.Console, x: int, y: int, w: int, h: int, fmt: str) -> int:
     """Print a string constrained to a rectangle.
 
     If h > 0 and the bottom of the rectangle is reached,
@@ -1553,9 +1489,7 @@ def console_print_rect(
     .. deprecated:: 8.5
         Use :any:`Console.print_rect` instead.
     """
-    return int(
-        lib.TCOD_console_printf_rect(_console(con), x, y, w, h, _fmt(fmt))
-    )
+    return int(lib.TCOD_console_printf_rect(_console(con), x, y, w, h, _fmt(fmt)))
 
 
 @deprecate("Call the `con.print_rect` method instead.")
@@ -1577,17 +1511,11 @@ def console_print_rect_ex(
     .. deprecated:: 8.5
         Use :any:`Console.print_rect` instead.
     """
-    return int(
-        lib.TCOD_console_printf_rect_ex(
-            _console(con), x, y, w, h, flag, alignment, _fmt(fmt)
-        )
-    )
+    return int(lib.TCOD_console_printf_rect_ex(_console(con), x, y, w, h, flag, alignment, _fmt(fmt)))
 
 
 @deprecate("Call the `con.get_height_rect` method instead.")
-def console_get_height_rect(
-    con: tcod.console.Console, x: int, y: int, w: int, h: int, fmt: str
-) -> int:
+def console_get_height_rect(con: tcod.console.Console, x: int, y: int, w: int, h: int, fmt: str) -> int:
     """Return the height of this text once word-wrapped into this rectangle.
 
     Returns:
@@ -1596,11 +1524,7 @@ def console_get_height_rect(
     .. deprecated:: 8.5
         Use :any:`Console.get_height_rect` instead.
     """
-    return int(
-        lib.TCOD_console_get_height_rect_fmt(
-            _console(con), x, y, w, h, _fmt(fmt)
-        )
-    )
+    return int(lib.TCOD_console_get_height_rect_fmt(_console(con), x, y, w, h, _fmt(fmt)))
 
 
 @deprecate("Call the `con.rect` method instead.")
@@ -1685,17 +1609,11 @@ def console_print_frame(
         Use :any:`Console.print_frame` instead.
     """
     fmt = _fmt(fmt) if fmt else ffi.NULL
-    _check(
-        lib.TCOD_console_printf_frame(
-            _console(con), x, y, w, h, clear, flag, fmt
-        )
-    )
+    _check(lib.TCOD_console_printf_frame(_console(con), x, y, w, h, clear, flag, fmt))
 
 
 @pending_deprecate()
-def console_set_color_control(
-    con: int, fore: Tuple[int, int, int], back: Tuple[int, int, int]
-) -> None:
+def console_set_color_control(con: int, fore: Tuple[int, int, int], back: Tuple[int, int, int]) -> None:
     """Configure :term:`color controls`.
 
     Args:
@@ -1715,9 +1633,7 @@ def console_get_default_background(con: tcod.console.Console) -> Color:
     .. deprecated:: 8.5
         Use :any:`Console.default_bg` instead.
     """
-    return Color._new_from_cdata(
-        lib.TCOD_console_get_default_background(_console(con))
-    )
+    return Color._new_from_cdata(lib.TCOD_console_get_default_background(_console(con)))
 
 
 @deprecate("Check the `con.default_fg` attribute instead.")
@@ -1727,39 +1643,29 @@ def console_get_default_foreground(con: tcod.console.Console) -> Color:
     .. deprecated:: 8.5
         Use :any:`Console.default_fg` instead.
     """
-    return Color._new_from_cdata(
-        lib.TCOD_console_get_default_foreground(_console(con))
-    )
+    return Color._new_from_cdata(lib.TCOD_console_get_default_foreground(_console(con)))
 
 
 @deprecate("Directly access a consoles background color with `console.bg`")
-def console_get_char_background(
-    con: tcod.console.Console, x: int, y: int
-) -> Color:
+def console_get_char_background(con: tcod.console.Console, x: int, y: int) -> Color:
     """Return the background color at the x,y of this console.
 
     .. deprecated:: 8.4
         Array access performs significantly faster than using this function.
         See :any:`Console.bg`.
     """
-    return Color._new_from_cdata(
-        lib.TCOD_console_get_char_background(_console(con), x, y)
-    )
+    return Color._new_from_cdata(lib.TCOD_console_get_char_background(_console(con), x, y))
 
 
 @deprecate("Directly access a consoles foreground color with `console.fg`")
-def console_get_char_foreground(
-    con: tcod.console.Console, x: int, y: int
-) -> Color:
+def console_get_char_foreground(con: tcod.console.Console, x: int, y: int) -> Color:
     """Return the foreground color at the x,y of this console.
 
     .. deprecated:: 8.4
         Array access performs significantly faster than using this function.
         See :any:`Console.fg`.
     """
-    return Color._new_from_cdata(
-        lib.TCOD_console_get_char_foreground(_console(con), x, y)
-    )
+    return Color._new_from_cdata(lib.TCOD_console_get_char_foreground(_console(con), x, y))
 
 
 @deprecate("Directly access a consoles characters with `console.ch`")
@@ -1860,12 +1766,8 @@ def console_from_file(filename: str) -> tcod.console.Console:
     Returns: A new :any`Console` instance.
     """
     if not os.path.exists(filename):
-        raise RuntimeError(
-            "File not found:\n\t%s" % (os.path.realpath(filename),)
-        )
-    return tcod.console.Console._from_cdata(
-        _check_p(lib.TCOD_console_from_file(filename.encode("utf-8")))
-    )
+        raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(filename),))
+    return tcod.console.Console._from_cdata(_check_p(lib.TCOD_console_from_file(filename.encode("utf-8"))))
 
 
 @deprecate("Call the `Console.blit` method instead.")
@@ -1886,17 +1788,11 @@ def console_blit(
     .. deprecated:: 8.5
         Call the :any:`Console.blit` method instead.
     """
-    lib.TCOD_console_blit(
-        _console(src), x, y, w, h, _console(dst), xdst, ydst, ffade, bfade
-    )
+    lib.TCOD_console_blit(_console(src), x, y, w, h, _console(dst), xdst, ydst, ffade, bfade)
 
 
-@deprecate(
-    "Pass the key color to `Console.blit` instead of calling this function."
-)
-def console_set_key_color(
-    con: tcod.console.Console, col: Tuple[int, int, int]
-) -> None:
+@deprecate("Pass the key color to `Console.blit` instead of calling this function.")
+def console_set_key_color(con: tcod.console.Console, col: Tuple[int, int, int]) -> None:
     """Set a consoles blit transparent color.
 
     .. deprecated:: 8.5
@@ -1936,8 +1832,7 @@ def console_delete(con: tcod.console.Console) -> None:
         )
     else:
         warnings.warn(
-            "You no longer need to make this call, "
-            "Console's are deleted when they go out of scope.",
+            "You no longer need to make this call, " "Console's are deleted when they go out of scope.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -1963,11 +1858,7 @@ def console_fill_foreground(
     """
     if len(r) != len(g) or len(r) != len(b):
         raise TypeError("R, G and B must all have the same size.")
-    if (
-        isinstance(r, np.ndarray)
-        and isinstance(g, np.ndarray)
-        and isinstance(b, np.ndarray)
-    ):
+    if isinstance(r, np.ndarray) and isinstance(g, np.ndarray) and isinstance(b, np.ndarray):
         # numpy arrays, use numpy's ctypes functions
         r_ = np.ascontiguousarray(r, dtype=np.intc)
         g_ = np.ascontiguousarray(g, dtype=np.intc)
@@ -2004,11 +1895,7 @@ def console_fill_background(
     """
     if len(r) != len(g) or len(r) != len(b):
         raise TypeError("R, G and B must all have the same size.")
-    if (
-        isinstance(r, np.ndarray)
-        and isinstance(g, np.ndarray)
-        and isinstance(b, np.ndarray)
-    ):
+    if isinstance(r, np.ndarray) and isinstance(g, np.ndarray) and isinstance(b, np.ndarray):
         # numpy arrays, use numpy's ctypes functions
         r_ = np.ascontiguousarray(r, dtype=np.intc)
         g_ = np.ascontiguousarray(g, dtype=np.intc)
@@ -2049,33 +1936,25 @@ def console_fill_char(con: tcod.console.Console, arr: Sequence[int]) -> None:
 @pending_deprecate()
 def console_load_asc(con: tcod.console.Console, filename: str) -> bool:
     """Update a console from a non-delimited ASCII `.asc` file."""
-    return bool(
-        lib.TCOD_console_load_asc(_console(con), filename.encode("utf-8"))
-    )
+    return bool(lib.TCOD_console_load_asc(_console(con), filename.encode("utf-8")))
 
 
 @pending_deprecate()
 def console_save_asc(con: tcod.console.Console, filename: str) -> bool:
     """Save a console to a non-delimited ASCII `.asc` file."""
-    return bool(
-        lib.TCOD_console_save_asc(_console(con), filename.encode("utf-8"))
-    )
+    return bool(lib.TCOD_console_save_asc(_console(con), filename.encode("utf-8")))
 
 
 @pending_deprecate()
 def console_load_apf(con: tcod.console.Console, filename: str) -> bool:
     """Update a console from an ASCII Paint `.apf` file."""
-    return bool(
-        lib.TCOD_console_load_apf(_console(con), filename.encode("utf-8"))
-    )
+    return bool(lib.TCOD_console_load_apf(_console(con), filename.encode("utf-8")))
 
 
 @pending_deprecate()
 def console_save_apf(con: tcod.console.Console, filename: str) -> bool:
     """Save a console to an ASCII Paint `.apf` file."""
-    return bool(
-        lib.TCOD_console_save_apf(_console(con), filename.encode("utf-8"))
-    )
+    return bool(lib.TCOD_console_save_apf(_console(con), filename.encode("utf-8")))
 
 
 @deprecate("Use tcod.console.load_xp to load this file.")
@@ -2086,33 +1965,21 @@ def console_load_xp(con: tcod.console.Console, filename: str) -> bool:
         Functions modifying console objects in-place are deprecated.
         Use :any:`tcod.console_from_xp` to load a Console from a file.
     """
-    return bool(
-        lib.TCOD_console_load_xp(_console(con), filename.encode("utf-8"))
-    )
+    return bool(lib.TCOD_console_load_xp(_console(con), filename.encode("utf-8")))
 
 
 @deprecate("Use tcod.console.save_xp to save this console.")
-def console_save_xp(
-    con: tcod.console.Console, filename: str, compress_level: int = 9
-) -> bool:
+def console_save_xp(con: tcod.console.Console, filename: str, compress_level: int = 9) -> bool:
     """Save a console to a REXPaint `.xp` file."""
-    return bool(
-        lib.TCOD_console_save_xp(
-            _console(con), filename.encode("utf-8"), compress_level
-        )
-    )
+    return bool(lib.TCOD_console_save_xp(_console(con), filename.encode("utf-8"), compress_level))
 
 
 @deprecate("Use tcod.console.load_xp to load this file.")
 def console_from_xp(filename: str) -> tcod.console.Console:
     """Return a single console from a REXPaint `.xp` file."""
     if not os.path.exists(filename):
-        raise RuntimeError(
-            "File not found:\n\t%s" % (os.path.realpath(filename),)
-        )
-    return tcod.console.Console._from_cdata(
-        _check_p(lib.TCOD_console_from_xp(filename.encode("utf-8")))
-    )
+        raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(filename),))
+    return tcod.console.Console._from_cdata(_check_p(lib.TCOD_console_from_xp(filename.encode("utf-8"))))
 
 
 @deprecate("Use tcod.console.load_xp to load this file.")
@@ -2121,9 +1988,7 @@ def console_list_load_xp(
 ) -> Optional[List[tcod.console.Console]]:
     """Return a list of consoles from a REXPaint `.xp` file."""
     if not os.path.exists(filename):
-        raise RuntimeError(
-            "File not found:\n\t%s" % (os.path.realpath(filename),)
-        )
+        raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(filename),))
     tcod_list = lib.TCOD_console_list_from_xp(filename.encode("utf-8"))
     if tcod_list == ffi.NULL:
         return None
@@ -2131,9 +1996,7 @@ def console_list_load_xp(
         python_list = []
         lib.TCOD_list_reverse(tcod_list)
         while not lib.TCOD_list_is_empty(tcod_list):
-            python_list.append(
-                tcod.console.Console._from_cdata(lib.TCOD_list_pop(tcod_list))
-            )
+            python_list.append(tcod.console.Console._from_cdata(lib.TCOD_list_pop(tcod_list)))
         return python_list
     finally:
         lib.TCOD_list_delete(tcod_list)
@@ -2150,19 +2013,13 @@ def console_list_save_xp(
     try:
         for console in console_list:
             lib.TCOD_list_push(tcod_list, _console(console))
-        return bool(
-            lib.TCOD_console_list_save_xp(
-                tcod_list, filename.encode("utf-8"), compress_level
-            )
-        )
+        return bool(lib.TCOD_console_list_save_xp(tcod_list, filename.encode("utf-8"), compress_level))
     finally:
         lib.TCOD_list_delete(tcod_list)
 
 
 @pending_deprecate()
-def path_new_using_map(
-    m: tcod.map.Map, dcost: float = 1.41
-) -> tcod.path.AStar:
+def path_new_using_map(m: tcod.map.Map, dcost: float = 1.41) -> tcod.path.AStar:
     """Return a new AStar using the given Map.
 
     Args:
@@ -2195,15 +2052,11 @@ def path_new_using_function(
     Returns:
         AStar: A new AStar instance.
     """
-    return tcod.path.AStar(
-        tcod.path._EdgeCostFunc((func, userData), (w, h)), dcost
-    )
+    return tcod.path.AStar(tcod.path._EdgeCostFunc((func, userData), (w, h)), dcost)
 
 
 @pending_deprecate()
-def path_compute(
-    p: tcod.path.AStar, ox: int, oy: int, dx: int, dy: int
-) -> bool:
+def path_compute(p: tcod.path.AStar, ox: int, oy: int, dx: int, dy: int) -> bool:
     """Find a path from (ox, oy) to (dx, dy).  Return True if path is found.
 
     Args:
@@ -2301,9 +2154,7 @@ def path_is_empty(p: tcod.path.AStar) -> bool:
 
 
 @pending_deprecate()
-def path_walk(
-    p: tcod.path.AStar, recompute: bool
-) -> Union[Tuple[int, int], Tuple[None, None]]:
+def path_walk(p: tcod.path.AStar, recompute: bool) -> Union[Tuple[int, int], Tuple[None, None]]:
     """Return the next (x, y) point in a path, or (None, None) if it's empty.
 
     When ``recompute`` is True and a previously valid path reaches a point
@@ -2344,9 +2195,7 @@ def dijkstra_new_using_function(
     userData: Any = 0,
     dcost: float = 1.41,
 ) -> tcod.path.Dijkstra:
-    return tcod.path.Dijkstra(
-        tcod.path._EdgeCostFunc((func, userData), (w, h)), dcost
-    )
+    return tcod.path.Dijkstra(tcod.path._EdgeCostFunc((func, userData), (w, h)), dcost)
 
 
 @pending_deprecate()
@@ -2458,8 +2307,7 @@ def heightmap_set_value(hm: np.ndarray, x: int, y: int, value: float) -> None:
     """
     if hm.flags["C_CONTIGUOUS"]:
         warnings.warn(
-            "Assign to this heightmap with hm[i,j] = value\n"
-            "consider using order='F'",
+            "Assign to this heightmap with hm[i,j] = value\n" "consider using order='F'",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -2546,9 +2394,7 @@ def heightmap_copy(hm1: np.ndarray, hm2: np.ndarray) -> None:
 
 
 @pending_deprecate()
-def heightmap_normalize(
-    hm: np.ndarray, mi: float = 0.0, ma: float = 1.0
-) -> None:
+def heightmap_normalize(hm: np.ndarray, mi: float = 0.0, ma: float = 1.0) -> None:
     """Normalize heightmap values between ``mi`` and ``ma``.
 
     Args:
@@ -2559,9 +2405,7 @@ def heightmap_normalize(
 
 
 @pending_deprecate()
-def heightmap_lerp_hm(
-    hm1: np.ndarray, hm2: np.ndarray, hm3: np.ndarray, coef: float
-) -> None:
+def heightmap_lerp_hm(hm1: np.ndarray, hm2: np.ndarray, hm3: np.ndarray, coef: float) -> None:
     """Perform linear interpolation between two heightmaps storing the result
     in ``hm3``.
 
@@ -2582,9 +2426,7 @@ def heightmap_lerp_hm(
 
 
 @deprecate("Add 2 arrays using `hm3 = hm1 + hm2`")
-def heightmap_add_hm(
-    hm1: np.ndarray, hm2: np.ndarray, hm3: np.ndarray
-) -> None:
+def heightmap_add_hm(hm1: np.ndarray, hm2: np.ndarray, hm3: np.ndarray) -> None:
     """Add two heightmaps together and stores the result in ``hm3``.
 
     Args:
@@ -2599,9 +2441,7 @@ def heightmap_add_hm(
 
 
 @deprecate("Multiply 2 arrays using `hm3 = hm1 * hm2`")
-def heightmap_multiply_hm(
-    hm1: np.ndarray, hm2: np.ndarray, hm3: np.ndarray
-) -> None:
+def heightmap_multiply_hm(hm1: np.ndarray, hm2: np.ndarray, hm3: np.ndarray) -> None:
     """Multiplies two heightmap's together and stores the result in ``hm3``.
 
     Args:
@@ -2617,9 +2457,7 @@ def heightmap_multiply_hm(
 
 
 @pending_deprecate()
-def heightmap_add_hill(
-    hm: np.ndarray, x: float, y: float, radius: float, height: float
-) -> None:
+def heightmap_add_hill(hm: np.ndarray, x: float, y: float, radius: float, height: float) -> None:
     """Add a hill (a half spheroid) at given position.
 
     If height == radius or -radius, the hill is a half-sphere.
@@ -2635,9 +2473,7 @@ def heightmap_add_hill(
 
 
 @pending_deprecate()
-def heightmap_dig_hill(
-    hm: np.ndarray, x: float, y: float, radius: float, height: float
-) -> None:
+def heightmap_dig_hill(hm: np.ndarray, x: float, y: float, radius: float, height: float) -> None:
     """
 
     This function takes the highest value (if height > 0) or the lowest
@@ -2739,9 +2575,7 @@ def heightmap_kernel_transform(
     cdx = ffi.new("int[]", dx)
     cdy = ffi.new("int[]", dy)
     cweight = ffi.new("float[]", weight)
-    lib.TCOD_heightmap_kernel_transform(
-        _heightmap_cdata(hm), kernelsize, cdx, cdy, cweight, minLevel, maxLevel
-    )
+    lib.TCOD_heightmap_kernel_transform(_heightmap_cdata(hm), kernelsize, cdx, cdy, cweight, minLevel, maxLevel)
 
 
 @pending_deprecate()
@@ -2910,8 +2744,7 @@ def heightmap_get_value(hm: np.ndarray, x: int, y: int) -> float:
     """
     if hm.flags["C_CONTIGUOUS"]:
         warnings.warn(
-            "Get a value from this heightmap with hm[i,j]\n"
-            "consider using order='F'",
+            "Get a value from this heightmap with hm[i,j]\n" "consider using order='F'",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -2928,9 +2761,7 @@ def heightmap_get_value(hm: np.ndarray, x: int, y: int) -> float:
 
 
 @pending_deprecate()
-def heightmap_get_interpolated_value(
-    hm: np.ndarray, x: float, y: float
-) -> float:
+def heightmap_get_interpolated_value(hm: np.ndarray, x: float, y: float) -> float:
     """Return the interpolated height at non integer coordinates.
 
     Args:
@@ -2941,9 +2772,7 @@ def heightmap_get_interpolated_value(
     Returns:
         float: The value at ``x``, ``y``.
     """
-    return float(
-        lib.TCOD_heightmap_get_interpolated_value(_heightmap_cdata(hm), x, y)
-    )
+    return float(lib.TCOD_heightmap_get_interpolated_value(_heightmap_cdata(hm), x, y))
 
 
 @pending_deprecate()
@@ -2962,9 +2791,7 @@ def heightmap_get_slope(hm: np.ndarray, x: int, y: int) -> float:
 
 
 @pending_deprecate()
-def heightmap_get_normal(
-    hm: np.ndarray, x: float, y: float, waterLevel: float
-) -> Tuple[float, float, float]:
+def heightmap_get_normal(hm: np.ndarray, x: float, y: float, waterLevel: float) -> Tuple[float, float, float]:
     """Return the map normal at given coordinates.
 
     Args:
@@ -3011,9 +2838,7 @@ def heightmap_has_land_on_border(hm: np.ndarray, waterlevel: float) -> bool:
     Returns:
         bool: True if the map edges are below ``waterlevel``, otherwise False.
     """
-    return bool(
-        lib.TCOD_heightmap_has_land_on_border(_heightmap_cdata(hm), waterlevel)
-    )
+    return bool(lib.TCOD_heightmap_has_land_on_border(_heightmap_cdata(hm), waterlevel))
 
 
 @deprecate("Use `hm.min()` and `hm.max()` instead.")
@@ -3082,9 +2907,7 @@ def image_scale(image: tcod.image.Image, neww: int, newh: int) -> None:
 
 
 @pending_deprecate()
-def image_set_key_color(
-    image: tcod.image.Image, col: Tuple[int, int, int]
-) -> None:
+def image_set_key_color(image: tcod.image.Image, col: Tuple[int, int, int]) -> None:
     image.set_key_color(col)
 
 
@@ -3094,9 +2917,7 @@ def image_get_alpha(image: tcod.image.Image, x: int, y: int) -> int:
 
 
 @pending_deprecate()
-def image_is_pixel_transparent(
-    image: tcod.image.Image, x: int, y: int
-) -> bool:
+def image_is_pixel_transparent(image: tcod.image.Image, x: int, y: int) -> bool:
     return bool(lib.TCOD_image_is_pixel_transparent(image.image_c, x, y))
 
 
@@ -3107,9 +2928,7 @@ def image_load(filename: str) -> tcod.image.Image:
     Args:
         filename (AnyStr): Path to a .bmp or .png image file.
     """
-    return tcod.image.Image._from_cdata(
-        ffi.gc(lib.TCOD_image_load(_bytes(filename)), lib.TCOD_image_delete)
-    )
+    return tcod.image.Image._from_cdata(ffi.gc(lib.TCOD_image_load(_bytes(filename)), lib.TCOD_image_delete))
 
 
 @pending_deprecate()
@@ -3130,9 +2949,7 @@ def image_from_console(console: tcod.console.Console) -> tcod.image.Image:
 
 
 @pending_deprecate()
-def image_refresh_console(
-    image: tcod.image.Image, console: tcod.console.Console
-) -> None:
+def image_refresh_console(image: tcod.image.Image, console: tcod.console.Console) -> None:
     image.refresh_console(console)
 
 
@@ -3142,23 +2959,17 @@ def image_get_size(image: tcod.image.Image) -> Tuple[int, int]:
 
 
 @pending_deprecate()
-def image_get_pixel(
-    image: tcod.image.Image, x: int, y: int
-) -> Tuple[int, int, int]:
+def image_get_pixel(image: tcod.image.Image, x: int, y: int) -> Tuple[int, int, int]:
     return image.get_pixel(x, y)
 
 
 @pending_deprecate()
-def image_get_mipmap_pixel(
-    image: tcod.image.Image, x0: float, y0: float, x1: float, y1: float
-) -> Tuple[int, int, int]:
+def image_get_mipmap_pixel(image: tcod.image.Image, x0: float, y0: float, x1: float, y1: float) -> Tuple[int, int, int]:
     return image.get_mipmap_pixel(x0, y0, x1, y1)
 
 
 @pending_deprecate()
-def image_put_pixel(
-    image: tcod.image.Image, x: int, y: int, col: Tuple[int, int, int]
-) -> None:
+def image_put_pixel(image: tcod.image.Image, x: int, y: int, col: Tuple[int, int, int]) -> None:
     image.put_pixel(x, y, col)
 
 
@@ -3259,9 +3070,7 @@ def line_step() -> Union[Tuple[int, int], Tuple[None, None]]:
 
 
 @deprecate("Use tcod.line_iter instead.")
-def line(
-    xo: int, yo: int, xd: int, yd: int, py_callback: Callable[[int, int], bool]
-) -> bool:
+def line(xo: int, yo: int, xd: int, yd: int, py_callback: Callable[[int, int], bool]) -> bool:
     """Iterate over a line using a callback function.
 
     Your callback function will take x and y parameters and return True to
@@ -3320,9 +3129,7 @@ def line_iter(xo: int, yo: int, xd: int, yd: int) -> Iterator[Tuple[int, int]]:
 
 
 @deprecate("This function has been replaced by tcod.los.bresenham.")
-def line_where(
-    x1: int, y1: int, x2: int, y2: int, inclusive: bool = True
-) -> Tuple[np.ndarray, np.ndarray]:
+def line_where(x1: int, y1: int, x2: int, y2: int, inclusive: bool = True) -> Tuple[np.ndarray, np.ndarray]:
     """Return a NumPy index array following a Bresenham line.
 
     If `inclusive` is true then the start point is included in the result.
@@ -3372,16 +3179,12 @@ def map_copy(source: tcod.map.Map, dest: tcod.map.Map) -> None:
         array attributes manually.
     """
     if source.width != dest.width or source.height != dest.height:
-        dest.__init__(  # type: ignore
-            source.width, source.height, source._order
-        )
+        dest.__init__(source.width, source.height, source._order)  # type: ignore
     dest._Map__buffer[:] = source._Map__buffer[:]  # type: ignore
 
 
 @deprecate("Set properties using the m.transparent and m.walkable arrays.")
-def map_set_properties(
-    m: tcod.map.Map, x: int, y: int, isTrans: bool, isWalk: bool
-) -> None:
+def map_set_properties(m: tcod.map.Map, x: int, y: int, isTrans: bool, isWalk: bool) -> None:
     """Set the properties of a single cell.
 
     .. note::
@@ -3394,9 +3197,7 @@ def map_set_properties(
 
 
 @deprecate("Clear maps using NumPy broadcast rules instead.")
-def map_clear(
-    m: tcod.map.Map, transparent: bool = False, walkable: bool = False
-) -> None:
+def map_clear(m: tcod.map.Map, transparent: bool = False, walkable: bool = False) -> None:
     """Change all map cells to a specific value.
 
     .. deprecated:: 4.5
@@ -3510,9 +3311,7 @@ def mouse_get_status() -> Mouse:
 
 
 @pending_deprecate()
-def namegen_parse(
-    filename: str, random: Optional[tcod.random.Random] = None
-) -> None:
+def namegen_parse(filename: str, random: Optional[tcod.random.Random] = None) -> None:
     lib.TCOD_namegen_parse(_bytes(filename), random or ffi.NULL)
 
 
@@ -3523,9 +3322,7 @@ def namegen_generate(name: str) -> str:
 
 @pending_deprecate()
 def namegen_generate_custom(name: str, rule: str) -> str:
-    return _unpack_char_p(
-        lib.TCOD_namegen_generate_custom(_bytes(name), _bytes(rule), False)
-    )
+    return _unpack_char_p(lib.TCOD_namegen_generate_custom(_bytes(name), _bytes(rule), False))
 
 
 @pending_deprecate()
@@ -3534,9 +3331,7 @@ def namegen_get_sets() -> List[str]:
     try:
         lst = []
         while not lib.TCOD_list_is_empty(sets):
-            lst.append(
-                _unpack_char_p(ffi.cast("char *", lib.TCOD_list_pop(sets)))
-            )
+            lst.append(_unpack_char_p(ffi.cast("char *", lib.TCOD_list_pop(sets))))
     finally:
         lib.TCOD_list_delete(sets)
     return lst
@@ -3579,9 +3374,7 @@ def noise_set_type(n: tcod.noise.Noise, typ: int) -> None:
 
 
 @pending_deprecate()
-def noise_get(
-    n: tcod.noise.Noise, f: Sequence[float], typ: int = NOISE_DEFAULT
-) -> float:
+def noise_get(n: tcod.noise.Noise, f: Sequence[float], typ: int = NOISE_DEFAULT) -> float:
     """Return the noise value sampled from the ``f`` coordinate.
 
     ``f`` should be a tuple or list with a length matching the `dimensions`
@@ -3618,9 +3411,7 @@ def noise_get_fbm(
     Returns:
         float: The sampled noise value.
     """
-    return float(
-        lib.TCOD_noise_get_fbm_ex(n.noise_c, ffi.new("float[4]", f), oc, typ)
-    )
+    return float(lib.TCOD_noise_get_fbm_ex(n.noise_c, ffi.new("float[4]", f), oc, typ))
 
 
 @pending_deprecate()
@@ -3641,11 +3432,7 @@ def noise_get_turbulence(
     Returns:
         float: The sampled noise value.
     """
-    return float(
-        lib.TCOD_noise_get_turbulence_ex(
-            n.noise_c, ffi.new("float[4]", f), oc, typ
-        )
-    )
+    return float(lib.TCOD_noise_get_turbulence_ex(n.noise_c, ffi.new("float[4]", f), oc, typ))
 
 
 @deprecate("libtcod objects are deleted automatically.")
@@ -3667,10 +3454,7 @@ def _unpack_union(type_: int, union: Any) -> Any:
         return union.i
     elif type_ == lib.TCOD_TYPE_FLOAT:
         return union.f
-    elif (
-        type_ == lib.TCOD_TYPE_STRING
-        or lib.TCOD_TYPE_VALUELIST15 >= type_ >= lib.TCOD_TYPE_VALUELIST00
-    ):
+    elif type_ == lib.TCOD_TYPE_STRING or lib.TCOD_TYPE_VALUELIST15 >= type_ >= lib.TCOD_TYPE_VALUELIST00:
         return _unpack_char_p(union.s)
     elif type_ == lib.TCOD_TYPE_COLOR:
         return Color._new_from_cdata(union.col)
@@ -3683,10 +3467,7 @@ def _unpack_union(type_: int, union: Any) -> Any:
 
 
 def _convert_TCODList(clist: Any, type_: int) -> Any:
-    return [
-        _unpack_union(type_, lib.TDL_list_get_union(clist, i))
-        for i in range(lib.TCOD_list_size(clist))
-    ]
+    return [_unpack_union(type_, lib.TDL_list_get_union(clist, i)) for i in range(lib.TCOD_list_size(clist))]
 
 
 @deprecate("Parser functions have been deprecated.")
@@ -3717,9 +3498,7 @@ def _pycall_parser_new_flag(name: str) -> Any:
 
 @ffi.def_extern()  # type: ignore
 def _pycall_parser_new_property(propname: Any, type: Any, value: Any) -> Any:
-    return _parser_listener.new_property(
-        _unpack_char_p(propname), type, _unpack_union(type, value)
-    )
+    return _parser_listener.new_property(_unpack_char_p(propname), type, _unpack_union(type, value))
 
 
 @ffi.def_extern()  # type: ignore
@@ -3789,16 +3568,12 @@ def parser_get_float_property(parser: Any, name: str) -> float:
 
 @deprecate("Parser functions have been deprecated.")
 def parser_get_string_property(parser: Any, name: str) -> str:
-    return _unpack_char_p(
-        lib.TCOD_parser_get_string_property(parser, _bytes(name))
-    )
+    return _unpack_char_p(lib.TCOD_parser_get_string_property(parser, _bytes(name)))
 
 
 @deprecate("Parser functions have been deprecated.")
 def parser_get_color_property(parser: Any, name: str) -> Color:
-    return Color._new_from_cdata(
-        lib.TCOD_parser_get_color_property(parser, _bytes(name))
-    )
+    return Color._new_from_cdata(lib.TCOD_parser_get_color_property(parser, _bytes(name)))
 
 
 @deprecate("Parser functions have been deprecated.")
@@ -3831,9 +3606,7 @@ def random_get_instance() -> tcod.random.Random:
     Returns:
         Random: A Random instance using the default random number generator.
     """
-    return tcod.random.Random._new_from_cdata(
-        ffi.cast("mersenne_data_t*", lib.TCOD_random_get_instance())
-    )
+    return tcod.random.Random._new_from_cdata(ffi.cast("mersenne_data_t*", lib.TCOD_random_get_instance()))
 
 
 @pending_deprecate()
@@ -3850,9 +3623,7 @@ def random_new(algo: int = RNG_CMWC) -> tcod.random.Random:
 
 
 @pending_deprecate()
-def random_new_from_seed(
-    seed: Hashable, algo: int = RNG_CMWC
-) -> tcod.random.Random:
+def random_new_from_seed(seed: Hashable, algo: int = RNG_CMWC) -> tcod.random.Random:
     """Return a new Random instance.  Using the given ``seed`` and ``algo``.
 
     Args:
@@ -3867,9 +3638,7 @@ def random_new_from_seed(
 
 
 @pending_deprecate()
-def random_set_distribution(
-    rnd: Optional[tcod.random.Random], dist: int
-) -> None:
+def random_set_distribution(rnd: Optional[tcod.random.Random], dist: int) -> None:
     """Change the distribution mode of a random number generator.
 
     Args:
@@ -3893,15 +3662,11 @@ def random_get_int(rnd: Optional[tcod.random.Random], mi: int, ma: int) -> int:
     Returns:
         int: A random integer in the range ``mi`` <= n <= ``ma``.
     """
-    return int(
-        lib.TCOD_random_get_int(rnd.random_c if rnd else ffi.NULL, mi, ma)
-    )
+    return int(lib.TCOD_random_get_int(rnd.random_c if rnd else ffi.NULL, mi, ma))
 
 
 @pending_deprecate()
-def random_get_float(
-    rnd: Optional[tcod.random.Random], mi: float, ma: float
-) -> float:
+def random_get_float(rnd: Optional[tcod.random.Random], mi: float, ma: float) -> float:
     """Return a random float in the range: ``mi`` <= n <= ``ma``.
 
     The result is affected by calls to :any:`random_set_distribution`.
@@ -3915,30 +3680,22 @@ def random_get_float(
         float: A random double precision float
                in the range ``mi`` <= n <= ``ma``.
     """
-    return float(
-        lib.TCOD_random_get_double(rnd.random_c if rnd else ffi.NULL, mi, ma)
-    )
+    return float(lib.TCOD_random_get_double(rnd.random_c if rnd else ffi.NULL, mi, ma))
 
 
 @deprecate("Call tcod.random_get_float instead.")
-def random_get_double(
-    rnd: Optional[tcod.random.Random], mi: float, ma: float
-) -> float:
+def random_get_double(rnd: Optional[tcod.random.Random], mi: float, ma: float) -> float:
     """Return a random float in the range: ``mi`` <= n <= ``ma``.
 
     .. deprecated:: 2.0
         Use :any:`random_get_float` instead.
         Both funtions return a double precision float.
     """
-    return float(
-        lib.TCOD_random_get_double(rnd.random_c if rnd else ffi.NULL, mi, ma)
-    )
+    return float(lib.TCOD_random_get_double(rnd.random_c if rnd else ffi.NULL, mi, ma))
 
 
 @pending_deprecate()
-def random_get_int_mean(
-    rnd: Optional[tcod.random.Random], mi: int, ma: int, mean: int
-) -> int:
+def random_get_int_mean(rnd: Optional[tcod.random.Random], mi: int, ma: int, mean: int) -> int:
     """Return a random weighted integer in the range: ``mi`` <= n <= ``ma``.
 
     The result is affacted by calls to :any:`random_set_distribution`.
@@ -3952,17 +3709,11 @@ def random_get_int_mean(
     Returns:
         int: A random weighted integer in the range ``mi`` <= n <= ``ma``.
     """
-    return int(
-        lib.TCOD_random_get_int_mean(
-            rnd.random_c if rnd else ffi.NULL, mi, ma, mean
-        )
-    )
+    return int(lib.TCOD_random_get_int_mean(rnd.random_c if rnd else ffi.NULL, mi, ma, mean))
 
 
 @pending_deprecate()
-def random_get_float_mean(
-    rnd: Optional[tcod.random.Random], mi: float, ma: float, mean: float
-) -> float:
+def random_get_float_mean(rnd: Optional[tcod.random.Random], mi: float, ma: float, mean: float) -> float:
     """Return a random weighted float in the range: ``mi`` <= n <= ``ma``.
 
     The result is affacted by calls to :any:`random_set_distribution`.
@@ -3977,28 +3728,18 @@ def random_get_float_mean(
         float: A random weighted double precision float
                in the range ``mi`` <= n <= ``ma``.
     """
-    return float(
-        lib.TCOD_random_get_double_mean(
-            rnd.random_c if rnd else ffi.NULL, mi, ma, mean
-        )
-    )
+    return float(lib.TCOD_random_get_double_mean(rnd.random_c if rnd else ffi.NULL, mi, ma, mean))
 
 
 @deprecate("Call tcod.random_get_float_mean instead.")
-def random_get_double_mean(
-    rnd: Optional[tcod.random.Random], mi: float, ma: float, mean: float
-) -> float:
+def random_get_double_mean(rnd: Optional[tcod.random.Random], mi: float, ma: float, mean: float) -> float:
     """Return a random weighted float in the range: ``mi`` <= n <= ``ma``.
 
     .. deprecated:: 2.0
         Use :any:`random_get_float_mean` instead.
         Both funtions return a double precision float.
     """
-    return float(
-        lib.TCOD_random_get_double_mean(
-            rnd.random_c if rnd else ffi.NULL, mi, ma, mean
-        )
-    )
+    return float(lib.TCOD_random_get_double_mean(rnd.random_c if rnd else ffi.NULL, mi, ma, mean))
 
 
 @deprecate("Use the standard library 'copy' module instead.")
@@ -4021,9 +3762,7 @@ def random_save(rnd: Optional[tcod.random.Random]) -> tcod.random.Random:
 
 
 @deprecate("This function is deprecated.")
-def random_restore(
-    rnd: Optional[tcod.random.Random], backup: tcod.random.Random
-) -> None:
+def random_restore(rnd: Optional[tcod.random.Random], backup: tcod.random.Random) -> None:
     """Restore a random number generator from a backed up copy.
 
     Args:
@@ -4057,9 +3796,7 @@ def struct_add_property(struct, name, typ, mandatory):  # type: ignore
 
 @deprecate("This function is deprecated.")
 def struct_add_value_list(struct, name, value_list, mandatory):  # type: ignore
-    c_strings = [
-        ffi.new("char[]", value.encode("utf-8")) for value in value_list
-    ]
+    c_strings = [ffi.new("char[]", value.encode("utf-8")) for value in value_list]
     c_value_list = ffi.new("char*[]", c_strings)
     lib.TCOD_struct_add_value_list(struct, name, c_value_list, mandatory)
 
@@ -4218,9 +3955,7 @@ def sys_save_screenshot(name: Optional[str] = None) -> None:
         This function is not supported by contexts.
         Use :any:`Context.save_screenshot` instead.
     """
-    lib.TCOD_sys_save_screenshot(
-        _bytes(name) if name is not None else ffi.NULL
-    )
+    lib.TCOD_sys_save_screenshot(_bytes(name) if name is not None else ffi.NULL)
 
 
 # custom fullscreen resolution
@@ -4245,9 +3980,7 @@ def sys_force_fullscreen_resolution(width: int, height: int) -> None:
     lib.TCOD_sys_force_fullscreen_resolution(width, height)
 
 
-@deprecate(
-    "This function is deprecated, which monitor is detected is ambiguous."
-)
+@deprecate("This function is deprecated, which monitor is detected is ambiguous.")
 def sys_get_current_resolution() -> Tuple[int, int]:
     """Return a monitors pixel resolution as (width, height).
 
@@ -4337,9 +4070,7 @@ def sys_register_SDL_renderer(callback: Callable[[Any], None]) -> None:
 
 
 @deprecate("Use tcod.event.get to check for events.")
-def sys_check_for_event(
-    mask: int, k: Optional[Key], m: Optional[Mouse]
-) -> int:
+def sys_check_for_event(mask: int, k: Optional[Key], m: Optional[Mouse]) -> int:
     """Check for and return an event.
 
     Args:
@@ -4352,17 +4083,11 @@ def sys_check_for_event(
     .. deprecated:: 9.3
         Use the :any:`tcod.event.get` function to check for events.
     """
-    return int(
-        lib.TCOD_sys_check_for_event(
-            mask, k.key_p if k else ffi.NULL, m.mouse_p if m else ffi.NULL
-        )
-    )
+    return int(lib.TCOD_sys_check_for_event(mask, k.key_p if k else ffi.NULL, m.mouse_p if m else ffi.NULL))
 
 
 @deprecate("Use tcod.event.wait to wait for events.")
-def sys_wait_for_event(
-    mask: int, k: Optional[Key], m: Optional[Mouse], flush: bool
-) -> int:
+def sys_wait_for_event(mask: int, k: Optional[Key], m: Optional[Mouse], flush: bool) -> int:
     """Wait for an event then return.
 
     If flush is True then the buffer will be cleared before waiting. Otherwise

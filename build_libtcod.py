@@ -34,21 +34,15 @@ BITSIZE, LINKAGE = platform.architecture()
 
 # Regular expressions to parse the headers for cffi.
 RE_COMMENT = re.compile(r"\s*/\*.*?\*/|\s*//*?$", re.DOTALL | re.MULTILINE)
-RE_CPLUSPLUS = re.compile(
-    r"#ifdef __cplusplus.*?#endif.*?$", re.DOTALL | re.MULTILINE
-)
-RE_PREPROCESSOR = re.compile(
-    r"(?!#define\s+\w+\s+\d+$)#.*?(?<!\\)$", re.DOTALL | re.MULTILINE
-)
+RE_CPLUSPLUS = re.compile(r"#ifdef __cplusplus.*?#endif.*?$", re.DOTALL | re.MULTILINE)
+RE_PREPROCESSOR = re.compile(r"(?!#define\s+\w+\s+\d+$)#.*?(?<!\\)$", re.DOTALL | re.MULTILINE)
 RE_INCLUDE = re.compile(r'#include "([^"]*)"')
 RE_TAGS = re.compile(
     r"TCODLIB_C?API|TCOD_PUBLIC|TCOD_NODISCARD|TCOD_DEPRECATED_NOMESSAGE"
     r"|(TCOD_DEPRECATED|TCODLIB_FORMAT)\([^)]*\)|__restrict"
 )
 RE_VAFUNC = re.compile(r".*\(.*va_list.*\);")
-RE_INLINE = re.compile(
-    r"(^.*?inline.*?\(.*?\))\s*\{.*?\}$", re.DOTALL | re.MULTILINE
-)
+RE_INLINE = re.compile(r"(^.*?inline.*?\(.*?\))\s*\{.*?\}$", re.DOTALL | re.MULTILINE)
 
 
 class ParsedHeader:
@@ -121,8 +115,7 @@ def resolve_dependencies(
         if not unresolved & resolved:
             raise RuntimeError(
                 "Could not resolve header load order.\n"
-                "Possible cyclic dependency with the unresolved headers:\n%s"
-                % (unresolved,)
+                "Possible cyclic dependency with the unresolved headers:\n%s" % (unresolved,)
             )
         unresolved -= resolved
     return result
@@ -176,9 +169,7 @@ def unpack_sdl2(version: str) -> str:
         assert sdl2_arc.endswith(".dmg")
         subprocess.check_call(["hdiutil", "mount", sdl2_arc])
         subprocess.check_call(["mkdir", "-p", sdl2_dir])
-        subprocess.check_call(
-            ["cp", "-r", "/Volumes/SDL2/SDL2.framework", sdl2_dir]
-        )
+        subprocess.check_call(["cp", "-r", "/Volumes/SDL2/SDL2.framework", sdl2_dir])
         subprocess.check_call(["hdiutil", "unmount", "/Volumes/SDL2"])
     return sdl2_path
 
@@ -234,9 +225,7 @@ elif sys.platform == "darwin":
 else:
     matches = re.findall(
         r"-I(\S+)",
-        subprocess.check_output(
-            ["sdl2-config", "--cflags"], universal_newlines=True
-        ),
+        subprocess.check_output(["sdl2-config", "--cflags"], universal_newlines=True),
     )
     assert matches
 
@@ -249,9 +238,7 @@ else:
 if sys.platform == "win32":
     include_dirs.append(SDL2_INCLUDE)
     ARCH_MAPPING = {"32bit": "x86", "64bit": "x64"}
-    SDL2_LIB_DIR = os.path.join(
-        SDL2_BUNDLE_PATH, "lib/", ARCH_MAPPING[BITSIZE]
-    )
+    SDL2_LIB_DIR = os.path.join(SDL2_BUNDLE_PATH, "lib/", ARCH_MAPPING[BITSIZE])
     library_dirs.append(SDL2_LIB_DIR)
     SDL2_LIB_DEST = os.path.join("tcod", ARCH_MAPPING[BITSIZE])
     if not os.path.exists(SDL2_LIB_DEST):
@@ -287,21 +274,9 @@ if sys.platform == "darwin":
     define_macros.append(("HAVE_UNISTD_H", 1))
 
 if sys.platform not in ["win32", "darwin"]:
-    extra_parse_args += (
-        subprocess.check_output(
-            ["sdl2-config", "--cflags"], universal_newlines=True
-        )
-        .strip()
-        .split()
-    )
+    extra_parse_args += subprocess.check_output(["sdl2-config", "--cflags"], universal_newlines=True).strip().split()
     extra_compile_args += extra_parse_args
-    extra_link_args += (
-        subprocess.check_output(
-            ["sdl2-config", "--libs"], universal_newlines=True
-        )
-        .strip()
-        .split()
-    )
+    extra_link_args += subprocess.check_output(["sdl2-config", "--libs"], universal_newlines=True).strip().split()
 
 tdl_build = os.environ.get("TDL_BUILD", "RELEASE").upper()
 
@@ -399,9 +374,7 @@ def parse_sdl_attrs(prefix: str, all_names: List[str]) -> Tuple[str, str]:
     """
     names = []
     lookup = []
-    for name, value in sorted(
-        find_sdl_attrs(prefix), key=lambda item: item[1]
-    ):
+    for name, value in sorted(find_sdl_attrs(prefix), key=lambda item: item[1]):
         all_names.append(name)
         names.append("%s = %s" % (name, value))
         lookup.append('%s: "%s"' % (value, name))
@@ -446,9 +419,7 @@ def update_module_all(filename: str, new_all: str) -> None:
 def generate_enums(prefix: str) -> Iterator[str]:
     """Generate attribute assignments suitable for a Python enum."""
     prefix_len = len(prefix) - len("SDL_") + 1
-    for name, value in sorted(
-        find_sdl_attrs(prefix), key=lambda item: item[1]
-    ):
+    for name, value in sorted(find_sdl_attrs(prefix), key=lambda item: item[1]):
         name = name.split("_", 1)[1]
         if name.isdigit():
             name = f"N{name}"
@@ -473,9 +444,7 @@ def write_library_constants() -> None:
                 continue
             if name in EXCLUDE_CONSTANTS:
                 continue
-            if any(
-                name.startswith(prefix) for prefix in EXCLUDE_CONSTANT_PREFIXES
-            ):
+            if any(name.startswith(prefix) for prefix in EXCLUDE_CONSTANT_PREFIXES):
                 continue
             value = getattr(lib, name)
             if name[:5] == "TCOD_":
@@ -511,28 +480,16 @@ def write_library_constants() -> None:
         all_names = []
         f.write(EVENT_CONSTANT_MODULE_HEADER)
         f.write("# --- SDL scancodes ---\n")
-        f.write(
-            "%s\n_REVERSE_SCANCODE_TABLE = %s\n"
-            % parse_sdl_attrs("SDL_SCANCODE", all_names)
-        )
+        f.write("%s\n_REVERSE_SCANCODE_TABLE = %s\n" % parse_sdl_attrs("SDL_SCANCODE", all_names))
 
         f.write("\n# --- SDL keyboard symbols ---\n")
-        f.write(
-            "%s\n_REVERSE_SYM_TABLE = %s\n"
-            % parse_sdl_attrs("SDLK", all_names)
-        )
+        f.write("%s\n_REVERSE_SYM_TABLE = %s\n" % parse_sdl_attrs("SDLK", all_names))
 
         f.write("\n# --- SDL keyboard modifiers ---\n")
-        f.write(
-            "%s\n_REVERSE_MOD_TABLE = %s\n"
-            % parse_sdl_attrs("KMOD", all_names)
-        )
+        f.write("%s\n_REVERSE_MOD_TABLE = %s\n" % parse_sdl_attrs("KMOD", all_names))
 
         f.write("\n# --- SDL wheel ---\n")
-        f.write(
-            "%s\n_REVERSE_WHEEL_TABLE = %s\n"
-            % parse_sdl_attrs("SDL_MOUSEWHEEL", all_names)
-        )
+        f.write("%s\n_REVERSE_WHEEL_TABLE = %s\n" % parse_sdl_attrs("SDL_MOUSEWHEEL", all_names))
         all_names = ",\n    ".join('"%s"' % name for name in all_names)
         f.write("\n__all__ = [\n    %s,\n]\n" % (all_names,))
 

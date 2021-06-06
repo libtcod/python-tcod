@@ -38,7 +38,7 @@ def test_tcod_bsp():
     for node in bsp.walk():
         assert isinstance(node, tcod.bsp.BSP)
 
-    assert bsp != 'asd'
+    assert bsp != "asd"
 
     # test that operations on deep BSP nodes preserve depth
     sub_bsp = bsp.children[0]
@@ -56,7 +56,7 @@ def test_tcod_bsp():
 @pytest.mark.filterwarnings("ignore:Use map.+ to check for this")
 @pytest.mark.filterwarnings("ignore:This class may perform poorly")
 def test_tcod_map_set_bits():
-    map_ = tcod.map.Map(2,2)
+    map_ = tcod.map.Map(2, 2)
 
     assert map_.transparent[:].any() == False
     assert map_.walkable[:].any() == False
@@ -72,7 +72,7 @@ def test_tcod_map_set_bits():
 
 @pytest.mark.filterwarnings("ignore:This class may perform poorly")
 def test_tcod_map_get_bits():
-    map_ = tcod.map.Map(2,2)
+    map_ = tcod.map.Map(2, 2)
     map_.transparent[0]
 
 
@@ -80,7 +80,7 @@ def test_tcod_map_get_bits():
 def test_tcod_map_copy():
     map_ = tcod.map.Map(3, 3)
     map_.transparent[:] = True
-    assert (map_.transparent.tolist() == copy.copy(map_).transparent.tolist())
+    assert map_.transparent.tolist() == copy.copy(map_).transparent.tolist()
 
 
 @pytest.mark.filterwarnings("ignore:This class may perform poorly")
@@ -88,12 +88,12 @@ def test_tcod_map_pickle():
     map_ = tcod.map.Map(3, 3)
     map_.transparent[:] = True
     map2 = pickle.loads(pickle.dumps(copy.copy(map_)))
-    assert (map_.transparent[:].tolist() == map2.transparent[:].tolist())
+    assert map_.transparent[:].tolist() == map2.transparent[:].tolist()
 
 
 @pytest.mark.filterwarnings("ignore:This class may perform poorly")
 def test_tcod_map_pickle_fortran():
-    map_ = tcod.map.Map(2, 3, order='F')
+    map_ = tcod.map.Map(2, 3, order="F")
     map2 = pickle.loads(pickle.dumps(copy.copy(map_)))
     assert map_._Map__buffer.strides == map2._Map__buffer.strides
     assert map_.transparent.strides == map2.transparent.strides
@@ -120,21 +120,20 @@ def test_color_class():
     assert color == (1, 2, 3)
 
 
-@pytest.mark.parametrize('dtype', [np.int8, np.int16, np.int32,
-                                   np.uint8, np.uint16, np.uint32, np.float32])
+@pytest.mark.parametrize("dtype", [np.int8, np.int16, np.int32, np.uint8, np.uint16, np.uint32, np.float32])
 def test_path_numpy(dtype):
     map_np = np.ones((6, 6), dtype=dtype)
     map_np[1:4, 1:4] = 0
 
     astar = tcod.path.AStar(map_np, 0)
-    astar = pickle.loads(pickle.dumps(astar)) # test pickle
-    astar = tcod.path.AStar(astar.cost, 0) # use existing cost attribute
+    astar = pickle.loads(pickle.dumps(astar))  # test pickle
+    astar = tcod.path.AStar(astar.cost, 0)  # use existing cost attribute
     assert len(astar.get_path(0, 0, 5, 5)) == 10
 
     dijkstra = tcod.path.Dijkstra(map_np, 0)
     dijkstra.set_goal(0, 0)
     assert len(dijkstra.get_path(5, 5)) == 10
-    repr(dijkstra) # cover __repr__ methods
+    repr(dijkstra)  # cover __repr__ methods
 
     # cover errors
     with pytest.raises(ValueError):
@@ -144,16 +143,14 @@ def test_path_numpy(dtype):
 
 
 def path_cost(this_x, this_y, dest_x, dest_y):
-        return 1
+    return 1
+
 
 def test_path_callback():
-    astar = tcod.path.AStar(
-        tcod.path.EdgeCostCallback(path_cost, (10, 10))
-        )
+    astar = tcod.path.AStar(tcod.path.EdgeCostCallback(path_cost, (10, 10)))
     astar = pickle.loads(pickle.dumps(astar))
-    assert astar.get_path(0, 0, 5, 0) == \
-        [(1, 0), (2, 0), (3, 0), (4, 0), (5, 0)]
-    repr(astar) # cover __repr__ methods
+    assert astar.get_path(0, 0, 5, 0) == [(1, 0), (2, 0), (3, 0), (4, 0), (5, 0)]
+    repr(astar)  # cover __repr__ methods
 
 
 def test_key_repr():
@@ -192,9 +189,7 @@ def test_context():
     with tcod.context.new_window(32, 32, renderer=tcod.RENDERER_SDL2):
         pass
     WIDTH, HEIGHT = 16, 4
-    with tcod.context.new_terminal(
-        columns=WIDTH, rows=HEIGHT, renderer=tcod.RENDERER_SDL2
-    ) as context:
+    with tcod.context.new_terminal(columns=WIDTH, rows=HEIGHT, renderer=tcod.RENDERER_SDL2) as context:
         console = tcod.Console(*context.recommended_console_size())
         context.present(console)
         context.sdl_window_p

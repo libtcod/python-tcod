@@ -41,9 +41,7 @@ def test_fov_single(maps: List[tcod.map.Map]) -> None:
         test_fov(map_)
 
 
-def test_fov_threads(
-    executor: concurrent.futures.Executor, maps: List[tcod.map.Map]
-) -> None:
+def test_fov_threads(executor: concurrent.futures.Executor, maps: List[tcod.map.Map]) -> None:
     for result in executor.map(test_fov, maps):
         pass
 
@@ -58,9 +56,7 @@ def test_astar_single(maps: List[tcod.map.Map]) -> None:
         test_astar(map_)
 
 
-def test_astar_threads(
-    executor: concurrent.futures.Executor, maps: List[tcod.map.Map]
-) -> None:
+def test_astar_threads(executor: concurrent.futures.Executor, maps: List[tcod.map.Map]) -> None:
     for result in executor.map(test_astar, maps):
         pass
 
@@ -68,31 +64,20 @@ def test_astar_threads(
 def run_test(
     maps: List[tcod.map.Map],
     single_func: Callable[[List[tcod.map.Map]], None],
-    multi_func: Callable[
-        [concurrent.futures.Executor, List[tcod.map.Map]], None
-    ],
+    multi_func: Callable[[concurrent.futures.Executor, List[tcod.map.Map]], None],
 ) -> None:
     """Run a function designed for a single thread and compare it to a threaded
     version.
 
     This prints the results of these tests.
     """
-    single_time = min(
-        timeit.repeat(lambda: single_func(maps), number=1, repeat=REPEAT)
-    )
+    single_time = min(timeit.repeat(lambda: single_func(maps), number=1, repeat=REPEAT))
     print(f"Single threaded: {single_time * 1000:.2f}ms")
 
     for i in range(1, THREADS + 1):
         executor = concurrent.futures.ThreadPoolExecutor(i)
-        multi_time = min(
-            timeit.repeat(
-                lambda: multi_func(executor, maps), number=1, repeat=REPEAT
-            )
-        )
-        print(
-            f"{i} threads: {multi_time * 1000:.2f}ms, "
-            f"{single_time / (multi_time * i) * 100:.2f}% efficiency"
-        )
+        multi_time = min(timeit.repeat(lambda: multi_func(executor, maps), number=1, repeat=REPEAT))
+        print(f"{i} threads: {multi_time * 1000:.2f}ms, " f"{single_time / (multi_time * i) * 100:.2f}% efficiency")
 
 
 def main() -> None:
@@ -102,14 +87,9 @@ def main() -> None:
         map_.walkable[...] = True
         map_.transparent[...] = True
 
-    print(
-        f"Python {sys.version}\n{platform.platform()}\n{platform.processor()}"
-    )
+    print(f"Python {sys.version}\n{platform.platform()}\n{platform.processor()}")
 
-    print(
-        f"\nComputing field-of-view for "
-        f"{len(maps)} empty {MAP_WIDTH}x{MAP_HEIGHT} maps."
-    )
+    print(f"\nComputing field-of-view for " f"{len(maps)} empty {MAP_WIDTH}x{MAP_HEIGHT} maps.")
     run_test(maps, test_fov_single, test_fov_threads)
 
     print(

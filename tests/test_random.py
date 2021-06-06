@@ -1,4 +1,3 @@
-
 import copy
 import pickle
 
@@ -12,12 +11,14 @@ def test_tcod_random():
     rand.guass(0, 1)
     rand.inverse_guass(0, 1)
 
+
 def test_tcod_random_copy():
     rand = tcod.random.Random(tcod.random.MERSENNE_TWISTER)
     rand2 = copy.copy(rand)
     assert rand.uniform(0, 1) == rand2.uniform(0, 1)
     assert rand.uniform(0, 1) == rand2.uniform(0, 1)
     assert rand.uniform(0, 1) == rand2.uniform(0, 1)
+
 
 def test_tcod_random_pickle():
     rand = tcod.random.Random(tcod.random.MERSENNE_TWISTER)

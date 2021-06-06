@@ -44,16 +44,12 @@ def test_noise_class(
         noise.sample_mgrid(np.mgrid[:2, :3]),
         noise.sample_ogrid(np.ogrid[:2, :3]),
     )
-    np.testing.assert_equal(
-        noise.sample_mgrid(np.mgrid[:2, :3]), noise[tuple(np.mgrid[:2, :3])]
-    )
+    np.testing.assert_equal(noise.sample_mgrid(np.mgrid[:2, :3]), noise[tuple(np.mgrid[:2, :3])])
     repr(noise)
 
 
 def test_noise_samples() -> None:
-    noise = tcod.noise.Noise(
-        2, tcod.noise.Algorithm.SIMPLEX, tcod.noise.Implementation.SIMPLE
-    )
+    noise = tcod.noise.Noise(2, tcod.noise.Algorithm.SIMPLEX, tcod.noise.Implementation.SIMPLE)
     np.testing.assert_equal(
         noise.sample_mgrid(np.mgrid[:32, :24]),
         noise.sample_ogrid(np.ogrid[:32, :24]),

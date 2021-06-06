@@ -127,9 +127,7 @@ class Color(List[int]):
         if isinstance(other, (Color, list, tuple)):
             return Color._new_from_cdata(lib.TCOD_color_multiply(self, other))
         else:
-            return Color._new_from_cdata(
-                lib.TCOD_color_multiply_scalar(self, other)
-            )
+            return Color._new_from_cdata(lib.TCOD_color_multiply_scalar(self, other))
 
     def __repr__(self) -> str:
         """Return a printable representation of the current color."""

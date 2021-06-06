@@ -17,12 +17,8 @@ FONT_PATH = os.path.join(BASE_DIR, "data/terminal8x8_gs_ro.png")
 
 
 def main():
-    tileset = tcod.tileset.load_tilesheet(
-        FONT_PATH, 16, 16, tcod.tileset.CHARMAP_CP437
-    )
-    with tcod.context.new(
-        columns=WIDTH, rows=HEIGHT, tileset=tileset
-    ) as context:
+    tileset = tcod.tileset.load_tilesheet(FONT_PATH, 16, 16, tcod.tileset.CHARMAP_CP437)
+    with tcod.context.new(columns=WIDTH, rows=HEIGHT, tileset=tileset) as context:
         while True:
             console = tcod.console.Console(WIDTH, HEIGHT)
             console.print(0, 0, "Hello World")

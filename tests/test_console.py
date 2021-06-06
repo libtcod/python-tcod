@@ -13,7 +13,7 @@ def test_array_read_write():
     console = tcod.console.Console(width=12, height=10)
     FG = (255, 254, 253)
     BG = (1, 2, 3)
-    CH = ord('&')
+    CH = ord("&")
     tcod.console_put_char_ex(console, 0, 0, CH, FG, BG)
     assert console.ch[0, 0] == CH
     assert tuple(console.fg[0, 0]) == FG
@@ -25,7 +25,7 @@ def test_array_read_write():
     assert tuple(console.bg[2, 1]) == BG
 
     console.clear()
-    assert console.ch[1, 1] == ord(' ')
+    assert console.ch[1, 1] == ord(" ")
     assert tuple(console.fg[1, 1]) == (255, 255, 255)
     assert tuple(console.bg[1, 1]) == (0, 0, 0)
 
@@ -61,14 +61,14 @@ def test_console_defaults():
 @pytest.mark.filterwarnings("ignore:.*default values have been deprecated")
 def test_console_methods():
     console = tcod.console.Console(width=12, height=10)
-    console.put_char(0, 0, ord('@'))
-    console.print_(0, 0, 'Test')
-    console.print_rect(0, 0, 2, 8, 'a b c d e f')
-    console.get_height_rect(0, 0, 2, 8, 'a b c d e f')
+    console.put_char(0, 0, ord("@"))
+    console.print_(0, 0, "Test")
+    console.print_rect(0, 0, 2, 8, "a b c d e f")
+    console.get_height_rect(0, 0, 2, 8, "a b c d e f")
     console.rect(0, 0, 2, 2, True)
     console.hline(0, 1, 10)
     console.vline(1, 0, 10)
-    console.print_frame(0, 0, 8, 8, 'Frame')
+    console.print_frame(0, 0, 8, 8, "Frame")
     console.blit(0, 0, 0, 0, console, 0, 0)
     console.blit(0, 0, 0, 0, console, 0, 0, key_color=(0, 0, 0))
     console.set_key_color((254, 0, 254))
@@ -76,7 +76,7 @@ def test_console_methods():
 
 def test_console_pickle():
     console = tcod.console.Console(width=12, height=10)
-    console.ch[...] = ord('.')
+    console.ch[...] = ord(".")
     console.fg[...] = (10, 20, 30)
     console.bg[...] = (1, 2, 3)
     console2 = pickle.loads(pickle.dumps(console))
@@ -86,7 +86,7 @@ def test_console_pickle():
 
 
 def test_console_pickle_fortran():
-    console = tcod.console.Console(2, 3, order='F')
+    console = tcod.console.Console(2, 3, order="F")
     console2 = pickle.loads(pickle.dumps(console))
     assert console.ch.strides == console2.ch.strides
     assert console.fg.strides == console2.fg.strides
@@ -102,8 +102,7 @@ def test_console_repr():
 def test_console_str():
     console = tcod.console.Console(10, 2)
     console.print_(0, 0, "Test")
-    assert str(console) == ("<Test      |\n"
-                            "|          >")
+    assert str(console) == ("<Test      |\n" "|          >")
 
 
 def test_console_fortran_buffer():
@@ -129,6 +128,7 @@ def test_console_semigraphics():
     console.draw_semigraphics(
         [[[255, 255, 255], [255, 255, 255]], [[255, 255, 255], [0, 0, 0]]],
     )
+
 
 def test_rexpaint(tmp_path) -> None:
     xp_path = tmp_path / "test.xp"

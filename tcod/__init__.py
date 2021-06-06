@@ -18,20 +18,7 @@
 import sys
 import warnings
 
-from tcod import (
-    bsp,
-    color,
-    console,
-    context,
-    event,
-    image,
-    los,
-    map,
-    noise,
-    path,
-    random,
-    tileset,
-)
+from tcod import bsp, color, console, context, event, image, los, map, noise, path, random, tileset
 from tcod.console import Console  # noqa: F401
 from tcod.constants import *  # noqa: F4
 from tcod.libtcodpy import *  # noqa: F4

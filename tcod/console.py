@@ -134,9 +134,7 @@ class Console:
                 "w": width,
                 "h": height,
                 "elements": width * height,
-                "tiles": ffi.from_buffer(
-                    "struct TCOD_ConsoleTile*", self._tiles
-                ),
+                "tiles": ffi.from_buffer("struct TCOD_ConsoleTile*", self._tiles),
                 "bkgnd_flag": default_bg_blend,
                 "alignment": default_alignment,
                 "fore": (255, 255, 255),
@@ -148,9 +146,7 @@ class Console:
             self.clear()
 
     @classmethod
-    def _from_cdata(
-        cls, cdata: Any, order: Literal["C", "F"] = "C"
-    ) -> "Console":
+    def _from_cdata(cls, cdata: Any, order: Literal["C", "F"] = "C") -> "Console":
         """Return a Console instance which wraps this `TCOD_Console*` object."""
         if isinstance(cdata, cls):
             return cdata
@@ -183,9 +179,7 @@ class Console:
             _root_console = self
             self._console_data = lib.TCOD_ctx.root
         else:
-            self._console_data = ffi.cast(
-                "struct TCOD_Console*", self.console_c
-            )
+            self._console_data = ffi.cast("struct TCOD_Console*", self.console_c)
 
         self._tiles = np.frombuffer(
             ffi.buffer(self._console_data.tiles[0 : self.width * self.height]),
@@ -385,8 +379,7 @@ class Console:
     def __clear_warning(self, name: str, value: Tuple[int, int, int]) -> None:
         """Raise a warning for bad default values during calls to clear."""
         warnings.warn(
-            "Clearing with the console default values is deprecated.\n"
-            "Add %s=%r to this call." % (name, value),
+            "Clearing with the console default values is deprecated.\n" "Add %s=%r to this call." % (name, value),
             DeprecationWarning,
             stacklevel=3,
         )
@@ -504,9 +497,7 @@ class Console:
         if bg_blend is not None:
             params.append("bg_blend=%s" % (self.__BG_BLEND_LOOKUP[bg_blend],))
         if alignment is not None:
-            params.append(
-                "alignment=%s" % (self.__ALIGNMENT_LOOKUP[alignment],)
-            )
+            params.append("alignment=%s" % (self.__ALIGNMENT_LOOKUP[alignment],))
         param_str = ", ".join(params)
         if not param_str:
             param_str = "."
@@ -544,9 +535,7 @@ class Console:
         """
         self.__deprecate_defaults("print", bg_blend, alignment)
         alignment = self.default_alignment if alignment is None else alignment
-        lib.TCOD_console_printf_ex(
-            self.console_c, x, y, bg_blend, alignment, _fmt(string)
-        )
+        lib.TCOD_console_printf_ex(self.console_c, x, y, bg_blend, alignment, _fmt(string))
 
     def print_rect(
         self,
@@ -598,9 +587,7 @@ class Console:
             )
         )
 
-    def get_height_rect(
-        self, x: int, y: int, width: int, height: int, string: str
-    ) -> int:
+    def get_height_rect(self, x: int, y: int, width: int, height: int, string: str) -> int:
         """Return the height of this text word-wrapped into this rectangle.
 
         Args:
@@ -614,11 +601,7 @@ class Console:
             int: The number of lines of text once word-wrapped.
         """
         string_ = string.encode("utf-8")
-        return int(
-            lib.TCOD_console_get_height_rect_n(
-                self.console_c, x, y, width, height, len(string_), string_
-            )
-        )
+        return int(lib.TCOD_console_get_height_rect_n(self.console_c, x, y, width, height, len(string_), string_))
 
     def rect(
         self,
@@ -650,9 +633,7 @@ class Console:
             explicit.
         """
         self.__deprecate_defaults("draw_rect", bg_blend, clear=bool(clear))
-        lib.TCOD_console_rect(
-            self.console_c, x, y, width, height, clear, bg_blend
-        )
+        lib.TCOD_console_rect(self.console_c, x, y, width, height, clear, bg_blend)
 
     def hline(
         self,
@@ -748,11 +729,7 @@ class Console:
         """
         self.__deprecate_defaults("draw_frame", bg_blend)
         string = _fmt(string) if string else ffi.NULL
-        _check(
-            lib.TCOD_console_printf_frame(
-                self.console_c, x, y, width, height, clear, bg_blend, string
-            )
-        )
+        _check(lib.TCOD_console_printf_frame(self.console_c, x, y, width, height, clear, bg_blend, string))
 
     def blit(
         self,
@@ -844,9 +821,7 @@ class Console:
                 bg_alpha,
             )
 
-    @deprecate(
-        "Pass the key color to Console.blit instead of calling this function."
-    )
+    @deprecate("Pass the key color to Console.blit instead of calling this function.")
     def set_key_color(self, color: Optional[Tuple[int, int, int]]) -> None:
         """Set a consoles blit transparent color.
 
@@ -884,9 +859,7 @@ class Console:
         .. versionadded:: 11.11
         """
         if self.console_c != ffi.NULL:
-            raise NotImplementedError(
-                "Only the root console can be used to close libtcod's window."
-            )
+            raise NotImplementedError("Only the root console can be used to close libtcod's window.")
         lib.TCOD_console_delete(self.console_c)
 
     def __exit__(self, *args: Any) -> None:
@@ -933,26 +906,21 @@ class Console:
             del state["_bg"]
 
         self.__dict__.update(state)
-        self._console_data["tiles"] = ffi.from_buffer(
-            "struct TCOD_ConsoleTile*", self._tiles
-        )
-        self._console_data = self.console_c = ffi.new(
-            "struct TCOD_Console*", self._console_data
-        )
+        self._console_data["tiles"] = ffi.from_buffer("struct TCOD_ConsoleTile*", self._tiles)
+        self._console_data = self.console_c = ffi.new("struct TCOD_Console*", self._console_data)
 
     def __repr__(self) -> str:
         """Return a string representation of this console."""
-        return (
-            "tcod.console.Console(width=%i, height=%i, "
-            "order=%r,buffer=\n%r)"
-            % (self.width, self.height, self._order, self.tiles)
+        return "tcod.console.Console(width=%i, height=%i, " "order=%r,buffer=\n%r)" % (
+            self.width,
+            self.height,
+            self._order,
+            self.tiles,
         )
 
     def __str__(self) -> str:
         """Return a simplified representation of this consoles contents."""
-        return "<%s>" % "|\n|".join(
-            "".join(chr(c) for c in line) for line in self._tiles["ch"]
-        )
+        return "<%s>" % "|\n|".join("".join(chr(c) for c in line) for line in self._tiles["ch"])
 
     def _pythonic_index(self, x: int, y: int) -> Tuple[int, int]:
         if __debug__ and (x < 0 or y < 0):
@@ -1189,9 +1157,7 @@ class Console:
         .. versionadded:: 11.4
         """
         image = tcod._internal._asimage(pixels)
-        lib.TCOD_image_blit_2x(
-            image.image_c, self.console_c, x, y, 0, 0, -1, -1
-        )
+        lib.TCOD_image_blit_2x(image.image_c, self.console_c, x, y, 0, 0, -1, -1)
 
 
 def get_height_rect(width: int, string: str) -> int:
@@ -1204,9 +1170,7 @@ def get_height_rect(width: int, string: str) -> int:
     .. versionadded:: 9.2
     """
     string_ = string.encode("utf-8")  # type: bytes
-    return int(
-        lib.TCOD_console_get_height_rect_wn(width, len(string_), string_)
-    )
+    return int(lib.TCOD_console_get_height_rect_wn(width, len(string_), string_))
 
 
 @deprecate("This function does not support contexts.")
@@ -1242,9 +1206,7 @@ def recommended_size() -> Tuple[int, int]:
     return w, h
 
 
-def load_xp(
-    path: Union[str, pathlib.Path], order: Literal["C", "F"] = "C"
-) -> Tuple[Console, ...]:
+def load_xp(path: Union[str, pathlib.Path], order: Literal["C", "F"] = "C") -> Tuple[Console, ...]:
     """Load a REXPaint file as a tuple of consoles.
 
     `path` is the name of the REXPaint file to load.
@@ -1279,14 +1241,10 @@ def load_xp(
     """
     if not os.path.exists(path):
         raise FileNotFoundError(f"File not found:\n\t{os.path.abspath(path)}")
-    layers = _check(
-        tcod.lib.TCOD_load_xp(str(path).encode("utf-8"), 0, ffi.NULL)
-    )
+    layers = _check(tcod.lib.TCOD_load_xp(str(path).encode("utf-8"), 0, ffi.NULL))
     consoles = ffi.new("TCOD_Console*[]", layers)
     _check(tcod.lib.TCOD_load_xp(str(path).encode("utf-8"), layers, consoles))
-    return tuple(
-        Console._from_cdata(console_p, order=order) for console_p in consoles
-    )
+    return tuple(Console._from_cdata(console_p, order=order) for console_p in consoles)
 
 
 def save_xp(

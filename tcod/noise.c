@@ -15,19 +15,13 @@ float NoiseGetSample(TDLNoise* noise, float* __restrict xyzw) {
       return TCOD_noise_get_turbulence(noise->noise, xyzw, noise->octaves);
   }
 }
-void NoiseSampleMeshGrid(
-    TDLNoise* noise,
-    const long len,
-    const float* __restrict in,
-    float* __restrict out) {
+void NoiseSampleMeshGrid(TDLNoise* noise, const long len, const float* __restrict in, float* __restrict out) {
   {
     long i;
     for (i = 0; i < len; ++i) {
       int axis;
       float xyzw[TCOD_NOISE_MAX_DIMENSIONS];
-      for (axis = 0; axis < noise->dimensions; ++axis) {
-        xyzw[axis] = in[axis * len + i];
-      }
+      for (axis = 0; axis < noise->dimensions; ++axis) { xyzw[axis] = in[axis * len + i]; }
       out[i] = NoiseGetSample(noise, xyzw);
     }
   }
@@ -65,8 +59,6 @@ void NoiseSampleOpenMeshGrid(
   {
     long i;
     long len = GetSizeFromShape(ndim_in, shape);
-    for (i = 0; i < len; ++i) {
-      out[i] = GetOpenMeshGridValue(noise, ndim_in, shape, ogrid_in, i);
-    }
+    for (i = 0; i < len; ++i) { out[i] = GetOpenMeshGridValue(noise, ndim_in, shape, ogrid_in, i); }
   }
 }

@@ -34,9 +34,7 @@ def verify_dependencies() -> None:
         lib_test.SDL_GetVersion(version)  # Need to check this version.
         version = version.major, version.minor, version.patch
         if version < (2, 0, 5):
-            raise RuntimeError(
-                "Tried to load an old version of SDL %r" % (version,)
-            )
+            raise RuntimeError("Tried to load an old version of SDL %r" % (version,))
 
 
 def get_architecture() -> str:

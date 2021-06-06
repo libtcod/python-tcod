@@ -36,9 +36,7 @@ def load_ttf(path: str, size: Tuple[int, int]) -> tcod.tileset.Tileset:
         ttf.load_glyph(glyph_index)
         bitmap = ttf.glyph.bitmap
         assert bitmap.pixel_mode == freetype.FT_PIXEL_MODE_GRAY
-        bitmap_array = np.asarray(bitmap.buffer).reshape(
-            (bitmap.width, bitmap.rows), order="F"
-        )
+        bitmap_array = np.asarray(bitmap.buffer).reshape((bitmap.width, bitmap.rows), order="F")
         if bitmap_array.size == 0:
             continue  # Skip blank glyphs.
         output_image = np.zeros(size, dtype=np.uint8, order="F")
@@ -50,9 +48,9 @@ def load_ttf(path: str, size: Tuple[int, int]) -> tcod.tileset.Tileset:
 
         # `max` is used because I was too lazy to properly slice the array.
         out_slice = out_slice[max(0, left) :, max(0, top) :]
-        out_slice[
-            : bitmap_array.shape[0], : bitmap_array.shape[1]
-        ] = bitmap_array[: out_slice.shape[0], : out_slice.shape[1]]
+        out_slice[: bitmap_array.shape[0], : bitmap_array.shape[1]] = bitmap_array[
+            : out_slice.shape[0], : out_slice.shape[1]
+        ]
 
         tileset.set_tile(codepoint, output_image.transpose())
     return tileset
@@ -71,18 +69,13 @@ def main() -> None:
             console.tiles_rgb["bg"][::2, ::2] = 0x20
             console.tiles_rgb["bg"][1::2, 1::2] = 0x20
             # Print ASCII characters.
-            console.tiles_rgb["ch"][:16, :6] = np.arange(0x20, 0x80).reshape(
-                0x10, -1, order="F"
-            )
+            console.tiles_rgb["ch"][:16, :6] = np.arange(0x20, 0x80).reshape(0x10, -1, order="F")
             console.print(0, 7, "Example text.")
             context.present(console, integer_scaling=True)
             for event in tcod.event.wait():
                 if isinstance(event, tcod.event.Quit):
                     raise SystemExit()
-                if (
-                    isinstance(event, tcod.event.WindowResized)
-                    and event.type == "WINDOWSIZECHANGED"
-                ):
+                if isinstance(event, tcod.event.WindowResized) and event.type == "WINDOWSIZECHANGED":
                     # Resize the Tileset to match the new screen size.
                     context.change_tileset(
                         load_ttf(
@@ -96,8 +89,6 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    tcod_version = tuple(
-        int(n) for n in tcod.__version__.split(".") if n.isdigit()
-    )
+    tcod_version = tuple(int(n) for n in tcod.__version__.split(".") if n.isdigit())
     assert tcod_version[:2] >= (12, 1), "Must be using tcod 12.1 or later."
     main()

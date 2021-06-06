@@ -213,30 +213,18 @@ class Context:
                 "align_y": align[1],
             },
         )
-        _check(
-            lib.TCOD_context_present(
-                self._context_p, console.console_c, viewport_args
-            )
-        )
+        _check(lib.TCOD_context_present(self._context_p, console.console_c, viewport_args))
 
     def pixel_to_tile(self, x: int, y: int) -> Tuple[int, int]:
         """Convert window pixel coordinates to tile coordinates."""
         with ffi.new("int[2]", (x, y)) as xy:
-            _check(
-                lib.TCOD_context_screen_pixel_to_tile_i(
-                    self._context_p, xy, xy + 1
-                )
-            )
+            _check(lib.TCOD_context_screen_pixel_to_tile_i(self._context_p, xy, xy + 1))
             return xy[0], xy[1]
 
     def pixel_to_subtile(self, x: int, y: int) -> Tuple[float, float]:
         """Convert window pixel coordinates to sub-tile coordinates."""
         with ffi.new("double[2]", (x, y)) as xy:
-            _check(
-                lib.TCOD_context_screen_pixel_to_tile_d(
-                    self._context_p, xy, xy + 1
-                )
-            )
+            _check(lib.TCOD_context_screen_pixel_to_tile_d(self._context_p, xy, xy + 1))
             return xy[0], xy[1]
 
     def convert_event(self, event: tcod.event.Event) -> None:
@@ -248,9 +236,7 @@ class Context:
                 event.pixel[0] - event.pixel_motion[0],
                 event.pixel[1] - event.pixel_motion[1],
             )
-            event.tile_motion = tcod.event.Point(
-                event.tile[0] - prev_tile[0], event.tile[1] - prev_tile[1]
-            )
+            event.tile_motion = tcod.event.Point(event.tile[0] - prev_tile[0], event.tile[1] - prev_tile[1])
 
     def save_screenshot(self, path: Optional[str] = None) -> None:
         """Save a screen-shot to the given file path."""
@@ -259,11 +245,7 @@ class Context:
 
     def change_tileset(self, tileset: Optional[tcod.tileset.Tileset]) -> None:
         """Change the active tileset used by this context."""
-        _check(
-            lib.TCOD_context_change_tileset(
-                self._context_p, _handle_tileset(tileset)
-            )
-        )
+        _check(lib.TCOD_context_change_tileset(self._context_p, _handle_tileset(tileset)))
 
     def new_console(
         self,
@@ -301,22 +283,13 @@ class Context:
             :any:`tcod.console.Console`
         """
         if magnification < 0:
-            raise ValueError(
-                "Magnification must be greater than zero. (Got %f)"
-                % magnification
-            )
+            raise ValueError("Magnification must be greater than zero. (Got %f)" % magnification)
         size = ffi.new("int[2]")
-        _check(
-            lib.TCOD_context_recommended_console_size(
-                self._context_p, magnification, size, size + 1
-            )
-        )
+        _check(lib.TCOD_context_recommended_console_size(self._context_p, magnification, size, size + 1))
         width, height = max(min_columns, size[0]), max(min_rows, size[1])
         return tcod.console.Console(width, height, order=order)
 
-    def recommended_console_size(
-        self, min_columns: int = 1, min_rows: int = 1
-    ) -> Tuple[int, int]:
+    def recommended_console_size(self, min_columns: int = 1, min_rows: int = 1) -> Tuple[int, int]:
         """Return the recommended (columns, rows) of a console for this
         context.
 
@@ -326,11 +299,7 @@ class Context:
         call :any:`Context.new_console` instead.
         """
         with ffi.new("int[2]") as size:
-            _check(
-                lib.TCOD_context_recommended_console_size(
-                    self._context_p, 1.0, size, size + 1
-                )
-            )
+            _check(lib.TCOD_context_recommended_console_size(self._context_p, 1.0, size, size + 1))
             return max(min_columns, size[0]), max(min_rows, size[1])
 
     @property
@@ -446,9 +415,7 @@ def new(
         sdl_window_flags = SDL_WINDOW_RESIZABLE
     if argv is None:
         argv = sys.argv
-    argv_encoded = [  # Needs to be kept alive for argv_c.
-        ffi.new("char[]", arg.encode("utf-8")) for arg in argv
-    ]
+    argv_encoded = [ffi.new("char[]", arg.encode("utf-8")) for arg in argv]  # Needs to be kept alive for argv_c.
     argv_c = ffi.new("char*[]", argv_encoded)
 
     catch_msg = []  # type: List[str]
@@ -486,9 +453,7 @@ def new(
     return Context._claim(context_pp[0])
 
 
-@pending_deprecate(
-    "Call tcod.context.new with width and height as keyword parameters."
-)
+@pending_deprecate("Call tcod.context.new with width and height as keyword parameters.")
 def new_window(
     width: int,
     height: int,
@@ -515,9 +480,7 @@ def new_window(
     )
 
 
-@pending_deprecate(
-    "Call tcod.context.new with columns and rows as keyword parameters."
-)
+@pending_deprecate("Call tcod.context.new with columns and rows as keyword parameters.")
 def new_terminal(
     columns: int,
     rows: int,

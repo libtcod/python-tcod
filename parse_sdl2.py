@@ -10,27 +10,18 @@ import cffi  # type: ignore
 # supported by cffi.
 RE_COMMENT = re.compile(r" */\*.*?\*/", re.DOTALL)
 RE_REMOVALS = re.compile(
-    r"#ifndef DOXYGEN_SHOULD_IGNORE_THIS.*"
-    r"#endif /\* DOXYGEN_SHOULD_IGNORE_THIS \*/",
+    r"#ifndef DOXYGEN_SHOULD_IGNORE_THIS.*" r"#endif /\* DOXYGEN_SHOULD_IGNORE_THIS \*/",
     re.DOTALL,
 )
 RE_DEFINE = re.compile(r"#define \w+(?!\() (?:.*?(?:\\\n)?)*$", re.MULTILINE)
 RE_TYPEDEF = re.compile(r"^typedef[^{;#]*?(?:{[^}]*\n}[^;]*)?;", re.MULTILINE)
 RE_ENUM = re.compile(r"^(?:typedef )?enum[^{;#]*?(?:{[^}]*\n}[^;]*)?;", re.MULTILINE)
 RE_DECL = re.compile(r"^extern[^#(]*\([^#]*?\);$", re.MULTILINE | re.DOTALL)
-RE_ENDIAN = re.compile(
-    r"#if SDL_BYTEORDER == SDL_LIL_ENDIAN(.*?)#else(.*?)#endif", re.DOTALL
-)
-RE_ENDIAN2 = re.compile(
-    r"#if SDL_BYTEORDER == SDL_BIG_ENDIAN(.*?)#else(.*?)#endif", re.DOTALL
-)
+RE_ENDIAN = re.compile(r"#if SDL_BYTEORDER == SDL_LIL_ENDIAN(.*?)#else(.*?)#endif", re.DOTALL)
+RE_ENDIAN2 = re.compile(r"#if SDL_BYTEORDER == SDL_BIG_ENDIAN(.*?)#else(.*?)#endif", re.DOTALL)
 RE_DEFINE_TRUNCATE = re.compile(r"(#define\s+\w+\s+).+$", flags=re.DOTALL)
-RE_TYPEDEF_TRUNCATE = re.compile(
-    r"(typedef\s+\w+\s+\w+)\s*{.*\n}(?=.*;$)", flags=re.DOTALL | re.MULTILINE
-)
-RE_ENUM_TRUNCATE = re.compile(
-    r"(\w+\s*=).+?(?=,$|})(?![^(']*\))", re.MULTILINE | re.DOTALL
-)
+RE_TYPEDEF_TRUNCATE = re.compile(r"(typedef\s+\w+\s+\w+)\s*{.*\n}(?=.*;$)", flags=re.DOTALL | re.MULTILINE)
+RE_ENUM_TRUNCATE = re.compile(r"(\w+\s*=).+?(?=,$|})(?![^(']*\))", re.MULTILINE | re.DOTALL)
 
 
 def get_header(name: str) -> str:
@@ -42,12 +33,8 @@ def get_header(name: str) -> str:
     # Remove comments.
     header = RE_COMMENT.sub("", header)
     # Deal with endianness in "SDL_audio.h".
-    header = RE_ENDIAN.sub(
-        r"\1" if sys.byteorder == "little" else r"\2", header
-    )
-    header = RE_ENDIAN2.sub(
-        r"\1" if sys.byteorder != "little" else r"\2", header
-    )
+    header = RE_ENDIAN.sub(r"\1" if sys.byteorder == "little" else r"\2", header)
+    header = RE_ENDIAN2.sub(r"\1" if sys.byteorder != "little" else r"\2", header)
 
     # Ignore bad ARM compiler typedef.
     header = header.replace("typedef int SDL_bool;", "")
@@ -81,9 +68,7 @@ def parse(header: str, NEEDS_PACK4: bool) -> Iterator[str]:
     for typedef in RE_TYPEDEF.findall(header):
         # Special case for SDL window flags enum.
         if "SDL_WINDOW_FULLSCREEN_DESKTOP" in typedef:
-            typedef = typedef.replace(
-                "( SDL_WINDOW_FULLSCREEN | 0x00001000 )", "..."
-            )
+            typedef = typedef.replace("( SDL_WINDOW_FULLSCREEN | 0x00001000 )", "...")
         # Detect array sizes at compile time.
         typedef = typedef.replace("SDL_TEXTINPUTEVENT_TEXT_SIZE", "...")
         typedef = typedef.replace("SDL_TEXTEDITINGEVENT_TEXT_SIZE", "...")
@@ -154,21 +139,13 @@ def add_to_ffi(ffi: cffi.FFI, path: str) -> None:
         # cdef_args["pack"] = 4
 
     ffi.cdef(
-        "\n".join(
-            RE_TYPEDEF.findall(get_header(os.path.join(path, "SDL_stdinc.h")))
-        ).replace("SDLCALL ", ""),
-        **cdef_args
+        "\n".join(RE_TYPEDEF.findall(get_header(os.path.join(path, "SDL_stdinc.h")))).replace("SDLCALL ", ""),
+        **cdef_args,
     )
     for header in HEADERS:
         try:
-            for code in parse(
-                get_header(os.path.join(path, header)), NEEDS_PACK4
-            ):
-                if (
-                    "typedef struct SDL_AudioCVT" in code
-                    and sys.platform != "win32"
-                    and not NEEDS_PACK4
-                ):
+            for code in parse(get_header(os.path.join(path, header)), NEEDS_PACK4):
+                if "typedef struct SDL_AudioCVT" in code and sys.platform != "win32" and not NEEDS_PACK4:
                     # This specific struct needs to be packed.
                     ffi.cdef(code, packed=1)
                     continue

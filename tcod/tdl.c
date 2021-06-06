@@ -11,44 +11,27 @@ TCOD_value_t TDL_list_get_union(TCOD_list_t l, int idx) {
   return item;
 }
 
-bool TDL_list_get_bool(TCOD_list_t l, int idx) {
-  return TDL_list_get_union(l, idx).b;
-}
+bool TDL_list_get_bool(TCOD_list_t l, int idx) { return TDL_list_get_union(l, idx).b; }
 
-char TDL_list_get_char(TCOD_list_t l, int idx) {
-  return TDL_list_get_union(l, idx).c;
-}
+char TDL_list_get_char(TCOD_list_t l, int idx) { return TDL_list_get_union(l, idx).c; }
 
-int TDL_list_get_int(TCOD_list_t l, int idx) {
-  return TDL_list_get_union(l, idx).i;
-}
+int TDL_list_get_int(TCOD_list_t l, int idx) { return TDL_list_get_union(l, idx).i; }
 
-float TDL_list_get_float(TCOD_list_t l, int idx) {
-  return TDL_list_get_union(l, idx).f;
-}
+float TDL_list_get_float(TCOD_list_t l, int idx) { return TDL_list_get_union(l, idx).f; }
 
-char* TDL_list_get_string(TCOD_list_t l, int idx) {
-  return TDL_list_get_union(l, idx).s;
-}
+char* TDL_list_get_string(TCOD_list_t l, int idx) { return TDL_list_get_union(l, idx).s; }
 
-TCOD_color_t TDL_list_get_color(TCOD_list_t l, int idx) {
-  return TDL_list_get_union(l, idx).col;
-}
+TCOD_color_t TDL_list_get_color(TCOD_list_t l, int idx) { return TDL_list_get_union(l, idx).col; }
 
-TCOD_dice_t TDL_list_get_dice(TCOD_list_t l, int idx) {
-  return TDL_list_get_union(l, idx).dice;
-}
+TCOD_dice_t TDL_list_get_dice(TCOD_list_t l, int idx) { return TDL_list_get_union(l, idx).dice; }
 
 /* get a TCOD color type from a 0xRRGGBB formatted integer */
 TCOD_color_t TDL_color_from_int(int color) {
-  TCOD_color_t tcod_color = {
-      (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff};
+  TCOD_color_t tcod_color = {(color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff};
   return tcod_color;
 }
 
-int TDL_color_to_int(TCOD_color_t* color) {
-  return (color->r << 16) | (color->g << 8) | color->b;
-}
+int TDL_color_to_int(TCOD_color_t* color) { return (color->r << 16) | (color->g << 8) | color->b; }
 
 int* TDL_color_int_to_array(int color) {
   static int array[3];
@@ -58,9 +41,7 @@ int* TDL_color_int_to_array(int color) {
   return array;
 }
 
-int TDL_color_RGB(int r, int g, int b) {
-  return ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
-}
+int TDL_color_RGB(int r, int g, int b) { return ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff); }
 
 int TDL_color_HSV(float h, float s, float v) {
   TCOD_color_t tcod_color = TCOD_color_HSV(h, s, v);
@@ -154,12 +135,7 @@ void TDL_map_data_from_buffer(TCOD_map_t map, uint8_t* buffer) {
   for (y = 0; y < height; y++) {
     for (x = 0; x < width; x++) {
       int i = y * width + x;
-      TCOD_map_set_properties(
-          map,
-          x,
-          y,
-          (buffer[i] & TRANSPARENT_BIT) != 0,
-          (buffer[i] & WALKABLE_BIT) != 0);
+      TCOD_map_set_properties(map, x, y, (buffer[i] & TRANSPARENT_BIT) != 0, (buffer[i] & WALKABLE_BIT) != 0);
     }
   }
 }
@@ -183,21 +159,12 @@ void TDL_map_fov_to_buffer(TCOD_map_t map, uint8_t* buffer, bool cumulative) {
    colors are converted to TCOD_color_t types in C and is much faster than in
    Python.
    Also Python indexing is used, negative x/y will index to (width-x, etc.) */
-int TDL_console_put_char_ex(
-    TCOD_console_t console,
-    int x,
-    int y,
-    int ch,
-    int fg,
-    int bg,
-    TCOD_bkgnd_flag_t blend) {
+int TDL_console_put_char_ex(TCOD_console_t console, int x, int y, int ch, int fg, int bg, TCOD_bkgnd_flag_t blend) {
   int width = TCOD_console_get_width(console);
   int height = TCOD_console_get_height(console);
   TCOD_color_t color;
 
-  if (x < -width || x >= width || y < -height || y >= height) {
-    return -1; /* outside of console */
-  }
+  if (x < -width || x >= width || y < -height || y >= height) { return -1; /* outside of console */ }
 
   /* normalize x, y */
   if (x < 0) { x += width; };
@@ -225,10 +192,8 @@ int TDL_console_get_fg(TCOD_console_t console, int x, int y) {
   return TDL_color_to_int(&tcod_color);
 }
 
-void TDL_console_set_bg(
-    TCOD_console_t console, int x, int y, int color, TCOD_bkgnd_flag_t flag) {
-  TCOD_console_set_char_background(
-      console, x, y, TDL_color_from_int(color), flag);
+void TDL_console_set_bg(TCOD_console_t console, int x, int y, int color, TCOD_bkgnd_flag_t flag) {
+  TCOD_console_set_char_background(console, x, y, TDL_color_from_int(color), flag);
 }
 
 void TDL_console_set_fg(TCOD_console_t console, int x, int y, int color) {

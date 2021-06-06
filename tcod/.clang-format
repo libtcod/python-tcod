@@ -5,7 +5,7 @@ Language: Cpp
 DerivePointerAlignment: false
 PointerAlignment: Left
 
-ColumnLimit: 79
+ColumnLimit: 120
 AlignAfterOpenBracket: AlwaysBreak
 BinPackArguments: false
 BinPackParameters: false

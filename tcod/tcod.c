@@ -20,9 +20,7 @@ int bresenham(int x1, int y1, int x2, int y2, int n, int* __restrict out) {
   // Bresenham length is Chebyshev distance.
   int length = MAX(abs(x1 - x2), abs(y1 - y2)) + 1;
   if (!out) { return length; }
-  if (n < length) {
-    return TCOD_set_errorv("Bresenham output length mismatched.");
-  }
+  if (n < length) { return TCOD_set_errorv("Bresenham output length mismatched."); }
   TCOD_bresenham_data_t bresenham;
   out[0] = x1;
   out[1] = y1;

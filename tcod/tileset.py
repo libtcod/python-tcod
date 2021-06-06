@@ -59,10 +59,7 @@ class Tileset:
 
     def __contains__(self, codepoint: int) -> bool:
         """Test if a tileset has a codepoint with ``n in tileset``."""
-        return bool(
-            lib.TCOD_tileset_get_tile_(self._tileset_p, codepoint, ffi.NULL)
-            == 0
-        )
+        return bool(lib.TCOD_tileset_get_tile_(self._tileset_p, codepoint, ffi.NULL) == 0)
 
     def get_tile(self, codepoint: int) -> np.ndarray:
         """Return a copy of a tile for the given codepoint.
@@ -98,10 +95,7 @@ class Tileset:
             return self.set_tile(codepoint, full_tile)
         required = self.tile_shape + (4,)
         if tile.shape != required:
-            raise ValueError(
-                "Tile shape must be %r or %r, got %r."
-                % (required, self.tile_shape, tile.shape)
-            )
+            raise ValueError("Tile shape must be %r or %r, got %r." % (required, self.tile_shape, tile.shape))
         lib.TCOD_tileset_set_tile_(
             self._tileset_p,
             codepoint,
@@ -167,8 +161,7 @@ class Tileset:
         if not (0 <= tile_i < self._tileset_p.tiles_count):
             raise IndexError(
                 "Tile %i is non-existent and can't be assigned."
-                " (Tileset has %i tiles.)"
-                % (tile_i, self._tileset_p.tiles_count)
+                " (Tileset has %i tiles.)" % (tile_i, self._tileset_p.tiles_count)
             )
         _check(
             lib.TCOD_tileset_assign_tile(
@@ -207,9 +200,7 @@ def set_default(tileset: Tileset) -> None:
     lib.TCOD_set_default_tileset(tileset._tileset_p)
 
 
-def load_truetype_font(
-    path: str, tile_width: int, tile_height: int
-) -> Tileset:
+def load_truetype_font(path: str, tile_width: int, tile_height: int) -> Tileset:
     """Return a new Tileset from a `.ttf` or `.otf` file.
 
     Same as :any:`set_truetype_font`, but returns a :any:`Tileset` instead.
@@ -219,9 +210,7 @@ def load_truetype_font(
     """
     if not os.path.exists(path):
         raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(path),))
-    cdata = lib.TCOD_load_truetype_font_(
-        path.encode(), tile_width, tile_height
-    )
+    cdata = lib.TCOD_load_truetype_font_(path.encode(), tile_width, tile_height)
     if not cdata:
         raise RuntimeError(ffi.string(lib.TCOD_get_error()))
     return Tileset._claim(cdata)
@@ -275,9 +264,7 @@ def load_bdf(path: str) -> Tileset:
     return Tileset._claim(cdata)
 
 
-def load_tilesheet(
-    path: str, columns: int, rows: int, charmap: Optional[Iterable[int]]
-) -> Tileset:
+def load_tilesheet(path: str, columns: int, rows: int, charmap: Optional[Iterable[int]]) -> Tileset:
     """Return a new Tileset from a simple tilesheet image.
 
     `path` is the file path to a PNG file with the tileset.
@@ -302,9 +289,7 @@ def load_tilesheet(
     mapping = []
     if charmap is not None:
         mapping = list(itertools.islice(charmap, columns * rows))
-    cdata = lib.TCOD_tileset_load(
-        path.encode(), columns, rows, len(mapping), mapping
-    )
+    cdata = lib.TCOD_tileset_load(path.encode(), columns, rows, len(mapping), mapping)
     if not cdata:
         _raise_tcod_error()
     return Tileset._claim(cdata)

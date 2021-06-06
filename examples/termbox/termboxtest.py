@@ -3,7 +3,8 @@
 
 import termbox
 
-spaceord = ord(u" ")
+spaceord = ord(" ")
+
 
 def print_line(t, msg, y, fg, bg):
     w = t.width()
@@ -13,7 +14,8 @@ def print_line(t, msg, y, fg, bg):
         c = spaceord
         if i < l:
             c = ord(msg[i])
-        t.change_cell(x+i, y, c, fg, bg)
+        t.change_cell(x + i, y, c, fg, bg)
+
 
 class SelectBox(object):
     def __init__(self, tb, choices, active=-1):
@@ -34,7 +36,7 @@ class SelectBox(object):
         if self.active < 0:
             self.active = 0
         if self.active >= len(self.choices):
-            self.active = len(self.choices)-1
+            self.active = len(self.choices) - 1
 
     def set_active(self, i):
         self.active = i
@@ -48,49 +50,60 @@ class SelectBox(object):
         self.active += 1
         self.validate_active()
 
+
 choices = [
-    u"This instructs Psyco",
-    u"to compile and run as",
-    u"much of your application",
-    u"code as possible. This is the",
-    u"simplest interface to Psyco.",
-    u"In good cases you can just add",
-    u"these two lines and enjoy the speed-up.",
-    u"If your application does a lot",
-    u"of initialization stuff before",
-    u"the real work begins, you can put",
-    u"the above two lines after this",
-    u"initialization - e.g. after importing",
-    u"modules, creating constant global objects, etc.",
-    u"This instructs Psyco",
-    u"to compile and run as",
-    u"much of your application",
-    u"code as possible. This is the",
-    u"simplest interface to Psyco.",
-    u"In good cases you can just add",
-    u"these two lines and enjoy the speed-up.",
-    u"If your application does a lot",
-    u"of initialization stuff before",
-    u"the real work begins, you can put",
-    u"the above two lines after this",
-    u"initialization - e.g. after importing",
-    u"modules, creating constant global objects, etc."
+    "This instructs Psyco",
+    "to compile and run as",
+    "much of your application",
+    "code as possible. This is the",
+    "simplest interface to Psyco.",
+    "In good cases you can just add",
+    "these two lines and enjoy the speed-up.",
+    "If your application does a lot",
+    "of initialization stuff before",
+    "the real work begins, you can put",
+    "the above two lines after this",
+    "initialization - e.g. after importing",
+    "modules, creating constant global objects, etc.",
+    "This instructs Psyco",
+    "to compile and run as",
+    "much of your application",
+    "code as possible. This is the",
+    "simplest interface to Psyco.",
+    "In good cases you can just add",
+    "these two lines and enjoy the speed-up.",
+    "If your application does a lot",
+    "of initialization stuff before",
+    "the real work begins, you can put",
+    "the above two lines after this",
+    "initialization - e.g. after importing",
+    "modules, creating constant global objects, etc.",
 ]
+
 
 def draw_bottom_line(t, i):
     i = i % 8
     w = t.width()
     h = t.height()
     c = i
-    palette = [termbox.DEFAULT, termbox.BLACK, termbox.RED, termbox.GREEN,
-               termbox.YELLOW, termbox.BLUE, termbox.MAGENTA, termbox.CYAN,
-               termbox.WHITE]
+    palette = [
+        termbox.DEFAULT,
+        termbox.BLACK,
+        termbox.RED,
+        termbox.GREEN,
+        termbox.YELLOW,
+        termbox.BLUE,
+        termbox.MAGENTA,
+        termbox.CYAN,
+        termbox.WHITE,
+    ]
     for x in range(w):
-        t.change_cell(x, h-1, ord(u' '), termbox.BLACK, palette[c])
-        t.change_cell(x, h-2, ord(u' '), termbox.BLACK, palette[c])
+        t.change_cell(x, h - 1, ord(" "), termbox.BLACK, palette[c])
+        t.change_cell(x, h - 2, ord(" "), termbox.BLACK, palette[c])
         c += 1
         if c > 7:
             c = 0
+
 
 with termbox.Termbox() as t:
     sb = SelectBox(t, choices, 0)

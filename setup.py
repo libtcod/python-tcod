@@ -15,9 +15,7 @@ SDL_VERSION_NEEDED = (2, 0, 5)
 def get_version() -> str:
     """Get the current version from a git tag, or by reading tcod/version.py"""
     try:
-        tag = check_output(
-            ["git", "describe", "--abbrev=0"], universal_newlines=True
-        ).strip()
+        tag = check_output(["git", "describe", "--abbrev=0"], universal_newlines=True).strip()
         assert not tag.startswith("v")
         version = tag
 
@@ -40,10 +38,7 @@ def get_version() -> str:
             with open("tcod/version.py") as version_file:
                 exec(version_file.read(), globals())  # Update __version__
         except FileNotFoundError:
-            warnings.warn(
-                "Unknown version: "
-                "Not in a Git repository and not from a sdist bundle or wheel."
-            )
+            warnings.warn("Unknown version: " "Not in a Git repository and not from a sdist bundle or wheel.")
         return __version__
 
 
@@ -81,9 +76,7 @@ def check_sdl_version() -> None:
         return
     needed_version = "%i.%i.%i" % SDL_VERSION_NEEDED
     try:
-        sdl_version_str = check_output(
-            ["sdl2-config", "--version"], universal_newlines=True
-        ).strip()
+        sdl_version_str = check_output(["sdl2-config", "--version"], universal_newlines=True).strip()
     except FileNotFoundError:
         raise RuntimeError(
             "libsdl2-dev or equivalent must be installed on your system"
@@ -93,10 +86,7 @@ def check_sdl_version() -> None:
     print("Found SDL %s." % (sdl_version_str,))
     sdl_version = tuple(int(s) for s in sdl_version_str.split("."))
     if sdl_version < SDL_VERSION_NEEDED:
-        raise RuntimeError(
-            "SDL version must be at least %s, (found %s)"
-            % (needed_version, sdl_version_str)
-        )
+        raise RuntimeError("SDL version must be at least %s, (found %s)" % (needed_version, sdl_version_str))
 
 
 if not os.path.exists("libtcod/src"):

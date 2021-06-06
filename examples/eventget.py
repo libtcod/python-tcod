@@ -19,9 +19,7 @@ def main() -> None:
     event_log: List[str] = []
     motion_desc = ""
 
-    with tcod.context.new(
-        width=WIDTH, height=HEIGHT, sdl_window_flags=FLAGS
-    ) as context:
+    with tcod.context.new(width=WIDTH, height=HEIGHT, sdl_window_flags=FLAGS) as context:
         console = context.new_console()
         while True:
             # Display all event items.

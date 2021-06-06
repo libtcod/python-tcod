@@ -7,15 +7,16 @@ import argparse
 import unicodedata
 from typing import Iterable, Iterator
 
-import tcod.tileset
 from tabulate import tabulate
+
+import tcod.tileset
 
 
 def get_charmaps() -> Iterator[str]:
     """Return an iterator of the current character maps from tcod.tilest."""
     for name in dir(tcod.tileset):
         if name.startswith("CHARMAP_"):
-            yield name[len("CHARMAP_"):].lower()
+            yield name[len("CHARMAP_") :].lower()
 
 
 def generate_table(charmap: Iterable[int]) -> str:
@@ -32,11 +33,7 @@ def generate_table(charmap: Iterable[int]) -> str:
         except ValueError:
             # Skip names rather than guessing, the official names are enough.
             name = ""
-        string = (
-            f"{chr(ch)!r}".replace("\\", "\\\\")
-            .replace("*", "\\*")  # Escape RST symbols.
-            .replace("`", "\\`")
-        )
+        string = f"{chr(ch)!r}".replace("\\", "\\\\").replace("*", "\\*").replace("`", "\\`")  # Escape RST symbols.
         table.append((i, f"0x{ch:0{hex_len}X}", string, name))
     return tabulate(table, headers, tablefmt="rst")
 

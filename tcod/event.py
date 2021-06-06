@@ -21,18 +21,7 @@ implied by ``import tcod``.
 """
 import enum
 import warnings
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Generic,
-    Iterator,
-    Mapping,
-    NamedTuple,
-    Optional,
-    Tuple,
-    TypeVar,
-)
+from typing import Any, Callable, Dict, Generic, Iterator, Mapping, NamedTuple, Optional, Tuple, TypeVar
 
 import numpy as np
 
@@ -58,9 +47,7 @@ class _ConstantsWithPrefix(Mapping[int, str]):
         return iter(self.constants)
 
 
-def _describe_bitmask(
-    bits: int, table: Mapping[int, str], default: str = "0"
-) -> str:
+def _describe_bitmask(bits: int, table: Mapping[int, str], default: str = "0") -> str:
     """Return a bitmask in human readable form.
 
     This is a private function, used internally.
@@ -209,15 +196,9 @@ _REVERSE_BUTTON_MASK_TABLE = {
 }
 
 _REVERSE_BUTTON_TABLE_PREFIX = _ConstantsWithPrefix(_REVERSE_BUTTON_TABLE)
-_REVERSE_BUTTON_MASK_TABLE_PREFIX = _ConstantsWithPrefix(
-    _REVERSE_BUTTON_MASK_TABLE
-)
-_REVERSE_SCANCODE_TABLE_PREFIX = _ConstantsWithPrefix(
-    tcod.event_constants._REVERSE_SCANCODE_TABLE
-)
-_REVERSE_SYM_TABLE_PREFIX = _ConstantsWithPrefix(
-    tcod.event_constants._REVERSE_SYM_TABLE
-)
+_REVERSE_BUTTON_MASK_TABLE_PREFIX = _ConstantsWithPrefix(_REVERSE_BUTTON_MASK_TABLE)
+_REVERSE_SCANCODE_TABLE_PREFIX = _ConstantsWithPrefix(tcod.event_constants._REVERSE_SCANCODE_TABLE)
+_REVERSE_SYM_TABLE_PREFIX = _ConstantsWithPrefix(tcod.event_constants._REVERSE_SYM_TABLE)
 
 
 _REVERSE_MOD_TABLE = tcod.event_constants._REVERSE_MOD_TABLE.copy()
@@ -292,9 +273,7 @@ class KeyboardEvent(Event):
         `scancode`, `sym`, and `mod` now use their respective enums.
     """
 
-    def __init__(
-        self, scancode: int, sym: int, mod: int, repeat: bool = False
-    ):
+    def __init__(self, scancode: int, sym: int, mod: int, repeat: bool = False):
         super().__init__()
         self.scancode = Scancode(scancode)
         self.sym = KeySym(sym)
@@ -304,9 +283,7 @@ class KeyboardEvent(Event):
     @classmethod
     def from_sdl_event(cls, sdl_event: Any) -> Any:
         keysym = sdl_event.key.keysym
-        self = cls(
-            keysym.scancode, keysym.sym, keysym.mod, bool(sdl_event.key.repeat)
-        )
+        self = cls(keysym.scancode, keysym.sym, keysym.mod, bool(sdl_event.key.repeat))
         self.sdl_event = sdl_event
         return self
 
@@ -336,9 +313,7 @@ class KeyboardEvent(Event):
     def __str__(self) -> str:
         return "<%s, scancode=%s, sym=%s, mod=%s, repeat=%r>" % (
             super().__str__().strip("<>"),
-            self._scancode_constant(
-                tcod.event_constants._REVERSE_SCANCODE_TABLE
-            ),
+            self._scancode_constant(tcod.event_constants._REVERSE_SCANCODE_TABLE),
             self._sym_constant(tcod.event_constants._REVERSE_SYM_TABLE),
             _describe_bitmask(self.mod, _REVERSE_MOD_TABLE),
             self.repeat,
@@ -437,9 +412,7 @@ class MouseMotion(MouseState):
     ):
         super().__init__(pixel, tile, state)
         self.pixel_motion = Point(*pixel_motion)
-        self.__tile_motion = (
-            Point(*tile_motion) if tile_motion is not None else None
-        )
+        self.__tile_motion = Point(*tile_motion) if tile_motion is not None else None
 
     @property
     def tile_motion(self) -> Point:
@@ -469,10 +442,7 @@ class MouseMotion(MouseState):
         return self
 
     def __repr__(self) -> str:
-        return (
-            "tcod.event.%s(pixel=%r, pixel_motion=%r, "
-            "tile=%r, tile_motion=%r, state=%s)"
-        ) % (
+        return ("tcod.event.%s(pixel=%r, pixel_motion=%r, " "tile=%r, tile_motion=%r, state=%s)") % (
             self.__class__.__name__,
             tuple(self.pixel),
             tuple(self.pixel_motion),
@@ -482,9 +452,7 @@ class MouseMotion(MouseState):
         )
 
     def __str__(self) -> str:
-        return (
-            "<%s, pixel_motion=(x=%i, y=%i), tile_motion=(x=%i, y=%i)>"
-        ) % (
+        return ("<%s, pixel_motion=(x=%i, y=%i), tile_motion=(x=%i, y=%i)>") % (
             super().__str__().strip("<>"),
             *self.pixel_motion,
             *self.tile_motion,
@@ -547,14 +515,11 @@ class MouseButtonEvent(MouseState):
         )
 
     def __str__(self) -> str:
-        return (
-            "<type=%r, pixel=(x=%i, y=%i), tile=(x=%i, y=%i), button=%s)"
-            % (
-                self.type,
-                *self.pixel,
-                *self.tile,
-                _REVERSE_BUTTON_TABLE[self.button],
-            )
+        return "<type=%r, pixel=(x=%i, y=%i), tile=(x=%i, y=%i), button=%s)" % (
+            self.type,
+            *self.pixel,
+            *self.tile,
+            _REVERSE_BUTTON_TABLE[self.button],
         )
 
 
@@ -650,9 +615,7 @@ class WindowEvent(Event):
             lib.SDL_WINDOWEVENT_RESIZED,
             lib.SDL_WINDOWEVENT_SIZE_CHANGED,
         ):
-            self = WindowResized(
-                event_type, sdl_event.window.data1, sdl_event.window.data2
-            )
+            self = WindowResized(event_type, sdl_event.window.data1, sdl_event.window.data2)
         else:
             self = cls(event_type)
         self.sdl_event = sdl_event
@@ -959,9 +922,7 @@ class EventDispatch(Generic[T]):
                 stacklevel=2,
             )
             return None
-        func = getattr(
-            self, "ev_%s" % (event.type.lower(),)
-        )  # type: Callable[[Any], Optional[T]]
+        func = getattr(self, "ev_%s" % (event.type.lower(),))  # type: Callable[[Any], Optional[T]]
         return func(event)
 
     def event_get(self) -> None:
@@ -984,14 +945,10 @@ class EventDispatch(Generic[T]):
     def ev_mousemotion(self, event: "tcod.event.MouseMotion") -> Optional[T]:
         """Called when the mouse is moved."""
 
-    def ev_mousebuttondown(
-        self, event: "tcod.event.MouseButtonDown"
-    ) -> Optional[T]:
+    def ev_mousebuttondown(self, event: "tcod.event.MouseButtonDown") -> Optional[T]:
         """Called when a mouse button is pressed."""
 
-    def ev_mousebuttonup(
-        self, event: "tcod.event.MouseButtonUp"
-    ) -> Optional[T]:
+    def ev_mousebuttonup(self, event: "tcod.event.MouseButtonUp") -> Optional[T]:
         """Called when a mouse button is released."""
 
     def ev_mousewheel(self, event: "tcod.event.MouseWheel") -> Optional[T]:
@@ -1015,29 +972,19 @@ class EventDispatch(Generic[T]):
     def ev_windowmoved(self, event: "tcod.event.WindowMoved") -> Optional[T]:
         """Called when the window is moved."""
 
-    def ev_windowresized(
-        self, event: "tcod.event.WindowResized"
-    ) -> Optional[T]:
+    def ev_windowresized(self, event: "tcod.event.WindowResized") -> Optional[T]:
         """Called when the window is resized."""
 
-    def ev_windowsizechanged(
-        self, event: "tcod.event.WindowResized"
-    ) -> Optional[T]:
+    def ev_windowsizechanged(self, event: "tcod.event.WindowResized") -> Optional[T]:
         """Called when the system or user changes the size of the window."""
 
-    def ev_windowminimized(
-        self, event: "tcod.event.WindowEvent"
-    ) -> Optional[T]:
+    def ev_windowminimized(self, event: "tcod.event.WindowEvent") -> Optional[T]:
         """Called when the window is minimized."""
 
-    def ev_windowmaximized(
-        self, event: "tcod.event.WindowEvent"
-    ) -> Optional[T]:
+    def ev_windowmaximized(self, event: "tcod.event.WindowEvent") -> Optional[T]:
         """Called when the window is maximized."""
 
-    def ev_windowrestored(
-        self, event: "tcod.event.WindowEvent"
-    ) -> Optional[T]:
+    def ev_windowrestored(self, event: "tcod.event.WindowEvent") -> Optional[T]:
         """Called when the window is restored."""
 
     def ev_windowenter(self, event: "tcod.event.WindowEvent") -> Optional[T]:
@@ -1046,22 +993,16 @@ class EventDispatch(Generic[T]):
     def ev_windowleave(self, event: "tcod.event.WindowEvent") -> Optional[T]:
         """Called when the window loses mouse focus."""
 
-    def ev_windowfocusgained(
-        self, event: "tcod.event.WindowEvent"
-    ) -> Optional[T]:
+    def ev_windowfocusgained(self, event: "tcod.event.WindowEvent") -> Optional[T]:
         """Called when the window gains keyboard focus."""
 
-    def ev_windowfocuslost(
-        self, event: "tcod.event.WindowEvent"
-    ) -> Optional[T]:
+    def ev_windowfocuslost(self, event: "tcod.event.WindowEvent") -> Optional[T]:
         """Called when the window loses keyboard focus."""
 
     def ev_windowclose(self, event: "tcod.event.WindowEvent") -> Optional[T]:
         """Called when the window manager requests the window to be closed."""
 
-    def ev_windowtakefocus(
-        self, event: "tcod.event.WindowEvent"
-    ) -> Optional[T]:
+    def ev_windowtakefocus(self, event: "tcod.event.WindowEvent") -> Optional[T]:
         pass
 
     def ev_windowhittest(self, event: "tcod.event.WindowEvent") -> Optional[T]:
@@ -1111,9 +1052,7 @@ def get_keyboard_state() -> np.ndarray:
     """
     numkeys = ffi.new("int[1]")
     keyboard_state = lib.SDL_GetKeyboardState(numkeys)
-    out: np.ndarray = np.frombuffer(
-        ffi.buffer(keyboard_state[0 : numkeys[0]]), dtype=bool
-    )
+    out: np.ndarray = np.frombuffer(ffi.buffer(keyboard_state[0 : numkeys[0]]), dtype=bool)
     out.flags["WRITEABLE"] = False  # This buffer is supposed to be const.
     return out
 
@@ -1662,8 +1601,7 @@ class Scancode(enum.IntEnum):
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, KeySym):
             raise TypeError(
-                "Scancode and KeySym enums can not be compared directly."
-                " Convert one or the other to the same type."
+                "Scancode and KeySym enums can not be compared directly." " Convert one or the other to the same type."
             )
         return super().__eq__(other)
 
@@ -2177,9 +2115,7 @@ class KeySym(enum.IntEnum):
             >>> tcod.event.KeySym.BACKSPACE.label
             'Backspace'
         """
-        return str(
-            ffi.string(lib.SDL_GetKeyName(self.value)), encoding="utf-8"
-        )
+        return str(ffi.string(lib.SDL_GetKeyName(self.value)), encoding="utf-8")
 
     @property
     def keysym(self) -> "KeySym":
@@ -2204,8 +2140,7 @@ class KeySym(enum.IntEnum):
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, Scancode):
             raise TypeError(
-                "Scancode and KeySym enums can not be compared directly."
-                " Convert one or the other to the same type."
+                "Scancode and KeySym enums can not be compared directly." " Convert one or the other to the same type."
             )
         return super().__eq__(other)
 

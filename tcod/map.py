@@ -138,22 +138,17 @@ class Map(object):
         if not (0 <= x < self.width and 0 <= y < self.height):
             warnings.warn(
                 "Index (%r, %r) is outside of this maps shape (%r, %r)."
-                "\nThis will raise an error in future versions."
-                % (x, y, self.width, self.height),
+                "\nThis will raise an error in future versions." % (x, y, self.width, self.height),
                 RuntimeWarning,
                 stacklevel=2,
             )
 
-        lib.TCOD_map_compute_fov(
-            self.map_c, x, y, radius, light_walls, algorithm
-        )
+        lib.TCOD_map_compute_fov(self.map_c, x, y, radius, light_walls, algorithm)
 
     def __setstate__(self, state: Any) -> None:
         if "_Map__buffer" not in state:  # deprecated
             # remove this check on major version update
-            self.__buffer = np.zeros(
-                (state["height"], state["width"], 3), dtype=np.bool_
-            )
+            self.__buffer = np.zeros((state["height"], state["width"], 3), dtype=np.bool_)
             self.__buffer[:, :, 0] = state["buffer"] & 0x01
             self.__buffer[:, :, 1] = state["buffer"] & 0x02
             self.__buffer[:, :, 2] = state["buffer"] & 0x04
@@ -240,23 +235,16 @@ def compute_fov(
     """
     transparency = np.asarray(transparency)
     if len(transparency.shape) != 2:
-        raise TypeError(
-            "transparency must be an array of 2 dimensions"
-            " (shape is %r)" % transparency.shape
-        )
+        raise TypeError("transparency must be an array of 2 dimensions" " (shape is %r)" % transparency.shape)
     if isinstance(pov, int):
         raise TypeError(
             "The tcod.map.compute_fov function has changed.  The `x` and `y`"
             " parameters should now be given as a single tuple."
         )
-    if not (
-        0 <= pov[0] < transparency.shape[0]
-        and 0 <= pov[1] < transparency.shape[1]
-    ):
+    if not (0 <= pov[0] < transparency.shape[0] and 0 <= pov[1] < transparency.shape[1]):
         warnings.warn(
             "Given pov index %r is outside the array of shape %r."
-            "\nThis will raise an error in future versions."
-            % (pov, transparency.shape),
+            "\nThis will raise an error in future versions." % (pov, transparency.shape),
             RuntimeWarning,
             stacklevel=2,
         )
@@ -274,7 +262,5 @@ def compute_fov(
         ),
     )
     map_buffer["transparent"] = transparency
-    lib.TCOD_map_compute_fov(
-        map_cdata, pov[1], pov[0], radius, light_walls, algorithm
-    )
+    lib.TCOD_map_compute_fov(map_cdata, pov[1], pov[0], radius, light_walls, algorithm)
     return map_buffer["fov"]  # type: ignore

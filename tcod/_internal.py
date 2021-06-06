@@ -13,9 +13,7 @@ FuncType = Callable[..., Any]
 F = TypeVar("F", bound=FuncType)
 
 
-def deprecate(
-    message: str, category: Any = DeprecationWarning, stacklevel: int = 0
-) -> Callable[[F], F]:
+def deprecate(message: str, category: Any = DeprecationWarning, stacklevel: int = 0) -> Callable[[F], F]:
     """Return a decorator which adds a warning to functions."""
 
     def decorator(func: F) -> F:
@@ -104,10 +102,7 @@ def _bytes(string: AnyStr) -> bytes:
 def _unicode(string: AnyStr, stacklevel: int = 2) -> str:
     if isinstance(string, bytes):
         warnings.warn(
-            (
-                "Passing byte strings as parameters to Unicode functions is "
-                "deprecated."
-            ),
+            ("Passing byte strings as parameters to Unicode functions is " "deprecated."),
             DeprecationWarning,
             stacklevel=stacklevel + 1,
         )
@@ -118,10 +113,7 @@ def _unicode(string: AnyStr, stacklevel: int = 2) -> str:
 def _fmt(string: str, stacklevel: int = 2) -> bytes:
     if isinstance(string, bytes):
         warnings.warn(
-            (
-                "Passing byte strings as parameters to Unicode functions is "
-                "deprecated."
-            ),
+            ("Passing byte strings as parameters to Unicode functions is " "deprecated."),
             DeprecationWarning,
             stacklevel=stacklevel + 1,
         )
@@ -234,10 +226,7 @@ class TempImage(object):
         self._array = np.ascontiguousarray(array, dtype=np.uint8)
         height, width, depth = self._array.shape
         if depth != 3:
-            raise TypeError(
-                "Array must have RGB channels.  Shape is: %r"
-                % (self._array.shape,)
-            )
+            raise TypeError("Array must have RGB channels.  Shape is: %r" % (self._array.shape,))
         self._buffer = ffi.from_buffer("TCOD_color_t[]", self._array)
         self._mipmaps = ffi.new(
             "struct TCOD_mipmap_*",

@@ -29,9 +29,7 @@ class Image(object):
 
     def __init__(self, width: int, height: int):
         self.width, self.height = width, height
-        self.image_c = ffi.gc(
-            lib.TCOD_image_new(width, height), lib.TCOD_image_delete
-        )
+        self.image_c = ffi.gc(lib.TCOD_image_new(width, height), lib.TCOD_image_delete)
 
     @classmethod
     def _from_cdata(cls, cdata: Any) -> "Image":
@@ -160,9 +158,7 @@ class Image(object):
         color = lib.TCOD_image_get_pixel(self.image_c, x, y)
         return color.r, color.g, color.b
 
-    def get_mipmap_pixel(
-        self, left: float, top: float, right: float, bottom: float
-    ) -> Tuple[int, int, int]:
+    def get_mipmap_pixel(self, left: float, top: float, right: float, bottom: float) -> Tuple[int, int, int]:
         """Get the average color of a rectangle in this Image.
 
         Parameters should stay within the following limits:
@@ -180,9 +176,7 @@ class Image(object):
                 An (r, g, b) tuple containing the averaged color value.
                 Values are in a 0 to 255 range.
         """
-        color = lib.TCOD_image_get_mipmap_pixel(
-            self.image_c, left, top, right, bottom
-        )
+        color = lib.TCOD_image_get_mipmap_pixel(self.image_c, left, top, right, bottom)
         return (color.r, color.g, color.b)
 
     def put_pixel(self, x: int, y: int, color: Tuple[int, int, int]) -> None:
@@ -250,9 +244,7 @@ class Image(object):
             height (int): Use -1 for Image height.
             bg_blend (int): Background blending mode to use.
         """
-        lib.TCOD_image_blit_rect(
-            self.image_c, _console(console), x, y, width, height, bg_blend
-        )
+        lib.TCOD_image_blit_rect(self.image_c, _console(console), x, y, width, height, bg_blend)
 
     def blit_2x(
         self,
@@ -346,9 +338,7 @@ def load(filename: str) -> np.ndarray:
 
     .. versionadded:: 11.4
     """
-    image = Image._from_cdata(
-        ffi.gc(lib.TCOD_image_load(filename.encode()), lib.TCOD_image_delete)
-    )
+    image = Image._from_cdata(ffi.gc(lib.TCOD_image_load(filename.encode()), lib.TCOD_image_delete))
     array = np.asarray(image, dtype=np.uint8)
     height, width, depth = array.shape
     if depth == 3:

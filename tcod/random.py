@@ -120,9 +120,7 @@ class Random(object):
         Returns:
             float: A random float.
         """
-        return float(
-            lib.TCOD_random_get_gaussian_double(self.random_c, mu, sigma)
-        )
+        return float(lib.TCOD_random_get_gaussian_double(self.random_c, mu, sigma))
 
     def inverse_guass(self, mu: float, sigma: float) -> float:
         """Return a random Gaussian number using the Box-Muller transform.
@@ -134,9 +132,7 @@ class Random(object):
         Returns:
             float: A random float.
         """
-        return float(
-            lib.TCOD_random_get_gaussian_double_inv(self.random_c, mu, sigma)
-        )
+        return float(lib.TCOD_random_get_gaussian_double_inv(self.random_c, mu, sigma))
 
     def __getstate__(self) -> Any:
         """Pack the self.random_c attribute into a portable state."""

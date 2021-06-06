@@ -22,11 +22,7 @@ typedef struct TDLNoise {
 float NoiseGetSample(TDLNoise* noise, float* __restrict xyzw);
 
 /* Fill `out` with samples derived from the  mesh-grid `in`. */
-void NoiseSampleMeshGrid(
-    TDLNoise* noise,
-    const long len,
-    const float* __restrict in,
-    float* __restrict out);
+void NoiseSampleMeshGrid(TDLNoise* noise, const long len, const float* __restrict in, float* __restrict out);
 
 /* Fill `out` with samples derived from the open mesh-grid `in`. */
 void NoiseSampleOpenMeshGrid(

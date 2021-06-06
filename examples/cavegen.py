@@ -19,9 +19,7 @@ def convolve(tiles: np.ndarray, wall_rule: int = 5) -> np.ndarray:
     walls then the tile will become a wall.
     """
     # Use convolve2d, the 2nd input is a 3x3 ones array.
-    neighbors: np.ndarray = scipy.signal.convolve2d(
-        tiles == 0, [[1, 1, 1], [1, 1, 1], [1, 1, 1]], "same"
-    )
+    neighbors: np.ndarray = scipy.signal.convolve2d(tiles == 0, [[1, 1, 1], [1, 1, 1], [1, 1, 1]], "same")
     next_tiles: np.ndarray = neighbors < wall_rule  # Apply the wall rule.
     return next_tiles
 

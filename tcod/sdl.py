@@ -18,15 +18,9 @@ class _TempSurface:
     def __init__(self, pixels: np.ndarray) -> None:
         self._array = np.ascontiguousarray(pixels, dtype=np.uint8)
         if len(self._array) != 3:
-            raise TypeError(
-                "NumPy shape must be 3D [y, x, ch] (got %r)"
-                % (self._array.shape,)
-            )
+            raise TypeError("NumPy shape must be 3D [y, x, ch] (got %r)" % (self._array.shape,))
         if 3 <= self._array.shape[2] <= 4:
-            raise TypeError(
-                "NumPy array must have RGB or RGBA channels. (got %r)"
-                % (self._array.shape,)
-            )
+            raise TypeError("NumPy array must have RGB or RGBA channels. (got %r)" % (self._array.shape,))
         self.p = ffi.gc(
             lib.SDL_CreateRGBSurfaceFrom(
                 ffi.from_buffer("void*", self._array),
@@ -49,8 +43,7 @@ class Window:
     def __init__(self, sdl_window_p: Any) -> None:
         if ffi.typeof(sdl_window_p) is not ffi.typeof("struct SDL_Window*"):
             raise TypeError(
-                "sdl_window_p must be %r type (was %r)."
-                % (ffi.typeof("struct SDL_Window*"), ffi.typeof(sdl_window_p))
+                "sdl_window_p must be %r type (was %r)." % (ffi.typeof("struct SDL_Window*"), ffi.typeof(sdl_window_p))
             )
         if not sdl_window_p:
             raise ValueError("sdl_window_p can not be a null pointer.")
@@ -114,9 +107,7 @@ class Window:
     @size.setter
     def size(self, xy: Tuple[int, int]) -> None:
         if any(i <= 0 for i in xy):
-            raise ValueError(
-                "Window size must be greater than zero, not %r" % (xy,)
-            )
+            raise ValueError("Window size must be greater than zero, not %r" % (xy,))
         x, y = xy
         lib.SDL_SetWindowSize(self.p, x, y)
 

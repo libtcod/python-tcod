@@ -85,9 +85,7 @@ class BSP(object):
 
     def _as_cdata(self) -> Any:
         cdata = ffi.gc(
-            lib.TCOD_bsp_new_with_size(
-                self.x, self.y, self.width, self.height
-            ),
+            lib.TCOD_bsp_new_with_size(self.x, self.y, self.width, self.height),
             lib.TCOD_bsp_delete,
         )
         cdata.level = self.level
@@ -252,10 +250,7 @@ class BSP(object):
             bool: True if this node contains these coordinates.
                   Otherwise False.
         """
-        return (
-            self.x <= x < self.x + self.width
-            and self.y <= y < self.y + self.height
-        )
+        return self.x <= x < self.x + self.width and self.y <= y < self.y + self.height
 
     def find_node(self, x: int, y: int) -> Optional["BSP"]:
         """Return the deepest node which contains these coordinates.

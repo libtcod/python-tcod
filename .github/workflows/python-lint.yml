@@ -32,18 +32,18 @@ jobs:
       uses: liskin/gh-problem-matcher-wrap@v1
       with:
         linters: flake8
-        run: flake8 tcod/
+        run: flake8 scripts/ tcod/
     - name: MyPy
       if: always()
       uses: liskin/gh-problem-matcher-wrap@v1
       with:
         linters: mypy
-        run: mypy --show-column-numbers tcod/
+        run: mypy --show-column-numbers scripts/ tcod/
     - name: isort
       uses: liskin/gh-problem-matcher-wrap@v1
       with:
         linters: isort
-        run: isort tcod/ tests/ --check
+        run: isort scripts/ tcod/ tests/ *.py --check
     - name: isort (examples)
       uses: liskin/gh-problem-matcher-wrap@v1
       with:
@@ -51,4 +51,4 @@ jobs:
         run: isort examples/ --check --thirdparty tcod
     - name: Black
       run: |
-        black --check tcod/
+        black --check examples/ scripts/ tcod/  tests/ *.py

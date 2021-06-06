@@ -8,7 +8,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.black]
-line-length = 79
+line-length = 120
 py36 = true
 target-version = ["py36"]
 
@@ -16,4 +16,4 @@ target-version = ["py36"]
 profile= "black"
 py_version = "36"
 skip_gitignore = true
-line_length = 79
+line_length = 120

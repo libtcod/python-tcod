@@ -9,36 +9,28 @@
 #include "../libtcod/src/libtcod/pathfinder_frontier.h"
 #include "../libtcod/src/libtcod/utility.h"
 
-static void* pick_array_pointer(
-    const struct PathCostArray* map, int i, int j) {
+static void* pick_array_pointer(const struct PathCostArray* map, int i, int j) {
   return (void*)(map->array + map->strides[0] * i + map->strides[1] * j);
 }
-float PathCostArrayFloat32(
-    int x1, int y1, int x2, int y2, const struct PathCostArray* map) {
+float PathCostArrayFloat32(int x1, int y1, int x2, int y2, const struct PathCostArray* map) {
   return *(float*)pick_array_pointer(map, x2, y2);
 }
-float PathCostArrayInt8(
-    int x1, int y1, int x2, int y2, const struct PathCostArray* map) {
+float PathCostArrayInt8(int x1, int y1, int x2, int y2, const struct PathCostArray* map) {
   return *(int8_t*)pick_array_pointer(map, x2, y2);
 }
-float PathCostArrayInt16(
-    int x1, int y1, int x2, int y2, const struct PathCostArray* map) {
+float PathCostArrayInt16(int x1, int y1, int x2, int y2, const struct PathCostArray* map) {
   return *(int16_t*)pick_array_pointer(map, x2, y2);
 }
-float PathCostArrayInt32(
-    int x1, int y1, int x2, int y2, const struct PathCostArray* map) {
+float PathCostArrayInt32(int x1, int y1, int x2, int y2, const struct PathCostArray* map) {
   return (float)(*(int32_t*)pick_array_pointer(map, x2, y2));
 }
-float PathCostArrayUInt8(
-    int x1, int y1, int x2, int y2, const struct PathCostArray* map) {
+float PathCostArrayUInt8(int x1, int y1, int x2, int y2, const struct PathCostArray* map) {
   return *(uint8_t*)pick_array_pointer(map, x2, y2);
 }
-float PathCostArrayUInt16(
-    int x1, int y1, int x2, int y2, const struct PathCostArray* map) {
+float PathCostArrayUInt16(int x1, int y1, int x2, int y2, const struct PathCostArray* map) {
   return *(uint16_t*)pick_array_pointer(map, x2, y2);
 }
-float PathCostArrayUInt32(
-    int x1, int y1, int x2, int y2, const struct PathCostArray* map) {
+float PathCostArrayUInt32(int x1, int y1, int x2, int y2, const struct PathCostArray* map) {
   return (float)(*(uint32_t*)pick_array_pointer(map, x2, y2));
 }
 
@@ -56,8 +48,7 @@ static void* get_array_ptr(const struct NArray* arr, int n, const int* index) {
   for (int i = 0; i < n; ++i) { ptr += arr->strides[i] * index[i]; }
   return (void*)ptr;
 }
-static int64_t get_array_int64(
-    const struct NArray* arr, int n, const int* index) {
+static int64_t get_array_int64(const struct NArray* arr, int n, const int* index) {
   const void* ptr = get_array_ptr(arr, n, index);
   switch (arr->type) {
     case np_int8:
@@ -83,11 +74,7 @@ static int64_t get_array_int64(
 static int get_array_int(const struct NArray* arr, int n, const int* index) {
   return (int)get_array_int64(arr, n, index);
 }
-static void set_array_int64(
-    struct NArray* __restrict arr,
-    int n,
-    const int* __restrict index,
-    int64_t value) {
+static void set_array_int64(struct NArray* __restrict arr, int n, const int* __restrict index, int64_t value) {
   void* ptr = get_array_ptr(arr, n, index);
   switch (arr->type) {
     case np_int8:
@@ -118,21 +105,17 @@ static void set_array_int64(
       return;
   }
 }
-static void set_array2d_int64(
-    struct NArray* __restrict arr, int i, int j, int64_t value) {
+static void set_array2d_int64(struct NArray* __restrict arr, int i, int j, int64_t value) {
   int index[2] = {i, j};
   set_array_int64(arr, 2, index, value);
 }
-static void set_array_int(
-    struct NArray* __restrict arr, int n, const int* index, int value) {
+static void set_array_int(struct NArray* __restrict arr, int n, const int* index, int value) {
   set_array_int64(arr, n, index, value);
 }
-static void set_array2d_int(
-    struct NArray* __restrict arr, int i, int j, int value) {
+static void set_array2d_int(struct NArray* __restrict arr, int i, int j, int value) {
   set_array2d_int64(arr, i, j, value);
 }
-static int64_t get_array_is_max(
-    const struct NArray* arr, int n, const int* index) {
+static int64_t get_array_is_max(const struct NArray* arr, int n, const int* index) {
   const void* ptr = get_array_ptr(arr, n, index);
   switch (arr->type) {
     case np_int8:
@@ -166,8 +149,7 @@ static void dijkstra2d_add_edge(
     int edge_cost,
     const int* __restrict dir  // dir[2]
 ) {
-  const int index[2] = {
-      frontier->active_index[0] + dir[0], frontier->active_index[1] + dir[1]};
+  const int index[2] = {frontier->active_index[0] + dir[0], frontier->active_index[1] + dir[1]};
   if (!array_in_range(dist_array, 2, index)) { return; }
   edge_cost *= get_array_int(cost, 2, index);
   if (edge_cost <= 0) { return; }
@@ -197,18 +179,14 @@ int dijkstra2d(
     int distance_here = get_array_int(dist_array, 2, frontier->active_index);
     if (frontier->active_dist != distance_here) { continue; }
     for (int i = 0; i < edges_2d_n; ++i) {
-      dijkstra2d_add_edge(
-          frontier, dist_array, cost, edges_2d[i * 3 + 2], &edges_2d[i * 3]);
+      dijkstra2d_add_edge(frontier, dist_array, cost, edges_2d[i * 3 + 2], &edges_2d[i * 3]);
     }
   }
   return TCOD_E_OK;
 }
 
 int dijkstra2d_basic(
-    struct NArray* __restrict dist_array,
-    const struct NArray* __restrict cost,
-    int cardinal,
-    int diagonal) {
+    struct NArray* __restrict dist_array, const struct NArray* __restrict cost, int cardinal, int diagonal) {
   struct TCOD_Frontier* frontier = TCOD_frontier_new(2);
   if (!frontier) { return TCOD_E_ERROR; }
   for (int i = 0; i < dist_array->shape[0]; ++i) {
@@ -274,8 +252,7 @@ int hillclimb2d(
     }
     const int origin[2] = {next[0], next[1]};
     for (int i = 0; i < edges_2d_n; ++i) {
-      hillclimb2d_check_edge(
-          dist_array, &new_dist, origin, &edges_2d[i * 2], next);
+      hillclimb2d_check_edge(dist_array, &new_dist, origin, &edges_2d[i * 2], next);
     }
     if (old_dist == new_dist) { return length; }
     old_dist = new_dist;
@@ -301,33 +278,22 @@ int hillclimb2d_basic(
     }
     const int origin[2] = {next[0], next[1]};
     if (cardinal) {
-      hillclimb2d_check_edge(
-          dist_array, &new_dist, origin, CARDINAL_[0], next);
-      hillclimb2d_check_edge(
-          dist_array, &new_dist, origin, CARDINAL_[1], next);
-      hillclimb2d_check_edge(
-          dist_array, &new_dist, origin, CARDINAL_[2], next);
-      hillclimb2d_check_edge(
-          dist_array, &new_dist, origin, CARDINAL_[3], next);
+      hillclimb2d_check_edge(dist_array, &new_dist, origin, CARDINAL_[0], next);
+      hillclimb2d_check_edge(dist_array, &new_dist, origin, CARDINAL_[1], next);
+      hillclimb2d_check_edge(dist_array, &new_dist, origin, CARDINAL_[2], next);
+      hillclimb2d_check_edge(dist_array, &new_dist, origin, CARDINAL_[3], next);
     }
     if (diagonal) {
-      hillclimb2d_check_edge(
-          dist_array, &new_dist, origin, DIAGONAL_[0], next);
-      hillclimb2d_check_edge(
-          dist_array, &new_dist, origin, DIAGONAL_[1], next);
-      hillclimb2d_check_edge(
-          dist_array, &new_dist, origin, DIAGONAL_[2], next);
-      hillclimb2d_check_edge(
-          dist_array, &new_dist, origin, DIAGONAL_[3], next);
+      hillclimb2d_check_edge(dist_array, &new_dist, origin, DIAGONAL_[0], next);
+      hillclimb2d_check_edge(dist_array, &new_dist, origin, DIAGONAL_[1], next);
+      hillclimb2d_check_edge(dist_array, &new_dist, origin, DIAGONAL_[2], next);
+      hillclimb2d_check_edge(dist_array, &new_dist, origin, DIAGONAL_[3], next);
     }
     if (old_dist == new_dist) { return length; }
     old_dist = new_dist;
   }
 }
-int compute_heuristic(
-    const struct PathfinderHeuristic* __restrict heuristic,
-    int ndim,
-    const int* __restrict index) {
+int compute_heuristic(const struct PathfinderHeuristic* __restrict heuristic, int ndim, const int* __restrict index) {
   if (!heuristic) { return 0; }
   int x = 0;
   int y = 0;
@@ -351,9 +317,7 @@ int compute_heuristic(
   }
   int diagonal = heuristic->diagonal != 0 ? MIN(x, y) : 0;
   int straight = MAX(x, y) - diagonal;
-  return (
-      straight * heuristic->cardinal + diagonal * heuristic->diagonal +
-      w * heuristic->w + z * heuristic->z);
+  return (straight * heuristic->cardinal + diagonal * heuristic->diagonal + w * heuristic->w + z * heuristic->z);
 }
 void path_compute_add_edge(
     struct TCOD_Frontier* __restrict frontier,
@@ -363,9 +327,7 @@ void path_compute_add_edge(
     const int* __restrict edge_rule,
     const struct PathfinderHeuristic* __restrict heuristic) {
   int dest[TCOD_PATHFINDER_MAX_DIMENSIONS];
-  for (int i = 0; i < frontier->ndim; ++i) {
-    dest[i] = frontier->active_index[i] + edge_rule[i];
-  }
+  for (int i = 0; i < frontier->ndim; ++i) { dest[i] = frontier->active_index[i] + edge_rule[i]; }
   if (!array_in_range(dist_map, frontier->ndim, dest)) { return; }
   int edge_cost = edge_rule[frontier->ndim];
   edge_cost *= get_array_int(cost_map, frontier->ndim, dest);
@@ -374,9 +336,7 @@ void path_compute_add_edge(
   if (get_array_int(dist_map, frontier->ndim, dest) <= distance) { return; }
   set_array_int(dist_map, frontier->ndim, dest, distance);
   int* path = get_array_ptr(travel_map, frontier->ndim, dest);
-  for (int i = 0; i < frontier->ndim; ++i) {
-    path[i] = frontier->active_index[i];
-  }
+  for (int i = 0; i < frontier->ndim; ++i) { path[i] = frontier->active_index[i]; }
   int priority = distance + compute_heuristic(heuristic, frontier->ndim, dest);
   TCOD_frontier_push(frontier, dest, distance, priority);
 }
@@ -384,8 +344,7 @@ void path_compute_add_edge(
     Returns true if the heuristic target has been reached by the active_node.
  */
 static bool path_compute_at_goal(
-    const struct TCOD_Frontier* __restrict frontier,
-    const struct PathfinderHeuristic* __restrict heuristic) {
+    const struct TCOD_Frontier* __restrict frontier, const struct PathfinderHeuristic* __restrict heuristic) {
   if (!heuristic) { return 0; }
   for (int i = 0; i < frontier->ndim; ++i) {
     if (frontier->active_index[i] != heuristic->target[i]) { return 0; }
@@ -404,19 +363,12 @@ int path_compute_step(
     return TCOD_set_errorv("Invalid frontier->ndim.");
   }
   if (!dist_map) { return TCOD_set_errorv("Missing dist_map."); }
-  if (frontier->ndim != dist_map->ndim) {
-    return TCOD_set_errorv("Invalid or corrupt input.");
-  }
-  if (travel_map && frontier->ndim + 1 != travel_map->ndim) {
-    return TCOD_set_errorv("Invalid or corrupt input.");
-  }
+  if (frontier->ndim != dist_map->ndim) { return TCOD_set_errorv("Invalid or corrupt input."); }
+  if (travel_map && frontier->ndim + 1 != travel_map->ndim) { return TCOD_set_errorv("Invalid or corrupt input."); }
   TCOD_frontier_pop(frontier);
   for (int i = 0; i < n; ++i) {
     if (rules[i].condition.type) {
-      if (!get_array_int(
-              &rules[i].condition, frontier->ndim, frontier->active_index)) {
-        continue;
-      }
+      if (!get_array_int(&rules[i].condition, frontier->ndim, frontier->active_index)) { continue; }
     }
     for (int edge_i = 0; edge_i < rules[i].edge_count; ++edge_i) {
       path_compute_add_edge(
@@ -442,25 +394,17 @@ int path_compute(
     const struct PathfinderHeuristic* __restrict heuristic) {
   if (!frontier) { return TCOD_set_errorv("Missing frontier."); }
   while (TCOD_frontier_size(frontier)) {
-    int err =
-        path_compute_step(frontier, dist_map, travel_map, n, rules, heuristic);
+    int err = path_compute_step(frontier, dist_map, travel_map, n, rules, heuristic);
     if (err != 0) { return err; }
   }
   return 0;
 }
 ptrdiff_t get_travel_path(
-    int8_t ndim,
-    const struct NArray* __restrict travel_map,
-    const int* __restrict start,
-    int* __restrict out) {
-  if (ndim <= 0 || ndim > TCOD_PATHFINDER_MAX_DIMENSIONS) {
-    return TCOD_set_errorv("Invalid ndim.");
-  }
+    int8_t ndim, const struct NArray* __restrict travel_map, const int* __restrict start, int* __restrict out) {
+  if (ndim <= 0 || ndim > TCOD_PATHFINDER_MAX_DIMENSIONS) { return TCOD_set_errorv("Invalid ndim."); }
   if (!travel_map) { return TCOD_set_errorv("Missing travel_map."); }
   if (!start) { return TCOD_set_errorv("Missing start."); }
-  if (ndim != travel_map->ndim - 1) {
-    return TCOD_set_errorv("Invalid or corrupt input.");
-  }
+  if (ndim != travel_map->ndim - 1) { return TCOD_set_errorv("Invalid or corrupt input."); }
   const int* next = get_array_ptr(travel_map, ndim, start);
   const int* current = start;
   ptrdiff_t max_loops = 1;
@@ -478,51 +422,33 @@ ptrdiff_t get_travel_path(
         case 1:
           return TCOD_set_errorvf("Index (%i) is out of range.", next[0]);
         case 2:
-          return TCOD_set_errorvf(
-              "Index (%i, %i) is out of range.", next[0], next[1]);
+          return TCOD_set_errorvf("Index (%i, %i) is out of range.", next[0], next[1]);
         case 3:
-          return TCOD_set_errorvf(
-              "Index (%i, %i, %i) is out of range.",
-              next[0],
-              next[1],
-              next[2]);
+          return TCOD_set_errorvf("Index (%i, %i, %i) is out of range.", next[0], next[1], next[2]);
         case 4:
-          return TCOD_set_errorvf(
-              "Index (%i, %i, %i, %i) is out of range.",
-              next[0],
-              next[1],
-              next[2],
-              next[3]);
+          return TCOD_set_errorvf("Index (%i, %i, %i, %i) is out of range.", next[0], next[1], next[2], next[3]);
       }
     }
     next = get_array_ptr(travel_map, ndim, next);
-    if (!out && length == max_loops) {
-      return TCOD_set_errorv("Possible cyclic loop detected.");
-    }
+    if (!out && length == max_loops) { return TCOD_set_errorv("Possible cyclic loop detected."); }
   }
   return length;
 }
 int update_frontier_heuristic(
-    struct TCOD_Frontier* __restrict frontier,
-    const struct PathfinderHeuristic* __restrict heuristic) {
+    struct TCOD_Frontier* __restrict frontier, const struct PathfinderHeuristic* __restrict heuristic) {
   if (!frontier) { return TCOD_set_errorv("Missing frontier."); }
   for (int i = 0; i < frontier->heap.size; ++i) {
     unsigned char* heap_ptr = (unsigned char*)frontier->heap.heap;
     heap_ptr += frontier->heap.node_size * i;
     struct TCOD_HeapNode* heap_node = (void*)heap_ptr;
     struct FrontierNode* fnode = (struct FrontierNode*)heap_node->data;
-    heap_node->priority =
-        (fnode->distance +
-         compute_heuristic(heuristic, frontier->ndim, fnode->index));
+    heap_node->priority = (fnode->distance + compute_heuristic(heuristic, frontier->ndim, fnode->index));
   }
   TCOD_minheap_heapify(&frontier->heap);
   return 0;
 }
 static int update_frontier_from_distance_iterator(
-    struct TCOD_Frontier* __restrict frontier,
-    const struct NArray* __restrict dist_map,
-    int dimension,
-    int* index) {
+    struct TCOD_Frontier* __restrict frontier, const struct NArray* __restrict dist_map, int dimension, int* index) {
   if (dimension == frontier->ndim) {
     if (get_array_is_max(dist_map, dimension, index)) { return 0; }
     int dist = get_array_int(dist_map, dimension, index);
@@ -530,15 +456,13 @@ static int update_frontier_from_distance_iterator(
   }
   for (int i = 0; i < dist_map->shape[dimension];) {
     index[dimension] = i;
-    int err = update_frontier_from_distance_iterator(
-        frontier, dist_map, dimension + 1, index);
+    int err = update_frontier_from_distance_iterator(frontier, dist_map, dimension + 1, index);
     if (err) { return err; }
   }
   return 0;
 }
 int rebuild_frontier_from_distance(
-    struct TCOD_Frontier* __restrict frontier,
-    const struct NArray* __restrict dist_map) {
+    struct TCOD_Frontier* __restrict frontier, const struct NArray* __restrict dist_map) {
   if (!frontier) { return TCOD_set_errorv("Missing frontier."); }
   if (!dist_map) { return TCOD_set_errorv("Missing dist_map."); }
   TCOD_frontier_clear(frontier);
