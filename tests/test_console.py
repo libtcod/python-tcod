@@ -102,8 +102,9 @@ def test_console_repr() -> None:
 @pytest.mark.filterwarnings("ignore")
 def test_console_str() -> None:
     console = tcod.console.Console(10, 2)
+    console.ch[:] = ord(".")
     console.print_(0, 0, "Test")
-    assert str(console) == ("<Test      |\n" "|          >")
+    assert str(console) == ("<Test......\n" " ..........>")
 
 
 def test_console_fortran_buffer() -> None:
@@ -142,3 +143,15 @@ def test_rexpaint(tmp_path: Path) -> None:
     assert consoles[1].rgb.shape == loaded[1].rgb.shape
     with pytest.raises(FileNotFoundError):
         tcod.console.load_xp(tmp_path / "non_existant")
+
+
+def test_draw_frame() -> None:
+    console = tcod.Console(3, 3, order="C")
+    with pytest.raises(TypeError):
+        console.draw_frame(0, 0, 3, 3, title="test", decoration="123456789")
+    with pytest.raises(TypeError):
+        console.draw_frame(0, 0, 3, 3, decoration="0123456789")
+
+    console.draw_frame(0, 0, 3, 3, decoration=(49, 50, 51, 52, 53, 54, 55, 56, 57))
+    assert console.ch.tolist() == [[49, 50, 51], [52, 53, 54], [55, 56, 57]]
+    console.draw_frame(0, 0, 3, 3, title="T")

@@ -79,13 +79,13 @@ class Console:
                 ...     dtype=tcod.console.Console.DTYPE,
                 ...     order="F",
                 ... )
-                >>> buffer["ch"] = ord(' ')
+                >>> buffer["ch"] = ord('_')
                 >>> buffer["ch"][:, 1] = ord('x')
                 >>> c = tcod.console.Console(20, 3, order="F", buffer=buffer)
                 >>> print(c)
-                <                    |
-                |xxxxxxxxxxxxxxxxxxxx|
-                |                    >
+                <____________________
+                 xxxxxxxxxxxxxxxxxxxx
+                 ____________________>
 
             .. versionadded:: 8.5
 
@@ -920,7 +920,7 @@ class Console:
 
     def __str__(self) -> str:
         """Return a simplified representation of this consoles contents."""
-        return "<%s>" % "|\n|".join("".join(chr(c) for c in line) for line in self._tiles["ch"])
+        return "<%s>" % "\n ".join("".join(chr(c) for c in line) for line in self._tiles["ch"])
 
     def _pythonic_index(self, x: int, y: int) -> Tuple[int, int]:
         if __debug__ and (x < 0 or y < 0):
@@ -1087,6 +1087,26 @@ class Console:
 
         .. versionchanged:: 12.6
             Added `decoration` parameter.
+
+        Example::
+
+            >>> console = tcod.Console(12, 6)
+            >>> console.draw_frame(x=0, y=0, width=3, height=3)
+            >>> console.draw_frame(x=3, y=0, width=3, height=3, decoration="╔═╗║ ║╚═╝")
+            >>> console.draw_frame(x=6, y=0, width=3, height=3, decoration="123456789")
+            >>> console.draw_frame(x=9, y=0, width=3, height=3, decoration="/-\\| |\\-/")
+            >>> console.draw_frame(x=0, y=3, width=12, height=3)
+            >>> console.print_box(x=0, y=3, width=12, height=1, string=" Title ", alignment=tcod.CENTER)
+            1
+            >>> console.print_box(x=0, y=5, width=12, height=1, string="┤Lower├", alignment=tcod.CENTER)
+            1
+            >>> print(console)
+            <┌─┐╔═╗123/-\\
+             │ │║ ║456| |
+             └─┘╚═╝789\\-/
+             ┌─ Title ──┐
+             │          │
+             └─┤Lower├──┘>
         """
         x, y = self._pythonic_index(x, y)
         if title and decoration != "┌─┐│ │└─┘":
@@ -1121,16 +1141,19 @@ class Console:
             decoration_ = decoration
         if len(decoration_) != 9:
             raise TypeError(f"Decoration must have a length of 9 (len(decoration) is {len(decoration_)}.)")
-        lib.TCOD_console_draw_frame_rgb(
-            x,
-            y,
-            width,
-            height,
-            decoration_,
-            (fg,) if fg is not None else ffi.NULL,
-            (bg,) if bg is not None else ffi.NULL,
-            bg_blend,
-            clear,
+        _check(
+            lib.TCOD_console_draw_frame_rgb(
+                self.console_c,
+                x,
+                y,
+                width,
+                height,
+                decoration_,
+                (fg,) if fg is not None else ffi.NULL,
+                (bg,) if bg is not None else ffi.NULL,
+                bg_blend,
+                clear,
+            )
         )
 
     def draw_rect(
