@@ -8,6 +8,13 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - Added the *decoration* parameter to *Console.draw_frame*.
+   You may use this parameter to designate custom glyphs as the frame border.
+
+Deprecated
+ - The handling of negative indexes given to console drawing and printing
+   functions will be changed to be used as absolute coordinates in the future.
 
 12.5.1 - 2021-05-30
 -------------------

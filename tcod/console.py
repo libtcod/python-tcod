@@ -6,7 +6,7 @@ See :ref:`getting-started` for info on how to set those up.
 import os
 import pathlib
 import warnings
-from typing import Any, Iterable, Optional, Tuple, Union
+from typing import Any, Iterable, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from typing_extensions import Literal
@@ -925,8 +925,9 @@ class Console:
     def _pythonic_index(self, x: int, y: int) -> Tuple[int, int]:
         if __debug__ and (x < 0 or y < 0):
             warnings.warn(
-                "How negative indexes are handled my change in the future.",
-                PendingDeprecationWarning,
+                "Negative indexes will be treated as absolute coordinates instead of relative in the future."
+                "  The current behavior of indexing from the end is deprecated.",
+                FutureWarning,
                 stacklevel=3,
             )
         if x < 0:
@@ -948,9 +949,7 @@ class Console:
         """Print a string on a console with manual line breaks.
 
         `x` and `y` are the starting tile, with ``0,0`` as the upper-left
-        corner of the console.  You can use negative numbers if you want to
-        start printing relative to the bottom-right corner, but this behavior
-        may change in future versions.
+        corner of the console.
 
         `string` is a Unicode string which may include color control
         characters.  Strings which are too long will be truncated until the
@@ -999,9 +998,7 @@ class Console:
         """Print a string constrained to a rectangle and return the height.
 
         `x` and `y` are the starting tile, with ``0,0`` as the upper-left
-        corner of the console.  You can use negative numbers if you want to
-        start printing relative to the bottom-right corner, but this behavior
-        may change in future versions.
+        corner of the console.
 
         `width` and `height` determine the bounds of the rectangle, the text
         will automatically be word-wrapped to fit within these bounds.
@@ -1054,13 +1051,13 @@ class Console:
         fg: Optional[Tuple[int, int, int]] = None,
         bg: Optional[Tuple[int, int, int]] = None,
         bg_blend: int = tcod.constants.BKGND_SET,
+        *,
+        decoration: Union[str, Tuple[int, int, int, int, int, int, int, int, int]] = "┌─┐│ │└─┘",
     ) -> None:
         """Draw a framed rectangle with an optional title.
 
         `x` and `y` are the starting tile, with ``0,0`` as the upper-left
-        corner of the console.  You can use negative numbers if you want to
-        start printing relative to the bottom-right corner, but this behavior
-        may change in future versions.
+        corner of the console.
 
         `width` and `height` determine the size of the frame.
 
@@ -1076,21 +1073,60 @@ class Console:
 
         `bg_blend` is the blend type used by libtcod.
 
+        `decoration` is a sequence of glyphs to use for rendering the borders.
+        This a str or tuple of int's with 9 items with the items arranged in
+        row-major order.
+        If a `decoration` is given then `title` can not be used because the
+        style for `title` is hard-coded.  You can easily print along the upper
+        or lower border of the frame manually.
+
         .. versionadded:: 8.5
 
         .. versionchanged:: 9.0
             `fg` and `bg` now default to `None` instead of white-on-black.
+
+        .. versionchanged:: 12.6
+            Added `decoration` parameter.
         """
         x, y = self._pythonic_index(x, y)
-        title_ = title.encode("utf-8")  # type: bytes
-        lib.TCOD_console_printn_frame(
-            self.console_c,
+        if title and decoration != "┌─┐│ │└─┘":
+            raise TypeError(
+                "The title and decoration parameters are mutually exclusive.  You should print the title manually."
+            )
+        if title:
+            warnings.warn(
+                "The title parameter will be removed in the future since the style is hard-coded.",
+                PendingDeprecationWarning,
+                stacklevel=2,
+            )
+            title_ = title.encode("utf-8")  # type: bytes
+            lib.TCOD_console_printn_frame(
+                self.console_c,
+                x,
+                y,
+                width,
+                height,
+                len(title_),
+                title_,
+                (fg,) if fg is not None else ffi.NULL,
+                (bg,) if bg is not None else ffi.NULL,
+                bg_blend,
+                clear,
+            )
+            return
+        decoration_: Sequence[int]
+        if isinstance(decoration, str):
+            decoration_ = [ord(c) for c in decoration]
+        else:
+            decoration_ = decoration
+        if len(decoration_) != 9:
+            raise TypeError(f"Decoration must have a length of 9 (len(decoration) is {len(decoration_)}.)")
+        lib.TCOD_console_draw_frame_rgb(
             x,
             y,
             width,
             height,
-            len(title_),
-            title_,
+            decoration_,
             (fg,) if fg is not None else ffi.NULL,
             (bg,) if bg is not None else ffi.NULL,
             bg_blend,
@@ -1111,9 +1147,7 @@ class Console:
         """Draw characters and colors over a rectangular region.
 
         `x` and `y` are the starting tile, with ``0,0`` as the upper-left
-        corner of the console.  You can use negative numbers if you want to
-        start printing relative to the bottom-right corner, but this behavior
-        may change in future versions.
+        corner of the console.
 
         `width` and `height` determine the size of the rectangle.
 
