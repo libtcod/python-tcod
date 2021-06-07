@@ -60,12 +60,12 @@ class BSP(object):
         self.width = width
         self.height = height
 
-        self.level = 0  # type: int
-        self.position = 0  # type: int
-        self.horizontal = False  # type: bool
+        self.level = 0
+        self.position = 0
+        self.horizontal = False
 
-        self.parent = None  # type: Optional['BSP']
-        self.children = ()  # type: Union[Tuple[()], Tuple['BSP', 'BSP']]
+        self.parent: Optional["BSP"] = None
+        self.children: Union[Tuple[()], Tuple["BSP", "BSP"]] = ()
 
     @property
     def w(self) -> int:

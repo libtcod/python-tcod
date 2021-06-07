@@ -744,7 +744,7 @@ class PathfindingSample(Sample):
                             sample_console,
                             x,
                             y,
-                            tcod.color_lerp(
+                            tcod.color_lerp(  # type: ignore
                                 LIGHT_GROUND,
                                 DARK_GROUND,
                                 0.9 * tcod.dijkstra_get_distance(self.dijk, x, y) / self.dijk_dist,
@@ -762,12 +762,12 @@ class PathfindingSample(Sample):
             if self.using_astar:
                 if not tcod.path_is_empty(self.path):
                     tcod.console_put_char(sample_console, self.px, self.py, " ", tcod.BKGND_NONE)
-                    self.px, self.py = tcod.path_walk(self.path, True)
+                    self.px, self.py = tcod.path_walk(self.path, True)  # type: ignore
                     tcod.console_put_char(sample_console, self.px, self.py, "@", tcod.BKGND_NONE)
             else:
                 if not tcod.dijkstra_is_empty(self.dijk):
                     tcod.console_put_char(sample_console, self.px, self.py, " ", tcod.BKGND_NONE)
-                    self.px, self.py = tcod.dijkstra_path_walk(self.dijk)
+                    self.px, self.py = tcod.dijkstra_path_walk(self.dijk)  # type: ignore
                     tcod.console_put_char(sample_console, self.px, self.py, "@", tcod.BKGND_NONE)
                     self.recalculate = True
 

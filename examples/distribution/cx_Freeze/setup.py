@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 
-from cx_Freeze import Executable, setup
+from cx_Freeze import Executable, setup  # type: ignore
 
 # cx_Freeze options, see documentation:
 # https://cx-freeze.readthedocs.io/en/latest/distutils.html#build-exe

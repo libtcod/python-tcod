@@ -2,7 +2,7 @@ import os.path
 import platform
 import re
 import sys
-from typing import Iterator
+from typing import Any, Dict, Iterator
 
 import cffi  # type: ignore
 
@@ -130,7 +130,7 @@ HEADERS = [
 
 def add_to_ffi(ffi: cffi.FFI, path: str) -> None:
     BITS, _ = platform.architecture()
-    cdef_args = {}
+    cdef_args: Dict[str, Any] = {}
     NEEDS_PACK4 = False
     if sys.platform == "win32" and BITS == "32bit":
         NEEDS_PACK4 = True
@@ -150,7 +150,7 @@ def add_to_ffi(ffi: cffi.FFI, path: str) -> None:
                     ffi.cdef(code, packed=1)
                     continue
                 ffi.cdef(code, **cdef_args)
-        except:
+        except Exception:
             print("Error parsing %r code:\n%s" % (header, code))
             raise
 

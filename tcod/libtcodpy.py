@@ -547,8 +547,8 @@ def bsp_split_recursive(
     nb: int,
     minHSize: int,
     minVSize: int,
-    maxHRatio: int,
-    maxVRatio: int,
+    maxHRatio: float,
+    maxVRatio: float,
 ) -> None:
     """
     .. deprecated:: 2.0
@@ -3477,7 +3477,7 @@ def parser_new() -> Any:
 
 @deprecate("Parser functions have been deprecated.")
 def parser_new_struct(parser: Any, name: str) -> Any:
-    return lib.TCOD_parser_new_struct(parser, name)
+    return lib.TCOD_parser_new_struct(parser, _bytes(name))
 
 
 # prevent multiple threads from messing with def_extern callbacks
@@ -3785,45 +3785,45 @@ def random_delete(rnd: tcod.random.Random) -> None:
 
 
 @deprecate("This function is deprecated.")
-def struct_add_flag(struct, name):  # type: ignore
-    lib.TCOD_struct_add_flag(struct, name)
+def struct_add_flag(struct: Any, name: str) -> None:
+    lib.TCOD_struct_add_flag(struct, _bytes(name))
 
 
 @deprecate("This function is deprecated.")
-def struct_add_property(struct, name, typ, mandatory):  # type: ignore
-    lib.TCOD_struct_add_property(struct, name, typ, mandatory)
+def struct_add_property(struct: Any, name: str, typ: int, mandatory: bool) -> None:
+    lib.TCOD_struct_add_property(struct, _bytes(name), typ, mandatory)
 
 
 @deprecate("This function is deprecated.")
-def struct_add_value_list(struct, name, value_list, mandatory):  # type: ignore
+def struct_add_value_list(struct: Any, name: str, value_list: Iterable[str], mandatory: bool) -> None:
     c_strings = [ffi.new("char[]", value.encode("utf-8")) for value in value_list]
     c_value_list = ffi.new("char*[]", c_strings)
     lib.TCOD_struct_add_value_list(struct, name, c_value_list, mandatory)
 
 
 @deprecate("This function is deprecated.")
-def struct_add_list_property(struct, name, typ, mandatory):  # type: ignore
-    lib.TCOD_struct_add_list_property(struct, name, typ, mandatory)
+def struct_add_list_property(struct: Any, name: str, typ: int, mandatory: bool) -> None:
+    lib.TCOD_struct_add_list_property(struct, _bytes(name), typ, mandatory)
 
 
 @deprecate("This function is deprecated.")
-def struct_add_structure(struct, sub_struct):  # type: ignore
+def struct_add_structure(struct: Any, sub_struct: Any) -> None:
     lib.TCOD_struct_add_structure(struct, sub_struct)
 
 
 @deprecate("This function is deprecated.")
-def struct_get_name(struct):  # type: ignore
+def struct_get_name(struct: Any) -> str:
     return _unpack_char_p(lib.TCOD_struct_get_name(struct))
 
 
 @deprecate("This function is deprecated.")
-def struct_is_mandatory(struct, name):  # type: ignore
-    return lib.TCOD_struct_is_mandatory(struct, name)
+def struct_is_mandatory(struct: Any, name: str) -> bool:
+    return bool(lib.TCOD_struct_is_mandatory(struct, _bytes(name)))
 
 
 @deprecate("This function is deprecated.")
-def struct_get_type(struct, name):  # type: ignore
-    return lib.TCOD_struct_get_type(struct, name)
+def struct_get_type(struct: Any, name: str) -> int:
+    return int(lib.TCOD_struct_get_type(struct, _bytes(name)))
 
 
 # high precision time functions

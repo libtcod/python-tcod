@@ -2,8 +2,6 @@
 
 import os
 
-import tcod as libtcod
-
 curdir = os.path.dirname(__file__)
 
 FONT_FILE = os.path.join(curdir, "data/fonts/consolas10x10_gs_tc.png")

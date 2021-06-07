@@ -11,9 +11,11 @@
     "python.linting.flake8Enabled": true,
     "python.linting.mypyEnabled": true,
     "python.linting.mypyArgs": [
-        "--python-version 3.8", // Python 3.8 supported by examples.
         "--follow-imports=silent",
         "--show-column-numbers"
     ],
-    "python.formatting.provider": "black"
+    "python.formatting.provider": "black",
+    "files.associations": {
+        "*.spec": "python",
+    }
 }

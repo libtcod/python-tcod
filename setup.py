@@ -7,7 +7,7 @@ import warnings
 from subprocess import CalledProcessError, check_output
 from typing import List
 
-from setuptools import setup
+from setuptools import setup  # type: ignore
 
 SDL_VERSION_NEEDED = (2, 0, 5)
 

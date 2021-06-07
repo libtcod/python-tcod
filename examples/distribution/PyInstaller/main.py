@@ -16,7 +16,7 @@ BASE_DIR = getattr(sys, "_MEIPASS", ".")
 FONT_PATH = os.path.join(BASE_DIR, "data/terminal8x8_gs_ro.png")
 
 
-def main():
+def main() -> None:
     tileset = tcod.tileset.load_tilesheet(FONT_PATH, 16, 16, tcod.tileset.CHARMAP_CP437)
     with tcod.context.new(columns=WIDTH, rows=HEIGHT, tileset=tileset) as context:
         while True:

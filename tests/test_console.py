@@ -1,4 +1,5 @@
 import pickle
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -9,7 +10,7 @@ import tcod
 
 @pytest.mark.filterwarnings("ignore:Directly access a consoles")
 @pytest.mark.filterwarnings("ignore:This function may be deprecated in the fu")
-def test_array_read_write():
+def test_array_read_write() -> None:
     console = tcod.console.Console(width=12, height=10)
     FG = (255, 254, 253)
     BG = (1, 2, 3)
@@ -40,26 +41,26 @@ def test_array_read_write():
 
 
 @pytest.mark.filterwarnings("ignore")
-def test_console_defaults():
+def test_console_defaults() -> None:
     console = tcod.console.Console(width=12, height=10)
 
-    console.default_bg = [2, 3, 4]
+    console.default_bg = [2, 3, 4]  # type: ignore
     assert console.default_bg == (2, 3, 4)
 
-    console.default_fg = (4, 5, 6)
+    console.default_fg = (4, 5, 6)  # type: ignore
     assert console.default_fg == (4, 5, 6)
 
-    console.default_bg_blend = tcod.BKGND_ADD
+    console.default_bg_blend = tcod.BKGND_ADD  # type: ignore
     assert console.default_bg_blend == tcod.BKGND_ADD
 
-    console.default_alignment = tcod.RIGHT
+    console.default_alignment = tcod.RIGHT  # type: ignore
     assert console.default_alignment == tcod.RIGHT
 
 
 @pytest.mark.filterwarnings("ignore:Parameter names have been moved around,")
 @pytest.mark.filterwarnings("ignore:Pass the key color to Console.blit instea")
 @pytest.mark.filterwarnings("ignore:.*default values have been deprecated")
-def test_console_methods():
+def test_console_methods() -> None:
     console = tcod.console.Console(width=12, height=10)
     console.put_char(0, 0, ord("@"))
     console.print_(0, 0, "Test")
@@ -69,12 +70,12 @@ def test_console_methods():
     console.hline(0, 1, 10)
     console.vline(1, 0, 10)
     console.print_frame(0, 0, 8, 8, "Frame")
-    console.blit(0, 0, 0, 0, console, 0, 0)
-    console.blit(0, 0, 0, 0, console, 0, 0, key_color=(0, 0, 0))
+    console.blit(0, 0, 0, 0, console, 0, 0)  # type: ignore
+    console.blit(0, 0, 0, 0, console, 0, 0, key_color=(0, 0, 0))  # type: ignore
     console.set_key_color((254, 0, 254))
 
 
-def test_console_pickle():
+def test_console_pickle() -> None:
     console = tcod.console.Console(width=12, height=10)
     console.ch[...] = ord(".")
     console.fg[...] = (10, 20, 30)
@@ -85,7 +86,7 @@ def test_console_pickle():
     assert (console.bg == console2.bg).all()
 
 
-def test_console_pickle_fortran():
+def test_console_pickle_fortran() -> None:
     console = tcod.console.Console(2, 3, order="F")
     console2 = pickle.loads(pickle.dumps(console))
     assert console.ch.strides == console2.ch.strides
@@ -93,19 +94,19 @@ def test_console_pickle_fortran():
     assert console.bg.strides == console2.bg.strides
 
 
-def test_console_repr():
+def test_console_repr() -> None:
     array  # Needed for eval.
     eval(repr(tcod.console.Console(10, 2)))
 
 
 @pytest.mark.filterwarnings("ignore")
-def test_console_str():
+def test_console_str() -> None:
     console = tcod.console.Console(10, 2)
     console.print_(0, 0, "Test")
     assert str(console) == ("<Test      |\n" "|          >")
 
 
-def test_console_fortran_buffer():
+def test_console_fortran_buffer() -> None:
     tcod.console.Console(
         width=1,
         height=2,
@@ -114,7 +115,7 @@ def test_console_fortran_buffer():
     )
 
 
-def test_console_clear():
+def test_console_clear() -> None:
     console = tcod.console.Console(1, 1)
     assert console.fg[0, 0].tolist() == [255, 255, 255]
     assert console.bg[0, 0].tolist() == [0, 0, 0]
@@ -123,14 +124,14 @@ def test_console_clear():
     assert console.bg[0, 0].tolist() == [10, 11, 12]
 
 
-def test_console_semigraphics():
+def test_console_semigraphics() -> None:
     console = tcod.console.Console(1, 1)
     console.draw_semigraphics(
         [[[255, 255, 255], [255, 255, 255]], [[255, 255, 255], [0, 0, 0]]],
     )
 
 
-def test_rexpaint(tmp_path) -> None:
+def test_rexpaint(tmp_path: Path) -> None:
     xp_path = tmp_path / "test.xp"
     consoles = tcod.Console(80, 24, order="F"), tcod.Console(8, 8, order="F")
     tcod.console.save_xp(xp_path, consoles, compress_level=0)
