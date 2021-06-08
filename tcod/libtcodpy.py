@@ -2921,7 +2921,10 @@ def image_is_pixel_transparent(image: tcod.image.Image, x: int, y: int) -> bool:
     return bool(lib.TCOD_image_is_pixel_transparent(image.image_c, x, y))
 
 
-@pending_deprecate()
+@pending_deprecate(
+    "This function may be removed in the future."
+    "  It's recommended to load images with a more complete image library such as python-Pillow or python-imageio."
+)
 def image_load(filename: str) -> tcod.image.Image:
     """Load an image file into an Image instance and return it.
 

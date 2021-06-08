@@ -12,7 +12,7 @@ from typing import Any, Dict, Tuple
 import numpy as np
 
 import tcod.console
-from tcod._internal import _console
+from tcod._internal import _console, deprecate
 from tcod.loader import ffi, lib
 
 
@@ -329,6 +329,11 @@ def _get_format_name(format: int) -> str:
     return str(format)
 
 
+@deprecate(
+    "This function may be removed in the future."
+    "  It's recommended to load images with a more complete image library such as python-Pillow or python-imageio.",
+    category=PendingDeprecationWarning,
+)
 def load(filename: str) -> np.ndarray:
     """Load a PNG file as an RGBA array.
 
