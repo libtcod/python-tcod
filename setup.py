@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import pathlib
 import platform
 import sys
 import warnings
@@ -10,6 +11,8 @@ from typing import List
 from setuptools import setup  # type: ignore
 
 SDL_VERSION_NEEDED = (2, 0, 5)
+
+PATH = pathlib.Path(__file__).parent  # setup.py current directory
 
 
 def get_version() -> str:
@@ -29,13 +32,13 @@ def get_version() -> str:
             version += ".dev%i" % commits_since_tag
 
         # update tcod/version.py
-        with open("tcod/version.py", "w") as version_file:
+        with open(PATH / "tcod/version.py", "w") as version_file:
             version_file.write('__version__ = "%s"\n' % version)
         return version
     except CalledProcessError:
         try:
             __version__ = "0.0.0"
-            with open("tcod/version.py") as version_file:
+            with open(PATH / "tcod/version.py") as version_file:
                 exec(version_file.read(), globals())  # Update __version__
         except FileNotFoundError:
             warnings.warn("Unknown version: " "Not in a Git repository and not from a sdist bundle or wheel.")
@@ -66,7 +69,7 @@ def get_package_data() -> List[str]:
 
 def get_long_description() -> str:
     """Return this projects description."""
-    with open("README.rst", "r") as readme_file:
+    with open(PATH / "README.rst", "r") as readme_file:
         return readme_file.read()
 
 
@@ -89,7 +92,7 @@ def check_sdl_version() -> None:
         raise RuntimeError("SDL version must be at least %s, (found %s)" % (needed_version, sdl_version_str))
 
 
-if not os.path.exists("libtcod/src"):
+if not os.path.exists(PATH / "libtcod/src"):
     print("Libtcod submodule is uninitialized.")
     print("Did you forget to run 'git submodule update --init'?")
     sys.exit(1)
