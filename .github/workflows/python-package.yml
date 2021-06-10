@@ -97,7 +97,7 @@ jobs:
         name: sdist
     - name: Build package in isolation
       run: |
-        pip install -v tcod-*.tar.gz
+        pip install tcod-*.tar.gz
     - name: Confirm package import
       run: |
         python -c "import tcod"

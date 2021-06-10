@@ -3,6 +3,7 @@
 import os
 import pathlib
 import platform
+import re
 import sys
 import warnings
 from subprocess import CalledProcessError, check_output
@@ -37,12 +38,13 @@ def get_version() -> str:
         return version
     except CalledProcessError:
         try:
-            __version__ = "0.0.0"
             with open(PATH / "tcod/version.py") as version_file:
-                exec(version_file.read(), globals())  # Update __version__
+                match = re.match(r'__version__ = "(\S+)"', version_file.read())
+            assert match
+            return match.groups()[0]
         except FileNotFoundError:
-            warnings.warn("Unknown version: " "Not in a Git repository and not from a sdist bundle or wheel.")
-        return __version__
+            warnings.warn("Unknown version: Not in a Git repository and not from a sdist bundle or wheel.")
+        return "0.0.0"
 
 
 is_pypy = platform.python_implementation() == "PyPy"
