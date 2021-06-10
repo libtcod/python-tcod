@@ -1,4 +1,4 @@
-include *.py *.cfg *.txt *.rst
+include *.py *.cfg *.txt *.rst *.toml
 
 recursive-include tcod *.py *.c *.h
 
