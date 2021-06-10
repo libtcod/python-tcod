@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+12.6.1 - 2021-06-09
+-------------------
 Fixed
  - Fixed version mismatch when building from sources.
 
