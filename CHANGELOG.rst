@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Git is no longer required to install from source.
 
 12.6.1 - 2021-06-09
 -------------------

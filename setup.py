@@ -4,9 +4,9 @@ import os
 import pathlib
 import platform
 import re
+import subprocess
 import sys
 import warnings
-from subprocess import CalledProcessError, check_output
 from typing import List
 
 from setuptools import setup  # type: ignore
@@ -18,25 +18,22 @@ PATH = pathlib.Path(__file__).parent  # setup.py current directory
 
 def get_version() -> str:
     """Get the current version from a git tag, or by reading tcod/version.py"""
-    try:
-        tag = check_output(["git", "describe", "--abbrev=0"], universal_newlines=True).strip()
+    if (PATH / ".git").exists():
+        tag = subprocess.check_output(["git", "describe", "--abbrev=0"], universal_newlines=True).strip()
         assert not tag.startswith("v")
         version = tag
 
         # add .devNN if needed
-        log = check_output(
-            ["git", "log", "%s..HEAD" % tag, "--oneline"],
-            universal_newlines=True,
-        )
+        log = subprocess.check_output(["git", "log", f"{tag}..HEAD", "--oneline"], universal_newlines=True)
         commits_since_tag = log.count("\n")
         if commits_since_tag:
             version += ".dev%i" % commits_since_tag
 
         # update tcod/version.py
         with open(PATH / "tcod/version.py", "w") as version_file:
-            version_file.write('__version__ = "%s"\n' % version)
+            version_file.write(f'__version__ = "{version}"\n')
         return version
-    except CalledProcessError:
+    else:  # Not a Git respotitory.
         try:
             with open(PATH / "tcod/version.py") as version_file:
                 match = re.match(r'__version__ = "(\S+)"', version_file.read())
@@ -81,7 +78,7 @@ def check_sdl_version() -> None:
         return
     needed_version = "%i.%i.%i" % SDL_VERSION_NEEDED
     try:
-        sdl_version_str = check_output(["sdl2-config", "--version"], universal_newlines=True).strip()
+        sdl_version_str = subprocess.check_output(["sdl2-config", "--version"], universal_newlines=True).strip()
     except FileNotFoundError:
         raise RuntimeError(
             "libsdl2-dev or equivalent must be installed on your system"
