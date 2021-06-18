@@ -1,7 +1,7 @@
 on:
   push:
     tags:
-      - '*.*.*'
+      - "*.*.*"
 
 name: Create Release
 
@@ -22,7 +22,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: ''
+          release_name: ""
           body_path: release_body.md
           draft: false
           prerelease: false

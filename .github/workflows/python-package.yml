@@ -18,86 +18,86 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ['ubuntu-20.04', 'windows-2019']
-        python-version: ['3.6', '3.7', '3.8', '3.9', 'pypy-3.6', 'pypy-3.7']
+        os: ["ubuntu-20.04", "windows-2019"]
+        python-version: ["3.6", "3.7", "3.8", "3.9", "pypy-3.6", "pypy-3.7"]
       fail-fast: false
 
     steps:
-    # v2 breaks `git describe` so v1 is needed.
-    # https://github.com/actions/checkout/issues/272
-    - uses: actions/checkout@v1
-    - name: Checkout submodules
-      run: |
-        git submodule update --init --recursive --depth 1
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install APT dependencies
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get update
-        sudo apt-get install libsdl2-dev xvfb
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pytest pytest-cov pytest-benchmark wheel twine
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Initialize package
-      run: |
-        python setup.py check  # Creates tcod/version.py.
-    - name: Build package.
-      run: |
-        python setup.py build sdist develop bdist_wheel --py-limited-api cp36  # Install the package in-place.
-    - name: Test with pytest
-      if: runner.os == 'Windows'
-      run: |
-        pytest --cov-report=xml
-    - name: Test with pytest
-      if: runner.os != 'Windows'
-      run: |
-        xvfb-run --auto-servernum pytest --cov-report=xml
-    - uses: codecov/codecov-action@v1
-    - name: Upload to PyPI
-      if: github.event_name == 'release' && runner.os != 'Linux'
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        twine upload --skip-existing dist/*
-    - uses: actions/upload-artifact@v2
-      if: runner.os == 'Linux'
-      with:
-        name: sdist
-        path: dist/tcod-*.tar.gz
-        retention-days: 3
+      # v2 breaks `git describe` so v1 is needed.
+      # https://github.com/actions/checkout/issues/272
+      - uses: actions/checkout@v1
+      - name: Checkout submodules
+        run: |
+          git submodule update --init --recursive --depth 1
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install APT dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install libsdl2-dev xvfb
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov pytest-benchmark wheel twine
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Initialize package
+        run: |
+          python setup.py check  # Creates tcod/version.py.
+      - name: Build package.
+        run: |
+          python setup.py build sdist develop bdist_wheel --py-limited-api cp36  # Install the package in-place.
+      - name: Test with pytest
+        if: runner.os == 'Windows'
+        run: |
+          pytest --cov-report=xml
+      - name: Test with pytest
+        if: runner.os != 'Windows'
+        run: |
+          xvfb-run --auto-servernum pytest --cov-report=xml
+      - uses: codecov/codecov-action@v1
+      - name: Upload to PyPI
+        if: github.event_name == 'release' && runner.os != 'Linux'
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          twine upload --skip-existing dist/*
+      - uses: actions/upload-artifact@v2
+        if: runner.os == 'Linux'
+        with:
+          name: sdist
+          path: dist/tcod-*.tar.gz
+          retention-days: 3
 
-  isolated:  # Test installing the package from source.
+  isolated: # Test installing the package from source.
     needs: build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ['ubuntu-20.04', 'windows-2019']
+        os: ["ubuntu-20.04", "windows-2019"]
     steps:
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.x
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install wheel
-    - name: Install APT dependencies
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get update
-        sudo apt-get install libsdl2-dev
-    - uses: actions/download-artifact@v2
-      with:
-        name: sdist
-    - name: Build package in isolation
-      run: |
-        pip install tcod-*.tar.gz
-    - name: Confirm package import
-      run: |
-        python -c "import tcod"
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install wheel
+      - name: Install APT dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install libsdl2-dev
+      - uses: actions/download-artifact@v2
+        with:
+          name: sdist
+      - name: Build package in isolation
+        run: |
+          pip install tcod-*.tar.gz
+      - name: Confirm package import
+        run: |
+          python -c "import tcod"
