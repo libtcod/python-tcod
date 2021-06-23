@@ -1,4 +1,5 @@
-"""
+"""Ports of the libtcod random number generator.
+
 Usually it's recommend to the Python's standard library `random` module
 instead of this one.
 

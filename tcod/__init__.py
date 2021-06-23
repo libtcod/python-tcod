@@ -1,19 +1,10 @@
-"""
-    This module provides a simple CFFI API to libtcod.
+"""The fast Python port of libtcod.
 
-    This port has large partial support for libtcod's C functions.
-    Use tcod/libtcod_cdef.h in the source distribution to see specially what
-    functions were exported and what new functions have been added by TDL.
+This module can be used as a drop in replacement for the official libtcodpy
+module.
 
-    The ffi and lib variables should be familiar to anyone that has used CFFI
-    before, otherwise it's time to read up on how they work:
-    https://cffi.readthedocs.org/en/latest/using.html
-
-    Otherwise this module can be used as a drop in replacement for the official
-    libtcod.py module.
-
-    Bring any issues or requests to GitHub:
-    https://github.com/HexDecimal/libtcod-cffi
+Bring any issues or feature requests to GitHub:
+https://github.com/libtcod/python-tcod
 """
 import sys
 import warnings

@@ -1063,6 +1063,9 @@ class Console:
 
         `title` is a Unicode string.  The title is drawn with `bg` as the text
         color and `fg` as the background.
+        Using the `title` parameter is discouraged since the style it uses is
+        hard-coded into libtcod.  You should print over the top or bottom
+        border with :any:`Console.print_box` using your own style.
 
         If `clear` is True than the region inside of the frame will be cleared.
 
