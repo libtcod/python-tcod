@@ -1,10 +1,10 @@
 """The fast Python port of libtcod.
 
-This module can be used as a drop in replacement for the official libtcodpy
-module.
+This module can be used as a drop in replacement for the official libtcodpy module.
 
-Bring any issues or feature requests to GitHub:
-https://github.com/libtcod/python-tcod
+Bring any issues or feature requests to GitHub: https://github.com/libtcod/python-tcod
+
+Read the documentation online: https://python-tcod.readthedocs.io/en/latest/
 """
 import sys
 import warnings
