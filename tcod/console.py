@@ -4,8 +4,8 @@ To render a console you need a tileset and a window to render to.
 See :ref:`getting-started` for info on how to set those up.
 """
 import os
-import pathlib
 import warnings
+from pathlib import Path
 from typing import Any, Iterable, Optional, Sequence, Tuple, Union
 
 import numpy as np
@@ -1266,7 +1266,7 @@ def recommended_size() -> Tuple[int, int]:
     return w, h
 
 
-def load_xp(path: Union[str, pathlib.Path], order: Literal["C", "F"] = "C") -> Tuple[Console, ...]:
+def load_xp(path: Union[str, Path], order: Literal["C", "F"] = "C") -> Tuple[Console, ...]:
     """Load a REXPaint file as a tuple of consoles.
 
     `path` is the name of the REXPaint file to load.
@@ -1308,7 +1308,7 @@ def load_xp(path: Union[str, pathlib.Path], order: Literal["C", "F"] = "C") -> T
 
 
 def save_xp(
-    path: Union[str, pathlib.Path],
+    path: Union[str, Path],
     consoles: Iterable[Console],
     compress_level: int = 9,
 ) -> None:

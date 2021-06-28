@@ -5,9 +5,8 @@ If your image can't be represented as tiles then you'll need to use
 `an alternative library for graphics rendering
 <https://wiki.python.org/moin/PythonGameLibraries>`_.
 """
-
-
-from typing import Any, Dict, Tuple
+from pathlib import Path
+from typing import Any, Dict, Tuple, Union
 
 import numpy as np
 
@@ -334,7 +333,7 @@ def _get_format_name(format: int) -> str:
     "  It's recommended to load images with a more complete image library such as python-Pillow or python-imageio.",
     category=PendingDeprecationWarning,
 )
-def load(filename: str) -> np.ndarray:
+def load(filename: Union[str, Path]) -> np.ndarray:
     """Load a PNG file as an RGBA array.
 
     `filename` is the name of the file to load.
@@ -343,7 +342,7 @@ def load(filename: str) -> np.ndarray:
 
     .. versionadded:: 11.4
     """
-    image = Image._from_cdata(ffi.gc(lib.TCOD_image_load(filename.encode()), lib.TCOD_image_delete))
+    image = Image._from_cdata(ffi.gc(lib.TCOD_image_load(str(filename).encode()), lib.TCOD_image_delete))
     array = np.asarray(image, dtype=np.uint8)
     height, width, depth = array.shape
     if depth == 3:

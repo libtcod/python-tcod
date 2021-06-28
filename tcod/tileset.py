@@ -12,7 +12,8 @@ python-tcod's pathfinding and field-of-view algorithms.
 """
 import itertools
 import os
-from typing import Any, Iterable, Optional, Tuple
+from pathlib import Path
+from typing import Any, Iterable, Optional, Tuple, Union
 
 import numpy as np
 
@@ -200,7 +201,7 @@ def set_default(tileset: Tileset) -> None:
     lib.TCOD_set_default_tileset(tileset._tileset_p)
 
 
-def load_truetype_font(path: str, tile_width: int, tile_height: int) -> Tileset:
+def load_truetype_font(path: Union[str, Path], tile_width: int, tile_height: int) -> Tileset:
     """Return a new Tileset from a `.ttf` or `.otf` file.
 
     Same as :any:`set_truetype_font`, but returns a :any:`Tileset` instead.
@@ -210,14 +211,14 @@ def load_truetype_font(path: str, tile_width: int, tile_height: int) -> Tileset:
     """
     if not os.path.exists(path):
         raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(path),))
-    cdata = lib.TCOD_load_truetype_font_(path.encode(), tile_width, tile_height)
+    cdata = lib.TCOD_load_truetype_font_(str(path).encode(), tile_width, tile_height)
     if not cdata:
         raise RuntimeError(ffi.string(lib.TCOD_get_error()))
     return Tileset._claim(cdata)
 
 
 @deprecate("Accessing the default tileset is deprecated.")
-def set_truetype_font(path: str, tile_width: int, tile_height: int) -> None:
+def set_truetype_font(path: Union[str, Path], tile_width: int, tile_height: int) -> None:
     """Set the default tileset from a `.ttf` or `.otf` file.
 
     `path` is the file path for the font file.
@@ -239,11 +240,11 @@ def set_truetype_font(path: str, tile_width: int, tile_height: int) -> None:
     """
     if not os.path.exists(path):
         raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(path),))
-    if lib.TCOD_tileset_load_truetype_(path.encode(), tile_width, tile_height):
+    if lib.TCOD_tileset_load_truetype_(str(path).encode(), tile_width, tile_height):
         raise RuntimeError(ffi.string(lib.TCOD_get_error()))
 
 
-def load_bdf(path: str) -> Tileset:
+def load_bdf(path: Union[str, Path]) -> Tileset:
     """Return a new Tileset from a `.bdf` file.
 
     For the best results the font should be monospace, cell-based, and
@@ -258,13 +259,13 @@ def load_bdf(path: str) -> Tileset:
     """  # noqa: E501
     if not os.path.exists(path):
         raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(path),))
-    cdata = lib.TCOD_load_bdf(path.encode())
+    cdata = lib.TCOD_load_bdf(str(path).encode())
     if not cdata:
         raise RuntimeError(ffi.string(lib.TCOD_get_error()).decode())
     return Tileset._claim(cdata)
 
 
-def load_tilesheet(path: str, columns: int, rows: int, charmap: Optional[Iterable[int]]) -> Tileset:
+def load_tilesheet(path: Union[str, Path], columns: int, rows: int, charmap: Optional[Iterable[int]]) -> Tileset:
     """Return a new Tileset from a simple tilesheet image.
 
     `path` is the file path to a PNG file with the tileset.
@@ -289,7 +290,7 @@ def load_tilesheet(path: str, columns: int, rows: int, charmap: Optional[Iterabl
     mapping = []
     if charmap is not None:
         mapping = list(itertools.islice(charmap, columns * rows))
-    cdata = lib.TCOD_tileset_load(path.encode(), columns, rows, len(mapping), mapping)
+    cdata = lib.TCOD_tileset_load(str(path).encode(), columns, rows, len(mapping), mapping)
     if not cdata:
         _raise_tcod_error()
     return Tileset._claim(cdata)

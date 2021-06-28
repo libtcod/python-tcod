@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - *tcod.image* and *tcod.tileset* now support *pathlib*.
 
 12.6.2 - 2021-06-15
 -------------------
