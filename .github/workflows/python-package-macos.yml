@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         os: ["macos-latest"]
-        python-version: ["3.7.9"]
+        python-version: ["3.x"]
 
     steps:
       # v2 breaks `git describe` so v1 is needed.
@@ -24,41 +24,33 @@ jobs:
       - name: Print git describe
         run: |
           git describe
-      - name: Set up Mac Python ${{ matrix.python-version }}
-        # actions/setup-python can't be used as it builds less portable extensions.
-        env:
-          MB_PYTHON_VERSION: ${{ matrix.python-version }}
-        run: |
-          source .travis/install_python.sh
-          install_python
-          $PYTHON_EXE -m venv venv
-          source venv/bin/activate
-          echo "$PATH" >> $GITHUB_PATH
-      - name: Print Python version
-        run: |
-          python -VV
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest pytest-cov pytest-benchmark wheel twine
-          pip install git+https://github.com/HexDecimal/delocate.git@loader_path
+          pip install wheel twine
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Build package.
+      - name: Prepare package.
+        # Downloads SDL2 for the later step.
         run: |
-          python setup.py sdist develop bdist_wheel --py-limited-api=cp36
-      - name: Test with pytest
-        run: |
-          pytest --no-window --cov-report=xml
-      - uses: codecov/codecov-action@v1
-      - name: Package binary files
-        run: |
-          delocate-wheel -v dist/*.whl
-          delocate-listdeps --all dist/*.whl
+          python setup.py check
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.0.0a4
+        env:
+          CIBW_BUILD: cp38-* pp*
+          CIBW_ARCHS_MACOS: x86_64 arm64 universal2
+          CIBW_BEFORE_BUILD_MACOS: pip install --force-reinstall git+https://github.com/HexDecimal/delocate.git@loader_path
+          CIBW_BEFORE_TEST: pip install numpy
+          CIBW_TEST_COMMAND: python -c "import tcod"
+          CIBW_TEST_SKIP: "pp* *-macosx_arm64 *-macosx_universal2:arm64"
       - name: Archive wheel
         uses: actions/upload-artifact@v2
         with:
           name: wheel-macos
-          path: dist/*.whl
+          path: wheelhouse/*.whl
           retention-days: 1
       - name: Upload to PyPI
         if: github.event_name == 'release'
@@ -66,28 +58,4 @@ jobs:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
-          twine upload --skip-existing dist/*
-
-  isolated_test:
-    name: Verify wheel dependencies
-    needs: build
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ["macos-latest"]
-        python-version: ["3.x"]
-    steps:
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - uses: actions/download-artifact@v2
-        with:
-          name: wheel-macos
-          path: dist
-      - name: Install tcod from wheel
-        run: |
-          python -m pip install dist/*.whl
-      - name: Verify dependency correctness
-        run: |
-          python -c "import tcod"
+          twine upload --skip-existing wheelhouse/*
