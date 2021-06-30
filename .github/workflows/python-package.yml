@@ -19,7 +19,15 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-20.04", "windows-2019"]
-        python-version: ["3.6", "3.7", "3.8", "3.9", "pypy-3.6", "pypy-3.7"]
+        python-version: ["3.6", "3.7", "3.8", "3.9", "pypy-3.7"]
+        architecture: ["x64"]
+        include:
+          - os: "windows-2019"
+            python-version: "3.6"
+            architecture: "x86"
+          - os: "windows-2019"
+            python-version: "pypy-3.6"
+            architecture: "x86"
       fail-fast: false
 
     steps:
@@ -33,6 +41,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.architecture }}
       - name: Install APT dependencies
         if: runner.os == 'Linux'
         run: |
