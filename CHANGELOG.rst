@@ -9,6 +9,11 @@ v2.0.0
 Unreleased
 ------------------
 
+12.7.1 - 2021-06-30
+-------------------
+Added
+ - Started uploading wheels for ARM64 macOS.
+
 12.7.0 - 2021-06-29
 -------------------
 Added
