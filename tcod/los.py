@@ -1,13 +1,13 @@
 """This modules holds functions for NumPy-based line of sight algorithms.
 """
-from typing import Tuple
+from typing import Any, Tuple
 
 import numpy as np
 
 from tcod.loader import ffi, lib
 
 
-def bresenham(start: Tuple[int, int], end: Tuple[int, int]) -> np.ndarray:
+def bresenham(start: Tuple[int, int], end: Tuple[int, int]) -> "np.ndarray[Any, np.dtype[np.intc]]":
     """Return a thin Bresenham line as a NumPy array of shape (length, 2).
 
     `start` and `end` are the endpoints of the line.
@@ -56,6 +56,6 @@ def bresenham(start: Tuple[int, int], end: Tuple[int, int]) -> np.ndarray:
     x1, y1 = start
     x2, y2 = end
     length = lib.bresenham(x1, y1, x2, y2, 0, ffi.NULL)
-    array = np.ndarray((length, 2), dtype=np.intc)
+    array: np.ndarray[Any, np.dtype[np.intc]] = np.ndarray((length, 2), dtype=np.intc)
     lib.bresenham(x1, y1, x2, y2, length, ffi.from_buffer("int*", array))
     return array

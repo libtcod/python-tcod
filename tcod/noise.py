@@ -233,7 +233,7 @@ class Noise(object):
         """
         return float(lib.NoiseGetSample(self._tdl_noise_c, (x, y, z, w)))
 
-    def __getitem__(self, indexes: Any) -> np.ndarray:
+    def __getitem__(self, indexes: Any) -> "np.ndarray[Any, np.dtype[np.float32]]":
         """Sample a noise map through NumPy indexing.
 
         This follows NumPy's advanced indexing rules, but allows for floating
@@ -247,7 +247,7 @@ class Noise(object):
             raise IndexError(
                 "This noise generator has %i dimensions, but was indexed with %i." % (self.dimensions, len(indexes))
             )
-        indexes = np.broadcast_arrays(*indexes)
+        indexes = np.broadcast_arrays(*indexes)  # type: ignore
         c_input = [ffi.NULL, ffi.NULL, ffi.NULL, ffi.NULL]
         for i, index in enumerate(indexes):
             if index.dtype.type == np.object_:
@@ -287,7 +287,7 @@ class Noise(object):
 
         return out
 
-    def sample_mgrid(self, mgrid: ArrayLike) -> np.ndarray:
+    def sample_mgrid(self, mgrid: ArrayLike) -> "np.ndarray[Any, np.dtype[np.float32]]":
         """Sample a mesh-grid array and return the result.
 
         The :any:`sample_ogrid` method performs better as there is a lot of
@@ -308,7 +308,7 @@ class Noise(object):
             raise ValueError(
                 "mgrid.shape[0] must equal self.dimensions, " "%r[0] != %r" % (mgrid.shape, self.dimensions)
             )
-        out = np.ndarray(mgrid.shape[1:], np.float32)
+        out: np.ndarray[Any, np.dtype[np.float32]] = np.ndarray(mgrid.shape[1:], np.float32)
         if mgrid.shape[1:] != out.shape:
             raise ValueError("mgrid.shape[1:] must equal out.shape, " "%r[1:] != %r" % (mgrid.shape, out.shape))
         lib.NoiseSampleMeshGrid(
@@ -319,7 +319,7 @@ class Noise(object):
         )
         return out
 
-    def sample_ogrid(self, ogrid: Sequence[ArrayLike]) -> np.ndarray:
+    def sample_ogrid(self, ogrid: Sequence[ArrayLike]) -> "np.ndarray[Any, np.dtype[np.float32]]":
         """Sample an open mesh-grid array and return the result.
 
         Args
@@ -335,7 +335,7 @@ class Noise(object):
         if len(ogrid) != self.dimensions:
             raise ValueError("len(ogrid) must equal self.dimensions, " "%r != %r" % (len(ogrid), self.dimensions))
         ogrids = [np.ascontiguousarray(array, np.float32) for array in ogrid]
-        out = np.ndarray([array.size for array in ogrids], np.float32)
+        out: np.ndarray[Any, np.dtype[np.float32]] = np.ndarray([array.size for array in ogrids], np.float32)
         lib.NoiseSampleOpenMeshGrid(
             self._tdl_noise_c,
             len(ogrids),
@@ -417,7 +417,7 @@ def grid(
     scale: Union[Tuple[float, ...], float],
     origin: Optional[Tuple[int, ...]] = None,
     indexing: Literal["ij", "xy"] = "xy",
-) -> Tuple[np.ndarray, ...]:
+) -> "Tuple[np.ndarray[Any, Any], ...]":
     """A helper function for generating a grid of noise samples.
 
     `shape` is the shape of the returned mesh grid.  This can be any number of
@@ -463,4 +463,4 @@ def grid(
     if len(shape) != len(origin):
         raise TypeError("shape must have the same length as origin")
     indexes = (np.arange(i_shape) * i_scale + i_origin for i_shape, i_scale, i_origin in zip(shape, scale, origin))
-    return tuple(np.meshgrid(*indexes, copy=False, sparse=True, indexing=indexing))
+    return tuple(np.meshgrid(*indexes, copy=False, sparse=True, indexing=indexing))  # type: ignore

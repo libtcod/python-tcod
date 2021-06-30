@@ -117,7 +117,7 @@ class EdgeCostCallback(_EdgeCostFunc):
         super(EdgeCostCallback, self).__init__(callback, shape)
 
 
-class NodeCostArray(np.ndarray):
+class NodeCostArray(np.ndarray):  # type: ignore
     """Calculate cost from a numpy array of nodes.
 
     `array` is a NumPy array holding the path-cost of each node.
@@ -297,7 +297,7 @@ def maxarray(
     shape: Tuple[int, ...],
     dtype: Any = np.int32,
     order: Literal["C", "F"] = "C",
-) -> np.ndarray:
+) -> "np.ndarray[Any, Any]":
     """Return a new array filled with the maximum finite value for `dtype`.
 
     `shape` is of the new array.  Same as other NumPy array initializers.
@@ -316,7 +316,7 @@ def maxarray(
     return np.full(shape, np.iinfo(dtype).max, dtype, order)
 
 
-def _export_dict(array: np.ndarray) -> Dict[str, Any]:
+def _export_dict(array: "np.ndarray[Any, Any]") -> Dict[str, Any]:
     """Convert a NumPy array into a format compatible with CFFI."""
     if array.dtype.type not in _INT_TYPES:
         raise TypeError("dtype was %s, but must be one of %s." % (array.dtype.type, tuple(_INT_TYPES.keys())))
@@ -329,14 +329,14 @@ def _export_dict(array: np.ndarray) -> Dict[str, Any]:
     }
 
 
-def _export(array: np.ndarray) -> Any:
+def _export(array: "np.ndarray[Any, Any]") -> Any:
     """Convert a NumPy array into a ctype object."""
     return ffi.new("struct NArray*", _export_dict(array))
 
 
 def _compile_cost_edges(edge_map: Any) -> Tuple[Any, int]:
     """Return an edge_cost array using an integer map."""
-    edge_map = np.copy(edge_map)
+    edge_map = np.array(edge_map, copy=True)
     if edge_map.ndim != 2:
         raise ValueError("edge_map must be 2 dimensional. (Got %i)" % edge_map.ndim)
     edge_center = edge_map.shape[0] // 2, edge_map.shape[1] // 2
@@ -346,7 +346,7 @@ def _compile_cost_edges(edge_map: Any) -> Tuple[Any, int]:
     edge_array = np.transpose(edge_nz)
     edge_array -= edge_center
     c_edges = ffi.new("int[]", len(edge_array) * 3)
-    edges = np.frombuffer(ffi.buffer(c_edges), dtype=np.intc).reshape(len(edge_array), 3)
+    edges = np.frombuffer(ffi.buffer(c_edges), dtype=np.intc).reshape(len(edge_array), 3)  # type: ignore
     edges[:, :2] = edge_array
     edges[:, 2] = edge_map[edge_nz]
     return c_edges, len(edge_array)
@@ -360,7 +360,7 @@ def dijkstra2d(
     *,
     edge_map: Any = None,
     out: Optional[np.ndarray] = ...,  # type: ignore
-) -> np.ndarray:
+) -> "np.ndarray[Any, Any]":
     """Return the computed distance of all nodes on a 2D Dijkstra grid.
 
     `distance` is an input array of node distances.  Is this often an
@@ -488,7 +488,7 @@ def dijkstra2d(
             stacklevel=2,
         )
     elif out is None:
-        out = np.copy(distance)
+        out = np.array(distance, copy=True)
     else:
         out[...] = dist
 
@@ -512,9 +512,9 @@ def dijkstra2d(
     return out
 
 
-def _compile_bool_edges(edge_map: Any) -> Tuple[Any, int]:
+def _compile_bool_edges(edge_map: ArrayLike) -> Tuple[Any, int]:
     """Return an edge array using a boolean map."""
-    edge_map = np.copy(edge_map)
+    edge_map = np.array(edge_map, copy=True)
     edge_center = edge_map.shape[0] // 2, edge_map.shape[1] // 2
     edge_map[edge_center] = 0
     edge_array = np.transpose(edge_map.nonzero())
@@ -529,7 +529,7 @@ def hillclimb2d(
     diagonal: Optional[bool] = None,
     *,
     edge_map: Any = None,
-) -> np.ndarray:
+) -> "np.ndarray[Any, Any]":
     """Return a path on a grid from `start` to the lowest point.
 
     `distance` should be a fully computed distance array.  This kind of array
@@ -574,17 +574,17 @@ def hillclimb2d(
     else:
         func = functools.partial(lib.hillclimb2d_basic, c_dist, x, y, cardinal, diagonal)
     length = _check(func(ffi.NULL))
-    path = np.ndarray((length, 2), dtype=np.intc)
+    path: np.ndarray[Any, np.dtype[np.intc]] = np.ndarray((length, 2), dtype=np.intc)
     c_path = ffi.from_buffer("int*", path)
     _check(func(c_path))
     return path
 
 
-def _world_array(shape: Tuple[int, ...], dtype: Any = np.int32) -> np.ndarray:
+def _world_array(shape: Tuple[int, ...], dtype: Any = np.int32) -> "np.ndarray[Any, Any]":
     """Return an array where ``ij == arr[ij]``."""
     return np.ascontiguousarray(
         np.transpose(
-            np.meshgrid(
+            np.meshgrid(  # type: ignore
                 *(np.arange(i, dtype=dtype) for i in shape),
                 indexing="ij",
                 copy=False,
@@ -594,7 +594,7 @@ def _world_array(shape: Tuple[int, ...], dtype: Any = np.int32) -> np.ndarray:
     )
 
 
-def _as_hashable(obj: Optional[np.ndarray]) -> Optional[Any]:
+def _as_hashable(obj: "Optional[np.ndarray[Any, Any]]") -> Optional[Any]:
     """Return NumPy arrays as a more hashable form."""
     if obj is None:
         return obj
@@ -691,8 +691,8 @@ class CustomGraph:
         edge_dir: Tuple[int, ...],
         edge_cost: int = 1,
         *,
-        cost: np.ndarray,
-        condition: Optional[np.ndarray] = None,
+        cost: "np.ndarray[Any, Any]",
+        condition: "Optional[np.ndarray[Any, Any]]" = None,
     ) -> None:
         """Add a single edge rule.
 
@@ -781,9 +781,9 @@ class CustomGraph:
     def add_edges(
         self,
         *,
-        edge_map: Any,
-        cost: np.ndarray,
-        condition: Optional[np.ndarray] = None,
+        edge_map: ArrayLike,
+        cost: "np.ndarray[Any, Any]",
+        condition: "Optional[np.ndarray[Any, Any]]" = None,
     ) -> None:
         """Add a rule with multiple edges.
 
@@ -876,9 +876,9 @@ class CustomGraph:
                 ],
             ]
         """
-        edge_map = np.copy(edge_map)
+        edge_map = np.array(edge_map, copy=True)
         if edge_map.ndim < self._ndim:
-            edge_map = edge_map[(np.newaxis,) * (self._ndim - edge_map.ndim)]
+            edge_map = np.asarray(edge_map[(np.newaxis,) * (self._ndim - edge_map.ndim)])
         if edge_map.ndim != self._ndim:
             raise TypeError("edge_map must must match graph dimensions (%i). (Got %i)" % (self.ndim, edge_map.ndim))
         if self._order == "F":
@@ -1024,7 +1024,7 @@ class SimpleGraph:
     .. versionadded:: 11.15
     """
 
-    def __init__(self, *, cost: np.ndarray, cardinal: int, diagonal: int, greed: int = 1):
+    def __init__(self, *, cost: ArrayLike, cardinal: int, diagonal: int, greed: int = 1):
         cost = np.asarray(cost)
         if cost.ndim != 2:
             raise TypeError("The cost array must e 2 dimensional, array of shape %r given." % (cost.shape,))
@@ -1093,7 +1093,7 @@ class Pathfinder:
         self._heuristic_p = ffi.NULL  # type: Any
 
     @property
-    def distance(self) -> np.ndarray:
+    def distance(self) -> "np.ndarray[Any, Any]":
         """The distance values of the pathfinder.
 
         The array returned from this property maintains the graphs `order`.
@@ -1113,7 +1113,7 @@ class Pathfinder:
         return self._distance.T if self._order == "F" else self._distance
 
     @property
-    def traversal(self) -> np.ndarray:
+    def traversal(self) -> "np.ndarray[Any, Any]":
         """An array used to generate paths from any point to the nearest root.
 
         The array returned from this property maintains the graphs `order`.
@@ -1272,7 +1272,7 @@ class Pathfinder:
         self._update_heuristic(goal)
         self._graph._resolve(self)
 
-    def path_from(self, index: Tuple[int, ...]) -> np.ndarray:
+    def path_from(self, index: Tuple[int, ...]) -> "np.ndarray[Any, Any]":
         """Return the shortest path from `index` to the nearest root.
 
         The returned array is of shape `(length, ndim)` where `length` is the
@@ -1313,7 +1313,7 @@ class Pathfinder:
         if self._order == "F":  # Convert to ij indexing order.
             index = index[::-1]
         length = _check(lib.get_travel_path(self._graph._ndim, self._travel_p, index, ffi.NULL))
-        path = np.ndarray((length, self._graph._ndim), dtype=np.intc)
+        path: np.ndarray[Any, np.dtype[np.intc]] = np.ndarray((length, self._graph._ndim), dtype=np.intc)
         _check(
             lib.get_travel_path(
                 self._graph._ndim,
@@ -1324,7 +1324,7 @@ class Pathfinder:
         )
         return path[:, ::-1] if self._order == "F" else path  # type: ignore
 
-    def path_to(self, index: Tuple[int, ...]) -> np.ndarray:
+    def path_to(self, index: Tuple[int, ...]) -> "np.ndarray[Any, Any]":
         """Return the shortest path from the nearest root to `index`.
 
         See :any:`path_from`.

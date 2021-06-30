@@ -110,7 +110,7 @@ class Console:
         width: int,
         height: int,
         order: Literal["C", "F"] = "C",
-        buffer: Optional[np.ndarray] = None,
+        buffer: "Optional[np.ndarray[Any, Any]]" = None,
     ):
         self._key_color = None  # type: Optional[Tuple[int, int, int]]
         self._order = tcod._internal.verify_order(order)
@@ -181,7 +181,7 @@ class Console:
         else:
             self._console_data = ffi.cast("struct TCOD_Console*", self.console_c)
 
-        self._tiles = np.frombuffer(
+        self._tiles = np.frombuffer(  # type: ignore
             ffi.buffer(self._console_data.tiles[0 : self.width * self.height]),
             dtype=self.DTYPE,
         ).reshape((self.height, self.width))
@@ -199,7 +199,7 @@ class Console:
         return lib.TCOD_console_get_height(self.console_c)  # type: ignore
 
     @property
-    def bg(self) -> np.ndarray:
+    def bg(self) -> "np.ndarray[Any, np.dtype[np.uint8]]":
         """A uint8 array with the shape (height, width, 3).
 
         You can change the consoles background colors by using this array.
@@ -208,13 +208,13 @@ class Console:
         ``console.bg[x, y, channel]  # order='F'``.
 
         """
-        bg = self._tiles["bg"][..., :3]  # type: np.ndarray
+        bg: np.ndarray[Any, np.dtype[np.uint8]] = self._tiles["bg"][..., :3]
         if self._order == "F":
             bg = bg.transpose(1, 0, 2)
         return bg
 
     @property
-    def fg(self) -> np.ndarray:
+    def fg(self) -> "np.ndarray[Any, np.dtype[np.uint8]]":
         """A uint8 array with the shape (height, width, 3).
 
         You can change the consoles foreground colors by using this array.
@@ -222,13 +222,13 @@ class Console:
         Index this array with ``console.fg[i, j, channel]  # order='C'`` or
         ``console.fg[x, y, channel]  # order='F'``.
         """
-        fg = self._tiles["fg"][..., :3]  # type: np.ndarray
+        fg: np.ndarray[Any, np.dtype[np.uint8]] = self._tiles["fg"][..., :3]
         if self._order == "F":
             fg = fg.transpose(1, 0, 2)
         return fg
 
     @property
-    def ch(self) -> np.ndarray:
+    def ch(self) -> "np.ndarray[Any, np.dtype[np.intc]]":
         """An integer array with the shape (height, width).
 
         You can change the consoles character codes by using this array.
@@ -240,7 +240,7 @@ class Console:
 
     @property  # type: ignore
     @deprecate("This attribute has been renamed to `rgba`.")
-    def tiles(self) -> np.ndarray:
+    def tiles(self) -> "np.ndarray[Any, Any]":
         """An array of this consoles raw tile data.
 
         This acts as a combination of the `ch`, `fg`, and `bg` attributes.
@@ -256,7 +256,7 @@ class Console:
 
     @property  # type: ignore
     @deprecate("This attribute has been renamed to `rgba`.")
-    def buffer(self) -> np.ndarray:
+    def buffer(self) -> "np.ndarray[Any, Any]":
         """An array of this consoles raw tile data.
 
         .. versionadded:: 11.4
@@ -268,7 +268,7 @@ class Console:
 
     @property  # type: ignore
     @deprecate("This attribute has been renamed to `rgb`.")
-    def tiles_rgb(self) -> np.ndarray:
+    def tiles_rgb(self) -> "np.ndarray[Any, Any]":
         """An array of this consoles data without the alpha channel.
 
         .. versionadded:: 11.8
@@ -280,7 +280,7 @@ class Console:
 
     @property  # type: ignore
     @deprecate("This attribute has been renamed to `rgb`.")
-    def tiles2(self) -> np.ndarray:
+    def tiles2(self) -> "np.ndarray[Any, Any]":
         """This name is deprecated in favour of :any:`rgb`.
 
         .. versionadded:: 11.3
@@ -291,7 +291,7 @@ class Console:
         return self.rgb
 
     @property
-    def rgba(self) -> np.ndarray:
+    def rgba(self) -> "np.ndarray[Any, Any]":
         """An array of this consoles raw tile data.
 
         The axes of this array is affected by the `order` parameter given to
@@ -312,7 +312,7 @@ class Console:
         return self._tiles.T if self._order == "F" else self._tiles
 
     @property
-    def rgb(self) -> np.ndarray:
+    def rgb(self) -> "np.ndarray[Any, Any]":
         """An array of this consoles data without the alpha channel.
 
         The axes of this array is affected by the `order` parameter given to
@@ -888,13 +888,13 @@ class Console:
             "back": self.default_bg,
         }
         if self.console_c == ffi.NULL:
-            state["_tiles"] = np.copy(self._tiles)
+            state["_tiles"] = np.array(self._tiles, copy=True)
         return state
 
     def __setstate__(self, state: Any) -> None:
         self._key_color = None
         if "_tiles" not in state:
-            tiles = np.ndarray((self.height, self.width), dtype=self.DTYPE)
+            tiles: np.ndarray[Any, Any] = np.ndarray((self.height, self.width), dtype=self.DTYPE)
             tiles["ch"] = state["_ch"]
             tiles["fg"][..., :3] = state["_fg"]
             tiles["fg"][..., 3] = 255

@@ -333,7 +333,7 @@ def _get_format_name(format: int) -> str:
     "  It's recommended to load images with a more complete image library such as python-Pillow or python-imageio.",
     category=PendingDeprecationWarning,
 )
-def load(filename: Union[str, Path]) -> np.ndarray:
+def load(filename: Union[str, Path]) -> "np.ndarray[Any, np.dtype[np.uint8]]":
     """Load a PNG file as an RGBA array.
 
     `filename` is the name of the file to load.
@@ -346,7 +346,7 @@ def load(filename: Union[str, Path]) -> np.ndarray:
     array = np.asarray(image, dtype=np.uint8)
     height, width, depth = array.shape
     if depth == 3:
-        array = np.concatenate(
+        array = np.concatenate(  # type: ignore
             (
                 array,
                 np.full((height, width, 1), fill_value=255, dtype=np.uint8),

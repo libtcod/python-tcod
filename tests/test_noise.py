@@ -40,17 +40,17 @@ def test_noise_class(
     noise.sample_mgrid(np.mgrid[:2, :3])
     noise.sample_ogrid(np.ogrid[:2, :3])
 
-    np.testing.assert_equal(
+    np.testing.assert_equal(  # type: ignore
         noise.sample_mgrid(np.mgrid[:2, :3]),
         noise.sample_ogrid(np.ogrid[:2, :3]),
     )
-    np.testing.assert_equal(noise.sample_mgrid(np.mgrid[:2, :3]), noise[tuple(np.mgrid[:2, :3])])
+    np.testing.assert_equal(noise.sample_mgrid(np.mgrid[:2, :3]), noise[tuple(np.mgrid[:2, :3])])  # type: ignore
     repr(noise)
 
 
 def test_noise_samples() -> None:
     noise = tcod.noise.Noise(2, tcod.noise.Algorithm.SIMPLEX, tcod.noise.Implementation.SIMPLE)
-    np.testing.assert_equal(
+    np.testing.assert_equal(  # type: ignore
         noise.sample_mgrid(np.mgrid[:32, :24]),
         noise.sample_ogrid(np.ogrid[:32, :24]),
     )
@@ -77,7 +77,7 @@ def test_noise_pickle(implementation: tcod.noise.Implementation) -> None:
     rand = tcod.random.Random(tcod.random.MERSENNE_TWISTER, 42)
     noise = tcod.noise.Noise(2, implementation, seed=rand)
     noise2 = copy.copy(noise)
-    np.testing.assert_equal(
+    np.testing.assert_equal(  # type: ignore
         noise.sample_ogrid(np.ogrid[:3, :1]),
         noise2.sample_ogrid(np.ogrid[:3, :1]),
     )
@@ -87,7 +87,7 @@ def test_noise_copy() -> None:
     rand = tcod.random.Random(tcod.random.MERSENNE_TWISTER, 42)
     noise = tcod.noise.Noise(2, seed=rand)
     noise2 = pickle.loads(pickle.dumps(noise))
-    np.testing.assert_equal(
+    np.testing.assert_equal(  # type: ignore
         noise.sample_ogrid(np.ogrid[:3, :1]),
         noise2.sample_ogrid(np.ogrid[:3, :1]),
     )

@@ -1030,7 +1030,7 @@ def _pycall_event_watch(userdata: Any, sdl_event: Any) -> int:
     return 0
 
 
-def get_keyboard_state() -> np.ndarray:
+def get_keyboard_state() -> "np.ndarray[Any, np.dtype[np.bool_]]":
     """Return a boolean array with the current keyboard state.
 
     Index this array with a scancode.  The value will be True if the key is
@@ -1052,7 +1052,7 @@ def get_keyboard_state() -> np.ndarray:
     """
     numkeys = ffi.new("int[1]")
     keyboard_state = lib.SDL_GetKeyboardState(numkeys)
-    out: np.ndarray = np.frombuffer(ffi.buffer(keyboard_state[0 : numkeys[0]]), dtype=bool)
+    out: np.ndarray[Any, Any] = np.frombuffer(ffi.buffer(keyboard_state[0 : numkeys[0]]), dtype=bool)  # type: ignore
     out.flags["WRITEABLE"] = False  # This buffer is supposed to be const.
     return out
 

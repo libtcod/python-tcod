@@ -99,18 +99,18 @@ class Map(object):
         )
 
     @property
-    def transparent(self) -> np.ndarray:
-        buffer = self.__buffer[:, :, 0]  # type: np.ndarray
+    def transparent(self) -> "np.ndarray[Any, np.dtype[np.bool_]]":
+        buffer: np.ndarray[Any, np.dtype[np.bool_]] = self.__buffer[:, :, 0]
         return buffer.T if self._order == "F" else buffer
 
     @property
-    def walkable(self) -> np.ndarray:
-        buffer = self.__buffer[:, :, 1]  # type: np.ndarray
+    def walkable(self) -> "np.ndarray[Any, np.dtype[np.bool_]]":
+        buffer: np.ndarray[Any, np.dtype[np.bool_]] = self.__buffer[:, :, 1]
         return buffer.T if self._order == "F" else buffer
 
     @property
-    def fov(self) -> np.ndarray:
-        buffer = self.__buffer[:, :, 2]  # type: np.ndarray
+    def fov(self) -> "np.ndarray[Any, np.dtype[np.bool_]]":
+        buffer: np.ndarray[Any, np.dtype[np.bool_]] = self.__buffer[:, :, 2]
         return buffer.T if self._order == "F" else buffer
 
     def compute_fov(
@@ -166,12 +166,12 @@ class Map(object):
 
 
 def compute_fov(
-    transparency: np.ndarray,
+    transparency: "np.ndarray[Any, Any]",
     pov: Tuple[int, int],
     radius: int = 0,
     light_walls: bool = True,
     algorithm: int = tcod.constants.FOV_RESTRICTIVE,
-) -> np.ndarray:
+) -> "np.ndarray[Any, np.dtype[np.bool_]]":
     """Return a boolean mask of the area covered by a field-of-view.
 
     `transparency` is a 2 dimensional array where all non-zero values are

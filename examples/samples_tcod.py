@@ -18,6 +18,7 @@ from typing import List
 
 import numpy as np
 import tcod
+from numpy.typing import NDArray
 
 if not sys.warnoptions:
     warnings.simplefilter("default")  # Show all warnings.
@@ -839,7 +840,7 @@ bsp_room_walls = True
 
 
 # draw a vertical line
-def vline(m: np.ndarray, x: int, y1: int, y2: int) -> None:
+def vline(m: NDArray[np.bool_], x: int, y1: int, y2: int) -> None:
     if y1 > y2:
         y1, y2 = y2, y1
     for y in range(y1, y2 + 1):
@@ -847,21 +848,21 @@ def vline(m: np.ndarray, x: int, y1: int, y2: int) -> None:
 
 
 # draw a vertical line up until we reach an empty space
-def vline_up(m: np.ndarray, x: int, y: int) -> None:
+def vline_up(m: NDArray[np.bool_], x: int, y: int) -> None:
     while y >= 0 and not m[x, y]:
         m[x, y] = True
         y -= 1
 
 
 # draw a vertical line down until we reach an empty space
-def vline_down(m: np.ndarray, x: int, y: int) -> None:
+def vline_down(m: NDArray[np.bool_], x: int, y: int) -> None:
     while y < SAMPLE_SCREEN_HEIGHT and not m[x, y]:
         m[x, y] = True
         y += 1
 
 
 # draw a horizontal line
-def hline(m: np.ndarray, x1: int, y: int, x2: int) -> None:
+def hline(m: NDArray[np.bool_], x1: int, y: int, x2: int) -> None:
     if x1 > x2:
         x1, x2 = x2, x1
     for x in range(x1, x2 + 1):
@@ -869,21 +870,21 @@ def hline(m: np.ndarray, x1: int, y: int, x2: int) -> None:
 
 
 # draw a horizontal line left until we reach an empty space
-def hline_left(m: np.ndarray, x: int, y: int) -> None:
+def hline_left(m: NDArray[np.bool_], x: int, y: int) -> None:
     while x >= 0 and not m[x, y]:
         m[x, y] = True
         x -= 1
 
 
 # draw a horizontal line right until we reach an empty space
-def hline_right(m: np.ndarray, x: int, y: int) -> None:
+def hline_right(m: NDArray[np.bool_], x: int, y: int) -> None:
     while x < SAMPLE_SCREEN_WIDTH and not m[x, y]:
         m[x, y] = True
         x += 1
 
 
 # the class building the dungeon from the bsp nodes
-def traverse_node(bsp_map: np.ndarray, node: tcod.bsp.BSP) -> None:
+def traverse_node(bsp_map: NDArray[np.bool_], node: tcod.bsp.BSP) -> None:
     if not node.children:
         # calculate the room size
         if bsp_room_walls:
@@ -1216,7 +1217,7 @@ AMBIENT_LIGHT = 0.8  # brightness of tunnel texture
 # xc = [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]
 # yc = [[1, 1, 1, 1], [2, 2, 2, 2], [3, 3, 3, 3]]
 if numpy_available:
-    (xc, yc) = np.meshgrid(range(SCREEN_W), range(SCREEN_H))
+    (xc, yc) = np.meshgrid(range(SCREEN_W), range(SCREEN_H))  # type: ignore
     # translate coordinates of all pixels to center
     xc = xc - HALF_W
     yc = yc - HALF_H

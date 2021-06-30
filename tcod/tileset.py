@@ -21,6 +21,11 @@ import tcod.console
 from tcod._internal import _check, _console, _raise_tcod_error, deprecate
 from tcod.loader import ffi, lib
 
+try:
+    from numpy.typing import ArrayLike
+except ImportError:  # Python < 3.7, Numpy < 1.20
+    from typing import Any as ArrayLike
+
 
 class Tileset:
     """A collection of graphical tiles.
@@ -62,7 +67,7 @@ class Tileset:
         """Test if a tileset has a codepoint with ``n in tileset``."""
         return bool(lib.TCOD_tileset_get_tile_(self._tileset_p, codepoint, ffi.NULL) == 0)
 
-    def get_tile(self, codepoint: int) -> np.ndarray:
+    def get_tile(self, codepoint: int) -> "np.ndarray[Any, np.dtype[np.uint8]]":
         """Return a copy of a tile for the given codepoint.
 
         If the tile does not exist yet then a blank array will be returned.
@@ -79,7 +84,7 @@ class Tileset:
         )
         return tile
 
-    def set_tile(self, codepoint: int, tile: np.ndarray) -> None:
+    def set_tile(self, codepoint: int, tile: ArrayLike) -> None:
         """Upload a tile into this array.
 
         The tile can be in 32-bit color (height, width, rgba), or grey-scale
@@ -103,7 +108,7 @@ class Tileset:
             ffi.from_buffer("struct TCOD_ColorRGBA*", tile),
         )
 
-    def render(self, console: tcod.console.Console) -> np.ndarray:
+    def render(self, console: tcod.console.Console) -> "np.ndarray[Any, np.dtype[np.uint8]]":
         """Render an RGBA array, using console with this tileset.
 
         `console` is the Console object to render, this can not be the root
