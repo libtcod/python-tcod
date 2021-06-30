@@ -8,8 +8,14 @@ v2.0.0
 
 Unreleased
 ------------------
+
+12.7.0 - 2021-06-29
+-------------------
 Added
  - *tcod.image* and *tcod.tileset* now support *pathlib*.
+
+Fixed
+ - Wheels for 32-bit Windows now deploy again.
 
 12.6.2 - 2021-06-15
 -------------------
