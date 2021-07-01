@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+12.7.2 - 2021-07-01
+-------------------
 Fixed
  - *Scancode* and *KeySym* enums no longer crash when SDL returns an unexpected value.
 
