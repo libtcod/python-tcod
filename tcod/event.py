@@ -1598,6 +1598,14 @@ class Scancode(enum.IntEnum):
         """
         return self
 
+    @classmethod
+    def _missing_(cls, value: object) -> "Optional[Scancode]":
+        if not isinstance(value, int):
+            return None
+        result = cls(0)
+        result._value_ = value
+        return result
+
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, KeySym):
             raise TypeError(
@@ -2136,6 +2144,14 @@ class KeySym(enum.IntEnum):
         """
         _init_sdl_video()
         return Scancode(lib.SDL_GetScancodeFromKey(self.value))
+
+    @classmethod
+    def _missing_(cls, value: object) -> "Optional[KeySym]":
+        if not isinstance(value, int):
+            return None
+        result = cls(0)
+        result._value_ = value
+        return result
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, Scancode):
