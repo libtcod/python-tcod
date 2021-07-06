@@ -24,14 +24,18 @@ def _fmt(string: str) -> bytes:
 
 _root_console = None
 
-rgba_graphic = np.dtype([("ch", np.intc), ("fg", "4u1"), ("bg", "4u1")])
-"""A NumPy :any:`dtype` compatible with :any:`Console.buffer`.
+rgba_graphic = np.dtype([("ch", np.intc), ("fg", "4B"), ("bg", "4B")])
+"""A NumPy :any:`dtype` compatible with :any:`Console.rgba`.
+
+This dtype is: ``np.dtype([("ch", np.intc), ("fg", "4B"), ("bg", "4B")])``
 
 .. versionadded:: 12.3
 """
 
-rgb_graphic = np.dtype([("ch", np.intc), ("fg", "3u1"), ("bg", "3u1")])
-"""A NumPy :any:`dtype` compatible with :any:`Console.tiles_rgb`.
+rgb_graphic = np.dtype([("ch", np.intc), ("fg", "3B"), ("bg", "3B")])
+"""A NumPy :any:`dtype` compatible with :any:`Console.rgb`.
+
+This dtype is: ``np.dtype([("ch", np.intc), ("fg", "3B"), ("bg", "3B")])``
 
 .. versionadded:: 12.3
 """
@@ -93,9 +97,9 @@ class Console:
                 Added an alpha channel to the color types.
     """
 
-    DTYPE = np.dtype([("ch", np.intc), ("fg", "4u1"), ("bg", "4u1")])
+    DTYPE = rgba_graphic
 
-    # A structured arrays type with the added "fg_rgb" and "bg_rgb" fields.
+    # A structured array type with the added "fg_rgb" and "bg_rgb" fields.
     _DTYPE_RGB = np.dtype(
         {
             "names": ["ch", "fg", "bg"],
@@ -318,8 +322,8 @@ class Console:
         The axes of this array is affected by the `order` parameter given to
         initialize the console.
 
-        The :any:`rgb_graphic` can be used to make arrays similar to these
-        independent of a :any:`Console`.
+        The :any:`rgb_graphic` dtype can be used to make arrays compatiable
+        with this attribute that are independent of a :any:`Console`.
 
         Example:
             >>> con = tcod.console.Console(10, 2)
