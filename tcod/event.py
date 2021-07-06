@@ -1071,7 +1071,7 @@ class Scancode(enum.IntEnum):
     For example the scan codes for WASD remain in the same physical location
     regardless of the actual keyboard layout.
 
-    These names are derived from SDL expect for the numbers which are prefixed
+    These names are derived from SDL except for the numbers which are prefixed
     with ``N`` (since raw numbers can not be a Python name.)
 
     .. versionadded:: 12.3
@@ -1621,7 +1621,7 @@ class Scancode(enum.IntEnum):
 class KeySym(enum.IntEnum):
     """Keyboard constants based on their symbol.
 
-    These names are derived from SDL expect for the numbers which are prefixed
+    These names are derived from SDL except for the numbers which are prefixed
     with ``N`` (since raw numbers can not be a Python name.)
 
     .. versionadded:: 12.3
