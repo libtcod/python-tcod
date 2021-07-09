@@ -144,8 +144,7 @@ def _handle_title(title: Optional[str]) -> Any:
 class Context:
     """Context manager for libtcod context objects.
 
-    You should use :any:`tcod.context.new_terminal` or
-    :any:`tcod.context.new_window` to create a new context.
+    Use :any:`tcod.context.new` to create a new context.
     """
 
     def __init__(self, context_p: Any):
