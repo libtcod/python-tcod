@@ -8,6 +8,10 @@ v2.0.0
 
 Unreleased
 ------------------
+Deprecated
+ - `tcod.console_is_key_pressed` was replaced with `tcod.event.get_keyboard_state`.
+ - `tcod.console_from_file` is deprecated.
+ - The `.asc` and `.apf` formats are no longer actively supported.
 
 12.7.2 - 2021-07-01
 -------------------

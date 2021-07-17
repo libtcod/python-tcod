@@ -1720,6 +1720,12 @@ def console_wait_for_keypress(flush: bool) -> Key:
 
     .. deprecated:: 9.3
         Use the :any:`tcod.event.wait` function to wait for events.
+
+        Example::
+
+            for event in tcod.event.wait():
+                if isinstance(event, tcod.event.KeyDown):
+                    ...
     """
     key = Key()
     lib.TCOD_console_wait_for_keypress_wrapper(key.key_p, flush)
@@ -1731,14 +1737,24 @@ def console_check_for_keypress(flags: int = KEY_RELEASED) -> Key:
     """
     .. deprecated:: 9.3
         Use the :any:`tcod.event.get` function to check for events.
+
+        Example::
+
+            for event in tcod.event.get():
+                if isinstance(event, tcod.event.KeyDown):
+                    ...
     """
     key = Key()
     lib.TCOD_console_check_for_keypress_wrapper(key.key_p, flags)
     return key
 
 
-@pending_deprecate()
+@deprecate("Use tcod.event.get_keyboard_state to see if a key is held.")
 def console_is_key_pressed(key: int) -> bool:
+    """
+    .. deprecated:: 12.7
+        Use :any:`tcod.event.get_keyboard_state` to check if a key is held.
+    """
     return bool(lib.TCOD_console_is_key_pressed(key))
 
 
@@ -1754,6 +1770,7 @@ def console_new(w: int, h: int) -> tcod.console.Console:
     return tcod.console.Console(w, h)
 
 
+@deprecate("This loading method is no longer supported, use tcod.console_load_xp instead.")
 def console_from_file(filename: str) -> tcod.console.Console:
     """Return a new console object from a filename.
 
@@ -1764,6 +1781,11 @@ def console_from_file(filename: str) -> tcod.console.Console:
         filename (Text): The path to the file, as a string.
 
     Returns: A new :any`Console` instance.
+
+    .. deprecated:: 12.7
+        Use :any:`tcod.console_load_xp` to load REXPaint consoles.
+
+        Other formats are not actively supported.
     """
     if not os.path.exists(filename):
         raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(filename),))
@@ -1933,27 +1955,43 @@ def console_fill_char(con: tcod.console.Console, arr: Sequence[int]) -> None:
     lib.TCOD_console_fill_char(_console(con), carr)
 
 
-@pending_deprecate()
+@deprecate("This format is not actively supported")
 def console_load_asc(con: tcod.console.Console, filename: str) -> bool:
-    """Update a console from a non-delimited ASCII `.asc` file."""
+    """Update a console from a non-delimited ASCII `.asc` file.
+
+    .. deprecated:: 12.7
+        This format is no longer supported.
+    """
     return bool(lib.TCOD_console_load_asc(_console(con), filename.encode("utf-8")))
 
 
-@pending_deprecate()
+@deprecate("This format is not actively supported")
 def console_save_asc(con: tcod.console.Console, filename: str) -> bool:
-    """Save a console to a non-delimited ASCII `.asc` file."""
+    """Save a console to a non-delimited ASCII `.asc` file.
+
+    .. deprecated:: 12.7
+        This format is no longer supported.
+    """
     return bool(lib.TCOD_console_save_asc(_console(con), filename.encode("utf-8")))
 
 
-@pending_deprecate()
+@deprecate("This format is not actively supported")
 def console_load_apf(con: tcod.console.Console, filename: str) -> bool:
-    """Update a console from an ASCII Paint `.apf` file."""
+    """Update a console from an ASCII Paint `.apf` file.
+
+    .. deprecated:: 12.7
+        This format is no longer supported.
+    """
     return bool(lib.TCOD_console_load_apf(_console(con), filename.encode("utf-8")))
 
 
-@pending_deprecate()
+@deprecate("This format is not actively supported")
 def console_save_apf(con: tcod.console.Console, filename: str) -> bool:
-    """Save a console to an ASCII Paint `.apf` file."""
+    """Save a console to an ASCII Paint `.apf` file.
+
+    .. deprecated:: 12.7
+        This format is no longer supported.
+    """
     return bool(lib.TCOD_console_save_apf(_console(con), filename.encode("utf-8")))
 
 
