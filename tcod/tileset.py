@@ -278,9 +278,8 @@ def load_tilesheet(path: Union[str, Path], columns: int, rows: int, charmap: Opt
     `columns` and `rows` is the shape of the tileset.  Tiles are assumed to
     take up the entire space of the image.
 
-    `charmap` is the character mapping to use.  This is a list or generator
-    of codepoints which map the tiles like this:
-    ``charmap[tile_index] = codepoint``.
+    `charmap` is a sequence of codepoints to map the tilesheet to in row-major order.
+    This is a list or generator of codepoints which map the tiles like this: ``charmap[tile_index] = codepoint``.
     For common tilesets `charmap` should be :any:`tcod.tileset.CHARMAP_CP437`.
     Generators will be sliced so :any:`itertools.count` can be used which will
     give all tiles the same codepoint as their index, but this will not map
