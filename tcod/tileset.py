@@ -84,7 +84,7 @@ class Tileset:
         )
         return tile
 
-    def set_tile(self, codepoint: int, tile: ArrayLike) -> None:
+    def set_tile(self, codepoint: int, tile: "ArrayLike") -> None:
         """Upload a tile into this array.
 
         The tile can be in 32-bit color (height, width, rgba), or grey-scale

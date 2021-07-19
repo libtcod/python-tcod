@@ -135,7 +135,7 @@ class NodeCostArray(np.ndarray):  # type: ignore
         np.uint32: ("uint32_t*", _get_pathcost_func("PathCostArrayUInt32")),
     }
 
-    def __new__(cls, array: ArrayLike) -> "NodeCostArray":
+    def __new__(cls, array: "ArrayLike") -> "NodeCostArray":
         """Validate a numpy array and setup a C callback."""
         self = np.asarray(array).view(cls)
         return self
@@ -353,8 +353,8 @@ def _compile_cost_edges(edge_map: Any) -> Tuple[Any, int]:
 
 
 def dijkstra2d(
-    distance: ArrayLike,
-    cost: ArrayLike,
+    distance: "ArrayLike",
+    cost: "ArrayLike",
     cardinal: Optional[int] = None,
     diagonal: Optional[int] = None,
     *,
@@ -512,7 +512,7 @@ def dijkstra2d(
     return out
 
 
-def _compile_bool_edges(edge_map: ArrayLike) -> Tuple[Any, int]:
+def _compile_bool_edges(edge_map: "ArrayLike") -> Tuple[Any, int]:
     """Return an edge array using a boolean map."""
     edge_map = np.array(edge_map, copy=True)
     edge_center = edge_map.shape[0] // 2, edge_map.shape[1] // 2
@@ -523,7 +523,7 @@ def _compile_bool_edges(edge_map: ArrayLike) -> Tuple[Any, int]:
 
 
 def hillclimb2d(
-    distance: ArrayLike,
+    distance: "ArrayLike",
     start: Tuple[int, int],
     cardinal: Optional[bool] = None,
     diagonal: Optional[bool] = None,
@@ -781,7 +781,7 @@ class CustomGraph:
     def add_edges(
         self,
         *,
-        edge_map: ArrayLike,
+        edge_map: "ArrayLike",
         cost: "np.ndarray[Any, Any]",
         condition: "Optional[np.ndarray[Any, Any]]" = None,
     ) -> None:
@@ -1024,7 +1024,7 @@ class SimpleGraph:
     .. versionadded:: 11.15
     """
 
-    def __init__(self, *, cost: ArrayLike, cardinal: int, diagonal: int, greed: int = 1):
+    def __init__(self, *, cost: "ArrayLike", cardinal: int, diagonal: int, greed: int = 1):
         cost = np.asarray(cost)
         if cost.ndim != 2:
             raise TypeError("The cost array must e 2 dimensional, array of shape %r given." % (cost.shape,))

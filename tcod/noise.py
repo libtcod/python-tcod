@@ -287,7 +287,7 @@ class Noise(object):
 
         return out
 
-    def sample_mgrid(self, mgrid: ArrayLike) -> "np.ndarray[Any, np.dtype[np.float32]]":
+    def sample_mgrid(self, mgrid: "ArrayLike") -> "np.ndarray[Any, np.dtype[np.float32]]":
         """Sample a mesh-grid array and return the result.
 
         The :any:`sample_ogrid` method performs better as there is a lot of
@@ -319,7 +319,7 @@ class Noise(object):
         )
         return out
 
-    def sample_ogrid(self, ogrid: Sequence[ArrayLike]) -> "np.ndarray[Any, np.dtype[np.float32]]":
+    def sample_ogrid(self, ogrid: "Sequence[ArrayLike]") -> "np.ndarray[Any, np.dtype[np.float32]]":
         """Sample an open mesh-grid array and return the result.
 
         Args
