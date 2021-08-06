@@ -1300,7 +1300,7 @@ def load_xp(path: Union[str, Path], order: Literal["C", "F"] = "C") -> Tuple[Con
 
         # Apply REXPaint's alpha key color.
         KEY_COLOR = (255, 0, 255)
-        is_transparent = console.rgb["bg"] == KEY_COLOR
+        is_transparent = (console.rgb["bg"] == KEY_COLOR).all(axis=-1)
         console.rgba[is_transparent] = (ord(" "), (0,), (0,))
     """
     if not os.path.exists(path):
