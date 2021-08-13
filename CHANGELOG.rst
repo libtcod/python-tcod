@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+12.7.3 - 2021-08-13
+-------------------
 Deprecated
  - `tcod.console_is_key_pressed` was replaced with `tcod.event.get_keyboard_state`.
  - `tcod.console_from_file` is deprecated.
