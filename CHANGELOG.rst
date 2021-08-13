@@ -13,6 +13,9 @@ Deprecated
  - `tcod.console_from_file` is deprecated.
  - The `.asc` and `.apf` formats are no longer actively supported.
 
+Fixed
+ - Fixed the parsing of SDL 2.0.16 headers.
+
 12.7.2 - 2021-07-01
 -------------------
 Fixed
