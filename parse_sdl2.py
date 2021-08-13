@@ -22,6 +22,7 @@ RE_ENDIAN2 = re.compile(r"#if SDL_BYTEORDER == SDL_BIG_ENDIAN(.*?)#else(.*?)#end
 RE_DEFINE_TRUNCATE = re.compile(r"(#define\s+\w+\s+).+$", flags=re.DOTALL)
 RE_TYPEDEF_TRUNCATE = re.compile(r"(typedef\s+\w+\s+\w+)\s*{.*\n}(?=.*;$)", flags=re.DOTALL | re.MULTILINE)
 RE_ENUM_TRUNCATE = re.compile(r"(\w+\s*=).+?(?=,$|})(?![^(']*\))", re.MULTILINE | re.DOTALL)
+RE_EVENT_PADDING = re.compile(r"Uint8 padding\[[^]]+\];", re.MULTILINE | re.DOTALL)
 
 
 def get_header(name: str) -> str:
@@ -76,6 +77,7 @@ def parse(header: str, NEEDS_PACK4: bool) -> Iterator[str]:
 
         typedef = typedef.replace("SDLCALL", " ")
         typedef = typedef.replace("SDL_AUDIOCVT_PACKED ", "")
+        typedef = RE_EVENT_PADDING.sub("Uint8 padding[...];", typedef)
 
         if NEEDS_PACK4 and "typedef struct SDL_AudioCVT" in typedef:
             typedef = RE_TYPEDEF_TRUNCATE.sub(r"\1 { ...; }", typedef)
@@ -93,8 +95,9 @@ def parse(header: str, NEEDS_PACK4: bool) -> Iterator[str]:
         if "va_list" in decl:
             continue
         decl = re.sub(r"SDL_PRINTF_VARARG_FUNC\(\w*\)", "", decl)
-        decl = decl.replace("extern DECLSPEC ", "")
-        decl = decl.replace("SDLCALL", " ")
+        decl = decl.replace("SDL_DEPRECATED", "")
+        decl = decl.replace("SDLCALL", "")
+        decl = re.sub(r"extern\s+DECLSPEC", "", decl)
         yield decl.replace("SDL_PRINTF_FORMAT_STRING ", "")
 
 
