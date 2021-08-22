@@ -19,6 +19,18 @@ def get_charmaps() -> Iterator[str]:
             yield name[len("CHARMAP_") :].lower()
 
 
+def escape_rst(string: str) -> str:
+    """Escape RST symbols and disable Sphinx smart quotes."""
+    return (
+        string.replace("\\", "\\\\")
+        .replace("*", "\\*")
+        .replace("|", "\\|")
+        .replace("`", "\\`")
+        .replace("'", "\\'")
+        .replace('"', '\\"')
+    )
+
+
 def generate_table(charmap: Iterable[int]) -> str:
     """Generate and RST table for `charmap`."""
     headers = ("Tile Index", "Unicode", "String", "Name")
@@ -33,7 +45,7 @@ def generate_table(charmap: Iterable[int]) -> str:
         except ValueError:
             # Skip names rather than guessing, the official names are enough.
             name = ""
-        string = f"{chr(ch)!r}".replace("\\", "\\\\").replace("*", "\\*").replace("`", "\\`")  # Escape RST symbols.
+        string = escape_rst(f"{chr(ch)!r}")
         table.append((i, f"0x{ch:0{hex_len}X}", string, name))
     return tabulate(table, headers, tablefmt="rst")
 
