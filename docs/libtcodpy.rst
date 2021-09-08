@@ -47,18 +47,44 @@ color
 
 color controls
 ~~~~~~~~~~~~~~
-Configurable color control constants which can be set up with
-:any:`tcod.console_set_color_control`.
+Libtcod color control constants.
+These can be inserted into Python strings with the ``%c`` format specifier as shown below.
 
 .. data:: tcod.COLCTRL_1
+
+    These can be configured with :any:`tcod.console_set_color_control`.
+    However, it is recommended to use :any:`tcod.COLCTRL_FORE_RGB` and :any:`tcod.COLCTRL_BACK_RGB` instead.
+
 .. data:: tcod.COLCTRL_2
 .. data:: tcod.COLCTRL_3
 .. data:: tcod.COLCTRL_4
 .. data:: tcod.COLCTRL_5
 
 .. data:: tcod.COLCTRL_STOP
+
+    When this control character is inserted into a string the foreground and background colors will be reset for the
+    remaining characters of the string.
+
+    >>> import tcod
+    >>> reset_color = f"{tcod.COLCTRL_STOP:c}"
+
 .. data:: tcod.COLCTRL_FORE_RGB
+
+    Sets the foreground color to the next 3 Unicode characters for the remaining characters.
+
+    >>> fg = (255, 255, 255)
+    >>> change_fg = f"{tcod.COLCTRL_FORE_RGB:c}{fg[0]:c}{fg[1]:c}{fg[2]:c}"
+    >>> string = f"Old color {change_fg}new color{tcod.COLCTRL_STOP:c} old color."
+
 .. data:: tcod.COLCTRL_BACK_RGB
+
+    Sets the background color to the next 3 Unicode characters for the remaining characters.
+
+    >>> from typing import Tuple
+    >>> def change_colors(fg: Tuple[int, int, int], bg: Tuple[int, int, int]) -> str:
+    ...     """Return the control codes to change the foreground and background colors."""
+    ...     return "%c%c%c%c%c%c%c%c" % (tcod.COLCTRL_FORE_RGB, *fg, tcod.COLCTRL_BACK_RGB, *bg)
+    >>> string = f"Old {change_colors(fg=(255, 255, 255), bg=(0, 0, 255))}new"
 
 console
 -------

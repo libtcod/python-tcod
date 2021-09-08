@@ -60,5 +60,4 @@ Glossary
     color control
     color controls
         Libtcod's old system which assigns colors to specific codepoints.
-        This is deprecated in favor of the codes which set the foreground and
-        background colors directly.
+        See :any:`tcod.COLCTRL_STOP`, :any:`tcod.COLCTRL_FORE_RGB`, and :any:`tcod.COLCTRL_BACK_RGB` for examples.
