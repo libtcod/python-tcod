@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Changed
+ - Console print and drawing functions now always use absolute coordinates for negative numbers.
 
 12.7.3 - 2021-08-13
 -------------------

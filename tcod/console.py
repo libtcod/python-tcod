@@ -926,20 +926,6 @@ class Console:
         """Return a simplified representation of this consoles contents."""
         return "<%s>" % "\n ".join("".join(chr(c) for c in line) for line in self._tiles["ch"])
 
-    def _pythonic_index(self, x: int, y: int) -> Tuple[int, int]:
-        if __debug__ and (x < 0 or y < 0):
-            warnings.warn(
-                "Negative indexes will be treated as absolute coordinates instead of relative in the future."
-                "  The current behavior of indexing from the end is deprecated.",
-                FutureWarning,
-                stacklevel=3,
-            )
-        if x < 0:
-            x += self.width
-        if y < 0:
-            y += self.height
-        return x, y
-
     def print(
         self,
         x: int,
@@ -972,8 +958,10 @@ class Console:
 
         .. versionchanged:: 9.0
             `fg` and `bg` now default to `None` instead of white-on-black.
+
+        .. versionchanged:: 13.0
+            `x` and `y` are now always used as an absolute position for negative values.
         """
-        x, y = self._pythonic_index(x, y)
         string_ = string.encode("utf-8")  # type: bytes
         lib.TCOD_console_printn(
             self.console_c,
@@ -1025,8 +1013,10 @@ class Console:
 
         .. versionchanged:: 9.0
             `fg` and `bg` now default to `None` instead of white-on-black.
+
+        .. versionchanged:: 13.0
+            `x` and `y` are now always used as an absolute position for negative values.
         """
-        x, y = self._pythonic_index(x, y)
         string_ = string.encode("utf-8")  # type: bytes
         return int(
             lib.TCOD_console_printn_rect(
@@ -1095,6 +1085,9 @@ class Console:
         .. versionchanged:: 12.6
             Added `decoration` parameter.
 
+        .. versionchanged:: 13.0
+            `x` and `y` are now always used as an absolute position for negative values.
+
         Example::
 
             >>> console = tcod.Console(12, 6)
@@ -1115,7 +1108,6 @@ class Console:
              │          │
              └─┤Lower├──┘>
         """
-        x, y = self._pythonic_index(x, y)
         if title and decoration != "┌─┐│ │└─┘":
             raise TypeError(
                 "The title and decoration parameters are mutually exclusive.  You should print the title manually."
@@ -1195,8 +1187,10 @@ class Console:
 
         .. versionchanged:: 9.0
             `fg` and `bg` now default to `None` instead of white-on-black.
+
+        .. versionchanged:: 13.0
+            `x` and `y` are now always used as an absolute position for negative values.
         """
-        x, y = self._pythonic_index(x, y)
         lib.TCOD_console_draw_rect_rgb(
             self.console_c,
             x,
