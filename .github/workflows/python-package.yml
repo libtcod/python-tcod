@@ -153,7 +153,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["macos-latest"]
+        os: ["macos-10.15"]
         python-version: ["3.x"]
     steps:
       # v2 breaks `git describe` so v1 is needed.
