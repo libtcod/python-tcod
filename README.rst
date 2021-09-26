@@ -6,7 +6,7 @@
 ========
 |VersionsBadge| |ImplementationBadge| |LicenseBadge|
 
-|PyPI| |RTD| |Appveyor| |Travis| |Codecov| |Codacy|
+|PyPI| |RTD| |Codecov| |Codacy|
 
 |Requires| |Pyup|
 
@@ -92,12 +92,6 @@ python-tcod is distributed under the `Simplified 2-clause FreeBSD license
 .. |RTD| image:: https://readthedocs.org/projects/python-tcod/badge/?version=latest
     :target: http://python-tcod.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
-
-.. |Appveyor| image:: https://ci.appveyor.com/api/projects/status/bb04bpankj0h1cpa/branch/master?svg=true
-    :target: https://ci.appveyor.com/project/HexDecimal/python-tdl/branch/master
-
-.. |Travis| image:: https://travis-ci.org/libtcod/python-tcod.svg?branch=master
-    :target: https://travis-ci.org/libtcod/python-tcod
 
 .. |Codecov| image:: https://codecov.io/gh/libtcod/python-tcod/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/libtcod/python-tcod
