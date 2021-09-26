@@ -6,13 +6,9 @@ from typing import Any, NoReturn
 
 import numpy as np
 import pytest
+from numpy.typing import DTypeLike
 
 import tcod
-
-try:
-    from numpy.typing import DTypeLike
-except ImportError:  # Python < 3.7
-    from typing import Any as DTypeLike
 
 
 def raise_Exception(*args: Any) -> NoReturn:

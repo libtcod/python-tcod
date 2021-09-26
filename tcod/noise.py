@@ -39,17 +39,13 @@ import warnings
 from typing import Any, Optional, Sequence, Tuple, Union
 
 import numpy as np
+from numpy.typing import ArrayLike
 from typing_extensions import Literal
 
 import tcod.constants
 import tcod.random
 from tcod._internal import deprecate
 from tcod.loader import ffi, lib
-
-try:
-    from numpy.typing import ArrayLike
-except ImportError:  # Python < 3.7, Numpy < 1.20
-    from typing import Any as ArrayLike
 
 
 class Algorithm(enum.IntEnum):

@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Removed
+ - Python 3.6 is no longer supported.
 
 13.0.0 - 2021-09-20
 -------------------

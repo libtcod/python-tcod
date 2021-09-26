@@ -119,7 +119,7 @@ setup(
     py_modules=["libtcodpy"],
     packages=["tcod", "tcod.__pyinstaller"],
     package_data={"tcod": get_package_data()},
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     setup_requires=[
         *pytest_runner,
         "cffi~=1.13",
@@ -127,7 +127,7 @@ setup(
     ],
     install_requires=[
         "cffi~=1.13",  # Also required by pyproject.toml.
-        "numpy~=1.10" if not is_pypy else "",
+        "numpy>=1.20.3" if not is_pypy else "",
         "typing_extensions",
     ],
     cffi_modules=["build_libtcod.py:ffi"],
@@ -144,7 +144,6 @@ setup(
         "Operating System :: MacOS :: MacOS X",
         "Operating System :: Microsoft :: Windows",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",

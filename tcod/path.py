@@ -21,16 +21,12 @@ import warnings
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
+from numpy.typing import ArrayLike
 from typing_extensions import Literal
 
 import tcod.map  # noqa: F401
 from tcod._internal import _check
 from tcod.loader import ffi, lib
-
-try:
-    from numpy.typing import ArrayLike
-except ImportError:  # Python < 3.7, Numpy < 1.20
-    from typing import Any as ArrayLike
 
 
 @ffi.def_extern()  # type: ignore

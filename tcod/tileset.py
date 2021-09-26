@@ -16,15 +16,11 @@ from pathlib import Path
 from typing import Any, Iterable, Optional, Tuple, Union
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 import tcod.console
 from tcod._internal import _check, _console, _raise_tcod_error, deprecate
 from tcod.loader import ffi, lib
-
-try:
-    from numpy.typing import ArrayLike
-except ImportError:  # Python < 3.7, Numpy < 1.20
-    from typing import Any as ArrayLike
 
 
 class Tileset:
