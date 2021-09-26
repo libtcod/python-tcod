@@ -1,6 +1,8 @@
 """
 
 """
+from __future__ import annotations
+
 import warnings
 from typing import Any, List
 
@@ -63,7 +65,7 @@ class Color(List[int]):
         self[2] = value & 0xFF
 
     @classmethod
-    def _new_from_cdata(cls, cdata: Any) -> "Color":
+    def _new_from_cdata(cls, cdata: Any) -> Color:
         """new in libtcod-cffi"""
         return cls(cdata.r, cdata.g, cdata.b)
 
@@ -100,7 +102,7 @@ class Color(List[int]):
             return False
 
     @deprecate("Use NumPy instead for color math operations.")
-    def __add__(self, other: Any) -> "Color":
+    def __add__(self, other: Any) -> Color:
         """Add two colors together.
 
         .. deprecated:: 9.2
@@ -109,7 +111,7 @@ class Color(List[int]):
         return Color._new_from_cdata(lib.TCOD_color_add(self, other))
 
     @deprecate("Use NumPy instead for color math operations.")
-    def __sub__(self, other: Any) -> "Color":
+    def __sub__(self, other: Any) -> Color:
         """Subtract one color from another.
 
         .. deprecated:: 9.2
@@ -118,7 +120,7 @@ class Color(List[int]):
         return Color._new_from_cdata(lib.TCOD_color_subtract(self, other))
 
     @deprecate("Use NumPy instead for color math operations.")
-    def __mul__(self, other: Any) -> "Color":
+    def __mul__(self, other: Any) -> Color:
         """Multiply with a scaler or another color.
 
         .. deprecated:: 9.2

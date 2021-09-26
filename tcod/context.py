@@ -47,6 +47,8 @@ to setup the size of the console.  You should use
 
 .. versionadded:: 11.12
 """  # noqa: E501
+from __future__ import annotations
+
 import os
 import pickle
 import sys
@@ -152,10 +154,10 @@ class Context:
         self._context_p = context_p
 
     @classmethod
-    def _claim(cls, context_p: Any) -> "Context":
+    def _claim(cls, context_p: Any) -> Context:
         return cls(ffi.gc(context_p, lib.TCOD_context_delete))
 
-    def __enter__(self) -> "Context":
+    def __enter__(self) -> Context:
         """This context can be used as a context manager."""
         return self
 
@@ -345,7 +347,7 @@ class Context:
 @ffi.def_extern()  # type: ignore
 def _pycall_cli_output(catch_reference: Any, output: Any) -> None:
     """Callback for the libtcod context CLI.  Catches the CLI output."""
-    catch = ffi.from_handle(catch_reference)  # type: List[str]
+    catch: List[str] = ffi.from_handle(catch_reference)
     catch.append(ffi.string(output).decode("utf-8"))
 
 
@@ -417,7 +419,7 @@ def new(
     argv_encoded = [ffi.new("char[]", arg.encode("utf-8")) for arg in argv]  # Needs to be kept alive for argv_c.
     argv_c = ffi.new("char*[]", argv_encoded)
 
-    catch_msg = []  # type: List[str]
+    catch_msg: List[str] = []
     catch_handle = ffi.new_handle(catch_msg)  # Keep alive.
 
     title_p = _handle_title(title)  # Keep alive.

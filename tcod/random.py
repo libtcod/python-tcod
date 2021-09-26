@@ -6,6 +6,8 @@ instead of this one.
 However, you will need to use these generators to get deterministic results
 from the :any:`Noise` and :any:`BSP` classes.
 """
+from __future__ import annotations
+
 import os
 import random
 import warnings
@@ -81,9 +83,9 @@ class Random(object):
         )
 
     @classmethod
-    def _new_from_cdata(cls, cdata: Any) -> "Random":
+    def _new_from_cdata(cls, cdata: Any) -> Random:
         """Return a new instance encapsulating this cdata."""
-        self = object.__new__(cls)  # type: "Random"
+        self: Random = object.__new__(cls)
         self.random_c = cdata
         return self
 

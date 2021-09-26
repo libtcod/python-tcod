@@ -10,13 +10,15 @@ useful to use `an alternative library for graphics rendering
 <https://wiki.python.org/moin/PythonGameLibraries>`_ while continuing to use
 python-tcod's pathfinding and field-of-view algorithms.
 """
+from __future__ import annotations
+
 import itertools
 import os
 from pathlib import Path
 from typing import Any, Iterable, Optional, Tuple, Union
 
 import numpy as np
-from numpy.typing import ArrayLike
+from numpy.typing import ArrayLike, NDArray
 
 import tcod.console
 from tcod._internal import _check, _console, _raise_tcod_error, deprecate
@@ -36,9 +38,9 @@ class Tileset:
         )
 
     @classmethod
-    def _claim(cls, cdata: Any) -> "Tileset":
+    def _claim(cls, cdata: Any) -> Tileset:
         """Return a new Tileset that owns the provided TCOD_Tileset* object."""
-        self = object.__new__(cls)  # type: Tileset
+        self: Tileset = object.__new__(cls)
         if cdata == ffi.NULL:
             raise RuntimeError("Tileset initialized with nullptr.")
         self._tileset_p = ffi.gc(cdata, lib.TCOD_tileset_delete)
@@ -63,7 +65,7 @@ class Tileset:
         """Test if a tileset has a codepoint with ``n in tileset``."""
         return bool(lib.TCOD_tileset_get_tile_(self._tileset_p, codepoint, ffi.NULL) == 0)
 
-    def get_tile(self, codepoint: int) -> "np.ndarray[Any, np.dtype[np.uint8]]":
+    def get_tile(self, codepoint: int) -> NDArray[np.uint8]:
         """Return a copy of a tile for the given codepoint.
 
         If the tile does not exist yet then a blank array will be returned.
@@ -80,7 +82,7 @@ class Tileset:
         )
         return tile
 
-    def set_tile(self, codepoint: int, tile: "ArrayLike") -> None:
+    def set_tile(self, codepoint: int, tile: ArrayLike) -> None:
         """Upload a tile into this array.
 
         The tile can be in 32-bit color (height, width, rgba), or grey-scale
@@ -104,7 +106,7 @@ class Tileset:
             ffi.from_buffer("struct TCOD_ColorRGBA*", tile),
         )
 
-    def render(self, console: tcod.console.Console) -> "np.ndarray[Any, np.dtype[np.uint8]]":
+    def render(self, console: tcod.console.Console) -> NDArray[np.uint8]:
         """Render an RGBA array, using console with this tileset.
 
         `console` is the Console object to render, this can not be the root

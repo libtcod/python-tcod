@@ -1,5 +1,7 @@
 """This module handles backward compatibility with the ctypes libtcodpy module.
 """
+from __future__ import annotations
+
 import atexit
 import os
 import sys
@@ -8,6 +10,7 @@ import warnings
 from typing import Any, AnyStr, Callable, Hashable, Iterable, Iterator, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
+from numpy.typing import NDArray
 from typing_extensions import Literal
 
 import tcod.bsp
@@ -142,13 +145,13 @@ class ConsoleBuffer(object):
         self.fore_b = [fore_b] * n
         self.char = [ord(char)] * n
 
-    def copy(self) -> "ConsoleBuffer":
+    def copy(self) -> ConsoleBuffer:
         """Returns a copy of this ConsoleBuffer.
 
         Returns:
             ConsoleBuffer: A new ConsoleBuffer copy.
         """
-        other = ConsoleBuffer(0, 0)  # type: "ConsoleBuffer"
+        other = ConsoleBuffer(0, 0)
         other.width = self.width
         other.height = self.height
         other.back_r = list(self.back_r)  # make explicit copies of all lists
@@ -2293,7 +2296,7 @@ def dijkstra_delete(p: tcod.path.Dijkstra) -> None:
     """
 
 
-def _heightmap_cdata(array: "np.ndarray[Any, np.dtype[np.float32]]") -> ffi.CData:
+def _heightmap_cdata(array: NDArray[np.float32]) -> ffi.CData:
     """Return a new TCOD_heightmap_t instance using an array.
 
     Formatting is verified during this function.
@@ -2310,7 +2313,7 @@ def _heightmap_cdata(array: "np.ndarray[Any, np.dtype[np.float32]]") -> ffi.CDat
 
 
 @pending_deprecate()
-def heightmap_new(w: int, h: int, order: str = "C") -> "np.ndarray[Any, np.dtype[np.float32]]":
+def heightmap_new(w: int, h: int, order: str = "C") -> NDArray[np.float32]:
     """Return a new numpy.ndarray formatted for use with heightmap functions.
 
     `w` and `h` are the width and height of the array.
@@ -2337,7 +2340,7 @@ def heightmap_new(w: int, h: int, order: str = "C") -> "np.ndarray[Any, np.dtype
 
 
 @deprecate("Assign to heightmaps as a NumPy array instead.")
-def heightmap_set_value(hm: "np.ndarray[Any, np.dtype[np.float32]]", x: int, y: int, value: float) -> None:
+def heightmap_set_value(hm: NDArray[np.float32], x: int, y: int, value: float) -> None:
     """Set the value of a point on a heightmap.
 
     .. deprecated:: 2.0
@@ -2362,7 +2365,7 @@ def heightmap_set_value(hm: "np.ndarray[Any, np.dtype[np.float32]]", x: int, y: 
 
 
 @deprecate("Add a scalar to an array using `hm[:] += value`")
-def heightmap_add(hm: "np.ndarray[Any, np.dtype[np.float32]]", value: float) -> None:
+def heightmap_add(hm: NDArray[np.float32], value: float) -> None:
     """Add value to all values on this heightmap.
 
     Args:
@@ -2376,7 +2379,7 @@ def heightmap_add(hm: "np.ndarray[Any, np.dtype[np.float32]]", value: float) -> 
 
 
 @deprecate("Multiply an array with a scaler using `hm[:] *= value`")
-def heightmap_scale(hm: "np.ndarray[Any, np.dtype[np.float32]]", value: float) -> None:
+def heightmap_scale(hm: NDArray[np.float32], value: float) -> None:
     """Multiply all items on this heightmap by value.
 
     Args:
@@ -2390,7 +2393,7 @@ def heightmap_scale(hm: "np.ndarray[Any, np.dtype[np.float32]]", value: float) -
 
 
 @deprecate("Clear an array with`hm[:] = 0`")
-def heightmap_clear(hm: "np.ndarray[Any, np.dtype[np.float32]]") -> None:
+def heightmap_clear(hm: NDArray[np.float32]) -> None:
     """Add value to all values on this heightmap.
 
     Args:
@@ -2403,7 +2406,7 @@ def heightmap_clear(hm: "np.ndarray[Any, np.dtype[np.float32]]") -> None:
 
 
 @deprecate("Clamp array values using `hm.clip(mi, ma)`")
-def heightmap_clamp(hm: "np.ndarray[Any, np.dtype[np.float32]]", mi: float, ma: float) -> None:
+def heightmap_clamp(hm: NDArray[np.float32], mi: float, ma: float) -> None:
     """Clamp all values on this heightmap between ``mi`` and ``ma``
 
     Args:
@@ -2418,7 +2421,7 @@ def heightmap_clamp(hm: "np.ndarray[Any, np.dtype[np.float32]]", mi: float, ma: 
 
 
 @deprecate("Copy an array using `hm2[:] = hm1[:]`, or `hm1.copy()`")
-def heightmap_copy(hm1: "np.ndarray[Any, np.dtype[np.float32]]", hm2: "np.ndarray[Any, np.dtype[np.float32]]") -> None:
+def heightmap_copy(hm1: NDArray[np.float32], hm2: NDArray[np.float32]) -> None:
     """Copy the heightmap ``hm1`` to ``hm2``.
 
     Args:
@@ -2432,7 +2435,7 @@ def heightmap_copy(hm1: "np.ndarray[Any, np.dtype[np.float32]]", hm2: "np.ndarra
 
 
 @pending_deprecate()
-def heightmap_normalize(hm: "np.ndarray[Any, np.dtype[np.float32]]", mi: float = 0.0, ma: float = 1.0) -> None:
+def heightmap_normalize(hm: NDArray[np.float32], mi: float = 0.0, ma: float = 1.0) -> None:
     """Normalize heightmap values between ``mi`` and ``ma``.
 
     Args:
@@ -2444,9 +2447,9 @@ def heightmap_normalize(hm: "np.ndarray[Any, np.dtype[np.float32]]", mi: float =
 
 @pending_deprecate()
 def heightmap_lerp_hm(
-    hm1: "np.ndarray[Any, np.dtype[np.float32]]",
-    hm2: "np.ndarray[Any, np.dtype[np.float32]]",
-    hm3: "np.ndarray[Any, np.dtype[np.float32]]",
+    hm1: NDArray[np.float32],
+    hm2: NDArray[np.float32],
+    hm3: NDArray[np.float32],
     coef: float,
 ) -> None:
     """Perform linear interpolation between two heightmaps storing the result
@@ -2470,9 +2473,9 @@ def heightmap_lerp_hm(
 
 @deprecate("Add 2 arrays using `hm3 = hm1 + hm2`")
 def heightmap_add_hm(
-    hm1: "np.ndarray[Any, np.dtype[np.float32]]",
-    hm2: "np.ndarray[Any, np.dtype[np.float32]]",
-    hm3: "np.ndarray[Any, np.dtype[np.float32]]",
+    hm1: NDArray[np.float32],
+    hm2: NDArray[np.float32],
+    hm3: NDArray[np.float32],
 ) -> None:
     """Add two heightmaps together and stores the result in ``hm3``.
 
@@ -2489,9 +2492,9 @@ def heightmap_add_hm(
 
 @deprecate("Multiply 2 arrays using `hm3 = hm1 * hm2`")
 def heightmap_multiply_hm(
-    hm1: "np.ndarray[Any, np.dtype[np.float32]]",
-    hm2: "np.ndarray[Any, np.dtype[np.float32]]",
-    hm3: "np.ndarray[Any, np.dtype[np.float32]]",
+    hm1: NDArray[np.float32],
+    hm2: NDArray[np.float32],
+    hm3: NDArray[np.float32],
 ) -> None:
     """Multiplies two heightmap's together and stores the result in ``hm3``.
 
@@ -2508,9 +2511,7 @@ def heightmap_multiply_hm(
 
 
 @pending_deprecate()
-def heightmap_add_hill(
-    hm: "np.ndarray[Any, np.dtype[np.float32]]", x: float, y: float, radius: float, height: float
-) -> None:
+def heightmap_add_hill(hm: NDArray[np.float32], x: float, y: float, radius: float, height: float) -> None:
     """Add a hill (a half spheroid) at given position.
 
     If height == radius or -radius, the hill is a half-sphere.
@@ -2526,9 +2527,7 @@ def heightmap_add_hill(
 
 
 @pending_deprecate()
-def heightmap_dig_hill(
-    hm: "np.ndarray[Any, np.dtype[np.float32]]", x: float, y: float, radius: float, height: float
-) -> None:
+def heightmap_dig_hill(hm: NDArray[np.float32], x: float, y: float, radius: float, height: float) -> None:
     """
 
     This function takes the highest value (if height > 0) or the lowest
@@ -2549,7 +2548,7 @@ def heightmap_dig_hill(
 
 @pending_deprecate()
 def heightmap_rain_erosion(
-    hm: "np.ndarray[Any, np.dtype[np.float32]]",
+    hm: NDArray[np.float32],
     nbDrops: int,
     erosionCoef: float,
     sedimentationCoef: float,
@@ -2578,7 +2577,7 @@ def heightmap_rain_erosion(
 
 @pending_deprecate()
 def heightmap_kernel_transform(
-    hm: "np.ndarray[Any, np.dtype[np.float32]]",
+    hm: NDArray[np.float32],
     kernelsize: int,
     dx: Sequence[int],
     dy: Sequence[int],
@@ -2635,7 +2634,7 @@ def heightmap_kernel_transform(
 
 @pending_deprecate()
 def heightmap_add_voronoi(
-    hm: "np.ndarray[Any, np.dtype[np.float32]]",
+    hm: NDArray[np.float32],
     nbPoints: Any,
     nbCoef: int,
     coef: Sequence[float],
@@ -2667,7 +2666,7 @@ def heightmap_add_voronoi(
 
 @deprecate("Arrays of noise should be sampled using the tcod.noise module.")
 def heightmap_add_fbm(
-    hm: "np.ndarray[Any, np.dtype[np.float32]]",
+    hm: NDArray[np.float32],
     noise: tcod.noise.Noise,
     mulx: float,
     muly: float,
@@ -2715,7 +2714,7 @@ def heightmap_add_fbm(
 
 @deprecate("Arrays of noise should be sampled using the tcod.noise module.")
 def heightmap_scale_fbm(
-    hm: "np.ndarray[Any, np.dtype[np.float32]]",
+    hm: NDArray[np.float32],
     noise: tcod.noise.Noise,
     mulx: float,
     muly: float,
@@ -2758,7 +2757,7 @@ def heightmap_scale_fbm(
 
 @pending_deprecate()
 def heightmap_dig_bezier(
-    hm: "np.ndarray[Any, np.dtype[np.float32]]",
+    hm: NDArray[np.float32],
     px: Tuple[int, int, int, int],
     py: Tuple[int, int, int, int],
     startRadius: float,
@@ -2791,7 +2790,7 @@ def heightmap_dig_bezier(
 
 
 @deprecate("This object can be accessed as a NumPy array.")
-def heightmap_get_value(hm: "np.ndarray[Any, np.dtype[np.float32]]", x: int, y: int) -> float:
+def heightmap_get_value(hm: NDArray[np.float32], x: int, y: int) -> float:
     """Return the value at ``x``, ``y`` in a heightmap.
 
     .. deprecated:: 2.0
@@ -2816,7 +2815,7 @@ def heightmap_get_value(hm: "np.ndarray[Any, np.dtype[np.float32]]", x: int, y: 
 
 
 @pending_deprecate()
-def heightmap_get_interpolated_value(hm: "np.ndarray[Any, np.dtype[np.float32]]", x: float, y: float) -> float:
+def heightmap_get_interpolated_value(hm: NDArray[np.float32], x: float, y: float) -> float:
     """Return the interpolated height at non integer coordinates.
 
     Args:
@@ -2831,7 +2830,7 @@ def heightmap_get_interpolated_value(hm: "np.ndarray[Any, np.dtype[np.float32]]"
 
 
 @pending_deprecate()
-def heightmap_get_slope(hm: "np.ndarray[Any, np.dtype[np.float32]]", x: int, y: int) -> float:
+def heightmap_get_slope(hm: NDArray[np.float32], x: int, y: int) -> float:
     """Return the slope between 0 and (pi / 2) at given coordinates.
 
     Args:
@@ -2846,9 +2845,7 @@ def heightmap_get_slope(hm: "np.ndarray[Any, np.dtype[np.float32]]", x: int, y: 
 
 
 @pending_deprecate()
-def heightmap_get_normal(
-    hm: "np.ndarray[Any, np.dtype[np.float32]]", x: float, y: float, waterLevel: float
-) -> Tuple[float, float, float]:
+def heightmap_get_normal(hm: NDArray[np.float32], x: float, y: float, waterLevel: float) -> Tuple[float, float, float]:
     """Return the map normal at given coordinates.
 
     Args:
@@ -2866,7 +2863,7 @@ def heightmap_get_normal(
 
 
 @deprecate("This function is deprecated, see documentation.")
-def heightmap_count_cells(hm: "np.ndarray[Any, np.dtype[np.float32]]", mi: float, ma: float) -> int:
+def heightmap_count_cells(hm: NDArray[np.float32], mi: float, ma: float) -> int:
     """Return the number of map cells which value is between ``mi`` and ``ma``.
 
     Args:
@@ -2885,7 +2882,7 @@ def heightmap_count_cells(hm: "np.ndarray[Any, np.dtype[np.float32]]", mi: float
 
 
 @pending_deprecate()
-def heightmap_has_land_on_border(hm: "np.ndarray[Any, np.dtype[np.float32]]", waterlevel: float) -> bool:
+def heightmap_has_land_on_border(hm: NDArray[np.float32], waterlevel: float) -> bool:
     """Returns True if the map edges are below ``waterlevel``, otherwise False.
 
     Args:
@@ -2899,7 +2896,7 @@ def heightmap_has_land_on_border(hm: "np.ndarray[Any, np.dtype[np.float32]]", wa
 
 
 @deprecate("Use `hm.min()` and `hm.max()` instead.")
-def heightmap_get_minmax(hm: "np.ndarray[Any, np.dtype[np.float32]]") -> Tuple[float, float]:
+def heightmap_get_minmax(hm: NDArray[np.float32]) -> Tuple[float, float]:
     """Return the min and max values of this heightmap.
 
     Args:
@@ -3189,9 +3186,7 @@ def line_iter(xo: int, yo: int, xd: int, yd: int) -> Iterator[Tuple[int, int]]:
 
 
 @deprecate("This function has been replaced by tcod.los.bresenham.")
-def line_where(
-    x1: int, y1: int, x2: int, y2: int, inclusive: bool = True
-) -> "Tuple[np.ndarray[Any, np.dtype[np.intc]], np.ndarray[Any, np.dtype[np.intc]]]":
+def line_where(x1: int, y1: int, x2: int, y2: int, inclusive: bool = True) -> Tuple[NDArray[np.intc], NDArray[np.intc]]:
     """Return a NumPy index array following a Bresenham line.
 
     If `inclusive` is true then the start point is included in the result.
@@ -3545,7 +3540,7 @@ def parser_new_struct(parser: Any, name: str) -> Any:
 # prevent multiple threads from messing with def_extern callbacks
 _parser_callback_lock = threading.Lock()
 # temporary global pointer to a listener instance
-_parser_listener = None  # type: Any
+_parser_listener: Any = None
 
 
 @ffi.def_extern()  # type: ignore

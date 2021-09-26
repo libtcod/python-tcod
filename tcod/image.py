@@ -5,10 +5,13 @@ If your image can't be represented as tiles then you'll need to use
 `an alternative library for graphics rendering
 <https://wiki.python.org/moin/PythonGameLibraries>`_.
 """
+from __future__ import annotations
+
 from pathlib import Path
 from typing import Any, Dict, Tuple, Union
 
 import numpy as np
+from numpy.typing import NDArray
 
 import tcod.console
 from tcod._internal import _console, deprecate
@@ -31,14 +34,14 @@ class Image(object):
         self.image_c = ffi.gc(lib.TCOD_image_new(width, height), lib.TCOD_image_delete)
 
     @classmethod
-    def _from_cdata(cls, cdata: Any) -> "Image":
-        self = object.__new__(cls)  # type: "Image"
+    def _from_cdata(cls, cdata: Any) -> Image:
+        self: Image = object.__new__(cls)
         self.image_c = cdata
         self.width, self.height = self._get_size()
         return self
 
     @classmethod
-    def from_array(cls, array: Any) -> "Image":
+    def from_array(cls, array: Any) -> Image:
         """Create a new Image from a copy of an array-like object.
 
         Example:
@@ -333,7 +336,7 @@ def _get_format_name(format: int) -> str:
     "  It's recommended to load images with a more complete image library such as python-Pillow or python-imageio.",
     category=PendingDeprecationWarning,
 )
-def load(filename: Union[str, Path]) -> "np.ndarray[Any, np.dtype[np.uint8]]":
+def load(filename: Union[str, Path]) -> NDArray[np.uint8]:
     """Load a PNG file as an RGBA array.
 
     `filename` is the name of the file to load.
@@ -343,7 +346,7 @@ def load(filename: Union[str, Path]) -> "np.ndarray[Any, np.dtype[np.uint8]]":
     .. versionadded:: 11.4
     """
     image = Image._from_cdata(ffi.gc(lib.TCOD_image_load(str(filename).encode()), lib.TCOD_image_delete))
-    array = np.asarray(image, dtype=np.uint8)
+    array: NDArray[np.uint8] = np.asarray(image, dtype=np.uint8)
     height, width, depth = array.shape
     if depth == 3:
         array = np.concatenate(  # type: ignore

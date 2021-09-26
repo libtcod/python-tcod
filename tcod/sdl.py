@@ -3,9 +3,12 @@
 Add the line ``import tcod.sdl`` to include this module, as importing this
 module is not implied by ``import tcod``.
 """
+from __future__ import annotations
+
 from typing import Any, Tuple
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 from tcod.loader import ffi, lib
 
@@ -15,7 +18,7 @@ __all__ = ("Window",)
 class _TempSurface:
     """Holds a temporary surface derived from a NumPy array."""
 
-    def __init__(self, pixels: "np.ndarray[Any, np.dtype[np.uint8]]") -> None:
+    def __init__(self, pixels: ArrayLike) -> None:
         self._array = np.ascontiguousarray(pixels, dtype=np.uint8)
         if len(self._array) != 3:
             raise TypeError("NumPy shape must be 3D [y, x, ch] (got %r)" % (self._array.shape,))
@@ -52,7 +55,7 @@ class Window:
     def __eq__(self, other: Any) -> bool:
         return bool(self.p == other.p)
 
-    def set_icon(self, image: "np.ndarray[Any, np.dtype[np.uint8]]") -> None:
+    def set_icon(self, image: ArrayLike) -> None:
         """Set the window icon from an image.
 
         `image` is a C memory order RGB or RGBA NumPy array.

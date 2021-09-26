@@ -19,11 +19,14 @@ implied by ``import tcod``.
 
 .. versionadded:: 8.4
 """
+from __future__ import annotations
+
 import enum
 import warnings
 from typing import Any, Callable, Dict, Generic, Iterator, Mapping, NamedTuple, Optional, Tuple, TypeVar
 
 import numpy as np
+from numpy.typing import NDArray
 
 import tcod.event_constants
 from tcod.event_constants import *  # noqa: F4
@@ -245,7 +248,7 @@ class Quit(Event):
     """
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> "Quit":
+    def from_sdl_event(cls, sdl_event: Any) -> Quit:
         self = cls()
         self.sdl_event = sdl_event
         return self
@@ -423,7 +426,7 @@ class MouseMotion(MouseState):
         self.__tile_motion = Point(*xy)
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> "MouseMotion":
+    def from_sdl_event(cls, sdl_event: Any) -> MouseMotion:
         motion = sdl_event.motion
 
         pixel = motion.x, motion.y
@@ -550,7 +553,7 @@ class MouseWheel(Event):
         self.flipped = flipped
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> "MouseWheel":
+    def from_sdl_event(cls, sdl_event: Any) -> MouseWheel:
         wheel = sdl_event.wheel
         self = cls(wheel.x, wheel.y, bool(wheel.direction))
         self.sdl_event = sdl_event
@@ -585,7 +588,7 @@ class TextInput(Event):
         self.text = text
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> "TextInput":
+    def from_sdl_event(cls, sdl_event: Any) -> TextInput:
         self = cls(ffi.string(sdl_event.text.text, 32).decode("utf8"))
         self.sdl_event = sdl_event
         return self
@@ -711,7 +714,7 @@ class Undefined(Event):
         super().__init__("")
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> "Undefined":
+    def from_sdl_event(cls, sdl_event: Any) -> Undefined:
         self = cls()
         self.sdl_event = sdl_event
         return self
@@ -722,7 +725,7 @@ class Undefined(Event):
         return "<Undefined>"
 
 
-_SDL_TO_CLASS_TABLE = {
+_SDL_TO_CLASS_TABLE: Dict[int, Any] = {
     lib.SDL_QUIT: Quit,
     lib.SDL_KEYDOWN: KeyDown,
     lib.SDL_KEYUP: KeyUp,
@@ -732,7 +735,7 @@ _SDL_TO_CLASS_TABLE = {
     lib.SDL_MOUSEWHEEL: MouseWheel,
     lib.SDL_TEXTINPUT: TextInput,
     lib.SDL_WINDOWEVENT: WindowEvent,
-}  # type: Dict[int, Any]
+}
 
 
 def get() -> Iterator[Any]:
@@ -922,7 +925,7 @@ class EventDispatch(Generic[T]):
                 stacklevel=2,
             )
             return None
-        func = getattr(self, "ev_%s" % (event.type.lower(),))  # type: Callable[[Any], Optional[T]]
+        func: Callable[[Any], Optional[T]] = getattr(self, "ev_%s" % (event.type.lower(),))
         return func(event)
 
     def event_get(self) -> None:
@@ -933,37 +936,37 @@ class EventDispatch(Generic[T]):
         wait(timeout)
         self.event_get()
 
-    def ev_quit(self, event: "tcod.event.Quit") -> Optional[T]:
+    def ev_quit(self, event: tcod.event.Quit) -> Optional[T]:
         """Called when the termination of the program is requested."""
 
-    def ev_keydown(self, event: "tcod.event.KeyDown") -> Optional[T]:
+    def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[T]:
         """Called when a keyboard key is pressed or repeated."""
 
-    def ev_keyup(self, event: "tcod.event.KeyUp") -> Optional[T]:
+    def ev_keyup(self, event: tcod.event.KeyUp) -> Optional[T]:
         """Called when a keyboard key is released."""
 
-    def ev_mousemotion(self, event: "tcod.event.MouseMotion") -> Optional[T]:
+    def ev_mousemotion(self, event: tcod.event.MouseMotion) -> Optional[T]:
         """Called when the mouse is moved."""
 
-    def ev_mousebuttondown(self, event: "tcod.event.MouseButtonDown") -> Optional[T]:
+    def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> Optional[T]:
         """Called when a mouse button is pressed."""
 
-    def ev_mousebuttonup(self, event: "tcod.event.MouseButtonUp") -> Optional[T]:
+    def ev_mousebuttonup(self, event: tcod.event.MouseButtonUp) -> Optional[T]:
         """Called when a mouse button is released."""
 
-    def ev_mousewheel(self, event: "tcod.event.MouseWheel") -> Optional[T]:
+    def ev_mousewheel(self, event: tcod.event.MouseWheel) -> Optional[T]:
         """Called when the mouse wheel is scrolled."""
 
-    def ev_textinput(self, event: "tcod.event.TextInput") -> Optional[T]:
+    def ev_textinput(self, event: tcod.event.TextInput) -> Optional[T]:
         """Called to handle Unicode input."""
 
-    def ev_windowshown(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowshown(self, event: tcod.event.WindowEvent) -> Optional[T]:
         """Called when the window is shown."""
 
-    def ev_windowhidden(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowhidden(self, event: tcod.event.WindowEvent) -> Optional[T]:
         """Called when the window is hidden."""
 
-    def ev_windowexposed(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowexposed(self, event: tcod.event.WindowEvent) -> Optional[T]:
         """Called when a window is exposed, and needs to be refreshed.
 
         This usually means a call to :any:`tcod.console_flush` is necessary.
@@ -978,34 +981,34 @@ class EventDispatch(Generic[T]):
     def ev_windowsizechanged(self, event: "tcod.event.WindowResized") -> Optional[T]:
         """Called when the system or user changes the size of the window."""
 
-    def ev_windowminimized(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowminimized(self, event: tcod.event.WindowEvent) -> Optional[T]:
         """Called when the window is minimized."""
 
-    def ev_windowmaximized(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowmaximized(self, event: tcod.event.WindowEvent) -> Optional[T]:
         """Called when the window is maximized."""
 
-    def ev_windowrestored(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowrestored(self, event: tcod.event.WindowEvent) -> Optional[T]:
         """Called when the window is restored."""
 
-    def ev_windowenter(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowenter(self, event: tcod.event.WindowEvent) -> Optional[T]:
         """Called when the window gains mouse focus."""
 
-    def ev_windowleave(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowleave(self, event: tcod.event.WindowEvent) -> Optional[T]:
         """Called when the window loses mouse focus."""
 
-    def ev_windowfocusgained(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowfocusgained(self, event: tcod.event.WindowEvent) -> Optional[T]:
         """Called when the window gains keyboard focus."""
 
-    def ev_windowfocuslost(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowfocuslost(self, event: tcod.event.WindowEvent) -> Optional[T]:
         """Called when the window loses keyboard focus."""
 
-    def ev_windowclose(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowclose(self, event: tcod.event.WindowEvent) -> Optional[T]:
         """Called when the window manager requests the window to be closed."""
 
-    def ev_windowtakefocus(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowtakefocus(self, event: tcod.event.WindowEvent) -> Optional[T]:
         pass
 
-    def ev_windowhittest(self, event: "tcod.event.WindowEvent") -> Optional[T]:
+    def ev_windowhittest(self, event: tcod.event.WindowEvent) -> Optional[T]:
         pass
 
     def ev_(self, event: Any) -> Optional[T]:
@@ -1030,7 +1033,7 @@ def _pycall_event_watch(userdata: Any, sdl_event: Any) -> int:
     return 0
 
 
-def get_keyboard_state() -> "np.ndarray[Any, np.dtype[np.bool_]]":
+def get_keyboard_state() -> NDArray[np.bool_]:
     """Return a boolean array with the current keyboard state.
 
     Index this array with a scancode.  The value will be True if the key is
@@ -1052,7 +1055,7 @@ def get_keyboard_state() -> "np.ndarray[Any, np.dtype[np.bool_]]":
     """
     numkeys = ffi.new("int[1]")
     keyboard_state = lib.SDL_GetKeyboardState(numkeys)
-    out: np.ndarray[Any, Any] = np.frombuffer(ffi.buffer(keyboard_state[0 : numkeys[0]]), dtype=bool)  # type: ignore
+    out: NDArray[np.bool_] = np.frombuffer(ffi.buffer(keyboard_state[0 : numkeys[0]]), dtype=np.bool_)  # type: ignore
     out.flags["WRITEABLE"] = False  # This buffer is supposed to be const.
     return out
 
@@ -1579,7 +1582,7 @@ class Scancode(enum.IntEnum):
         return self.keysym.label
 
     @property
-    def keysym(self) -> "KeySym":
+    def keysym(self) -> KeySym:
         """Return a :class:`KeySym` from a scancode.
 
         Based on the current keyboard layout.
@@ -1588,7 +1591,7 @@ class Scancode(enum.IntEnum):
         return KeySym(lib.SDL_GetKeyFromScancode(self.value))
 
     @property
-    def scancode(self) -> "Scancode":
+    def scancode(self) -> Scancode:
         """Return a scancode from a keycode.
 
         Returns itself since it is already a :class:`Scancode`.
@@ -1599,7 +1602,7 @@ class Scancode(enum.IntEnum):
         return self
 
     @classmethod
-    def _missing_(cls, value: object) -> "Optional[Scancode]":
+    def _missing_(cls, value: object) -> Optional[Scancode]:
         if not isinstance(value, int):
             return None
         result = cls(0)
@@ -2126,7 +2129,7 @@ class KeySym(enum.IntEnum):
         return str(ffi.string(lib.SDL_GetKeyName(self.value)), encoding="utf-8")
 
     @property
-    def keysym(self) -> "KeySym":
+    def keysym(self) -> KeySym:
         """Return a keycode from a scancode.
 
         Returns itself since it is already a :class:`KeySym`.
@@ -2146,7 +2149,7 @@ class KeySym(enum.IntEnum):
         return Scancode(lib.SDL_GetScancodeFromKey(self.value))
 
     @classmethod
-    def _missing_(cls, value: object) -> "Optional[KeySym]":
+    def _missing_(cls, value: object) -> Optional[KeySym]:
         if not isinstance(value, int):
             return None
         result = cls(0)

@@ -3,12 +3,15 @@ Libtcod consoles are a strictly tile-based representation of text and color.
 To render a console you need a tileset and a window to render to.
 See :ref:`getting-started` for info on how to set those up.
 """
+from __future__ import annotations
+
 import os
 import warnings
 from pathlib import Path
 from typing import Any, Iterable, Optional, Sequence, Tuple, Union
 
 import numpy as np
+from numpy.typing import NDArray
 from typing_extensions import Literal
 
 import tcod._internal
@@ -114,9 +117,9 @@ class Console:
         width: int,
         height: int,
         order: Literal["C", "F"] = "C",
-        buffer: "Optional[np.ndarray[Any, Any]]" = None,
+        buffer: Optional[NDArray[Any]] = None,
     ):
-        self._key_color = None  # type: Optional[Tuple[int, int, int]]
+        self._key_color: Optional[Tuple[int, int, int]] = None
         self._order = tcod._internal.verify_order(order)
         if buffer is not None:
             if self._order == "F":
@@ -150,17 +153,17 @@ class Console:
             self.clear()
 
     @classmethod
-    def _from_cdata(cls, cdata: Any, order: Literal["C", "F"] = "C") -> "Console":
+    def _from_cdata(cls, cdata: Any, order: Literal["C", "F"] = "C") -> Console:
         """Return a Console instance which wraps this `TCOD_Console*` object."""
         if isinstance(cdata, cls):
             return cdata
-        self = object.__new__(cls)  # type: Console
+        self: Console = object.__new__(cls)
         self.console_c = cdata
         self._init_setup_console_data(order)
         return self
 
     @classmethod
-    def _get_root(cls, order: Optional[Literal["C", "F"]] = None) -> "Console":
+    def _get_root(cls, order: Optional[Literal["C", "F"]] = None) -> Console:
         """Return a root console singleton with valid buffers.
 
         This function will also update an already active root console.
@@ -168,7 +171,7 @@ class Console:
         global _root_console
         if _root_console is None:
             _root_console = object.__new__(cls)
-        self = _root_console  # type: Console
+        self: Console = _root_console
         if order is not None:
             self._order = order
         self.console_c = ffi.NULL
@@ -185,7 +188,7 @@ class Console:
         else:
             self._console_data = ffi.cast("struct TCOD_Console*", self.console_c)
 
-        self._tiles = np.frombuffer(  # type: ignore
+        self._tiles: NDArray[Any] = np.frombuffer(  # type: ignore
             ffi.buffer(self._console_data.tiles[0 : self.width * self.height]),
             dtype=self.DTYPE,
         ).reshape((self.height, self.width))
@@ -203,7 +206,7 @@ class Console:
         return lib.TCOD_console_get_height(self.console_c)  # type: ignore
 
     @property
-    def bg(self) -> "np.ndarray[Any, np.dtype[np.uint8]]":
+    def bg(self) -> NDArray[np.uint8]:
         """A uint8 array with the shape (height, width, 3).
 
         You can change the consoles background colors by using this array.
@@ -218,7 +221,7 @@ class Console:
         return bg
 
     @property
-    def fg(self) -> "np.ndarray[Any, np.dtype[np.uint8]]":
+    def fg(self) -> NDArray[np.uint8]:
         """A uint8 array with the shape (height, width, 3).
 
         You can change the consoles foreground colors by using this array.
@@ -232,7 +235,7 @@ class Console:
         return fg
 
     @property
-    def ch(self) -> "np.ndarray[Any, np.dtype[np.intc]]":
+    def ch(self) -> NDArray[np.intc]:
         """An integer array with the shape (height, width).
 
         You can change the consoles character codes by using this array.
@@ -244,7 +247,7 @@ class Console:
 
     @property  # type: ignore
     @deprecate("This attribute has been renamed to `rgba`.")
-    def tiles(self) -> "np.ndarray[Any, Any]":
+    def tiles(self) -> NDArray[Any]:
         """An array of this consoles raw tile data.
 
         This acts as a combination of the `ch`, `fg`, and `bg` attributes.
@@ -260,7 +263,7 @@ class Console:
 
     @property  # type: ignore
     @deprecate("This attribute has been renamed to `rgba`.")
-    def buffer(self) -> "np.ndarray[Any, Any]":
+    def buffer(self) -> NDArray[Any]:
         """An array of this consoles raw tile data.
 
         .. versionadded:: 11.4
@@ -272,7 +275,7 @@ class Console:
 
     @property  # type: ignore
     @deprecate("This attribute has been renamed to `rgb`.")
-    def tiles_rgb(self) -> "np.ndarray[Any, Any]":
+    def tiles_rgb(self) -> NDArray[Any]:
         """An array of this consoles data without the alpha channel.
 
         .. versionadded:: 11.8
@@ -284,7 +287,7 @@ class Console:
 
     @property  # type: ignore
     @deprecate("This attribute has been renamed to `rgb`.")
-    def tiles2(self) -> "np.ndarray[Any, Any]":
+    def tiles2(self) -> NDArray[Any]:
         """This name is deprecated in favour of :any:`rgb`.
 
         .. versionadded:: 11.3
@@ -295,7 +298,7 @@ class Console:
         return self.rgb
 
     @property
-    def rgba(self) -> "np.ndarray[Any, Any]":
+    def rgba(self) -> NDArray[Any]:
         """An array of this consoles raw tile data.
 
         The axes of this array is affected by the `order` parameter given to
@@ -316,7 +319,7 @@ class Console:
         return self._tiles.T if self._order == "F" else self._tiles
 
     @property
-    def rgb(self) -> "np.ndarray[Any, Any]":
+    def rgb(self) -> NDArray[Any]:
         """An array of this consoles data without the alpha channel.
 
         The axes of this array is affected by the `order` parameter given to
@@ -468,8 +471,8 @@ class Console:
         if not __debug__:
             return
 
-        fg = self.default_fg  # type: Any
-        bg = self.default_bg  # type: Any
+        fg: Optional[Tuple[int, int, int]] = self.default_fg
+        bg: Optional[Tuple[int, int, int]] = self.default_bg
         if bg_blend == tcod.constants.BKGND_NONE:
             bg = None
         if bg_blend == tcod.constants.BKGND_DEFAULT:
@@ -737,7 +740,7 @@ class Console:
 
     def blit(
         self,
-        dest: "Console",
+        dest: Console,
         dest_x: int = 0,
         dest_y: int = 0,
         src_x: int = 0,
@@ -837,7 +840,7 @@ class Console:
         """
         self._key_color = color
 
-    def __enter__(self) -> "Console":
+    def __enter__(self) -> Console:
         """Returns this console in a managed context.
 
         When the root console is used as a context, the graphical window will
@@ -898,7 +901,7 @@ class Console:
     def __setstate__(self, state: Any) -> None:
         self._key_color = None
         if "_tiles" not in state:
-            tiles: np.ndarray[Any, Any] = np.ndarray((self.height, self.width), dtype=self.DTYPE)
+            tiles: NDArray[Any] = np.ndarray((self.height, self.width), dtype=self.DTYPE)
             tiles["ch"] = state["_ch"]
             tiles["fg"][..., :3] = state["_fg"]
             tiles["fg"][..., 3] = 255
@@ -962,7 +965,7 @@ class Console:
         .. versionchanged:: 13.0
             `x` and `y` are now always used as an absolute position for negative values.
         """
-        string_ = string.encode("utf-8")  # type: bytes
+        string_ = string.encode("utf-8")
         lib.TCOD_console_printn(
             self.console_c,
             x,
@@ -1017,7 +1020,7 @@ class Console:
         .. versionchanged:: 13.0
             `x` and `y` are now always used as an absolute position for negative values.
         """
-        string_ = string.encode("utf-8")  # type: bytes
+        string_ = string.encode("utf-8")
         return int(
             lib.TCOD_console_printn_rect(
                 self.console_c,
@@ -1118,7 +1121,7 @@ class Console:
                 PendingDeprecationWarning,
                 stacklevel=2,
             )
-            title_ = title.encode("utf-8")  # type: bytes
+            title_ = title.encode("utf-8")
             lib.TCOD_console_printn_frame(
                 self.console_c,
                 x,
@@ -1227,7 +1230,7 @@ def get_height_rect(width: int, string: str) -> int:
 
     .. versionadded:: 9.2
     """
-    string_ = string.encode("utf-8")  # type: bytes
+    string_ = string.encode("utf-8")
     return int(lib.TCOD_console_get_height_rect_wn(width, len(string_), string_))
 
 

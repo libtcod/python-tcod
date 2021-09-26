@@ -34,12 +34,14 @@ Example::
            [ 63,  94, 159, 209, 203],
            [ 44, 111, 196, 230, 195]], dtype=uint8)
 """  # noqa: E501
+from __future__ import annotations
+
 import enum
 import warnings
 from typing import Any, Optional, Sequence, Tuple, Union
 
 import numpy as np
-from numpy.typing import ArrayLike
+from numpy.typing import ArrayLike, NDArray
 from typing_extensions import Literal
 
 import tcod.constants
@@ -229,7 +231,7 @@ class Noise(object):
         """
         return float(lib.NoiseGetSample(self._tdl_noise_c, (x, y, z, w)))
 
-    def __getitem__(self, indexes: Any) -> "np.ndarray[Any, np.dtype[np.float32]]":
+    def __getitem__(self, indexes: Any) -> NDArray[np.float32]:
         """Sample a noise map through NumPy indexing.
 
         This follows NumPy's advanced indexing rules, but allows for floating
@@ -283,7 +285,7 @@ class Noise(object):
 
         return out
 
-    def sample_mgrid(self, mgrid: "ArrayLike") -> "np.ndarray[Any, np.dtype[np.float32]]":
+    def sample_mgrid(self, mgrid: ArrayLike) -> NDArray[np.float32]:
         """Sample a mesh-grid array and return the result.
 
         The :any:`sample_ogrid` method performs better as there is a lot of
@@ -315,7 +317,7 @@ class Noise(object):
         )
         return out
 
-    def sample_ogrid(self, ogrid: "Sequence[ArrayLike]") -> "np.ndarray[Any, np.dtype[np.float32]]":
+    def sample_ogrid(self, ogrid: Sequence[ArrayLike]) -> NDArray[np.float32]:
         """Sample an open mesh-grid array and return the result.
 
         Args
@@ -413,7 +415,7 @@ def grid(
     scale: Union[Tuple[float, ...], float],
     origin: Optional[Tuple[int, ...]] = None,
     indexing: Literal["ij", "xy"] = "xy",
-) -> "Tuple[np.ndarray[Any, Any], ...]":
+) -> Tuple[NDArray[Any], ...]:
     """A helper function for generating a grid of noise samples.
 
     `shape` is the shape of the returned mesh grid.  This can be any number of

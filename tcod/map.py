@@ -2,10 +2,13 @@
 
 
 """
+from __future__ import annotations
+
 import warnings
 from typing import Any, Tuple
 
 import numpy as np
+from numpy.typing import ArrayLike, NDArray
 from typing_extensions import Literal
 
 import tcod._internal
@@ -99,17 +102,17 @@ class Map(object):
         )
 
     @property
-    def transparent(self) -> "np.ndarray[Any, np.dtype[np.bool_]]":
+    def transparent(self) -> NDArray[np.bool_]:
         buffer: np.ndarray[Any, np.dtype[np.bool_]] = self.__buffer[:, :, 0]
         return buffer.T if self._order == "F" else buffer
 
     @property
-    def walkable(self) -> "np.ndarray[Any, np.dtype[np.bool_]]":
+    def walkable(self) -> NDArray[np.bool_]:
         buffer: np.ndarray[Any, np.dtype[np.bool_]] = self.__buffer[:, :, 1]
         return buffer.T if self._order == "F" else buffer
 
     @property
-    def fov(self) -> "np.ndarray[Any, np.dtype[np.bool_]]":
+    def fov(self) -> NDArray[np.bool_]:
         buffer: np.ndarray[Any, np.dtype[np.bool_]] = self.__buffer[:, :, 2]
         return buffer.T if self._order == "F" else buffer
 
@@ -166,12 +169,12 @@ class Map(object):
 
 
 def compute_fov(
-    transparency: "np.ndarray[Any, Any]",
+    transparency: ArrayLike,
     pov: Tuple[int, int],
     radius: int = 0,
     light_walls: bool = True,
     algorithm: int = tcod.constants.FOV_RESTRICTIVE,
-) -> "np.ndarray[Any, np.dtype[np.bool_]]":
+) -> NDArray[np.bool_]:
     """Return a boolean mask of the area covered by a field-of-view.
 
     `transparency` is a 2 dimensional array where all non-zero values are

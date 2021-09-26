@@ -23,6 +23,8 @@ Example::
         else:
             print('Dig a room for %s.' % node)
 """
+from __future__ import annotations
+
 from typing import Any, Iterator, List, Optional, Tuple, Union  # noqa: F401
 
 import tcod.random
@@ -64,8 +66,8 @@ class BSP(object):
         self.position = 0
         self.horizontal = False
 
-        self.parent: Optional["BSP"] = None
-        self.children: Union[Tuple[()], Tuple["BSP", "BSP"]] = ()
+        self.parent: Optional[BSP] = None
+        self.children: Union[Tuple[()], Tuple[BSP, BSP]] = ()
 
     @property
     def w(self) -> int:
@@ -172,7 +174,7 @@ class BSP(object):
         self._unpack_bsp_tree(cdata)
 
     @deprecate("Use pre_order method instead of walk.")
-    def walk(self) -> Iterator["BSP"]:
+    def walk(self) -> Iterator[BSP]:
         """Iterate over this BSP's hierarchy in pre order.
 
         .. deprecated:: 2.3
@@ -180,7 +182,7 @@ class BSP(object):
         """
         return self.post_order()
 
-    def pre_order(self) -> Iterator["BSP"]:
+    def pre_order(self) -> Iterator[BSP]:
         """Iterate over this BSP's hierarchy in pre order.
 
         .. versionadded:: 8.3
@@ -189,7 +191,7 @@ class BSP(object):
         for child in self.children:
             yield from child.pre_order()
 
-    def in_order(self) -> Iterator["BSP"]:
+    def in_order(self) -> Iterator[BSP]:
         """Iterate over this BSP's hierarchy in order.
 
         .. versionadded:: 8.3
@@ -201,7 +203,7 @@ class BSP(object):
         else:
             yield self
 
-    def post_order(self) -> Iterator["BSP"]:
+    def post_order(self) -> Iterator[BSP]:
         """Iterate over this BSP's hierarchy in post order.
 
         .. versionadded:: 8.3
@@ -210,29 +212,29 @@ class BSP(object):
             yield from child.post_order()
         yield self
 
-    def level_order(self) -> Iterator["BSP"]:
+    def level_order(self) -> Iterator[BSP]:
         """Iterate over this BSP's hierarchy in level order.
 
         .. versionadded:: 8.3
         """
-        next = [self]  # type: List['BSP']
+        next = [self]
         while next:
-            level = next  # type: List['BSP']
+            level = next
             next = []
             yield from level
             for node in level:
                 next.extend(node.children)
 
-    def inverted_level_order(self) -> Iterator["BSP"]:
+    def inverted_level_order(self) -> Iterator[BSP]:
         """Iterate over this BSP's hierarchy in inverse level order.
 
         .. versionadded:: 8.3
         """
-        levels = []  # type: List[List['BSP']]
-        next = [self]  # type: List['BSP']
+        levels: List[List[BSP]] = []
+        next = [self]
         while next:
             levels.append(next)
-            level = next  # type: List['BSP']
+            level = next
             next = []
             for node in level:
                 next.extend(node.children)
@@ -252,7 +254,7 @@ class BSP(object):
         """
         return self.x <= x < self.x + self.width and self.y <= y < self.y + self.height
 
-    def find_node(self, x: int, y: int) -> Optional["BSP"]:
+    def find_node(self, x: int, y: int) -> Optional[BSP]:
         """Return the deepest node which contains these coordinates.
 
         Returns:
@@ -261,7 +263,7 @@ class BSP(object):
         if not self.contains(x, y):
             return None
         for child in self.children:
-            found = child.find_node(x, y)  # type: Optional["BSP"]
+            found: Optional[BSP] = child.find_node(x, y)
             if found:
                 return found
         return self

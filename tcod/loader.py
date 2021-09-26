@@ -1,5 +1,7 @@
 """This module handles loading of the libtcod cffi API.
 """
+from __future__ import annotations
+
 import os
 import platform
 import sys
@@ -78,8 +80,8 @@ class _Mock(object):
         return False
 
 
-lib = None  # type: Any
-ffi = None  # type: Any
+lib: Any = None
+ffi: Any = None
 
 if os.environ.get("READTHEDOCS"):
     # Mock the lib and ffi objects needed to compile docs for readthedocs.io
