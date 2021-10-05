@@ -58,7 +58,7 @@ class ParsedHeader:
         self.path = path = os.path.normpath(path)
         directory = os.path.dirname(path)
         depends = set()
-        with open(self.path, "r") as f:
+        with open(self.path, "r", encoding="utf-8") as f:
             header = f.read()
         header = RE_COMMENT.sub("", header)
         header = RE_CPLUSPLUS.sub("", header)
@@ -251,7 +251,7 @@ def fix_header(filepath: str) -> None:
 
     This whitespace is causing issues with directives on some platforms.
     """
-    with open(filepath, "r+") as f:
+    with open(filepath, "r+", encoding="utf-8") as f:
         current = f.read()
         fixed = "\n".join(line.strip() for line in current.split("\n"))
         if current == fixed:
@@ -406,11 +406,11 @@ def update_module_all(filename: str, new_all: str) -> None:
         r"(.*# --- From constants.py ---).*(# --- End constants.py ---.*)",
         re.DOTALL,
     )
-    with open(filename, "r") as f:
+    with open(filename, "r", encoding="utf-8") as f:
         match = RE_CONSTANTS_ALL.match(f.read())
     assert match, "Can't determine __all__ subsection in %s!" % (filename,)
     header, footer = match.groups()
-    with open(filename, "w") as f:
+    with open(filename, "w", encoding="utf-8") as f:
         f.write("%s\n    %s,\n    %s" % (header, new_all, footer))
 
 
@@ -431,7 +431,7 @@ def write_library_constants() -> None:
     import tcod.color
     from tcod._libtcod import ffi, lib
 
-    with open("tcod/constants.py", "w") as f:
+    with open("tcod/constants.py", "w", encoding="utf-8") as f:
         all_names = []
         f.write(CONSTANT_MODULE_HEADER)
         for name in dir(lib):
@@ -473,7 +473,7 @@ def write_library_constants() -> None:
         update_module_all("tcod/__init__.py", all_names_merged)
         update_module_all("tcod/libtcodpy.py", all_names_merged)
 
-    with open("tcod/event_constants.py", "w") as f:
+    with open("tcod/event_constants.py", "w", encoding="utf-8") as f:
         all_names = []
         f.write(EVENT_CONSTANT_MODULE_HEADER)
         f.write("# --- SDL scancodes ---\n")
@@ -490,7 +490,7 @@ def write_library_constants() -> None:
         all_names_merged = ",\n    ".join('"%s"' % name for name in all_names)
         f.write("\n__all__ = [\n    %s,\n]\n" % (all_names_merged,))
 
-    with open("tcod/event.py", "r") as f:
+    with open("tcod/event.py", "r", encoding="utf-8") as f:
         event_py = f.read()
 
     event_py = re.sub(
@@ -506,7 +506,7 @@ def write_library_constants() -> None:
         flags=re.DOTALL,
     )
 
-    with open("tcod/event.py", "w") as f:
+    with open("tcod/event.py", "w", encoding="utf-8") as f:
         f.write(event_py)
 
 

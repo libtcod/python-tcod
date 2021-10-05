@@ -19,7 +19,7 @@ parser.add_argument("-v", "--verbose", action="store_true", help="Print debug in
 
 def parse_changelog(args: Any) -> Tuple[str, str]:
     """Return an updated changelog and and the list of changes."""
-    with open("CHANGELOG.rst", "r") as file:
+    with open("CHANGELOG.rst", "r", encoding="utf-8") as file:
         match = re.match(
             pattern=r"(.*?Unreleased\n---+\n)(.+?)(\n*[^\n]+\n---+\n.*)",
             string=file.read(),
@@ -48,7 +48,7 @@ def main() -> None:
     new_changelog, changes = parse_changelog(args)
 
     if not args.dry_run:
-        with open("CHANGELOG.rst", "w") as f:
+        with open("CHANGELOG.rst", "w", encoding="utf-8") as f:
             f.write(new_changelog)
         edit = ["-e"] if args.edit else []
         subprocess.check_call(["git", "commit", "-avm", "Prepare %s release." % args.tag] + edit)

@@ -30,12 +30,12 @@ def get_version() -> str:
             version += ".dev%i" % commits_since_tag
 
         # update tcod/version.py
-        with open(PATH / "tcod/version.py", "w") as version_file:
+        with open(PATH / "tcod/version.py", "w", encoding="utf-8") as version_file:
             version_file.write(f'__version__ = "{version}"\n')
         return version
     else:  # Not a Git respotitory.
         try:
-            with open(PATH / "tcod/version.py") as version_file:
+            with open(PATH / "tcod/version.py", encoding="utf-8") as version_file:
                 match = re.match(r'__version__ = "(\S+)"', version_file.read())
             assert match
             return match.groups()[0]
@@ -68,7 +68,7 @@ def get_package_data() -> List[str]:
 
 def get_long_description() -> str:
     """Return this projects description."""
-    with open(PATH / "README.rst", "r") as readme_file:
+    with open(PATH / "README.rst", "r", encoding="utf-8") as readme_file:
         return readme_file.read()
 
 

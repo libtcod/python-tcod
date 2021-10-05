@@ -27,7 +27,7 @@ RE_EVENT_PADDING = re.compile(r"Uint8 padding\[[^]]+\];", re.MULTILINE | re.DOTA
 
 def get_header(name: str) -> str:
     """Return the source of a header in a partially preprocessed state."""
-    with open(name, "r") as f:
+    with open(name, "r", encoding="utf-8") as f:
         header = f.read()
     # Remove Doxygen code.
     header = RE_REMOVALS.sub("", header)
