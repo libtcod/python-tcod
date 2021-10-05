@@ -10,7 +10,6 @@ from typing import List
 import tcod
 
 WIDTH, HEIGHT = 720, 480
-FLAGS = tcod.context.SDL_WINDOW_RESIZABLE | tcod.context.SDL_WINDOW_MAXIMIZED
 
 
 def main() -> None:
@@ -19,7 +18,7 @@ def main() -> None:
     event_log: List[str] = []
     motion_desc = ""
 
-    with tcod.context.new(width=WIDTH, height=HEIGHT, sdl_window_flags=FLAGS) as context:
+    with tcod.context.new(width=WIDTH, height=HEIGHT) as context:
         console = context.new_console()
         while True:
             # Display all event items.
@@ -36,11 +35,11 @@ def main() -> None:
             for event in tcod.event.wait():
                 context.convert_event(event)  # Set tile coordinates for event.
                 print(repr(event))
-                if event.type == "QUIT":
+                if isinstance(event, tcod.event.Quit):
                     raise SystemExit()
-                if event.type == "WINDOWRESIZED":
+                if isinstance(event, tcod.event.WindowResized) and event.type == "WINDOWRESIZED":
                     console = context.new_console()
-                if event.type == "MOUSEMOTION":
+                if isinstance(event, tcod.event.MouseMotion):
                     motion_desc = str(event)
                 else:
                     event_log.append(str(event))

@@ -23,10 +23,11 @@ from __future__ import annotations
 
 import enum
 import warnings
-from typing import Any, Callable, Dict, Generic, Iterator, Mapping, NamedTuple, Optional, Tuple, TypeVar
+from typing import Any, Callable, Dict, Generic, Iterator, Mapping, NamedTuple, Optional, Tuple, TypeVar, Union
 
 import numpy as np
 from numpy.typing import NDArray
+from typing_extensions import Final, Literal
 
 import tcod.event_constants
 from tcod.event_constants import *  # noqa: F4
@@ -225,7 +226,7 @@ class Event:
     def __init__(self, type: Optional[str] = None):
         if type is None:
             type = self.__class__.__name__.upper()
-        self.type = type
+        self.type: Final = type
         self.sdl_event = None
 
     @classmethod
@@ -606,12 +607,33 @@ class WindowEvent(Event):
         type (str): A window event could mean various event types.
     """
 
+    type: Final[  # type: ignore[misc]  # Narrowing contant type.
+        Literal[
+            "WindowShown",
+            "WindowHidden",
+            "WindowExposed",
+            "WindowMoved",
+            "WindowResized",
+            "WindowSizeChanged",
+            "WindowMinimized",
+            "WindowMaximized",
+            "WindowRestored",
+            "WindowEnter",
+            "WindowLeave",
+            "WindowFocusGained",
+            "WindowFocusLost",
+            "WindowClose",
+            "WindowTakeFocus",
+            "WindowHitTest",
+        ]
+    ]
+
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> Any:
+    def from_sdl_event(cls, sdl_event: Any) -> Union[WindowEvent, Undefined]:
         if sdl_event.window.event not in cls.__WINDOW_TYPES:
             return Undefined.from_sdl_event(sdl_event)
-        event_type = cls.__WINDOW_TYPES[sdl_event.window.event].upper()
-        self = None  # type: Any
+        event_type: Final = cls.__WINDOW_TYPES[sdl_event.window.event].upper()
+        self: WindowEvent
         if sdl_event.window.event == lib.SDL_WINDOWEVENT_MOVED:
             self = WindowMoved(sdl_event.window.data1, sdl_event.window.data2)
         elif sdl_event.window.event in (
@@ -655,6 +677,8 @@ class WindowMoved(WindowEvent):
         y (int): Movement on the y-axis.
     """
 
+    type: Literal["WINDOWMOVED"]  # type: ignore[assignment,misc]
+
     def __init__(self, x: int, y: int) -> None:
         super().__init__(None)
         self.x = x
@@ -683,6 +707,8 @@ class WindowResized(WindowEvent):
         width (int): The current width of the window.
         height (int): The current height of the window.
     """
+
+    type: Literal["WINDOWRESIZED", "WINDOWSIZECHANGED"]  # type: ignore[assignment,misc]
 
     def __init__(self, type: str, width: int, height: int) -> None:
         super().__init__(type)
