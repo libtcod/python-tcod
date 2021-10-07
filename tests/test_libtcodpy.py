@@ -15,7 +15,7 @@ pytestmark = [
 ]
 
 
-def test_console_behaviour(console: tcod.Console) -> None:
+def test_console_behavior(console: tcod.Console) -> None:
     assert not console
 
 
@@ -599,44 +599,44 @@ def test_random() -> None:
 
 @pytest.mark.filterwarnings("ignore")
 def test_heightmap() -> None:
-    hmap = libtcodpy.heightmap_new(16, 16)
-    repr(hmap)
+    h_map = libtcodpy.heightmap_new(16, 16)
+    repr(h_map)
     noise = libtcodpy.noise_new(2)
 
     # basic operations
-    libtcodpy.heightmap_set_value(hmap, 0, 0, 1)
-    libtcodpy.heightmap_add(hmap, 1)
-    libtcodpy.heightmap_scale(hmap, 1)
-    libtcodpy.heightmap_clear(hmap)
-    libtcodpy.heightmap_clamp(hmap, 0, 0)
-    libtcodpy.heightmap_copy(hmap, hmap)
-    libtcodpy.heightmap_normalize(hmap)
-    libtcodpy.heightmap_lerp_hm(hmap, hmap, hmap, 0)
-    libtcodpy.heightmap_add_hm(hmap, hmap, hmap)
-    libtcodpy.heightmap_multiply_hm(hmap, hmap, hmap)
+    libtcodpy.heightmap_set_value(h_map, 0, 0, 1)
+    libtcodpy.heightmap_add(h_map, 1)
+    libtcodpy.heightmap_scale(h_map, 1)
+    libtcodpy.heightmap_clear(h_map)
+    libtcodpy.heightmap_clamp(h_map, 0, 0)
+    libtcodpy.heightmap_copy(h_map, h_map)
+    libtcodpy.heightmap_normalize(h_map)
+    libtcodpy.heightmap_lerp_hm(h_map, h_map, h_map, 0)
+    libtcodpy.heightmap_add_hm(h_map, h_map, h_map)
+    libtcodpy.heightmap_multiply_hm(h_map, h_map, h_map)
 
     # modifying the heightmap
-    libtcodpy.heightmap_add_hill(hmap, 0, 0, 4, 1)
-    libtcodpy.heightmap_dig_hill(hmap, 0, 0, 4, 1)
-    libtcodpy.heightmap_rain_erosion(hmap, 1, 1, 1)
-    libtcodpy.heightmap_kernel_transform(hmap, 3, [-1, 1, 0], [0, 0, 0], [0.33, 0.33, 0.33], 0, 1)
-    libtcodpy.heightmap_add_voronoi(hmap, 10, 3, [1, 3, 5])
-    libtcodpy.heightmap_add_fbm(hmap, noise, 1, 1, 1, 1, 4, 1, 1)
-    libtcodpy.heightmap_scale_fbm(hmap, noise, 1, 1, 1, 1, 4, 1, 1)
-    libtcodpy.heightmap_dig_bezier(hmap, (0, 16, 16, 0), (0, 0, 16, 16), 1, 1, 1, 1)
+    libtcodpy.heightmap_add_hill(h_map, 0, 0, 4, 1)
+    libtcodpy.heightmap_dig_hill(h_map, 0, 0, 4, 1)
+    libtcodpy.heightmap_rain_erosion(h_map, 1, 1, 1)
+    libtcodpy.heightmap_kernel_transform(h_map, 3, [-1, 1, 0], [0, 0, 0], [0.33, 0.33, 0.33], 0, 1)
+    libtcodpy.heightmap_add_voronoi(h_map, 10, 3, [1, 3, 5])
+    libtcodpy.heightmap_add_fbm(h_map, noise, 1, 1, 1, 1, 4, 1, 1)
+    libtcodpy.heightmap_scale_fbm(h_map, noise, 1, 1, 1, 1, 4, 1, 1)
+    libtcodpy.heightmap_dig_bezier(h_map, (0, 16, 16, 0), (0, 0, 16, 16), 1, 1, 1, 1)
 
     # read data
-    libtcodpy.heightmap_get_value(hmap, 0, 0)
-    libtcodpy.heightmap_get_interpolated_value(hmap, 0, 0)
+    libtcodpy.heightmap_get_value(h_map, 0, 0)
+    libtcodpy.heightmap_get_interpolated_value(h_map, 0, 0)
 
-    libtcodpy.heightmap_get_slope(hmap, 0, 0)
-    libtcodpy.heightmap_get_normal(hmap, 0, 0, 0)
-    libtcodpy.heightmap_count_cells(hmap, 0, 0)
-    libtcodpy.heightmap_has_land_on_border(hmap, 0)
-    libtcodpy.heightmap_get_minmax(hmap)
+    libtcodpy.heightmap_get_slope(h_map, 0, 0)
+    libtcodpy.heightmap_get_normal(h_map, 0, 0, 0)
+    libtcodpy.heightmap_count_cells(h_map, 0, 0)
+    libtcodpy.heightmap_has_land_on_border(h_map, 0)
+    libtcodpy.heightmap_get_minmax(h_map)
 
     libtcodpy.noise_delete(noise)
-    libtcodpy.heightmap_delete(hmap)
+    libtcodpy.heightmap_delete(h_map)
 
 
 MAP = np.array(

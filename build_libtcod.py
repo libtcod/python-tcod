@@ -62,8 +62,8 @@ class ParsedHeader:
             header = f.read()
         header = RE_COMMENT.sub("", header)
         header = RE_CPLUSPLUS.sub("", header)
-        for dependancy in RE_INCLUDE.findall(header):
-            depends.add(os.path.normpath(os.path.join(directory, dependancy)))
+        for dependency in RE_INCLUDE.findall(header):
+            depends.add(os.path.normpath(os.path.join(directory, dependency)))
         header = RE_PREPROCESSOR.sub("", header)
         header = RE_TAGS.sub("", header)
         header = RE_VAFUNC.sub("", header)

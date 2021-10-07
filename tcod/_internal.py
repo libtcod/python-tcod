@@ -23,9 +23,9 @@ def deprecate(message: str, category: Any = DeprecationWarning, stacklevel: int 
             return func
 
         @functools.wraps(func)
-        def wrapper(*args, **kargs):  # type: ignore
+        def wrapper(*args, **kwargs):  # type: ignore
             warnings.warn(message, category, stacklevel=stacklevel + 2)
-            return func(*args, **kargs)
+            return func(*args, **kwargs)
 
         return cast(F, wrapper)
 
@@ -170,15 +170,15 @@ class _PropagateException:
 
 
 class _CDataWrapper(object):
-    def __init__(self, *args: Any, **kargs: Any):
-        self.cdata = self._get_cdata_from_args(*args, **kargs)
+    def __init__(self, *args: Any, **kwargs: Any):
+        self.cdata = self._get_cdata_from_args(*args, **kwargs)
         if self.cdata is None:
             self.cdata = ffi.NULL
         super(_CDataWrapper, self).__init__()
 
     @staticmethod
-    def _get_cdata_from_args(*args: Any, **kargs: Any) -> Any:
-        if len(args) == 1 and isinstance(args[0], ffi.CData) and not kargs:
+    def _get_cdata_from_args(*args: Any, **kwargs: Any) -> Any:
+        if len(args) == 1 and isinstance(args[0], ffi.CData) and not kwargs:
             return args[0]
         else:
             return None
@@ -251,7 +251,7 @@ class TempImage(object):
         )
 
 
-def _asimage(image: Any) -> TempImage:
+def _as_image(image: Any) -> TempImage:
     """Convert this input into an Image-like object."""
     if hasattr(image, "image_c"):
         return image  # type: ignore

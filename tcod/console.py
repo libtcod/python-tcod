@@ -325,7 +325,7 @@ class Console:
         The axes of this array is affected by the `order` parameter given to
         initialize the console.
 
-        The :any:`rgb_graphic` dtype can be used to make arrays compatiable
+        The :any:`rgb_graphic` dtype can be used to make arrays compatible
         with this attribute that are independent of a :any:`Console`.
 
         Example:
@@ -683,7 +683,7 @@ class Console:
         Args:
             x (int): The x coordinate from the left.
             y (int): The y coordinate from the top.
-            height (int): The horozontal length of this line.
+            height (int): The horizontal length of this line.
             bg_blend (int): The background blending flag.
 
         .. deprecated:: 8.5
@@ -765,8 +765,8 @@ class Console:
             height (int): The height of the region to blit.
 
                 If this is 0 the maximum possible height will be used.
-            fg_alpha (float): Foreground color alpha vaule.
-            bg_alpha (float): Background color alpha vaule.
+            fg_alpha (float): Foreground color alpha value.
+            bg_alpha (float): Background color alpha value.
             key_color (Optional[Tuple[int, int, int]]):
                 None, or a (red, green, blue) tuple with values of 0-255.
 
@@ -1217,7 +1217,7 @@ class Console:
 
         .. versionadded:: 11.4
         """
-        image = tcod._internal._asimage(pixels)
+        image = tcod._internal._as_image(pixels)
         lib.TCOD_image_blit_2x(image.image_c, self.console_c, x, y, 0, 0, -1, -1)
 
 

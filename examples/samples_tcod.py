@@ -171,8 +171,8 @@ class OffscreenConsoleSample(Sample):
         self.counter = 0.0
         self.x = 0
         self.y = 0
-        self.xdir = 1
-        self.ydir = 1
+        self.x_dir = 1
+        self.y_dir = 1
 
         self.secondary.draw_frame(
             0,
@@ -204,16 +204,16 @@ class OffscreenConsoleSample(Sample):
     def on_draw(self) -> None:
         if time.perf_counter() - self.counter >= 1:
             self.counter = time.perf_counter()
-            self.x += self.xdir
-            self.y += self.ydir
+            self.x += self.x_dir
+            self.y += self.y_dir
             if self.x == sample_console.width / 2 + 5:
-                self.xdir = -1
+                self.x_dir = -1
             elif self.x == -5:
-                self.xdir = 1
+                self.x_dir = 1
             if self.y == sample_console.height / 2 + 5:
-                self.ydir = -1
+                self.y_dir = -1
             elif self.y == -5:
-                self.ydir = 1
+                self.y_dir = 1
         self.screenshot.blit(sample_console)
         self.secondary.blit(
             sample_console,
@@ -278,13 +278,13 @@ class LineDrawingSample(Sample):
             self.bk_flag = tcod.BKGND_ADDALPHA(int(alpha))
 
         self.bk.blit(sample_console)
-        recty = int((sample_console.height - 2) * ((1.0 + math.cos(time.time())) / 2.0))
+        rect_y = int((sample_console.height - 2) * ((1.0 + math.cos(time.time())) / 2.0))
         for x in range(sample_console.width):
             value = x * 255 // sample_console.width
             col = (value, value, value)
-            tcod.console_set_char_background(sample_console, x, recty, col, self.bk_flag)
-            tcod.console_set_char_background(sample_console, x, recty + 1, col, self.bk_flag)
-            tcod.console_set_char_background(sample_console, x, recty + 2, col, self.bk_flag)
+            tcod.console_set_char_background(sample_console, x, rect_y, col, self.bk_flag)
+            tcod.console_set_char_background(sample_console, x, rect_y + 1, col, self.bk_flag)
+            tcod.console_set_char_background(sample_console, x, rect_y + 2, col, self.bk_flag)
         angle = time.time() * 2.0
         cos_angle = math.cos(angle)
         sin_angle = math.sin(angle)
@@ -399,29 +399,31 @@ class NoiseSample(Sample):
                 c = int((value + 1.0) / 2.0 * 255)
                 c = max(0, min(c, 255))
                 self.img.put_pixel(x, y, (c // 2, c // 2, c))
-        rectw = 24
-        recth = 13
+        rect_w = 24
+        rect_h = 13
         if self.implementation == tcod.noise.Implementation.SIMPLE:
-            recth = 10
+            rect_h = 10
         sample_console.draw_semigraphics(self.img)
         sample_console.draw_rect(
             2,
             2,
-            rectw,
-            recth,
+            rect_w,
+            rect_h,
             ch=0,
             fg=None,
             bg=GREY,
             bg_blend=tcod.BKGND_MULTIPLY,
         )
-        sample_console.fg[2 : 2 + rectw, 2 : 2 + recth] = sample_console.fg[2 : 2 + rectw, 2 : 2 + recth] * GREY / 255
+        sample_console.fg[2 : 2 + rect_w, 2 : 2 + rect_h] = (
+            sample_console.fg[2 : 2 + rect_w, 2 : 2 + rect_h] * GREY / 255
+        )
 
-        for curfunc in range(len(self.NOISE_OPTIONS)):
-            text = "%i : %s" % (curfunc + 1, self.NOISE_OPTIONS[curfunc][0])
-            if curfunc == self.func:
-                sample_console.print(2, 2 + curfunc, text, fg=WHITE, bg=LIGHT_BLUE)
+        for cur_func in range(len(self.NOISE_OPTIONS)):
+            text = "%i : %s" % (cur_func + 1, self.NOISE_OPTIONS[cur_func][0])
+            if cur_func == self.func:
+                sample_console.print(2, 2 + cur_func, text, fg=WHITE, bg=LIGHT_BLUE)
             else:
-                sample_console.print(2, 2 + curfunc, text, fg=GREY, bg=None)
+                sample_console.print(2, 2 + cur_func, text, fg=GREY, bg=None)
         sample_console.print(2, 11, "Y/H : zoom (%2.1f)" % self.zoom, fg=WHITE, bg=None)
         if self.implementation != tcod.noise.Implementation.SIMPLE:
             sample_console.print(
@@ -664,7 +666,7 @@ class PathfindingSample(Sample):
         self.py = 10
         self.dx = 24
         self.dy = 1
-        self.dijk_dist = 0.0
+        self.dijkstra_dist = 0.0
         self.using_astar = True
         self.recalculate = False
         self.busy = 0.0
@@ -680,7 +682,7 @@ class PathfindingSample(Sample):
                     # window
                     tcod.map_set_properties(self.map, x, y, True, False)
         self.path = tcod.path_new_using_map(self.map)
-        self.dijk = tcod.dijkstra_new(self.map)
+        self.dijkstra = tcod.dijkstra_new(self.map)
 
     def on_enter(self) -> None:
         # we draw the foreground only the first time.
@@ -712,17 +714,17 @@ class PathfindingSample(Sample):
             if self.using_astar:
                 tcod.path_compute(self.path, self.px, self.py, self.dx, self.dy)
             else:
-                self.dijk_dist = 0.0
+                self.dijkstra_dist = 0.0
                 # compute dijkstra grid (distance from px,py)
-                tcod.dijkstra_compute(self.dijk, self.px, self.py)
+                tcod.dijkstra_compute(self.dijkstra, self.px, self.py)
                 # get the maximum distance (needed for rendering)
                 for y in range(SAMPLE_SCREEN_HEIGHT):
                     for x in range(SAMPLE_SCREEN_WIDTH):
-                        d = tcod.dijkstra_get_distance(self.dijk, x, y)
-                        if d > self.dijk_dist:
-                            self.dijk_dist = d
+                        d = tcod.dijkstra_get_distance(self.dijkstra, x, y)
+                        if d > self.dijkstra_dist:
+                            self.dijkstra_dist = d
                 # compute path from px,py to dx,dy
-                tcod.dijkstra_path_set(self.dijk, self.dx, self.dy)
+                tcod.dijkstra_path_set(self.dijkstra, self.dx, self.dy)
             self.recalculate = False
             self.busy = 0.2
         # draw the dungeon
@@ -748,12 +750,12 @@ class PathfindingSample(Sample):
                             tcod.color_lerp(  # type: ignore
                                 LIGHT_GROUND,
                                 DARK_GROUND,
-                                0.9 * tcod.dijkstra_get_distance(self.dijk, x, y) / self.dijk_dist,
+                                0.9 * tcod.dijkstra_get_distance(self.dijkstra, x, y) / self.dijkstra_dist,
                             ),
                             tcod.BKGND_SET,
                         )
-            for i in range(tcod.dijkstra_size(self.dijk)):
-                x, y = tcod.dijkstra_get(self.dijk, i)
+            for i in range(tcod.dijkstra_size(self.dijkstra)):
+                x, y = tcod.dijkstra_get(self.dijkstra, i)
                 tcod.console_set_char_background(sample_console, x, y, LIGHT_GROUND, tcod.BKGND_SET)
 
         # move the creature
@@ -766,9 +768,9 @@ class PathfindingSample(Sample):
                     self.px, self.py = tcod.path_walk(self.path, True)  # type: ignore
                     tcod.console_put_char(sample_console, self.px, self.py, "@", tcod.BKGND_NONE)
             else:
-                if not tcod.dijkstra_is_empty(self.dijk):
+                if not tcod.dijkstra_is_empty(self.dijkstra):
                     tcod.console_put_char(sample_console, self.px, self.py, " ", tcod.BKGND_NONE)
-                    self.px, self.py = tcod.dijkstra_path_walk(self.dijk)  # type: ignore
+                    self.px, self.py = tcod.dijkstra_path_walk(self.dijkstra)  # type: ignore
                     tcod.console_put_char(sample_console, self.px, self.py, "@", tcod.BKGND_NONE)
                     self.recalculate = True
 
@@ -918,9 +920,9 @@ def traverse_node(bsp_map: NDArray[np.bool_], node: tcod.bsp.BSP) -> None:
                 vline_down(bsp_map, x2, y + 1)
             else:
                 # straight vertical corridor
-                minx = max(left.x, right.x)
-                maxx = min(left.x + left.w - 1, right.x + right.w - 1)
-                x = random.randint(minx, maxx)
+                min_x = max(left.x, right.x)
+                max_x = min(left.x + left.w - 1, right.x + right.w - 1)
+                x = random.randint(min_x, max_x)
                 vline_down(bsp_map, x, right.y)
                 vline_up(bsp_map, x, right.y - 1)
         else:
@@ -935,9 +937,9 @@ def traverse_node(bsp_map: NDArray[np.bool_], node: tcod.bsp.BSP) -> None:
                 hline_right(bsp_map, x + 1, y2)
             else:
                 # straight horizontal corridor
-                miny = max(left.y, right.y)
-                maxy = min(left.y + left.h - 1, right.y + right.h - 1)
-                y = random.randint(miny, maxy)
+                min_y = max(left.y, right.y)
+                max_y = min(left.y + left.h - 1, right.y + right.h - 1)
+                y = random.randint(min_y, max_y)
                 hline_left(bsp_map, right.x - 1, y)
                 hline_right(bsp_map, right.x, y)
 
@@ -1064,7 +1066,7 @@ class MouseSample(Sample):
         self.name = "Mouse support"
 
         self.motion = tcod.event.MouseMotion()
-        self.lbut = self.mbut = self.rbut = 0
+        self.mouse_left = self.mouse_middle = self.mouse_right = 0
         self.log: List[str] = []
 
     def on_enter(self) -> None:
@@ -1076,19 +1078,19 @@ class MouseSample(Sample):
 
     def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> None:
         if event.button == tcod.event.BUTTON_LEFT:
-            self.lbut = True
+            self.mouse_left = True
         elif event.button == tcod.event.BUTTON_MIDDLE:
-            self.mbut = True
+            self.mouse_middle = True
         elif event.button == tcod.event.BUTTON_RIGHT:
-            self.rbut = True
+            self.mouse_right = True
 
     def ev_mousebuttonup(self, event: tcod.event.MouseButtonUp) -> None:
         if event.button == tcod.event.BUTTON_LEFT:
-            self.lbut = False
+            self.mouse_left = False
         elif event.button == tcod.event.BUTTON_MIDDLE:
-            self.mbut = False
+            self.mouse_middle = False
         elif event.button == tcod.event.BUTTON_RIGHT:
-            self.rbut = False
+            self.mouse_right = False
 
     def on_draw(self) -> None:
         sample_console.clear(bg=GREY)
@@ -1108,9 +1110,9 @@ class MouseSample(Sample):
                 self.motion.tile.y,
                 self.motion.tile_motion.x,
                 self.motion.tile_motion.y,
-                ("OFF", "ON")[self.lbut],
-                ("OFF", "ON")[self.rbut],
-                ("OFF", "ON")[self.mbut],
+                ("OFF", "ON")[self.mouse_left],
+                ("OFF", "ON")[self.mouse_right],
+                ("OFF", "ON")[self.mouse_middle],
             ),
             fg=LIGHT_YELLOW,
             bg=None,
@@ -1137,13 +1139,12 @@ class NameGeneratorSample(Sample):
         self.name = "Name generator"
 
         self.curset = 0
-        self.nbsets = 0
         self.delay = 0.0
         self.names: List[str] = []
         self.sets: List[str] = []
 
     def on_draw(self) -> None:
-        if self.nbsets == 0:
+        if not self.sets:
             # parse all *.cfg files in data/namegen
             for file in os.listdir(get_data("namegen")):
                 if file.find(".cfg") > 0:
@@ -1151,7 +1152,6 @@ class NameGeneratorSample(Sample):
             # get the sets list
             self.sets = tcod.namegen_get_sets()
             print(self.sets)
-            self.nbsets = len(self.sets)
         while len(self.names) > 15:
             self.names.pop(0)
         sample_console.clear(bg=GREY)
@@ -1179,16 +1179,13 @@ class NameGeneratorSample(Sample):
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym == ord("="):
             self.curset += 1
-            if self.curset == self.nbsets:
-                self.curset = 0
             self.names.append("======")
         elif event.sym == ord("-"):
             self.curset -= 1
-            if self.curset < 0:
-                self.curset = self.nbsets - 1
             self.names.append("======")
         else:
             super().ev_keydown(event)
+        self.curset %= len(self.sets)
 
 
 #############################################

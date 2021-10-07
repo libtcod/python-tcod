@@ -1097,7 +1097,7 @@ Changed
  - tcod.console: `Console.blit` parameters have been rearranged.
    Most of the parameters are now optional.
  - tcod.noise: `Noise.__init__` parameter `rand` is now named `seed`.
- - tdl: Changed `set_fps` paramter name to `fps`.
+ - tdl: Changed `set_fps` parameter name to `fps`.
 Fixed
  - tcod.bsp: Corrected spelling of max_vertical_ratio.
 
@@ -1140,7 +1140,7 @@ Fixed
 Changed
  - `KeyEvent`'s with `text` now have all their modifier keys set to False.
 Fixed
- - Undefined behaviour in text events caused crashes on 32-bit builds.
+ - Undefined behavior in text events caused crashes on 32-bit builds.
 
 3.0.0 - 2017-03-21
 ------------------
@@ -1166,7 +1166,7 @@ Fixed
 ------------------
 Changed
  - Dependencies updated, tdl now requires libtcod-cffi 2.x.x
- - Some event behaviours have changed with SDL2, event keys might be different
+ - Some event behaviors have changed with SDL2, event keys might be different
    than what you expect.
 Removed
  - Key repeat functions were removed from SDL2.
@@ -1203,7 +1203,7 @@ Removed
   https://github.com/HexDecimal/libtcod-cffi
   You can use this library to have some raw access to libtcod if you want.
   Plus it can be used alongside TDL.
-- The libtocd console objects in Console instances have been made public.
+- The libtcod console objects in Console instances have been made public.
 - Added tdl.event.wait function.  This function can called with a timeout and
   can automatically call tdl.flush.
 
@@ -1262,7 +1262,7 @@ Removed
 ------------------
 - Some of the setFont parameters were incorrectly labeled and documented.
 - setFont can auto-detect tilesets if the font sizes are in the filenames.
-- Added some X11 unicode tilesets, including unifont.
+- Added some X11 unicode tilesets, including Unifont.
 
 1.1.2 - 2012-12-13
 ------------------

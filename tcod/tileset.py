@@ -231,7 +231,7 @@ def set_truetype_font(path: Union[str, Path], tile_width: int, tile_height: int)
     `tile_width`.
 
     This function must be called before :any:`tcod.console_init_root`.  Once
-    the root console is setup you may call this funtion again to change the
+    the root console is setup you may call this function again to change the
     font.  The tileset can be changed but the window will not be resized
     automatically.
 

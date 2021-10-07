@@ -111,9 +111,9 @@ int TDL_color_set_value(int color, float h) {
   TCOD_color_set_value(&tcod_color, h);
   return TDL_color_to_int(&tcod_color);
 }
-int TDL_color_shift_hue(int color, float hshift) {
+int TDL_color_shift_hue(int color, float hue_shift) {
   TCOD_color_t tcod_color = TDL_color_from_int(color);
-  TCOD_color_shift_hue(&tcod_color, hshift);
+  TCOD_color_shift_hue(&tcod_color, hue_shift);
   return TDL_color_to_int(&tcod_color);
 }
 int TDL_color_scale_HSV(int color, float scoef, float vcoef) {

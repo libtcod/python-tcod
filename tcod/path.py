@@ -328,7 +328,7 @@ def _export_dict(array: NDArray[Any]) -> Dict[str, Any]:
 
 
 def _export(array: NDArray[Any]) -> Any:
-    """Convert a NumPy array into a ctype object."""
+    """Convert a NumPy array into a cffi object."""
     return ffi.new("struct NArray*", _export_dict(array))
 
 

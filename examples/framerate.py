@@ -122,7 +122,7 @@ def main() -> None:
                 1,
                 f"Current time:{time.perf_counter() * 1000:8.2f}ms"
                 f"\nDelta time:{delta_time * 1000:8.2f}ms"
-                f"\nDesired FPS:{desired_fps:3d} (use scroll whell to adjust)"
+                f"\nDesired FPS:{desired_fps:3d} (use scroll wheel to adjust)"
                 f"\n  last:{clock.last_fps:.2f} fps"
                 f"\n  mean:{clock.mean_fps:.2f} fps"
                 f"\nmedian:{clock.median_fps:.2f} fps"

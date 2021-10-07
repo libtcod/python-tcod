@@ -36,8 +36,8 @@ use with pycparser.
 
 - Open a command prompt in the cloned git directory.
 - Assuming a Debian based distribution of Linux.
-  Install tcod's dependancies with this command:
-  `sudo apt install gcc python-dev libsdl2-dev libffi-dev libomp-dev`
+  Install tcod's dependencies with this command:
+  `sudo apt install gcc python-dev libsdl2-dev libffi-dev`
 - Make sure the libtcod submodule is downloaded with this command:
   `git submodule update --init`
 - Install an editable version of tdl with this command:

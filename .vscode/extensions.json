@@ -9,6 +9,7 @@
         "ms-python.vscode-pylance",
         "ms-vscode.cpptools",
         "redhat.vscode-yaml",
+        "streetsidesoftware.code-spell-checker",
         "tamasfe.even-better-toml",
         "xaver.clang-format",
     ],

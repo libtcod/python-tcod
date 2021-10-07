@@ -33,7 +33,7 @@ def get_version() -> str:
         with open(PATH / "tcod/version.py", "w", encoding="utf-8") as version_file:
             version_file.write(f'__version__ = "{version}"\n')
         return version
-    else:  # Not a Git respotitory.
+    else:  # Not a Git repository.
         try:
             with open(PATH / "tcod/version.py", encoding="utf-8") as version_file:
                 match = re.match(r'__version__ = "(\S+)"', version_file.read())

@@ -441,8 +441,8 @@ int update_frontier_heuristic(
     unsigned char* heap_ptr = (unsigned char*)frontier->heap.heap;
     heap_ptr += frontier->heap.node_size * i;
     struct TCOD_HeapNode* heap_node = (void*)heap_ptr;
-    struct FrontierNode* fnode = (struct FrontierNode*)heap_node->data;
-    heap_node->priority = (fnode->distance + compute_heuristic(heuristic, frontier->ndim, fnode->index));
+    struct FrontierNode* f_node = (struct FrontierNode*)heap_node->data;
+    heap_node->priority = (f_node->distance + compute_heuristic(heuristic, frontier->ndim, f_node->index));
   }
   TCOD_minheap_heapify(&frontier->heap);
   return 0;
@@ -479,10 +479,10 @@ int frontier_has_index(
     const unsigned char* heap_ptr = (const unsigned char*)frontier->heap.heap;
     heap_ptr += frontier->heap.node_size * i;
     const struct TCOD_HeapNode* heap_node = (const void*)heap_ptr;
-    const struct FrontierNode* fnode = (const void*)heap_node->data;
+    const struct FrontierNode* f_node = (const void*)heap_node->data;
     bool found = 1;
     for (int j = 0; j < frontier->ndim; ++j) {
-      if (index[j] != fnode->index[j]) {
+      if (index[j] != f_node->index[j]) {
         found = 0;
         break;
       }

@@ -3,7 +3,7 @@
 
 #include "../libtcod/src/libtcod/libtcod.h"
 
-/* TDL FUNCTONS ----------------------------------------------------------- */
+/* TDL FUNCTIONS ---------------------------------------------------------- */
 
 TCOD_value_t TDL_list_get_union(TCOD_list_t l, int idx);
 bool TDL_list_get_bool(TCOD_list_t l, int idx);
@@ -34,7 +34,7 @@ float TDL_color_get_value(int color);
 int TDL_color_set_hue(int color, float h);
 int TDL_color_set_saturation(int color, float h);
 int TDL_color_set_value(int color, float h);
-int TDL_color_shift_hue(int color, float hshift);
+int TDL_color_shift_hue(int color, float hue_shift);
 int TDL_color_scale_HSV(int color, float scoef, float vcoef);
 
 /* map data functions using a bitmap of:

@@ -277,15 +277,15 @@ class Dice(_CDataWrapper):
         which is tied to a CData object.
     """
 
-    def __init__(self, *args: Any, **kargs: Any) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         warnings.warn(
             "Using this class is not recommended.",
             DeprecationWarning,
             stacklevel=2,
         )
-        super(Dice, self).__init__(*args, **kargs)
+        super(Dice, self).__init__(*args, **kwargs)
         if self.cdata == ffi.NULL:
-            self._init(*args, **kargs)
+            self._init(*args, **kwargs)
 
     def _init(
         self,
@@ -472,7 +472,7 @@ class Mouse(_CDataWrapper):
         cy: int = 0,
         dcx: int = 0,
         dcy: int = 0,
-        **kargs: Any,
+        **kwargs: Any,
     ):
         if isinstance(x, ffi.CData):
             self.cdata = x
@@ -486,7 +486,7 @@ class Mouse(_CDataWrapper):
         self.cy = cy
         self.dcx = dcx
         self.dcy = dcy
-        for attr, value in kargs.items():
+        for attr, value in kwargs.items():
             setattr(self, attr, value)
 
     def __repr__(self) -> str:
@@ -739,8 +739,8 @@ def bsp_delete(node: tcod.bsp.BSP) -> None:
 def color_lerp(c1: Tuple[int, int, int], c2: Tuple[int, int, int], a: float) -> Color:
     """Return the linear interpolation between two colors.
 
-    ``a`` is the interpolation value, with 0 returing ``c1``,
-    1 returning ``c2``, and 0.5 returing a color halfway between both.
+    ``a`` is the interpolation value, with 0 returning ``c1``,
+    1 returning ``c2``, and 0.5 returning a color halfway between both.
 
     Args:
         c1 (Union[Tuple[int, int, int], Sequence[int]]):
@@ -759,7 +759,7 @@ def color_lerp(c1: Tuple[int, int, int], c2: Tuple[int, int, int], a: float) -> 
 def color_set_hsv(c: Color, h: float, s: float, v: float) -> None:
     """Set a color using: hue, saturation, and value parameters.
 
-    Does not return a new Color.  ``c`` is modified inplace.
+    Does not return a new Color.  ``c`` is modified in-place.
 
     Args:
         c (Union[Color, List[Any]]): A Color instance, or a list of any kind.
@@ -793,7 +793,7 @@ def color_get_hsv(c: Tuple[int, int, int]) -> Tuple[float, float, float]:
 def color_scale_HSV(c: Color, scoef: float, vcoef: float) -> None:
     """Scale a color's saturation and value.
 
-    Does not return a new Color.  ``c`` is modified inplace.
+    Does not return a new Color.  ``c`` is modified in-place.
 
     Args:
         c (Union[Color, List[int]]): A Color instance, or an [r, g, b] list.
@@ -829,11 +829,11 @@ def color_gen_map(colors: Iterable[Tuple[int, int, int]], indexes: Iterable[int]
         [Color(0, 0, 0), Color(51, 25, 0), Color(102, 51, 0), \
 Color(153, 76, 0), Color(204, 102, 0), Color(255, 128, 0)]
     """
-    ccolors = ffi.new("TCOD_color_t[]", colors)
-    cindexes = ffi.new("int[]", indexes)
-    cres = ffi.new("TCOD_color_t[]", max(indexes) + 1)
-    lib.TCOD_color_gen_map(cres, len(ccolors), ccolors, cindexes)
-    return [Color._new_from_cdata(cdata) for cdata in cres]
+    c_colors = ffi.new("TCOD_color_t[]", colors)
+    c_indexes = ffi.new("int[]", indexes)
+    c_out = ffi.new("TCOD_color_t[]", max(indexes) + 1)
+    lib.TCOD_color_gen_map(c_out, len(c_colors), c_colors, c_indexes)
+    return [Color._new_from_cdata(cdata) for cdata in c_out]
 
 
 @deprecate(
@@ -1446,7 +1446,7 @@ def console_print(con: tcod.console.Console, x: int, y: int, fmt: str) -> None:
         con (Console): Any Console instance.
         x (int): Character x position from the left.
         y (int): Character y position from the top.
-        fmt (AnyStr): A unicode or bytes string optionaly using color codes.
+        fmt (AnyStr): A unicode or bytes string optionally using color codes.
 
     .. deprecated:: 8.5
         Use :any:`Console.print_` instead.
@@ -1597,7 +1597,7 @@ def console_print_frame(
     flag: int = BKGND_DEFAULT,
     fmt: str = "",
 ) -> None:
-    """Draw a framed rectangle with optinal text.
+    """Draw a framed rectangle with optional text.
 
     This uses the default background color and blend mode to fill the
     rectangle and the default foreground to draw the outline.
@@ -1777,7 +1777,7 @@ def console_new(w: int, h: int) -> tcod.console.Console:
 def console_from_file(filename: str) -> tcod.console.Console:
     """Return a new console object from a filename.
 
-    The file format is automactially determined.  This can load REXPaint `.xp`,
+    The file format is automatically determined.  This can load REXPaint `.xp`,
     ASCII Paint `.apf`, or Non-delimited ASCII `.asc` files.
 
     Args:
@@ -1870,7 +1870,7 @@ def console_fill_foreground(
     g: Sequence[int],
     b: Sequence[int],
 ) -> None:
-    """Fill the foregound of a console with r,g,b.
+    """Fill the foreground of a console with r,g,b.
 
     Args:
         con (Console): Any Console instance.
@@ -1907,7 +1907,7 @@ def console_fill_background(
     g: Sequence[int],
     b: Sequence[int],
 ) -> None:
-    """Fill the backgound of a console with r,g,b.
+    """Fill the background of a console with r,g,b.
 
     Args:
         con (Console): Any Console instance.
@@ -2586,7 +2586,7 @@ def heightmap_kernel_transform(
     maxLevel: float,
 ) -> None:
     """Apply a generic transformation on the map, so that each resulting cell
-    value is the weighted sum of several neighbour cells.
+    value is the weighted sum of several neighbor cells.
 
     This can be used to smooth/sharpen the map.
 
@@ -2594,10 +2594,10 @@ def heightmap_kernel_transform(
         hm (numpy.ndarray): A numpy.ndarray formatted for heightmap functions.
         kernelsize (int): Should be set to the length of the parameters::
                           dx, dy, and weight.
-        dx (Sequence[int]): A sequence of x coorinates.
-        dy (Sequence[int]): A sequence of y coorinates.
+        dx (Sequence[int]): A sequence of x coordinates.
+        dy (Sequence[int]): A sequence of y coordinates.
         weight (Sequence[float]): A sequence of kernelSize cells weight.
-                                  The value of each neighbour cell is scaled by
+                                  The value of each neighbor cell is scaled by
                                   its corresponding weight
         minLevel (float): No transformation will apply to cells
                           below this value.
@@ -2626,10 +2626,10 @@ def heightmap_kernel_transform(
         >>> tcod.heightmap_kernel_transform(heightmap, 3, dx, dy, weight,
         ...                                 0.0, 1.0)
     """
-    cdx = ffi.new("int[]", dx)
-    cdy = ffi.new("int[]", dy)
-    cweight = ffi.new("float[]", weight)
-    lib.TCOD_heightmap_kernel_transform(_heightmap_cdata(hm), kernelsize, cdx, cdy, cweight, minLevel, maxLevel)
+    c_dx = ffi.new("int[]", dx)
+    c_dy = ffi.new("int[]", dy)
+    c_weight = ffi.new("float[]", weight)
+    lib.TCOD_heightmap_kernel_transform(_heightmap_cdata(hm), kernelsize, c_dx, c_dy, c_weight, minLevel, maxLevel)
 
 
 @pending_deprecate()
@@ -3086,7 +3086,7 @@ def image_delete(image: tcod.image.Image) -> None:
 
 @deprecate("Use tcod.line_iter instead.")
 def line_init(xo: int, yo: int, xd: int, yd: int) -> None:
-    """Initilize a line whose points will be returned by `line_step`.
+    """Initialize a line whose points will be returned by `line_step`.
 
     This function does not return anything on its own.
 
@@ -3523,8 +3523,8 @@ def _unpack_union(type_: int, union: Any) -> Any:
         raise RuntimeError("Unknown libtcod type: %i" % type_)
 
 
-def _convert_TCODList(clist: Any, type_: int) -> Any:
-    return [_unpack_union(type_, lib.TDL_list_get_union(clist, i)) for i in range(lib.TCOD_list_size(clist))]
+def _convert_TCODList(c_list: Any, type_: int) -> Any:
+    return [_unpack_union(type_, lib.TDL_list_get_union(c_list, i)) for i in range(lib.TCOD_list_size(c_list))]
 
 
 @deprecate("Parser functions have been deprecated.")
@@ -3577,7 +3577,7 @@ def parser_run(parser: Any, filename: str, listener: Any = None) -> None:
 
     propagate_manager = _PropagateException()
 
-    clistener = ffi.new(
+    c_listener = ffi.new(
         "TCOD_parser_listener_t *",
         {
             "new_struct": lib._pycall_parser_new_struct,
@@ -3591,7 +3591,7 @@ def parser_run(parser: Any, filename: str, listener: Any = None) -> None:
     with _parser_callback_lock:
         _parser_listener = listener
         with propagate_manager:
-            lib.TCOD_parser_run(parser, _bytes(filename), clistener)
+            lib.TCOD_parser_run(parser, _bytes(filename), c_listener)
 
 
 @deprecate("libtcod objects are deleted automatically.")
@@ -3642,8 +3642,8 @@ def parser_get_dice_property(parser: Any, name: str) -> Dice:
 
 @deprecate("Parser functions have been deprecated.")
 def parser_get_list_property(parser: Any, name: str, type: Any) -> Any:
-    clist = lib.TCOD_parser_get_list_property(parser, _bytes(name), type)
-    return _convert_TCODList(clist, type)
+    c_list = lib.TCOD_parser_get_list_property(parser, _bytes(name), type)
+    return _convert_TCODList(c_list, type)
 
 
 RNG_MT = 0
@@ -3746,7 +3746,7 @@ def random_get_double(rnd: Optional[tcod.random.Random], mi: float, ma: float) -
 
     .. deprecated:: 2.0
         Use :any:`random_get_float` instead.
-        Both funtions return a double precision float.
+        Both functions return a double precision float.
     """
     return float(lib.TCOD_random_get_double(rnd.random_c if rnd else ffi.NULL, mi, ma))
 
@@ -3755,7 +3755,7 @@ def random_get_double(rnd: Optional[tcod.random.Random], mi: float, ma: float) -
 def random_get_int_mean(rnd: Optional[tcod.random.Random], mi: int, ma: int, mean: int) -> int:
     """Return a random weighted integer in the range: ``mi`` <= n <= ``ma``.
 
-    The result is affacted by calls to :any:`random_set_distribution`.
+    The result is affected by calls to :any:`random_set_distribution`.
 
     Args:
         rnd (Optional[Random]): A Random instance, or None to use the default.
@@ -3773,7 +3773,7 @@ def random_get_int_mean(rnd: Optional[tcod.random.Random], mi: int, ma: int, mea
 def random_get_float_mean(rnd: Optional[tcod.random.Random], mi: float, ma: float, mean: float) -> float:
     """Return a random weighted float in the range: ``mi`` <= n <= ``ma``.
 
-    The result is affacted by calls to :any:`random_set_distribution`.
+    The result is affected by calls to :any:`random_set_distribution`.
 
     Args:
         rnd (Optional[Random]): A Random instance, or None to use the default.
@@ -3794,7 +3794,7 @@ def random_get_double_mean(rnd: Optional[tcod.random.Random], mi: float, ma: flo
 
     .. deprecated:: 2.0
         Use :any:`random_get_float_mean` instead.
-        Both funtions return a double precision float.
+        Both functions return a double precision float.
     """
     return float(lib.TCOD_random_get_double_mean(rnd.random_c if rnd else ffi.NULL, mi, ma, mean))
 
@@ -4148,7 +4148,7 @@ def sys_wait_for_event(mask: int, k: Optional[Key], m: Optional[Mouse], flush: b
     """Wait for an event then return.
 
     If flush is True then the buffer will be cleared before waiting. Otherwise
-    each available event will be returned in the order they're recieved.
+    each available event will be returned in the order they're received.
 
     Args:
         mask (int): :any:`Event types` to wait for.
