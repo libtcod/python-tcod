@@ -211,8 +211,6 @@ _REVERSE_BUTTON_MASK_TABLE = {
 
 _REVERSE_BUTTON_TABLE_PREFIX = _ConstantsWithPrefix(_REVERSE_BUTTON_TABLE)
 _REVERSE_BUTTON_MASK_TABLE_PREFIX = _ConstantsWithPrefix(_REVERSE_BUTTON_MASK_TABLE)
-_REVERSE_SCANCODE_TABLE_PREFIX = _ConstantsWithPrefix(tcod.event_constants._REVERSE_SCANCODE_TABLE)
-_REVERSE_SYM_TABLE_PREFIX = _ConstantsWithPrefix(tcod.event_constants._REVERSE_SYM_TABLE)
 
 
 _REVERSE_MOD_TABLE = tcod.event_constants._REVERSE_MOD_TABLE.copy()
@@ -301,37 +299,17 @@ class KeyboardEvent(Event):
         self.sdl_event = sdl_event
         return self
 
-    def _scancode_constant(self, table: Mapping[int, str]) -> str:
-        """Return the constant name for this scan-code from a table."""
-        try:
-            return table[self.scancode]
-        except KeyError:
-            return str(self.scancode)
-
-    def _sym_constant(self, table: Mapping[int, str]) -> str:
-        """Return the constant name for this symbol from a table."""
-        try:
-            return table[self.sym]
-        except KeyError:
-            return str(self.sym)
-
     def __repr__(self) -> str:
-        return "tcod.event.%s(scancode=%s, sym=%s, mod=%s%s)" % (
+        return "tcod.event.%s(scancode=%r, sym=%r, mod=%s%s)" % (
             self.__class__.__name__,
-            self._scancode_constant(_REVERSE_SCANCODE_TABLE_PREFIX),
-            self._sym_constant(_REVERSE_SYM_TABLE_PREFIX),
+            self.scancode,
+            self.sym,
             _describe_bitmask(self.mod, _REVERSE_MOD_TABLE_PREFIX),
             ", repeat=True" if self.repeat else "",
         )
 
     def __str__(self) -> str:
-        return "<%s, scancode=%s, sym=%s, mod=%s, repeat=%r>" % (
-            super().__str__().strip("<>"),
-            self._scancode_constant(tcod.event_constants._REVERSE_SCANCODE_TABLE),
-            self._sym_constant(tcod.event_constants._REVERSE_SYM_TABLE),
-            _describe_bitmask(self.mod, _REVERSE_MOD_TABLE),
-            self.repeat,
-        )
+        return self.__repr__().replace("tcod.event.", "")
 
 
 class KeyDown(KeyboardEvent):
@@ -1678,6 +1656,10 @@ class Scancode(enum.IntEnum):
         # __eq__ was defined, so __hash__ must be defined.
         return super().__hash__()
 
+    def __repr__(self) -> str:
+        """Return the fully qualified name of this enum."""
+        return f"tcod.event.{self.__class__.__name__}.{self.name}"
+
 
 class KeySym(enum.IntEnum):
     """Keyboard constants based on their symbol.
@@ -2224,6 +2206,10 @@ class KeySym(enum.IntEnum):
     def __hash__(self) -> int:
         # __eq__ was defined, so __hash__ must be defined.
         return super().__hash__()
+
+    def __repr__(self) -> str:
+        """Return the fully qualified name of this enum."""
+        return f"tcod.event.{self.__class__.__name__}.{self.name}"
 
 
 __all__ = [  # noqa: F405
