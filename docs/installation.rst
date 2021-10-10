@@ -2,20 +2,21 @@
 
 Installation
 ============
-Once installed, you'll be able to import the `tcod` and `libtcodpy` modules,
-as well as the deprecated `tdl` module.
+Once python-tcod is installed, you'll be able to import the `tcod` module.
 
-Python 3.5 or above is required for a normal install.
+The latest version of Python 3 is recommended for a normal install.
+Python 2 can not be used with the latest versions of python-tcod.
 These instructions include installing Python if you don't have it yet.
-
-There are known issues in very old versions of pip.
-If pip fails to install python-tcod then try updating it first.
 
 Windows
 -------
-`First install a recent version of Python 3.
+`First install the latest recent version of Python 3.
 <https://www.python.org/downloads/>`_
-Make sure Python is added to the Windows `PATH`.
+
+.. important::
+    Make sure ``Add Python to environment variables`` is checked in the installer.
+    Otherwise Python will not be added to the Windows ``PATH``.
+    If you forgot to do this then you can reopen the installer and *modify* your installation.
 
 If you don't already have it, then install the latest
 `Microsoft Visual C++ Redistributable
@@ -24,12 +25,36 @@ If you don't already have it, then install the latest
 for a 64-bit install.  You'll need to keep this in mind when distributing any
 libtcod program to end-users.
 
-Then to install python-tcod run the following from a Windows command line::
+You should verify your Python install with your terminal.
+The terminal you use can be the Windows Command Prompt, PowerShell, GitBash, or similar.
+It can not be the Python interpreter (indicated with a ``>>>`` prompt.)
+Run the following commands (excluding the ``>``) to verify your Python installation::
 
-    py -m pip install tcod
+    >python -V
+    Python 3.10.0
+
+    >pip -V
+    pip 21.2.4 from ...\Python310\lib\site-packages\pip (python 3.10)
+
+The above outputs would be the result of Python 3.10 being installed.
+**Make sure the mentioned Python versions you get are not different than the latest version you just installed.**
+
+To install python-tcod run the following from a Windows command line::
+
+    >pip install tcod
 
 If Python was installed for all users then you may need to add the ``--user``
 flag to pip.
+
+You can then verify that ``tcod`` is importable from the Python interpreter::
+
+    >python
+
+    >>> import tcod
+
+If ``import tcod`` doesn't throw an ``ImportError`` then ``tcod`` has been installed correctly to your system libraries.
+
+Some IDE's such as PyCharm will create a virtual environment which will ignore your system libraries and require tcod to be installed again in that new environment.
 
 MacOS
 -----
@@ -68,22 +93,13 @@ By default the bottom bar of PyCharm will have a tab labeled `terminal`.
 Open this tab and you should see a prompt with ``(venv)`` on it.
 This means your commands will run in the virtual environment of your project.
 
-With a new project and virtual environment you should upgrade pip before
-installing python-tcod.  You can do this by running the command::
-
-    python -m pip install --upgrade pip
-
-If this for some reason failed, you may fall back on using `easy_install`::
-
-    easy_install --upgrade pip
-
-After pip is upgraded you can install tcod with the following command::
+From this terminal you can install ``tcod`` to the virtual environment with the following command::
 
     pip install tcod
 
 You can now use ``import tcod``.
 
-If you are working with multiple people or computers then it's recommend to pin
+If you are working with multiple people or computers or are using a Git repository then it is recommend to pin
 the tcod version in a `requirements.txt file <https://pip.pypa.io/en/stable/user_guide/#requirements-files>`_.
 PyCharm will automatically update the virtual environment from these files.
 
