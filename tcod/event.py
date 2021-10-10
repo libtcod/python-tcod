@@ -80,7 +80,17 @@ def _pixel_to_tile(x: float, y: float) -> Optional[Tuple[float, float]]:
     return xy[0], xy[1]
 
 
-Point = NamedTuple("Point", [("x", int), ("y", int)])
+class Point(NamedTuple):
+    """A 2D position used for events with mouse coordinates.
+
+    .. seealso::
+        :any:`MouseMotion` :any:`MouseButtonDown` :any:`MouseButtonUp`
+    """
+
+    x: int
+    """A pixel or tile coordinate starting with zero as the left-most position."""
+    y: int
+    """A pixel or tile coordinate starting with zero as the top-most position."""
 
 
 def _verify_tile_coordinates(xy: Optional[Point]) -> Point:
@@ -774,19 +784,41 @@ def get() -> Iterator[Any]:
 
     Example::
 
+        context: tcod.context.Context  # Context object initialized earlier.
         for event in tcod.event.get():
-            if event.type == "QUIT":
+            context.convert_event(event)  # Add tile coordinates to mouse events.
+            if isinstance(event, tcod.event.Quit):
                 print(event)
                 raise SystemExit()
-            elif event.type == "KEYDOWN":
-                print(event)
-            elif event.type == "MOUSEBUTTONDOWN":
-                print(event)
-            elif event.type == "MOUSEMOTION":
-                print(event)
+            elif isinstance(event, tcod.event.KeyDown):
+                print(event)  # Prints the Scancode and KeySym enums for this event.
+            elif isinstance(event, tcod.event.MouseButtonDown):
+                print(event)  # Prints the mouse button constant names for this event.
+            elif isinstance(event, tcod.event.MouseMotion):
+                print(event)  # Prints the mouse button mask bits in a readable format.
             else:
-                print(event)
+                print(event)  # Print any unhandled events.
         # For loop exits after all current events are processed.
+
+    Python 3.10 introduced `match statements <https://docs.python.org/3/tutorial/controlflow.html#match-statements>`_
+    which can be used to dispatch events more gracefully:
+
+    Example::
+
+        context: tcod.context.Context  # Context object initialized earlier.
+        for event in tcod.event.get():
+            context.convert_event(event)  # Add tile coordinates to mouse events.
+            match event:
+                case tcod.event.Quit():
+                    raise SystemExit()
+                case tcod.event.KeyDown(sym, scancode, mod, repeat):
+                    print(f"KeyDown: {sym=}, {scancode=}, {mod=}, {repeat=}")
+                case tcod.event.MouseButtonDown(button, pixel, tile):
+                    print(f"MouseButtonDown: {button=}, {pixel=}, {tile=}")
+                case tcod.event.MouseMotion(pixel, pixel_motion, tile, tile_motion):
+                    print(f"MouseMotion: {pixel=}, {pixel_motion=}, {tile=}, {tile_motion=}")
+                case tcod.event.Event() as event:
+                    print(event)  # Show any unhandled events.
     """
     sdl_event = ffi.new("SDL_Event*")
     while lib.SDL_PollEvent(sdl_event):
@@ -804,21 +836,21 @@ def wait(timeout: Optional[float] = None) -> Iterator[Any]:
 
     Returns the same iterator as a call to :any:`tcod.event.get`.
 
+    This function is useful for simple games with little to no animations.
+    The following example sleeps whenever no events are queued:
+
     Example::
 
-        for event in tcod.event.wait():
-            if event.type == "QUIT":
-                print(event)
-                raise SystemExit()
-            elif event.type == "KEYDOWN":
-                print(event)
-            elif event.type == "MOUSEBUTTONDOWN":
-                print(event)
-            elif event.type == "MOUSEMOTION":
-                print(event)
-            else:
-                print(event)
-        # For loop exits on timeout or after at least one event is processed.
+        context: tcod.context.Context  # Context object initialized earlier.
+        while True:  # Main game-loop.
+            console: tcod.Console  # Console used for rendering.
+            ...  # Render the frame to `console` and then:
+            context.present(console)  # Show the console to the display.
+            # The ordering to draw first before waiting for events is important.
+            for event in tcod.event.wait():  # Sleeps until the next events exist.
+                ...  # All events are handled at once before the next frame.
+
+    See :any:`tcod.event.get` examples for how different events are handled.
     """
     if timeout is not None:
         lib.SDL_WaitEventTimeout(ffi.NULL, int(timeout * 1000))

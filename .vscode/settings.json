@@ -128,6 +128,7 @@
         "imageio",
         "INCOL",
         "INROW",
+        "isinstance",
         "itleref",
         "ivar",
         "jice",
