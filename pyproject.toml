@@ -11,3 +11,22 @@ profile = "black"
 py_version = "37"
 skip_gitignore = true
 line_length = 120
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+required_plugins = ["pytest-cov"]
+testpaths = ["tcod/", "tests/", "docs/"]
+addopts = [
+    "--doctest-modules",
+    "--doctest-glob='*.rst'",
+    "--cov=tcod",
+    "--capture=sys",
+    "--ignore=tcod/__pyinstaller",
+]
+log_file_level = "DEBUG"
+faulthandler_timeout = 5
+filterwarnings = [
+    "ignore::DeprecationWarning:tcod.libtcodpy",
+    "ignore::PendingDeprecationWarning:tcod.libtcodpy",
+    "ignore:This class may perform poorly and is no longer needed.::tcod.map",
+]
