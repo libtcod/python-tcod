@@ -6,9 +6,7 @@
 ========
 |VersionsBadge| |ImplementationBadge| |LicenseBadge|
 
-|PyPI| |RTD| |Codecov| |Codacy|
-
-|Requires| |Pyup|
+|PyPI| |RTD| |Codecov| |Pyup|
 
 =======
  About
@@ -98,13 +96,6 @@ python-tcod is distributed under the `Simplified 2-clause FreeBSD license
 
 .. |Issues| image:: https://img.shields.io/github/issues/libtcod/python-tcod.svg?maxAge=3600
     :target: https://github.com/libtcod/python-tcod/issues
-
-.. |Codacy| image:: https://api.codacy.com/project/badge/Grade/b9df9aff87fb4968a0508a72aeb74a72
-    :target: https://www.codacy.com/app/4b796c65-github/python-tcod?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=libtcod/python-tcod&amp;utm_campaign=Badge_Grade
-
-.. |Requires| image:: https://requires.io/github/libtcod/python-tcod/requirements.svg?branch=master
-    :target: https://requires.io/github/libtcod/python-tcod/requirements/?branch=master
-    :alt: Requirements Status
 
 .. |Pyup| image:: https://pyup.io/repos/github/libtcod/python-tcod/shield.svg
     :target: https://pyup.io/repos/github/libtcod/python-tcod/
