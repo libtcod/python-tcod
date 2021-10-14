@@ -222,40 +222,30 @@ jobs:
           twine upload --skip-existing wheelhouse/*
 
   build-macos:
-    runs-on: ${{ matrix.os }}
+    runs-on: "macos-10.15"
     strategy:
+      fail-fast: true
       matrix:
-        os: ["macos-10.15"]
-        python-version: ["3.x"]
+        python: ["cp38-*_universal2", "cp38-*_x86_64", "cp38-*_arm64", "pp37-*"]
     steps:
       # v2 breaks `git describe` so v1 is needed.
       # https://github.com/actions/checkout/issues/272
       - uses: actions/checkout@v1
       - name: Checkout submodules
-        run: |
-          git submodule update --init --recursive --depth 1
+        run: git submodule update --init --recursive --depth 1
       - name: Print git describe
-        run: |
-          git describe
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
+        run: git describe
       - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install wheel twine
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Prepare package.
+        run: pip3 install wheel twine -r requirements.txt
+      - name: Prepare package
         # Downloads SDL2 for the later step.
-        run: |
-          python setup.py check
+        run: python3 setup.py check
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.0.0a4
         env:
-          CIBW_BUILD: cp38-* pp*
+          CIBW_BUILD: ${{ matrix.python }}
           CIBW_ARCHS_MACOS: x86_64 arm64 universal2
-          CIBW_BEFORE_BUILD_MACOS: pip install --force-reinstall git+https://github.com/matthew-brett/delocate.git@1c07b50
+          CIBW_BEFORE_BUILD_MACOS: pip install --upgrade delocate
           CIBW_BEFORE_TEST: pip install numpy
           CIBW_TEST_COMMAND: python -c "import tcod"
           CIBW_TEST_SKIP: "pp* *-macosx_arm64 *-macosx_universal2:arm64"
@@ -270,5 +260,4 @@ jobs:
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: |
-          twine upload --skip-existing wheelhouse/*
+        run: twine upload --skip-existing wheelhouse/*
