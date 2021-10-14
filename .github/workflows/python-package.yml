@@ -133,9 +133,12 @@ jobs:
         run: |
           pytest --cov-report=xml
       - name: Test with pytest (Xvfb)
-        if: runner.os != 'Windows'
+        if: always() && runner.os != 'Windows'
         run: |
-          xvfb-run --server-num=$RANDOM --auto-servernum pytest --cov-report=xml
+          xvfb-run -e /tmp/xvfb.log --server-num=$RANDOM --auto-servernum pytest --cov-report=xml
+      - name: Xvfb logs
+        if: runner.os != 'Windows'
+        run: cat /tmp/xvfb.log
       - uses: codecov/codecov-action@v1
       - name: Upload to PyPI
         if: startsWith(github.ref, 'refs/tags/') && runner.os != 'Linux'
