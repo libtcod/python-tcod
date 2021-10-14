@@ -12,6 +12,78 @@ defaults:
     shell: bash
 
 jobs:
+  black:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Black
+        run: pip install black
+      - name: Run Black
+        run: black --check --diff examples/ scripts/ tcod/ tests/ *.py
+
+  isort:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install isort
+        run: pip install isort
+      - name: isort
+        uses: liskin/gh-problem-matcher-wrap@v1
+        with:
+          linters: isort
+          run: isort scripts/ tcod/ tests/ --check --diff
+      - name: isort (examples)
+        uses: liskin/gh-problem-matcher-wrap@v1
+        with:
+          linters: isort
+          run: isort examples/ --check --diff --thirdparty tcod
+
+  flake8:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Flake8
+        run: pip install Flake8
+      - name: Flake8
+        uses: liskin/gh-problem-matcher-wrap@v1
+        with:
+          linters: flake8
+          run: flake8 scripts/ tcod/ tests/
+
+  mypy:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Checkout submodules
+        run: git submodule update --init --recursive --depth 1
+      - name: Install Python dependencies
+        run: pip install mypy pytest types-tabulate -r requirements.txt
+      - name: Fake initialize package
+        run: |
+          echo '__version__ = ""' > tcod/version.py
+      - name: Mypy
+        uses: liskin/gh-problem-matcher-wrap@v1
+        with:
+          linters: mypy
+          run: mypy --show-column-numbers .
+
+  # This makes sure that the latest versions of the SDL headers parse correctly.
+  parse_sdl:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["windows-2019", "macos-11"]
+        sdl-version: ["2.0.14", "2.0.16"]
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v1 # v1 required to build package.
+      - name: Checkout submodules
+        run: git submodule update --init --recursive --depth 1
+      - name: Build package
+        run: ./setup.py build
+        env:
+          SDL_VERSION: ${{ matrix.sdl-version }}
+
   build:
     runs-on: ${{ matrix.os }}
     strategy:
