@@ -9,7 +9,7 @@ import sys
 import warnings
 from typing import List
 
-from setuptools import setup  # type: ignore
+from setuptools import setup
 
 SDL_VERSION_NEEDED = (2, 0, 5)
 
@@ -147,6 +147,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Games/Entertainment",

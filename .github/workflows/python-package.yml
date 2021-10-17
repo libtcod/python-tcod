@@ -57,7 +57,7 @@ jobs:
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
       - name: Install Python dependencies
-        run: pip install mypy pytest types-tabulate -r requirements.txt
+        run: pip install mypy pytest -r requirements.txt
       - name: Fake initialize package
         run: |
           echo '__version__ = ""' > tcod/version.py
