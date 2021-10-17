@@ -82,14 +82,54 @@ class Tileset:
         )
         return tile
 
-    def set_tile(self, codepoint: int, tile: ArrayLike) -> None:
+    def set_tile(self, codepoint: int, tile: Union[ArrayLike, NDArray[np.uint8]]) -> None:
         """Upload a tile into this array.
 
-        The tile can be in 32-bit color (height, width, rgba), or grey-scale
-        (height, width).  The tile should have a dtype of ``np.uint8``.
+        Args:
+            codepoint (int): The Unicode codepoint you are assigning to.
+                If the tile is a sprite rather than a common glyph then consider assigning it to a
+                `Private Use Area <https://en.wikipedia.org/wiki/Private_Use_Areas>`_.
+            tile (Union[ArrayLike, NDArray[np.uint8]]):
+                The pixels to use for this tile in row-major order and must be in the same shape as :any:`tile_shape`.
+                `tile` can be an RGBA array with the shape of ``(height, width, rgba)``, or a grey-scale array with the
+                shape ``(height, width)``.
+                The `tile` array will be converted to a dtype of ``np.uint8``.
 
-        This data may need to be sent to graphics card memory, this is a slow
-        operation.
+        An RGB array as an input is too ambiguous and an alpha channel must be added, for example if an image has a key
+        color than the key color pixels must have their alpha channel set to zero.
+
+        This data may be immediately sent to VRAM, which can be a slow operation.
+
+        Example::
+
+            # Examples use imageio for image loading, see https://imageio.readthedocs.io
+            tileset: tcod.tileset.Tileset  # This example assumes you are modifying an existing tileset.
+
+            # Normal usage when a tile already has its own alpha channel.
+            # The loaded tile must be the correct shape for the tileset you assign it to.
+            # The tile is assigned to a private use area and will not conflict with any exiting codepoint.
+            tileset.set_tile(0x100000, imageio.load("rgba_tile.png"))
+
+            # Load a greyscale tile.
+            tileset.set_tile(0x100001, imageio.load("greyscale_tile.png"), pilmode="L")
+            # If you are stuck with an RGB array then you can use the red channel as the input: `rgb[:, :, 0]`
+
+            # Loads an RGB sprite without a background.
+            tileset.set_tile(0x100002, imageio.load("rgb_no_background.png", pilmode="RGBA"))
+            # If you're stuck with an RGB array then you can pad the channel axis with an alpha of 255:
+            #   rgba = np.pad(rgb, pad_width=((0, 0), (0, 0), (0, 1)), constant_values=255)
+
+            # Loads an RGB sprite with a key color background.
+            KEY_COLOR = np.asarray((255, 0, 255), dtype=np.uint8)
+            sprite_rgb = imageio.load("rgb_tile.png")
+            # Compare the RGB colors to KEY_COLOR, compress full matches to a 2D mask.
+            sprite_mask = (sprite_rgb != KEY_COLOR).all(axis=2)
+            # Generate the alpha array, with 255 as the foreground and 0 as the background.
+            sprite_alpha = sprite_mask.astype(np.uint8) * 255
+            # Combine the RGB and alpha arrays into an RGBA array.
+            sprite_rgba = np.append(sprite_rgb, sprite_alpha, axis=2)
+            tileset.set_tile(0x100003, sprite_rgba)
+
         """
         tile = np.ascontiguousarray(tile, dtype=np.uint8)
         if tile.shape == self.tile_shape:
@@ -99,7 +139,13 @@ class Tileset:
             return self.set_tile(codepoint, full_tile)
         required = self.tile_shape + (4,)
         if tile.shape != required:
-            raise ValueError("Tile shape must be %r or %r, got %r." % (required, self.tile_shape, tile.shape))
+            note = ""
+            if len(tile.shape) == 3 and tile.shape[2] == 3:
+                note = (
+                    "\nNote: An RGB array is too ambiguous,"
+                    " an alpha channel must be added to this array to divide the background/foreground areas."
+                )
+            raise ValueError(f"Tile shape must be {required} or {self.tile_shape}, got {tile.shape}.{note}")
         lib.TCOD_tileset_set_tile_(
             self._tileset_p,
             codepoint,
@@ -296,6 +342,105 @@ def load_tilesheet(path: Union[str, Path], columns: int, rows: int, charmap: Opt
     if not cdata:
         _raise_tcod_error()
     return Tileset._claim(cdata)
+
+
+def procedural_block_elements(tileset: Tileset) -> None:
+    """Overwrites the block element codepoints in `tileset` with prodecually generated glyphs.
+
+    Args:
+        tileset (Tileset): A :any:`Tileset` with tiles of any shape.
+
+    This will overwrite all of the codepoints `listed here <https://en.wikipedia.org/wiki/Block_Elements>`_
+    except for the shade glyphs.
+
+    This function is useful for other functions such as :any:`Console.draw_semigraphics` which use more types of block
+    elements than are found in Code Page 437.
+
+    .. versionadded:: 13.1
+
+    Example::
+
+        >>> tileset = tcod.tileset.Tileset(8, 8)
+        >>> tcod.tileset.procedural_block_elements(tileset)
+        >>> tileset.get_tile(0x259E)[:, :, 3]  # "▞" Quadrant upper right and lower left.
+        array([[  0,   0,   0,   0, 255, 255, 255, 255],
+               [  0,   0,   0,   0, 255, 255, 255, 255],
+               [  0,   0,   0,   0, 255, 255, 255, 255],
+               [  0,   0,   0,   0, 255, 255, 255, 255],
+               [255, 255, 255, 255,   0,   0,   0,   0],
+               [255, 255, 255, 255,   0,   0,   0,   0],
+               [255, 255, 255, 255,   0,   0,   0,   0],
+               [255, 255, 255, 255,   0,   0,   0,   0]], dtype=uint8)
+        >>> tileset.get_tile(0x2581)[:, :, 3]  # "▁" Lower one eighth block.
+        array([[  0,   0,   0,   0,   0,   0,   0,   0],
+               [  0,   0,   0,   0,   0,   0,   0,   0],
+               [  0,   0,   0,   0,   0,   0,   0,   0],
+               [  0,   0,   0,   0,   0,   0,   0,   0],
+               [  0,   0,   0,   0,   0,   0,   0,   0],
+               [  0,   0,   0,   0,   0,   0,   0,   0],
+               [  0,   0,   0,   0,   0,   0,   0,   0],
+               [255, 255, 255, 255, 255, 255, 255, 255]], dtype=uint8)
+       >>> tileset.get_tile(0x258D)[:, :, 3]  # "▍" Left three eighths block.
+       array([[255, 255, 255,   0,   0,   0,   0,   0],
+              [255, 255, 255,   0,   0,   0,   0,   0],
+              [255, 255, 255,   0,   0,   0,   0,   0],
+              [255, 255, 255,   0,   0,   0,   0,   0],
+              [255, 255, 255,   0,   0,   0,   0,   0],
+              [255, 255, 255,   0,   0,   0,   0,   0],
+              [255, 255, 255,   0,   0,   0,   0,   0],
+              [255, 255, 255,   0,   0,   0,   0,   0]], dtype=uint8)
+    """
+    quadrants: NDArray[np.uint8] = np.zeros(tileset.tile_shape, dtype=np.uint8)
+    half_height = tileset.tile_height // 2
+    half_width = tileset.tile_width // 2
+    quadrants[:half_height, :half_width] = 0b1000  # Top-left.
+    quadrants[:half_height, half_width:] = 0b0100  # Top-right.
+    quadrants[half_height:, :half_width] = 0b0010  # Bottom-left.
+    quadrants[half_height:, half_width:] = 0b0001  # Bottom-right.
+
+    for codepoint, quad_mask in (
+        (0x2580, 0b1100),  # "▀" Upper half block.
+        (0x2584, 0b0011),  # "▄" Lower half block.
+        (0x2588, 0b1111),  # "█" Full block.
+        (0x258C, 0b1010),  # "▌" Left half block.
+        (0x2590, 0b0101),  # "▐" Right half block.
+        (0x2596, 0b0010),  # "▖" Quadrant lower left.
+        (0x2597, 0b0001),  # "▗" Quadrant lower right.
+        (0x2598, 0b1000),  # "▘" Quadrant upper left.
+        (0x2599, 0b1011),  # "▙" Quadrant upper left and lower left and lower right.
+        (0x259A, 0b1001),  # "▚" Quadrant upper left and lower right.
+        (0x259B, 0b1110),  # "▛" Quadrant upper left and upper right and lower left.
+        (0x259C, 0b1101),  # "▜" Quadrant upper left and upper right and lower right.
+        (0x259D, 0b0100),  # "▝" Quadrant upper right.
+        (0x259E, 0b0110),  # "▞" Quadrant upper right and lower left.
+        (0x259F, 0b0111),  # "▟" Quadrant upper right and lower left and lower right.
+    ):
+        alpha: NDArray[np.uint8] = np.asarray((quadrants & quad_mask) != 0, dtype=np.uint8) * 255
+        tileset.set_tile(codepoint, alpha)
+
+    for codepoint, axis, fraction, negative in (
+        (0x2581, 0, 7, True),  # "▁" Lower one eighth block.
+        (0x2582, 0, 6, True),  # "▂" Lower one quarter block.
+        (0x2583, 0, 5, True),  # "▃" Lower three eighths block.
+        (0x2585, 0, 3, True),  # "▅" Lower five eighths block.
+        (0x2586, 0, 2, True),  # "▆" Lower three quarters block.
+        (0x2587, 0, 1, True),  # "▇" Lower seven eighths block.
+        (0x2589, 1, 7, False),  # "▉" Left seven eighths block.
+        (0x258A, 1, 6, False),  # "▊" Left three quarters block.
+        (0x258B, 1, 5, False),  # "▋" Left five eighths block.
+        (0x258D, 1, 3, False),  # "▍" Left three eighths block.
+        (0x258E, 1, 2, False),  # "▎" Left one quarter block.
+        (0x258F, 1, 1, False),  # "▏" Left one eighth block.
+        (0x2594, 0, 1, False),  # "▔" Upper one eighth block.
+        (0x2595, 1, 7, True),  # "▕" Right one eighth block .
+    ):
+        indexes = [slice(None), slice(None)]
+        divide = tileset.tile_shape[axis] * fraction // 8
+        # If negative then shade from the far corner, otherwise shade from the near corner.
+        indexes[axis] = slice(divide, None) if negative else slice(None, divide)
+        alpha = np.zeros(tileset.tile_shape, dtype=np.uint8)
+        alpha[tuple(indexes)] = 255
+        tileset.set_tile(codepoint, alpha)
 
 
 CHARMAP_CP437 = [

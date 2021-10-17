@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - Added the `tcod.tileset.procedural_block_elements` function.
 Removed
  - Python 3.6 is no longer supported.
 
