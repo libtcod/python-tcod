@@ -8,6 +8,37 @@
             "label": "develop python-tcod",
             "type": "shell",
             "command": "python setup.py develop"
+        },
+        {
+            "label": "install documentation requirements",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "-m",
+                "pip",
+                "install",
+                "--requirement",
+                "docs/requirements.txt"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "build documentation",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "html"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/docs"
+            },
+            "problemMatcher": [],
+            "dependsOn": [
+                "install documentation requirements"
+            ],
+            "windows": {
+                "command": "./make.bat"
+            }
         }
     ]
 }

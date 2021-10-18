@@ -22,6 +22,29 @@
             "cwd": "${workspaceFolder}/examples",
             "console": "integratedTerminal",
             "preLaunchTask": "develop python-tcod",
+        },
+        {
+            "name": "Python: Run tests",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest",
+            "preLaunchTask": "develop python-tcod",
+        },
+        {
+            "name": "Documentation: Launch Chrome",
+            "request": "launch",
+            "type": "pwa-chrome",
+            "url": "file://${workspaceFolder}/docs/_build/html/index.html",
+            "webRoot": "${workspaceFolder}",
+            "preLaunchTask": "build documentation",
+        },
+        {
+            "name": "Documentation: Launch Edge",
+            "request": "launch",
+            "type": "pwa-msedge",
+            "url": "file://${workspaceFolder}/docs/_build/html/index.html",
+            "webRoot": "${workspaceFolder}",
+            "preLaunchTask": "build documentation",
         }
     ]
 }
