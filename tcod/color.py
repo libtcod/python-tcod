@@ -24,7 +24,7 @@ class Color(List[int]):
 
     @property
     def r(self) -> int:
-        """int: Red value, always normalised to 0-255.
+        """int: Red value, always normalized to 0-255.
 
         .. deprecated:: 9.2
             Color attributes will not be mutable in the future.
@@ -38,7 +38,7 @@ class Color(List[int]):
 
     @property
     def g(self) -> int:
-        """int: Green value, always normalised to 0-255.
+        """int: Green value, always normalized to 0-255.
 
         .. deprecated:: 9.2
             Color attributes will not be mutable in the future.
@@ -52,7 +52,7 @@ class Color(List[int]):
 
     @property
     def b(self) -> int:
-        """int: Blue value, always normalised to 0-255.
+        """int: Blue value, always normalized to 0-255.
 
         .. deprecated:: 9.2
             Color attributes will not be mutable in the future.
