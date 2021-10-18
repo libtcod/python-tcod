@@ -344,7 +344,7 @@ def load_tilesheet(path: Union[str, Path], columns: int, rows: int, charmap: Opt
     return Tileset._claim(cdata)
 
 
-def procedural_block_elements(tileset: Tileset) -> None:
+def procedural_block_elements(*, tileset: Tileset) -> None:
     """Overwrites the block element codepoints in `tileset` with prodecually generated glyphs.
 
     Args:
@@ -361,7 +361,7 @@ def procedural_block_elements(tileset: Tileset) -> None:
     Example::
 
         >>> tileset = tcod.tileset.Tileset(8, 8)
-        >>> tcod.tileset.procedural_block_elements(tileset)
+        >>> tcod.tileset.procedural_block_elements(tileset=tileset)
         >>> tileset.get_tile(0x259E)[:, :, 3]  # "▞" Quadrant upper right and lower left.
         array([[  0,   0,   0,   0, 255, 255, 255, 255],
                [  0,   0,   0,   0, 255, 255, 255, 255],
