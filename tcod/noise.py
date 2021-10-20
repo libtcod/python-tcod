@@ -321,7 +321,7 @@ class Noise(object):
         """Sample an open mesh-grid array and return the result.
 
         Args
-            ogrid (Sequence[Sequence[float]]): An open mesh-grid.
+            ogrid (Sequence[ArrayLike]): An open mesh-grid.
 
         Returns:
             numpy.ndarray: An array of sampled points.

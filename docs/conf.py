@@ -129,6 +129,12 @@ todo_include_todos = False
 
 autodoc_member_order = "groupwise"
 
+# Prevent type aliases from expanding
+autodoc_type_aliases = {
+    "ArrayLike": "numpy.typing.ArrayLike",
+    "NDArray": "numpy.typing.NDArray",
+}
+
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
