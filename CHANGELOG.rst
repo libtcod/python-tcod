@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+13.1.0 - 2021-10-22
+-------------------
 Added
  - Added the `tcod.tileset.procedural_block_elements` function.
 Removed
