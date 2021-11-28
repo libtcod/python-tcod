@@ -3,6 +3,6 @@ include *.py *.cfg *.txt *.rst *.toml
 recursive-include tcod *.py *.c *.h
 
 recursive-include libtcod/src *.glsl* *.c *.h
-include libtcod/*.txt libtcod/*.md
+include libtcod/*.txt libtcod/*.md tests/data/*.pkl
 
 exclude tcod/*/SDL2.dll

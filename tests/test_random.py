@@ -1,4 +1,5 @@
 import copy
+import pathlib
 import pickle
 
 import tcod
@@ -26,3 +27,10 @@ def test_tcod_random_pickle() -> None:
     assert rand.uniform(0, 1) == rand2.uniform(0, 1)
     assert rand.uniform(0, 1) == rand2.uniform(0, 1)
     assert rand.uniform(0, 1) == rand2.uniform(0, 1)
+
+
+def test_load_rng_v13() -> None:
+    with open(pathlib.Path(__file__).parent / "data/random_v13.pkl", "rb") as f:
+        rand: tcod.random.Random = pickle.load(f)
+    assert rand.randint(0, 0xFFFF) == 56422
+    assert rand.randint(0, 0xFFFF) == 15795
