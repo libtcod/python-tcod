@@ -75,10 +75,7 @@ class Random(object):
             seed = hash(seed)
 
         self.random_c = ffi.gc(
-            ffi.cast(
-                "mersenne_data_t*",
-                lib.TCOD_random_new_from_seed(algorithm, seed & 0xFFFFFFFF),
-            ),
+            lib.TCOD_random_new_from_seed(algorithm, seed & 0xFFFFFFFF),
             lib.TCOD_random_delete,
         )
 
@@ -141,22 +138,24 @@ class Random(object):
         """Pack the self.random_c attribute into a portable state."""
         state = self.__dict__.copy()
         state["random_c"] = {
-            "algo": self.random_c.algo,
-            "distribution": self.random_c.distribution,
-            "mt": list(self.random_c.mt),
-            "cur_mt": self.random_c.cur_mt,
-            "Q": list(self.random_c.Q),
-            "c": self.random_c.c,
-            "cur": self.random_c.cur,
+            "mt_cmwc": {
+                "algorithm": self.random_c.mt_cmwc.algorithm,
+                "distribution": self.random_c.mt_cmwc.distribution,
+                "mt": list(self.random_c.mt_cmwc.mt),
+                "cur_mt": self.random_c.mt_cmwc.cur_mt,
+                "Q": list(self.random_c.mt_cmwc.Q),
+                "c": self.random_c.mt_cmwc.c,
+                "cur": self.random_c.mt_cmwc.cur,
+            }
         }
         return state
 
     def __setstate__(self, state: Any) -> None:
         """Create a new cdata object with the stored paramaters."""
-        try:
-            cdata = state["random_c"]
-        except KeyError:  # old/deprecated format
-            cdata = state["cdata"]
-            del state["cdata"]
-        state["random_c"] = ffi.new("mersenne_data_t*", cdata)
+        if "algo" in state["random_c"]:
+            # Handle old/deprecated format.  Covert to libtcod's new union type.
+            state["random_c"]["algorithm"] = state["random_c"]["algo"]
+            del state["random_c"]["algo"]
+            state["random_c"] = {"mt_cmwc": state["random_c"]}
+        state["random_c"] = ffi.new("TCOD_Random*", state["random_c"])
         self.__dict__.update(state)

@@ -2,6 +2,7 @@
    Anything included here will be accessible from tcod.loader.lib */
 #include "../libtcod/src/libtcod/libtcod.h"
 #include "../libtcod/src/libtcod/libtcod_int.h"
+#include "../libtcod/src/libtcod/renderer_xterm.h"
 #include "../libtcod/src/libtcod/tileset_truetype.h"
 #include "../libtcod/src/libtcod/wrappers.h"
 #include "noise.h"

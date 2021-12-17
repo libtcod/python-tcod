@@ -3663,7 +3663,7 @@ def random_get_instance() -> tcod.random.Random:
     Returns:
         Random: A Random instance using the default random number generator.
     """
-    return tcod.random.Random._new_from_cdata(ffi.cast("mersenne_data_t*", lib.TCOD_random_get_instance()))
+    return tcod.random.Random._new_from_cdata(lib.TCOD_random_get_instance())
 
 
 @pending_deprecate()
@@ -3809,10 +3809,7 @@ def random_save(rnd: Optional[tcod.random.Random]) -> tcod.random.Random:
     """
     return tcod.random.Random._new_from_cdata(
         ffi.gc(
-            ffi.cast(
-                "mersenne_data_t*",
-                lib.TCOD_random_save(rnd.random_c if rnd else ffi.NULL),
-            ),
+            lib.TCOD_random_save(rnd.random_c if rnd else ffi.NULL),
             lib.TCOD_random_delete,
         )
     )

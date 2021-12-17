@@ -29,7 +29,7 @@ def test_tcod_random_pickle() -> None:
     assert rand.uniform(0, 1) == rand2.uniform(0, 1)
 
 
-def test_load_rng_v13() -> None:
+def test_load_rng_v13_1() -> None:
     with open(pathlib.Path(__file__).parent / "data/random_v13.pkl", "rb") as f:
         rand: tcod.random.Random = pickle.load(f)
     assert rand.randint(0, 0xFFFF) == 56422

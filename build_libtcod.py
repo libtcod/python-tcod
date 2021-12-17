@@ -38,10 +38,10 @@ RE_CPLUSPLUS = re.compile(r"#ifdef __cplusplus.*?#endif.*?$", re.DOTALL | re.MUL
 RE_PREPROCESSOR = re.compile(r"(?!#define\s+\w+\s+\d+$)#.*?(?<!\\)$", re.DOTALL | re.MULTILINE)
 RE_INCLUDE = re.compile(r'#include "([^"]*)"')
 RE_TAGS = re.compile(
-    r"TCODLIB_C?API|TCOD_PUBLIC|TCOD_NODISCARD|TCOD_DEPRECATED_NOMESSAGE"
+    r"TCODLIB_C?API|TCOD_PUBLIC|TCOD_NODISCARD|TCOD_DEPRECATED_NOMESSAGE|TCOD_DEPRECATED_ENUM"
     r"|(TCOD_DEPRECATED|TCODLIB_FORMAT)\([^)]*\)|__restrict"
 )
-RE_VAFUNC = re.compile(r".*\(.*va_list.*\);")
+RE_VAFUNC = re.compile(r"^[^;]*\([^;]*va_list.*\);", re.MULTILINE)
 RE_INLINE = re.compile(r"(^.*?inline.*?\(.*?\))\s*\{.*?\}$", re.DOTALL | re.MULTILINE)
 
 
