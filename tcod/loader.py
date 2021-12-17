@@ -9,7 +9,7 @@ from typing import Any  # noqa: F401
 
 import cffi  # type: ignore
 
-from tcod import __path__  # type: ignore
+from tcod import __path__
 
 __sdl_version__ = ""
 

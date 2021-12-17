@@ -621,8 +621,8 @@ class FOVSample(Sample):
             light[~visible] = 0  # Set non-visible areas to darkness.
 
             # Setup background colors for floating point math.
-            light_bg = self.light_map_bg.astype(np.float16)
-            dark_bg = self.dark_map_bg.astype(np.float16)
+            light_bg: NDArray[np.float16] = self.light_map_bg.astype(np.float16)
+            dark_bg: NDArray[np.float16] = self.dark_map_bg.astype(np.float16)
 
             # Linear interpolation between colors.
             sample_console.tiles_rgb["bg"] = dark_bg + (light_bg - dark_bg) * light[..., np.newaxis]
