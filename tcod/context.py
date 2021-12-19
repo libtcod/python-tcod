@@ -365,6 +365,7 @@ def new(
     sdl_window_flags: Optional[int] = None,
     title: Optional[str] = None,
     argv: Optional[Iterable[str]] = None,
+    console: Optional[tcod.Console] = None,
 ) -> Context:
     """Create a new context with the desired pixel size.
 
@@ -375,6 +376,9 @@ def new(
 
     `columns` and `rows` is the desired size of the console.  Can be left as
     `None` when you're setting a context by a window size instead of a console.
+
+    `console` automatically fills in the `columns` and `rows` parameters from an existing :any:`tcod.console.Console`
+    instance.
 
     Providing no size information at all is also acceptable.
 
@@ -409,6 +413,9 @@ def new(
     the console which should be used.
 
     .. versionadded:: 11.16
+
+    .. versionchanged:: 13.2
+        Added the `console` parameter.
     """
     if renderer is None:
         renderer = RENDERER_OPENGL2
@@ -416,6 +423,9 @@ def new(
         sdl_window_flags = SDL_WINDOW_RESIZABLE
     if argv is None:
         argv = sys.argv
+    if console is not None:
+        columns = columns or console.width
+        rows = rows or console.height
     argv_encoded = [ffi.new("char[]", arg.encode("utf-8")) for arg in argv]  # Needs to be kept alive for argv_c.
     argv_c = ffi.new("char*[]", argv_encoded)
 
