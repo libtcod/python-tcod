@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+
+13.2.0 - 2021-12-24
+-------------------
 Added
  - New `console` parameter in `tcod.context.new` which sets parameters from an existing Console.
 
