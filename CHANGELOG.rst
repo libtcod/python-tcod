@@ -11,10 +11,20 @@ Unreleased
 Added
  - New `console` parameter in `tcod.context.new` which sets parameters from an existing Console.
 
+Changed
+ - Using `libtcod 1.20.0`.
+
+Fixed
+ - Fixed segfault when an OpenGL2 context fails to load.
+ - Gaussian number generation no longer affects the results of unrelated RNG's.
+ - Gaussian number generation is now reentrant and thread-safe.
+ - Fixed potential crash in PNG image loading.
+
 13.1.0 - 2021-10-22
 -------------------
 Added
  - Added the `tcod.tileset.procedural_block_elements` function.
+
 Removed
  - Python 3.6 is no longer supported.
 
