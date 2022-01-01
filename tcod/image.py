@@ -11,7 +11,7 @@ from os import PathLike
 from typing import Any, Dict, Tuple, Union
 
 import numpy as np
-from numpy.typing import NDArray
+from numpy.typing import ArrayLike, NDArray
 
 import tcod.console
 from tcod._internal import _console, deprecate
@@ -41,7 +41,7 @@ class Image(object):
         return self
 
     @classmethod
-    def from_array(cls, array: Any) -> Image:
+    def from_array(cls, array: ArrayLike) -> Image:
         """Create a new Image from a copy of an array-like object.
 
         Example:
@@ -52,10 +52,10 @@ class Image(object):
 
         .. versionadded:: 11.4
         """
-        array = np.asarray(array)
+        array = np.asarray(array, dtype=np.uint8)
         height, width, depth = array.shape
         image = cls(width, height)
-        image_array = np.asarray(image)
+        image_array: NDArray[np.uint8] = np.asarray(image)
         image_array[...] = array
         return image
 
@@ -349,7 +349,7 @@ def load(filename: Union[str, PathLike[str]]) -> NDArray[np.uint8]:
     array: NDArray[np.uint8] = np.asarray(image, dtype=np.uint8)
     height, width, depth = array.shape
     if depth == 3:
-        array = np.concatenate(  # type: ignore
+        array = np.concatenate(
             (
                 array,
                 np.full((height, width, 1), fill_value=255, dtype=np.uint8),

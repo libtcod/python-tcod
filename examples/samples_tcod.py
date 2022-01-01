@@ -14,7 +14,7 @@ import random
 import sys
 import time
 import warnings
-from typing import List
+from typing import Any, List
 
 import numpy as np
 import tcod
@@ -101,14 +101,14 @@ class TrueColorSample(Sample):
     def __init__(self) -> None:
         self.name = "True colors"
         # corner colors
-        self.colors = np.array(
+        self.colors: NDArray[np.int16] = np.array(
             [(50, 40, 150), (240, 85, 5), (50, 35, 240), (10, 200, 130)],
             dtype=np.int16,
         )
         # color shift direction
-        self.slide_dir = np.array([[1, 1, 1], [-1, -1, 1], [1, -1, 1], [1, 1, -1]], dtype=np.int16)
+        self.slide_dir: NDArray[np.int16] = np.array([[1, 1, 1], [-1, -1, 1], [1, -1, 1], [1, 1, -1]], dtype=np.int16)
         # corner indexes
-        self.corners = np.array([0, 1, 2, 3])
+        self.corners: NDArray[np.int16] = np.array([0, 1, 2, 3], dtype=np.int16)
 
     def on_draw(self) -> None:
         self.slide_corner_colors()
@@ -509,7 +509,7 @@ SAMPLE_MAP_ = [
     "##############################################",
 ]
 
-SAMPLE_MAP = np.array([list(line) for line in SAMPLE_MAP_]).transpose()
+SAMPLE_MAP: NDArray[Any] = np.array([list(line) for line in SAMPLE_MAP_]).transpose()
 
 FOV_ALGO_NAMES = [
     "BASIC      ",
@@ -545,17 +545,17 @@ class FOVSample(Sample):
 
         map_shape = (SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
 
-        self.walkable = np.zeros(map_shape, dtype=bool, order="F")
+        self.walkable: NDArray[np.bool_] = np.zeros(map_shape, dtype=bool, order="F")
         self.walkable[:] = SAMPLE_MAP[:] == " "
 
-        self.transparent = np.zeros(map_shape, dtype=bool, order="F")
+        self.transparent: NDArray[np.bool_] = np.zeros(map_shape, dtype=bool, order="F")
         self.transparent[:] = self.walkable[:] | (SAMPLE_MAP == "=")
 
         # Lit background colors for the map.
-        self.light_map_bg = np.full(SAMPLE_MAP.shape, LIGHT_GROUND, dtype="3B")
+        self.light_map_bg: NDArray[np.uint8] = np.full(SAMPLE_MAP.shape, LIGHT_GROUND, dtype="3B")
         self.light_map_bg[SAMPLE_MAP[:] == "#"] = LIGHT_WALL
         # Dark background colors for the map.
-        self.dark_map_bg = np.full(SAMPLE_MAP.shape, DARK_GROUND, dtype="3B")
+        self.dark_map_bg: NDArray[np.uint8] = np.full(SAMPLE_MAP.shape, DARK_GROUND, dtype="3B")
         self.dark_map_bg[SAMPLE_MAP[:] == "#"] = DARK_WALL
 
     def draw_ui(self) -> None:
@@ -948,7 +948,7 @@ class BSPSample(Sample):
     def __init__(self) -> None:
         self.name = "Bsp toolkit"
         self.bsp = tcod.bsp.BSP(1, 1, SAMPLE_SCREEN_WIDTH - 1, SAMPLE_SCREEN_HEIGHT - 1)
-        self.bsp_map = np.zeros((SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT), dtype=bool, order="F")
+        self.bsp_map: NDArray[np.bool_] = np.zeros((SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT), dtype=bool, order="F")
         self.bsp_generate()
 
     def bsp_generate(self) -> None:
@@ -1214,7 +1214,7 @@ AMBIENT_LIGHT = 0.8  # brightness of tunnel texture
 # xc = [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]
 # yc = [[1, 1, 1, 1], [2, 2, 2, 2], [3, 3, 3, 3]]
 if numpy_available:
-    (xc, yc) = np.meshgrid(range(SCREEN_W), range(SCREEN_H))  # type: ignore
+    (xc, yc) = np.meshgrid(range(SCREEN_W), range(SCREEN_H))
     # translate coordinates of all pixels to center
     xc = xc - HALF_W
     yc = yc - HALF_H

@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import Any, Tuple
 
 import numpy as np
-from numpy.typing import ArrayLike
+from numpy.typing import ArrayLike, NDArray
 
 from tcod.loader import ffi, lib
 
@@ -19,7 +19,7 @@ class _TempSurface:
     """Holds a temporary surface derived from a NumPy array."""
 
     def __init__(self, pixels: ArrayLike) -> None:
-        self._array = np.ascontiguousarray(pixels, dtype=np.uint8)
+        self._array: NDArray[np.uint8] = np.ascontiguousarray(pixels, dtype=np.uint8)
         if len(self._array) != 3:
             raise TypeError("NumPy shape must be 3D [y, x, ch] (got %r)" % (self._array.shape,))
         if 3 <= self._array.shape[2] <= 4:

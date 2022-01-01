@@ -124,7 +124,7 @@ class Console:
         if buffer is not None:
             if self._order == "F":
                 buffer = buffer.transpose()
-            self._tiles = np.ascontiguousarray(buffer, self.DTYPE)
+            self._tiles: NDArray[Any] = np.ascontiguousarray(buffer, self.DTYPE)
         else:
             self._tiles = np.ndarray((height, width), dtype=self.DTYPE)
 

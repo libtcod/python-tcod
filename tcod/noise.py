@@ -38,7 +38,7 @@ from __future__ import annotations
 
 import enum
 import warnings
-from typing import Any, Optional, Sequence, Tuple, Union
+from typing import Any, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -245,7 +245,7 @@ class Noise(object):
             raise IndexError(
                 "This noise generator has %i dimensions, but was indexed with %i." % (self.dimensions, len(indexes))
             )
-        indexes = np.broadcast_arrays(*indexes)  # type: ignore
+        indexes = np.broadcast_arrays(*indexes)
         c_input = [ffi.NULL, ffi.NULL, ffi.NULL, ffi.NULL]
         for i, index in enumerate(indexes):
             if index.dtype.type == np.object_:
@@ -253,7 +253,7 @@ class Noise(object):
             indexes[i] = np.ascontiguousarray(index, dtype=np.float32)
             c_input[i] = ffi.from_buffer("float*", indexes[i])
 
-        out = np.empty(indexes[0].shape, dtype=np.float32)
+        out: NDArray[np.float32] = np.empty(indexes[0].shape, dtype=np.float32)
         if self.implementation == Implementation.SIMPLE:
             lib.TCOD_noise_get_vectorized(
                 self.noise_c,
@@ -332,7 +332,7 @@ class Noise(object):
         """
         if len(ogrid) != self.dimensions:
             raise ValueError("len(ogrid) must equal self.dimensions, " "%r != %r" % (len(ogrid), self.dimensions))
-        ogrids = [np.ascontiguousarray(array, np.float32) for array in ogrid]
+        ogrids: List[NDArray[np.float32]] = [np.ascontiguousarray(array, np.float32) for array in ogrid]
         out: np.ndarray[Any, np.dtype[np.float32]] = np.ndarray([array.size for array in ogrids], np.float32)
         lib.NoiseSampleOpenMeshGrid(
             self._tdl_noise_c,
@@ -461,4 +461,4 @@ def grid(
     if len(shape) != len(origin):
         raise TypeError("shape must have the same length as origin")
     indexes = (np.arange(i_shape) * i_scale + i_origin for i_shape, i_scale, i_origin in zip(shape, scale, origin))
-    return tuple(np.meshgrid(*indexes, copy=False, sparse=True, indexing=indexing))  # type: ignore
+    return tuple(np.meshgrid(*indexes, copy=False, sparse=True, indexing=indexing))

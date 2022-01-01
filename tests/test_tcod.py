@@ -6,7 +6,7 @@ from typing import Any, NoReturn
 
 import numpy as np
 import pytest
-from numpy.typing import DTypeLike
+from numpy.typing import DTypeLike, NDArray
 
 import tcod
 
@@ -125,7 +125,7 @@ def test_color_class() -> None:
 
 @pytest.mark.parametrize("dtype", [np.int8, np.int16, np.int32, np.uint8, np.uint16, np.uint32, np.float32])
 def test_path_numpy(dtype: DTypeLike) -> None:
-    map_np = np.ones((6, 6), dtype=dtype)
+    map_np: NDArray[Any] = np.ones((6, 6), dtype=dtype)
     map_np[1:4, 1:4] = 0
 
     astar = tcod.path.AStar(map_np, 0)

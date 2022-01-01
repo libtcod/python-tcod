@@ -87,7 +87,7 @@ class Map(object):
         self.height = height
         self._order = tcod._internal.verify_order(order)
 
-        self.__buffer = np.zeros((height, width, 3), dtype=np.bool_)
+        self.__buffer: NDArray[np.bool_] = np.zeros((height, width, 3), dtype=np.bool_)
         self.map_c = self.__as_cdata()
 
     def __as_cdata(self) -> Any:
@@ -251,7 +251,7 @@ def compute_fov(
             RuntimeWarning,
             stacklevel=2,
         )
-    map_buffer = np.empty(
+    map_buffer: NDArray[np.bool_] = np.empty(
         transparency.shape,
         dtype=[("transparent", bool), ("walkable", bool), ("fov", bool)],
     )

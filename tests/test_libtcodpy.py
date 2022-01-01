@@ -5,6 +5,7 @@ from typing import Any, Callable, Iterator, List, Optional, Tuple, Union
 import numpy
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 
 import tcod
 import tcod as libtcodpy
@@ -253,7 +254,7 @@ def test_console_fill(console: tcod.console.Console) -> None:
 def test_console_fill_numpy(console: tcod.console.Console) -> None:
     width = libtcodpy.console_get_width(console)
     height = libtcodpy.console_get_height(console)
-    fill = numpy.zeros((height, width), dtype=numpy.intc)
+    fill: NDArray[np.intc] = numpy.zeros((height, width), dtype=np.intc)
     for y in range(height):
         fill[y, :] = y % 256
 
@@ -262,9 +263,9 @@ def test_console_fill_numpy(console: tcod.console.Console) -> None:
     libtcodpy.console_fill_char(console, fill)  # type: ignore
 
     # verify fill
-    bg = numpy.zeros((height, width), dtype=numpy.intc)
-    fg = numpy.zeros((height, width), dtype=numpy.intc)
-    ch = numpy.zeros((height, width), dtype=numpy.intc)
+    bg: NDArray[np.intc] = numpy.zeros((height, width), dtype=numpy.intc)
+    fg: NDArray[np.intc] = numpy.zeros((height, width), dtype=numpy.intc)
+    ch: NDArray[np.intc] = numpy.zeros((height, width), dtype=numpy.intc)
     for y in range(height):
         for x in range(width):
             bg[y, x] = libtcodpy.console_get_char_background(console, x, y)[0]
@@ -639,7 +640,7 @@ def test_heightmap() -> None:
     libtcodpy.heightmap_delete(h_map)
 
 
-MAP = np.array(
+MAP: NDArray[Any] = np.array(
     [
         list(line)
         for line in (

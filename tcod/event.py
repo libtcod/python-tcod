@@ -1091,8 +1091,8 @@ def get_keyboard_state() -> NDArray[np.bool_]:
     """
     numkeys = ffi.new("int[1]")
     keyboard_state = lib.SDL_GetKeyboardState(numkeys)
-    out: NDArray[np.bool_] = np.frombuffer(ffi.buffer(keyboard_state[0 : numkeys[0]]), dtype=np.bool_)  # type: ignore
-    out.flags["WRITEABLE"] = False  # This buffer is supposed to be const.
+    out: NDArray[np.bool_] = np.frombuffer(ffi.buffer(keyboard_state[0 : numkeys[0]]), dtype=np.bool_)
+    out.flags["WRITEABLE"] = False  # type: ignore[index]  # This buffer is supposed to be const.
     return out
 
 

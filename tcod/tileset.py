@@ -74,7 +74,7 @@ class Tileset:
         uint8.  Note that most grey-scale tiles will only use the alpha
         channel and will usually have a solid white color channel.
         """
-        tile = np.zeros(self.tile_shape + (4,), dtype=np.uint8)
+        tile: NDArray[np.uint8] = np.zeros(self.tile_shape + (4,), dtype=np.uint8)
         lib.TCOD_tileset_get_tile_(
             self._tileset_p,
             codepoint,
@@ -133,7 +133,7 @@ class Tileset:
         """
         tile = np.ascontiguousarray(tile, dtype=np.uint8)
         if tile.shape == self.tile_shape:
-            full_tile = np.empty(self.tile_shape + (4,), dtype=np.uint8)
+            full_tile: NDArray[np.uint8] = np.empty(self.tile_shape + (4,), dtype=np.uint8)
             full_tile[:, :, :3] = 255
             full_tile[:, :, 3] = tile
             return self.set_tile(codepoint, full_tile)
@@ -167,7 +167,7 @@ class Tileset:
             raise ValueError("'console' must not be the root console.")
         width = console.width * self.tile_width
         height = console.height * self.tile_height
-        out = np.empty((height, width, 4), np.uint8)
+        out: NDArray[np.uint8] = np.empty((height, width, 4), np.uint8)
         out[:] = 9
         surface_p = ffi.gc(
             lib.SDL_CreateRGBSurfaceWithFormatFrom(
@@ -415,7 +415,8 @@ def procedural_block_elements(*, tileset: Tileset) -> None:
         (0x259E, 0b0110),  # "▞" Quadrant upper right and lower left.
         (0x259F, 0b0111),  # "▟" Quadrant upper right and lower left and lower right.
     ):
-        alpha: NDArray[np.uint8] = np.asarray((quadrants & quad_mask) != 0, dtype=np.uint8) * 255
+        alpha: NDArray[np.uint8] = np.asarray((quadrants & quad_mask) != 0, dtype=np.uint8)
+        alpha *= 255
         tileset.set_tile(codepoint, alpha)
 
     for codepoint, axis, fraction, negative in (

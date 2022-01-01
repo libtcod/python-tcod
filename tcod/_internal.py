@@ -7,6 +7,7 @@ import warnings
 from typing import Any, AnyStr, Callable, TypeVar, cast
 
 import numpy as np
+from numpy.typing import NDArray
 from typing_extensions import Literal, NoReturn
 
 from tcod.loader import ffi, lib
@@ -225,7 +226,7 @@ class TempImage(object):
     """An Image-like container for NumPy arrays."""
 
     def __init__(self, array: Any):
-        self._array = np.ascontiguousarray(array, dtype=np.uint8)
+        self._array: NDArray[np.uint8] = np.ascontiguousarray(array, dtype=np.uint8)
         height, width, depth = self._array.shape
         if depth != 3:
             raise TypeError("Array must have RGB channels.  Shape is: %r" % (self._array.shape,))

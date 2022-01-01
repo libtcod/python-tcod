@@ -13,6 +13,7 @@ from typing import Tuple
 import freetype  # type: ignore  # pip install freetype-py
 import numpy as np
 import tcod
+from numpy.typing import NDArray
 
 FONT = "VeraMono.ttf"
 
@@ -36,10 +37,10 @@ def load_ttf(path: str, size: Tuple[int, int]) -> tcod.tileset.Tileset:
         ttf.load_glyph(glyph_index)
         bitmap = ttf.glyph.bitmap
         assert bitmap.pixel_mode == freetype.FT_PIXEL_MODE_GRAY
-        bitmap_array = np.asarray(bitmap.buffer).reshape((bitmap.width, bitmap.rows), order="F")
+        bitmap_array: NDArray[np.uint8] = np.asarray(bitmap.buffer).reshape((bitmap.width, bitmap.rows), order="F")
         if bitmap_array.size == 0:
             continue  # Skip blank glyphs.
-        output_image = np.zeros(size, dtype=np.uint8, order="F")
+        output_image: NDArray[np.uint8] = np.zeros(size, dtype=np.uint8, order="F")
         out_slice = output_image
 
         # Adjust the position to center this glyph on the tile.

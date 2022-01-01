@@ -473,7 +473,7 @@ def dijkstra2d(
     .. versionchanged:: 12.1
         Added `out` parameter.  Now returns the output array.
     """
-    dist = np.asarray(distance)
+    dist: NDArray[Any] = np.asarray(distance)
     if out is ...:  # type: ignore
         out = dist
         warnings.warn(
@@ -560,7 +560,7 @@ def hillclimb2d(
         Added `edge_map` parameter.
     """
     x, y = start
-    dist = np.asarray(distance)
+    dist: NDArray[Any] = np.asarray(distance)
     if not (0 <= x < dist.shape[0] and 0 <= y < dist.shape[1]):
         raise IndexError("Starting point %r not in shape %r" % (start, dist.shape))
     c_dist = _export(dist)
@@ -582,7 +582,7 @@ def _world_array(shape: Tuple[int, ...], dtype: Any = np.int32) -> NDArray[Any]:
     """Return an array where ``ij == arr[ij]``."""
     return np.ascontiguousarray(
         np.transpose(
-            np.meshgrid(  # type: ignore
+            np.meshgrid(
                 *(np.arange(i, dtype=dtype) for i in shape),
                 indexing="ij",
                 copy=False,
