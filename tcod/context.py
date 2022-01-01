@@ -80,6 +80,7 @@ __all__ = (
     "RENDERER_OPENGL2",
     "RENDERER_SDL",
     "RENDERER_SDL2",
+    "RENDERER_XTERM",
 )
 
 SDL_WINDOW_FULLSCREEN = lib.SDL_WINDOW_FULLSCREEN
@@ -125,6 +126,19 @@ RENDERER_SDL2 = lib.TCOD_RENDERER_SDL2
 
 Rendering is decided by SDL2 and can be changed by using an SDL2 hint:
 https://wiki.libsdl.org/SDL_HINT_RENDER_DRIVER
+"""
+RENDERER_XTERM = lib.TCOD_RENDERER_XTERM
+"""A renderer targeting modern terminals with 24-bit color support.
+
+This is an experimental renderer with partial support for XTerm and SSH.
+This will work best on those terminals.
+
+Terminal inputs and events will be passed to SDL's event system.
+
+There is poor support for ANSI escapes on Windows 10.
+It is not recommended to use this renderer on Windows.
+
+.. versionadded:: 13.3
 """
 
 

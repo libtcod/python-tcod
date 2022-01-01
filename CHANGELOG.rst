@@ -8,6 +8,9 @@ v2.0.0
 
 Unreleased
 ------------------
+Added
+ - New experimental renderer `tcod.context.RENDERER_XTERM`.
+
 Fixed
  - Functions accepting `Path`-like parameters now accept the more correct `os.PathLike` type.
 

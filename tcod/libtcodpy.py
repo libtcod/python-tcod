@@ -4713,6 +4713,7 @@ __all__ = [  # noqa: F405
     "RENDERER_OPENGL2",
     "RENDERER_SDL",
     "RENDERER_SDL2",
+    "RENDERER_XTERM",
     "RIGHT",
     "RNG_CMWC",
     "RNG_MT",
