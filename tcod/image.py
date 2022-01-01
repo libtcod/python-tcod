@@ -7,7 +7,7 @@ If your image can't be represented as tiles then you'll need to use
 """
 from __future__ import annotations
 
-from pathlib import Path
+from os import PathLike
 from typing import Any, Dict, Tuple, Union
 
 import numpy as np
@@ -336,7 +336,7 @@ def _get_format_name(format: int) -> str:
     "  It's recommended to load images with a more complete image library such as python-Pillow or python-imageio.",
     category=PendingDeprecationWarning,
 )
-def load(filename: Union[str, Path]) -> NDArray[np.uint8]:
+def load(filename: Union[str, PathLike[str]]) -> NDArray[np.uint8]:
     """Load a PNG file as an RGBA array.
 
     `filename` is the name of the file to load.

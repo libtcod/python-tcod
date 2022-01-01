@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import os
 import warnings
-from pathlib import Path
+from os import PathLike
 from typing import Any, Iterable, Optional, Sequence, Tuple, Union
 
 import numpy as np
@@ -1267,7 +1267,7 @@ def recommended_size() -> Tuple[int, int]:
     return w, h
 
 
-def load_xp(path: Union[str, Path], order: Literal["C", "F"] = "C") -> Tuple[Console, ...]:
+def load_xp(path: Union[str, PathLike[str]], order: Literal["C", "F"] = "C") -> Tuple[Console, ...]:
     """Load a REXPaint file as a tuple of consoles.
 
     `path` is the name of the REXPaint file to load.
@@ -1309,7 +1309,7 @@ def load_xp(path: Union[str, Path], order: Literal["C", "F"] = "C") -> Tuple[Con
 
 
 def save_xp(
-    path: Union[str, Path],
+    path: Union[str, PathLike[str]],
     consoles: Iterable[Console],
     compress_level: int = 9,
 ) -> None:

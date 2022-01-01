@@ -8,6 +8,8 @@ v2.0.0
 
 Unreleased
 ------------------
+Fixed
+ - Functions accepting `Path`-like parameters now accept the more correct `os.PathLike` type.
 
 13.2.0 - 2021-12-24
 -------------------
