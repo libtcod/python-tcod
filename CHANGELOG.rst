@@ -13,6 +13,7 @@ Added
 
 Fixed
  - Functions accepting `Path`-like parameters now accept the more correct `os.PathLike` type.
+ - BDF files with blank lines no longer fail to load with an "Unknown keyword" error.
 
 13.2.0 - 2021-12-24
 -------------------

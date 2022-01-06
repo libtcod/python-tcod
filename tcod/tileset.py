@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import itertools
 import os
-from pathlib import Path
+from os import PathLike
 from typing import Any, Iterable, Optional, Tuple, Union
 
 import numpy as np
@@ -250,7 +250,7 @@ def set_default(tileset: Tileset) -> None:
     lib.TCOD_set_default_tileset(tileset._tileset_p)
 
 
-def load_truetype_font(path: Union[str, Path], tile_width: int, tile_height: int) -> Tileset:
+def load_truetype_font(path: Union[str, PathLike[str]], tile_width: int, tile_height: int) -> Tileset:
     """Return a new Tileset from a `.ttf` or `.otf` file.
 
     Same as :any:`set_truetype_font`, but returns a :any:`Tileset` instead.
@@ -267,7 +267,7 @@ def load_truetype_font(path: Union[str, Path], tile_width: int, tile_height: int
 
 
 @deprecate("Accessing the default tileset is deprecated.")
-def set_truetype_font(path: Union[str, Path], tile_width: int, tile_height: int) -> None:
+def set_truetype_font(path: Union[str, PathLike[str]], tile_width: int, tile_height: int) -> None:
     """Set the default tileset from a `.ttf` or `.otf` file.
 
     `path` is the file path for the font file.
@@ -293,7 +293,7 @@ def set_truetype_font(path: Union[str, Path], tile_width: int, tile_height: int)
         raise RuntimeError(ffi.string(lib.TCOD_get_error()))
 
 
-def load_bdf(path: Union[str, Path]) -> Tileset:
+def load_bdf(path: Union[str, PathLike[str]]) -> Tileset:
     """Return a new Tileset from a `.bdf` file.
 
     For the best results the font should be monospace, cell-based, and
@@ -314,7 +314,9 @@ def load_bdf(path: Union[str, Path]) -> Tileset:
     return Tileset._claim(cdata)
 
 
-def load_tilesheet(path: Union[str, Path], columns: int, rows: int, charmap: Optional[Iterable[int]]) -> Tileset:
+def load_tilesheet(
+    path: Union[str, PathLike[str]], columns: int, rows: int, charmap: Optional[Iterable[int]]
+) -> Tileset:
     """Return a new Tileset from a simple tilesheet image.
 
     `path` is the file path to a PNG file with the tileset.
