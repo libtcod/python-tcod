@@ -111,7 +111,7 @@ setup(
     url="https://github.com/libtcod/python-tcod",
     project_urls={
         "Documentation": "https://python-tcod.readthedocs.io",
-        "Changelog": "https://github.com/libtcod/python-tcod/blob/develop/CHANGELOG.rst",
+        "Changelog": "https://github.com/libtcod/python-tcod/blob/develop/CHANGELOG.md",
         "Source": "https://github.com/libtcod/python-tcod",
         "Tracker": "https://github.com/libtcod/python-tcod/issues",
         "Forum": "https://github.com/libtcod/python-tcod/discussions",
