@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 ## [Unreleased]
 ### Added
 - New experimental renderer `tcod.context.RENDERER_XTERM`.
+### Changed
+- Using `libtcod 1.20.1`.
 ### Fixed
 - Functions accepting `Path`-like parameters now accept the more correct `os.PathLike` type.
 - BDF files with blank lines no longer fail to load with an "Unknown keyword" error.
