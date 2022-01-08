@@ -4,6 +4,8 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+
+## [13.3.0] - 2022-01-07
 ### Added
 - New experimental renderer `tcod.context.RENDERER_XTERM`.
 ### Changed
