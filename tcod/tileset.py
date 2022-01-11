@@ -13,8 +13,8 @@ python-tcod's pathfinding and field-of-view algorithms.
 from __future__ import annotations
 
 import itertools
-import os
 from os import PathLike
+from pathlib import Path
 from typing import Any, Iterable, Optional, Tuple, Union
 
 import numpy as np
@@ -258,9 +258,10 @@ def load_truetype_font(path: Union[str, PathLike[str]], tile_width: int, tile_he
 
     This function is provisional.  The API may change.
     """
-    if not os.path.exists(path):
-        raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(path),))
-    cdata = lib.TCOD_load_truetype_font_(str(path).encode(), tile_width, tile_height)
+    path = Path(path)
+    if not path.exists():
+        raise RuntimeError(f"File not found:\n\t{path.resolve()}")
+    cdata = lib.TCOD_load_truetype_font_(bytes(path), tile_width, tile_height)
     if not cdata:
         raise RuntimeError(ffi.string(lib.TCOD_get_error()))
     return Tileset._claim(cdata)
@@ -287,9 +288,10 @@ def set_truetype_font(path: Union[str, PathLike[str]], tile_width: int, tile_hei
         This function does not support contexts.
         Use :any:`load_truetype_font` instead.
     """
-    if not os.path.exists(path):
-        raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(path),))
-    if lib.TCOD_tileset_load_truetype_(str(path).encode(), tile_width, tile_height):
+    path = Path(path)
+    if not path.exists():
+        raise RuntimeError(f"File not found:\n\t{path.resolve()}")
+    if lib.TCOD_tileset_load_truetype_(bytes(path), tile_width, tile_height):
         raise RuntimeError(ffi.string(lib.TCOD_get_error()))
 
 
@@ -306,9 +308,10 @@ def load_bdf(path: Union[str, PathLike[str]]) -> Tileset:
 
     .. versionadded:: 11.10
     """  # noqa: E501
-    if not os.path.exists(path):
-        raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(path),))
-    cdata = lib.TCOD_load_bdf(str(path).encode())
+    path = Path(path)
+    if not path.exists():
+        raise RuntimeError(f"File not found:\n\t{path.resolve()}")
+    cdata = lib.TCOD_load_bdf(bytes(path))
     if not cdata:
         raise RuntimeError(ffi.string(lib.TCOD_get_error()).decode())
     return Tileset._claim(cdata)
@@ -335,12 +338,13 @@ def load_tilesheet(
 
     .. versionadded:: 11.12
     """
-    if not os.path.exists(path):
-        raise RuntimeError("File not found:\n\t%s" % (os.path.realpath(path),))
+    path = Path(path)
+    if not path.exists():
+        raise RuntimeError(f"File not found:\n\t{path.resolve()}")
     mapping = []
     if charmap is not None:
         mapping = list(itertools.islice(charmap, columns * rows))
-    cdata = lib.TCOD_tileset_load(str(path).encode(), columns, rows, len(mapping), mapping)
+    cdata = lib.TCOD_tileset_load(bytes(path), columns, rows, len(mapping), mapping)
     if not cdata:
         _raise_tcod_error()
     return Tileset._claim(cdata)

@@ -5,9 +5,9 @@ See :ref:`getting-started` for info on how to set those up.
 """
 from __future__ import annotations
 
-import os
 import warnings
 from os import PathLike
+from pathlib import Path
 from typing import Any, Iterable, Optional, Sequence, Tuple, Union
 
 import numpy as np
@@ -1300,11 +1300,12 @@ def load_xp(path: Union[str, PathLike[str]], order: Literal["C", "F"] = "C") -> 
         is_transparent = (console.rgb["bg"] == KEY_COLOR).all(axis=-1)
         console.rgba[is_transparent] = (ord(" "), (0,), (0,))
     """
-    if not os.path.exists(path):
-        raise FileNotFoundError(f"File not found:\n\t{os.path.abspath(path)}")
-    layers = _check(tcod.lib.TCOD_load_xp(str(path).encode("utf-8"), 0, ffi.NULL))
+    path = Path(path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found:\n\t{path.resolve()}")
+    layers = _check(tcod.lib.TCOD_load_xp(bytes(path), 0, ffi.NULL))
     consoles = ffi.new("TCOD_Console*[]", layers)
-    _check(tcod.lib.TCOD_load_xp(str(path).encode("utf-8"), layers, consoles))
+    _check(tcod.lib.TCOD_load_xp(bytes(path), layers, consoles))
     return tuple(Console._from_cdata(console_p, order=order) for console_p in consoles)
 
 
@@ -1358,12 +1359,13 @@ def save_xp(
 
         tcod.console.save_xp("example.xp", [console])
     """
+    path = Path(path)
     consoles_c = ffi.new("TCOD_Console*[]", [c.console_c for c in consoles])
     _check(
         tcod.lib.TCOD_save_xp(
             len(consoles_c),
             consoles_c,
-            str(path).encode("utf-8"),
+            bytes(path),
             compress_level,
         )
     )

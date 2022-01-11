@@ -8,6 +8,7 @@ If your image can't be represented as tiles then you'll need to use
 from __future__ import annotations
 
 from os import PathLike
+from pathlib import Path
 from typing import Any, Dict, Tuple, Union
 
 import numpy as np
@@ -345,7 +346,7 @@ def load(filename: Union[str, PathLike[str]]) -> NDArray[np.uint8]:
 
     .. versionadded:: 11.4
     """
-    image = Image._from_cdata(ffi.gc(lib.TCOD_image_load(str(filename).encode()), lib.TCOD_image_delete))
+    image = Image._from_cdata(ffi.gc(lib.TCOD_image_load(bytes(Path(filename))), lib.TCOD_image_delete))
     array: NDArray[np.uint8] = np.asarray(image, dtype=np.uint8)
     height, width, depth = array.shape
     if depth == 3:
