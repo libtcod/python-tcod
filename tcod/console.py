@@ -393,7 +393,7 @@ class Console:
 
     def clear(
         self,
-        ch: int = ord(" "),
+        ch: int = 0x20,
         fg: Tuple[int, int, int] = ...,  # type: ignore
         bg: Tuple[int, int, int] = ...,  # type: ignore
     ) -> None:

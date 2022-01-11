@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 
-import os
-import pathlib
 import platform
 import re
 import subprocess
 import sys
 import warnings
+from pathlib import Path
 from typing import List
 
 from setuptools import setup
 
 SDL_VERSION_NEEDED = (2, 0, 5)
 
-PATH = pathlib.Path(__file__).parent  # setup.py current directory
+SETUP_DIR = Path(__file__).parent  # setup.py current directory
 
 
 def get_version() -> str:
     """Get the current version from a git tag, or by reading tcod/version.py"""
-    if (PATH / ".git").exists():
+    if (SETUP_DIR / ".git").exists():
         tag = subprocess.check_output(["git", "describe", "--abbrev=0"], universal_newlines=True).strip()
         assert not tag.startswith("v")
         version = tag
@@ -30,13 +30,11 @@ def get_version() -> str:
             version += ".dev%i" % commits_since_tag
 
         # update tcod/version.py
-        with open(PATH / "tcod/version.py", "w", encoding="utf-8") as version_file:
-            version_file.write(f'__version__ = "{version}"\n')
+        (SETUP_DIR / "tcod/version.py").write_text(f'__version__ = "{version}"\n', encoding="utf-8")
         return version
     else:  # Not a Git repository.
         try:
-            with open(PATH / "tcod/version.py", encoding="utf-8") as version_file:
-                match = re.match(r'__version__ = "(\S+)"', version_file.read())
+            match = re.match(r'__version__ = "(\S+)"', (SETUP_DIR / "tcod/version.py").read_text(encoding="utf-8"))
             assert match
             return match.groups()[0]
         except FileNotFoundError:
@@ -66,12 +64,6 @@ def get_package_data() -> List[str]:
     return files
 
 
-def get_long_description() -> str:
-    """Return this projects description."""
-    with open(PATH / "README.rst", "r", encoding="utf-8") as readme_file:
-        return readme_file.read()
-
-
 def check_sdl_version() -> None:
     """Check the local SDL version on Linux distributions."""
     if not sys.platform.startswith("linux"):
@@ -91,7 +83,7 @@ def check_sdl_version() -> None:
         raise RuntimeError("SDL version must be at least %s, (found %s)" % (needed_version, sdl_version_str))
 
 
-if not os.path.exists(PATH / "libtcod/src"):
+if not (SETUP_DIR / "libtcod/src").exists():
     print("Libtcod submodule is uninitialized.")
     print("Did you forget to run 'git submodule update --init'?")
     sys.exit(1)
@@ -107,7 +99,7 @@ setup(
     author="Kyle Benesch",
     author_email="4b796c65+tcod@gmail.com",
     description="The official Python port of libtcod.",
-    long_description=get_long_description(),
+    long_description=(SETUP_DIR / "README.rst").read_text(encoding="utf-8"),
     url="https://github.com/libtcod/python-tcod",
     project_urls={
         "Documentation": "https://python-tcod.readthedocs.io",

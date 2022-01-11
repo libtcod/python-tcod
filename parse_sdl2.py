@@ -1,8 +1,11 @@
-import os.path
+from __future__ import annotations
+
 import platform
 import re
 import sys
-from typing import Any, Dict, Iterator
+from os import PathLike
+from pathlib import Path
+from typing import Any, Dict, Iterator, Union
 
 import cffi  # type: ignore
 
@@ -25,10 +28,9 @@ RE_ENUM_TRUNCATE = re.compile(r"(\w+\s*=).+?(?=,$|})(?![^(']*\))", re.MULTILINE 
 RE_EVENT_PADDING = re.compile(r"Uint8 padding\[[^]]+\];", re.MULTILINE | re.DOTALL)
 
 
-def get_header(name: str) -> str:
+def get_header(path: Path) -> str:
     """Return the source of a header in a partially preprocessed state."""
-    with open(name, "r", encoding="utf-8") as f:
-        header = f.read()
+    header = path.read_text(encoding="utf-8")
     # Remove Doxygen code.
     header = RE_REMOVALS.sub("", header)
     # Remove comments.
@@ -131,7 +133,8 @@ HEADERS = [
 ]
 
 
-def add_to_ffi(ffi: cffi.FFI, path: str) -> None:
+def add_to_ffi(ffi: cffi.FFI, path: Union[str, PathLike[str]]) -> None:
+    path = Path(path)
     BITS, _ = platform.architecture()
     cdef_args: Dict[str, Any] = {}
     NEEDS_PACK4 = False
@@ -142,12 +145,12 @@ def add_to_ffi(ffi: cffi.FFI, path: str) -> None:
         # cdef_args["pack"] = 4
 
     ffi.cdef(
-        "\n".join(RE_TYPEDEF.findall(get_header(os.path.join(path, "SDL_stdinc.h")))).replace("SDLCALL ", ""),
+        "\n".join(RE_TYPEDEF.findall(get_header(path / "SDL_stdinc.h"))).replace("SDLCALL ", ""),
         **cdef_args,
     )
     for header in HEADERS:
         try:
-            for code in parse(get_header(os.path.join(path, header)), NEEDS_PACK4):
+            for code in parse(get_header(path / header), NEEDS_PACK4):
                 if "typedef struct SDL_AudioCVT" in code and sys.platform != "win32" and not NEEDS_PACK4:
                     # This specific struct needs to be packed.
                     ffi.cdef(code, packed=1)
@@ -158,7 +161,7 @@ def add_to_ffi(ffi: cffi.FFI, path: str) -> None:
             raise
 
 
-def get_ffi(path: str) -> cffi.FFI:
+def get_ffi(path: Union[str, PathLike[str]]) -> cffi.FFI:
     """Return an ffi for SDL2, needs to be compiled."""
     ffi = cffi.FFI()
     add_to_ffi(ffi, path)

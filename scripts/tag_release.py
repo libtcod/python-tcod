@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import argparse
 import datetime
 import re
 import subprocess
 import sys
+from pathlib import Path
 from typing import Tuple
 
 parser = argparse.ArgumentParser(description="Tags and releases the next version of this project.")
@@ -19,12 +22,11 @@ parser.add_argument("-v", "--verbose", action="store_true", help="Print debug in
 
 def parse_changelog(args: argparse.Namespace) -> Tuple[str, str]:
     """Return an updated changelog and and the list of changes."""
-    with open("CHANGELOG.md", "r", encoding="utf-8") as file:
-        match = re.match(
-            pattern=r"(.*?## \[Unreleased]\n)(.+?\n)(\n*## \[.*)",
-            string=file.read(),
-            flags=re.DOTALL,
-        )
+    match = re.match(
+        pattern=r"(.*?## \[Unreleased]\n)(.+?\n)(\n*## \[.*)",
+        string=Path("CHANGELOG.md").read_text(encoding="utf-8"),
+        flags=re.DOTALL,
+    )
     assert match
     header, changes, tail = match.groups()
     tagged = "\n## [%s] - %s\n%s" % (
@@ -53,8 +55,7 @@ def main() -> None:
         print(new_changelog)
 
     if not args.dry_run:
-        with open("CHANGELOG.md", "w", encoding="utf-8") as f:
-            f.write(new_changelog)
+        Path("CHANGELOG.md").write_text(new_changelog, encoding="utf-8")
         edit = ["-e"] if args.edit else []
         subprocess.check_call(["git", "commit", "-avm", "Prepare %s release." % args.tag] + edit)
         subprocess.check_call(["git", "tag", args.tag, "-am", "%s\n\n%s" % (args.tag, changes)] + edit)

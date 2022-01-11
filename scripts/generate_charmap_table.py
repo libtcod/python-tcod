@@ -3,6 +3,8 @@
 
 Uses the tabulate module from PyPI.
 """
+from __future__ import annotations
+
 import argparse
 import unicodedata
 from typing import Iterable, Iterator
@@ -71,8 +73,9 @@ def main() -> None:
     )
     args = parser.parse_args()
     charmap = getattr(tcod.tileset, f"CHARMAP_{args.charmap.upper()}")
+    output = generate_table(charmap)
     with args.out_file as f:
-        f.write(generate_table(charmap))
+        f.write(output)
 
 
 if __name__ == "__main__":

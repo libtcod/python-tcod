@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 
 import glob
 import os
@@ -8,16 +9,13 @@ import shutil
 import subprocess
 import sys
 import zipfile
+from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, List, Set, Tuple, Union
-
-try:
-    from urllib import urlretrieve  # type: ignore
-except ImportError:
-    from urllib.request import urlretrieve
+from urllib.request import urlretrieve
 
 from cffi import FFI  # type: ignore
 
-sys.path.append(os.path.dirname(__file__))
+sys.path.append(str(Path(__file__).parent))  # Allow importing local modules.
 
 import parse_sdl2  # noqa: E402
 
@@ -52,18 +50,18 @@ class ParsedHeader:
     """
 
     # Class dictionary of all parsed headers.
-    all_headers = {}  # type: Dict[str, "ParsedHeader"]
+    all_headers: Dict[Path, ParsedHeader] = {}
 
-    def __init__(self, path: str) -> None:
-        self.path = path = os.path.normpath(path)
-        directory = os.path.dirname(path)
+    def __init__(self, path: Path) -> None:
+        self.path = path = path.resolve(True)
+        directory = path.parent
         depends = set()
         with open(self.path, "r", encoding="utf-8") as f:
             header = f.read()
         header = RE_COMMENT.sub("", header)
         header = RE_CPLUSPLUS.sub("", header)
         for dependency in RE_INCLUDE.findall(header):
-            depends.add(os.path.normpath(os.path.join(directory, dependency)))
+            depends.add((directory / dependency).resolve(True))
         header = RE_PREPROCESSOR.sub("", header)
         header = RE_TAGS.sub("", header)
         header = RE_VAFUNC.sub("", header)
@@ -87,17 +85,17 @@ class ParsedHeader:
         )
 
     def __repr__(self) -> str:
-        return "ParsedHeader(%s)" % (self.path,)
+        return f"ParsedHeader({self.path})"
 
 
 def walk_includes(directory: str) -> Iterator[ParsedHeader]:
     """Parse all the include files in a directory and subdirectories."""
-    for path, dirs, files in os.walk(directory):
+    for path, _dirs, files in os.walk(directory):
         for file in files:
             if file in HEADER_PARSE_EXCLUDES:
                 continue
             if file.endswith(".h"):
-                yield ParsedHeader(os.path.join(path, file))
+                yield ParsedHeader(Path(path, file).resolve(True))
 
 
 def resolve_dependencies(
@@ -105,7 +103,7 @@ def resolve_dependencies(
 ) -> List[ParsedHeader]:
     """Sort headers by their correct include order."""
     unresolved = set(includes)
-    resolved = set()  # type: Set[ParsedHeader]
+    resolved: Set[ParsedHeader] = set()
     result = []
     while unresolved:
         for item in unresolved:
@@ -115,7 +113,7 @@ def resolve_dependencies(
         if not unresolved & resolved:
             raise RuntimeError(
                 "Could not resolve header load order.\n"
-                "Possible cyclic dependency with the unresolved headers:\n%s" % (unresolved,)
+                f"Possible cyclic dependency with the unresolved headers:\n{unresolved}"
             )
         unresolved -= resolved
     return result
@@ -124,49 +122,50 @@ def resolve_dependencies(
 def parse_includes() -> List[ParsedHeader]:
     """Collect all parsed header files and return them.
 
-    Reads HEADER_PARSE_PATHS and HEADER_PARSE_EXCLUDES."""
-    includes = []  # type: List[ParsedHeader]
+    Reads HEADER_PARSE_PATHS and HEADER_PARSE_EXCLUDES.
+    """
+    includes: List[ParsedHeader] = []
     for dirpath in HEADER_PARSE_PATHS:
         includes.extend(walk_includes(dirpath))
     return resolve_dependencies(includes)
 
 
 def walk_sources(directory: str) -> Iterator[str]:
-    for path, dirs, files in os.walk(directory):
+    for path, _dirs, files in os.walk(directory):
         for source in files:
             if source.endswith(".c"):
-                yield os.path.join(path, source)
+                yield str(Path(path, source))
 
 
-def get_sdl2_file(version: str) -> str:
+def get_sdl2_file(version: str) -> Path:
     if sys.platform == "win32":
-        sdl2_file = "SDL2-devel-%s-VC.zip" % (version,)
+        sdl2_file = f"SDL2-devel-{version}-VC.zip"
     else:
         assert sys.platform == "darwin"
-        sdl2_file = "SDL2-%s.dmg" % (version,)
-    sdl2_local_file = os.path.join("dependencies", sdl2_file)
-    sdl2_remote_file = "https://www.libsdl.org/release/%s" % sdl2_file
-    if not os.path.exists(sdl2_local_file):
-        print("Downloading %s" % sdl2_remote_file)
+        sdl2_file = f"SDL2-{version}.dmg"
+    sdl2_local_file = Path("dependencies", sdl2_file)
+    sdl2_remote_file = f"https://www.libsdl.org/release/{sdl2_file}"
+    if not sdl2_local_file.exists():
+        print(f"Downloading {sdl2_remote_file}")
         os.makedirs("dependencies/", exist_ok=True)
         urlretrieve(sdl2_remote_file, sdl2_local_file)
     return sdl2_local_file
 
 
-def unpack_sdl2(version: str) -> str:
-    sdl2_path = "dependencies/SDL2-%s" % (version,)
+def unpack_sdl2(version: str) -> Path:
+    sdl2_path = Path(f"dependencies/SDL2-{version}")
     if sys.platform == "darwin":
         sdl2_dir = sdl2_path
-        sdl2_path += "/SDL2.framework"
-    if os.path.exists(sdl2_path):
+        sdl2_path /= "SDL2.framework"
+    if sdl2_path.exists():
         return sdl2_path
     sdl2_arc = get_sdl2_file(version)
-    print("Extracting %s" % sdl2_arc)
-    if sdl2_arc.endswith(".zip"):
+    print(f"Extracting {sdl2_arc}")
+    if sdl2_arc.suffix == ".zip":
         with zipfile.ZipFile(sdl2_arc) as zf:
             zf.extractall("dependencies/")
     elif sys.platform == "darwin":
-        assert sdl2_arc.endswith(".dmg")
+        assert sdl2_arc.suffix == ".dmg"
         subprocess.check_call(["hdiutil", "mount", sdl2_arc])
         subprocess.check_call(["mkdir", "-p", sdl2_dir])
         subprocess.check_call(["cp", "-r", "/Volumes/SDL2/SDL2.framework", sdl2_dir])
@@ -187,11 +186,11 @@ include_dirs = [
 extra_parse_args = []
 extra_compile_args = []
 extra_link_args = []
-sources = []  # type: List[str]
+sources: List[str] = []
 
 libraries = []
 library_dirs: List[str] = []
-define_macros = [("Py_LIMITED_API", 0x03060000)]  # type: List[Tuple[str, Any]]
+define_macros: List[Tuple[str, Any]] = [("Py_LIMITED_API", 0x03060000)]
 
 sources += walk_sources("tcod/")
 sources += walk_sources("libtcod/src/libtcod/")
@@ -219,9 +218,9 @@ if sys.platform in ["win32", "darwin"]:
     include_dirs.append("libtcod/src/zlib/")
 
 if sys.platform == "win32":
-    SDL2_INCLUDE = os.path.join(SDL2_PARSE_PATH, "include")
+    SDL2_INCLUDE = Path(SDL2_PARSE_PATH, "include")
 elif sys.platform == "darwin":
-    SDL2_INCLUDE = os.path.join(SDL2_PARSE_PATH, "Versions/A/Headers")
+    SDL2_INCLUDE = Path(SDL2_PARSE_PATH, "Versions/A/Headers")
 else:
     matches = re.findall(
         r"-I(\S+)",
@@ -231,43 +230,40 @@ else:
 
     SDL2_INCLUDE = None
     for match in matches:
-        if os.path.isfile(os.path.join(match, "SDL_stdinc.h")):
+        if Path(match, "SDL_stdinc.h").is_file():
             SDL2_INCLUDE = match
     assert SDL2_INCLUDE
 
 if sys.platform == "win32":
-    include_dirs.append(SDL2_INCLUDE)
+    include_dirs.append(str(SDL2_INCLUDE))
     ARCH_MAPPING = {"32bit": "x86", "64bit": "x64"}
-    SDL2_LIB_DIR = os.path.join(SDL2_BUNDLE_PATH, "lib/", ARCH_MAPPING[BITSIZE])
-    library_dirs.append(SDL2_LIB_DIR)
-    SDL2_LIB_DEST = os.path.join("tcod", ARCH_MAPPING[BITSIZE])
-    if not os.path.exists(SDL2_LIB_DEST):
+    SDL2_LIB_DIR = Path(SDL2_BUNDLE_PATH, "lib/", ARCH_MAPPING[BITSIZE])
+    library_dirs.append(str(SDL2_LIB_DIR))
+    SDL2_LIB_DEST = Path("tcod", ARCH_MAPPING[BITSIZE])
+    if not SDL2_LIB_DEST.exists():
         os.mkdir(SDL2_LIB_DEST)
-    shutil.copy(os.path.join(SDL2_LIB_DIR, "SDL2.dll"), SDL2_LIB_DEST)
+    shutil.copy(Path(SDL2_LIB_DIR, "SDL2.dll"), SDL2_LIB_DEST)
 
 
-def fix_header(filepath: str) -> None:
+def fix_header(path: Path) -> None:
     """Removes leading whitespace from a MacOS header file.
 
     This whitespace is causing issues with directives on some platforms.
     """
-    with open(filepath, "r+", encoding="utf-8") as f:
-        current = f.read()
-        fixed = "\n".join(line.strip() for line in current.split("\n"))
-        if current == fixed:
-            return
-        f.seek(0)
-        f.truncate()
-        f.write(fixed)
+    current = path.read_text(encoding="utf-8")
+    fixed = "\n".join(line.strip() for line in current.split("\n"))
+    if current == fixed:
+        return
+    path.write_text(fixed, encoding="utf-8")
 
 
 if sys.platform == "darwin":
-    HEADER_DIR = os.path.join(SDL2_PARSE_PATH, "Headers")
-    fix_header(os.path.join(HEADER_DIR, "SDL_assert.h"))
-    fix_header(os.path.join(HEADER_DIR, "SDL_config_macosx.h"))
+    HEADER_DIR = Path(SDL2_PARSE_PATH, "Headers")
+    fix_header(Path(HEADER_DIR, "SDL_assert.h"))
+    fix_header(Path(HEADER_DIR, "SDL_config_macosx.h"))
     include_dirs.append(HEADER_DIR)
-    extra_link_args += ["-F%s/.." % SDL2_BUNDLE_PATH]
-    extra_link_args += ["-rpath", "%s/.." % SDL2_BUNDLE_PATH]
+    extra_link_args += [f"-F{SDL2_BUNDLE_PATH}/.."]
+    extra_link_args += ["-rpath", f"{SDL2_BUNDLE_PATH}/.."]
     extra_link_args += ["-rpath", "/usr/local/opt/llvm/lib/"]
 
     # Fix "implicit declaration of function 'close'" in zlib.
@@ -309,7 +305,7 @@ for include in includes:
         ffi.cdef(include.header)
     except Exception:
         # Print the source, for debugging.
-        print("Error with: %s" % include.path)
+        print(f"Error with: {include.path}")
         for i, line in enumerate(include.header.split("\n"), 1):
             print("%03i %s" % (i, line))
         raise
@@ -374,8 +370,8 @@ def parse_sdl_attrs(prefix: str, all_names: List[str]) -> Tuple[str, str]:
     lookup = []
     for name, value in sorted(find_sdl_attrs(prefix), key=lambda item: item[1]):
         all_names.append(name)
-        names.append("%s = %s" % (name, value))
-        lookup.append('%s: "%s"' % (value, name))
+        names.append(f"{name} = {value}")
+        lookup.append(f'{value}: "{name}"')
     return "\n".join(names), "{\n    %s,\n}" % (",\n    ".join(lookup),)
 
 
@@ -408,10 +404,10 @@ def update_module_all(filename: str, new_all: str) -> None:
     )
     with open(filename, "r", encoding="utf-8") as f:
         match = RE_CONSTANTS_ALL.match(f.read())
-    assert match, "Can't determine __all__ subsection in %s!" % (filename,)
+    assert match, f"Can't determine __all__ subsection in {filename}!"
     header, footer = match.groups()
     with open(filename, "w", encoding="utf-8") as f:
-        f.write("%s\n    %s,\n    %s" % (header, new_all, footer))
+        f.write(f"{header}\n    {new_all},\n    {footer}")
 
 
 def generate_enums(prefix: str) -> Iterator[str]:
@@ -446,14 +442,14 @@ def write_library_constants() -> None:
             value = getattr(lib, name)
             if name[:5] == "TCOD_":
                 if name.isupper():  # const names
-                    f.write("%s = %r\n" % (name[5:], value))
+                    f.write(f"{name[5:]} = {value!r}\n")
                     all_names.append(name[5:])
             elif name.startswith("FOV"):  # fov const names
-                f.write("%s = %r\n" % (name, value))
+                f.write(f"{name} = {value!r}\n")
                 all_names.append(name)
             elif name[:6] == "TCODK_":  # key name
-                f.write("KEY_%s = %r\n" % (name[6:], value))
-                all_names.append("KEY_%s" % name[6:])
+                f.write(f"KEY_{name[6:]} = {value!r}\n")
+                all_names.append(f"KEY_{name[6:]}")
 
         f.write("\n# --- colors ---\n")
         for name in dir(lib):
@@ -465,11 +461,11 @@ def write_library_constants() -> None:
             if ffi.typeof(value) != ffi.typeof("TCOD_color_t"):
                 continue
             color = tcod.color.Color._new_from_cdata(value)
-            f.write("%s = %r\n" % (name[5:], color))
+            f.write(f"{name[5:]} = {color!r}\n")
             all_names.append(name[5:])
 
-        all_names_merged = ",\n    ".join('"%s"' % name for name in all_names)
-        f.write("\n__all__ = [\n    %s,\n]\n" % (all_names_merged,))
+        all_names_merged = ",\n    ".join(f'"{name}"' for name in all_names)
+        f.write(f"\n__all__ = [\n    {all_names_merged},\n]\n")
         update_module_all("tcod/__init__.py", all_names_merged)
         update_module_all("tcod/libtcodpy.py", all_names_merged)
 
@@ -487,11 +483,10 @@ def write_library_constants() -> None:
 
         f.write("\n# --- SDL wheel ---\n")
         f.write("%s\n_REVERSE_WHEEL_TABLE = %s\n" % parse_sdl_attrs("SDL_MOUSEWHEEL", all_names))
-        all_names_merged = ",\n    ".join('"%s"' % name for name in all_names)
-        f.write("\n__all__ = [\n    %s,\n]\n" % (all_names_merged,))
+        all_names_merged = ",\n    ".join(f'"{name}"' for name in all_names)
+        f.write(f"\n__all__ = [\n    {all_names_merged},\n]\n")
 
-    with open("tcod/event.py", "r", encoding="utf-8") as f:
-        event_py = f.read()
+    event_py = Path("tcod/event.py").read_text(encoding="utf-8")
 
     event_py = re.sub(
         r"(?<=# --- SDL scancodes ---\n    ).*?(?=\n    # --- end ---\n)",
@@ -506,8 +501,7 @@ def write_library_constants() -> None:
         flags=re.DOTALL,
     )
 
-    with open("tcod/event.py", "w", encoding="utf-8") as f:
-        f.write(event_py)
+    Path("tcod/event.py").write_text(event_py, encoding="utf-8")
 
 
 if __name__ == "__main__":
