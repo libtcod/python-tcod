@@ -132,6 +132,12 @@ HEADERS = [
     "SDL_version.h",
 ]
 
+# It's easier to manually add these instead of parsing SDL_stdinc.h
+CDEF_EXTRA = """
+void* SDL_calloc(size_t nmemb, size_t size);
+void SDL_free(void *mem);
+"""
+
 
 def add_to_ffi(ffi: cffi.FFI, path: Union[str, PathLike[str]]) -> None:
     path = Path(path)
@@ -148,6 +154,7 @@ def add_to_ffi(ffi: cffi.FFI, path: Union[str, PathLike[str]]) -> None:
         "\n".join(RE_TYPEDEF.findall(get_header(path / "SDL_stdinc.h"))).replace("SDLCALL ", ""),
         **cdef_args,
     )
+    ffi.cdef(CDEF_EXTRA, **cdef_args)
     for header in HEADERS:
         try:
             for code in parse(get_header(path / header), NEEDS_PACK4):
