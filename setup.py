@@ -114,11 +114,12 @@ setup(
     python_requires=">=3.7",
     setup_requires=[
         *pytest_runner,
-        "cffi~=1.13",
+        "cffi>=1.15",
         "pycparser>=2.14",
+        "pcpp==1.30",
     ],
     install_requires=[
-        "cffi~=1.13",  # Also required by pyproject.toml.
+        "cffi>=1.15",  # Also required by pyproject.toml.
         "numpy>=1.20.3" if not is_pypy else "",
         "typing_extensions",
     ],

@@ -1,5 +1,11 @@
 [build-system]
-requires = ["setuptools>=57.0.0", "wheel", "cffi~=1.13", "pycparser>=2.14"]
+requires = [
+    "setuptools>=57.0.0",
+    "wheel",
+    "cffi>=1.15",
+    "pycparser>=2.14",
+    "pcpp==1.30",
+]
 build-backend = "setuptools.build_meta"
 
 [tool.black]

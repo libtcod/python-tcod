@@ -5,25 +5,23 @@ import glob
 import os
 import platform
 import re
-import shutil
-import subprocess
 import sys
-import zipfile
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, List, Set, Tuple, Union
-from urllib.request import urlretrieve
 
 from cffi import FFI  # type: ignore
 
 sys.path.append(str(Path(__file__).parent))  # Allow importing local modules.
 
-import parse_sdl2  # noqa: E402
+import build_sdl  # noqa: E402
 
 # The SDL2 version to parse and export symbols from.
 SDL2_PARSE_VERSION = os.environ.get("SDL_VERSION", "2.0.5")
 
 # The SDL2 version to include in binary distributions.
 SDL2_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "2.0.14")
+
+Py_LIMITED_API = 0x03060000
 
 HEADER_PARSE_PATHS = ("tcod/", "libtcod/src/libtcod/")
 HEADER_PARSE_EXCLUDES = ("gl2_ext_.h", "renderer_gl_internal.h", "event.h")
@@ -137,60 +135,24 @@ def walk_sources(directory: str) -> Iterator[str]:
                 yield str(Path(path, source))
 
 
-def get_sdl2_file(version: str) -> Path:
-    if sys.platform == "win32":
-        sdl2_file = f"SDL2-devel-{version}-VC.zip"
-    else:
-        assert sys.platform == "darwin"
-        sdl2_file = f"SDL2-{version}.dmg"
-    sdl2_local_file = Path("dependencies", sdl2_file)
-    sdl2_remote_file = f"https://www.libsdl.org/release/{sdl2_file}"
-    if not sdl2_local_file.exists():
-        print(f"Downloading {sdl2_remote_file}")
-        os.makedirs("dependencies/", exist_ok=True)
-        urlretrieve(sdl2_remote_file, sdl2_local_file)
-    return sdl2_local_file
-
-
-def unpack_sdl2(version: str) -> Path:
-    sdl2_path = Path(f"dependencies/SDL2-{version}")
-    if sys.platform == "darwin":
-        sdl2_dir = sdl2_path
-        sdl2_path /= "SDL2.framework"
-    if sdl2_path.exists():
-        return sdl2_path
-    sdl2_arc = get_sdl2_file(version)
-    print(f"Extracting {sdl2_arc}")
-    if sdl2_arc.suffix == ".zip":
-        with zipfile.ZipFile(sdl2_arc) as zf:
-            zf.extractall("dependencies/")
-    elif sys.platform == "darwin":
-        assert sdl2_arc.suffix == ".dmg"
-        subprocess.check_call(["hdiutil", "mount", sdl2_arc])
-        subprocess.check_call(["mkdir", "-p", sdl2_dir])
-        subprocess.check_call(["cp", "-r", "/Volumes/SDL2/SDL2.framework", sdl2_dir])
-        subprocess.check_call(["hdiutil", "unmount", "/Volumes/SDL2"])
-    return sdl2_path
-
-
 includes = parse_includes()
 
 module_name = "tcod._libtcod"
-include_dirs = [
+include_dirs: List[str] = [
     ".",
     "libtcod/src/vendor/",
     "libtcod/src/vendor/utf8proc",
     "libtcod/src/vendor/zlib/",
+    *build_sdl.include_dirs,
 ]
 
-extra_parse_args = []
-extra_compile_args = []
-extra_link_args = []
+extra_compile_args: List[str] = [*build_sdl.extra_compile_args]
+extra_link_args: List[str] = [*build_sdl.extra_link_args]
 sources: List[str] = []
 
-libraries = []
-library_dirs: List[str] = []
-define_macros: List[Tuple[str, Any]] = [("Py_LIMITED_API", 0x03060000)]
+libraries: List[str] = [*build_sdl.libraries]
+library_dirs: List[str] = [*build_sdl.library_dirs]
+define_macros: List[Tuple[str, Any]] = [("Py_LIMITED_API", Py_LIMITED_API)]
 
 sources += walk_sources("tcod/")
 sources += walk_sources("libtcod/src/libtcod/")
@@ -205,74 +167,14 @@ if sys.platform == "win32":
     define_macros.append(("TCODLIB_API", ""))
     define_macros.append(("_CRT_SECURE_NO_WARNINGS", None))
 
-if sys.platform == "darwin":
-    extra_link_args += ["-framework", "SDL2"]
-else:
-    libraries += ["SDL2"]
-
-# included SDL headers are for whatever OS's don't easily come with them
-
 if sys.platform in ["win32", "darwin"]:
-    SDL2_PARSE_PATH = unpack_sdl2(SDL2_PARSE_VERSION)
-    SDL2_BUNDLE_PATH = unpack_sdl2(SDL2_BUNDLE_VERSION)
     include_dirs.append("libtcod/src/zlib/")
 
-if sys.platform == "win32":
-    SDL2_INCLUDE = Path(SDL2_PARSE_PATH, "include")
-elif sys.platform == "darwin":
-    SDL2_INCLUDE = Path(SDL2_PARSE_PATH, "Versions/A/Headers")
-else:
-    matches = re.findall(
-        r"-I(\S+)",
-        subprocess.check_output(["sdl2-config", "--cflags"], universal_newlines=True),
-    )
-    assert matches
-
-    SDL2_INCLUDE = None
-    for match in matches:
-        if Path(match, "SDL_stdinc.h").is_file():
-            SDL2_INCLUDE = match
-    assert SDL2_INCLUDE
-
-if sys.platform == "win32":
-    include_dirs.append(str(SDL2_INCLUDE))
-    ARCH_MAPPING = {"32bit": "x86", "64bit": "x64"}
-    SDL2_LIB_DIR = Path(SDL2_BUNDLE_PATH, "lib/", ARCH_MAPPING[BITSIZE])
-    library_dirs.append(str(SDL2_LIB_DIR))
-    SDL2_LIB_DEST = Path("tcod", ARCH_MAPPING[BITSIZE])
-    if not SDL2_LIB_DEST.exists():
-        os.mkdir(SDL2_LIB_DEST)
-    shutil.copy(Path(SDL2_LIB_DIR, "SDL2.dll"), SDL2_LIB_DEST)
-
-
-def fix_header(path: Path) -> None:
-    """Removes leading whitespace from a MacOS header file.
-
-    This whitespace is causing issues with directives on some platforms.
-    """
-    current = path.read_text(encoding="utf-8")
-    fixed = "\n".join(line.strip() for line in current.split("\n"))
-    if current == fixed:
-        return
-    path.write_text(fixed, encoding="utf-8")
-
 
 if sys.platform == "darwin":
-    HEADER_DIR = Path(SDL2_PARSE_PATH, "Headers")
-    fix_header(Path(HEADER_DIR, "SDL_assert.h"))
-    fix_header(Path(HEADER_DIR, "SDL_config_macosx.h"))
-    include_dirs.append(HEADER_DIR)
-    extra_link_args += [f"-F{SDL2_BUNDLE_PATH}/.."]
-    extra_link_args += ["-rpath", f"{SDL2_BUNDLE_PATH}/.."]
-    extra_link_args += ["-rpath", "/usr/local/opt/llvm/lib/"]
-
     # Fix "implicit declaration of function 'close'" in zlib.
     define_macros.append(("HAVE_UNISTD_H", 1))
 
-if sys.platform not in ["win32", "darwin"]:
-    extra_parse_args += subprocess.check_output(["sdl2-config", "--cflags"], universal_newlines=True).strip().split()
-    extra_compile_args += extra_parse_args
-    extra_link_args += subprocess.check_output(["sdl2-config", "--libs"], universal_newlines=True).strip().split()
 
 tdl_build = os.environ.get("TDL_BUILD", "RELEASE").upper()
 
@@ -299,7 +201,7 @@ else:
     extra_link_args.extend(GCC_CFLAGS[tdl_build])
 
 ffi = FFI()
-parse_sdl2.add_to_ffi(ffi, SDL2_INCLUDE)
+ffi.cdef(build_sdl.get_cdef())
 for include in includes:
     try:
         ffi.cdef(include.header)

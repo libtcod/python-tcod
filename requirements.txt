@@ -1,7 +1,8 @@
-cffi~=1.13
+cffi>=1.15
 numpy>=1.20.3
 pycparser>=2.14
 setuptools>=36.0.1
 types-setuptools
 types-tabulate
 typing_extensions
+pcpp==1.30
