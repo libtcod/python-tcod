@@ -23,4 +23,16 @@ def _sdl_log_output_function(_userdata: Any, category: int, priority: int, messa
     logger.log(_LOG_PRIORITY.get(priority, 0), "%i:%s", category, ffi.string(message).decode("utf-8"))
 
 
+def _get_error() -> str:
+    """Return a message from SDL_GetError as a Unicode string."""
+    return str(ffi.string(lib.SDL_GetError()), encoding="utf-8")
+
+
+def _check(result: int) -> int:
+    """Check if an SDL function returned without errors, and raise an exception if it did."""
+    if result < 0:
+        raise RuntimeError(_get_error())
+    return result
+
+
 lib.SDL_LogSetOutputFunction(lib._sdl_log_output_function, ffi.NULL)

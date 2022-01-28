@@ -4,6 +4,7 @@ import enum
 from typing import Any, Tuple
 
 from tcod.loader import ffi, lib
+from tcod.sdl import _check
 
 
 class Subsystem(enum.IntFlag):
@@ -16,12 +17,6 @@ class Subsystem(enum.IntFlag):
     EVENTS = lib.SDL_INIT_EVENTS
     SENSOR = getattr(lib, "SDL_INIT_SENSOR", 0)
     EVERYTHING = lib.SDL_INIT_EVERYTHING
-
-
-def _check(result: int) -> int:
-    if result < 0:
-        raise RuntimeError(_get_error())
-    return result
 
 
 def init(flags: int = Subsystem.EVERYTHING) -> None:
@@ -50,10 +45,6 @@ class _ScopeInit:
 
     def __exit__(self, *args: Any) -> None:
         self.close()
-
-
-def _get_error() -> str:
-    return str(ffi.string(lib.SDL_GetError()), encoding="utf-8")
 
 
 class _PowerState(enum.IntEnum):

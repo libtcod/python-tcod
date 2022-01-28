@@ -11,6 +11,7 @@ from numpy.typing import ArrayLike, DTypeLike, NDArray
 
 import tcod.sdl.sys
 from tcod.loader import ffi, lib
+from tcod.sdl import _get_error
 
 
 def _get_format(format: DTypeLike) -> int:
@@ -82,7 +83,7 @@ class AudioDevice:
             obtained,
             allowed_changes,
         )
-        assert self.device_id != 0, tcod.sdl.sys._get_error()
+        assert self.device_id != 0, _get_error()
         self.frequency = obtained.freq
         self.is_capture = capture
         self.format = _dtype_from_format(obtained.format)
