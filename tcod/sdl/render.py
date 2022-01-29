@@ -91,6 +91,20 @@ class Renderer:
     def __eq__(self, other: Any) -> bool:
         return bool(self.p == getattr(other, "p", None))
 
+    def copy(
+        self,
+        texture: Texture,
+        source: Optional[Tuple[int, int, int, int]] = None,
+        dest: Optional[Tuple[int, int, int, int]] = None,
+    ) -> None:
+        """Copy a texture to the rendering target.
+
+        `source` and `dest` are (x, y, width, height) regions of the texture parameter and target texture respectively.
+        """
+        source_ = ffi.NULL if source is None else ffi.new("SDL_Rect*", source)
+        dest_ = ffi.NULL if dest is None else ffi.new("SDL_Rect*", dest)
+        _check(lib.SDL_RenderCopy(self.p, texture.p, source_, dest_))
+
     def new_texture(
         self, width: int, height: int, *, format: Optional[int] = None, access: Optional[int] = None
     ) -> Texture:
