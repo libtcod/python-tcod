@@ -116,7 +116,7 @@ class Renderer:
             elif pixels.shape[2] == 3:
                 format = int(lib.SDL_PIXELFORMAT_RGB32)
             else:
-                assert False
+                raise TypeError(f"Can't determine the format required for an array of shape {pixels.shape}.")
 
         texture = self.new_texture(pixels.shape[1], pixels.shape[0], format=format, access=access)
         if not pixels[0].flags["C_CONTIGUOUS"]:

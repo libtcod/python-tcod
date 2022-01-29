@@ -58,6 +58,8 @@ from typing_extensions import Literal, NoReturn
 
 import tcod
 import tcod.event
+import tcod.sdl.render
+import tcod.sdl.video
 import tcod.tileset
 from tcod._internal import _check, _check_warn, pending_deprecate
 from tcod.loader import ffi, lib
@@ -350,6 +352,24 @@ class Context:
                 )
         '''  # noqa: E501
         return lib.TCOD_context_get_sdl_window(self._context_p)
+
+    @property
+    def sdl_window(self) -> Optional[tcod.sdl.video.Window]:
+        """Return a tcod.sdl.video.Window referencing this contexts SDL window if it exists.
+
+        .. versionadded:: 13.4
+        """
+        p = self.sdl_window_p
+        return tcod.sdl.video.Window(p) if p else None
+
+    @property
+    def sdl_renderer(self) -> Optional[tcod.sdl.render.Renderer]:
+        """Return a tcod.sdl.render.Renderer referencing this contexts SDL renderer if it exists.
+
+        .. versionadded:: 13.4
+        """
+        p = lib.TCOD_context_get_sdl_renderer(self._context_p)
+        return tcod.sdl.render.Renderer(p) if p else None
 
     def __reduce__(self) -> NoReturn:
         """Contexts can not be pickled, so this class will raise

@@ -114,8 +114,17 @@ class Window:
         x, y = xy
         lib.SDL_SetWindowSize(self.p, x, y)
 
+    @property
+    def title(self) -> str:
+        """The title of the window.  You may set this attribute to change it."""
+        return str(ffi.string(lib.SDL_GetWindowtitle(self.p)), encoding="utf-8")
 
-def get_active_window() -> Window:
+    @title.setter
+    def title(self, value: str) -> None:
+        lib.SDL_SetWindowtitle(self.p, value.encode("utf-8"))
+
+
+def _get_active_window() -> Window:
     """Return the SDL2 window current managed by libtcod.
 
     Will raise an error if libtcod does not currently have a window.
