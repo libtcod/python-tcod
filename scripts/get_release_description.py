@@ -7,7 +7,7 @@ from pathlib import Path
 
 TAG_BANNER = r"## \[[\w.]*\] - \d+-\d+-\d+\n"
 
-RE_BODY = re.compile(fr".*?{TAG_BANNER}(.*?){TAG_BANNER}", re.DOTALL)
+RE_BODY = re.compile(rf".*?{TAG_BANNER}(.*?){TAG_BANNER}", re.DOTALL)
 
 
 def main() -> None:

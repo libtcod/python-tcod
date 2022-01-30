@@ -608,7 +608,7 @@ class FOVSample(Sample):
             x = x.astype(np.float32) - torch_x
             y = y.astype(np.float32) - torch_y
 
-            distance_squared = x ** 2 + y ** 2  # 2D squared distance array.
+            distance_squared = x**2 + y**2  # 2D squared distance array.
 
             # Get the currently visible cells.
             visible = (distance_squared < SQUARED_TORCH_RADIUS) & fov
@@ -1299,8 +1299,8 @@ class FastRenderSample(Sample):
 
         # squared distance from center,
         # clipped to sensible minimum and maximum values
-        sqr_dist = xc ** 2 + yc ** 2
-        sqr_dist = sqr_dist.clip(1.0 / RES_V, RES_V ** 2)
+        sqr_dist = xc**2 + yc**2
+        sqr_dist = sqr_dist.clip(1.0 / RES_V, RES_V**2)
 
         # one coordinate into the texture, represents depth in the tunnel
         vv = TEX_STRETCH * float(RES_V) / sqr_dist + self.frac_t

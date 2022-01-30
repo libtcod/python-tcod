@@ -1422,8 +1422,8 @@ def render_py(first, key, mouse):
                     ) + libtcod.noise_get_fbm(noise2d, [1 - u / float(RES_U), tex_v], 32.0)
     if use_numpy:
         # squared distance from center, clipped to sensible minimum and maximum values
-        sqr_dist = xc ** 2 + yc ** 2
-        sqr_dist = sqr_dist.clip(1.0 / RES_V, RES_V ** 2)
+        sqr_dist = xc**2 + yc**2
+        sqr_dist = sqr_dist.clip(1.0 / RES_V, RES_V**2)
 
         # one coordinate into the texture, represents depth in the tunnel
         v = TEX_STRETCH * float(RES_V) / sqr_dist + frac_t
@@ -1444,8 +1444,8 @@ def render_py(first, key, mouse):
         for y in range(-HALF_H, HALF_H):
             for x in range(-HALF_W, HALF_W):
                 # squared distance from center, clipped to sensible minimum and maximum values
-                sqr_dist = x ** 2 + y ** 2
-                sqr_dist = min(max(sqr_dist, 1.0 / RES_V), RES_V ** 2)
+                sqr_dist = x**2 + y**2
+                sqr_dist = min(max(sqr_dist, 1.0 / RES_V), RES_V**2)
 
                 # one coordinate into the texture, represents depth in the tunnel
                 v = TEX_STRETCH * float(RES_V) / sqr_dist + frac_t
