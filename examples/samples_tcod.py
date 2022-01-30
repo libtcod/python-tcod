@@ -18,6 +18,7 @@ from typing import Any, List
 
 import numpy as np
 import tcod
+import tcod.render
 from numpy.typing import NDArray
 
 if not sys.warnoptions:
@@ -1417,6 +1418,10 @@ def main() -> None:
     global context, tileset
     tileset = tcod.tileset.load_tilesheet(FONT, 32, 8, tcod.tileset.CHARMAP_TCOD)
     context = init_context(tcod.RENDERER_SDL2)
+    sdl_renderer = context.sdl_renderer
+    assert sdl_renderer
+    atlas = tcod.render.SDLTilesetAtlas(sdl_renderer, tileset)
+    console_render = tcod.render.SDLConsoleRender(atlas)
     try:
         SAMPLES[cur_sample].on_enter()
 
@@ -1429,7 +1434,9 @@ def main() -> None:
             SAMPLES[cur_sample].on_draw()
             sample_console.blit(root_console, SAMPLE_SCREEN_X, SAMPLE_SCREEN_Y)
             draw_stats()
-            context.present(root_console)
+            # context.present(root_console)
+            sdl_renderer.copy(console_render.render(root_console))
+            sdl_renderer.present()
             handle_time()
             handle_events()
     finally:
