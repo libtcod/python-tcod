@@ -48,9 +48,11 @@ class SDLConsoleRender:
                 format=int(lib.SDL_PIXELFORMAT_RGBA32),
                 access=int(lib.SDL_TEXTUREACCESS_TARGET),
             )
-        _check(
-            lib.TCOD_sdl2_render_texture(
-                self._atlas.p, console.console_c, self._cache_console.console_c, self._texture.p
+
+        with self._renderer.set_render_target(self._texture):
+            _check(
+                lib.TCOD_sdl2_render_texture(
+                    self._atlas.p, console.console_c, self._cache_console.console_c, self._texture.p
+                )
             )
-        )
         return self._texture

@@ -82,6 +82,20 @@ class Texture:
         _check(lib.SDL_SetTextureColorMod(self.p, rgb[0], rgb[1], rgb[2]))
 
 
+class _RestoreTargetContext:
+    """A context manager which tracks the current render target and restores it on exiting."""
+
+    def __init__(self, renderer: Renderer) -> None:
+        self.renderer = renderer
+        self.old_texture_p = lib.SDL_GetRenderTarget(renderer.p)
+
+    def __enter__(self) -> None:
+        pass
+
+    def __exit__(self, *_: Any) -> None:
+        _check(lib.SDL_SetRenderTarget(self.renderer.p, self.old_texture_p))
+
+
 class Renderer:
     def __init__(self, sdl_renderer_p: Any) -> None:
         if ffi.typeof(sdl_renderer_p) is not ffi.typeof("struct SDL_Renderer*"):
@@ -105,6 +119,10 @@ class Renderer:
         dest_ = ffi.NULL if dest is None else ffi.new("SDL_Rect*", dest)
         _check(lib.SDL_RenderCopy(self.p, texture.p, source_, dest_))
 
+    def present(self) -> None:
+        """Present the currently rendered image to the screen."""
+        lib.SDL_RenderPresent(self.p)
+
     def new_texture(
         self, width: int, height: int, *, format: Optional[int] = None, access: Optional[int] = None
     ) -> Texture:
@@ -113,10 +131,14 @@ class Renderer:
             format = 0
         if access is None:
             access = int(lib.SDL_TEXTUREACCESS_STATIC)
-        format = int(lib.SDL_PIXELFORMAT_RGBA32)
-        access = int(lib.SDL_TEXTUREACCESS_STATIC)
         texture_p = ffi.gc(lib.SDL_CreateTexture(self.p, format, access, width, height), lib.SDL_DestroyTexture)
         return Texture(texture_p, self.p)
+
+    def set_render_target(self, texture: Texture) -> _RestoreTargetContext:
+        """Change the render target to `texture`, returns a context that will restore the original target when exited."""
+        restore = _RestoreTargetContext(self)
+        _check(lib.SDL_SetRenderTarget(self.p, texture.p))
+        return restore
 
     def upload_texture(
         self, pixels: NDArray[Any], *, format: Optional[int] = None, access: Optional[int] = None
