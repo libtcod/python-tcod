@@ -8,15 +8,15 @@ from tcod.sdl import _check
 
 
 class Subsystem(enum.IntFlag):
-    TIMER = lib.SDL_INIT_TIMER
-    AUDIO = lib.SDL_INIT_AUDIO
-    VIDEO = lib.SDL_INIT_VIDEO
-    JOYSTICK = lib.SDL_INIT_JOYSTICK
-    HAPTIC = lib.SDL_INIT_HAPTIC
-    GAMECONTROLLER = lib.SDL_INIT_GAMECONTROLLER
-    EVENTS = lib.SDL_INIT_EVENTS
-    SENSOR = getattr(lib, "SDL_INIT_SENSOR", 0)
-    EVERYTHING = lib.SDL_INIT_EVERYTHING
+    TIMER = getattr(lib, "SDL_INIT_TIMER", 0x00000001)
+    AUDIO = getattr(lib, "SDL_INIT_AUDIO", 0x00000010)
+    VIDEO = getattr(lib, "SDL_INIT_VIDEO", 0x00000020)
+    JOYSTICK = getattr(lib, "SDL_INIT_JOYSTICK", 0x00000200)
+    HAPTIC = getattr(lib, "SDL_INIT_HAPTIC", 0x00001000)
+    GAMECONTROLLER = getattr(lib, "SDL_INIT_GAMECONTROLLER", 0x00002000)
+    EVENTS = getattr(lib, "SDL_INIT_EVENTS", 0x00004000)
+    SENSOR = getattr(lib, "SDL_INIT_SENSOR", 0x00008000)
+    EVERYTHING = getattr(lib, "SDL_INIT_EVERYTHING", 0)
 
 
 def init(flags: int = Subsystem.EVERYTHING) -> None:
@@ -48,11 +48,11 @@ class _ScopeInit:
 
 
 class _PowerState(enum.IntEnum):
-    UNKNOWN = lib.SDL_POWERSTATE_UNKNOWN
-    ON_BATTERY = lib.SDL_POWERSTATE_ON_BATTERY
-    NO_BATTERY = lib.SDL_POWERSTATE_NO_BATTERY
-    CHARGING = lib.SDL_POWERSTATE_CHARGING
-    CHARGED = lib.SDL_POWERSTATE_CHARGED
+    UNKNOWN = getattr(lib, "SDL_POWERSTATE_UNKNOWN", 0)
+    ON_BATTERY = getattr(lib, "SDL_POWERSTATE_ON_BATTERY", 0)
+    NO_BATTERY = getattr(lib, "SDL_POWERSTATE_NO_BATTERY", 0)
+    CHARGING = getattr(lib, "SDL_POWERSTATE_CHARGING", 0)
+    CHARGED = getattr(lib, "SDL_POWERSTATE_CHARGED", 0)
 
 
 def _get_power_info() -> Tuple[_PowerState, int, int]:
