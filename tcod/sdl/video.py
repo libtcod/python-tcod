@@ -5,12 +5,14 @@ module is not implied by ``import tcod``.
 """
 from __future__ import annotations
 
-from typing import Any, Tuple
+import sys
+from typing import Any, Optional, Tuple
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from tcod.loader import ffi, lib
+from tcod.sdl import _check_p
 
 __all__ = ("Window",)
 
@@ -122,6 +124,33 @@ class Window:
     @title.setter
     def title(self, value: str) -> None:
         lib.SDL_SetWindowtitle(self.p, value.encode("utf-8"))
+
+
+def new_window(
+    width: int,
+    height: int,
+    *,
+    x: Optional[int] = None,
+    y: Optional[int] = None,
+    title: Optional[str] = None,
+    flags: int = 0,
+) -> Window:
+    """Initialize and return a new SDL Window.
+
+    Example::
+
+        # Create a new resizable window with a custom title.
+        window = tcod.sdl.video.new_window(640, 480, title="Title bar text", flags=tcod.lib.SDL_WINDOW_RESIZABLE)
+
+    .. seealso::
+        :func:`tcod.sdl.render.new_renderer`
+    """
+    x = x if x is not None else int(lib.SDL_WINDOWPOS_UNDEFINED)
+    y = y if y is not None else int(lib.SDL_WINDOWPOS_UNDEFINED)
+    if title is None:
+        title = sys.argv[0]
+    window_p = ffi.gc(lib.SDL_CreateWindow(title.encode("utf-8"), x, y, width, height, flags), lib.SDL_DestroyWindow)
+    return Window(_check_p(window_p))
 
 
 def _get_active_window() -> Window:

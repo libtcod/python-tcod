@@ -35,4 +35,11 @@ def _check(result: int) -> int:
     return result
 
 
+def _check_p(result: Any) -> Any:
+    """Check if an SDL function returned NULL, and raise an exception if it did."""
+    if not result:
+        raise RuntimeError(_get_error())
+    return result
+
+
 lib.SDL_LogSetOutputFunction(lib._sdl_log_output_function, ffi.NULL)

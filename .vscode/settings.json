@@ -220,6 +220,7 @@
         "pcpp",
         "PILCROW",
         "pilmode",
+        "PRESENTVSYNC",
         "PRINTF",
         "printn",
         "pycall",

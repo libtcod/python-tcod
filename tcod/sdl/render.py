@@ -5,8 +5,9 @@ from typing import Any, Optional, Tuple
 import numpy as np
 from numpy.typing import NDArray
 
+import tcod.sdl.video
 from tcod.loader import ffi, lib
-from tcod.sdl import _check
+from tcod.sdl import _check, _check_p
 
 
 class Texture:
@@ -161,3 +162,34 @@ class Renderer:
             lib.SDL_UpdateTexture(texture.p, ffi.NULL, ffi.cast("const void*", pixels.ctypes.data), pixels.strides[0])
         )
         return texture
+
+
+def new_renderer(
+    window: tcod.sdl.video.Window,
+    *,
+    driver: Optional[int] = None,
+    software: bool = False,
+    vsync: bool = True,
+    target_textures: bool = False,
+) -> Renderer:
+    """Initialize and return a new SDL Renderer.
+
+    Example::
+
+        # Start by creating a window.
+        sdl_window = tcod.sdl.video.new_window(640, 480)
+        # Create a renderer with target texture support.
+        sdl_renderer = tcod.sdl.render.new_renderer(sdl_window, target_textures=True)
+
+    .. seealso::
+        :func:`tcod.sdl.video.new_window`
+    """
+    driver = driver if driver is not None else -1
+    flags = 0
+    if vsync:
+        flags |= int(lib.SDL_RENDERER_PRESENTVSYNC)
+    if target_textures:
+        flags |= int(lib.SDL_RENDERER_TARGETTEXTURE)
+    flags |= int(lib.SDL_RENDERER_SOFTWARE) if software else int(lib.SDL_RENDERER_ACCELERATED)
+    renderer_p = _check_p(ffi.gc(lib.SDL_CreateRenderer(window.p, driver, flags), lib.SDL_DestroyRenderer))
+    return Renderer(renderer_p)
