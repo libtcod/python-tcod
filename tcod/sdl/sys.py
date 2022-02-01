@@ -8,15 +8,15 @@ from tcod.sdl import _check
 
 
 class Subsystem(enum.IntFlag):
-    TIMER = getattr(lib, "SDL_INIT_TIMER", 0x00000001)
-    AUDIO = getattr(lib, "SDL_INIT_AUDIO", 0x00000010)
-    VIDEO = getattr(lib, "SDL_INIT_VIDEO", 0x00000020)
-    JOYSTICK = getattr(lib, "SDL_INIT_JOYSTICK", 0x00000200)
-    HAPTIC = getattr(lib, "SDL_INIT_HAPTIC", 0x00001000)
-    GAMECONTROLLER = getattr(lib, "SDL_INIT_GAMECONTROLLER", 0x00002000)
-    EVENTS = getattr(lib, "SDL_INIT_EVENTS", 0x00004000)
-    SENSOR = getattr(lib, "SDL_INIT_SENSOR", 0x00008000)
-    EVERYTHING = getattr(lib, "SDL_INIT_EVERYTHING", 0)
+    TIMER = lib.SDL_INIT_TIMER or 0x00000001
+    AUDIO = lib.SDL_INIT_AUDIO or 0x00000010
+    VIDEO = lib.SDL_INIT_VIDEO or 0x00000020
+    JOYSTICK = lib.SDL_INIT_JOYSTICK or 0x00000200
+    HAPTIC = lib.SDL_INIT_HAPTIC or 0x00001000
+    GAMECONTROLLER = lib.SDL_INIT_GAMECONTROLLER or 0x00002000
+    EVENTS = lib.SDL_INIT_EVENTS or 0x00004000
+    SENSOR = getattr(lib, "SDL_INIT_SENSOR", None) or 0x00008000  # SDL >= 2.0.9
+    EVERYTHING = lib.SDL_INIT_EVERYTHING or 0
 
 
 def init(flags: int = Subsystem.EVERYTHING) -> None:

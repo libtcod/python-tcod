@@ -1,3 +1,26 @@
+"""Handle the rendering of libtcod's tilesets.
+
+Example::
+
+    tileset = tcod.tileset.load_tilsheet("dejavu16x16_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD)
+    console = tcod.Console(20, 8)
+    console.print(0, 0, "Hello World")
+    sdl_window = tcod.sdl.video.new_window(
+        console.width * tileset.tile_width,
+        console.height * tileset.tile_height,
+        flags=tcod.lib.SDL_WINDOW_RESIZABLE,
+    )
+    sdl_renderer = tcod.sdl.render.new_renderer(sdl_window, target_textures=True)
+    atlas = tcod.render.SDLTilesetAtlas(sdl_renderer, tileset)
+    console_render = tcod.render.SDLConsoleRender(atlas)
+    while True:
+        sdl_renderer.copy(console_render.render(console))
+        sdl_renderer.present()
+        for event in tcod.event.wait():
+            if isinstance(event, tcod.event.Quit):
+                raise SystemExit()
+"""
+
 from __future__ import annotations
 
 from typing import Optional

@@ -5,6 +5,7 @@ module is not implied by ``import tcod``.
 """
 from __future__ import annotations
 
+import enum
 import sys
 from typing import Any, Optional, Tuple
 
@@ -12,9 +13,52 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from tcod.loader import ffi, lib
-from tcod.sdl import _check_p
+from tcod.sdl import _check, _check_p, _required_version
 
-__all__ = ("Window",)
+__all__ = (
+    "WindowFlags",
+    "FlashOperation",
+    "Window",
+    "new_window",
+    "get_grabbed_window",
+)
+
+
+class WindowFlags(enum.IntFlag):
+    """Bit flags which make up a windows state.
+
+    .. seealso::
+        https://wiki.libsdl.org/SDL_WindowFlags
+    """
+
+    FULLSCREEN = lib.SDL_WINDOW_FULLSCREEN or 0
+    FULLSCREEN_DESKTOP = lib.SDL_WINDOW_FULLSCREEN_DESKTOP or 0
+    OPENGL = lib.SDL_WINDOW_OPENGL or 0
+    SHOWN = lib.SDL_WINDOW_SHOWN or 0
+    HIDDEN = lib.SDL_WINDOW_HIDDEN or 0
+    BORDERLESS = lib.SDL_WINDOW_BORDERLESS or 0
+    RESIZABLE = lib.SDL_WINDOW_RESIZABLE or 0
+    MINIMIZED = lib.SDL_WINDOW_MINIMIZED or 0
+    MAXIMIZED = lib.SDL_WINDOW_MAXIMIZED or 0
+    MOUSE_GRABBED = lib.SDL_WINDOW_INPUT_GRABBED or 0
+    INPUT_FOCUS = lib.SDL_WINDOW_INPUT_FOCUS or 0
+    MOUSE_FOCUS = lib.SDL_WINDOW_MOUSE_FOCUS or 0
+    FOREIGN = lib.SDL_WINDOW_FOREIGN or 0
+    ALLOW_HIGHDPI = lib.SDL_WINDOW_ALLOW_HIGHDPI or 0
+    MOUSE_CAPTURE = lib.SDL_WINDOW_MOUSE_CAPTURE or 0
+    ALWAYS_ON_TOP = lib.SDL_WINDOW_ALWAYS_ON_TOP or 0
+    SKIP_TASKBAR = lib.SDL_WINDOW_SKIP_TASKBAR or 0
+    UTILITY = lib.SDL_WINDOW_UTILITY or 0
+    TOOLTIP = lib.SDL_WINDOW_TOOLTIP or 0
+    POPUP_MENU = lib.SDL_WINDOW_POPUP_MENU or 0
+    VULKAN = lib.SDL_WINDOW_VULKAN or 0
+    METAL = getattr(lib, "SDL_WINDOW_METAL", None) or 0x20000000  # SDL >= 2.0.14
+
+
+class FlashOperation(enum.IntEnum):
+    CANCEL = 0
+    BRIEFLY = 1
+    UNTIL_FOCUSED = 2
 
 
 class _TempSurface:
@@ -67,10 +111,7 @@ class Window:
 
     @property
     def allow_screen_saver(self) -> bool:
-        """If True the operating system is allowed to display a screen saver.
-
-        You can set this attribute to enable or disable the screen saver.
-        """
+        """Get or set if the operating system is allowed to display a screen saver."""
         return bool(lib.SDL_IsScreenSaverEnabled(self.p))
 
     @allow_screen_saver.setter
@@ -82,11 +123,10 @@ class Window:
 
     @property
     def position(self) -> Tuple[int, int]:
-        """Return the (x, y) position of the window.
+        """Get or set the (x, y) position of the window.
 
         This attribute can be set the move the window.
-        The constants tcod.lib.SDL_WINDOWPOS_CENTERED or
-        tcod.lib.SDL_WINDOWPOS_UNDEFINED can be used.
+        The constants tcod.lib.SDL_WINDOWPOS_CENTERED or tcod.lib.SDL_WINDOWPOS_UNDEFINED may be used.
         """
         xy = ffi.new("int[2]")
         lib.SDL_GetWindowPosition(self.p, xy, xy + 1)
@@ -99,11 +139,10 @@ class Window:
 
     @property
     def size(self) -> Tuple[int, int]:
-        """Return the pixel (width, height) of the window.
+        """Get or set the pixel (width, height) of the window client area.
 
-        This attribute can be set to change the size of the window but the
-        given size must be greater than (1, 1) or else an exception will be
-        raised.
+        This attribute can be set to change the size of the window but the given size must be greater than (1, 1) or
+        else ValueError will be raised.
         """
         xy = ffi.new("int[2]")
         lib.SDL_GetWindowSize(self.p, xy, xy + 1)
@@ -112,18 +151,145 @@ class Window:
     @size.setter
     def size(self, xy: Tuple[int, int]) -> None:
         if any(i <= 0 for i in xy):
-            raise ValueError("Window size must be greater than zero, not %r" % (xy,))
+            raise ValueError(f"Window size must be greater than zero, not {xy}")
         x, y = xy
         lib.SDL_SetWindowSize(self.p, x, y)
 
     @property
+    def min_size(self) -> Tuple[int, int]:
+        """Get or set this windows minimum client area."""
+        xy = ffi.new("int[2]")
+        lib.SDL_GetWindowMinimumSize(self.p, xy, xy + 1)
+        return xy[0], xy[1]
+
+    @min_size.setter
+    def min_size(self, xy: Tuple[int, int]) -> None:
+        lib.SDL_SetWindowMinimumSize(self.p, xy[0], xy[1])
+
+    @property
+    def max_size(self) -> Tuple[int, int]:
+        """Get or set this windows maximum client area."""
+        xy = ffi.new("int[2]")
+        lib.SDL_GetWindowMaximumSize(self.p, xy, xy + 1)
+        return xy[0], xy[1]
+
+    @max_size.setter
+    def max_size(self, xy: Tuple[int, int]) -> None:
+        lib.SDL_SetWindowMaximumSize(self.p, xy[0], xy[1])
+
+    @property
     def title(self) -> str:
-        """The title of the window.  You may set this attribute to change it."""
+        """Get or set the title of the window."""
         return str(ffi.string(lib.SDL_GetWindowtitle(self.p)), encoding="utf-8")
 
     @title.setter
     def title(self, value: str) -> None:
         lib.SDL_SetWindowtitle(self.p, value.encode("utf-8"))
+
+    @property
+    def flags(self) -> WindowFlags:
+        """The current flags of this window, read-only."""
+        return WindowFlags(lib.SDL_GetWindowFlags(self.p))
+
+    @property
+    def fullscreen(self) -> int:
+        """Get or set the fullscreen status of this window.
+
+        Can be set to :any:`WindowFlags.FULLSCREEN` or :any:`WindowFlags.FULLSCREEN_DESKTOP` flags
+
+        Example::
+
+            # Toggle fullscreen.
+            window: tcod.sdl.video.Window
+            if window.fullscreen:
+                window.fullscreen = False  # Set windowed mode.
+            else:
+                window.fullscreen = tcod.sdl.video.WindowFlags.FULLSCREEN_DESKTOP
+        """
+        return self.flags & (WindowFlags.FULLSCREEN | WindowFlags.FULLSCREEN_DESKTOP)
+
+    @fullscreen.setter
+    def fullscreen(self, value: int) -> None:
+        _check(lib.SDL_SetWindowFullscreen(self.p, value))
+
+    @property
+    def resizable(self) -> bool:
+        """Get or set if this window can be resized."""
+        return bool(self.flags & WindowFlags.RESIZABLE)
+
+    @resizable.setter
+    def resizable(self, value: bool) -> None:
+        lib.SDL_SetWindowResizable(self.p, value)
+
+    @property
+    def border_size(self) -> Tuple[int, int, int, int]:
+        """Get the (top, left, bottom, right) size of the window decorations around the client area.
+
+        If this fails or the window doesn't have decorations yet then the value will be (0, 0, 0, 0).
+
+        .. seealso::
+            https://wiki.libsdl.org/SDL_GetWindowBordersSize
+        """
+        borders = ffi.new("int[4]")
+        # The return code is ignored.
+        _ = lib.SDL_GetWindowBordersSize(self.p, borders, borders + 1, borders + 2, borders + 3)
+        return borders[0], borders[1], borders[2], borders[3]
+
+    @property
+    def opacity(self) -> float:
+        """Get or set this windows opacity.  0.0 is fully transarpent and 1.0 is fully opaque.
+
+        Will error if you try to set this and opacity isn't supported.
+        """
+        out = ffi.new("float*")
+        _check(lib.SDL_GetWindowOpacity(self.p, out))
+        return float(out[0])
+
+    @opacity.setter
+    def opacity(self, value: float) -> None:
+        _check(lib.SDL_SetWindowOpacity(self.p, value))
+
+    @property
+    def grab(self) -> bool:
+        """Get or set this windows input grab mode.
+
+        .. seealso::
+            https://wiki.libsdl.org/SDL_SetWindowGrab
+        """
+        return bool(lib.SDL_GetWindowGrab(self.p))
+
+    @grab.setter
+    def grab(self, value: bool) -> None:
+        lib.SDL_SetWindowGrab(self.p, value)
+
+    @_required_version((2, 0, 16))
+    def flash(self, operation: FlashOperation = FlashOperation.UNTIL_FOCUSED) -> None:
+        """Get the users attention."""
+        _check(lib.SDL_FlashWindow(self.p, operation))
+
+    def raise_window(self) -> None:
+        """Raise the window and set input focus."""
+        lib.SDL_RaiseWindow(self.p)
+
+    def restore(self) -> None:
+        """Restore a minimized or maximized window to its original size and position."""
+        lib.SDL_RestoreWindow(self.p)
+
+    def maximize(self) -> None:
+        """Make the window as big as possible."""
+        lib.SDL_MaximizeWindow(self.p)
+
+    def minimize(self) -> None:
+        """Minimize the window to an iconic state."""
+        lib.SDL_MinimizeWindow(self.p)
+
+    def show(self) -> None:
+        """Show this window."""
+        lib.SDL_ShowWindow(self.p)
+
+    def hide(self) -> None:
+        """Hide this window."""
+        lib.SDL_HideWindow(self.p)
 
 
 def new_window(
@@ -151,6 +317,12 @@ def new_window(
         title = sys.argv[0]
     window_p = ffi.gc(lib.SDL_CreateWindow(title.encode("utf-8"), x, y, width, height, flags), lib.SDL_DestroyWindow)
     return Window(_check_p(window_p))
+
+
+def get_grabbed_window() -> Optional[Window]:
+    """Return the window which has input grab enabled, if any."""
+    sdl_window_p = lib.SDL_GetGrabbedWindow()
+    return Window(sdl_window_p) if sdl_window_p else None
 
 
 def _get_active_window() -> Window:
