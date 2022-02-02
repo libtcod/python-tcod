@@ -17,6 +17,7 @@ import pcpp  # type: ignore
 
 BITSIZE, LINKAGE = platform.architecture()
 
+# Reject versions of SDL older than this, update the requirements in the readme if you change this.
 SDL_MIN_VERSION = (2, 0, 10)
 # The SDL2 version to parse and export symbols from.
 SDL2_PARSE_VERSION = os.environ.get("SDL_VERSION", "2.0.20")
