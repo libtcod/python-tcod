@@ -189,6 +189,7 @@ jobs:
     strategy:
       matrix:
         arch: ["x86_64", "aarch64"]
+        build: ["cp37-manylinux*", "pp37-manylinux*"]
     steps:
       - uses: actions/checkout@v1
       - name: Set up QEMU
@@ -204,12 +205,12 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install twine cibuildwheel==2.0.0
+          pip install twine cibuildwheel==2.3.1
       - name: Build wheels
         run: |
           python -m cibuildwheel --output-dir wheelhouse
         env:
-          CIBW_BUILD: cp36-* pp*
+          CIBW_BUILD: ${{ matrix.build }}
           CIBW_ARCHS_LINUX: ${{ matrix.arch }}
           CIBW_MANYLINUX_*_IMAGE: manylinux2014
           CIBW_MANYLINUX_PYPY_X86_64_IMAGE: manylinux2014
