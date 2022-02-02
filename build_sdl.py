@@ -17,10 +17,11 @@ import pcpp  # type: ignore
 
 BITSIZE, LINKAGE = platform.architecture()
 
+SDL_MIN_VERSION = (2, 0, 10)
 # The SDL2 version to parse and export symbols from.
-SDL2_PARSE_VERSION = os.environ.get("SDL_VERSION", "2.0.5")
+SDL2_PARSE_VERSION = os.environ.get("SDL_VERSION", "2.0.20")
 # The SDL2 version to include in binary distributions.
-SDL2_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "2.0.14")
+SDL2_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "2.0.20")
 
 
 # Used to remove excessive newlines in debug outputs.
@@ -52,6 +53,7 @@ IGNORE_DEFINES = frozenset(
         "SDL_DEPRECATED",
         "SDL_INLINE",
         "SDL_FORCE_INLINE",
+        "SDL_FALLTHROUGH",
         # Might show up in parsing and not in source.
         "SDL_ANDROID_EXTERNAL_STORAGE_READ",
         "SDL_ANDROID_EXTERNAL_STORAGE_WRITE",
@@ -68,8 +70,7 @@ def check_sdl_version() -> None:
     """Check the local SDL version on Linux distributions."""
     if not sys.platform.startswith("linux"):
         return
-    needed_version = SDL2_PARSE_VERSION
-    SDL_VERSION_NEEDED = tuple(int(n) for n in needed_version.split("."))
+    needed_version = f"{SDL_MIN_VERSION[0]}.{SDL_MIN_VERSION[1]}.{SDL_MIN_VERSION[2]}"
     try:
         sdl_version_str = subprocess.check_output(["sdl2-config", "--version"], universal_newlines=True).strip()
     except FileNotFoundError:
@@ -80,7 +81,7 @@ def check_sdl_version() -> None:
         )
     print(f"Found SDL {sdl_version_str}.")
     sdl_version = tuple(int(s) for s in sdl_version_str.split("."))
-    if sdl_version < SDL_VERSION_NEEDED:
+    if sdl_version < SDL_MIN_VERSION:
         raise RuntimeError("SDL version must be at least %s, (found %s)" % (needed_version, sdl_version_str))
 
 
