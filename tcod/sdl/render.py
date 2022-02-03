@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import enum
 from typing import Any, Optional, Tuple
 
 import numpy as np
@@ -8,6 +9,17 @@ from numpy.typing import NDArray
 import tcod.sdl.video
 from tcod.loader import ffi, lib
 from tcod.sdl import _check, _check_p
+
+
+class TextureAccess(enum.IntEnum):
+    """Determines how a texture is expected to be used."""
+
+    STATIC = lib.SDL_TEXTUREACCESS_STATIC or 0
+    """Texture rarely changes."""
+    STREAMING = lib.SDL_TEXTUREACCESS_STREAMING or 0
+    """Texture frequently changes."""
+    TARGET = lib.SDL_TEXTUREACCESS_TARGET or 0
+    """Texture will be used as a render target."""
 
 
 class Texture:
@@ -56,7 +68,9 @@ class Texture:
     @property
     def alpha_mod(self) -> int:
         """Texture alpha modulate value, can be set to: 0 - 255."""
-        return int(lib.SDL_GetTextureAlphaMod(self.p))
+        out = ffi.new("uint8_t*")
+        _check(lib.SDL_GetTextureAlphaMod(self.p, out))
+        return int(out[0])
 
     @alpha_mod.setter
     def alpha_mod(self, value: int) -> None:
@@ -65,7 +79,9 @@ class Texture:
     @property
     def blend_mode(self) -> int:
         """Texture blend mode, can be set."""
-        return int(lib.SDL_GetTextureBlendMode(self.p))
+        out = ffi.new("SDL_BlendMode*")
+        _check(lib.SDL_GetTextureBlendMode(self.p, out))
+        return int(out[0])
 
     @blend_mode.setter
     def blend_mode(self, value: int) -> None:
@@ -101,6 +117,8 @@ class Renderer:
     def __init__(self, sdl_renderer_p: Any) -> None:
         if ffi.typeof(sdl_renderer_p) is not ffi.typeof("struct SDL_Renderer*"):
             raise TypeError(f"Expected a {ffi.typeof('struct SDL_Window*')} type (was {ffi.typeof(sdl_renderer_p)}).")
+        if not sdl_renderer_p:
+            raise TypeError("C pointer must not be null.")
         self.p = sdl_renderer_p
 
     def __eq__(self, other: Any) -> bool:
@@ -124,10 +142,24 @@ class Renderer:
         """Present the currently rendered image to the screen."""
         lib.SDL_RenderPresent(self.p)
 
+    def set_render_target(self, texture: Texture) -> _RestoreTargetContext:
+        """Change the render target to `texture`, returns a context that will restore the original target when exited."""
+        restore = _RestoreTargetContext(self)
+        _check(lib.SDL_SetRenderTarget(self.p, texture.p))
+        return restore
+
     def new_texture(
         self, width: int, height: int, *, format: Optional[int] = None, access: Optional[int] = None
     ) -> Texture:
-        """Allocate and return a new Texture for this renderer."""
+        """Allocate and return a new Texture for this renderer.
+
+        Args:
+            width: The pixel width of the new texture.
+            height: The pixel height of the new texture.
+            format: The format the new texture.
+            access: The access mode of the texture.  Defaults to :any:`TextureAccess.STATIC`.
+                    See :any:`TextureAccess` for more options.
+        """
         if format is None:
             format = 0
         if access is None:
@@ -135,23 +167,24 @@ class Renderer:
         texture_p = ffi.gc(lib.SDL_CreateTexture(self.p, format, access, width, height), lib.SDL_DestroyTexture)
         return Texture(texture_p, self.p)
 
-    def set_render_target(self, texture: Texture) -> _RestoreTargetContext:
-        """Change the render target to `texture`, returns a context that will restore the original target when exited."""
-        restore = _RestoreTargetContext(self)
-        _check(lib.SDL_SetRenderTarget(self.p, texture.p))
-        return restore
-
     def upload_texture(
         self, pixels: NDArray[Any], *, format: Optional[int] = None, access: Optional[int] = None
     ) -> Texture:
-        """Return a new Texture from an array of pixels."""
+        """Return a new Texture from an array of pixels.
+
+        Args:
+            pixels: An RGB or RGBA array of pixels in row-major order.
+            format: The format of `pixels` when it isn't a simple RGB or RGBA array.
+            access: The access mode of the texture.  Defaults to :any:`TextureAccess.STATIC`.
+                    See :any:`TextureAccess` for more options.
+        """
         if format is None:
             assert len(pixels.shape) == 3
             assert pixels.dtype == np.uint8
             if pixels.shape[2] == 4:
                 format = int(lib.SDL_PIXELFORMAT_RGBA32)
             elif pixels.shape[2] == 3:
-                format = int(lib.SDL_PIXELFORMAT_RGB32)
+                format = int(lib.SDL_PIXELFORMAT_RGB24)
             else:
                 raise TypeError(f"Can't determine the format required for an array of shape {pixels.shape}.")
 
@@ -173,6 +206,13 @@ def new_renderer(
     target_textures: bool = False,
 ) -> Renderer:
     """Initialize and return a new SDL Renderer.
+
+    Args:
+        window: The window that this renderer will be attached to.
+        driver: Force SDL to use a specific video driver.
+        software: If True then a software renderer will be forced.  By default a hardware renderer is used.
+        vsync: If True then Vsync will be enabled.
+        target_textures: If True then target textures can be used by the renderer.
 
     Example::
 

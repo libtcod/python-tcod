@@ -21,6 +21,7 @@ __all__ = (
     "Window",
     "new_window",
     "get_grabbed_window",
+    "screen_saver_allowed",
 )
 
 
@@ -66,10 +67,10 @@ class _TempSurface:
 
     def __init__(self, pixels: ArrayLike) -> None:
         self._array: NDArray[np.uint8] = np.ascontiguousarray(pixels, dtype=np.uint8)
-        if len(self._array) != 3:
-            raise TypeError("NumPy shape must be 3D [y, x, ch] (got %r)" % (self._array.shape,))
-        if 3 <= self._array.shape[2] <= 4:
-            raise TypeError("NumPy array must have RGB or RGBA channels. (got %r)" % (self._array.shape,))
+        if len(self._array.shape) != 3:
+            raise TypeError(f"NumPy shape must be 3D [y, x, ch] (got {self._array.shape})")
+        if not (3 <= self._array.shape[2] <= 4):
+            raise TypeError(f"NumPy array must have RGB or RGBA channels. (got {self._array.shape})")
         self.p = ffi.gc(
             lib.SDL_CreateRGBSurfaceFrom(
                 ffi.from_buffer("void*", self._array),
@@ -95,31 +96,20 @@ class Window:
                 "sdl_window_p must be %r type (was %r)." % (ffi.typeof("struct SDL_Window*"), ffi.typeof(sdl_window_p))
             )
         if not sdl_window_p:
-            raise ValueError("sdl_window_p can not be a null pointer.")
+            raise TypeError("sdl_window_p can not be a null pointer.")
         self.p = sdl_window_p
 
     def __eq__(self, other: Any) -> bool:
         return bool(self.p == other.p)
 
-    def set_icon(self, image: ArrayLike) -> None:
+    def set_icon(self, pixels: ArrayLike) -> None:
         """Set the window icon from an image.
 
-        `image` is a C memory order RGB or RGBA NumPy array.
+        Args:
+            pixels: A row-major array of RGB or RGBA pixel values.
         """
-        surface = _TempSurface(image)
+        surface = _TempSurface(pixels)
         lib.SDL_SetWindowIcon(self.p, surface.p)
-
-    @property
-    def allow_screen_saver(self) -> bool:
-        """Get or set if the operating system is allowed to display a screen saver."""
-        return bool(lib.SDL_IsScreenSaverEnabled(self.p))
-
-    @allow_screen_saver.setter
-    def allow_screen_saver(self, value: bool) -> None:
-        if value:
-            lib.SDL_EnableScreenSaver(self.p)
-        else:
-            lib.SDL_DisableScreenSaver(self.p)
 
     @property
     def position(self) -> Tuple[int, int]:
@@ -180,11 +170,11 @@ class Window:
     @property
     def title(self) -> str:
         """Get or set the title of the window."""
-        return str(ffi.string(lib.SDL_GetWindowtitle(self.p)), encoding="utf-8")
+        return str(ffi.string(lib.SDL_GetWindowTitle(self.p)), encoding="utf-8")
 
     @title.setter
     def title(self, value: str) -> None:
-        lib.SDL_SetWindowtitle(self.p, value.encode("utf-8"))
+        lib.SDL_SetWindowTitle(self.p, value.encode("utf-8"))
 
     @property
     def flags(self) -> WindowFlags:
@@ -303,6 +293,15 @@ def new_window(
 ) -> Window:
     """Initialize and return a new SDL Window.
 
+    Args:
+        width: The requested pixel width of the window.
+        height: The requested pixel height of the window.
+        x: The left-most position of the window.
+        y: The top-most position of the window.
+        title: The title text of the new window.  If no option is given then `sys.arg[0]` will be used as the title.
+        flags: The SDL flags to use for this window, such as `tcod.sdl.video.WindowFlags.RESIZABLE`.
+               See :any:`WindowFlags` for more options.
+
     Example::
 
         # Create a new resizable window with a custom title.
@@ -325,12 +324,12 @@ def get_grabbed_window() -> Optional[Window]:
     return Window(sdl_window_p) if sdl_window_p else None
 
 
-def _get_active_window() -> Window:
-    """Return the SDL2 window current managed by libtcod.
-
-    Will raise an error if libtcod does not currently have a window.
-    """
-    sdl_window = lib.TCOD_sys_get_window()
-    if not sdl_window:
-        raise RuntimeError("TCOD does not have an active window.")
-    return Window(sdl_window)
+def screen_saver_allowed(allow: Optional[bool] = None) -> bool:
+    """Allow or prevent a screen saver from being displayed and return the current allowed status."""
+    if allow is None:
+        pass
+    elif allow:
+        lib.SDL_EnableScreenSaver()
+    else:
+        lib.SDL_DisableScreenSaver()
+    return bool(lib.SDL_IsScreenSaverEnabled())
