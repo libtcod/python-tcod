@@ -1,3 +1,7 @@
+"""SDL2 Rendering functionality.
+
+.. versionadded:: 13.4
+"""
 from __future__ import annotations
 
 import enum
@@ -23,6 +27,8 @@ class TextureAccess(enum.IntEnum):
 
 
 class Texture:
+    """SDL hardware textures."""
+
     def __init__(self, sdl_texture_p: Any, sdl_renderer_p: Any = None) -> None:
         self.p = sdl_texture_p
         self._sdl_renderer_p = sdl_renderer_p  # Keep alive.
@@ -114,6 +120,8 @@ class _RestoreTargetContext:
 
 
 class Renderer:
+    """SDL Renderer."""
+
     def __init__(self, sdl_renderer_p: Any) -> None:
         if ffi.typeof(sdl_renderer_p) is not ffi.typeof("struct SDL_Renderer*"):
             raise TypeError(f"Expected a {ffi.typeof('struct SDL_Window*')} type (was {ffi.typeof(sdl_renderer_p)}).")

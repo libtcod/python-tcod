@@ -1,4 +1,8 @@
-"""Handle the rendering of libtcod's tilesets.
+"""Handles the rendering of libtcod's tilesets.
+
+Using this module you can render a console to an SDL :any:`Texture` directly, letting you have full control over how
+conoles are displayed.
+This includes rendering multiple tilesets in a single frame and rendering consoles on top of each other.
 
 Example::
 
@@ -19,6 +23,8 @@ Example::
         for event in tcod.event.wait():
             if isinstance(event, tcod.event.Quit):
                 raise SystemExit()
+
+.. versionadded:: 13.4
 """
 
 from __future__ import annotations

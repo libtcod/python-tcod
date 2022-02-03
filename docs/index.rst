@@ -36,8 +36,11 @@ Contents:
     tcod/noise
     tcod/path
     tcod/random
+    tcod/render
     tcod/tileset
     libtcodpy
+    sdl/render
+    sdl/video
 
 Indices and tables
 ==================

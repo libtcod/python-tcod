@@ -1,7 +1,6 @@
-"""SDL2 specific functionality.
+"""SDL2 Window and Display handling.
 
-Add the line ``import tcod.sdl`` to include this module, as importing this
-module is not implied by ``import tcod``.
+.. versionadded:: 13.4
 """
 from __future__ import annotations
 
@@ -33,33 +32,60 @@ class WindowFlags(enum.IntFlag):
     """
 
     FULLSCREEN = lib.SDL_WINDOW_FULLSCREEN or 0
+    """"""
     FULLSCREEN_DESKTOP = lib.SDL_WINDOW_FULLSCREEN_DESKTOP or 0
+    """"""
     OPENGL = lib.SDL_WINDOW_OPENGL or 0
+    """"""
     SHOWN = lib.SDL_WINDOW_SHOWN or 0
+    """"""
     HIDDEN = lib.SDL_WINDOW_HIDDEN or 0
+    """"""
     BORDERLESS = lib.SDL_WINDOW_BORDERLESS or 0
+    """"""
     RESIZABLE = lib.SDL_WINDOW_RESIZABLE or 0
+    """"""
     MINIMIZED = lib.SDL_WINDOW_MINIMIZED or 0
+    """"""
     MAXIMIZED = lib.SDL_WINDOW_MAXIMIZED or 0
+    """"""
     MOUSE_GRABBED = lib.SDL_WINDOW_INPUT_GRABBED or 0
+    """"""
     INPUT_FOCUS = lib.SDL_WINDOW_INPUT_FOCUS or 0
+    """"""
     MOUSE_FOCUS = lib.SDL_WINDOW_MOUSE_FOCUS or 0
+    """"""
     FOREIGN = lib.SDL_WINDOW_FOREIGN or 0
+    """"""
     ALLOW_HIGHDPI = lib.SDL_WINDOW_ALLOW_HIGHDPI or 0
+    """"""
     MOUSE_CAPTURE = lib.SDL_WINDOW_MOUSE_CAPTURE or 0
+    """"""
     ALWAYS_ON_TOP = lib.SDL_WINDOW_ALWAYS_ON_TOP or 0
+    """"""
     SKIP_TASKBAR = lib.SDL_WINDOW_SKIP_TASKBAR or 0
+    """"""
     UTILITY = lib.SDL_WINDOW_UTILITY or 0
+    """"""
     TOOLTIP = lib.SDL_WINDOW_TOOLTIP or 0
+    """"""
     POPUP_MENU = lib.SDL_WINDOW_POPUP_MENU or 0
+    """"""
     VULKAN = lib.SDL_WINDOW_VULKAN or 0
+    """"""
     METAL = getattr(lib, "SDL_WINDOW_METAL", None) or 0x20000000  # SDL >= 2.0.14
+    """"""
 
 
 class FlashOperation(enum.IntEnum):
+    """Values for :any:`Window.flash`."""
+
     CANCEL = 0
+    """Stop flashing."""
     BRIEFLY = 1
+    """Flash breifly."""
     UNTIL_FOCUSED = 2
+    """Flash until focus is gained."""
 
 
 class _TempSurface:
@@ -185,7 +211,7 @@ class Window:
     def fullscreen(self) -> int:
         """Get or set the fullscreen status of this window.
 
-        Can be set to :any:`WindowFlags.FULLSCREEN` or :any:`WindowFlags.FULLSCREEN_DESKTOP` flags
+        Can be set to the :any:`WindowFlags.FULLSCREEN` or :any:`WindowFlags.FULLSCREEN_DESKTOP` flags.
 
         Example::
 
@@ -304,8 +330,9 @@ def new_window(
 
     Example::
 
+        import tcod.sdl.video
         # Create a new resizable window with a custom title.
-        window = tcod.sdl.video.new_window(640, 480, title="Title bar text", flags=tcod.lib.SDL_WINDOW_RESIZABLE)
+        window = tcod.sdl.video.new_window(640, 480, title="Title bar text", flags=tcod.sdl.video.WindowFlags.RESIZABLE)
 
     .. seealso::
         :func:`tcod.sdl.render.new_renderer`
