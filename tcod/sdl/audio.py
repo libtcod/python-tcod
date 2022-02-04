@@ -3,7 +3,6 @@ from __future__ import annotations
 import sys
 import threading
 import time
-import weakref
 from typing import Any, Iterator, List, Optional
 
 import numpy as np
@@ -27,7 +26,7 @@ def _get_format(format: DTypeLike) -> int:
     if byteorder == "=":
         byteorder = "<" if sys.byteorder == "little" else ">"
 
-    return (  # type: ignore
+    return int(
         bitsize
         | (lib.SDL_AUDIO_MASK_DATATYPE * is_float)
         | (lib.SDL_AUDIO_MASK_ENDIAN * (byteorder == ">"))
@@ -51,57 +50,45 @@ def _dtype_from_format(format: int) -> np.dtype[Any]:
 
 
 class AudioDevice:
+    """An SDL audio device."""
+
     def __init__(
         self,
-        device: Optional[str] = None,
-        capture: bool = False,
-        *,
-        frequency: int = 44100,
-        format: DTypeLike = np.float32,
-        channels: int = 2,
-        samples: int = 0,
-        allowed_changes: int = 0,
+        device_id: int,
+        capture: bool,
+        spec: Any,  # SDL_AudioSpec*
     ):
-        self.__sdl_subsystems = tcod.sdl.sys._ScopeInit(tcod.sdl.sys.Subsystem.AUDIO)
-        self.__handle = ffi.new_handle(weakref.ref(self))
-        desired = ffi.new(
-            "SDL_AudioSpec*",
-            {
-                "freq": frequency,
-                "format": _get_format(format),
-                "channels": channels,
-                "samples": samples,
-                "callback": ffi.NULL,
-                "userdata": self.__handle,
-            },
-        )
-        obtained = ffi.new("SDL_AudioSpec*")
-        self.device_id = lib.SDL_OpenAudioDevice(
-            ffi.NULL if device is None else device.encode("utf-8"),
-            capture,
-            desired,
-            obtained,
-            allowed_changes,
-        )
-        assert self.device_id != 0, _get_error()
-        self.frequency = obtained.freq
+        assert device_id >= 0
+        assert ffi.typeof(spec) is ffi.typeof("SDL_AudioSpec*")
+        assert spec
+        self.device_id = device_id
+        self.spec = spec
+        self.frequency = spec.freq
         self.is_capture = capture
-        self.format = _dtype_from_format(obtained.format)
-        self.channels = int(obtained.channels)
-        self.silence = int(obtained.silence)
-        self.samples = int(obtained.samples)
-        self.buffer_size = int(obtained.size)
-        self.unpause()
+        self.format = _dtype_from_format(spec.format)
+        self.channels = int(spec.channels)
+        self.silence = int(spec.silence)
+        self.samples = int(spec.samples)
+        self.buffer_size = int(spec.size)
+        self._callback = self.__default_callback
 
     @property
     def _sample_size(self) -> int:
         return self.format.itemsize * self.channels
 
-    def pause(self) -> None:
-        lib.SDL_PauseAudioDevice(self.device_id, True)
+    @property
+    def stopped(self) -> bool:
+        """Is True if the device has failed or was closed."""
+        return bool(lib.SDL_GetAudioDeviceStatus(self.device_id) != lib.SDL_AUDIO_STOPPED)
 
-    def unpause(self) -> None:
-        lib.SDL_PauseAudioDevice(self.device_id, False)
+    @property
+    def paused(self) -> bool:
+        """Get or set the device paused state."""
+        return bool(lib.SDL_GetAudioDeviceStatus(self.device_id) != lib.SDL_AUDIO_PLAYING)
+
+    @paused.setter
+    def paused(self, value: bool) -> None:
+        lib.SDL_PauseAudioDevice(self.device_id, value)
 
     def _verify_array_format(self, samples: NDArray[Any]) -> NDArray[Any]:
         if samples.dtype != self.format:
@@ -121,12 +108,14 @@ class AudioDevice:
         return int(lib.SDL_GetQueuedAudioSize(self.device_id))
 
     def queue_audio(self, samples: ArrayLike) -> None:
+        """Append audio samples to the audio data queue."""
         assert not self.is_capture
         samples = self._convert_array(samples)
         buffer = ffi.from_buffer(samples)
         lib.SDL_QueueAudio(self.device_id, buffer, len(buffer))
 
     def dequeue_audio(self) -> NDArray[Any]:
+        """Return the audio buffer from a capture stream."""
         assert self.is_capture
         out_samples = self.queued_audio_bytes // self._sample_size
         out = np.empty((out_samples, self.channels), self.format)
@@ -140,31 +129,30 @@ class AudioDevice:
         self.close()
 
     def close(self) -> None:
+        """Close this audio device."""
         if not self.device_id:
             return
         lib.SDL_CloseAudioDevice(self.device_id)
         self.device_id = 0
 
-    @staticmethod
-    def __default_callback(stream: NDArray[Any], silence: int) -> None:
-        stream[...] = silence
+    def __default_callback(self, stream: NDArray[Any]) -> None:
+        stream[...] = self.silence
 
 
 class Mixer(threading.Thread):
     def __init__(self, device: AudioDevice):
         super().__init__(daemon=True)
         self.device = device
-        self.device.unpause()
-        self.start()
 
     def run(self) -> None:
         buffer = np.full((self.device.samples, self.device.channels), self.device.silence, dtype=self.device.format)
         while True:
-            time.sleep(0.001)
-            if self.device.queued_audio_bytes == 0:
-                self.on_stream(buffer)
-                self.device.queue_audio(buffer)
-                buffer[:] = self.device.silence
+            if self.device.queued_audio_bytes > 0:
+                time.sleep(0.001)
+                continue
+            self.on_stream(buffer)
+            self.device.queue_audio(buffer)
+            buffer[:] = self.device.silence
 
     def on_stream(self, stream: NDArray[Any]) -> None:
         pass
@@ -197,7 +185,8 @@ def _sdl_audio_callback(userdata: Any, stream: Any, length: int) -> None:
     """Handle audio device callbacks."""
     device: Optional[AudioDevice] = ffi.from_handle(userdata)()
     assert device is not None
-    _ = np.frombuffer(ffi.buffer(stream, length), dtype=device.format).reshape(-1, device.channels)
+    buffer = np.frombuffer(ffi.buffer(stream, length), dtype=device.format).reshape(-1, device.channels)
+    device._callback(buffer)
 
 
 def _get_devices(capture: bool) -> Iterator[str]:
@@ -216,3 +205,41 @@ def get_devices() -> Iterator[str]:
 def get_capture_devices() -> Iterator[str]:
     """Iterate over the available audio capture devices."""
     yield from _get_devices(capture=True)
+
+
+def open(
+    name: Optional[str] = None,
+    capture: bool = False,
+    *,
+    frequency: int = 44100,
+    format: DTypeLike = np.float32,
+    channels: int = 2,
+    samples: int = 0,
+    allowed_changes: int = 0,
+    paused: bool = False,
+) -> AudioDevice:
+    """Open an audio device for playback or capture."""
+    tcod.sdl.sys.init(tcod.sdl.sys.Subsystem.AUDIO)
+    desired = ffi.new(
+        "SDL_AudioSpec*",
+        {
+            "freq": frequency,
+            "format": _get_format(format),
+            "channels": channels,
+            "samples": samples,
+            "callback": ffi.NULL,
+            "userdata": ffi.NULL,
+        },
+    )
+    obtained = ffi.new("SDL_AudioSpec*")
+    device_id: int = lib.SDL_OpenAudioDevice(
+        ffi.NULL if name is None else name.encode("utf-8"),
+        capture,
+        desired,
+        obtained,
+        allowed_changes,
+    )
+    assert device_id >= 0, _get_error()
+    device = AudioDevice(device_id, capture, obtained)
+    device.paused = paused
+    return device
