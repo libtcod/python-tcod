@@ -207,7 +207,10 @@ EXTRA_CDEF = """
 extern "Python" {
 // SDL_AudioCallback callback.
 void _sdl_audio_callback(void* userdata, Uint8* stream, int len);
+// SDL to Python log function.
 void _sdl_log_output_function(void *userdata, int category, SDL_LogPriority priority, const char *message);
+// Generic event watcher callback.
+int _sdl_event_watcher(void* userdata, SDL_Event* event);
 }
 """
 

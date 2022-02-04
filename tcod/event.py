@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import enum
 import warnings
-from typing import Any, Callable, Dict, Generic, Iterator, Mapping, NamedTuple, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, Generic, Iterator, Mapping, NamedTuple, Optional, Tuple, Type, TypeVar, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -238,7 +238,7 @@ class Event:
         self.sdl_event = None
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> Any:
+    def from_sdl_event(cls, sdl_event: Any) -> Event:
         """Return a class instance from a python-cffi 'SDL_Event*' pointer."""
         raise NotImplementedError()
 
@@ -739,7 +739,7 @@ class Undefined(Event):
         return "<Undefined>"
 
 
-_SDL_TO_CLASS_TABLE: Dict[int, Any] = {
+_SDL_TO_CLASS_TABLE: Dict[int, Type[Event]] = {
     lib.SDL_QUIT: Quit,
     lib.SDL_KEYDOWN: KeyDown,
     lib.SDL_KEYUP: KeyUp,
@@ -750,6 +750,13 @@ _SDL_TO_CLASS_TABLE: Dict[int, Any] = {
     lib.SDL_TEXTINPUT: TextInput,
     lib.SDL_WINDOWEVENT: WindowEvent,
 }
+
+
+def _parse_event(sdl_event: Any) -> Event:
+    """Convert a C SDL_Event* type into a tcod Event sub-class."""
+    if sdl_event.type not in _SDL_TO_CLASS_TABLE:
+        return Undefined.from_sdl_event(sdl_event)
+    return _SDL_TO_CLASS_TABLE[sdl_event.type].from_sdl_event(sdl_event)
 
 
 def get() -> Iterator[Any]:
@@ -1065,8 +1072,61 @@ def get_mouse_state() -> MouseState:
 
 
 @ffi.def_extern()  # type: ignore
-def _pycall_event_watch(userdata: Any, sdl_event: Any) -> int:
+def _sdl_event_watcher(userdata: Any, sdl_event: Any) -> int:
+    callback: Callable[[Event], None] = ffi.from_handle(userdata)
+    callback(_parse_event(sdl_event))
     return 0
+
+
+_EventCallback = TypeVar("_EventCallback", bound=Callable[[Event], None])
+_event_watch_handles: Dict[Callable[[Event], None], Any] = {}  # Callbacks and their FFI handles.
+
+
+def add_watch(callback: _EventCallback) -> _EventCallback:
+    """Add a callback for watching events.
+
+    This function can be called with the callback to register, or be used as a decorator.
+
+    Callbacks added as event watchers can later be removed with :any:`tcod.event.remove_watch`.
+
+    Args:
+        callback (Callable[[Event], None]):
+            A function which accepts :any:`Event` parameters.
+
+    Example::
+
+        import tcod.event
+
+        @tcod.event.add_watch
+        def handle_events(event: tcod.event.Event) -> None:
+            if isinstance(event, tcod.event.KeyDown):
+                print(event)
+
+    .. versionadded:: 13.4
+    """
+    if callback in _event_watch_handles:
+        warnings.warn(f"{callback} is already an active event watcher, nothing was added.", RuntimeWarning)
+        return callback
+    handle = _event_watch_handles[callback] = ffi.new_handle(callback)
+    lib.SDL_AddEventWatch(lib._sdl_event_watcher, handle)
+    return callback
+
+
+def remove_watch(callback: Callable[[Event], None]) -> None:
+    """Remove a callback as an event wacher.
+
+    Args:
+        callback (Callable[[Event], None]):
+            A function which has been previously registered with :any:`tcod.event.add_watch`.
+
+    .. versionadded:: 13.4
+    """
+    if callback not in _event_watch_handles:
+        warnings.warn(f"{callback} is not an active event watcher, nothing was removed.", RuntimeWarning)
+        return
+    handle = _event_watch_handles[callback]
+    lib.SDL_DelEventWatch(lib._sdl_event_watcher, handle)
+    del _event_watch_handles[callback]
 
 
 def get_keyboard_state() -> NDArray[np.bool_]:
