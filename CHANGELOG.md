@@ -4,6 +4,12 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+### Added
+- Adds `sdl_window` and `sdl_renderer` to tcod contexts.
+- Adds `tcod.event.add_watch` and `tcod.event.remove_watch` to handle SDL events via callback.
+- Adds the `tcod.sdl.video` module to handle SDL windows.
+- Adds the `tcod.sdl.render` module to handle SDL renderers.
+- Adds the `tcod.render` module which gives more control over the rendering of consoles and tilesets.
 ### Fixed
 - Fixed handling of non-Path PathLike parameters and filepath encodings.
 

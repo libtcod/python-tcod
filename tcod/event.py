@@ -1089,6 +1089,10 @@ def add_watch(callback: _EventCallback) -> _EventCallback:
 
     Callbacks added as event watchers can later be removed with :any:`tcod.event.remove_watch`.
 
+    .. warning::
+        How uncaught exceptions in a callback are handled is not currently defined by tcod.
+        They will likely be handled by :any:`sys.unraisablehook`.
+
     Args:
         callback (Callable[[Event], None]):
             A function which accepts :any:`Event` parameters.
@@ -2303,6 +2307,8 @@ __all__ = [  # noqa: F405
     "get",
     "wait",
     "get_mouse_state",
+    "add_watch",
+    "remove_watch",
     "EventDispatch",
     "get_keyboard_state",
     "get_modifier_state",

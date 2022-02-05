@@ -355,7 +355,7 @@ class Context:
 
     @property
     def sdl_window(self) -> Optional[tcod.sdl.video.Window]:
-        """Return a tcod.sdl.video.Window referencing this contexts SDL window if it exists.
+        """Return a :any:`tcod.sdl.video.Window` referencing this contexts SDL window if it exists.
 
         .. versionadded:: 13.4
         """
@@ -364,7 +364,7 @@ class Context:
 
     @property
     def sdl_renderer(self) -> Optional[tcod.sdl.render.Renderer]:
-        """Return a tcod.sdl.render.Renderer referencing this contexts SDL renderer if it exists.
+        """Return a :any:`tcod.sdl.render.Renderer` referencing this contexts SDL renderer if it exists.
 
         .. versionadded:: 13.4
         """
