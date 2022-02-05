@@ -1092,6 +1092,7 @@ def add_watch(callback: _EventCallback) -> _EventCallback:
     .. warning::
         How uncaught exceptions in a callback are handled is not currently defined by tcod.
         They will likely be handled by :any:`sys.unraisablehook`.
+        This may be later changed to pass the excpetion to a :any`tcod.event.get` or :any:`tcod.event.wait` call.
 
     Args:
         callback (Callable[[Event], None]):

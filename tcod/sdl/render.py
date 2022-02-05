@@ -73,7 +73,7 @@ class Texture:
 
     @property
     def alpha_mod(self) -> int:
-        """Texture alpha modulate value, can be set to: 0 - 255."""
+        """Texture alpha modulate value, can be set to 0 - 255."""
         out = ffi.new("uint8_t*")
         _check(lib.SDL_GetTextureAlphaMod(self.p, out))
         return int(out[0])
