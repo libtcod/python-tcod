@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 import threading
 import time
-from typing import Any, Iterator, List, Optional
+from typing import Any, Callable, Dict, Hashable, Iterator, List, Optional, Tuple, Union
 
 import numpy as np
 from numpy.typing import ArrayLike, DTypeLike, NDArray
@@ -139,8 +139,65 @@ class AudioDevice:
         stream[...] = self.silence
 
 
+class Channel:
+    mixer: Mixer
+
+    def __init__(self) -> None:
+        self.volume: Union[float, Tuple[float, ...]] = 1.0
+        self.sound_queue: List[NDArray[Any]] = []
+        self.on_end_callback: Optional[Callable[[Channel], None]] = None
+
+    @property
+    def busy(self) -> bool:
+        return bool(self.sound_queue)
+
+    def play(
+        self,
+        sound: ArrayLike,
+        *,
+        on_end: Optional[Callable[[Channel], None]] = None,
+    ) -> None:
+        self.sound_queue[:] = [self._verify_audio_sample(sound)]
+        self.on_end_callback = on_end
+
+    def _verify_audio_sample(self, sample: ArrayLike) -> NDArray[Any]:
+        """Verify an audio sample is valid and return it as a Numpy array."""
+        array: NDArray[Any] = np.asarray(sample)
+        assert array.dtype == self.mixer.device.format
+        if len(array.shape) == 1:
+            array = array[:, np.newaxis]
+        return array
+
+    def _on_mix(self, stream: NDArray[Any]) -> None:
+        while self.sound_queue and stream.size:
+            buffer = self.sound_queue[0]
+            if buffer.shape[0] > stream.shape[0]:
+                # Mix part of the buffer into the stream.
+                stream[:] += buffer[: stream.shape[0]] * self.volume
+                self.sound_queue[0] = buffer[stream.shape[0] :]
+                break  # Stream was filled.
+            # Remaining buffer fits the stream array.
+            stream[: buffer.shape[0]] += buffer * self.volume
+            stream = stream[buffer.shape[0] :]
+            self.sound_queue.pop(0)
+            if not self.sound_queue and self.on_end_callback is not None:
+                self.on_end_callback(self)
+
+    def fadeout(self, time: float) -> None:
+        assert time >= 0
+        time_samples = round(time * self.mixer.device.frequency) + 1
+        buffer: NDArray[np.float32] = np.zeros((time_samples, self.mixer.device.channels), np.float32)
+        self._on_mix(buffer)
+        buffer *= np.linspace(1.0, 0.0, time_samples + 1, endpoint=False)[1:]
+        self.sound_queue[:] = [buffer]
+
+    def stop(self) -> None:
+        self.fadeout(0.0005)
+
+
 class Mixer(threading.Thread):
     def __init__(self, device: AudioDevice):
+        assert device.format == np.float32
         super().__init__(daemon=True)
         self.device = device
 
@@ -161,23 +218,35 @@ class Mixer(threading.Thread):
 class BasicMixer(Mixer):
     def __init__(self, device: AudioDevice):
         super().__init__(device)
-        self.play_buffers: List[List[NDArray[Any]]] = []
+        self.channels: Dict[Hashable, Channel] = {}
 
-    def play(self, sound: ArrayLike) -> None:
-        array = np.asarray(sound, dtype=self.device.format)
-        assert array.size
-        if len(array.shape) == 1:
-            array = array[:, np.newaxis]
-        chunks: List[NDArray[Any]] = np.split(array, range(0, len(array), self.device.samples)[1:])[::-1]
-        self.play_buffers.append(chunks)
+    def get_channel(self, key: Hashable) -> Channel:
+        if key not in self.channels:
+            self.channels[key] = Channel()
+            self.channels[key].mixer = self
+        return self.channels[key]
+
+    def get_free_channel(self) -> Channel:
+        i = 0
+        while True:
+            if not self.get_channel(i).busy:
+                return self.channels[i]
+            i += 1
+
+    def play(
+        self,
+        sound: ArrayLike,
+        *,
+        on_end: Optional[Callable[[Channel], None]] = None,
+    ) -> Channel:
+        channel = self.get_free_channel()
+        channel.play(sound, on_end=on_end)
+        return channel
 
     def on_stream(self, stream: NDArray[Any]) -> None:
         super().on_stream(stream)
-        for chunks in self.play_buffers:
-            chunk = chunks.pop()
-            stream[: len(chunk)] += chunk
-
-        self.play_buffers = [chunks for chunks in self.play_buffers if chunks]
+        for channel in list(self.channels.values()):
+            channel._on_mix(stream)
 
 
 @ffi.def_extern()  # type: ignore
