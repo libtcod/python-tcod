@@ -4,6 +4,8 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+
+## [13.4.0] - 2022-02-04
 ### Added
 - Adds `sdl_window` and `sdl_renderer` to tcod contexts.
 - Adds `tcod.event.add_watch` and `tcod.event.remove_watch` to handle SDL events via callback.
