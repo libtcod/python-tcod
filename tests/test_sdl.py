@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 import tcod.sdl.render
+import tcod.sdl.sys
 import tcod.sdl.video
 
 
@@ -44,6 +45,7 @@ def test_sdl_window_bad_types() -> None:
 
 
 def test_sdl_screen_saver() -> None:
+    tcod.sdl.sys.init()
     assert tcod.sdl.video.screen_saver_allowed(False) is False
     assert tcod.sdl.video.screen_saver_allowed(True) is True
     assert tcod.sdl.video.screen_saver_allowed() is True

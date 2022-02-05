@@ -26,6 +26,17 @@ class TextureAccess(enum.IntEnum):
     """Texture will be used as a render target."""
 
 
+class RendererFlip(enum.IntFlag):
+    """Flip parameter for :any:`Renderer.copy`."""
+
+    NONE = 0
+    """Default value, no flip."""
+    HORIZONTAL = 1
+    """Flip the image horizontally."""
+    VERTICAL = 2
+    """Flip the image vertically."""
+
+
 class Texture:
     """SDL hardware textures."""
 
@@ -146,16 +157,37 @@ class Renderer:
     def copy(
         self,
         texture: Texture,
-        source: Optional[Tuple[int, int, int, int]] = None,
-        dest: Optional[Tuple[int, int, int, int]] = None,
+        source: Optional[Tuple[float, float, float, float]] = None,
+        dest: Optional[Tuple[float, float, float, float]] = None,
+        angle: float = 0,
+        center: Optional[Tuple[float, float]] = None,
+        flip: RendererFlip = RendererFlip.NONE,
     ) -> None:
         """Copy a texture to the rendering target.
 
-        `source` and `dest` are (x, y, width, height) regions of the texture parameter and target texture respectively.
+        Args:
+            texture: The texture to copy onto the current texture target.
+            source: The (x, y, width, height) region of `texture` to copy.  If None then the entire texture is copied.
+            dest: The (x, y, width, height) region of the target.  If None then the entire target is drawn over.
+            angle: The angle in degrees to rotate the image clockwise.
+            center: The (x, y) point where rotation is applied.  If None then the center of `dest` is used.
+            flip: Flips the `texture` when drawing it.
+
+        .. versionchanged:: unreleased
+            `source` and `dest` can now be float tuples.
+            Added the `angle`, `center`, and `flip` parameters.
         """
-        source_ = ffi.NULL if source is None else ffi.new("SDL_Rect*", source)
-        dest_ = ffi.NULL if dest is None else ffi.new("SDL_Rect*", dest)
-        _check(lib.SDL_RenderCopy(self.p, texture.p, source_, dest_))
+        _check(
+            lib.SDL_RenderCopyExF(
+                self.p,
+                texture.p,
+                (source,) if source is not None else ffi.NULL,
+                (dest,) if dest is not None else ffi.NULL,
+                angle,
+                (center,) if center is not None else ffi.NULL,
+                flip,
+            )
+        )
 
     def present(self) -> None:
         """Present the currently rendered image to the screen."""
