@@ -94,14 +94,14 @@ class Texture:
         _check(lib.SDL_SetTextureBlendMode(self.p, value))
 
     @property
-    def rgb_mod(self) -> Tuple[int, int, int]:
+    def color_mod(self) -> Tuple[int, int, int]:
         """Texture RGB color modulate values, can be set."""
         rgb = ffi.new("uint8_t[3]")
         _check(lib.SDL_GetTextureColorMod(self.p, rgb, rgb + 1, rgb + 2))
         return int(rgb[0]), int(rgb[1]), int(rgb[2])
 
-    @rgb_mod.setter
-    def rgb_mod(self, rgb: Tuple[int, int, int]) -> None:
+    @color_mod.setter
+    def color_mod(self, rgb: Tuple[int, int, int]) -> None:
         _check(lib.SDL_SetTextureColorMod(self.p, rgb[0], rgb[1], rgb[2]))
 
 

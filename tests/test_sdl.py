@@ -59,7 +59,7 @@ def test_sdl_render() -> None:
     assert rgb.format == tcod.lib.SDL_PIXELFORMAT_RGB24
     rgb.alpha_mod = rgb.alpha_mod
     rgb.blend_mode = rgb.blend_mode
-    rgb.rgb_mod = rgb.rgb_mod
+    rgb.color_mod = rgb.color_mod
     rgba = render.upload_texture(np.zeros((8, 8, 4), np.uint8), access=tcod.sdl.render.TextureAccess.TARGET)
     with render.set_render_target(rgba):
         render.copy(rgb)
