@@ -4,6 +4,9 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+### Changed
+- `Texture.access` and `Texture.blend_mode` properties now return enum instances.
+  You can still set them with `int` but Mypy will complain.
 
 ## [13.4.0] - 2022-02-04
 ### Added

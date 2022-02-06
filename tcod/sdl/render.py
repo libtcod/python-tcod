@@ -177,11 +177,15 @@ class Texture:
         return int(buffer[0])
 
     @property
-    def access(self) -> int:
-        """Texture access mode, read only."""
+    def access(self) -> TextureAccess:
+        """Texture access mode, read only.
+
+        .. versionadded:: unreleased
+            Property now returns a TextureAccess instance.
+        """
         buffer = ffi.new("int*")
         lib.SDL_QueryTexture(self.p, ffi.NULL, buffer, ffi.NULL, ffi.NULL)
-        return int(buffer[0])
+        return TextureAccess(buffer[0])
 
     @property
     def width(self) -> int:
@@ -209,11 +213,15 @@ class Texture:
         _check(lib.SDL_SetTextureAlphaMod(self.p, value))
 
     @property
-    def blend_mode(self) -> int:
-        """Texture blend mode, can be set."""
+    def blend_mode(self) -> BlendMode:
+        """Texture blend mode, can be set.
+
+        .. versionadded:: unreleased
+            Property now returns a BlendMode instance.
+        """
         out = ffi.new("SDL_BlendMode*")
         _check(lib.SDL_GetTextureBlendMode(self.p, out))
-        return int(out[0])
+        return BlendMode(out[0])
 
     @blend_mode.setter
     def blend_mode(self, value: int) -> None:
@@ -366,14 +374,14 @@ class Renderer:
         _check(lib.SDL_SetRenderDrawColor(self.p, *rgba))
 
     @property
-    def draw_blend_mode(self) -> int:
+    def draw_blend_mode(self) -> BlendMode:
         """Get or set the active blend mode of this renderer.
 
         .. versionadded:: unreleased
         """
         out = ffi.new("SDL_BlendMode*")
         _check(lib.SDL_GetRenderDrawBlendMode(self.p, out))
-        return int(out[0])
+        return BlendMode(out[0])
 
     @draw_blend_mode.setter
     def draw_blend_mode(self, value: int) -> None:
