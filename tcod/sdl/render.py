@@ -375,6 +375,14 @@ class Renderer:
     def viewport(self, rect: Optional[Tuple[int, int, int, int]]) -> None:
         _check(lib.SDL_RenderSetViewport(self.p, (rect,)))
 
+    @_required_version((2, 0, 18))
+    def set_vsync(self, enable: bool) -> None:
+        """Enable or disable VSync for this renderer.
+
+        .. versionadded:: unreleased
+        """
+        _check(lib.SDL_RenderSetVSync(self.p, enable))
+
     def read_pixels(
         self,
         *,
