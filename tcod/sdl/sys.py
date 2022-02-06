@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import enum
+import warnings
 from typing import Any, Tuple
 
 from tcod.loader import ffi, lib
-from tcod.sdl import _check
+from tcod.sdl import _check, _get_error
 
 
 class Subsystem(enum.IntFlag):
@@ -61,3 +62,16 @@ def _get_power_info() -> Tuple[_PowerState, int, int]:
     seconds_of_power = buffer[0]
     percenage = buffer[1]
     return power_state, seconds_of_power, percenage
+
+
+def _get_clipboard() -> str:
+    """Return the text of the clipboard."""
+    text = str(ffi.string(lib.SDL_GetClipboardText()), encoding="utf-8")
+    if not text:  # Show the reason for an empty return, this should probably be logged instead.
+        warnings.warn(f"Return string is empty because: {_get_error()}")
+    return text
+
+
+def _set_clipboard(text: str) -> None:
+    """Replace the clipboard with text."""
+    _check(lib.SDL_SetClipboardText(text.encode("utf-8")))
