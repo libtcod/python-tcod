@@ -18,11 +18,11 @@ from tcod.sdl import _check, _check_p, _required_version
 class TextureAccess(enum.IntEnum):
     """Determines how a texture is expected to be used."""
 
-    STATIC = lib.SDL_TEXTUREACCESS_STATIC or 0
+    STATIC = 0
     """Texture rarely changes."""
-    STREAMING = lib.SDL_TEXTUREACCESS_STREAMING or 0
+    STREAMING = 1
     """Texture frequently changes."""
-    TARGET = lib.SDL_TEXTUREACCESS_TARGET or 0
+    TARGET = 2
     """Texture will be used as a render target."""
 
 
@@ -35,6 +35,110 @@ class RendererFlip(enum.IntFlag):
     """Flip the image horizontally."""
     VERTICAL = 2
     """Flip the image vertically."""
+
+
+class BlendFactor(enum.IntEnum):
+    """SDL blend factors.
+
+    .. seealso::
+        :any:`compose_blend_mode`
+        https://wiki.libsdl.org/SDL_BlendFactor
+
+    .. versionadded:: unreleased
+    """
+
+    ZERO = 0x1
+    """"""
+    ONE = 0x2
+    """"""
+    SRC_COLOR = 0x3
+    """"""
+    ONE_MINUS_SRC_COLOR = 0x4
+    """"""
+    SRC_ALPHA = 0x5
+    """"""
+    ONE_MINUS_SRC_ALPHA = 0x6
+    """"""
+    DST_COLOR = 0x7
+    """"""
+    ONE_MINUS_DST_COLOR = 0x8
+    """"""
+    DST_ALPHA = 0x9
+    """"""
+    ONE_MINUS_DST_ALPHA = 0xA
+    """"""
+
+
+class BlendOperation(enum.IntEnum):
+    """SDL blend operations.
+
+    .. seealso::
+        :any:`compose_blend_mode`
+        https://wiki.libsdl.org/SDL_BlendOperation
+
+    .. versionadded:: unreleased
+    """
+
+    ADD = 0x1
+    """dest + source"""
+    SUBTRACT = 0x2
+    """dest - source"""
+    REV_SUBTRACT = 0x3
+    """source - dest"""
+    MINIMUM = 0x4
+    """min(dest, source)"""
+    MAXIMUM = 0x5
+    """max(dest, source)"""
+
+
+class BlendMode(enum.IntEnum):
+    """SDL blend modes.
+
+    .. seealso::
+        :any:`Texture.blend_mode`
+        :any:`Renderer.draw_blend_mode`
+        :any:`compose_blend_mode`
+
+    .. versionadded:: unreleased
+    """
+
+    NONE = 0x00000000
+    """"""
+    BLEND = 0x00000001
+    """"""
+    ADD = 0x00000002
+    """"""
+    MOD = 0x00000004
+    """"""
+    INVALID = 0x7FFFFFFF
+    """"""
+
+
+def compose_blend_mode(
+    source_color_factor: BlendFactor,
+    dest_color_factor: BlendFactor,
+    color_operation: BlendOperation,
+    source_alpha_factor: BlendFactor,
+    dest_alpha_factor: BlendFactor,
+    alpha_operation: BlendOperation,
+) -> BlendMode:
+    """Return a custom blend mode composed of the given factors and operations.
+
+    .. seealso::
+        https://wiki.libsdl.org/SDL_ComposeCustomBlendMode
+
+    .. versionadded:: unreleased
+    """
+    return BlendMode(
+        lib.SDL_ComposeCustomBlendMode(
+            source_color_factor,
+            dest_color_factor,
+            color_operation,
+            source_alpha_factor,
+            dest_alpha_factor,
+            alpha_operation,
+        )
+    )
 
 
 class Texture:
