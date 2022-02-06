@@ -58,6 +58,15 @@ def _linked_version() -> Tuple[int, int, int]:
     return int(sdl_version.major), int(sdl_version.minor), int(sdl_version.patch)
 
 
+def _version_at_least(required: Tuple[int, int, int]) -> None:
+    """Raise an error if the compiled version is less than required.  Used to guard recentally defined SDL functions."""
+    if required <= _compiled_version():
+        return
+    raise RuntimeError(
+        f"This feature requires SDL version {required}, but tcod was compiled with version {_compiled_version()}"
+    )
+
+
 def _required_version(required: Tuple[int, int, int]) -> Callable[[T], T]:
     if not lib:  # Read the docs mock object.
         return lambda x: x

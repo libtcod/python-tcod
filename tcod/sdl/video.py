@@ -12,7 +12,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from tcod.loader import ffi, lib
-from tcod.sdl import _check, _check_p, _required_version
+from tcod.sdl import _check, _check_p, _required_version, _version_at_least
 
 __all__ = (
     "WindowFlags",
@@ -277,6 +277,23 @@ class Window:
     @grab.setter
     def grab(self, value: bool) -> None:
         lib.SDL_SetWindowGrab(self.p, value)
+
+    @property
+    def mouse_rect(self) -> Optional[Tuple[int, int, int, int]]:
+        """Get or set the mouse confinement area when the window has mouse focus.
+
+        Setting this will not automatically grab the cursor.
+
+        .. versionadded:: unreleased
+        """
+        _version_at_least((2, 0, 18))
+        rect = lib.SDL_GetWindowMouseRect(self.p)
+        return (rect.x, rect.y, rect.w, rect.h) if rect else None
+
+    @mouse_rect.setter
+    def mouse_rect(self, rect: Optional[Tuple[int, int, int, int]]) -> None:
+        _version_at_least((2, 0, 18))
+        _check(lib.SDL_SetWindowMouseRect(self.p, (rect,) if rect else ffi.NULL))
 
     @_required_version((2, 0, 16))
     def flash(self, operation: FlashOperation = FlashOperation.UNTIL_FOCUSED) -> None:

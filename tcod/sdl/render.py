@@ -180,7 +180,7 @@ class Texture:
     def access(self) -> TextureAccess:
         """Texture access mode, read only.
 
-        .. versionadded:: unreleased
+        .. versionchanged:: unreleased
             Property now returns a TextureAccess instance.
         """
         buffer = ffi.new("int*")
@@ -216,7 +216,7 @@ class Texture:
     def blend_mode(self) -> BlendMode:
         """Texture blend mode, can be set.
 
-        .. versionadded:: unreleased
+        .. versionchanged:: unreleased
             Property now returns a BlendMode instance.
         """
         out = ffi.new("SDL_BlendMode*")
