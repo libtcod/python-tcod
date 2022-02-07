@@ -40,6 +40,7 @@ Contents:
     tcod/tileset
     libtcodpy
     sdl/render
+    sdl/mouse
     sdl/video
 
 Indices and tables
