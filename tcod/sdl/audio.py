@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import enum
 import sys
 import threading
 import time
@@ -7,6 +8,7 @@ from typing import Any, Callable, Dict, Hashable, Iterator, List, Optional, Tupl
 
 import numpy as np
 from numpy.typing import ArrayLike, DTypeLike, NDArray
+from typing_extensions import Literal
 
 import tcod.sdl.sys
 from tcod.loader import ffi, lib
@@ -70,7 +72,20 @@ class AudioDevice:
         self.silence = int(spec.silence)
         self.samples = int(spec.samples)
         self.buffer_size = int(spec.size)
-        self._callback = self.__default_callback
+        self._handle: Optional[Any] = None
+        self._callback: Callable[[AudioDevice, NDArray[Any]], None] = self.__default_callback
+
+    @property
+    def callback(self) -> Callable[[AudioDevice, NDArray[Any]], None]:
+        if self._handle is None:
+            raise TypeError("This AudioDevice was opened without a callback.")
+        return self._callback
+
+    @callback.setter
+    def callback(self, new_callback: Callable[[AudioDevice, NDArray[Any]], None]) -> None:
+        if self._handle is None:
+            raise TypeError("This AudioDevice was opened without a callback.")
+        self._callback = new_callback
 
     @property
     def _sample_size(self) -> int:
@@ -135,8 +150,9 @@ class AudioDevice:
         lib.SDL_CloseAudioDevice(self.device_id)
         self.device_id = 0
 
-    def __default_callback(self, stream: NDArray[Any]) -> None:
-        stream[...] = self.silence
+    @staticmethod
+    def __default_callback(device: AudioDevice, stream: NDArray[Any]) -> None:
+        stream[...] = device.silence
 
 
 class Channel:
@@ -249,13 +265,17 @@ class BasicMixer(Mixer):
             channel._on_mix(stream)
 
 
+class _AudioCallbackUserdata:
+    device: AudioDevice
+
+
 @ffi.def_extern()  # type: ignore
 def _sdl_audio_callback(userdata: Any, stream: Any, length: int) -> None:
     """Handle audio device callbacks."""
-    device: Optional[AudioDevice] = ffi.from_handle(userdata)()
-    assert device is not None
+    data: _AudioCallbackUserdata = ffi.from_handle(userdata)()
+    device = data.device
     buffer = np.frombuffer(ffi.buffer(stream, length), dtype=device.format).reshape(-1, device.channels)
-    device._callback(buffer)
+    device._callback(device, buffer)
 
 
 def _get_devices(capture: bool) -> Iterator[str]:
@@ -276,6 +296,23 @@ def get_capture_devices() -> Iterator[str]:
     yield from _get_devices(capture=True)
 
 
+class AllowedChanges(enum.IntFlag):
+    """Which parameters are allowed to be changed when the values given are not supported."""
+
+    NONE = 0
+    """"""
+    FREQUENCY = 0x01
+    """"""
+    FORMAT = 0x02
+    """"""
+    CHANNELS = 0x04
+    """"""
+    SAMPLES = 0x08
+    """"""
+    ANY = FREQUENCY | FORMAT | CHANNELS | SAMPLES
+    """"""
+
+
 def open(
     name: Optional[str] = None,
     capture: bool = False,
@@ -284,10 +321,43 @@ def open(
     format: DTypeLike = np.float32,
     channels: int = 2,
     samples: int = 0,
-    allowed_changes: int = 0,
+    allowed_changes: AllowedChanges = AllowedChanges.NONE,
     paused: bool = False,
+    callback: Union[None, Literal[True], Callable[[AudioDevice, NDArray[Any]], None]] = None,
 ) -> AudioDevice:
-    """Open an audio device for playback or capture."""
+    """Open an audio device for playback or capture and return it.
+
+    Args:
+        name: The name of the device to open, or None for the most reasonable default.
+        capture: True if this is a recording device, or False if this is an output device.
+        frequency: The desired sample rate to open the device with.
+        format: The data format to use for samples as a NumPy dtype.
+        channels: The number of speakers for the device. 1, 2, 4, or 6 are typical options.
+        samples:  The desired size of the audio buffer, must be a power of two.
+        allowed_changes:
+            By default if the hardware does not support the desired format than SDL will transparently convert between
+            formats for you.
+            Otherwise you can specify which parameters are allowed to be changed to fit the hardware better.
+        paused:
+            If True then the device will begin in a paused state.
+            It can then be unpaused by assigning False to :any:`AudioDevice.paused`.
+        callback:
+            If None then this device will be opened in push mode and you'll have to use :any:`AudioDevice.queue_audio`
+            to send audio data or :any:`AudioDevice.dequeue_audio` to receive it.
+            If a callback is given then you can change it later, but you can not enable or disable the callback on an
+            opened device.
+            If True then a default callback which plays silence will be used, this is useful if you need the audio
+            device before your callback is ready.
+
+    If a callback is given then it will be called with the `AudioDevice` and a Numpy buffer of the data stream.
+    This callback will be run on a separate thread.
+    Exceptions not handled by the callback become unraiseable and will be handled by :any:`sys.unraisablehook`.
+
+    .. seealso::
+        https://wiki.libsdl.org/SDL_AudioSpec
+        https://wiki.libsdl.org/SDL_OpenAudioDevice
+
+    """
     tcod.sdl.sys.init(tcod.sdl.sys.Subsystem.AUDIO)
     desired = ffi.new(
         "SDL_AudioSpec*",
@@ -300,6 +370,14 @@ def open(
             "userdata": ffi.NULL,
         },
     )
+    callback_data = _AudioCallbackUserdata()
+    if callback is not None:
+        handle = ffi.new_handle(callback_data)
+        desired.callback = lib._sdl_audio_callback
+        desired.userdata = handle
+    else:
+        handle = None
+
     obtained = ffi.new("SDL_AudioSpec*")
     device_id: int = lib.SDL_OpenAudioDevice(
         ffi.NULL if name is None else name.encode("utf-8"),
@@ -310,5 +388,10 @@ def open(
     )
     assert device_id >= 0, _get_error()
     device = AudioDevice(device_id, capture, obtained)
+    if callback is not None:
+        callback_data.device = device
+        device._handle = handle
+        if callback is not True:
+            device._callback = callback
     device.paused = paused
     return device
