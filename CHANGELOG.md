@@ -4,6 +4,8 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+
+## [13.5.0] - 2022-02-11
 ### Added
 - `tcod.sdl.audio`, a new module exposing SDL audio devices.  This does not include an audio mixer yet.
 - `tcod.sdl.mouse`, for SDL mouse and cursor handing.

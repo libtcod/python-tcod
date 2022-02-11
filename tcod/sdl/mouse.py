@@ -1,6 +1,6 @@
 """SDL mouse and cursor functions.
 
-.. versionadded:: unreleased
+.. versionadded:: 13.5
 """
 from __future__ import annotations
 

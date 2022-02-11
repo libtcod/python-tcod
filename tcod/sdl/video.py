@@ -284,7 +284,7 @@ class Window:
 
         Setting this will not automatically grab the cursor.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         _version_at_least((2, 0, 18))
         rect = lib.SDL_GetWindowMouseRect(self.p)

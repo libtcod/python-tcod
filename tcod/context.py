@@ -376,7 +376,7 @@ class Context:
     def sdl_atlas(self) -> Optional[tcod.render.SDLTilesetAtlas]:
         """Return a :any:`tcod.render.SDLTilesetAtlas` referencing libtcod's SDL texture atlas if it exists.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         if self._context_p.type not in (lib.TCOD_RENDERER_SDL, lib.TCOD_RENDERER_SDL2):
             return None

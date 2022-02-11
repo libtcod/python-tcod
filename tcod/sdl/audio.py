@@ -1,6 +1,6 @@
 """SDL2 audio playback and recording tools.
 
-.. versionadded:: unreleased
+.. versionadded:: 13.5
 """
 from __future__ import annotations
 

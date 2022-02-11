@@ -45,7 +45,7 @@ class BlendFactor(enum.IntEnum):
         :any:`compose_blend_mode`
         https://wiki.libsdl.org/SDL_BlendFactor
 
-    .. versionadded:: unreleased
+    .. versionadded:: 13.5
     """
 
     ZERO = 0x1
@@ -77,7 +77,7 @@ class BlendOperation(enum.IntEnum):
         :any:`compose_blend_mode`
         https://wiki.libsdl.org/SDL_BlendOperation
 
-    .. versionadded:: unreleased
+    .. versionadded:: 13.5
     """
 
     ADD = 0x1
@@ -100,7 +100,7 @@ class BlendMode(enum.IntEnum):
         :any:`Renderer.draw_blend_mode`
         :any:`compose_blend_mode`
 
-    .. versionadded:: unreleased
+    .. versionadded:: 13.5
     """
 
     NONE = 0x00000000
@@ -128,7 +128,7 @@ def compose_blend_mode(
     .. seealso::
         https://wiki.libsdl.org/SDL_ComposeCustomBlendMode
 
-    .. versionadded:: unreleased
+    .. versionadded:: 13.5
     """
     return BlendMode(
         lib.SDL_ComposeCustomBlendMode(
@@ -157,7 +157,7 @@ class Texture:
         self.access: Final[TextureAccess] = TextureAccess(query[1])
         """Texture access mode, read only.
 
-        .. versionchanged:: unreleased
+        .. versionchanged:: 13.5
             Attribute is now a :any:`TextureAccess` value.
         """
         self.width: Final[int] = query[2]
@@ -178,7 +178,7 @@ class Texture:
     def update(self, pixels: NDArray[Any], rect: Optional[Tuple[int, int, int, int]] = None) -> None:
         """Update the pixel data of this texture.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         if rect is None:
             rect = (0, 0, self.width, self.height)
@@ -202,7 +202,7 @@ class Texture:
     def blend_mode(self) -> BlendMode:
         """Texture blend mode, can be set.
 
-        .. versionchanged:: unreleased
+        .. versionchanged:: 13.5
             Property now returns a BlendMode instance.
         """
         out = ffi.new("SDL_BlendMode*")
@@ -271,7 +271,7 @@ class Renderer:
             center: The (x, y) point where rotation is applied.  If None then the center of `dest` is used.
             flip: Flips the `texture` when drawing it.
 
-        .. versionchanged:: unreleased
+        .. versionchanged:: 13.5
             `source` and `dest` can now be float tuples.
             Added the `angle`, `center`, and `flip` parameters.
         """
@@ -349,7 +349,7 @@ class Renderer:
     def draw_color(self) -> Tuple[int, int, int, int]:
         """Get or set the active RGBA draw color for this renderer.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         rgba = ffi.new("uint8_t[4]")
         _check(lib.SDL_GetRenderDrawColor(self.p, rgba, rgba + 1, rgba + 2, rgba + 3))
@@ -363,7 +363,7 @@ class Renderer:
     def draw_blend_mode(self) -> BlendMode:
         """Get or set the active blend mode of this renderer.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         out = ffi.new("SDL_BlendMode*")
         _check(lib.SDL_GetRenderDrawBlendMode(self.p, out))
@@ -380,7 +380,7 @@ class Renderer:
         .. seealso::
             https://wiki.libsdl.org/SDL_GetRendererOutputSize
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         out = ffi.new("int[2]")
         _check(lib.SDL_GetRendererOutputSize(self.p, out, out + 1))
@@ -392,7 +392,7 @@ class Renderer:
 
         Set to None to disable clipping.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         if not lib.SDL_RenderIsClipEnabled(self.p):
             return None
@@ -412,7 +412,7 @@ class Renderer:
         .. seealso::
             https://wiki.libsdl.org/SDL_RenderSetIntegerScale
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         return bool(lib.SDL_RenderGetIntegerScale(self.p))
 
@@ -429,7 +429,7 @@ class Renderer:
         .. seealso::
             https://wiki.libsdl.org/SDL_RenderSetLogicalSize
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         out = ffi.new("int[2]")
         lib.SDL_RenderGetLogicalSize(self.p, out, out + 1)
@@ -446,7 +446,7 @@ class Renderer:
         .. seealso::
             https://wiki.libsdl.org/SDL_RenderSetScale
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         out = ffi.new("float[2]")
         lib.SDL_RenderGetScale(self.p, out, out + 1)
@@ -463,7 +463,7 @@ class Renderer:
         .. seealso::
             https://wiki.libsdl.org/SDL_RenderSetViewport
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         rect = ffi.new("SDL_Rect*")
         lib.SDL_RenderGetViewport(self.p, rect)
@@ -477,7 +477,7 @@ class Renderer:
     def set_vsync(self, enable: bool) -> None:
         """Enable or disable VSync for this renderer.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         _check(lib.SDL_RenderSetVSync(self.p, enable))
 
@@ -489,7 +489,7 @@ class Renderer:
         out: Optional[NDArray[Any]] = None,
     ) -> NDArray[Any]:
         """
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         if format is None:
             format = lib.SDL_PIXELFORMAT_RGBA32
@@ -516,41 +516,41 @@ class Renderer:
     def clear(self) -> None:
         """Clear the current render target with :any:`draw_color`.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         _check(lib.SDL_RenderClear(self.p))
 
     def fill_rect(self, rect: Tuple[float, float, float, float]) -> None:
         """Fill a rectangle with :any:`draw_color`.
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         _check(lib.SDL_RenderFillRectF(self.p, (rect,)))
 
     def draw_rect(self, rect: Tuple[float, float, float, float]) -> None:
         """Draw a rectangle outline.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         _check(lib.SDL_RenderDrawRectF(self.p, (rect,)))
 
     def draw_point(self, xy: Tuple[float, float]) -> None:
         """Draw a point.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         _check(lib.SDL_RenderDrawPointF(self.p, (xy,)))
 
     def draw_line(self, start: Tuple[float, float], end: Tuple[float, float]) -> None:
         """Draw a single line.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         _check(lib.SDL_RenderDrawLineF(self.p, *start, *end))
 
     def fill_rects(self, rects: NDArray[Union[np.intc, np.float32]]) -> None:
         """Fill multiple rectangles from an array.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         assert len(rects.shape) == 2
         assert rects.shape[1] == 4
@@ -565,7 +565,7 @@ class Renderer:
     def draw_rects(self, rects: NDArray[Union[np.intc, np.float32]]) -> None:
         """Draw multiple outlined rectangles from an array.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         assert len(rects.shape) == 2
         assert rects.shape[1] == 4
@@ -580,7 +580,7 @@ class Renderer:
     def draw_points(self, points: NDArray[Union[np.intc, np.float32]]) -> None:
         """Draw an array of points.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         assert len(points.shape) == 2
         assert points.shape[1] == 2
@@ -595,7 +595,7 @@ class Renderer:
     def draw_lines(self, points: NDArray[Union[np.intc, np.float32]]) -> None:
         """Draw a connected series of lines from an array.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         assert len(points.shape) == 2
         assert points.shape[1] == 2
@@ -618,7 +618,7 @@ class Renderer:
     ) -> None:
         """Render triangles from texture and vertex data.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.5
         """
         assert xy.dtype == np.float32
         assert len(xy.shape) == 2
