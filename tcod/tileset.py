@@ -40,10 +40,16 @@ class Tileset:
     @classmethod
     def _claim(cls, cdata: Any) -> Tileset:
         """Return a new Tileset that owns the provided TCOD_Tileset* object."""
-        self: Tileset = object.__new__(cls)
+        self = object.__new__(cls)
         if cdata == ffi.NULL:
             raise RuntimeError("Tileset initialized with nullptr.")
         self._tileset_p = ffi.gc(cdata, lib.TCOD_tileset_delete)
+        return self
+
+    @classmethod
+    def _from_ref(cls, tileset_p: Any) -> Tileset:
+        self = object.__new__(cls)
+        self._tileset_p = tileset_p
         return self
 
     @property

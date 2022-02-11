@@ -9,8 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "console": "integratedTerminal",
-            "preLaunchTask": "develop python-tcod",
+            "console": "internalConsole",
         },
         {
             // Run the Python samples.
@@ -20,8 +19,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/examples/samples_tcod.py",
             "cwd": "${workspaceFolder}/examples",
-            "console": "integratedTerminal",
-            "preLaunchTask": "develop python-tcod",
+            "console": "internalConsole",
         },
         {
             "name": "Python: Run tests",

@@ -29,7 +29,7 @@ Example::
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Any, Optional
 
 import tcod.console
 import tcod.sdl.render
@@ -45,6 +45,14 @@ class SDLTilesetAtlas:
         self._renderer = renderer
         self.tileset = tileset
         self.p = ffi.gc(_check_p(lib.TCOD_sdl2_atlas_new(renderer.p, tileset._tileset_p)), lib.TCOD_sdl2_atlas_delete)
+
+    @classmethod
+    def _from_ref(cls, renderer_p: Any, atlas_p: Any) -> SDLTilesetAtlas:
+        self = object.__new__(cls)
+        self._renderer = tcod.sdl.render.Renderer(renderer_p)
+        self.tileset = tcod.tileset.Tileset._from_ref(atlas_p.tileset)
+        self.p = atlas_p
+        return self
 
 
 class SDLConsoleRender:

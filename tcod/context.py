@@ -58,6 +58,7 @@ from typing_extensions import Literal, NoReturn
 
 import tcod
 import tcod.event
+import tcod.render
 import tcod.sdl.render
 import tcod.sdl.video
 import tcod.tileset
@@ -370,6 +371,17 @@ class Context:
         """
         p = lib.TCOD_context_get_sdl_renderer(self._context_p)
         return tcod.sdl.render.Renderer(p) if p else None
+
+    @property
+    def sdl_atlas(self) -> Optional[tcod.render.SDLTilesetAtlas]:
+        """Return a :any:`tcod.render.SDLTilesetAtlas` referencing libtcod's SDL texture atlas if it exists.
+
+        .. versionadded:: unreleased
+        """
+        if self._context_p.type not in (lib.TCOD_RENDERER_SDL, lib.TCOD_RENDERER_SDL2):
+            return None
+        context_data = ffi.cast("struct TCOD_RendererSDL2*", self._context_p.contextdata_)
+        return tcod.render.SDLTilesetAtlas._from_ref(context_data.renderer, context_data.atlas)
 
     def __reduce__(self) -> NoReturn:
         """Contexts can not be pickled, so this class will raise

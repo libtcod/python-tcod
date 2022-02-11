@@ -9,6 +9,7 @@ from typing import Any, Optional, Tuple, Union
 
 import numpy as np
 from numpy.typing import NDArray
+from typing_extensions import Final
 
 import tcod.sdl.video
 from tcod.loader import ffi, lib
@@ -142,11 +143,27 @@ def compose_blend_mode(
 
 
 class Texture:
-    """SDL hardware textures."""
+    """SDL hardware textures.
+
+    Create a new texture using :any:`Renderer.new_texture` or :any:`Renderer.upload_texture`.
+    """
 
     def __init__(self, sdl_texture_p: Any, sdl_renderer_p: Any = None) -> None:
         self.p = sdl_texture_p
         self._sdl_renderer_p = sdl_renderer_p  # Keep alive.
+        query = self._query()
+        self.format: Final[int] = query[0]
+        """Texture format, read only."""
+        self.access: Final[TextureAccess] = TextureAccess(query[1])
+        """Texture access mode, read only.
+
+        .. versionchanged:: unreleased
+            Attribute is now a :any:`TextureAccess` value.
+        """
+        self.width: Final[int] = query[2]
+        """Texture pixel width, read only."""
+        self.height: Final[int] = query[3]
+        """Texture pixel height, read only."""
 
     def __eq__(self, other: Any) -> bool:
         return bool(self.p == getattr(other, "p", None))
@@ -156,7 +173,7 @@ class Texture:
         format = ffi.new("uint32_t*")
         buffer = ffi.new("int[3]")
         lib.SDL_QueryTexture(self.p, format, buffer, buffer + 1, buffer + 2)
-        return int(format), int(buffer[0]), int(buffer[1]), int(buffer[2])
+        return int(format[0]), int(buffer[0]), int(buffer[1]), int(buffer[2])
 
     def update(self, pixels: NDArray[Any], rect: Optional[Tuple[int, int, int, int]] = None) -> None:
         """Update the pixel data of this texture.
@@ -165,41 +182,10 @@ class Texture:
         """
         if rect is None:
             rect = (0, 0, self.width, self.height)
-        assert pixels.shape[:2] == rect[3], rect[2]
-        assert pixels[0].flags.c_contiguous
+        assert pixels.shape[:2] == (self.height, self.width)
+        if not pixels[0].flags.c_contiguous:
+            pixels = np.ascontiguousarray(pixels)
         _check(lib.SDL_UpdateTexture(self.p, (rect,), ffi.cast("void*", pixels.ctypes.data), pixels.strides[0]))
-
-    @property
-    def format(self) -> int:
-        """Texture format, read only."""
-        buffer = ffi.new("uint32_t*")
-        lib.SDL_QueryTexture(self.p, buffer, ffi.NULL, ffi.NULL, ffi.NULL)
-        return int(buffer[0])
-
-    @property
-    def access(self) -> TextureAccess:
-        """Texture access mode, read only.
-
-        .. versionchanged:: unreleased
-            Property now returns a TextureAccess instance.
-        """
-        buffer = ffi.new("int*")
-        lib.SDL_QueryTexture(self.p, ffi.NULL, buffer, ffi.NULL, ffi.NULL)
-        return TextureAccess(buffer[0])
-
-    @property
-    def width(self) -> int:
-        """Texture pixel width, read only."""
-        buffer = ffi.new("int*")
-        lib.SDL_QueryTexture(self.p, ffi.NULL, ffi.NULL, buffer, ffi.NULL)
-        return int(buffer[0])
-
-    @property
-    def height(self) -> int:
-        """Texture pixel height, read only."""
-        buffer = ffi.new("int*")
-        lib.SDL_QueryTexture(self.p, ffi.NULL, ffi.NULL, ffi.NULL, buffer)
-        return int(buffer[0])
 
     @property
     def alpha_mod(self) -> int:

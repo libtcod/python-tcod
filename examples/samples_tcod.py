@@ -19,6 +19,7 @@ from typing import Any, List
 import numpy as np
 import tcod
 import tcod.render
+import tcod.sdl.render
 from numpy.typing import NDArray
 
 if not sys.warnoptions:
@@ -50,6 +51,8 @@ FONT = get_data("fonts/dejavu10x10_gs_tc.png")
 # Mutable global names.
 context: tcod.context.Context
 tileset: tcod.tileset.Tileset
+console_render: tcod.render.SDLConsoleRender  # Optional SDL renderer.
+sample_minimap: tcod.sdl.render.Texture  # Optional minimap texture.
 root_console = tcod.Console(80, 50, order="F")
 sample_console = tcod.console.Console(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT, order="F")
 cur_sample = 0  # Current selected sample.
@@ -68,7 +71,7 @@ class Sample(tcod.event.EventDispatch[None]):
         pass
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        global cur_sample, context
+        global cur_sample
         if event.sym == tcod.event.K_DOWN:
             cur_sample = (cur_sample + 1) % len(SAMPLES)
             SAMPLES[cur_sample].on_enter()
@@ -91,8 +94,7 @@ class Sample(tcod.event.EventDispatch[None]):
             raise SystemExit()
         elif event.sym in RENDERER_KEYS:
             # Swap the active context for one with a different renderer.
-            context.close()
-            context = init_context(RENDERER_KEYS[event.sym])
+            init_context(RENDERER_KEYS[event.sym])
 
     def ev_quit(self, event: tcod.event.Quit) -> None:
         raise SystemExit()
@@ -541,7 +543,7 @@ class FOVSample(Sample):
         self.player_y = 10
         self.torch = False
         self.light_walls = True
-        self.algo_num = 0
+        self.algo_num = tcod.FOV_SYMMETRIC_SHADOWCAST
         self.noise = tcod.noise.Noise(1)  # 1D noise for the torch flickering.
 
         map_shape = (SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
@@ -582,7 +584,7 @@ class FOVSample(Sample):
         self.draw_ui()
         sample_console.print(self.player_x, self.player_y, "@")
         # Draw windows.
-        sample_console.tiles_rgb["ch"][SAMPLE_MAP == "="] = tcod.CHAR_DHLINE
+        sample_console.tiles_rgb["ch"][SAMPLE_MAP == "="] = 0x2550  # BOX DRAWINGS DOUBLE HORIZONTAL
         sample_console.tiles_rgb["fg"][SAMPLE_MAP == "="] = BLACK
 
         # Get a 2D boolean array of visible cells.
@@ -1394,17 +1396,20 @@ SAMPLES = (
 )
 
 
-def init_context(renderer: int) -> tcod.context.Context:
-    """Return a new context with common parameters set.
+def init_context(renderer: int) -> None:
+    """Setup or reset a global context with common parameters set.
 
     This function exists to more easily switch between renderers.
     """
+    global context, console_render, sample_minimap
+    if "context" in globals():
+        context.close()
     libtcod_version = "%i.%i.%i" % (
         tcod.lib.TCOD_MAJOR_VERSION,
         tcod.lib.TCOD_MINOR_VERSION,
         tcod.lib.TCOD_PATCHLEVEL,
     )
-    return tcod.context.new(
+    context = tcod.context.new(
         columns=root_console.width,
         rows=root_console.height,
         title=f"python-tcod samples" f" (python-tcod {tcod.__version__}, libtcod {libtcod_version})",
@@ -1412,16 +1417,27 @@ def init_context(renderer: int) -> tcod.context.Context:
         vsync=False,  # VSync turned off since this is for benchmarking.
         tileset=tileset,
     )
+    if context.sdl_renderer:  # If this context supports SDL rendering.
+        # Start by setting the logical size so that window resizing doesn't break anything.
+        context.sdl_renderer.logical_size = (
+            tileset.tile_width * root_console.width,
+            tileset.tile_height * root_console.height,
+        )
+        assert context.sdl_atlas
+        # Generate the console renderer and minimap.
+        console_render = tcod.render.SDLConsoleRender(context.sdl_atlas)
+        sample_minimap = context.sdl_renderer.new_texture(
+            SAMPLE_SCREEN_WIDTH,
+            SAMPLE_SCREEN_HEIGHT,
+            format=tcod.lib.SDL_PIXELFORMAT_RGB24,
+            access=tcod.sdl.render.TextureAccess.STREAMING,  # Updated every frame.
+        )
 
 
 def main() -> None:
     global context, tileset
     tileset = tcod.tileset.load_tilesheet(FONT, 32, 8, tcod.tileset.CHARMAP_TCOD)
-    context = init_context(tcod.RENDERER_SDL2)
-    sdl_renderer = context.sdl_renderer
-    assert sdl_renderer
-    atlas = tcod.render.SDLTilesetAtlas(sdl_renderer, tileset)
-    console_render = tcod.render.SDLConsoleRender(atlas)
+    init_context(tcod.RENDERER_SDL2)
     try:
         SAMPLES[cur_sample].on_enter()
 
@@ -1434,9 +1450,25 @@ def main() -> None:
             SAMPLES[cur_sample].on_draw()
             sample_console.blit(root_console, SAMPLE_SCREEN_X, SAMPLE_SCREEN_Y)
             draw_stats()
-            # context.present(root_console)
-            sdl_renderer.copy(console_render.render(root_console))
-            sdl_renderer.present()
+            if context.sdl_renderer:
+                # SDL renderer support, upload the sample console background to a minimap texture.
+                sample_minimap.update(sample_console.rgb.T["bg"])
+                # Render the root_console normally, this is the drawing step of context.present without presenting.
+                context.sdl_renderer.copy(console_render.render(root_console))
+                # Render the minimap to the screen.
+                context.sdl_renderer.copy(
+                    sample_minimap,
+                    dest=(
+                        tileset.tile_width * 24,
+                        tileset.tile_height * 36,
+                        SAMPLE_SCREEN_WIDTH * 3,
+                        SAMPLE_SCREEN_HEIGHT * 3,
+                    ),
+                )
+                context.sdl_renderer.present()
+            else:  # No SDL renderer, just use plain context rendering.
+                context.present(root_console)
+
             handle_time()
             handle_events()
     finally:
