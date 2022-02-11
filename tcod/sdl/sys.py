@@ -9,14 +9,14 @@ from tcod.sdl import _check, _get_error
 
 
 class Subsystem(enum.IntFlag):
-    TIMER = lib.SDL_INIT_TIMER or 0x00000001
-    AUDIO = lib.SDL_INIT_AUDIO or 0x00000010
-    VIDEO = lib.SDL_INIT_VIDEO or 0x00000020
-    JOYSTICK = lib.SDL_INIT_JOYSTICK or 0x00000200
-    HAPTIC = lib.SDL_INIT_HAPTIC or 0x00001000
-    GAMECONTROLLER = lib.SDL_INIT_GAMECONTROLLER or 0x00002000
-    EVENTS = lib.SDL_INIT_EVENTS or 0x00004000
-    SENSOR = getattr(lib, "SDL_INIT_SENSOR", None) or 0x00008000  # SDL >= 2.0.9
+    TIMER = 0x00000001
+    AUDIO = 0x00000010
+    VIDEO = 0x00000020
+    JOYSTICK = 0x00000200
+    HAPTIC = 0x00001000
+    GAMECONTROLLER = 0x00002000
+    EVENTS = 0x00004000
+    SENSOR = 0x00008000
     EVERYTHING = lib.SDL_INIT_EVERYTHING or 0
 
 
@@ -49,11 +49,11 @@ class _ScopeInit:
 
 
 class _PowerState(enum.IntEnum):
-    UNKNOWN = getattr(lib, "SDL_POWERSTATE_UNKNOWN", 0)
-    ON_BATTERY = getattr(lib, "SDL_POWERSTATE_ON_BATTERY", 0)
-    NO_BATTERY = getattr(lib, "SDL_POWERSTATE_NO_BATTERY", 0)
-    CHARGING = getattr(lib, "SDL_POWERSTATE_CHARGING", 0)
-    CHARGED = getattr(lib, "SDL_POWERSTATE_CHARGED", 0)
+    UNKNOWN = 0
+    ON_BATTERY = enum.auto()
+    NO_BATTERY = enum.auto()
+    CHARGING = enum.auto()
+    CHARGED = enum.auto()
 
 
 def _get_power_info() -> Tuple[_PowerState, int, int]:

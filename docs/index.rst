@@ -39,6 +39,7 @@ Contents:
     tcod/render
     tcod/tileset
     libtcodpy
+    sdl/audio
     sdl/render
     sdl/mouse
     sdl/video

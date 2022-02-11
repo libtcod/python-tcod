@@ -1,3 +1,7 @@
+"""SDL2 audio playback and recording tools.
+
+.. versionadded:: unreleased
+"""
 from __future__ import annotations
 
 import enum
@@ -8,7 +12,7 @@ from typing import Any, Callable, Dict, Hashable, Iterator, List, Optional, Tupl
 
 import numpy as np
 from numpy.typing import ArrayLike, DTypeLike, NDArray
-from typing_extensions import Literal
+from typing_extensions import Final, Literal
 
 import tcod.sdl.sys
 from tcod.loader import ffi, lib
@@ -52,7 +56,10 @@ def _dtype_from_format(format: int) -> np.dtype[Any]:
 
 
 class AudioDevice:
-    """An SDL audio device."""
+    """An SDL audio device.
+
+    Open new audio devices using :any:`tcod.sdl.audio.open`.
+    """
 
     def __init__(
         self,
@@ -63,20 +70,30 @@ class AudioDevice:
         assert device_id >= 0
         assert ffi.typeof(spec) is ffi.typeof("SDL_AudioSpec*")
         assert spec
-        self.device_id = device_id
-        self.spec = spec
-        self.frequency = spec.freq
-        self.is_capture = capture
-        self.format = _dtype_from_format(spec.format)
-        self.channels = int(spec.channels)
-        self.silence = int(spec.silence)
-        self.samples = int(spec.samples)
-        self.buffer_size = int(spec.size)
+        self.device_id: Final[int] = device_id
+        """The SDL device identifier used for SDL C functions."""
+        self.spec: Final[Any] = spec
+        """The SDL_AudioSpec as a CFFI object."""
+        self.frequency: Final[int] = spec.freq
+        """The audio device sound frequency."""
+        self.is_capture: Final[bool] = capture
+        """True if this is a recording device instead of an output device."""
+        self.format: Final[np.dtype[Any]] = _dtype_from_format(spec.format)
+        """The format used for audio samples with this device."""
+        self.channels: Final[int] = int(spec.channels)
+        """The number of audio channels for this device."""
+        self.silence: float = int(spec.silence)
+        """The value of silence, according to SDL."""
+        self.buffer_samples: Final[int] = int(spec.samples)
+        """The size of the audio buffer in samples."""
+        self.buffer_bytes: Final[int] = int(spec.size)
+        """The size of the audio buffer in bytes."""
         self._handle: Optional[Any] = None
         self._callback: Callable[[AudioDevice, NDArray[Any]], None] = self.__default_callback
 
     @property
     def callback(self) -> Callable[[AudioDevice, NDArray[Any]], None]:
+        """If the device was opened with a callback enabled, then you may get or set the callback with this attribute."""
         if self._handle is None:
             raise TypeError("This AudioDevice was opened without a callback.")
         return self._callback
@@ -89,6 +106,7 @@ class AudioDevice:
 
     @property
     def _sample_size(self) -> int:
+        """The size of a sample in bytes."""
         return self.format.itemsize * self.channels
 
     @property
@@ -119,8 +137,14 @@ class AudioDevice:
         return np.ascontiguousarray(np.broadcast_to(samples, (samples.shape[0], self.channels)), dtype=self.format)
 
     @property
-    def queued_audio_bytes(self) -> int:
+    def _queued_bytes(self) -> int:
+        """The current amount of bytes remaining in the audio queue."""
         return int(lib.SDL_GetQueuedAudioSize(self.device_id))
+
+    @property
+    def queued_samples(self) -> int:
+        """The current amount of samples remaining in the audio queue."""
+        return self._queued_bytes // self._sample_size
 
     def queue_audio(self, samples: ArrayLike) -> None:
         """Append audio samples to the audio data queue."""
@@ -132,7 +156,7 @@ class AudioDevice:
     def dequeue_audio(self) -> NDArray[Any]:
         """Return the audio buffer from a capture stream."""
         assert self.is_capture
-        out_samples = self.queued_audio_bytes // self._sample_size
+        out_samples = self._queued_bytes // self._sample_size
         out = np.empty((out_samples, self.channels), self.format)
         buffer = ffi.from_buffer(out)
         bytes_returned = lib.SDL_DequeueAudio(self.device_id, buffer, len(buffer))
@@ -144,11 +168,11 @@ class AudioDevice:
         self.close()
 
     def close(self) -> None:
-        """Close this audio device."""
-        if not self.device_id:
+        """Close this audio device.  Using this object after it has been closed is invalid."""
+        if not hasattr(self, "device_id"):
             return
         lib.SDL_CloseAudioDevice(self.device_id)
-        self.device_id = 0
+        del self.device_id
 
     @staticmethod
     def __default_callback(device: AudioDevice, stream: NDArray[Any]) -> None:
@@ -218,9 +242,11 @@ class Mixer(threading.Thread):
         self.device = device
 
     def run(self) -> None:
-        buffer = np.full((self.device.samples, self.device.channels), self.device.silence, dtype=self.device.format)
+        buffer = np.full(
+            (self.device.buffer_samples, self.device.channels), self.device.silence, dtype=self.device.format
+        )
         while True:
-            if self.device.queued_audio_bytes > 0:
+            if self.device._queued_bytes > 0:
                 time.sleep(0.001)
                 continue
             self.on_stream(buffer)
