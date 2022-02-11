@@ -3,11 +3,14 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import os
 import re
 import subprocess
 import sys
 from pathlib import Path
 from typing import Tuple
+
+PROJECT_DIR = Path(__file__).parent.parent
 
 parser = argparse.ArgumentParser(description="Tags and releases the next version of this project.")
 
@@ -24,7 +27,7 @@ def parse_changelog(args: argparse.Namespace) -> Tuple[str, str]:
     """Return an updated changelog and and the list of changes."""
     match = re.match(
         pattern=r"(.*?## \[Unreleased]\n)(.+?\n)(\n*## \[.*)",
-        string=Path("CHANGELOG.md").read_text(encoding="utf-8"),
+        string=(PROJECT_DIR / "CHANGELOG.md").read_text(encoding="utf-8"),
         flags=re.DOTALL,
     )
     assert match
@@ -41,6 +44,23 @@ def parse_changelog(args: argparse.Namespace) -> Tuple[str, str]:
     return "".join((header, tagged, tail)), changes
 
 
+def replace_unreleased_tags(tag: str, dry_run: bool) -> None:
+    match = re.match(r"\d+\.\d+", tag)
+    assert match
+    short_tag = match.group()
+    for directory, _, files in os.walk(PROJECT_DIR / "tcod"):
+        for filename in files:
+            file = Path(directory, filename)
+            if file.suffix != ".py":
+                continue
+            text = file.read_text(encoding="utf-8")
+            new_text = re.sub(r":: unreleased", rf":: {short_tag}", text)
+            if text != new_text:
+                print(f"Update tags in {file}")
+                if not dry_run:
+                    file.write_text(new_text, encoding="utf-8")
+
+
 def main() -> None:
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -54,8 +74,10 @@ def main() -> None:
         print("--- New changelog:")
         print(new_changelog)
 
+    replace_unreleased_tags(args.tag, args.dry_run)
+
     if not args.dry_run:
-        Path("CHANGELOG.md").write_text(new_changelog, encoding="utf-8")
+        (PROJECT_DIR / "CHANGELOG.md").write_text(new_changelog, encoding="utf-8")
         edit = ["-e"] if args.edit else []
         subprocess.check_call(["git", "commit", "-avm", "Prepare %s release." % args.tag] + edit)
         subprocess.check_call(["git", "tag", args.tag, "-am", "%s\n\n%s" % (args.tag, changes)] + edit)
