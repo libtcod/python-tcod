@@ -179,10 +179,27 @@ class AudioDevice:
         stream[...] = device.silence
 
 
+class _LoopSoundFunc:
+    def __init__(self, sound: NDArray[Any], loops: int, on_end: Optional[Callable[[Channel], None]]):
+        self.sound = sound
+        self.loops = loops
+        self.on_end = on_end
+
+    def __call__(self, channel: Channel) -> None:
+        if not self.loops:
+            if self.on_end is not None:
+                self.on_end(channel)
+            return
+        channel.play(self.sound, volume=channel.volume, on_end=self)
+        if self.loops > 0:
+            self.loops -= 1
+
+
 class Channel:
     mixer: Mixer
 
     def __init__(self) -> None:
+        self._lock = threading.RLock()
         self.volume: Union[float, Tuple[float, ...]] = 1.0
         self.sound_queue: List[NDArray[Any]] = []
         self.on_end_callback: Optional[Callable[[Channel], None]] = None
@@ -195,10 +212,17 @@ class Channel:
         self,
         sound: ArrayLike,
         *,
+        volume: Union[float, Tuple[float, ...]] = 1.0,
+        loops: int = 0,
         on_end: Optional[Callable[[Channel], None]] = None,
     ) -> None:
-        self.sound_queue[:] = [self._verify_audio_sample(sound)]
-        self.on_end_callback = on_end
+        sound = self._verify_audio_sample(sound)
+        with self._lock:
+            self.volume = volume
+            self.sound_queue[:] = [sound]
+            self.on_end_callback = on_end
+            if loops:
+                self.on_end_callback = _LoopSoundFunc(sound, loops, on_end)
 
     def _verify_audio_sample(self, sample: ArrayLike) -> NDArray[Any]:
         """Verify an audio sample is valid and return it as a Numpy array."""
@@ -209,27 +233,29 @@ class Channel:
         return array
 
     def _on_mix(self, stream: NDArray[Any]) -> None:
-        while self.sound_queue and stream.size:
-            buffer = self.sound_queue[0]
-            if buffer.shape[0] > stream.shape[0]:
-                # Mix part of the buffer into the stream.
-                stream[:] += buffer[: stream.shape[0]] * self.volume
-                self.sound_queue[0] = buffer[stream.shape[0] :]
-                break  # Stream was filled.
-            # Remaining buffer fits the stream array.
-            stream[: buffer.shape[0]] += buffer * self.volume
-            stream = stream[buffer.shape[0] :]
-            self.sound_queue.pop(0)
-            if not self.sound_queue and self.on_end_callback is not None:
-                self.on_end_callback(self)
+        with self._lock:
+            while self.sound_queue and stream.size:
+                buffer = self.sound_queue[0]
+                if buffer.shape[0] > stream.shape[0]:
+                    # Mix part of the buffer into the stream.
+                    stream[:] += buffer[: stream.shape[0]] * self.volume
+                    self.sound_queue[0] = buffer[stream.shape[0] :]
+                    break  # Stream was filled.
+                # Remaining buffer fits the stream array.
+                stream[: buffer.shape[0]] += buffer * self.volume
+                stream = stream[buffer.shape[0] :]
+                self.sound_queue.pop(0)
+                if not self.sound_queue and self.on_end_callback is not None:
+                    self.on_end_callback(self)
 
     def fadeout(self, time: float) -> None:
         assert time >= 0
-        time_samples = round(time * self.mixer.device.frequency) + 1
-        buffer: NDArray[np.float32] = np.zeros((time_samples, self.mixer.device.channels), np.float32)
-        self._on_mix(buffer)
-        buffer *= np.linspace(1.0, 0.0, time_samples + 1, endpoint=False)[1:]
-        self.sound_queue[:] = [buffer]
+        with self._lock:
+            time_samples = round(time * self.mixer.device.frequency) + 1
+            buffer: NDArray[np.float32] = np.zeros((time_samples, self.mixer.device.channels), np.float32)
+            self._on_mix(buffer)
+            buffer *= np.linspace(1.0, 0.0, time_samples + 1, endpoint=False)[1:]
+            self.sound_queue[:] = [buffer]
 
     def stop(self) -> None:
         self.fadeout(0.0005)
@@ -240,6 +266,7 @@ class Mixer(threading.Thread):
         assert device.format == np.float32
         super().__init__(daemon=True)
         self.device = device
+        self._lock = threading.RLock()
 
     def run(self) -> None:
         buffer = np.full(
@@ -263,32 +290,37 @@ class BasicMixer(Mixer):
         self.channels: Dict[Hashable, Channel] = {}
 
     def get_channel(self, key: Hashable) -> Channel:
-        if key not in self.channels:
-            self.channels[key] = Channel()
-            self.channels[key].mixer = self
-        return self.channels[key]
+        with self._lock:
+            if key not in self.channels:
+                self.channels[key] = Channel()
+                self.channels[key].mixer = self
+            return self.channels[key]
 
     def get_free_channel(self) -> Channel:
-        i = 0
-        while True:
-            if not self.get_channel(i).busy:
-                return self.channels[i]
-            i += 1
+        with self._lock:
+            i = 0
+            while True:
+                if not self.get_channel(i).busy:
+                    return self.channels[i]
+                i += 1
 
     def play(
         self,
         sound: ArrayLike,
         *,
+        volume: Union[float, Tuple[float, ...]] = 1.0,
+        loops: int = 0,
         on_end: Optional[Callable[[Channel], None]] = None,
     ) -> Channel:
         channel = self.get_free_channel()
-        channel.play(sound, on_end=on_end)
+        channel.play(sound, volume=volume, loops=loops, on_end=on_end)
         return channel
 
     def on_stream(self, stream: NDArray[Any]) -> None:
         super().on_stream(stream)
-        for channel in list(self.channels.values()):
-            channel._on_mix(stream)
+        with self._lock:
+            for channel in list(self.channels.values()):
+                channel._on_mix(stream)
 
 
 class _AudioCallbackUserdata:
