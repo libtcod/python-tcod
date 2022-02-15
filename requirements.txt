@@ -1,7 +1,7 @@
 cffi>=1.15
 numpy>=1.20.3
 pycparser>=2.14
-setuptools>=60.9.0
+setuptools==60.8.2
 types-setuptools
 types-tabulate
 typing_extensions

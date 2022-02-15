@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "setuptools>=60.9.0",
+    "setuptools==60.8.2",
     "wheel>=0.37.1",
     "cffi>=1.15",
     "pycparser>=2.14",
