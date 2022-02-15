@@ -267,6 +267,7 @@ class Mixer(threading.Thread):
         super().__init__(daemon=True)
         self.device = device
         self._lock = threading.RLock()
+        self.start()
 
     def run(self) -> None:
         buffer = np.full(
@@ -286,8 +287,8 @@ class Mixer(threading.Thread):
 
 class BasicMixer(Mixer):
     def __init__(self, device: AudioDevice):
-        super().__init__(device)
         self.channels: Dict[Hashable, Channel] = {}
+        super().__init__(device)
 
     def get_channel(self, key: Hashable) -> Channel:
         with self._lock:
