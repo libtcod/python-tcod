@@ -267,19 +267,23 @@ class Mixer(threading.Thread):
         super().__init__(daemon=True)
         self.device = device
         self._lock = threading.RLock()
+        self._running = True
         self.start()
 
     def run(self) -> None:
         buffer = np.full(
             (self.device.buffer_samples, self.device.channels), self.device.silence, dtype=self.device.format
         )
-        while True:
+        while self._running:
             if self.device._queued_bytes > 0:
                 time.sleep(0.001)
                 continue
             self.on_stream(buffer)
             self.device.queue_audio(buffer)
             buffer[:] = self.device.silence
+
+    def close(self) -> None:
+        self._running = False
 
     def on_stream(self, stream: NDArray[Any]) -> None:
         pass
