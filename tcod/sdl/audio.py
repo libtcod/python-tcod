@@ -69,7 +69,7 @@ def convert_audio(
         out_format: The output format of the converted array.
         out_channels: The number of audio channels of the output array.
 
-    .. versionadded:: unreleased
+    .. versionadded:: 13.6
 
     .. seealso::
         :any:`AudioDevice.convert`
@@ -201,7 +201,7 @@ class AudioDevice:
             rate: The samplerate of the input array.
                   If None is given then it's assumed to be the same as the device.
 
-        .. versionadded:: unreleased
+        .. versionadded:: 13.6
 
         .. seealso::
             :any:`convert_audio`
@@ -279,7 +279,7 @@ class _LoopSoundFunc:
 class Channel:
     """An audio channel for :any:`BasicMixer`.  Use :any:`BasicMixer.get_channel` to initialize this object.
 
-    .. versionadded:: unreleased
+    .. versionadded:: 13.6
     """
 
     mixer: BasicMixer
@@ -374,7 +374,7 @@ class BasicMixer(threading.Thread):
         while channel.busy:
             time.sleep(0.001)
 
-    .. versionadded:: unreleased
+    .. versionadded:: 13.6
     """
 
     def __init__(self, device: AudioDevice):
