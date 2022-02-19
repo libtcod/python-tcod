@@ -192,6 +192,7 @@
         "msilib",
         "MSVC",
         "msvcr",
+        "mult",
         "mulx",
         "muly",
         "mypy",

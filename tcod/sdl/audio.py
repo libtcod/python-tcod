@@ -16,7 +16,7 @@ from typing_extensions import Final, Literal
 
 import tcod.sdl.sys
 from tcod.loader import ffi, lib
-from tcod.sdl import _get_error
+from tcod.sdl import _check, _get_error
 
 
 def _get_format(format: DTypeLike) -> int:
@@ -55,10 +55,65 @@ def _dtype_from_format(format: int) -> np.dtype[Any]:
     return np.dtype(f"{byteorder}{kind}{bytesize}")
 
 
+def convert_audio(
+    in_sound: ArrayLike, in_rate: int, *, out_rate: int, out_format: DTypeLike, out_channels: int
+) -> NDArray[Any]:
+    """Convert an audio sample into a format supported by this device.
+
+    Returns the converted array.  This might be a reference to the input array if no conversion was needed.
+
+    Args:
+        in_sound: The input ArrayLike sound sample.  Input format and channels are derived from the array.
+        in_rate: The samplerate of the input array.
+        out_rate: The samplerate of the output array.
+        out_format: The output format of the converted array.
+        out_channels: The number of audio channels of the output array.
+
+    .. versionadded:: unreleased
+
+    .. seealso::
+        :any:`AudioDevice.convert`
+    """
+    in_array: NDArray[Any] = np.asarray(in_sound)
+    if len(in_array.shape) == 1:
+        in_array = in_array[:, np.newaxis]
+    if not len(in_array.shape) == 2:
+        raise TypeError(f"Expected a 1 or 2 ndim input, got {in_array.shape} instead.")
+    cvt = ffi.new("SDL_AudioCVT*")
+    in_channels = in_array.shape[1]
+    in_format = _get_format(in_array.dtype)
+    out_sdl_format = _get_format(out_format)
+    if _check(lib.SDL_BuildAudioCVT(cvt, in_format, in_channels, in_rate, out_sdl_format, out_channels, out_rate)) == 0:
+        return in_array  # No conversion needed.
+    # Upload to the SDL_AudioCVT buffer.
+    cvt.len = in_array.itemsize * in_array.size
+    out_buffer = cvt.buf = ffi.new("uint8_t[]", cvt.len * cvt.len_mult)
+    np.frombuffer(ffi.buffer(out_buffer[0 : cvt.len]), dtype=in_array.dtype).reshape(in_array.shape)[:] = in_array
+
+    _check(lib.SDL_ConvertAudio(cvt))
+    out_array: NDArray[Any] = (
+        np.frombuffer(ffi.buffer(out_buffer[0 : cvt.len_cvt]), dtype=out_format).reshape(-1, out_channels).copy()
+    )
+    return out_array
+
+
 class AudioDevice:
     """An SDL audio device.
 
     Open new audio devices using :any:`tcod.sdl.audio.open`.
+
+    Example::
+
+        import soundfile  # pip install soundfile
+        import tcod.sdl.audio
+
+        device = tcod.sdl.audio.open()
+        sound, samplerate = soundfile.read("example_sound.wav")
+        converted = device.convert(sound, samplerate)
+        device.queue_audio(converted)  # Play the audio syncroniously.
+
+    When you use this object directly the audio passed to :any:`queue_audio` is always played syncroniously.
+    For more typical asynchronous audio you should pass an AudioDevice to :any:`BasicMixer`.
     """
 
     def __init__(
@@ -136,6 +191,32 @@ class AudioDevice:
             samples = samples[:, np.newaxis]
         return np.ascontiguousarray(np.broadcast_to(samples, (samples.shape[0], self.channels)), dtype=self.format)
 
+    def convert(self, sound: ArrayLike, rate: Optional[int] = None) -> NDArray[Any]:
+        """Convert an audio sample into a format supported by this device.
+
+        Returns the converted array.  This might be a reference to the input array if no conversion was needed.
+
+        Args:
+            sound: An ArrayLike sound sample.
+            rate: The samplerate of the input array.
+                  If None is given then it's assumed to be the same as the device.
+
+        .. versionadded:: unreleased
+
+        .. seealso::
+            :any:`convert_audio`
+        """
+        in_array: NDArray[Any] = np.asarray(sound)
+        if len(in_array.shape) == 1:
+            in_array = in_array[:, np.newaxis]
+        return convert_audio(
+            in_sound=sound,
+            in_rate=rate if rate is not None else self.frequency,
+            out_channels=self.channels if in_array.shape[1] > 1 else 1,
+            out_format=self.format,
+            out_rate=self.frequency,
+        )
+
     @property
     def _queued_bytes(self) -> int:
         """The current amount of bytes remaining in the audio queue."""
@@ -196,7 +277,13 @@ class _LoopSoundFunc:
 
 
 class Channel:
-    mixer: Mixer
+    """An audio channel for :any:`BasicMixer`.  Use :any:`BasicMixer.get_channel` to initialize this object.
+
+    .. versionadded:: unreleased
+    """
+
+    mixer: BasicMixer
+    """The :any:`BasicMixer` is channel belongs to."""
 
     def __init__(self) -> None:
         self._lock = threading.RLock()
@@ -206,6 +293,7 @@ class Channel:
 
     @property
     def busy(self) -> bool:
+        """Is True when this channel is playing audio."""
         return bool(self.sound_queue)
 
     def play(
@@ -216,6 +304,10 @@ class Channel:
         loops: int = 0,
         on_end: Optional[Callable[[Channel], None]] = None,
     ) -> None:
+        """Play an audio sample, stopping any audio currently playing on this channel.
+
+        Parameters are the same as :any:`BasicMixer.play`.
+        """
         sound = self._verify_audio_sample(sound)
         with self._lock:
             self.volume = volume
@@ -233,6 +325,7 @@ class Channel:
         return array
 
     def _on_mix(self, stream: NDArray[Any]) -> None:
+        """Mix the next part of this channels audio into an active audio stream."""
         with self._lock:
             while self.sound_queue and stream.size:
                 buffer = self.sound_queue[0]
@@ -249,8 +342,10 @@ class Channel:
                     self.on_end_callback(self)
 
     def fadeout(self, time: float) -> None:
-        assert time >= 0
+        """Fadeout this channel then stop playing."""
         with self._lock:
+            if not self.sound_queue:
+                return
             time_samples = round(time * self.mixer.device.frequency) + 1
             buffer: NDArray[np.float32] = np.zeros((time_samples, self.mixer.device.channels), np.float32)
             self._on_mix(buffer)
@@ -258,14 +353,36 @@ class Channel:
             self.sound_queue[:] = [buffer]
 
     def stop(self) -> None:
+        """Stop audio on this channel."""
         self.fadeout(0.0005)
 
 
-class Mixer(threading.Thread):
+class BasicMixer(threading.Thread):
+    """An SDL sound mixer implemented in Python and Numpy.
+
+    Example::
+
+        import time
+
+        import soundfile  # pip install soundfile
+        import tcod.sdl.audio
+
+        mixer = tcod.sdl.audio.BasicMixer(tcod.sdl.audio.open())
+        sound, samplerate = soundfile.read("example_sound.wav")
+        sound = mixer.device.convert(sound, samplerate)  # Needed if dtype or samplerate differs.
+        channel = mixer.play(sound)
+        while channel.busy:
+            time.sleep(0.001)
+
+    .. versionadded:: unreleased
+    """
+
     def __init__(self, device: AudioDevice):
+        self.channels: Dict[Hashable, Channel] = {}
         assert device.format == np.float32
         super().__init__(daemon=True)
         self.device = device
+        """The :any:`AudioDevice`"""
         self._lock = threading.RLock()
         self._running = True
         self.start()
@@ -278,30 +395,30 @@ class Mixer(threading.Thread):
             if self.device._queued_bytes > 0:
                 time.sleep(0.001)
                 continue
-            self.on_stream(buffer)
+            self._on_stream(buffer)
             self.device.queue_audio(buffer)
             buffer[:] = self.device.silence
 
     def close(self) -> None:
+        """Shutdown this mixer, all playing audio will be abruptly stopped."""
         self._running = False
 
-    def on_stream(self, stream: NDArray[Any]) -> None:
-        pass
-
-
-class BasicMixer(Mixer):
-    def __init__(self, device: AudioDevice):
-        self.channels: Dict[Hashable, Channel] = {}
-        super().__init__(device)
-
     def get_channel(self, key: Hashable) -> Channel:
+        """Return a channel tied to with the given key.
+
+        Channels are initialized as you access them with this function.
+        :any:`int` channels starting from zero are used internally.
+
+        This can be used to generate a ``"music"`` channel for example.
+        """
         with self._lock:
             if key not in self.channels:
                 self.channels[key] = Channel()
                 self.channels[key].mixer = self
             return self.channels[key]
 
-    def get_free_channel(self) -> Channel:
+    def _get_next_channel(self) -> Channel:
+        """Return the next available channel for the play method."""
         with self._lock:
             i = 0
             while True:
@@ -317,12 +434,28 @@ class BasicMixer(Mixer):
         loops: int = 0,
         on_end: Optional[Callable[[Channel], None]] = None,
     ) -> Channel:
-        channel = self.get_free_channel()
+        """Play a sound, return the channel the sound is playing on.
+
+        Args:
+            sound: The sound to play.  This a Numpy array matching the format of the loaded audio device.
+            volume: The volume to play the sound at.
+                    You can also pass a tuple of floats to set the volume for each channel/speaker.
+            loops: How many times to play the sound, `-1` can be used to loop the sound forever.
+            on_end: A function to call when this sound has ended.
+                    This is called with the :any:`Channel` which was playing the sound.
+        """
+        channel = self._get_next_channel()
         channel.play(sound, volume=volume, loops=loops, on_end=on_end)
         return channel
 
-    def on_stream(self, stream: NDArray[Any]) -> None:
-        super().on_stream(stream)
+    def stop(self) -> None:
+        """Stop playback on all channels from this mixer."""
+        with self._lock:
+            for channel in self.channels.values():
+                channel.stop()
+
+    def _on_stream(self, stream: NDArray[Any]) -> None:
+        """Called to fill the audio buffer."""
         with self._lock:
             for channel in list(self.channels.values()):
                 channel._on_mix(stream)
