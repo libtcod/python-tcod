@@ -15,12 +15,6 @@ sys.path.append(str(Path(__file__).parent))  # Allow importing local modules.
 
 import build_sdl  # noqa: E402
 
-# The SDL2 version to parse and export symbols from.
-SDL2_PARSE_VERSION = os.environ.get("SDL_VERSION", "2.0.5")
-
-# The SDL2 version to include in binary distributions.
-SDL2_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "2.0.14")
-
 Py_LIMITED_API = 0x03060000
 
 HEADER_PARSE_PATHS = ("tcod/", "libtcod/src/libtcod/")

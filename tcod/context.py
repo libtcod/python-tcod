@@ -464,7 +464,7 @@ def new(
         Added the `console` parameter.
     """
     if renderer is None:
-        renderer = RENDERER_OPENGL2
+        renderer = RENDERER_SDL2
     if sdl_window_flags is None:
         sdl_window_flags = SDL_WINDOW_RESIZABLE
     if argv is None:
