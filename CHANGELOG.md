@@ -4,6 +4,8 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+
+## [13.6.1] - 2022-03-29
 ### Changed
 - The SDL2 renderer has had a major performance update when compiled with SDL 2.0.18.
 - SDL2 is now the default renderer to avoid rare issues with the OpenGL 2 renderer.
