@@ -120,7 +120,7 @@ setup(
     ],
     install_requires=[
         "cffi>=1.15",  # Also required by pyproject.toml.
-        "numpy>=1.20.3" if not is_pypy else "",
+        "numpy>=1.21.4" if not is_pypy else "",
         "typing_extensions",
     ],
     cffi_modules=["build_libtcod.py:ffi"],
