@@ -1,5 +1,9 @@
 """SDL mouse and cursor functions.
 
+You can use this module to move or capture the cursor.
+
+You can also set the cursor icon to an OS-defined or custom icon.
+
 .. versionadded:: 13.5
 """
 from __future__ import annotations
@@ -140,6 +144,20 @@ def capture(enable: bool) -> None:
     """Enable or disable mouse capture to track the mouse outside of a window.
 
     It is highly reccomended to read the related remarks section in the SDL docs before using this.
+
+    Example::
+
+        # Make mouse button presses capture the mouse until all buttons are released.
+        # This means that dragging the mouse outside of the window will not cause an interruption in motion events.
+        for event in tcod.event.get():
+            match event:
+                case tcod.event.MouseButtonDown(button, pixel):  # Clicking the window captures the mouse.
+                    tcod.sdl.mouse.capture(True)
+                case tcod.event.MouseButtonUp():  # When all buttons are released then the mouse is released.
+                    if tcod.event.mouse.get_global_state().state == 0:
+                        tcod.sdl.mouse.capture(False)
+                case tcod.event.MouseMotion(pixel, pixel_motion, state):
+                    pass  # While a button is held this event is still captured outside of the window.
 
     .. seealso::
         :any:`tcod.sdl.mouse.set_relative_mode`

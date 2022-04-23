@@ -1,5 +1,39 @@
 """SDL2 audio playback and recording tools.
 
+This module includes SDL's low-level audio API and a naive implentation of an SDL mixer.
+If you have experience with audio mixing then you might be better off writing your own mixer or
+modifying the existing one which was written using Python/Numpy.
+
+This module is designed to integrate with the wider Python ecosystem.
+It leaves the loading to sound samples to other libaries like
+`SoundFile <https://pysoundfile.readthedocs.io/en/latest/>`_.
+
+Example::
+
+    # Synchronous audio example using SDL's low-level API.
+    import soundfile  # pip install soundfile
+    import tcod.sdl.audio
+
+    device = tcod.sdl.audio.open()  # Open the default output device.
+    sound, samplerate = soundfile.read("example_sound.wav")  # Load an audio sample using SoundFile.
+    converted = device.convert(sound, samplerate)  # Convert this sample to the format expected by the device.
+    device.queue_audio(converted)  # Play audio syncroniously by appending it to the device buffer.
+
+Example::
+
+    # Asynchronous audio example using BasicMixer.
+    import time
+
+    import soundfile  # pip install soundfile
+    import tcod.sdl.audio
+
+    mixer = tcod.sdl.audio.BasicMixer(tcod.sdl.audio.open())  # Setup BasicMixer with the default audio output.
+    sound, samplerate = soundfile.read("example_sound.wav")  # Load an audio sample using SoundFile.
+    sound = mixer.device.convert(sound, samplerate)  # Convert this sample to the format expected by the device.
+    channel = mixer.play(sound)  # Start asynchronous playback, audio is mixed on a separate Python thread.
+    while channel.busy:  # Wait until the sample is done playing.
+        time.sleep(0.001)
+
 .. versionadded:: 13.5
 """
 from __future__ import annotations
@@ -101,16 +135,6 @@ class AudioDevice:
     """An SDL audio device.
 
     Open new audio devices using :any:`tcod.sdl.audio.open`.
-
-    Example::
-
-        import soundfile  # pip install soundfile
-        import tcod.sdl.audio
-
-        device = tcod.sdl.audio.open()
-        sound, samplerate = soundfile.read("example_sound.wav")
-        converted = device.convert(sound, samplerate)
-        device.queue_audio(converted)  # Play the audio syncroniously.
 
     When you use this object directly the audio passed to :any:`queue_audio` is always played syncroniously.
     For more typical asynchronous audio you should pass an AudioDevice to :any:`BasicMixer`.
@@ -359,20 +383,6 @@ class Channel:
 
 class BasicMixer(threading.Thread):
     """An SDL sound mixer implemented in Python and Numpy.
-
-    Example::
-
-        import time
-
-        import soundfile  # pip install soundfile
-        import tcod.sdl.audio
-
-        mixer = tcod.sdl.audio.BasicMixer(tcod.sdl.audio.open())
-        sound, samplerate = soundfile.read("example_sound.wav")
-        sound = mixer.device.convert(sound, samplerate)  # Needed if dtype or samplerate differs.
-        channel = mixer.play(sound)
-        while channel.busy:
-            time.sleep(0.001)
 
     .. versionadded:: 13.6
     """

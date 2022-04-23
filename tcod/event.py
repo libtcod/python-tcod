@@ -1,5 +1,4 @@
-"""
-A light-weight implementation of event handling built on calls to SDL.
+"""A light-weight implementation of event handling built on calls to SDL.
 
 Many event constants are derived directly from SDL.
 For example: ``tcod.event.K_UP`` and ``tcod.event.SCANCODE_A`` refer to
@@ -8,14 +7,75 @@ SDL's ``SDLK_UP`` and ``SDL_SCANCODE_A`` respectfully.
 <https://wiki.libsdl.org/SDL_Keycode>`_
 
 Printing any event will tell you its attributes in a human readable format.
-An events type attribute if omitted is just the classes name with all letters
-upper-case.
+An events type attribute if omitted is just the classes name with all letters upper-case.
 
-As a general guideline, you should use :any:`KeyboardEvent.sym` for command
-inputs, and :any:`TextInput.text` for name entry fields.
+As a general guideline, you should use :any:`KeyboardEvent.sym` for command inputs,
+and :any:`TextInput.text` for name entry fields.
 
-Remember to add the line ``import tcod.event``, as importing this module is not
-implied by ``import tcod``.
+Example::
+
+    import tcod
+
+    KEY_COMMANDS = {
+        tcod.event.KeySym.UP: "move N",
+        tcod.event.KeySym.DOWN: "move S",
+        tcod.event.KeySym.LEFT: "move W",
+        tcod.event.KeySym.RIGHT: "move E",
+    }
+
+    context = tcod.context.new()
+    while True:
+        console = context.new_console()
+        context.present(console, integer_scaling=True)
+        for event in tcod.event.wait():
+            context.convert_event(event)  # Adds tile coordinates to mouse events.
+            if isinstance(event, tcod.event.Quit):
+                print(event)
+                raise SystemExit()
+            elif isinstance(event, tcod.event.KeyDown):
+                print(event)  # Prints the Scancode and KeySym enums for this event.
+                if event.sym in KEY_COMMANDS:
+                    print(f"Command: {KEY_COMMANDS[event.sym]}")
+            elif isinstance(event, tcod.event.MouseButtonDown):
+                print(event)  # Prints the mouse button constant names for this event.
+            elif isinstance(event, tcod.event.MouseMotion):
+                print(event)  # Prints the mouse button mask bits in a readable format.
+            else:
+                print(event)  # Print any unhandled events.
+
+Python 3.10 introduced `match statements <https://docs.python.org/3/tutorial/controlflow.html#match-statements>`_
+which can be used to dispatch events more gracefully:
+
+Example::
+
+    import tcod
+
+    KEY_COMMANDS = {
+        tcod.event.KeySym.UP: "move N",
+        tcod.event.KeySym.DOWN: "move S",
+        tcod.event.KeySym.LEFT: "move W",
+        tcod.event.KeySym.RIGHT: "move E",
+    }
+
+    context = tcod.context.new()
+    while True:
+        console = context.new_console()
+        context.present(console, integer_scaling=True)
+        for event in tcod.event.wait():
+            context.convert_event(event)  # Adds tile coordinates to mouse events.
+            match event:
+                case tcod.event.Quit():
+                    raise SystemExit()
+                case tcod.event.KeyDown(sym) if sym in KEY_COMMANDS:
+                    print(f"Command: {KEY_COMMANDS[sym]}")
+                case tcod.event.KeyDown(sym, scancode, mod, repeat):
+                    print(f"KeyDown: {sym=}, {scancode=}, {mod=}, {repeat=}")
+                case tcod.event.MouseButtonDown(button, pixel, tile):
+                    print(f"MouseButtonDown: {button=}, {pixel=}, {tile=}")
+                case tcod.event.MouseMotion(pixel, pixel_motion, tile, tile_motion):
+                    print(f"MouseMotion: {pixel=}, {pixel_motion=}, {tile=}, {tile_motion=}")
+                case tcod.event.Event() as event:
+                    print(event)  # Show any unhandled events.
 
 .. versionadded:: 8.4
 """
@@ -762,48 +822,10 @@ def _parse_event(sdl_event: Any) -> Event:
 def get() -> Iterator[Any]:
     """Return an iterator for all pending events.
 
-    Events are processed as the iterator is consumed.  Breaking out of, or
-    discarding the iterator will leave the remaining events on the event queue.
-    It is also safe to call this function inside of a loop that is already
-    handling events (the event iterator is reentrant.)
-
-    Example::
-
-        context: tcod.context.Context  # Context object initialized earlier.
-        for event in tcod.event.get():
-            context.convert_event(event)  # Add tile coordinates to mouse events.
-            if isinstance(event, tcod.event.Quit):
-                print(event)
-                raise SystemExit()
-            elif isinstance(event, tcod.event.KeyDown):
-                print(event)  # Prints the Scancode and KeySym enums for this event.
-            elif isinstance(event, tcod.event.MouseButtonDown):
-                print(event)  # Prints the mouse button constant names for this event.
-            elif isinstance(event, tcod.event.MouseMotion):
-                print(event)  # Prints the mouse button mask bits in a readable format.
-            else:
-                print(event)  # Print any unhandled events.
-        # For loop exits after all current events are processed.
-
-    Python 3.10 introduced `match statements <https://docs.python.org/3/tutorial/controlflow.html#match-statements>`_
-    which can be used to dispatch events more gracefully:
-
-    Example::
-
-        context: tcod.context.Context  # Context object initialized earlier.
-        for event in tcod.event.get():
-            context.convert_event(event)  # Add tile coordinates to mouse events.
-            match event:
-                case tcod.event.Quit():
-                    raise SystemExit()
-                case tcod.event.KeyDown(sym, scancode, mod, repeat):
-                    print(f"KeyDown: {sym=}, {scancode=}, {mod=}, {repeat=}")
-                case tcod.event.MouseButtonDown(button, pixel, tile):
-                    print(f"MouseButtonDown: {button=}, {pixel=}, {tile=}")
-                case tcod.event.MouseMotion(pixel, pixel_motion, tile, tile_motion):
-                    print(f"MouseMotion: {pixel=}, {pixel_motion=}, {tile=}, {tile_motion=}")
-                case tcod.event.Event() as event:
-                    print(event)  # Show any unhandled events.
+    Events are processed as the iterator is consumed.
+    Breaking out of, or discarding the iterator will leave the remaining events on the event queue.
+    It is also safe to call this function inside of a loop that is already handling events
+    (the event iterator is reentrant.)
     """
     sdl_event = ffi.new("SDL_Event*")
     while lib.SDL_PollEvent(sdl_event):

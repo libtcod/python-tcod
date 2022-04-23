@@ -1,5 +1,9 @@
 """SDL2 Window and Display handling.
 
+There are two main ways to access the SDL window.
+Either you can use this module to open a window yourself bypassing libtcod's context,
+or you can use :any:`Context.sdl_window` to get the window being controlled by that context (if the context has one.)
+
 .. versionadded:: 13.4
 """
 from __future__ import annotations
@@ -369,7 +373,23 @@ def get_grabbed_window() -> Optional[Window]:
 
 
 def screen_saver_allowed(allow: Optional[bool] = None) -> bool:
-    """Allow or prevent a screen saver from being displayed and return the current allowed status."""
+    """Allow or prevent a screen saver from being displayed and return the current allowed status.
+
+    If `allow` is `None` then only the current state is returned.
+    Otherwise it will change the state before checking it.
+
+    SDL typically disables the screensaver by default.
+    If you're unsure, then don't touch this.
+
+    Example::
+
+        import tcod.sdl.video
+
+        print(f"Screen saver was allowed: {tcod.sdl.video.screen_saver_allowed()}")
+        # Allow the screen saver.
+        # Might be okay for some turn-based games which don't use a gamepad.
+        tcod.sdl.video.screen_saver_allowed(True)
+    """
     if allow is None:
         pass
     elif allow:

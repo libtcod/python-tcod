@@ -179,9 +179,10 @@ class Context:
         return self
 
     def close(self) -> None:
-        """Delete the context, closing any windows opened by this context.
+        """Close this context, closing any windows opened by this context.
 
-        This instance is invalid after this call."""
+        Afterwards doing anything with this instance other than closing it again is invalid.
+        """
         if hasattr(self, "_context_p"):
             ffi.release(self._context_p)
             del self._context_p
@@ -246,7 +247,21 @@ class Context:
             return xy[0], xy[1]
 
     def convert_event(self, event: tcod.event.Event) -> None:
-        """Fill in the tile coordinates of a mouse event using this context."""
+        """Fill in the tile coordinates of a mouse event using this context.
+
+        Example::
+
+            context: tcod.context.Context
+            for event in tcod.event.get():
+                if isinstance(event, tcod.event.MouseMotion):
+                    # Pixel coordinates are always accessible.
+                    print(f"{event.pixel=}, {event.pixel_motion=}")
+                context.convert_event(event)
+                if isinstance(event, tcod.event.MouseMotion):
+                    # Now tile coordinate attributes can be accessed.
+                    print(f"{event.tile=}, {event.tile_motion=}")
+                    # A warning will be raised if you try to access these without convert_event.
+        """
         if isinstance(event, (tcod.event.MouseState, tcod.event.MouseMotion)):
             event.tile = tcod.event.Point(*self.pixel_to_tile(*event.pixel))
         if isinstance(event, tcod.event.MouseMotion):
@@ -262,7 +277,17 @@ class Context:
         _check(lib.TCOD_context_save_screenshot(self._context_p, c_path))
 
     def change_tileset(self, tileset: Optional[tcod.tileset.Tileset]) -> None:
-        """Change the active tileset used by this context."""
+        """Change the active tileset used by this context.
+
+        The new tileset will take effect on the next call to :any:`present`.
+        Contexts not using a renderer with an emulated terminal will be unaffected by this method.
+
+        This does not do anything to resize the window, keep this in mind if the tileset as a differing tile size.
+        Access the window with :any:`sdl_window` to resize it manually, if needed.
+
+        Using this method only one tileset is active per-frame.
+        See :any:`tcod.render` if you want to renderer with multiple tilesets in a single frame.
+        """
         _check(lib.TCOD_context_change_tileset(self._context_p, _handle_tileset(tileset)))
 
     def new_console(
@@ -299,6 +324,25 @@ class Context:
 
         .. seealso::
             :any:`tcod.console.Console`
+
+        Example::
+
+            scale = 1  # Tile size scale.  This example uses integers but floating point numbers are also valid.
+            context = tcod.context.new()
+            while True:
+                # Create a cleared, dynamically-sized console for each frame.
+                console = context.new_console(magnification=scale)
+                # This printed output will wrap if the window is shrunk.
+                console.print_box(0, 0, console.width, console.height, "Hello world")
+                # Use integer_scaling to prevent subpixel distorsion.
+                # This may add padding around the rendered console.
+                context.present(console, integer_scaling=True)
+                for event in tcod.event.wait():
+                    if isinstance(event, tcod.event.Quit):
+                        raise SystemExit()
+                    elif isinstance(event, tcod.event.MouseWheel):
+                        # Use the mouse wheel to change the rendered tile size.
+                        scale = max(1, scale + event.y)
         """
         if magnification < 0:
             raise ValueError("Magnification must be greater than zero. (Got %f)" % magnification)
@@ -351,15 +395,31 @@ class Context:
                     context.sdl_window_p,
                     0 if fullscreen else tcod.lib.SDL_WINDOW_FULLSCREEN_DESKTOP,
                 )
+
         '''  # noqa: E501
         return lib.TCOD_context_get_sdl_window(self._context_p)
 
     @property
     def sdl_window(self) -> Optional[tcod.sdl.video.Window]:
-        """Return a :any:`tcod.sdl.video.Window` referencing this contexts SDL window if it exists.
+        '''Return a :any:`tcod.sdl.video.Window` referencing this contexts SDL window if it exists.
+
+        Example::
+
+            import tcod
+            improt tcod.sdl.video
+
+            def toggle_fullscreen(context: tcod.context.Context) -> None:
+                """Toggle a context window between fullscreen and windowed modes."""
+                window = context.sdl_window
+                if not window:
+                    return
+                if window.fullscreen:
+                    window.fullscreen = False
+                else:
+                    window.fullscreen = tcod.sdl.video.WindowFlags.FULLSCREEN_DESKTOP
 
         .. versionadded:: 13.4
-        """
+        '''
         p = self.sdl_window_p
         return tcod.sdl.video.Window(p) if p else None
 

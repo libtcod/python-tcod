@@ -1,9 +1,12 @@
-"""Functionality for handling images.
+"""Libtcod functionality for handling images.
 
-**Python-tcod is unable to render pixels to the screen directly.**
-If your image can't be represented as tiles then you'll need to use
-`an alternative library for graphics rendering
-<https://wiki.python.org/moin/PythonGameLibraries>`_.
+This module is generally seen as outdated.
+To load images you should typically use `Pillow <https://pillow.readthedocs.io/en/stable/>`_ or
+`imageio <https://imageio.readthedocs.io/en/stable/>`_ unless you need to use a feature exclusive to libtcod.
+
+**Python-tcod is unable to render pixels to consoles.**
+The best it can do with consoles is convert an image into semigraphics which can be shown on non-emulated terminals.
+For true pixel-based rendering you'll want to access the SDL rendering port at :any:`tcod.sdl.render`.
 """
 from __future__ import annotations
 
