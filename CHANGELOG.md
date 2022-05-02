@@ -4,6 +4,8 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+### Fixed
+- SDL renderers were ignoring tiles where only the background red channel was changed.
 
 ## [13.6.1] - 2022-03-29
 ### Changed
