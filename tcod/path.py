@@ -344,7 +344,7 @@ def _compile_cost_edges(edge_map: Any) -> Tuple[Any, int]:
     edge_array = np.transpose(edge_nz)
     edge_array -= edge_center
     c_edges = ffi.new("int[]", len(edge_array) * 3)
-    edges = np.frombuffer(ffi.buffer(c_edges), dtype=np.intc).reshape(len(edge_array), 3)  # type: ignore
+    edges = np.frombuffer(ffi.buffer(c_edges), dtype=np.intc).reshape(len(edge_array), 3)
     edges[:, :2] = edge_array
     edges[:, 2] = edge_map[edge_nz]
     return c_edges, len(edge_array)
@@ -1148,7 +1148,7 @@ class Pathfinder:
         """
         if self._order == "F":
             axes = range(self._travel.ndim)
-            return self._travel.transpose((*axes[-2::-1], axes[-1]))[..., ::-1]  # type: ignore
+            return self._travel.transpose((*axes[-2::-1], axes[-1]))[..., ::-1]
         return self._travel
 
     def clear(self) -> None:
@@ -1320,7 +1320,7 @@ class Pathfinder:
                 ffi.from_buffer("int*", path),
             )
         )
-        return path[:, ::-1] if self._order == "F" else path  # type: ignore
+        return path[:, ::-1] if self._order == "F" else path
 
     def path_to(self, index: Tuple[int, ...]) -> NDArray[Any]:
         """Return the shortest path from the nearest root to `index`.
@@ -1347,4 +1347,4 @@ class Pathfinder:
             >>> pf.path_to((0, 0))[1:].tolist()  # Exclude the starting point so that a blocked path is an empty list.
             []
         """  # noqa: E501
-        return self.path_from(index)[::-1]  # type: ignore
+        return self.path_from(index)[::-1]

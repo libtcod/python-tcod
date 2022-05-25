@@ -508,7 +508,7 @@ class Renderer:
                 out = np.empty((height, width, 3), dtype=np.uint8)
             else:
                 raise TypeError("Pixel format not supported yet.")
-        assert out.shape[:2] == height, width
+        assert out.shape[:2] == (height, width)
         assert out[0].flags.c_contiguous
         _check(lib.SDL_RenderReadPixels(self.p, format, ffi.cast("void*", out.ctypes.data), out.strides[0]))
         return out

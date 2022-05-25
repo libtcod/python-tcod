@@ -428,7 +428,7 @@ def procedural_block_elements(*, tileset: Tileset) -> None:
         (0x259F, 0b0111),  # "▟" Quadrant upper right and lower left and lower right.
     ):
         alpha: NDArray[np.uint8] = np.asarray((quadrants & quad_mask) != 0, dtype=np.uint8)
-        alpha *= 255
+        alpha *= 255  # type: ignore[arg-type]  # https://github.com/numpy/numpy/issues/21592
         tileset.set_tile(codepoint, alpha)
 
     for codepoint, axis, fraction, negative in (

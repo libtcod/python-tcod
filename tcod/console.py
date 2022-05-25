@@ -243,7 +243,7 @@ class Console:
         Index this array with ``console.ch[i, j]  # order='C'`` or
         ``console.ch[x, y]  # order='F'``.
         """
-        return self._tiles["ch"].T if self._order == "F" else self._tiles["ch"]  # type: ignore
+        return self._tiles["ch"].T if self._order == "F" else self._tiles["ch"]
 
     @property  # type: ignore
     @deprecate("This attribute has been renamed to `rgba`.")
