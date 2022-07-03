@@ -5,6 +5,7 @@ requires = [
     "cffi>=1.15",
     "pycparser>=2.14",
     "pcpp==1.30",
+    "requests>=2.28.1",
 ]
 build-backend = "setuptools.build_meta"
 

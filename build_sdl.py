@@ -11,9 +11,9 @@ import sys
 import zipfile
 from pathlib import Path
 from typing import Any, Dict, List, Set
-from urllib.request import urlretrieve
 
 import pcpp  # type: ignore
+import requests
 
 BITSIZE, LINKAGE = platform.architecture()
 
@@ -97,7 +97,9 @@ def get_sdl2_file(version: str) -> Path:
     if not sdl2_local_file.exists():
         print(f"Downloading {sdl2_remote_file}")
         os.makedirs("dependencies/", exist_ok=True)
-        urlretrieve(sdl2_remote_file, sdl2_local_file)
+        with requests.get(sdl2_remote_file) as response:
+            response.raise_for_status()
+            sdl2_local_file.write_bytes(response.content)
     return sdl2_local_file
 
 

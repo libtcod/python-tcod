@@ -115,6 +115,7 @@ setup(
     setup_requires=[
         *pytest_runner,
         "cffi>=1.15",
+        "requests>=2.28.1",
         "pycparser>=2.14",
         "pcpp==1.30",
     ],
