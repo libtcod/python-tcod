@@ -140,7 +140,7 @@ class TrueColorSample(Sample):
     def darken_background_characters(self) -> None:
         # darken background characters
         sample_console.fg[:] = sample_console.bg[:]
-        sample_console.fg[:] //= 2  # type: ignore[arg-type]  # https://github.com/numpy/numpy/issues/21592
+        sample_console.fg[:] //= 2
 
     def randomize_sample_conole(self) -> None:
         # randomize sample console characters
