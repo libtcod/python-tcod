@@ -63,6 +63,8 @@ IGNORE_DEFINES = frozenset(
         # Prevent double definition.
         "SDL_FALSE",
         "SDL_TRUE",
+        # Ignore floating point symbols.
+        "SDL_FLT_EPSILON",
     )
 )
 
