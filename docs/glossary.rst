@@ -10,6 +10,17 @@ Glossary
 
         These have been deprecated since version `8.5`.
 
+    tcod
+        `tcod` on its own is shorthand for both :term:`libtcod` and all of its bindings including :term:`python-tcod`.
+
+        It originated as an acronym for the game the library was first created for:
+        `The Chronicles Of Doryen <http://www.roguebasin.com/index.php/Doryen>`_
+
+    libtcod
+        This is the original C library which contains the implementations and algorithms used by C programs.
+
+        :term:`python-tcod` includes a statically linked version of this library.
+
     libtcod-cffi
         This is the `cffi` implementation of libtcodpy, the original was
         made using `ctypes` which was more difficult to maintain.
@@ -19,8 +30,10 @@ Glossary
         implemented.
 
     python-tcod
-        `python-tcod` is a superset of the :term:`libtcodpy` API.  The major
-        additions include class functionality in returned objects, no manual
+        `python-tcod` is the main Python port of :term:`libtcod`.
+
+        Originally a superset of the :term:`libtcodpy` API.  The major
+        additions included class functionality in returned objects, no manual
         memory management, pickle-able objects, and `numpy` array attributes
         in most objects.
 
@@ -38,14 +51,13 @@ Glossary
         This left it impractical for any real use as a roguelike library.
 
         Currently no new features are planned for `tdl`, instead new features
-        are added to `libtcod` itself and then ported to :term:`python-tcod`.
+        are added to :term:`libtcod` itself and then ported to :term:`python-tcod`.
 
         :term:`python-tdl` and :term:`libtcodpy` are included in installations
         of `python-tcod`.
 
     libtcodpy
-        `libtcodpy` is more or less a direct port of `libtcod`'s C API to
-        Python.
+        :term:`libtcodpy` is more or less a direct port of :term:`libtcod`'s C API to Python.
         This caused a handful of issues including instances needing to be
         freed manually or else a memory leak would occur, and many functions
         performing badly in Python due to the need to call them frequently.
