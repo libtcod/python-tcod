@@ -19,7 +19,9 @@ SETUP_DIR = Path(__file__).parent  # setup.py current directory
 def get_version() -> str:
     """Get the current version from a git tag, or by reading tcod/version.py"""
     if (SETUP_DIR / ".git").exists():
-        tag = subprocess.check_output(["git", "describe", "--abbrev=0"], universal_newlines=True).strip()
+        # "--tags" is required to workaround actions/checkout's broken annotated tag handing.
+        # https://github.com/actions/checkout/issues/290
+        tag = subprocess.check_output(["git", "describe", "--abbrev=0", "--tags"], universal_newlines=True).strip()
         assert not tag.startswith("v")
         version = tag
 

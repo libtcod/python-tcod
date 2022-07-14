@@ -11,11 +11,14 @@ defaults:
   run:
     shell: bash
 
+env:
+  git-depth: 0 # Depth to search for tags.
+
 jobs:
   black:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install Black
         run: pip install black
       - name: Run Black
@@ -24,7 +27,7 @@ jobs:
   isort:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install isort
         run: pip install isort
       - name: isort
@@ -41,7 +44,7 @@ jobs:
   flake8:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install Flake8
         run: pip install Flake8
       - name: Flake8
@@ -53,7 +56,7 @@ jobs:
   mypy:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
       - name: Install Python dependencies
@@ -76,7 +79,9 @@ jobs:
         sdl-version: ["2.0.14", "2.0.16"]
       fail-fast: true
     steps:
-      - uses: actions/checkout@v1 # v1 required to build package.
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
       - name: Build package
@@ -101,9 +106,9 @@ jobs:
       fail-fast: false
 
     steps:
-      # v2 breaks `git describe` so v1 is needed.
-      # https://github.com/actions/checkout/issues/272
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: |
           git submodule update --init --recursive --depth 1
@@ -197,7 +202,9 @@ jobs:
         arch: ["x86_64", "aarch64"]
         build: ["cp37-manylinux*", "pp37-manylinux*"]
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ env.git-depth }}
       - name: Set up QEMU
         if: ${{ matrix.arch == 'aarch64' }}
         uses: docker/setup-qemu-action@v1
@@ -248,13 +255,15 @@ jobs:
       matrix:
         python: ["cp38-*_universal2", "cp38-*_x86_64", "cp38-*_arm64", "pp37-*"]
     steps:
-      # v2 breaks `git describe` so v1 is needed.
-      # https://github.com/actions/checkout/issues/272
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
       - name: Print git describe
-        run: git describe
+        # "--tags" is required to workaround actions/checkout's broken annotated tag handing.
+        # https://github.com/actions/checkout/issues/290
+        run: git describe --tags
       - name: Install Python dependencies
         run: pip3 install wheel twine -r requirements.txt
       - name: Prepare package
