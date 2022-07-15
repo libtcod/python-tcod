@@ -54,7 +54,7 @@ def replace_unreleased_tags(tag: str, dry_run: bool) -> None:
             if file.suffix != ".py":
                 continue
             text = file.read_text(encoding="utf-8")
-            new_text = re.sub(r":: unreleased", rf":: {short_tag}", text)
+            new_text = re.sub(r":: *unreleased", rf":: {short_tag}", text, flags=re.IGNORECASE)
             if text != new_text:
                 print(f"Update tags in {file}")
                 if not dry_run:
