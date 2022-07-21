@@ -8,6 +8,8 @@
 from typing import List
 
 import tcod
+import tcod.sdl.joystick
+import tcod.sdl.sys
 
 WIDTH, HEIGHT = 720, 480
 
@@ -17,6 +19,7 @@ def main() -> None:
 
     event_log: List[str] = []
     motion_desc = ""
+    joysticks = tcod.sdl.joystick.get_joysticks()
 
     with tcod.context.new(width=WIDTH, height=HEIGHT) as context:
         console = context.new_console()

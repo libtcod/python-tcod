@@ -93,6 +93,7 @@ import tcod.event_constants
 from tcod.event_constants import *  # noqa: F4
 from tcod.event_constants import KMOD_ALT, KMOD_CTRL, KMOD_GUI, KMOD_SHIFT
 from tcod.loader import ffi, lib
+from tcod.sdl.joystick import _HAT_DIRECTIONS
 
 T = TypeVar("T")
 
@@ -303,7 +304,7 @@ class Event:
         raise NotImplementedError()
 
     def __str__(self) -> str:
-        return "<type=%r>" % (self.type,)
+        return f"<type={self.type!r}>"
 
 
 class Quit(Event):
@@ -779,6 +780,199 @@ class WindowResized(WindowEvent):
         )
 
 
+class JoystickEvent(Event):
+    """A base class for joystick events.
+
+    .. versionadded:: Unreleased
+    """
+
+    def __init__(self, type: str, which: int):
+        super().__init__(type)
+        self.which = which
+        """The ID of the joystick this event is for."""
+
+    def __repr__(self) -> str:
+        return f"tcod.event.{self.__class__.__name__}" f"(type={self.type!r}, which={self.which})"
+
+    def __str__(self) -> str:
+        prefix = super().__str__().strip("<>")
+        return f"<{prefix}, which={self.which}>"
+
+
+class JoystickAxis(JoystickEvent):
+    """When a joystick axis changes in value.
+
+    .. versionadded:: Unreleased
+
+    .. seealso::
+        :any:`tcod.sdl.joystick`
+    """
+
+    which: int
+    """The ID of the joystick this event is for."""
+
+    def __init__(self, type: str, which: int, axis: int, value: int):
+        super().__init__(type, which)
+        self.axis = axis
+        """The index of the changed axis."""
+        self.value = value
+        """The raw value of the axis in the range -32768 to 32767."""
+
+    @classmethod
+    def from_sdl_event(cls, sdl_event: Any) -> JoystickAxis:
+        return cls("JOYAXISMOTION", sdl_event.jaxis.which, sdl_event.jaxis.axis, sdl_event.jaxis.value)
+
+    def __repr__(self) -> str:
+        return (
+            f"tcod.event.{self.__class__.__name__}"
+            f"(type={self.type!r}, which={self.which}, axis={self.axis}, value={self.value})"
+        )
+
+    def __str__(self) -> str:
+        prefix = super().__str__().strip("<>")
+        return f"<{prefix}, axis={self.axis}, value={self.value}>"
+
+
+class JoystickBall(JoystickEvent):
+    """When a joystick ball is moved.
+
+    .. versionadded:: Unreleased
+
+    .. seealso::
+        :any:`tcod.sdl.joystick`
+    """
+
+    which: int
+    """The ID of the joystick this event is for."""
+
+    def __init__(self, type: str, which: int, ball: int, dx: int, dy: int):
+        super().__init__(type, which)
+        self.ball = ball
+        """The index of the moved ball."""
+        self.dx = dx
+        """The X motion of the ball."""
+        self.dy = dy
+        """The Y motion of the ball."""
+
+    @classmethod
+    def from_sdl_event(cls, sdl_event: Any) -> JoystickBall:
+        return cls(
+            "JOYBALLMOTION", sdl_event.jball.which, sdl_event.jball.ball, sdl_event.jball.xrel, sdl_event.jball.yrel
+        )
+
+    def __repr__(self) -> str:
+        return (
+            f"tcod.event.{self.__class__.__name__}"
+            f"(type={self.type!r}, which={self.which}, ball={self.ball}, dx={self.dx}, dy={self.dy})"
+        )
+
+    def __str__(self) -> str:
+        prefix = super().__str__().strip("<>")
+        return f"<{prefix}, ball={self.ball}, dx={self.dx}, dy={self.dy}>"
+
+
+class JoystickHat(JoystickEvent):
+    """When a joystick hat changes direction.
+
+    .. versionadded:: Unreleased
+
+    .. seealso::
+        :any:`tcod.sdl.joystick`
+    """
+
+    which: int
+    """The ID of the joystick this event is for."""
+
+    def __init__(self, type: str, which: int, x: Literal[-1, 0, 1], y: Literal[-1, 0, 1]):
+        super().__init__(type, which)
+        self.x = x
+        """The new X direction of the hat."""
+        self.y = y
+        """The new Y direction of the hat."""
+
+    @classmethod
+    def from_sdl_event(cls, sdl_event: Any) -> JoystickHat:
+        return cls("JOYHATMOTION", sdl_event.jhat.which, *_HAT_DIRECTIONS[sdl_event.jhat.hat])
+
+    def __repr__(self) -> str:
+        return (
+            f"tcod.event.{self.__class__.__name__}" f"(type={self.type!r}, which={self.which}, x={self.x}, y={self.y})"
+        )
+
+    def __str__(self) -> str:
+        prefix = super().__str__().strip("<>")
+        return f"<{prefix}, x={self.x}, y={self.y}>"
+
+
+class JoystickButton(JoystickEvent):
+    """When a joystick button is pressed or released.
+
+    .. versionadded:: Unreleased
+
+    Example::
+
+        for event in tcod.event.get():
+            match event:
+                case JoystickButton(which=which, button=button, pressed=True):
+                    print(f"Pressed {button=} on controller {which}.")
+                case JoystickButton(which=which, button=button, pressed=False):
+                    print(f"Released {button=} on controller {which}.")
+    """
+
+    which: int
+    """The ID of the joystick this event is for."""
+
+    def __init__(self, type: str, which: int, button: int):
+        super().__init__(type, which)
+        self.button = button
+        """The index of the button this event is for."""
+
+    @property
+    def pressed(self) -> bool:
+        """True if the joystick button has been pressed, False when the button was released."""
+        return self.type == "JOYBUTTONDOWN"
+
+    @classmethod
+    def from_sdl_event(cls, sdl_event: Any) -> JoystickButton:
+        type = {lib.SDL_JOYBUTTONDOWN: "JOYBUTTONDOWN", lib.SDL_JOYBUTTONUP: "JOYBUTTONUP"}[sdl_event.type]
+        return cls(type, sdl_event.jbutton.which, sdl_event.jbutton.button)
+
+    def __repr__(self) -> str:
+        return f"tcod.event.{self.__class__.__name__}" f"(type={self.type!r}, which={self.which}, button={self.button})"
+
+    def __str__(self) -> str:
+        prefix = super().__str__().strip("<>")
+        return f"<{prefix}, button={self.button}>"
+
+
+class JoystickDevice(JoystickEvent):
+    """An event for when a joystick is added or removed.
+
+    .. versionadded:: Unreleased
+
+    Example::
+
+        joysticks: dict[int, tcod.sdl.joystick.Joystick] = {}
+        for event in tcod.event.get():
+            match event:
+                case tcod.event.JoystickDevice(type="JOYDEVICEADDED", which=device_id):
+                    new_joystick = tcod.sdl.joystick.Joystick(device_id)
+                    joysticks[new_joystick.id] = new_joystick
+                case tcod.event.JoystickDevice(type="JOYDEVICEREMOVED", which=which):
+                    del joysticks[which]
+    """
+
+    which: int
+    """When type="JOYDEVICEADDED" this is the device ID.
+    When type="JOYDEVICEREMOVED" this is the instance ID.
+    """
+
+    @classmethod
+    def from_sdl_event(cls, sdl_event: Any) -> JoystickDevice:
+        type = {lib.SDL_JOYDEVICEADDED: "JOYDEVICEADDED", lib.SDL_JOYDEVICEREMOVED: "JOYDEVICEREMOVED"}[sdl_event.type]
+        return cls(type, sdl_event.jdevice.which)
+
+
 class Undefined(Event):
     """This class is a place holder for SDL events without their own tcod.event
     class.
@@ -809,6 +1003,13 @@ _SDL_TO_CLASS_TABLE: Dict[int, Type[Event]] = {
     lib.SDL_MOUSEWHEEL: MouseWheel,
     lib.SDL_TEXTINPUT: TextInput,
     lib.SDL_WINDOWEVENT: WindowEvent,
+    lib.SDL_JOYAXISMOTION: JoystickAxis,
+    lib.SDL_JOYBALLMOTION: JoystickBall,
+    lib.SDL_JOYHATMOTION: JoystickHat,
+    lib.SDL_JOYBUTTONDOWN: JoystickButton,
+    lib.SDL_JOYBUTTONUP: JoystickButton,
+    lib.SDL_JOYDEVICEADDED: JoystickDevice,
+    lib.SDL_JOYDEVICEREMOVED: JoystickDevice,
 }
 
 
@@ -1075,6 +1276,41 @@ class EventDispatch(Generic[T]):
 
     def ev_windowhittest(self, event: tcod.event.WindowEvent) -> Optional[T]:
         pass
+
+    def ev_joyaxismotion(self, event: tcod.event.JoystickAxis) -> Optional[T]:
+        """
+        .. versionadded:: Unreleased
+        """
+
+    def ev_joyballmotion(self, event: tcod.event.JoystickBall) -> Optional[T]:
+        """
+        .. versionadded:: Unreleased
+        """
+
+    def ev_joyhatmotion(self, event: tcod.event.JoystickHat) -> Optional[T]:
+        """
+        .. versionadded:: Unreleased
+        """
+
+    def ev_joybuttondown(self, event: tcod.event.JoystickButton) -> Optional[T]:
+        """
+        .. versionadded:: Unreleased
+        """
+
+    def ev_joybuttonup(self, event: tcod.event.JoystickButton) -> Optional[T]:
+        """
+        .. versionadded:: Unreleased
+        """
+
+    def ev_joydeviceadded(self, event: tcod.event.JoystickDevice) -> Optional[T]:
+        """
+        .. versionadded:: Unreleased
+        """
+
+    def ev_joydeviceremoved(self, event: tcod.event.JoystickDevice) -> Optional[T]:
+        """
+        .. versionadded:: Unreleased
+        """
 
     def ev_(self, event: Any) -> Optional[T]:
         pass
@@ -2326,6 +2562,12 @@ __all__ = [  # noqa: F405
     "WindowEvent",
     "WindowMoved",
     "WindowResized",
+    "JoystickEvent",
+    "JoystickAxis",
+    "JoystickBall",
+    "JoystickHat",
+    "JoystickButton",
+    "JoystickDevice",
     "Undefined",
     "get",
     "wait",

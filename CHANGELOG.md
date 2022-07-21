@@ -4,6 +4,9 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+### Added
+- Ported SDL2 joystick handing as `tcod.sdl.joystick`.
+- New joystick related events.
 
 ## [13.7.0] - 2022-08-07
 ### Added

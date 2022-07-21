@@ -40,6 +40,7 @@ Contents:
     tcod/tileset
     libtcodpy
     sdl/audio
+    sdl/joystick
     sdl/render
     sdl/mouse
     sdl/video
