@@ -87,7 +87,7 @@ class FlashOperation(enum.IntEnum):
     CANCEL = 0
     """Stop flashing."""
     BRIEFLY = 1
-    """Flash breifly."""
+    """Flash briefly."""
     UNTIL_FOCUSED = 2
     """Flash until focus is gained."""
 

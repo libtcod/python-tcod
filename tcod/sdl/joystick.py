@@ -59,15 +59,20 @@ class Joystick:
     def __init__(self, device_index: int):
         tcod.sdl.sys.init(tcod.sdl.sys.Subsystem.JOYSTICK)
         self.sdl_joystick_p: Final = _check_p(ffi.gc(lib.SDL_JoystickOpen(device_index), lib.SDL_JoystickClose))
-        self.axes: Final = _check(lib.SDL_JoystickNumAxes(self.sdl_joystick_p))
-        self.balls: Final = _check(lib.SDL_JoystickNumBalls(self.sdl_joystick_p))
-        self.buttons: Final = _check(lib.SDL_JoystickNumButtons(self.sdl_joystick_p))
-        self.hats: Final = _check(lib.SDL_JoystickNumHats(self.sdl_joystick_p))
-        self.name: Final = str(ffi.string(lib.SDL_JoystickName(self.sdl_joystick_p)), encoding="utf-8")
+        """The CFFI pointer to an SDL_Joystick struct."""
+        self.axes: Final[int] = _check(lib.SDL_JoystickNumAxes(self.sdl_joystick_p))
+        """The total number of axes."""
+        self.balls: Final[int] = _check(lib.SDL_JoystickNumBalls(self.sdl_joystick_p))
+        """The total number of trackballs."""
+        self.buttons: Final[int] = _check(lib.SDL_JoystickNumButtons(self.sdl_joystick_p))
+        """The total number of buttons."""
+        self.hats: Final[int] = _check(lib.SDL_JoystickNumHats(self.sdl_joystick_p))
+        """The total number of hats."""
+        self.name: Final[str] = str(ffi.string(lib.SDL_JoystickName(self.sdl_joystick_p)), encoding="utf-8")
         """The name of this joystick."""
-        self.guid: Final = self._get_guid()
+        self.guid: Final[str] = self._get_guid()
         """The GUID of this joystick."""
-        self.id: Final = _check(lib.SDL_JoystickInstanceID(self.sdl_joystick_p))
+        self.id: Final[int] = _check(lib.SDL_JoystickInstanceID(self.sdl_joystick_p))
         """The instance ID of this joystick.  This is not the same as the device ID."""
 
     def _get_guid(self) -> str:
