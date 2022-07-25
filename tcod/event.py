@@ -68,12 +68,12 @@ Example::
                     raise SystemExit()
                 case tcod.event.KeyDown(sym) if sym in KEY_COMMANDS:
                     print(f"Command: {KEY_COMMANDS[sym]}")
-                case tcod.event.KeyDown(sym, scancode, mod, repeat):
-                    print(f"KeyDown: {sym=}, {scancode=}, {mod=}, {repeat=}")
-                case tcod.event.MouseButtonDown(button, pixel, tile):
-                    print(f"MouseButtonDown: {button=}, {pixel=}, {tile=}")
-                case tcod.event.MouseMotion(pixel, pixel_motion, tile, tile_motion):
-                    print(f"MouseMotion: {pixel=}, {pixel_motion=}, {tile=}, {tile_motion=}")
+                case tcod.event.KeyDown(scancode, sym, mod, repeat):
+                    print(f"KeyDown: {scancode=}, {sym=}, {mod=}, {repeat=}")
+                case tcod.event.MouseButtonDown(pixel, tile, button):
+                    print(f"MouseButtonDown: {pixel=}, {tile=}, {button=}")
+                case tcod.event.MouseMotion(pixel, pixel_motion, tile, tile_motion, state):
+                    print(f"MouseMotion: {pixel=}, {pixel_motion=}, {tile=}, {tile_motion=}, {state=}")
                 case tcod.event.Event() as event:
                     print(event)  # Show any unhandled events.
 
@@ -291,6 +291,8 @@ class Event:
                    pointer.  All sub-classes have this attribute.
     """
 
+    __match_args__ = ("type",)
+
     def __init__(self, type: Optional[str] = None):
         if type is None:
             type = self.__class__.__name__.upper()
@@ -344,6 +346,7 @@ class KeyboardEvent(Event):
     .. versionchanged:: 12.5
         `scancode`, `sym`, and `mod` now use their respective enums.
     """
+    __match_args__ = ("scancode", "sym", "mod", "repeat")
 
     def __init__(self, scancode: int, sym: int, mod: int, repeat: bool = False):
         super().__init__()
@@ -398,6 +401,7 @@ class MouseState(Event):
 
     .. versionadded:: 9.3
     """
+    __match_args__ = ("pixel", "tile", "state")
 
     def __init__(
         self,
@@ -453,6 +457,7 @@ class MouseMotion(MouseState):
             * tcod.event.BUTTON_X1MASK
             * tcod.event.BUTTON_X2MASK
     """
+    __match_args__ = ("pixel", "pixel_motion", "tile", "tile_motion", "state")
 
     def __init__(
         self,
@@ -528,6 +533,7 @@ class MouseButtonEvent(MouseState):
             * tcod.event.BUTTON_X1
             * tcod.event.BUTTON_X2
     """
+    __match_args__ = ("pixel", "tile", "button")
 
     def __init__(
         self,
@@ -594,6 +600,7 @@ class MouseWheel(Event):
                         of their usual values.  This depends on the settings of
                         the Operating System.
     """
+    __match_args__ = ("x", "y", "flipped")
 
     def __init__(self, x: int, y: int, flipped: bool = False):
         super().__init__()
@@ -631,6 +638,7 @@ class TextInput(Event):
         type (str): Always "TEXTINPUT".
         text (str): A Unicode string with the input.
     """
+    __match_args__ = ("text",)
 
     def __init__(self, text: str):
         super().__init__()
@@ -655,7 +663,7 @@ class WindowEvent(Event):
         type (str): A window event could mean various event types.
     """
 
-    type: Final[  # type: ignore[misc]  # Narrowing contant type.
+    type: Final[  # type: ignore[misc]  # Narrowing constant type.
         Literal[
             "WindowShown",
             "WindowHidden",
@@ -724,6 +732,7 @@ class WindowMoved(WindowEvent):
         x (int): Movement on the x-axis.
         y (int): Movement on the y-axis.
     """
+    __match_args__ = ("x", "y")
 
     type: Literal["WINDOWMOVED"]  # type: ignore[assignment,misc]
 
@@ -755,6 +764,7 @@ class WindowResized(WindowEvent):
         width (int): The current width of the window.
         height (int): The current height of the window.
     """
+    __match_args__ = ("type", "width", "height")
 
     type: Literal["WINDOWRESIZED", "WINDOWSIZECHANGED"]  # type: ignore[assignment,misc]
 
@@ -783,6 +793,7 @@ class Undefined(Event):
     """This class is a place holder for SDL events without their own tcod.event
     class.
     """
+    __match_args__ = ("sdl_event",)
 
     def __init__(self) -> None:
         super().__init__("")
