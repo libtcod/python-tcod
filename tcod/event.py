@@ -656,7 +656,7 @@ class WindowEvent(Event):
         type (str): A window event could mean various event types.
     """
 
-    type: Final[  # type: ignore[misc]  # Narrowing contant type.
+    type: Final[  # type: ignore[misc]  # Narrowing final type.
         Literal[
             "WindowShown",
             "WindowHidden",
@@ -726,7 +726,7 @@ class WindowMoved(WindowEvent):
         y (int): Movement on the y-axis.
     """
 
-    type: Literal["WINDOWMOVED"]  # type: ignore[assignment,misc]
+    type: Final[Literal["WINDOWMOVED"]]  # type: ignore[assignment,misc]
 
     def __init__(self, x: int, y: int) -> None:
         super().__init__(None)
@@ -757,7 +757,7 @@ class WindowResized(WindowEvent):
         height (int): The current height of the window.
     """
 
-    type: Literal["WINDOWRESIZED", "WINDOWSIZECHANGED"]  # type: ignore[assignment,misc]
+    type: Final[Literal["WINDOWRESIZED", "WINDOWSIZECHANGED"]]  # type: ignore[assignment,misc]
 
     def __init__(self, type: str, width: int, height: int) -> None:
         super().__init__(type)
@@ -961,6 +961,8 @@ class JoystickDevice(JoystickEvent):
                 case tcod.event.JoystickDevice(type="JOYDEVICEREMOVED", which=which):
                     del joysticks[which]
     """
+
+    type = Final[Literal["JOYDEVICEADDED", "JOYDEVICEREMOVED"]]  # type: ignore[assignment,misc]
 
     which: int
     """When type="JOYDEVICEADDED" this is the device ID.
