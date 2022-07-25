@@ -68,11 +68,11 @@ Example::
                     raise SystemExit()
                 case tcod.event.KeyDown(sym) if sym in KEY_COMMANDS:
                     print(f"Command: {KEY_COMMANDS[sym]}")
-                case tcod.event.KeyDown(sym, scancode, mod, repeat):
+                case tcod.event.KeyDown(sym=sym, scancode=scancode, mod=mod, repeat=repeat):
                     print(f"KeyDown: {sym=}, {scancode=}, {mod=}, {repeat=}")
-                case tcod.event.MouseButtonDown(button, pixel, tile):
+                case tcod.event.MouseButtonDown(button=button, pixel=pixel, tile=tile):
                     print(f"MouseButtonDown: {button=}, {pixel=}, {tile=}")
-                case tcod.event.MouseMotion(pixel, pixel_motion, tile, tile_motion):
+                case tcod.event.MouseMotion(pixel=pixel, pixel_motion=pixel_motion, tile=tile, tile_motion=tile_motion):
                     print(f"MouseMotion: {pixel=}, {pixel_motion=}, {tile=}, {tile_motion=}")
                 case tcod.event.Event() as event:
                     print(event)  # Show any unhandled events.
