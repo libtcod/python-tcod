@@ -4,6 +4,8 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+
+## [13.7.0] - 2022-08-07
 ### Added
 - You can new use `SDLConsoleRender.atlas` to access the `SDLTilesetAtlas` used to create it.
   [#121](https://github.com/libtcod/python-tcod/issues/121)

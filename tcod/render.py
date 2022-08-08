@@ -69,7 +69,7 @@ class SDLConsoleRender:
         self.atlas: Final[SDLTilesetAtlas] = atlas
         """The SDLTilesetAtlas used to create this SDLConsoleRender.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 13.7
         """
         self._renderer = atlas._renderer
         self._cache_console: Optional[tcod.console.Console] = None
