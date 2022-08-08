@@ -1,12 +1,12 @@
 """Handles the rendering of libtcod's tilesets.
 
 Using this module you can render a console to an SDL :any:`Texture` directly, letting you have full control over how
-conoles are displayed.
+consoles are displayed.
 This includes rendering multiple tilesets in a single frame and rendering consoles on top of each other.
 
 Example::
 
-    tileset = tcod.tileset.load_tilsheet("dejavu16x16_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD)
+    tileset = tcod.tileset.load_tilesheet("dejavu16x16_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD)
     console = tcod.Console(20, 8)
     console.print(0, 0, "Hello World")
     sdl_window = tcod.sdl.video.new_window(
@@ -31,6 +31,8 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
+from typing_extensions import Final
+
 import tcod.console
 import tcod.sdl.render
 import tcod.tileset
@@ -43,15 +45,20 @@ class SDLTilesetAtlas:
 
     def __init__(self, renderer: tcod.sdl.render.Renderer, tileset: tcod.tileset.Tileset) -> None:
         self._renderer = renderer
-        self.tileset = tileset
-        self.p = ffi.gc(_check_p(lib.TCOD_sdl2_atlas_new(renderer.p, tileset._tileset_p)), lib.TCOD_sdl2_atlas_delete)
+        self.tileset: Final[tcod.tileset.Tileset] = tileset
+        """The tileset used to create this SDLTilesetAtlas."""
+        self.p: Final = ffi.gc(
+            _check_p(lib.TCOD_sdl2_atlas_new(renderer.p, tileset._tileset_p)), lib.TCOD_sdl2_atlas_delete
+        )
 
     @classmethod
     def _from_ref(cls, renderer_p: Any, atlas_p: Any) -> SDLTilesetAtlas:
         self = object.__new__(cls)
+        # Ignore Final reassignment type errors since this is an alternative constructor.
+        # This could be a sign that the current constructor was badly implemented.
         self._renderer = tcod.sdl.render.Renderer(renderer_p)
-        self.tileset = tcod.tileset.Tileset._from_ref(atlas_p.tileset)
-        self.p = atlas_p
+        self.tileset = tcod.tileset.Tileset._from_ref(atlas_p.tileset)  # type: ignore[misc]
+        self.p = atlas_p  # type: ignore[misc]
         return self
 
 
@@ -59,7 +66,11 @@ class SDLConsoleRender:
     """Holds an internal cache console and texture which are used to optimized console rendering."""
 
     def __init__(self, atlas: SDLTilesetAtlas) -> None:
-        self._atlas = atlas
+        self.atlas: Final[SDLTilesetAtlas] = atlas
+        """The SDLTilesetAtlas used to create this SDLConsoleRender.
+
+        .. versionadded:: Unreleased
+        """
         self._renderer = atlas._renderer
         self._cache_console: Optional[tcod.console.Console] = None
         self._texture: Optional[tcod.sdl.render.Texture] = None
@@ -80,8 +91,8 @@ class SDLConsoleRender:
         if self._cache_console is None or self._texture is None:
             self._cache_console = tcod.console.Console(console.width, console.height)
             self._texture = self._renderer.new_texture(
-                self._atlas.tileset.tile_width * console.width,
-                self._atlas.tileset.tile_height * console.height,
+                self.atlas.tileset.tile_width * console.width,
+                self.atlas.tileset.tile_height * console.height,
                 format=int(lib.SDL_PIXELFORMAT_RGBA32),
                 access=int(lib.SDL_TEXTUREACCESS_TARGET),
             )
@@ -89,7 +100,7 @@ class SDLConsoleRender:
         with self._renderer.set_render_target(self._texture):
             _check(
                 lib.TCOD_sdl2_render_texture(
-                    self._atlas.p, console.console_c, self._cache_console.console_c, self._texture.p
+                    self.atlas.p, console.console_c, self._cache_console.console_c, self._texture.p
                 )
             )
         return self._texture
