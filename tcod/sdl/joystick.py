@@ -148,6 +148,10 @@ class Joystick:
         p = _check_p(ffi.gc(lib.SDL_JoystickOpen(device_index), lib.SDL_JoystickClose))
         return cls(p)
 
+    @classmethod
+    def _from_instance_id(cls, instance_id: int) -> Joystick:
+        return cls(_check_p(ffi.gc(lib.SDL_JoystickFromInstanceID(instance_id), lib.SDL_JoystickClose)))
+
     def __eq__(self, other: object) -> bool:
         if isinstance(other, GameController):
             return self == other.joystick.id
@@ -198,6 +202,10 @@ class GameController:
     @classmethod
     def _open(cls, joystick_index: int) -> GameController:
         return cls(_check_p(ffi.gc(lib.SDL_GameControllerOpen(joystick_index), lib.SDL_GameControllerClose)))
+
+    @classmethod
+    def _from_instance_id(cls, instance_id: int) -> GameController:
+        return cls(_check_p(ffi.gc(lib.SDL_GameControllerFromInstanceID(instance_id), lib.SDL_GameControllerClose)))
 
     def get_button(self, button: ControllerButton) -> bool:
         """Return True if `button` is currently held."""
@@ -347,9 +355,14 @@ class GameController:
         return bool(lib.SDL_GameControllerGetButton(self.sdl_controller_p, lib.SDL_CONTROLLER_BUTTON_TOUCHPAD))
 
 
+def init() -> None:
+    """Initialize SDL's joystick and game controller subsystems."""
+    tcod.sdl.sys.init(tcod.sdl.sys.Subsystem.JOYSTICK | tcod.sdl.sys.Subsystem.GAMECONTROLLER)
+
+
 def _get_number() -> int:
     """Return the number of attached joysticks."""
-    tcod.sdl.sys.init(tcod.sdl.sys.Subsystem.JOYSTICK)
+    init()
     return _check(lib.SDL_NumJoysticks())
 
 

@@ -5,7 +5,7 @@
 # https://creativecommons.org/publicdomain/zero/1.0/
 """An demonstration of event handling using the tcod.event module.
 """
-from typing import List
+from typing import List, Set
 
 import tcod
 import tcod.sdl.joystick
@@ -19,7 +19,9 @@ def main() -> None:
 
     event_log: List[str] = []
     motion_desc = ""
-    joysticks = tcod.sdl.joystick.get_joysticks()
+    tcod.sdl.joystick.init()
+    controllers: Set[tcod.sdl.joystick.GameController] = set()
+    joysticks: Set[tcod.sdl.joystick.Joystick] = set()
 
     with tcod.context.new(width=WIDTH, height=HEIGHT) as context:
         console = context.new_console()
@@ -42,9 +44,19 @@ def main() -> None:
                     raise SystemExit()
                 if isinstance(event, tcod.event.WindowResized) and event.type == "WINDOWRESIZED":
                     console = context.new_console()
+                if isinstance(event, tcod.event.ControllerDevice):
+                    if event.type == "CONTROLLERDEVICEADDED":
+                        controllers.add(event.controller)
+                    elif event.type == "CONTROLLERDEVICEREMOVED":
+                        controllers.remove(event.controller)
+                if isinstance(event, tcod.event.JoystickDevice):
+                    if event.type == "JOYDEVICEADDED":
+                        joysticks.add(event.joystick)
+                    elif event.type == "JOYDEVICEREMOVED":
+                        joysticks.remove(event.joystick)
                 if isinstance(event, tcod.event.MouseMotion):
                     motion_desc = str(event)
-                else:
+                else:  # Log all events other than MouseMotion.
                     event_log.append(str(event))
 
 

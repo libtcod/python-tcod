@@ -90,6 +90,7 @@ from numpy.typing import NDArray
 from typing_extensions import Final, Literal
 
 import tcod.event_constants
+import tcod.sdl.joystick
 from tcod.event_constants import *  # noqa: F4
 from tcod.event_constants import KMOD_ALT, KMOD_CTRL, KMOD_GUI, KMOD_SHIFT
 from tcod.loader import ffi, lib
@@ -791,6 +792,12 @@ class JoystickEvent(Event):
         self.which = which
         """The ID of the joystick this event is for."""
 
+    @property
+    def joystick(self) -> tcod.sdl.joystick.Joystick:
+        if self.type == "JOYDEVICEADDED":
+            return tcod.sdl.joystick.Joystick._open(self.which)
+        return tcod.sdl.joystick.Joystick._from_instance_id(self.which)
+
     def __repr__(self) -> str:
         return f"tcod.event.{self.__class__.__name__}" f"(type={self.type!r}, which={self.which})"
 
@@ -952,17 +959,16 @@ class JoystickDevice(JoystickEvent):
 
     Example::
 
-        joysticks: dict[int, tcod.sdl.joystick.Joystick] = {}
+        joysticks: set[tcod.sdl.joystick.Joystick] = {}
         for event in tcod.event.get():
             match event:
-                case tcod.event.JoystickDevice(type="JOYDEVICEADDED", which=device_id):
-                    new_joystick = tcod.sdl.joystick.Joystick(device_id)
-                    joysticks[new_joystick.id] = new_joystick
-                case tcod.event.JoystickDevice(type="JOYDEVICEREMOVED", which=which):
-                    del joysticks[which]
+                case tcod.event.JoystickDevice(type="JOYDEVICEADDED", joystick=new_joystick):
+                    joysticks.add(new_joystick)
+                case tcod.event.JoystickDevice(type="JOYDEVICEREMOVED", joystick=joystick):
+                    joysticks.remove(joystick)
     """
 
-    type = Final[Literal["JOYDEVICEADDED", "JOYDEVICEREMOVED"]]  # type: ignore[assignment,misc]
+    type: Final[Literal["JOYDEVICEADDED", "JOYDEVICEREMOVED"]]  # type: ignore[misc]
 
     which: int
     """When type="JOYDEVICEADDED" this is the device ID.
@@ -973,6 +979,126 @@ class JoystickDevice(JoystickEvent):
     def from_sdl_event(cls, sdl_event: Any) -> JoystickDevice:
         type = {lib.SDL_JOYDEVICEADDED: "JOYDEVICEADDED", lib.SDL_JOYDEVICEREMOVED: "JOYDEVICEREMOVED"}[sdl_event.type]
         return cls(type, sdl_event.jdevice.which)
+
+
+class ControllerEvent(Event):
+    """Base class for controller events.
+
+    .. versionadded:: Unreleased
+    """
+
+    def __init__(self, type: str, which: int):
+        super().__init__(type)
+        self.which = which
+        """The ID of the joystick this event is for."""
+
+    @property
+    def controller(self) -> tcod.sdl.joystick.GameController:
+        """The :any:`GameController: for this event."""
+        if self.type == "CONTROLLERDEVICEADDED":
+            return tcod.sdl.joystick.GameController._open(self.which)
+        return tcod.sdl.joystick.GameController._from_instance_id(self.which)
+
+    def __repr__(self) -> str:
+        return f"tcod.event.{self.__class__.__name__}" f"(type={self.type!r}, which={self.which})"
+
+    def __str__(self) -> str:
+        prefix = super().__str__().strip("<>")
+        return f"<{prefix}, which={self.which}>"
+
+
+class ControllerAxis(ControllerEvent):
+    """When a controller axis is moved.
+
+    .. versionadded:: Unreleased
+    """
+
+    type: Final[Literal["CONTROLLERAXISMOTION"]]  # type: ignore[misc]
+
+    def __init__(self, type: str, which: int, axis: tcod.sdl.joystick.ControllerAxis, value: int):
+        super().__init__(type, which)
+        self.axis = axis
+        """Which axis is being moved.  One of :any:`ControllerAxis`."""
+        self.value = value
+        """The new value of this events axis.
+
+        This will be -32768 to 32767 for all axes except for triggers which are 0 to 32767 instead."""
+
+    @classmethod
+    def from_sdl_event(cls, sdl_event: Any) -> ControllerAxis:
+        return cls(
+            "CONTROLLERAXISMOTION",
+            sdl_event.caxis.which,
+            tcod.sdl.joystick.ControllerAxis(sdl_event.caxis.axis),
+            sdl_event.caxis.value,
+        )
+
+    def __repr__(self) -> str:
+        return (
+            f"tcod.event.{self.__class__.__name__}"
+            f"(type={self.type!r}, which={self.which}, axis={self.axis}, value={self.value})"
+        )
+
+    def __str__(self) -> str:
+        prefix = super().__str__().strip("<>")
+        return f"<{prefix}, axis={self.axis}, value={self.value}>"
+
+
+class ControllerButton(ControllerEvent):
+    """When a controller button is pressed or released.
+
+    .. versionadded:: Unreleased
+    """
+
+    type: Final[Literal["CONTROLLERBUTTONDOWN", "CONTROLLERBUTTONUP"]]  # type: ignore[misc]
+
+    def __init__(self, type: str, which: int, button: tcod.sdl.joystick.ControllerButton, pressed: bool):
+        super().__init__(type, which)
+        self.button = button
+        """The button for this event.  One of :any:`ControllerButton`."""
+        self.pressed = pressed
+        """True if the button was pressed, False if it was released."""
+
+    @classmethod
+    def from_sdl_event(cls, sdl_event: Any) -> ControllerButton:
+        type = {
+            lib.SDL_CONTROLLERBUTTONDOWN: "CONTROLLERBUTTONDOWN",
+            lib.SDL_CONTROLLERBUTTONUP: "CONTROLLERBUTTONUP",
+        }[sdl_event.type]
+        return cls(
+            type,
+            sdl_event.cbutton.which,
+            tcod.sdl.joystick.ControllerButton(sdl_event.cbutton.button),
+            sdl_event.cbutton.state == lib.SDL_PRESSED,
+        )
+
+    def __repr__(self) -> str:
+        return (
+            f"tcod.event.{self.__class__.__name__}"
+            f"(type={self.type!r}, which={self.which}, button={self.button}, pressed={self.pressed})"
+        )
+
+    def __str__(self) -> str:
+        prefix = super().__str__().strip("<>")
+        return f"<{prefix}, button={self.button}, pressed={self.pressed}>"
+
+
+class ControllerDevice(ControllerEvent):
+    """When a controller is added, removed, or remapped.
+
+    .. versionadded:: Unreleased
+    """
+
+    type: Final[Literal["CONTROLLERDEVICEADDED", "CONTROLLERDEVICEREMOVED", "CONTROLLERDEVICEREMAPPED"]]  # type: ignore[misc]
+
+    @classmethod
+    def from_sdl_event(cls, sdl_event: Any) -> ControllerDevice:
+        type = {
+            lib.SDL_CONTROLLERDEVICEADDED: "CONTROLLERDEVICEADDED",
+            lib.SDL_CONTROLLERDEVICEREMOVED: "CONTROLLERDEVICEREMOVED",
+            lib.SDL_CONTROLLERDEVICEREMAPPED: "CONTROLLERDEVICEREMAPPED",
+        }[sdl_event.type]
+        return cls(type, sdl_event.cdevice.which)
 
 
 class Undefined(Event):
@@ -1012,6 +1138,12 @@ _SDL_TO_CLASS_TABLE: Dict[int, Type[Event]] = {
     lib.SDL_JOYBUTTONUP: JoystickButton,
     lib.SDL_JOYDEVICEADDED: JoystickDevice,
     lib.SDL_JOYDEVICEREMOVED: JoystickDevice,
+    lib.SDL_CONTROLLERAXISMOTION: ControllerAxis,
+    lib.SDL_CONTROLLERBUTTONDOWN: ControllerButton,
+    lib.SDL_CONTROLLERBUTTONUP: ControllerButton,
+    lib.SDL_CONTROLLERDEVICEADDED: ControllerDevice,
+    lib.SDL_CONTROLLERDEVICEREMOVED: ControllerDevice,
+    lib.SDL_CONTROLLERDEVICEREMAPPED: ControllerDevice,
 }
 
 
