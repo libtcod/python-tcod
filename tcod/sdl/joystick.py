@@ -153,8 +153,6 @@ class Joystick:
         return cls(_check_p(ffi.gc(lib.SDL_JoystickFromInstanceID(instance_id), lib.SDL_JoystickClose)))
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, GameController):
-            return self == other.joystick.id
         if isinstance(other, Joystick):
             return self.id == other.id
         return NotImplemented
@@ -222,8 +220,6 @@ class GameController:
     def __eq__(self, other: object) -> bool:
         if isinstance(other, GameController):
             return self.joystick.id == other.joystick.id
-        if isinstance(other, Joystick):
-            return self.joystick.id == other.id
         return NotImplemented
 
     def __hash__(self) -> int:
