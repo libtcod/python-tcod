@@ -4,6 +4,8 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+### Fixed
+- `EventDispatch` was missing new event names.
 
 ## [13.8.0] - 2022-09-22
 ### Added

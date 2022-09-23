@@ -1325,7 +1325,11 @@ class EventDispatch(Generic[T]):
                 stacklevel=2,
             )
             return None
-        func: Callable[[Any], Optional[T]] = getattr(self, "ev_%s" % (event.type.lower(),))
+        func_name = f"ev_{event.type.lower()}"
+        func: Optional[Callable[[Any], Optional[T]]] = getattr(self, func_name, None)
+        if func is None:
+            warnings.warn(f"{func_name} is missing from this EventDispatch object.", RuntimeWarning, stacklevel=2)
+            return None
         return func(event)
 
     def event_get(self) -> None:
@@ -1444,6 +1448,36 @@ class EventDispatch(Generic[T]):
     def ev_joydeviceremoved(self, event: tcod.event.JoystickDevice) -> Optional[T]:
         """
         .. versionadded:: 13.8
+        """
+
+    def ev_controlleraxismotion(self, event: tcod.event.ControllerAxis) -> Optional[T]:
+        """
+        .. versionadded:: Unreleased
+        """
+
+    def ev_controllerbuttondown(self, event: tcod.event.ControllerButton) -> Optional[T]:
+        """
+        .. versionadded:: Unreleased
+        """
+
+    def ev_controllerbuttonup(self, event: tcod.event.ControllerButton) -> Optional[T]:
+        """
+        .. versionadded:: Unreleased
+        """
+
+    def ev_controllerdeviceadded(self, event: tcod.event.ControllerDevice) -> Optional[T]:
+        """
+        .. versionadded:: Unreleased
+        """
+
+    def ev_controllerdeviceremoved(self, event: ControllerDevice) -> Optional[T]:
+        """
+        .. versionadded:: Unreleased
+        """
+
+    def ev_controllerdeviceremapped(self, event: ControllerDevice) -> Optional[T]:
+        """
+        .. versionadded:: Unreleased
         """
 
     def ev_(self, event: Any) -> Optional[T]:
