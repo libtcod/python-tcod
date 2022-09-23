@@ -8,6 +8,13 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 - Ported SDL2 joystick handing as `tcod.sdl.joystick`.
 - New joystick related events.
 
+### Changed
+- Using `libtcod 1.22.3`.
+
+### Fixed
+- Fixed double present bug in non-context flush functions.
+  This was affecting performance and also caused a screen flicker whenever the global fade color was active.
+
 ## [13.7.0] - 2022-08-07
 ### Added
 - You can new use `SDLConsoleRender.atlas` to access the `SDLTilesetAtlas` used to create it.
