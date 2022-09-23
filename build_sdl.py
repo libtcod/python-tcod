@@ -22,7 +22,7 @@ SDL_MIN_VERSION = (2, 0, 10)
 # The SDL2 version to parse and export symbols from.
 SDL2_PARSE_VERSION = os.environ.get("SDL_VERSION", "2.0.20")
 # The SDL2 version to include in binary distributions.
-SDL2_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "2.0.20")
+SDL2_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "2.24.0")
 
 
 # Used to remove excessive newlines in debug outputs.
@@ -65,6 +65,10 @@ IGNORE_DEFINES = frozenset(
         "SDL_TRUE",
         # Ignore floating point symbols.
         "SDL_FLT_EPSILON",
+        # Conditional config flags which might be missing.
+        "SDL_VIDEO_RENDER_D3D12",
+        "SDL_SENSOR_WINDOWS",
+        "SDL_SENSOR_DUMMY",
     )
 )
 

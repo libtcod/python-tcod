@@ -10,10 +10,12 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ### Changed
 - Using `libtcod 1.22.3`.
+- Bundle `SDL 2.24.0` on Windows and MacOS.
 
 ### Fixed
 - Fixed double present bug in non-context flush functions.
   This was affecting performance and also caused a screen flicker whenever the global fade color was active.
+- Fixed the parsing of SDL 2.24.0 headers on Windows.
 
 ## [13.7.0] - 2022-08-07
 ### Added
