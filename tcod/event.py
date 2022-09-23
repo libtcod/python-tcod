@@ -994,7 +994,7 @@ class ControllerEvent(Event):
 
     @property
     def controller(self) -> tcod.sdl.joystick.GameController:
-        """The :any:`GameController: for this event."""
+        """The :any:`GameController` for this event."""
         if self.type == "CONTROLLERDEVICEADDED":
             return tcod.sdl.joystick.GameController._open(self.which)
         return tcod.sdl.joystick.GameController._from_instance_id(self.which)
