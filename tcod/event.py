@@ -1376,13 +1376,13 @@ class EventDispatch(Generic[T]):
         This usually means a call to :any:`tcod.console_flush` is necessary.
         """
 
-    def ev_windowmoved(self, event: "tcod.event.WindowMoved") -> Optional[T]:
+    def ev_windowmoved(self, event: tcod.event.WindowMoved) -> Optional[T]:
         """Called when the window is moved."""
 
-    def ev_windowresized(self, event: "tcod.event.WindowResized") -> Optional[T]:
+    def ev_windowresized(self, event: tcod.event.WindowResized) -> Optional[T]:
         """Called when the window is resized."""
 
-    def ev_windowsizechanged(self, event: "tcod.event.WindowResized") -> Optional[T]:
+    def ev_windowsizechanged(self, event: tcod.event.WindowResized) -> Optional[T]:
         """Called when the system or user changes the size of the window."""
 
     def ev_windowminimized(self, event: tcod.event.WindowEvent) -> Optional[T]:
@@ -1470,12 +1470,12 @@ class EventDispatch(Generic[T]):
         .. versionadded:: 13.8
         """
 
-    def ev_controllerdeviceremoved(self, event: ControllerDevice) -> Optional[T]:
+    def ev_controllerdeviceremoved(self, event: tcod.event.ControllerDevice) -> Optional[T]:
         """
         .. versionadded:: 13.8
         """
 
-    def ev_controllerdeviceremapped(self, event: ControllerDevice) -> Optional[T]:
+    def ev_controllerdeviceremapped(self, event: tcod.event.ControllerDevice) -> Optional[T]:
         """
         .. versionadded:: 13.8
         """
