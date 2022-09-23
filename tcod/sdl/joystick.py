@@ -375,7 +375,7 @@ def get_controllers() -> List[GameController]:
     return [GameController._open(i) for i in range(_get_number()) if lib.SDL_IsGameController(i)]
 
 
-def get_all() -> List[Union[Joystick, GameController]]:
+def _get_all() -> List[Union[Joystick, GameController]]:
     """Return a list of all connected joystick or controller devices.
 
     If the joystick has a controller mapping then it is returned as a :any:`GameController`.
