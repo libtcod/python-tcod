@@ -12,6 +12,9 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 - Using `libtcod 1.22.3`.
 - Bundle `SDL 2.24.0` on Windows and MacOS.
 
+### Deprecated
+- Renderers other than `tcod.RENDERER_SDL2` are now discouraged.
+
 ### Fixed
 - Fixed double present bug in non-context flush functions.
   This was affecting performance and also caused a screen flicker whenever the global fade color was active.

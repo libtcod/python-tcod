@@ -52,6 +52,7 @@ from __future__ import annotations
 import os
 import pickle
 import sys
+import warnings
 from typing import Any, Iterable, List, Optional, Tuple
 
 from typing_extensions import Literal, NoReturn
@@ -489,8 +490,8 @@ def new(
     Providing no size information at all is also acceptable.
 
     `renderer` is the desired libtcod renderer to use.
-    Typical options are :any:`tcod.context.RENDERER_OPENGL2` for a faster
-    renderer or :any:`tcod.context.RENDERER_SDL2` for a reliable renderer.
+    The default is :any:`tcod.context.RENDERER_SDL2` which is a fast renderer that runs reliably on all platforms.
+    If unsure then don't set this parameter.
 
     `tileset` is the font/tileset for the new context to render with.
     The fall-back tileset available from passing None is useful for
@@ -525,6 +526,12 @@ def new(
     """
     if renderer is None:
         renderer = RENDERER_SDL2
+    if renderer != RENDERER_SDL2:
+        warnings.warn(
+            "In the future all renderers other than tcod.RENDERER_SDL2 may be removed or ignored.",
+            PendingDeprecationWarning,
+            stacklevel=2,
+        )
     if sdl_window_flags is None:
         sdl_window_flags = SDL_WINDOW_RESIZABLE
     if argv is None:
