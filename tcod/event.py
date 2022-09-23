@@ -784,7 +784,7 @@ class WindowResized(WindowEvent):
 class JoystickEvent(Event):
     """A base class for joystick events.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 13.8
     """
 
     def __init__(self, type: str, which: int):
@@ -809,7 +809,7 @@ class JoystickEvent(Event):
 class JoystickAxis(JoystickEvent):
     """When a joystick axis changes in value.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 13.8
 
     .. seealso::
         :any:`tcod.sdl.joystick`
@@ -843,7 +843,7 @@ class JoystickAxis(JoystickEvent):
 class JoystickBall(JoystickEvent):
     """When a joystick ball is moved.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 13.8
 
     .. seealso::
         :any:`tcod.sdl.joystick`
@@ -881,7 +881,7 @@ class JoystickBall(JoystickEvent):
 class JoystickHat(JoystickEvent):
     """When a joystick hat changes direction.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 13.8
 
     .. seealso::
         :any:`tcod.sdl.joystick`
@@ -914,7 +914,7 @@ class JoystickHat(JoystickEvent):
 class JoystickButton(JoystickEvent):
     """When a joystick button is pressed or released.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 13.8
 
     Example::
 
@@ -955,7 +955,7 @@ class JoystickButton(JoystickEvent):
 class JoystickDevice(JoystickEvent):
     """An event for when a joystick is added or removed.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 13.8
 
     Example::
 
@@ -984,7 +984,7 @@ class JoystickDevice(JoystickEvent):
 class ControllerEvent(Event):
     """Base class for controller events.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 13.8
     """
 
     def __init__(self, type: str, which: int):
@@ -1010,7 +1010,7 @@ class ControllerEvent(Event):
 class ControllerAxis(ControllerEvent):
     """When a controller axis is moved.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 13.8
     """
 
     type: Final[Literal["CONTROLLERAXISMOTION"]]  # type: ignore[misc]
@@ -1047,7 +1047,7 @@ class ControllerAxis(ControllerEvent):
 class ControllerButton(ControllerEvent):
     """When a controller button is pressed or released.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 13.8
     """
 
     type: Final[Literal["CONTROLLERBUTTONDOWN", "CONTROLLERBUTTONUP"]]  # type: ignore[misc]
@@ -1086,7 +1086,7 @@ class ControllerButton(ControllerEvent):
 class ControllerDevice(ControllerEvent):
     """When a controller is added, removed, or remapped.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 13.8
     """
 
     type: Final[Literal["CONTROLLERDEVICEADDED", "CONTROLLERDEVICEREMOVED", "CONTROLLERDEVICEREMAPPED"]]  # type: ignore[misc]
@@ -1413,37 +1413,37 @@ class EventDispatch(Generic[T]):
 
     def ev_joyaxismotion(self, event: tcod.event.JoystickAxis) -> Optional[T]:
         """
-        .. versionadded:: Unreleased
+        .. versionadded:: 13.8
         """
 
     def ev_joyballmotion(self, event: tcod.event.JoystickBall) -> Optional[T]:
         """
-        .. versionadded:: Unreleased
+        .. versionadded:: 13.8
         """
 
     def ev_joyhatmotion(self, event: tcod.event.JoystickHat) -> Optional[T]:
         """
-        .. versionadded:: Unreleased
+        .. versionadded:: 13.8
         """
 
     def ev_joybuttondown(self, event: tcod.event.JoystickButton) -> Optional[T]:
         """
-        .. versionadded:: Unreleased
+        .. versionadded:: 13.8
         """
 
     def ev_joybuttonup(self, event: tcod.event.JoystickButton) -> Optional[T]:
         """
-        .. versionadded:: Unreleased
+        .. versionadded:: 13.8
         """
 
     def ev_joydeviceadded(self, event: tcod.event.JoystickDevice) -> Optional[T]:
         """
-        .. versionadded:: Unreleased
+        .. versionadded:: 13.8
         """
 
     def ev_joydeviceremoved(self, event: tcod.event.JoystickDevice) -> Optional[T]:
         """
-        .. versionadded:: Unreleased
+        .. versionadded:: 13.8
         """
 
     def ev_(self, event: Any) -> Optional[T]:

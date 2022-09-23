@@ -1,6 +1,6 @@
 """SDL Joystick Support
 
-.. versionadded:: Unreleased
+.. versionadded:: 13.8
 """
 from __future__ import annotations
 
