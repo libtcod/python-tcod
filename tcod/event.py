@@ -1452,32 +1452,32 @@ class EventDispatch(Generic[T]):
 
     def ev_controlleraxismotion(self, event: tcod.event.ControllerAxis) -> Optional[T]:
         """
-        .. versionadded:: Unreleased
+        .. versionadded:: 13.8
         """
 
     def ev_controllerbuttondown(self, event: tcod.event.ControllerButton) -> Optional[T]:
         """
-        .. versionadded:: Unreleased
+        .. versionadded:: 13.8
         """
 
     def ev_controllerbuttonup(self, event: tcod.event.ControllerButton) -> Optional[T]:
         """
-        .. versionadded:: Unreleased
+        .. versionadded:: 13.8
         """
 
     def ev_controllerdeviceadded(self, event: tcod.event.ControllerDevice) -> Optional[T]:
         """
-        .. versionadded:: Unreleased
+        .. versionadded:: 13.8
         """
 
     def ev_controllerdeviceremoved(self, event: ControllerDevice) -> Optional[T]:
         """
-        .. versionadded:: Unreleased
+        .. versionadded:: 13.8
         """
 
     def ev_controllerdeviceremapped(self, event: ControllerDevice) -> Optional[T]:
         """
-        .. versionadded:: Unreleased
+        .. versionadded:: 13.8
         """
 
     def ev_(self, event: Any) -> Optional[T]:
