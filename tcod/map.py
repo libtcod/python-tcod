@@ -136,7 +136,7 @@ class Map(object):
             algorithm (int): Defaults to tcod.FOV_RESTRICTIVE
 
         If you already have transparency in a NumPy array then you could use
-        :any:`tcod.map_compute_fov` instead.
+        :any:`tcod.map.compute_fov` instead.
         """
         if not (0 <= x < self.width and 0 <= y < self.height):
             warnings.warn(
