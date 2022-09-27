@@ -117,9 +117,9 @@ def test_color_class() -> None:
     assert tcod.black + (2, 2, 2) - (1, 1, 1) == (1, 1, 1)
 
     color = tcod.Color()
-    color.r = 1  # type: ignore
-    color.g = 2  # type: ignore
-    color.b = 3  # type: ignore
+    color.r = 1
+    color.g = 2
+    color.b = 3
     assert color == (1, 2, 3)
 
 

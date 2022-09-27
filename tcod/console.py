@@ -245,7 +245,7 @@ class Console:
         """
         return self._tiles["ch"].T if self._order == "F" else self._tiles["ch"]
 
-    @property  # type: ignore
+    @property
     @deprecate("This attribute has been renamed to `rgba`.")
     def tiles(self) -> NDArray[Any]:
         """An array of this consoles raw tile data.
@@ -261,7 +261,7 @@ class Console:
         """
         return self.rgba
 
-    @property  # type: ignore
+    @property
     @deprecate("This attribute has been renamed to `rgba`.")
     def buffer(self) -> NDArray[Any]:
         """An array of this consoles raw tile data.
@@ -273,7 +273,7 @@ class Console:
         """
         return self.rgba
 
-    @property  # type: ignore
+    @property
     @deprecate("This attribute has been renamed to `rgb`.")
     def tiles_rgb(self) -> NDArray[Any]:
         """An array of this consoles data without the alpha channel.
@@ -285,7 +285,7 @@ class Console:
         """
         return self.rgb
 
-    @property  # type: ignore
+    @property
     @deprecate("This attribute has been renamed to `rgb`.")
     def tiles2(self) -> NDArray[Any]:
         """This name is deprecated in favour of :any:`rgb`.
@@ -347,7 +347,7 @@ class Console:
         color = self._console_data.back
         return color.r, color.g, color.b
 
-    @default_bg.setter  # type: ignore
+    @default_bg.setter
     @deprecate("Console defaults have been deprecated.")
     def default_bg(self, color: Tuple[int, int, int]) -> None:
         self._console_data.back = color
@@ -358,7 +358,7 @@ class Console:
         color = self._console_data.fore
         return color.r, color.g, color.b
 
-    @default_fg.setter  # type: ignore
+    @default_fg.setter
     @deprecate("Console defaults have been deprecated.")
     def default_fg(self, color: Tuple[int, int, int]) -> None:
         self._console_data.fore = color
@@ -368,7 +368,7 @@ class Console:
         """int: The default blending mode."""
         return self._console_data.bkgnd_flag  # type: ignore
 
-    @default_bg_blend.setter  # type: ignore
+    @default_bg_blend.setter
     @deprecate("Console defaults have been deprecated.")
     def default_bg_blend(self, value: int) -> None:
         self._console_data.bkgnd_flag = value
@@ -378,7 +378,7 @@ class Console:
         """int: The default text alignment."""
         return self._console_data.alignment  # type: ignore
 
-    @default_alignment.setter  # type: ignore
+    @default_alignment.setter
     @deprecate("Console defaults have been deprecated.")
     def default_alignment(self, value: int) -> None:
         self._console_data.alignment = value

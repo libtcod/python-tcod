@@ -31,7 +31,7 @@ class Color(List[int]):
         """
         return int(self[0])
 
-    @r.setter  # type: ignore
+    @r.setter
     @deprecate("Setting color attributes has been deprecated.")
     def r(self, value: int) -> None:
         self[0] = value & 0xFF
@@ -45,7 +45,7 @@ class Color(List[int]):
         """
         return int(self[1])
 
-    @g.setter  # type: ignore
+    @g.setter
     @deprecate("Setting color attributes has been deprecated.")
     def g(self, value: int) -> None:
         self[1] = value & 0xFF
@@ -59,7 +59,7 @@ class Color(List[int]):
         """
         return int(self[2])
 
-    @b.setter  # type: ignore
+    @b.setter
     @deprecate("Setting color attributes has been deprecated.")
     def b(self, value: int) -> None:
         self[2] = value & 0xFF
@@ -102,7 +102,7 @@ class Color(List[int]):
             return False
 
     @deprecate("Use NumPy instead for color math operations.")
-    def __add__(self, other: Any) -> Color:
+    def __add__(self, other: Any) -> Color:  # type: ignore[override]
         """Add two colors together.
 
         .. deprecated:: 9.2

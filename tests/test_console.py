@@ -44,16 +44,16 @@ def test_array_read_write() -> None:
 def test_console_defaults() -> None:
     console = tcod.console.Console(width=12, height=10)
 
-    console.default_bg = [2, 3, 4]  # type: ignore
+    console.default_bg = [2, 3, 4]  # type: ignore[assignment]
     assert console.default_bg == (2, 3, 4)
 
-    console.default_fg = (4, 5, 6)  # type: ignore
+    console.default_fg = (4, 5, 6)
     assert console.default_fg == (4, 5, 6)
 
-    console.default_bg_blend = tcod.BKGND_ADD  # type: ignore
+    console.default_bg_blend = tcod.BKGND_ADD
     assert console.default_bg_blend == tcod.BKGND_ADD
 
-    console.default_alignment = tcod.RIGHT  # type: ignore
+    console.default_alignment = tcod.RIGHT
     assert console.default_alignment == tcod.RIGHT
 
 

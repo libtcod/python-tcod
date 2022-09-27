@@ -180,7 +180,7 @@ class Noise(object):
     def dimensions(self) -> int:
         return int(self._tdl_noise_c.dimensions)
 
-    @property  # type: ignore
+    @property
     @deprecate("This is a misspelling of 'dimensions'.")
     def dimentions(self) -> int:
         return self.dimensions

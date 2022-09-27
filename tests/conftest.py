@@ -33,10 +33,10 @@ def console(session_console: tcod.console.Console) -> tcod.console.Console:
     tcod.console_flush()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        console.default_fg = (255, 255, 255)  # type: ignore
-        console.default_bg = (0, 0, 0)  # type: ignore
-        console.default_bg_blend = tcod.BKGND_SET  # type: ignore
-        console.default_alignment = tcod.LEFT  # type: ignore
+        console.default_fg = (255, 255, 255)
+        console.default_bg = (0, 0, 0)
+        console.default_bg_blend = tcod.BKGND_SET
+        console.default_alignment = tcod.LEFT
     console.clear()
     return console
 
