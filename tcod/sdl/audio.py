@@ -11,13 +11,18 @@ It leaves the loading to sound samples to other libaries like
 Example::
 
     # Synchronous audio example using SDL's low-level API.
+    import time
+
     import soundfile  # pip install soundfile
     import tcod.sdl.audio
 
     device = tcod.sdl.audio.open()  # Open the default output device.
-    sound, samplerate = soundfile.read("example_sound.wav")  # Load an audio sample using SoundFile.
+    sound, samplerate = soundfile.read("example_sound.wav", dtype="float32")  # Load an audio sample using SoundFile.
     converted = device.convert(sound, samplerate)  # Convert this sample to the format expected by the device.
     device.queue_audio(converted)  # Play audio syncroniously by appending it to the device buffer.
+
+    while device.queued_samples:  # Wait until device is done playing.
+        time.sleep(0.001)
 
 Example::
 
