@@ -173,7 +173,7 @@ https://en.wikipedia.org/wiki/Code_page_437
          124  0x7C       \'\|\'     VERTICAL LINE
          125  0x7D       \'}\'      RIGHT CURLY BRACKET
          126  0x7E       \'~\'      TILDE
-         127  0x7F       \'\\x7f\'
+         127  0x2302     \'⌂\'      HOUSE
          128  0xC7       \'Ç\'      LATIN CAPITAL LETTER C WITH CEDILLA
          129  0xFC       \'ü\'      LATIN SMALL LETTER U WITH DIAERESIS
          130  0xE9       \'é\'      LATIN SMALL LETTER E WITH ACUTE

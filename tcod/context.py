@@ -489,9 +489,7 @@ def new(
 
     Providing no size information at all is also acceptable.
 
-    `renderer` is the desired libtcod renderer to use.
-    The default is :any:`tcod.context.RENDERER_SDL2` which is a fast renderer that runs reliably on all platforms.
-    If unsure then don't set this parameter.
+    `renderer` now does nothing and should not be set.  It may be removed in the future.
 
     `tileset` is the font/tileset for the new context to render with.
     The fall-back tileset available from passing None is useful for
@@ -524,14 +522,14 @@ def new(
     .. versionchanged:: 13.2
         Added the `console` parameter.
     """
-    if renderer is None:
-        renderer = RENDERER_SDL2
-    if renderer != RENDERER_SDL2:
+    if renderer is not None:
         warnings.warn(
-            "In the future all renderers other than tcod.RENDERER_SDL2 may be removed or ignored.",
-            PendingDeprecationWarning,
+            "The renderer parameter was deprecated and will likely be removed in a future version of libtcod.  "
+            "Remove the renderer parameter to fix this warning.",
+            FutureWarning,
             stacklevel=2,
         )
+    renderer = RENDERER_SDL2
     if sdl_window_flags is None:
         sdl_window_flags = SDL_WINDOW_RESIZABLE
     if argv is None:

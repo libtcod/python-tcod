@@ -29,6 +29,7 @@ RE_PREPROCESSOR = re.compile(r"(?!#define\s+\w+\s+\d+$)#.*?(?<!\\)$", re.DOTALL 
 RE_INCLUDE = re.compile(r'#include "([^"]*)"')
 RE_TAGS = re.compile(
     r"TCODLIB_C?API|TCOD_PUBLIC|TCOD_NODISCARD|TCOD_DEPRECATED_NOMESSAGE|TCOD_DEPRECATED_ENUM"
+    r"|(TCOD_DEPRECATED\(\".*?\"\))"
     r"|(TCOD_DEPRECATED|TCODLIB_FORMAT)\([^)]*\)|__restrict"
 )
 RE_VAFUNC = re.compile(r"^[^;]*\([^;]*va_list.*\);", re.MULTILINE)
@@ -151,7 +152,6 @@ define_macros: List[Tuple[str, Any]] = [("Py_LIMITED_API", Py_LIMITED_API)]
 sources += walk_sources("tcod/")
 sources += walk_sources("libtcod/src/libtcod/")
 sources += ["libtcod/src/vendor/stb.c"]
-sources += ["libtcod/src/vendor/glad.c"]
 sources += ["libtcod/src/vendor/lodepng.c"]
 sources += ["libtcod/src/vendor/utf8proc/utf8proc.c"]
 sources += glob.glob("libtcod/src/vendor/zlib/*.c")
@@ -265,6 +265,8 @@ def parse_sdl_attrs(prefix: str, all_names: List[str]) -> Tuple[str, str]:
     names = []
     lookup = []
     for name, value in sorted(find_sdl_attrs(prefix), key=lambda item: item[1]):
+        if name == "KMOD_RESERVED":
+            continue
         all_names.append(name)
         names.append(f"{name} = {value}")
         lookup.append(f'{value}: "{name}"')

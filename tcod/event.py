@@ -1583,7 +1583,7 @@ def get_keyboard_state() -> NDArray[np.bool_]:
     numkeys = ffi.new("int[1]")
     keyboard_state = lib.SDL_GetKeyboardState(numkeys)
     out: NDArray[np.bool_] = np.frombuffer(ffi.buffer(keyboard_state[0 : numkeys[0]]), dtype=np.bool_)
-    out.flags["WRITEABLE"] = False  # type: ignore[index]  # This buffer is supposed to be const.
+    out.flags["WRITEABLE"] = False  # This buffer is supposed to be const.
     return out
 
 
@@ -2094,6 +2094,8 @@ class Scancode(enum.IntEnum):
     SLEEP = 282
     APP1 = 283
     APP2 = 284
+    AUDIOREWIND = 285
+    AUDIOFASTFORWARD = 286
     # --- end ---
 
     @property
@@ -2639,6 +2641,10 @@ class KeySym(enum.IntEnum):
     KBDILLUMUP = 1073742104
     EJECT = 1073742105
     SLEEP = 1073742106
+    APP1 = 1073742107
+    APP2 = 1073742108
+    AUDIOREWIND = 1073742109
+    AUDIOFASTFORWARD = 1073742110
     # --- end ---
 
     @property

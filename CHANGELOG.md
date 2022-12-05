@@ -4,6 +4,14 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+### Changed
+- Using `libtcod 1.23.1`.
+- Bundle `SDL 2.26.0` on Windows and MacOS.
+- Code Page 437: Character 0x7F is now assigned to 0x2302 (HOUSE).
+- Forced all renderers to ``RENDERER_SDL2`` to fix rare graphical artifacts with OpenGL.
+
+### Deprecated
+- The `renderer` parameter of new contexts is now deprecated.
 
 ## [13.8.1] - 2022-09-23
 ### Fixed

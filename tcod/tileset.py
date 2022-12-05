@@ -584,7 +584,7 @@ CHARMAP_CP437 = [
     0x007C,
     0x007D,
     0x007E,
-    0x007F,
+    0x2302,
     0x00C7,
     0x00FC,
     0x00E9,
@@ -719,6 +719,9 @@ CHARMAP_CP437 = [
 See :ref:`code-page-437` for more info and a table of glyphs.
 
 .. versionadded:: 11.12
+
+.. versionchanged:: Unreleased
+    Character at index ``0x7F`` was changed from value ``0x7F`` to the HOUSE ``⌂`` glyph ``0x2302``.
 """
 
 CHARMAP_TCOD = [
