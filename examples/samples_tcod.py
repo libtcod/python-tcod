@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-This code demonstrates various usages of python-tcod.
-"""
+"""This code demonstrates various usages of python-tcod."""
 # To the extent possible under law, the libtcod maintainers have waived all
 # copyright and related or neighboring rights to these samples.
 # https://creativecommons.org/publicdomain/zero/1.0/
@@ -1412,7 +1410,7 @@ def init_context(renderer: int) -> None:
     context = tcod.context.new(
         columns=root_console.width,
         rows=root_console.height,
-        title=f"python-tcod samples" f" (python-tcod {tcod.__version__}, libtcod {libtcod_version})",
+        title=f"python-tcod samples (python-tcod {tcod.__version__}, libtcod {libtcod_version})",
         renderer=renderer,
         vsync=False,  # VSync turned off since this is for benchmarking.
         tileset=tileset,
@@ -1488,7 +1486,19 @@ def handle_time() -> None:
 
 def handle_events() -> None:
     for event in tcod.event.get():
-        context.convert_event(event)
+        if context.sdl_renderer:
+            # Manual handing of tile coordinates since context.present is skipped.
+            if isinstance(event, (tcod.event.MouseState, tcod.event.MouseMotion)):
+                event.tile = tcod.event.Point(event.pixel.x // tileset.tile_width, event.pixel.y // tileset.tile_height)
+            if isinstance(event, tcod.event.MouseMotion):
+                prev_tile = (
+                    (event.pixel[0] - event.pixel_motion[0]) // tileset.tile_width,
+                    (event.pixel[1] - event.pixel_motion[1]) // tileset.tile_height,
+                )
+                event.tile_motion = tcod.event.Point(event.tile[0] - prev_tile[0], event.tile[1] - prev_tile[1])
+        else:
+            context.convert_event(event)
+
         SAMPLES[cur_sample].dispatch(event)
         if isinstance(event, tcod.event.Quit):
             raise SystemExit()
