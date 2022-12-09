@@ -91,6 +91,7 @@ jobs:
           SDL_VERSION: ${{ matrix.sdl-version }}
 
   build:
+    needs: [black, isort, flake8, mypy]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -197,6 +198,7 @@ jobs:
           python -c "import tcod"
 
   linux-wheels:
+    needs: build # These take a while to build/test, so wait for normal tests to pass first.
     runs-on: "ubuntu-20.04"
     strategy:
       matrix:
@@ -250,6 +252,7 @@ jobs:
           twine upload --skip-existing wheelhouse/*
 
   build-macos:
+    needs: [black, isort, flake8, mypy]
     runs-on: "macos-10.15"
     strategy:
       fail-fast: true
