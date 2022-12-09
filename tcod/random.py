@@ -151,7 +151,7 @@ class Random(object):
         return state
 
     def __setstate__(self, state: Any) -> None:
-        """Create a new cdata object with the stored paramaters."""
+        """Create a new cdata object with the stored parameters."""
         if "algo" in state["random_c"]:
             # Handle old/deprecated format.  Covert to libtcod's new union type.
             state["random_c"]["algorithm"] = state["random_c"]["algo"]

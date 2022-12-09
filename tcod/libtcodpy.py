@@ -1,5 +1,4 @@
-"""This module handles backward compatibility with the ctypes libtcodpy module.
-"""
+"""This module handles backward compatibility with the ctypes libtcodpy module."""
 from __future__ import annotations
 
 import atexit
@@ -72,8 +71,7 @@ def BKGND_ADDALPHA(a: int) -> int:
 
 
 class ConsoleBuffer(object):
-    """Simple console that allows direct (fast) access to cells. simplifies
-    use of the "fill" functions.
+    """Simple console that allows direct (fast) access to cells. Simplifies use of the "fill" functions.
 
     .. deprecated:: 6.0
         Console array attributes perform better than this class.
@@ -102,8 +100,9 @@ class ConsoleBuffer(object):
         fore_b: int = 0,
         char: str = " ",
     ) -> None:
-        """initialize with given width and height. values to fill the buffer
-        are optional, defaults to black with no characters.
+        """Initialize with given width and height.
+
+        Values to fill the buffer are optional, defaults to black with no characters.
         """
         warnings.warn(
             "Console array attributes perform better than this class.",
@@ -124,8 +123,9 @@ class ConsoleBuffer(object):
         fore_b: int = 0,
         char: str = " ",
     ) -> None:
-        """Clears the console.  Values to fill it with are optional, defaults
-        to black with no characters.
+        """Clear the console.
+
+        Values to fill it with are optional, defaults to black with no characters.
 
         Args:
             back_r (int): Red background color, from 0 to 255.
@@ -146,7 +146,7 @@ class ConsoleBuffer(object):
         self.char = [ord(char)] * n
 
     def copy(self) -> ConsoleBuffer:
-        """Returns a copy of this ConsoleBuffer.
+        """Return a copy of this ConsoleBuffer.
 
         Returns:
             ConsoleBuffer: A new ConsoleBuffer copy.
@@ -332,7 +332,7 @@ _LOOKUP_VK = {value: "KEY_%s" % key[6:] for key, value in lib.__dict__.items() i
 
 
 class Key(_CDataWrapper):
-    """Key Event instance
+    r"""Key Event instance
 
     Attributes:
         vk (int): TCOD_keycode_t key code
@@ -631,9 +631,7 @@ def _bsp_traverse(
     callback: Callable[[tcod.bsp.BSP, Any], None],
     userData: Any,
 ) -> None:
-    """pack callback into a handle for use with the callback
-    _pycall_bsp_callback
-    """
+    """Pack callback into a handle for use with the callback _pycall_bsp_callback."""
     for node in node_iter:
         callback(node, userData)
 
@@ -1057,12 +1055,11 @@ def console_map_ascii_codes_to_font(firstAsciiCode: int, nbCodes: int, fontCharX
 
 @deprecate("Setup fonts using the tcod.tileset module.")
 def console_map_string_to_font(s: str, fontCharX: int, fontCharY: int) -> None:
-    """Remap a string of codes to a contiguous set of tiles.
+    r"""Remap a string of codes to a contiguous set of tiles.
 
     Args:
         s (AnyStr): A string of character codes to map to new values.
-                    The null character `'\\x00'` will prematurely end this
-                    function.
+                    Any null character `'\x00'` will prematurely end the printed text.
         fontCharX (int): The starting X tile coordinate on the loaded tileset.
                          0 is the leftmost tile.
         fontCharY (int): The starting Y tile coordinate on the loaded tileset.
@@ -3144,7 +3141,7 @@ def line(xo: int, yo: int, xd: int, yd: int, py_callback: Callable[[int, int], b
             A callback which takes x and y parameters and returns bool.
 
     Returns:
-        bool: False if the callback cancels the line interation by
+        bool: False if the callback cancels the line interaction by
               returning False or None, otherwise True.
 
     .. deprecated:: 2.0
@@ -3947,7 +3944,7 @@ def sys_elapsed_milli() -> int:
     """Get number of milliseconds since the start of the program.
 
     Returns:
-        int: Time since the progeam has started in milliseconds.
+        int: Time since the program has started in milliseconds.
 
     .. deprecated:: 2.0
        Use Python's :mod:`time` module instead.
@@ -3960,7 +3957,7 @@ def sys_elapsed_seconds() -> float:
     """Get number of seconds since the start of the program.
 
     Returns:
-        float: Time since the progeam has started in seconds.
+        float: Time since the program has started in seconds.
 
     .. deprecated:: 2.0
        Use Python's :mod:`time` module instead.
@@ -4097,7 +4094,7 @@ def sys_update_char(
 
 @deprecate("This function is not supported if contexts are being used.")
 def sys_register_SDL_renderer(callback: Callable[[Any], None]) -> None:
-    """Register a custom randering function with libtcod.
+    """Register a custom rendering function with libtcod.
 
     Note:
         This callback will only be called by the SDL renderer.

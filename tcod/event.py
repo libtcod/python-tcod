@@ -185,7 +185,7 @@ def _init_sdl_video() -> None:
 
 
 class Modifier(enum.IntFlag):
-    """Keyboard modifier flags, a bitfield of held modifier keys.
+    """Keyboard modifier flags, a bit-field of held modifier keys.
 
     Use `bitwise and` to check if a modifier key is held.
 
@@ -195,8 +195,6 @@ class Modifier(enum.IntFlag):
     Example::
 
         >>> mod = tcod.event.Modifier(4098)
-        >>> mod
-        <Modifier.NUM|RSHIFT: 4098>
         >>> mod & tcod.event.Modifier.SHIFT  # Check if any shift key is held.
         <Modifier.RSHIFT: 2>
         >>> mod & tcod.event.Modifier.LSHIFT  # Check if left shift key is held.
@@ -1518,7 +1516,7 @@ def add_watch(callback: _EventCallback) -> _EventCallback:
     .. warning::
         How uncaught exceptions in a callback are handled is not currently defined by tcod.
         They will likely be handled by :any:`sys.unraisablehook`.
-        This may be later changed to pass the excpetion to a :any:`tcod.event.get` or :any:`tcod.event.wait` call.
+        This may be later changed to pass the exception to a :any:`tcod.event.get` or :any:`tcod.event.wait` call.
 
     Args:
         callback (Callable[[Event], None]):
@@ -1544,7 +1542,7 @@ def add_watch(callback: _EventCallback) -> _EventCallback:
 
 
 def remove_watch(callback: Callable[[Event], None]) -> None:
-    """Remove a callback as an event wacher.
+    """Remove a callback as an event watcher.
 
     Args:
         callback (Callable[[Event], None]):
@@ -1580,9 +1578,9 @@ def get_keyboard_state() -> NDArray[np.bool_]:
 
     .. versionadded:: 12.3
     """
-    numkeys = ffi.new("int[1]")
-    keyboard_state = lib.SDL_GetKeyboardState(numkeys)
-    out: NDArray[np.bool_] = np.frombuffer(ffi.buffer(keyboard_state[0 : numkeys[0]]), dtype=np.bool_)
+    num_keys = ffi.new("int[1]")
+    keyboard_state = lib.SDL_GetKeyboardState(num_keys)
+    out: NDArray[np.bool_] = np.frombuffer(ffi.buffer(keyboard_state[0 : num_keys[0]]), dtype=np.bool_)
     out.flags["WRITEABLE"] = False  # This buffer is supposed to be const.
     return out
 

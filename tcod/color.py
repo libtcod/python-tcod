@@ -11,7 +11,7 @@ from tcod.loader import lib
 
 
 class Color(List[int]):
-    """
+    """Old-style libtcodpy color class.
 
     Args:
         r (int): Red value, from 0 to 255.
@@ -66,7 +66,6 @@ class Color(List[int]):
 
     @classmethod
     def _new_from_cdata(cls, cdata: Any) -> Color:
-        """new in libtcod-cffi"""
         return cls(cdata.r, cdata.g, cdata.b)
 
     def __getitem__(self, index: Any) -> Any:

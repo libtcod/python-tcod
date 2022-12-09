@@ -168,7 +168,7 @@ class Context:
     """
 
     def __init__(self, context_p: Any):
-        """Creates a context from a cffi pointer."""
+        """Create a context from a cffi pointer."""
         self._context_p = context_p
 
     @classmethod
@@ -176,7 +176,7 @@ class Context:
         return cls(ffi.gc(context_p, lib.TCOD_context_delete))
 
     def __enter__(self) -> Context:
-        """This context can be used as a context manager."""
+        """Enter this context which will close on exiting."""
         return self
 
     def close(self) -> None:
@@ -189,7 +189,7 @@ class Context:
             del self._context_p
 
     def __exit__(self, *args: Any) -> None:
-        """The libtcod context is closed as this context manager exits."""
+        """Automatically close on the context on exit."""
         self.close()
 
     def present(
@@ -335,7 +335,7 @@ class Context:
                 console = context.new_console(magnification=scale)
                 # This printed output will wrap if the window is shrunk.
                 console.print_box(0, 0, console.width, console.height, "Hello world")
-                # Use integer_scaling to prevent subpixel distorsion.
+                # Use integer_scaling to prevent subpixel distortion.
                 # This may add padding around the rendered console.
                 context.present(console, integer_scaling=True)
                 for event in tcod.event.wait():
@@ -353,13 +353,11 @@ class Context:
         return tcod.console.Console(width, height, order=order)
 
     def recommended_console_size(self, min_columns: int = 1, min_rows: int = 1) -> Tuple[int, int]:
-        """Return the recommended (columns, rows) of a console for this
-        context.
+        """Return the recommended (columns, rows) of a console for this context.
 
         `min_columns`, `min_rows` are the lowest values which will be returned.
 
-        If result is only used to create a new console then you may want to
-        call :any:`Context.new_console` instead.
+        If result is only used to create a new console then you may want to call :any:`Context.new_console` instead.
         """
         with ffi.new("int[2]") as size:
             _check(lib.TCOD_context_recommended_console_size(self._context_p, 1.0, size, size + 1))
@@ -407,7 +405,7 @@ class Context:
         Example::
 
             import tcod
-            improt tcod.sdl.video
+            import tcod.sdl.video
 
             def toggle_fullscreen(context: tcod.context.Context) -> None:
                 """Toggle a context window between fullscreen and windowed modes."""
@@ -445,15 +443,16 @@ class Context:
         return tcod.render.SDLTilesetAtlas._from_ref(context_data.renderer, context_data.atlas)
 
     def __reduce__(self) -> NoReturn:
-        """Contexts can not be pickled, so this class will raise
-        :class:`pickle.PicklingError`.
-        """
+        """Contexts can not be pickled, so this class will raise :class:`pickle.PicklingError`."""
         raise pickle.PicklingError("Python-tcod contexts can not be pickled.")
 
 
 @ffi.def_extern()  # type: ignore
 def _pycall_cli_output(catch_reference: Any, output: Any) -> None:
-    """Callback for the libtcod context CLI.  Catches the CLI output."""
+    """Callback for the libtcod context CLI.
+
+    Catches the CLI output.
+    """
     catch: List[str] = ffi.from_handle(catch_reference)
     catch.append(ffi.string(output).decode("utf-8"))
 

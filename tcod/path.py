@@ -33,7 +33,7 @@ from tcod.loader import ffi, lib
 
 @ffi.def_extern()  # type: ignore
 def _pycall_path_old(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:
-    """libtcodpy style callback, needs to preserve the old userData issue."""
+    """Libtcodpy style callback, needs to preserve the old userData issue."""
     func, userData = ffi.from_handle(handle)
     return func(x1, y1, x2, y2, userData)  # type: ignore
 
@@ -56,7 +56,7 @@ def _pycall_path_dest_only(x1: int, y1: int, x2: int, y2: int, handle: Any) -> f
     return ffi.from_handle(handle)(x2, y2)  # type: ignore
 
 
-def _get_pathcost_func(
+def _get_path_cost_func(
     name: str,
 ) -> Callable[[int, int, int, int, Any], float]:
     """Return a properly cast PathCostArray callback."""
@@ -80,7 +80,7 @@ class _EdgeCostFunc(object):
         self.shape = shape
 
     def get_tcod_path_ffi(self) -> Tuple[Any, Any, Tuple[int, int]]:
-        """Return (C callback, userdata handle, shape)"""
+        """Return (C callback, userdata handle, shape)."""
         return self._CALLBACK_P, ffi.new_handle(self._userdata), self.shape
 
     def __repr__(self) -> str:
@@ -123,14 +123,14 @@ class NodeCostArray(np.ndarray):  # type: ignore
     """
 
     _C_ARRAY_CALLBACKS = {
-        np.float32: ("float*", _get_pathcost_func("PathCostArrayFloat32")),
-        np.bool_: ("int8_t*", _get_pathcost_func("PathCostArrayInt8")),
-        np.int8: ("int8_t*", _get_pathcost_func("PathCostArrayInt8")),
-        np.uint8: ("uint8_t*", _get_pathcost_func("PathCostArrayUInt8")),
-        np.int16: ("int16_t*", _get_pathcost_func("PathCostArrayInt16")),
-        np.uint16: ("uint16_t*", _get_pathcost_func("PathCostArrayUInt16")),
-        np.int32: ("int32_t*", _get_pathcost_func("PathCostArrayInt32")),
-        np.uint32: ("uint32_t*", _get_pathcost_func("PathCostArrayUInt32")),
+        np.float32: ("float*", _get_path_cost_func("PathCostArrayFloat32")),
+        np.bool_: ("int8_t*", _get_path_cost_func("PathCostArrayInt8")),
+        np.int8: ("int8_t*", _get_path_cost_func("PathCostArrayInt8")),
+        np.uint8: ("uint8_t*", _get_path_cost_func("PathCostArrayUInt8")),
+        np.int16: ("int16_t*", _get_path_cost_func("PathCostArrayInt16")),
+        np.uint16: ("uint16_t*", _get_path_cost_func("PathCostArrayUInt16")),
+        np.int32: ("int32_t*", _get_path_cost_func("PathCostArrayInt32")),
+        np.uint32: ("uint32_t*", _get_path_cost_func("PathCostArrayUInt32")),
     }
 
     def __new__(cls, array: ArrayLike) -> NodeCostArray:
@@ -676,12 +676,12 @@ class CustomGraph:
 
     @property
     def ndim(self) -> int:
-        """The number of dimensions."""
+        """Return the number of dimensions."""
         return self._ndim
 
     @property
     def shape(self) -> Tuple[int, ...]:
-        """The shape of this graph."""
+        """Return the shape of this graph."""
         return self._shape
 
     def add_edge(
@@ -895,7 +895,7 @@ class CustomGraph:
             self.add_edge(edge, edge_cost, cost=cost, condition=condition)
 
     def set_heuristic(self, *, cardinal: int = 0, diagonal: int = 0, z: int = 0, w: int = 0) -> None:
-        """Sets a pathfinder heuristic so that pathfinding can done with A*.
+        """Set a pathfinder heuristic so that pathfinding can done with A*.
 
         `cardinal`, `diagonal`, `z, and `w` are the lower-bound cost of
         movement in those directions.  Values above the lower-bound can be
@@ -1092,7 +1092,7 @@ class Pathfinder:
 
     @property
     def distance(self) -> NDArray[Any]:
-        """The distance values of the pathfinder.
+        """Distance values of the pathfinder.
 
         The array returned from this property maintains the graphs `order`.
 
@@ -1112,7 +1112,7 @@ class Pathfinder:
 
     @property
     def traversal(self) -> NDArray[Any]:
-        """An array used to generate paths from any point to the nearest root.
+        """Array used to generate paths from any point to the nearest root.
 
         The array returned from this property maintains the graphs `order`.
         It has an extra dimension which includes the index of the next path.

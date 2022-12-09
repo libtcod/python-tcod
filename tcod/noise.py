@@ -181,7 +181,7 @@ class Noise(object):
         return int(self._tdl_noise_c.dimensions)
 
     @property
-    @deprecate("This is a misspelling of 'dimensions'.")
+    @deprecate("This is a misspelling of 'dimensions'.", FutureWarning)
     def dimentions(self) -> int:
         return self.dimensions
 
@@ -416,7 +416,7 @@ def grid(
     origin: Optional[Tuple[int, ...]] = None,
     indexing: Literal["ij", "xy"] = "xy",
 ) -> Tuple[NDArray[Any], ...]:
-    """A helper function for generating a grid of noise samples.
+    """Helper function for generating a grid of noise samples.
 
     `shape` is the shape of the returned mesh grid.  This can be any number of
     dimensions, but :class:`Noise` classes only support up to 4.

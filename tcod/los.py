@@ -1,5 +1,4 @@
-"""This modules holds functions for NumPy-based line of sight algorithms.
-"""
+"""This modules holds functions for NumPy-based line of sight algorithms."""
 from __future__ import annotations
 
 from typing import Any, Tuple

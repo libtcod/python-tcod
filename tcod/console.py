@@ -45,8 +45,7 @@ This dtype is: ``np.dtype([("ch", np.intc), ("fg", "3B"), ("bg", "3B")])``
 
 
 class Console:
-    """A console object containing a grid of characters with
-    foreground/background colors.
+    """A console object containing a grid of characters with foreground/background colors.
 
     `width` and `height` are the size of the console (in tiles.)
 
@@ -771,7 +770,7 @@ class Console:
                 None, or a (red, green, blue) tuple with values of 0-255.
 
         .. versionchanged:: 4.0
-            Parameters were rearraged and made optional.
+            Parameters were rearranged and made optional.
 
             Previously they were:
             `(x, y, width, height, dest, dest_x, dest_y, *)`
@@ -841,7 +840,7 @@ class Console:
         self._key_color = color
 
     def __enter__(self) -> Console:
-        """Returns this console in a managed context.
+        """Return this console in a managed context.
 
         When the root console is used as a context, the graphical window will
         close once the context is left as if :any:`tcod.console_delete` was
@@ -870,14 +869,14 @@ class Console:
         lib.TCOD_console_delete(self.console_c)
 
     def __exit__(self, *args: Any) -> None:
-        """Closes the graphical window on exit.
+        """Close the graphical window on exit.
 
         Some tcod functions may have undefined behavior after this point.
         """
         self.close()
 
     def __bool__(self) -> bool:
-        """Returns False if this is the root console.
+        """Return False if this is the root console.
 
         This mimics libtcodpy behavior.
         """
@@ -939,14 +938,14 @@ class Console:
         bg_blend: int = tcod.constants.BKGND_SET,
         alignment: int = tcod.constants.LEFT,
     ) -> None:
-        """Print a string on a console with manual line breaks.
+        r"""Print a string on a console with manual line breaks.
 
         `x` and `y` are the starting tile, with ``0,0`` as the upper-left
         corner of the console.
 
         `string` is a Unicode string which may include color control
         characters.  Strings which are too long will be truncated until the
-        next newline character ``"\\n"``.
+        next newline character ``"\n"``.
 
         `fg` and `bg` are the foreground text color and background tile color
         respectfully.  This is a 3-item tuple with (r, g, b) color values from
@@ -1051,7 +1050,7 @@ class Console:
         *,
         decoration: Union[str, Tuple[int, int, int, int, int, int, int, int, int]] = "┌─┐│ │└─┘",
     ) -> None:
-        """Draw a framed rectangle with an optional title.
+        r"""Draw a framed rectangle with an optional title.
 
         `x` and `y` are the starting tile, with ``0,0`` as the upper-left
         corner of the console.
@@ -1104,9 +1103,9 @@ class Console:
             >>> console.print_box(x=0, y=5, width=12, height=1, string="┤Lower├", alignment=tcod.CENTER)
             1
             >>> print(console)
-            <┌─┐╔═╗123/-\\
+            <┌─┐╔═╗123/-\
              │ │║ ║456| |
-             └─┘╚═╝789\\-/
+             └─┘╚═╝789\-/
              ┌─ Title ──┐
              │          │
              └─┤Lower├──┘>

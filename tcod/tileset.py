@@ -54,17 +54,17 @@ class Tileset:
 
     @property
     def tile_width(self) -> int:
-        """The width of the tile in pixels."""
+        """Width of the tile in pixels."""
         return int(lib.TCOD_tileset_get_tile_width_(self._tileset_p))
 
     @property
     def tile_height(self) -> int:
-        """The height of the tile in pixels."""
+        """Height of the tile in pixels."""
         return int(lib.TCOD_tileset_get_tile_height_(self._tileset_p))
 
     @property
     def tile_shape(self) -> Tuple[int, int]:
-        """The shape (height, width) of the tile in pixels."""
+        """Shape (height, width) of the tile in pixels."""
         return self.tile_height, self.tile_width
 
     def __contains__(self, codepoint: int) -> bool:
@@ -357,7 +357,7 @@ def load_tilesheet(
 
 
 def procedural_block_elements(*, tileset: Tileset) -> None:
-    """Overwrites the block element codepoints in `tileset` with prodecually generated glyphs.
+    """Overwrite the block element codepoints in `tileset` with procedurally generated glyphs.
 
     Args:
         tileset (Tileset): A :any:`Tileset` with tiles of any shape.

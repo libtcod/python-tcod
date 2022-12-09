@@ -1,4 +1,4 @@
-"""
+r"""
 The following example shows how to traverse the BSP tree using Python.  This
 assumes `create_room` and `connect_rooms` will be replaced by custom code.
 
@@ -19,7 +19,7 @@ Example::
     for node in bsp.pre_order():
         if node.children:
             node1, node2 = node.children
-            print('Connect the rooms:\\n%s\\n%s' % (node1, node2))
+            print('Connect the rooms:\n%s\n%s' % (node1, node2))
         else:
             print('Dig a room for %s.' % node)
 """
@@ -33,8 +33,7 @@ from tcod.loader import ffi, lib
 
 
 class BSP(object):
-    """A binary space partitioning tree which can be used for simple dungeon
-    generation.
+    """A binary space partitioning tree which can be used for simple dungeon generation.
 
     Attributes:
         x (int): Rectangle left coordinate.
@@ -242,7 +241,7 @@ class BSP(object):
             yield from levels.pop()
 
     def contains(self, x: int, y: int) -> bool:
-        """Returns True if this node contains these coordinates.
+        """Return True if this node contains these coordinates.
 
         Args:
             x (int): X position to check.

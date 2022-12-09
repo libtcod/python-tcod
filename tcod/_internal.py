@@ -1,5 +1,4 @@
-"""This module internal helper functions used by the rest of the library.
-"""
+"""This module internal helper functions used by the rest of the library."""
 from __future__ import annotations
 
 import functools
@@ -39,8 +38,7 @@ def pending_deprecate(
     category: Any = PendingDeprecationWarning,
     stacklevel: int = 0,
 ) -> Callable[[F], F]:
-    """Like deprecate, but the default parameters are filled out for a generic
-    pending deprecation warning."""
+    """Like deprecate, but the default parameters are filled out for a generic pending deprecation warning."""
     return deprecate(message, category, stacklevel)
 
 
@@ -88,7 +86,7 @@ def _unpack_char_p(char_p: Any) -> str:
 
 
 def _int(int_or_str: Any) -> int:
-    "return an integer where a single character string may be expected"
+    """Return an integer where a single character string may be expected."""
     if isinstance(int_or_str, str):
         return ord(int_or_str)
     if isinstance(int_or_str, bytes):
@@ -125,8 +123,9 @@ def _fmt(string: str, stacklevel: int = 2) -> bytes:
 
 
 class _PropagateException:
-    """Context manager designed to propagate exceptions outside of a cffi
-    callback context.  Normally cffi suppresses the exception.
+    """Context manager designed to propagate exceptions outside of a cffi callback context.
+
+    Normally cffi suppresses the exception.
 
     When propagate is called this class will hold onto the error until the
     control flow leaves the context, then the error will be raised.
@@ -148,9 +147,7 @@ class _PropagateException:
             self.exc_info = exc_info
 
     def __enter__(self) -> Callable[[Any], None]:
-        """Once in context, only the propagate call is needed to use this
-        class effectively.
-        """
+        """Once in context, only the propagate call is needed to use this class effectively."""
         return self.propagate
 
     def __exit__(self, type: Any, value: Any, traceback: Any) -> None:
