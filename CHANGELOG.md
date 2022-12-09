@@ -4,6 +4,9 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+### Added
+- Added explicit support for namespace packages.
+
 ### Changed
 - Using `libtcod 1.23.1`.
 - Bundle `SDL 2.26.0` on Windows and MacOS.

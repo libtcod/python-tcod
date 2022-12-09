@@ -10,6 +10,9 @@ from __future__ import annotations
 
 import sys
 import warnings
+from pkgutil import extend_path
+
+__path__ = extend_path(__path__, __name__)
 
 from tcod import bsp, color, console, context, event, image, los, map, noise, path, random, tileset
 from tcod.console import Console  # noqa: F401
