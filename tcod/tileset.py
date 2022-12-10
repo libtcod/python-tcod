@@ -720,7 +720,7 @@ See :ref:`code-page-437` for more info and a table of glyphs.
 
 .. versionadded:: 11.12
 
-.. versionchanged:: Unreleased
+.. versionchanged:: 14.0
     Character at index ``0x7F`` was changed from value ``0x7F`` to the HOUSE ``⌂`` glyph ``0x2302``.
 """
 
