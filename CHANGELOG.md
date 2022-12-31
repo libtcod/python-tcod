@@ -4,6 +4,9 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+### Changed
+- Updated the case of window event types to match their type annotations.
+  This may cause regressions.  Run Mypy to check for ``[comparison-overlap]`` errors.
 
 ## [14.0.0] - 2022-12-09
 ### Added

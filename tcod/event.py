@@ -650,10 +650,7 @@ class TextInput(Event):
 
 
 class WindowEvent(Event):
-    """
-    Attributes:
-        type (str): A window event could mean various event types.
-    """
+    """A window event."""
 
     type: Final[  # type: ignore[misc]  # Narrowing final type.
         Literal[
@@ -675,12 +672,13 @@ class WindowEvent(Event):
             "WindowHitTest",
         ]
     ]
+    """The current window event. This can be one of various options."""
 
     @classmethod
     def from_sdl_event(cls, sdl_event: Any) -> Union[WindowEvent, Undefined]:
         if sdl_event.window.event not in cls.__WINDOW_TYPES:
             return Undefined.from_sdl_event(sdl_event)
-        event_type: Final = cls.__WINDOW_TYPES[sdl_event.window.event].upper()
+        event_type: Final = cls.__WINDOW_TYPES[sdl_event.window.event]
         self: WindowEvent
         if sdl_event.window.event == lib.SDL_WINDOWEVENT_MOVED:
             self = WindowMoved(sdl_event.window.data1, sdl_event.window.data2)
@@ -720,12 +718,12 @@ class WindowEvent(Event):
 class WindowMoved(WindowEvent):
     """
     Attributes:
-        type (str): Always "WINDOWMOVED".
         x (int): Movement on the x-axis.
         y (int): Movement on the y-axis.
     """
 
     type: Final[Literal["WINDOWMOVED"]]  # type: ignore[assignment,misc]
+    """Always "WINDOWMOVED"."""
 
     def __init__(self, x: int, y: int) -> None:
         super().__init__(None)
@@ -751,12 +749,12 @@ class WindowMoved(WindowEvent):
 class WindowResized(WindowEvent):
     """
     Attributes:
-        type (str): "WINDOWRESIZED" or "WINDOWSIZECHANGED"
         width (int): The current width of the window.
         height (int): The current height of the window.
     """
 
     type: Final[Literal["WINDOWRESIZED", "WINDOWSIZECHANGED"]]  # type: ignore[assignment,misc]
+    """WINDOWRESIZED" or "WINDOWSIZECHANGED"""
 
     def __init__(self, type: str, width: int, height: int) -> None:
         super().__init__(type)
