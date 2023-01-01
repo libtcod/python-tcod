@@ -60,7 +60,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "python-tcod"
-copyright = "2009-2021, Kyle Benesch"
+copyright = "2009-2023, Kyle Benesch"
 author = "Kyle Benesch"
 
 # The version info for the project you're documenting, acts as replacement for
