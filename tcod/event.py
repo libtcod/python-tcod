@@ -384,7 +384,7 @@ class MouseState(Event):
     """
     Attributes:
         type (str): Always "MOUSESTATE".
-        pixel (Point): The pixel coordinates of the mouse.
+        position (Point): The position coordinates of the mouse.
         tile (Point): The integer tile coordinates of the mouse on the screen.
         state (int): A bitmask of which mouse buttons are currently held.
 
@@ -397,39 +397,70 @@ class MouseState(Event):
             * tcod.event.BUTTON_X2MASK
 
     .. versionadded:: 9.3
+
+    .. versionchanged:: Unreleased
+        Renamed `pixel` attribute to `position`.
     """
 
     def __init__(
         self,
-        pixel: Tuple[int, int] = (0, 0),
+        position: Tuple[int, int] = (0, 0),
         tile: Optional[Tuple[int, int]] = (0, 0),
         state: int = 0,
     ):
         super().__init__()
-        self.pixel = Point(*pixel)
+        self.position = Point(*position)
         self.__tile = Point(*tile) if tile is not None else None
         self.state = state
 
     @property
+    def pixel(self) -> Point:
+        warnings.warn(
+            "The mouse.pixel attribute is deprecated.  Use mouse.position instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.position
+
+    @pixel.setter
+    def pixel(self, value: Point) -> None:
+        warnings.warn(
+            "The mouse.pixel attribute is deprecated.  Use mouse.position instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self.position = value
+
+    @property
     def tile(self) -> Point:
+        warnings.warn(
+            "The mouse.tile attribute is deprecated.  Use mouse.position of the event returned by context.convert_event instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return _verify_tile_coordinates(self.__tile)
 
     @tile.setter
     def tile(self, xy: Tuple[int, int]) -> None:
+        warnings.warn(
+            "The mouse.tile attribute is deprecated.  Use mouse.position of the event returned by context.convert_event instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.__tile = Point(*xy)
 
     def __repr__(self) -> str:
-        return ("tcod.event.%s(pixel=%r, tile=%r, state=%s)") % (
+        return ("tcod.event.%s(position=%r, tile=%r, state=%s)") % (
             self.__class__.__name__,
-            tuple(self.pixel),
+            tuple(self.position),
             tuple(self.tile),
             _describe_bitmask(self.state, _REVERSE_BUTTON_MASK_TABLE_PREFIX),
         )
 
     def __str__(self) -> str:
-        return ("<%s, pixel=(x=%i, y=%i), tile=(x=%i, y=%i), state=%s>") % (
+        return ("<%s, position=(x=%i, y=%i), tile=(x=%i, y=%i), state=%s>") % (
             super().__str__().strip("<>"),
-            *self.pixel,
+            *self.position,
             *self.tile,
             _describe_bitmask(self.state, _REVERSE_BUTTON_MASK_TABLE),
         )
@@ -439,8 +470,8 @@ class MouseMotion(MouseState):
     """
     Attributes:
         type (str): Always "MOUSEMOTION".
-        pixel (Point): The pixel coordinates of the mouse.
-        pixel_motion (Point): The pixel delta.
+        position (Point): The pixel coordinates of the mouse.
+        motion (Point): The pixel delta.
         tile (Point): The integer tile coordinates of the mouse on the screen.
         tile_motion (Point): The integer tile delta.
         state (int): A bitmask of which mouse buttons are currently held.
@@ -452,26 +483,60 @@ class MouseMotion(MouseState):
             * tcod.event.BUTTON_RMASK
             * tcod.event.BUTTON_X1MASK
             * tcod.event.BUTTON_X2MASK
+
+    .. versionchanged:: Unreleased
+        Renamed `pixel` attribute to `position`.
+        Renamed `pixel_motion` attribute to `motion`.
     """
 
     def __init__(
         self,
-        pixel: Tuple[int, int] = (0, 0),
-        pixel_motion: Tuple[int, int] = (0, 0),
+        position: Tuple[int, int] = (0, 0),
+        motion: Tuple[int, int] = (0, 0),
         tile: Optional[Tuple[int, int]] = (0, 0),
         tile_motion: Optional[Tuple[int, int]] = (0, 0),
         state: int = 0,
     ):
-        super().__init__(pixel, tile, state)
-        self.pixel_motion = Point(*pixel_motion)
+        super().__init__(position, tile, state)
+        self.motion = Point(*motion)
         self.__tile_motion = Point(*tile_motion) if tile_motion is not None else None
 
     @property
+    def pixel_motion(self) -> Point:
+        warnings.warn(
+            "The mouse.pixel_motion attribute is deprecated.  Use mouse.motion instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.motion
+
+    @pixel_motion.setter
+    def pixel_motion(self, value: Point) -> None:
+        warnings.warn(
+            "The mouse.pixel_motion attribute is deprecated.  Use mouse.motion instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self.motion = value
+
+    @property
     def tile_motion(self) -> Point:
+        warnings.warn(
+            "The mouse.tile_motion attribute is deprecated."
+            "  Use mouse.motion of the event returned by context.convert_event instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return _verify_tile_coordinates(self.__tile_motion)
 
     @tile_motion.setter
     def tile_motion(self, xy: Tuple[int, int]) -> None:
+        warnings.warn(
+            "The mouse.tile_motion attribute is deprecated."
+            "  Use mouse.motion of the event returned by context.convert_event instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.__tile_motion = Point(*xy)
 
     @classmethod
@@ -494,19 +559,19 @@ class MouseMotion(MouseState):
         return self
 
     def __repr__(self) -> str:
-        return ("tcod.event.%s(pixel=%r, pixel_motion=%r, " "tile=%r, tile_motion=%r, state=%s)") % (
+        return ("tcod.event.%s(position=%r, motion=%r, tile=%r, tile_motion=%r, state=%s)") % (
             self.__class__.__name__,
-            tuple(self.pixel),
-            tuple(self.pixel_motion),
+            tuple(self.position),
+            tuple(self.motion),
             tuple(self.tile),
             tuple(self.tile_motion),
             _describe_bitmask(self.state, _REVERSE_BUTTON_MASK_TABLE_PREFIX),
         )
 
     def __str__(self) -> str:
-        return ("<%s, pixel_motion=(x=%i, y=%i), tile_motion=(x=%i, y=%i)>") % (
+        return ("<%s, motion=(x=%i, y=%i), tile_motion=(x=%i, y=%i)>") % (
             super().__str__().strip("<>"),
-            *self.pixel_motion,
+            *self.motion,
             *self.tile_motion,
         )
 
@@ -516,7 +581,7 @@ class MouseButtonEvent(MouseState):
     Attributes:
         type (str): Will be "MOUSEBUTTONDOWN" or "MOUSEBUTTONUP",
                     depending on the event.
-        pixel (Point): The pixel coordinates of the mouse.
+        position (Point): The pixel coordinates of the mouse.
         tile (Point): The integer tile coordinates of the mouse on the screen.
         button (int): Which mouse button.
 
@@ -527,6 +592,7 @@ class MouseButtonEvent(MouseState):
             * tcod.event.BUTTON_RIGHT
             * tcod.event.BUTTON_X1
             * tcod.event.BUTTON_X2
+
     """
 
     def __init__(
@@ -559,17 +625,17 @@ class MouseButtonEvent(MouseState):
         return self
 
     def __repr__(self) -> str:
-        return "tcod.event.%s(pixel=%r, tile=%r, button=%s)" % (
+        return "tcod.event.%s(position=%r, tile=%r, button=%s)" % (
             self.__class__.__name__,
-            tuple(self.pixel),
+            tuple(self.position),
             tuple(self.tile),
             _REVERSE_BUTTON_TABLE_PREFIX[self.button],
         )
 
     def __str__(self) -> str:
-        return "<type=%r, pixel=(x=%i, y=%i), tile=(x=%i, y=%i), button=%s)" % (
+        return "<type=%r, position=(x=%i, y=%i), tile=(x=%i, y=%i), button=%s)" % (
             self.type,
-            *self.pixel,
+            *self.position,
             *self.tile,
             _REVERSE_BUTTON_TABLE[self.button],
         )

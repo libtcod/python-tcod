@@ -1105,8 +1105,8 @@ class MouseSample(Sample):
             "Right button   : %s\n"
             "Middle button  : %s\n"
             % (
-                self.motion.pixel.x,
-                self.motion.pixel.y,
+                self.motion.position.x,
+                self.motion.position.y,
                 self.motion.tile.x,
                 self.motion.tile.y,
                 self.motion.tile_motion.x,
@@ -1489,11 +1489,13 @@ def handle_events() -> None:
         if context.sdl_renderer:
             # Manual handing of tile coordinates since context.present is skipped.
             if isinstance(event, (tcod.event.MouseState, tcod.event.MouseMotion)):
-                event.tile = tcod.event.Point(event.pixel.x // tileset.tile_width, event.pixel.y // tileset.tile_height)
+                event.tile = tcod.event.Point(
+                    event.position.x // tileset.tile_width, event.position.y // tileset.tile_height
+                )
             if isinstance(event, tcod.event.MouseMotion):
                 prev_tile = (
-                    (event.pixel[0] - event.pixel_motion[0]) // tileset.tile_width,
-                    (event.pixel[1] - event.pixel_motion[1]) // tileset.tile_height,
+                    (event.position[0] - event.motion[0]) // tileset.tile_width,
+                    (event.position[1] - event.motion[1]) // tileset.tile_height,
                 )
                 event.tile_motion = tcod.event.Point(event.tile[0] - prev_tile[0], event.tile[1] - prev_tile[1])
         else:

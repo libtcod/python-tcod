@@ -49,11 +49,12 @@ to setup the size of the console.  You should use
 """  # noqa: E501
 from __future__ import annotations
 
+import copy
 import os
 import pickle
 import sys
 import warnings
-from typing import Any, Iterable, List, Optional, Tuple
+from typing import Any, Iterable, List, Optional, Tuple, TypeVar
 
 from typing_extensions import Literal, NoReturn
 
@@ -86,6 +87,8 @@ __all__ = (
     "RENDERER_SDL2",
     "RENDERER_XTERM",
 )
+
+_Event = TypeVar("_Event", bound=tcod.event.Event)
 
 SDL_WINDOW_FULLSCREEN = lib.SDL_WINDOW_FULLSCREEN
 """Exclusive fullscreen mode.
@@ -247,30 +250,38 @@ class Context:
             _check(lib.TCOD_context_screen_pixel_to_tile_d(self._context_p, xy, xy + 1))
             return xy[0], xy[1]
 
-    def convert_event(self, event: tcod.event.Event) -> None:
-        """Fill in the tile coordinates of a mouse event using this context.
+    def convert_event(self, event: _Event) -> _Event:
+        """Return an event with mouse pixel coordinates converted into tile coordinates.
 
         Example::
 
             context: tcod.context.Context
             for event in tcod.event.get():
+                event_tile = context.convert_event(event)
                 if isinstance(event, tcod.event.MouseMotion):
-                    # Pixel coordinates are always accessible.
-                    print(f"{event.pixel=}, {event.pixel_motion=}")
-                context.convert_event(event)
-                if isinstance(event, tcod.event.MouseMotion):
-                    # Now tile coordinate attributes can be accessed.
-                    print(f"{event.tile=}, {event.tile_motion=}")
-                    # A warning will be raised if you try to access these without convert_event.
+                    # Events start with pixel coordinates and motion.
+                    print(f"Pixels: {event.position=}, {event.motion=}")
+                if isinstance(event_tile, tcod.event.MouseMotion):
+                    # Tile coordinates are used in the returned event.
+                    print(f"Tiles: {event_tile.position=}, {event_tile.motion=}")
+
+        .. versionchanged:: Unreleased
+            Now returns a new event with the coordinates converted into tiles.
         """
+        event_copy = copy.copy(event)
         if isinstance(event, (tcod.event.MouseState, tcod.event.MouseMotion)):
-            event.tile = tcod.event.Point(*self.pixel_to_tile(*event.pixel))
+            assert isinstance(event_copy, (tcod.event.MouseState, tcod.event.MouseMotion))
+            event_copy.position = event.tile = tcod.event.Point(*self.pixel_to_tile(*event.position))
         if isinstance(event, tcod.event.MouseMotion):
+            assert isinstance(event_copy, tcod.event.MouseMotion)
             prev_tile = self.pixel_to_tile(
-                event.pixel[0] - event.pixel_motion[0],
-                event.pixel[1] - event.pixel_motion[1],
+                event.position[0] - event.motion[0],
+                event.position[1] - event.motion[1],
             )
-            event.tile_motion = tcod.event.Point(event.tile[0] - prev_tile[0], event.tile[1] - prev_tile[1])
+            event_copy.motion = event.tile_motion = tcod.event.Point(
+                event.tile[0] - prev_tile[0], event.tile[1] - prev_tile[1]
+            )
+        return event_copy
 
     def save_screenshot(self, path: Optional[str] = None) -> None:
         """Save a screen-shot to the given file path."""
