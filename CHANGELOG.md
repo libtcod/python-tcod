@@ -4,9 +4,16 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+
+## [15.0.0] - 2023-01-04
 ### Changed
-- Updated the case of window event types to match their type annotations.
+- Modified the letter case of window event types to match their type annotations.
   This may cause regressions.  Run Mypy to check for ``[comparison-overlap]`` errors.
+- Mouse event attributes have been changed ``.pixel -> .position`` and ``.pixel_motion -> .motion``.
+- `Context.convert_event` now returns copies of events with mouse coordinates converted into tile positions.
+
+### Deprecated
+- Mouse event pixel and tile attributes have been deprecated.
 
 ## [14.0.0] - 2022-12-09
 ### Added

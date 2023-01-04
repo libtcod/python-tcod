@@ -398,7 +398,7 @@ class MouseState(Event):
 
     .. versionadded:: 9.3
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 15.0
         Renamed `pixel` attribute to `position`.
     """
 
@@ -484,7 +484,7 @@ class MouseMotion(MouseState):
             * tcod.event.BUTTON_X1MASK
             * tcod.event.BUTTON_X2MASK
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 15.0
         Renamed `pixel` attribute to `position`.
         Renamed `pixel_motion` attribute to `motion`.
     """

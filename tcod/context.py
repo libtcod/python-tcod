@@ -265,7 +265,7 @@ class Context:
                     # Tile coordinates are used in the returned event.
                     print(f"Tiles: {event_tile.position=}, {event_tile.motion=}")
 
-        .. versionchanged:: Unreleased
+        .. versionchanged:: 15.0
             Now returns a new event with the coordinates converted into tiles.
         """
         event_copy = copy.copy(event)
