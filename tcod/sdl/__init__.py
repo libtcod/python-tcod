@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import logging
+from pkgutil import extend_path
 from typing import Any, Callable, Tuple, TypeVar
 
 from tcod.loader import ffi, lib
+
+__path__ = extend_path(__path__, __name__)
 
 T = TypeVar("T")
 
@@ -59,7 +62,7 @@ def _linked_version() -> Tuple[int, int, int]:
 
 
 def _version_at_least(required: Tuple[int, int, int]) -> None:
-    """Raise an error if the compiled version is less than required.  Used to guard recentally defined SDL functions."""
+    """Raise an error if the compiled version is less than required.  Used to guard recently defined SDL functions."""
     if required <= _compiled_version():
         return
     raise RuntimeError(
