@@ -12,27 +12,24 @@ Example::
     ...     algorithm=tcod.noise.Algorithm.SIMPLEX,
     ...     seed=42,
     ... )
-    >>> samples = noise[tcod.noise.grid(shape=(5, 5), scale=0.25, origin=(0, 0))]
+    >>> samples = noise[tcod.noise.grid(shape=(5, 4), scale=0.25, origin=(0, 0))]
     >>> samples  # Samples are a grid of floats between -1.0 and 1.0
     array([[ 0.        , -0.55046356, -0.76072866, -0.7088647 , -0.68165785],
            [-0.27523372, -0.7205134 , -0.74057037, -0.43919194, -0.29195625],
            [-0.40398532, -0.57662135, -0.33160293,  0.12860827,  0.2864191 ],
-           [-0.50773406, -0.2643614 ,  0.24446318,  0.6390255 ,  0.5922846 ],
-           [-0.64945626, -0.12529983,  0.5346834 ,  0.80402255,  0.52655405]],
+           [-0.50773406, -0.2643614 ,  0.24446318,  0.6390255 ,  0.5922846 ]],
           dtype=float32)
     >>> (samples + 1.0) * 0.5  # You can normalize samples to 0.0 - 1.0
     array([[0.5       , 0.22476822, 0.11963567, 0.14556766, 0.15917107],
            [0.36238313, 0.1397433 , 0.12971482, 0.28040403, 0.35402188],
            [0.29800734, 0.21168932, 0.33419853, 0.5643041 , 0.6432096 ],
-           [0.24613297, 0.3678193 , 0.6222316 , 0.8195127 , 0.79614234],
-           [0.17527187, 0.4373501 , 0.76734173, 0.9020113 , 0.76327705]],
+           [0.24613297, 0.3678193 , 0.6222316 , 0.8195127 , 0.79614234]],
           dtype=float32)
     >>> ((samples + 1.0) * (256 / 2)).astype(np.uint8)  # Or as 8-bit unsigned bytes.
     array([[128,  57,  30,  37,  40],
            [ 92,  35,  33,  71,  90],
            [ 76,  54,  85, 144, 164],
-           [ 63,  94, 159, 209, 203],
-           [ 44, 111, 196, 230, 195]], dtype=uint8)
+           [ 63,  94, 159, 209, 203]], dtype=uint8)
 """  # noqa: E501
 from __future__ import annotations
 
@@ -103,26 +100,23 @@ def __getattr__(name: str) -> Implementation:
 
 
 class Noise(object):
-    """
+    """A configurable noise sampler.
 
     The ``hurst`` exponent describes the raggedness of the resultant noise,
     with a higher value leading to a smoother noise.
     Not used with tcod.noise.SIMPLE.
 
-    ``lacunarity`` is a multiplier that determines how fast the noise
-    frequency increases for each successive octave.
+    ``lacunarity`` is a multiplier that determines how fast the noise frequency increases for each successive octave.
     Not used with tcod.noise.SIMPLE.
 
     Args:
-        dimensions (int): Must be from 1 to 4.
-        algorithm (int): Defaults to :any:`tcod.noise.Algorithm.SIMPLEX`
-        implementation (int):
-            Defaults to :any:`tcod.noise.Implementation.SIMPLE`
-        hurst (float): The hurst exponent.  Should be in the 0.0-1.0 range.
-        lacunarity (float): The noise lacunarity.
-        octaves (float): The level of detail on fBm and turbulence
-                         implementations.
-        seed (Optional[Random]): A Random instance, or None.
+        dimensions: Must be from 1 to 4.
+        algorithm: Defaults to :any:`tcod.noise.Algorithm.SIMPLEX`
+        implementation: Defaults to :any:`tcod.noise.Implementation.SIMPLE`
+        hurst: The hurst exponent.  Should be in the 0.0-1.0 range.
+        lacunarity: The noise lacunarity.
+        octaves: The level of detail on fBm and turbulence implementations.
+        seed: A Random instance, or None.
 
     Attributes:
         noise_c (CData): A cffi pointer to a TCOD_noise_t object.
@@ -224,18 +218,17 @@ class Noise(object):
         """Return the noise value at the (x, y, z, w) point.
 
         Args:
-            x (float): The position on the 1st axis.
-            y (float): The position on the 2nd axis.
-            z (float): The position on the 3rd axis.
-            w (float): The position on the 4th axis.
+            x: The position on the 1st axis.
+            y: The position on the 2nd axis.
+            z: The position on the 3rd axis.
+            w: The position on the 4th axis.
         """
         return float(lib.NoiseGetSample(self._tdl_noise_c, (x, y, z, w)))
 
     def __getitem__(self, indexes: Any) -> NDArray[np.float32]:
         """Sample a noise map through NumPy indexing.
 
-        This follows NumPy's advanced indexing rules, but allows for floating
-        point values.
+        This follows NumPy's advanced indexing rules, but allows for floating point values.
 
         .. versionadded:: 11.16
         """
@@ -292,14 +285,14 @@ class Noise(object):
         overhead when working with large mesh-grids.
 
         Args:
-            mgrid (numpy.ndarray): A mesh-grid array of points to sample.
+            mgrid: A mesh-grid array of points to sample.
                 A contiguous array of type `numpy.float32` is preferred.
 
         Returns:
-            numpy.ndarray: An array of sampled points.
+            An array of sampled points.
 
-                This array has the shape: ``mgrid.shape[:-1]``.
-                The ``dtype`` is `numpy.float32`.
+            This array has the shape: ``mgrid.shape[:-1]``.
+            The ``dtype`` is `numpy.float32`.
         """
         mgrid = np.ascontiguousarray(mgrid, np.float32)
         if mgrid.shape[0] != self.dimensions:
@@ -320,15 +313,14 @@ class Noise(object):
     def sample_ogrid(self, ogrid: Sequence[ArrayLike]) -> NDArray[np.float32]:
         """Sample an open mesh-grid array and return the result.
 
-        Args
-            ogrid (Sequence[ArrayLike]): An open mesh-grid.
+        Args:
+            ogrid: An open mesh-grid.
 
         Returns:
-            numpy.ndarray: An array of sampled points.
+            An array of sampled points.
 
-                The ``shape`` is based on the lengths of the open mesh-grid
-                arrays.
-                The ``dtype`` is `numpy.float32`.
+            The ``shape`` is based on the lengths of the open mesh-grid arrays.
+            The ``dtype`` is `numpy.float32`.
         """
         if len(ogrid) != self.dimensions:
             raise ValueError("len(ogrid) must equal self.dimensions, " "%r != %r" % (len(ogrid), self.dimensions))
@@ -416,38 +408,39 @@ def grid(
     origin: Optional[Tuple[int, ...]] = None,
     indexing: Literal["ij", "xy"] = "xy",
 ) -> Tuple[NDArray[Any], ...]:
-    """Helper function for generating a grid of noise samples.
+    """Generate a mesh-grid of sample points to use with noise sampling.
 
-    `shape` is the shape of the returned mesh grid.  This can be any number of
-    dimensions, but :class:`Noise` classes only support up to 4.
+    Args:
+        shape: The shape of the grid.
+            This can be any number of dimensions, but :class:`Noise` classes only support up to 4.
+        scale: The step size between samples.
+            This can be a single float, or it can be a tuple of floats with one float for each axis in `shape`.
+            A lower scale gives smoother transitions between noise values.
+        origin: The position of the first sample.
+            If `None` then the `origin` will be zero on each axis.
+            `origin` is not scaled by the `scale` parameter.
+        indexing: Passed to :any:`numpy.meshgrid`.
 
-    `scale` is the step size of indexes away from `origin`.
-    This can be a single float, or it can be a tuple of floats with one float
-    for each axis in `shape`.  A lower scale gives smoother transitions
-    between noise values.
-
-    `origin` is the first sample of the grid.
-    If `None` then the `origin` will be zero on each axis.
-    `origin` is not scaled by the `scale` parameter.
-
-    `indexing` is passed to :any:`numpy.meshgrid`.
+    Returns:
+        A sparse mesh-grid to be passed into a :class:`Noise` instance.
 
     Example::
 
         >>> noise = tcod.noise.Noise(dimensions=2, seed=42)
-        >>> noise[tcod.noise.grid(shape=(5, 5), scale=0.25)]
-        array([[ 0.        , -0.55046356, -0.76072866, -0.7088647 , -0.68165785],
-               [-0.27523372, -0.7205134 , -0.74057037, -0.43919194, -0.29195625],
-               [-0.40398532, -0.57662135, -0.33160293,  0.12860827,  0.2864191 ],
-               [-0.50773406, -0.2643614 ,  0.24446318,  0.6390255 ,  0.5922846 ],
-               [-0.64945626, -0.12529983,  0.5346834 ,  0.80402255,  0.52655405]],
+
+        # Common case for ij-indexed arrays.
+        >>> noise[tcod.noise.grid(shape=(3, 5), scale=0.25, indexing="ij")]
+        array([[ 0.        , -0.27523372, -0.40398532, -0.50773406, -0.64945626],
+               [-0.55046356, -0.7205134 , -0.57662135, -0.2643614 , -0.12529983],
+               [-0.76072866, -0.74057037, -0.33160293,  0.24446318,  0.5346834 ]],
               dtype=float32)
-        >>> noise[tcod.noise.grid(shape=(5, 5), scale=(0.5, 0.25), origin=(1, 1))]
-        array([[ 0.52655405, -0.5037453 , -0.81221616, -0.7057655 ,  0.24630858],
-               [ 0.25038874, -0.75348294, -0.6379566 , -0.5817767 , -0.02789652],
-               [-0.03488023, -0.73630923, -0.12449139, -0.22774395, -0.22243626],
-               [-0.18455243, -0.35063767,  0.4495706 ,  0.02399864, -0.42226675],
-               [-0.16333057,  0.18149695,  0.7547447 , -0.07006818, -0.6546707 ]],
+
+        # Transpose an xy-indexed array to get a standard order="F" result.
+        >>> noise[tcod.noise.grid(shape=(4, 5), scale=(0.5, 0.25), origin=(1.0, 1.0))].T
+        array([[ 0.52655405,  0.25038874, -0.03488023, -0.18455243, -0.16333057],
+               [-0.5037453 , -0.75348294, -0.73630923, -0.35063767,  0.18149695],
+               [-0.81221616, -0.6379566 , -0.12449139,  0.4495706 ,  0.7547447 ],
+               [-0.7057655 , -0.5817767 , -0.22774395,  0.02399864, -0.07006818]],
               dtype=float32)
 
     .. versionadded:: 12.2
