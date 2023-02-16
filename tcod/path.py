@@ -474,7 +474,7 @@ def dijkstra2d(
         Added `out` parameter.  Now returns the output array.
     """
     dist: NDArray[Any] = np.asarray(distance)
-    if out is ...:  # type: ignore
+    if out is ...:
         out = dist
         warnings.warn(
             "No `out` parameter was given. "

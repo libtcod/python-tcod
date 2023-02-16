@@ -930,6 +930,8 @@ bsp_random_room = False
 # if true, there is always a wall on north & west side of a room
 bsp_room_walls = True
 bsp_map = None
+
+
 # draw a vertical line
 def vline(m, x, y1, y2):
     if y1 > y2:

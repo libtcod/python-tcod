@@ -230,7 +230,6 @@ class OffscreenConsoleSample(Sample):
 
 
 class LineDrawingSample(Sample):
-
     FLAG_NAMES = [
         "BKGND_NONE",
         "BKGND_SET",

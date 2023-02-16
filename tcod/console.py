@@ -782,7 +782,7 @@ class Console:
         """
         # The old syntax is easy to detect and correct.
         if hasattr(src_y, "console_c"):
-            (src_x, src_y, width, height, dest, dest_x, dest_y,) = (
+            (src_x, src_y, width, height, dest, dest_x, dest_y) = (
                 dest,  # type: ignore
                 dest_x,
                 dest_y,
