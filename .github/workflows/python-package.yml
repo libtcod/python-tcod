@@ -32,12 +32,12 @@ jobs:
       - name: Install isort
         run: pip install isort
       - name: isort
-        uses: liskin/gh-problem-matcher-wrap@v1
+        uses: liskin/gh-problem-matcher-wrap@v2
         with:
           linters: isort
           run: isort scripts/ tcod/ tests/ --check --diff
       - name: isort (examples)
-        uses: liskin/gh-problem-matcher-wrap@v1
+        uses: liskin/gh-problem-matcher-wrap@v2
         with:
           linters: isort
           run: isort examples/ --check --diff --thirdparty tcod
@@ -49,7 +49,7 @@ jobs:
       - name: Install Flake8
         run: pip install Flake8
       - name: Flake8
-        uses: liskin/gh-problem-matcher-wrap@v1
+        uses: liskin/gh-problem-matcher-wrap@v2
         with:
           linters: flake8
           run: flake8 scripts/ tcod/ tests/
@@ -66,7 +66,7 @@ jobs:
         run: |
           echo '__version__ = ""' > tcod/version.py
       - name: Mypy
-        uses: liskin/gh-problem-matcher-wrap@v1
+        uses: liskin/gh-problem-matcher-wrap@v2
         with:
           linters: mypy
           run: mypy --show-column-numbers .
@@ -115,7 +115,7 @@ jobs:
         run: |
           git submodule update --init --recursive --depth 1
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.architecture }}
@@ -146,7 +146,7 @@ jobs:
       - name: Xvfb logs
         if: runner.os != 'Windows'
         run: cat /tmp/xvfb.log
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
       - name: Upload to PyPI
         if: startsWith(github.ref, 'refs/tags/') && runner.os != 'Linux'
         env:
@@ -154,13 +154,13 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
           twine upload --skip-existing dist/*
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: runner.os == 'Linux'
         with:
           name: sdist
           path: dist/tcod-*.tar.gz
           retention-days: 7
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: runner.os == 'Windows'
         with:
           name: wheels-windows
@@ -175,7 +175,7 @@ jobs:
         os: ["ubuntu-20.04", "windows-2019"]
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.x
       - name: Install Python dependencies
@@ -187,7 +187,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install libsdl2-dev
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: sdist
       - name: Build package in isolation
@@ -210,12 +210,12 @@ jobs:
           fetch-depth: ${{ env.git-depth }}
       - name: Set up QEMU
         if: ${{ matrix.arch == 'aarch64' }}
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
       - name: Checkout submodules
         run: |
           git submodule update --init --recursive --depth 1
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.x"
       - name: Install Python dependencies
@@ -238,7 +238,7 @@ jobs:
           CIBW_BEFORE_TEST: pip install numpy
           CIBW_TEST_COMMAND: python -c "import tcod"
       - name: Archive wheel
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: wheels-linux
           path: wheelhouse/*.whl
@@ -283,7 +283,7 @@ jobs:
           CIBW_TEST_COMMAND: python -c "import tcod"
           CIBW_TEST_SKIP: "pp* *-macosx_arm64 *-macosx_universal2:arm64"
       - name: Archive wheel
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: wheels-macos
           path: wheelhouse/*.whl
