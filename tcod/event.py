@@ -1264,15 +1264,14 @@ def wait(timeout: Optional[float] = None) -> Iterator[Any]:
 
 
 class EventDispatch(Generic[T]):
-    '''This class dispatches events to methods depending on the events type
-    attribute.
+    '''Dispatches events to methods depending on the events type attribute.
 
-    To use this class, make a sub-class and override the relevant `ev_*`
-    methods.  Then send events to the dispatch method.
+    To use this class, make a sub-class and override the relevant `ev_*` methods.
+    Then send events to the dispatch method.
 
     .. versionchanged:: 11.12
-        This is now a generic class.  The type hists at the return value of
-        :any:`dispatch` and the `ev_*` methods.
+        This is now a generic class.
+        The type hints at the return value of :any:`dispatch` and the `ev_*` methods.
 
     Example::
 
