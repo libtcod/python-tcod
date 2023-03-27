@@ -37,3 +37,47 @@ filterwarnings = [
     "ignore::PendingDeprecationWarning:tcod.libtcodpy",
     "ignore:This class may perform poorly and is no longer needed.::tcod.map",
 ]
+
+[tool.ruff]
+# https://beta.ruff.rs/docs/rules/
+select = [
+    "C90", # mccabe
+    "E",   # pycodestyle
+    "W",   # pycodestyle
+    "F",   # Pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "YTT", # flake8-2020
+    "ANN", # flake8-annotations
+    "S",   # flake8-bandit
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "DTZ", # flake8-datetimez
+    "EM",  # flake8-errmsg
+    "EXE", # flake8-executable
+    "RET", # flake8-return
+    "ICN", # flake8-import-conventions
+    "INP", # flake8-no-pep420
+    "PIE", # flake8-pie
+    "PT",  # flake8-pytest-style
+    "SIM", # flake8-simplify
+    "PTH", # flake8-use-pathlib
+    "PL",  # Pylint
+    "TRY", # tryceratops
+    "RUF", # NumPy-specific rules
+    "G",   # flake8-logging-format
+    "D",   # pydocstyle
+]
+ignore = [
+    "E501",   # line-too-long
+    "S101",   # assert
+    "ANN101", # missing-type-self
+    "D203",   # one-blank-line-before-class
+    "D204",   # one-blank-line-after-class
+    "D213",   # multi-line-summary-second-line
+    "D407",   # dashed-underline-after-section
+    "D408",   # section-underline-after-name
+    "D409",   # section-underline-matches-section-length
+]
+line-length = 120
+target-version = "py37"

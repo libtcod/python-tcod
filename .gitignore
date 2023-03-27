@@ -83,3 +83,4 @@ debian/python*
 .pytest_cache
 Thumbs.db
 .mypy_cache/
+.ruff_cache/
