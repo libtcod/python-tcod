@@ -1632,7 +1632,7 @@ def get_keyboard_state() -> NDArray[np.bool_]:
         state = tcod.event.get_keyboard_state()
 
         # Get a WASD movement vector:
-        x = int(state[tcod.event.Scancode.E]) - int(state[tcod.event.Scancode.A])
+        x = int(state[tcod.event.Scancode.D]) - int(state[tcod.event.Scancode.A])
         y = int(state[tcod.event.Scancode.S]) - int(state[tcod.event.Scancode.W])
 
         # Key with 'z' glyph is held:
