@@ -70,17 +70,17 @@ class Sample(tcod.event.EventDispatch[None]):
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         global cur_sample
-        if event.sym == tcod.event.K_DOWN:
+        if event.sym == tcod.event.KeySym.DOWN:
             cur_sample = (cur_sample + 1) % len(SAMPLES)
             SAMPLES[cur_sample].on_enter()
             draw_samples_menu()
-        elif event.sym == tcod.event.K_UP:
+        elif event.sym == tcod.event.KeySym.UP:
             cur_sample = (cur_sample - 1) % len(SAMPLES)
             SAMPLES[cur_sample].on_enter()
             draw_samples_menu()
-        elif event.sym == tcod.event.K_RETURN and event.mod & tcod.event.KMOD_LALT:
+        elif event.sym == tcod.event.KeySym.RETURN and event.mod & tcod.event.KMOD_LALT:
             tcod.console_set_fullscreen(not tcod.console_is_fullscreen())
-        elif event.sym == tcod.event.K_PRINTSCREEN or event.sym == ord("p"):
+        elif event.sym == tcod.event.KeySym.PRINTSCREEN or event.sym == tcod.event.KeySym.p:
             print("screenshot")
             if event.mod & tcod.event.KMOD_LALT:
                 tcod.console_save_apf(root_console, "samples.apf")
@@ -88,7 +88,7 @@ class Sample(tcod.event.EventDispatch[None]):
             else:
                 tcod.sys_save_screenshot()
                 print("png")
-        elif event.sym == tcod.event.K_ESCAPE:
+        elif event.sym == tcod.event.KeySym.ESCAPE:
             raise SystemExit()
         elif event.sym in RENDERER_KEYS:
             # Swap the active context for one with a different renderer.
@@ -259,7 +259,7 @@ class LineDrawingSample(Sample):
         self.bk.ch[:] = ord(" ")
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        if event.sym in (tcod.event.K_RETURN, tcod.event.K_KP_ENTER):
+        if event.sym in (tcod.event.KeySym.RETURN, tcod.event.KeySym.KP_ENTER):
             self.bk_flag += 1
             if (self.bk_flag & 0xFF) > tcod.BKGND_ALPH:
                 self.bk_flag = tcod.BKGND_NONE
@@ -449,30 +449,30 @@ class NoiseSample(Sample):
             )
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        if ord("9") >= event.sym >= ord("1"):
-            self.func = event.sym - ord("1")
+        if tcod.event.KeySym.N9 >= event.sym >= tcod.event.KeySym.N1:
+            self.func = event.sym - tcod.event.KeySym.N1
             self.noise = self.get_noise()
-        elif event.sym == ord("e"):
+        elif event.sym == tcod.event.KeySym.e:
             self.hurst += 0.1
             self.noise = self.get_noise()
-        elif event.sym == ord("d"):
+        elif event.sym == tcod.event.KeySym.d:
             self.hurst -= 0.1
             self.noise = self.get_noise()
-        elif event.sym == ord("r"):
+        elif event.sym == tcod.event.KeySym.r:
             self.lacunarity += 0.5
             self.noise = self.get_noise()
-        elif event.sym == ord("f"):
+        elif event.sym == tcod.event.KeySym.f:
             self.lacunarity -= 0.5
             self.noise = self.get_noise()
-        elif event.sym == ord("t"):
+        elif event.sym == tcod.event.KeySym.t:
             self.octaves += 0.5
             self.noise.octaves = self.octaves
-        elif event.sym == ord("g"):
+        elif event.sym == tcod.event.KeySym.g:
             self.octaves -= 0.5
             self.noise.octaves = self.octaves
-        elif event.sym == ord("y"):
+        elif event.sym == tcod.event.KeySym.y:
             self.zoom += 0.2
-        elif event.sym == ord("h"):
+        elif event.sym == tcod.event.KeySym.h:
             self.zoom -= 0.2
         else:
             super().ev_keydown(event)
@@ -631,25 +631,25 @@ class FOVSample(Sample):
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         MOVE_KEYS = {
-            ord("i"): (0, -1),
-            ord("j"): (-1, 0),
-            ord("k"): (0, 1),
-            ord("l"): (1, 0),
+            tcod.event.KeySym.i: (0, -1),
+            tcod.event.KeySym.j: (-1, 0),
+            tcod.event.KeySym.k: (0, 1),
+            tcod.event.KeySym.l: (1, 0),
         }
         FOV_SELECT_KEYS = {
-            ord("-"): -1,
-            ord("="): 1,
-            tcod.event.K_KP_MINUS: -1,
-            tcod.event.K_KP_PLUS: 1,
+            tcod.event.KeySym.MINUS: -1,
+            tcod.event.KeySym.EQUALS: 1,
+            tcod.event.KeySym.KP_MINUS: -1,
+            tcod.event.KeySym.KP_PLUS: 1,
         }
         if event.sym in MOVE_KEYS:
             x, y = MOVE_KEYS[event.sym]
             if self.walkable[self.player_x + x, self.player_y + y]:
                 self.player_x += x
                 self.player_y += y
-        elif event.sym == ord("t"):
+        elif event.sym == tcod.event.KeySym.t:
             self.torch = not self.torch
-        elif event.sym == ord("w"):
+        elif event.sym == tcod.event.KeySym.w:
             self.light_walls = not self.light_walls
         elif event.sym in FOV_SELECT_KEYS:
             self.algo_num += FOV_SELECT_KEYS[event.sym]
@@ -775,7 +775,7 @@ class PathfindingSample(Sample):
                     self.recalculate = True
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        if event.sym == ord("i") and self.dy > 0:
+        if event.sym == tcod.event.KeySym.i and self.dy > 0:
             # destination move north
             tcod.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE)
             self.dy -= 1
@@ -783,7 +783,7 @@ class PathfindingSample(Sample):
             tcod.console_put_char(sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
-        elif event.sym == ord("k") and self.dy < SAMPLE_SCREEN_HEIGHT - 1:
+        elif event.sym == tcod.event.KeySym.k and self.dy < SAMPLE_SCREEN_HEIGHT - 1:
             # destination move south
             tcod.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE)
             self.dy += 1
@@ -791,7 +791,7 @@ class PathfindingSample(Sample):
             tcod.console_put_char(sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
-        elif event.sym == ord("j") and self.dx > 0:
+        elif event.sym == tcod.event.KeySym.j and self.dx > 0:
             # destination move west
             tcod.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE)
             self.dx -= 1
@@ -799,7 +799,7 @@ class PathfindingSample(Sample):
             tcod.console_put_char(sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
-        elif event.sym == ord("l") and self.dx < SAMPLE_SCREEN_WIDTH - 1:
+        elif event.sym == tcod.event.KeySym.l and self.dx < SAMPLE_SCREEN_WIDTH - 1:
             # destination move east
             tcod.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE)
             self.dx += 1
@@ -807,7 +807,7 @@ class PathfindingSample(Sample):
             tcod.console_put_char(sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
-        elif event.sym == tcod.event.K_TAB:
+        elif event.sym == tcod.event.KeySym.TAB:
             self.using_astar = not self.using_astar
             if self.using_astar:
                 tcod.console_print(sample_console, 1, 4, "Using : A*      ")
@@ -999,28 +999,28 @@ class BSPSample(Sample):
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         global bsp_random_room, bsp_room_walls, bsp_depth, bsp_min_room_size
-        if event.sym in (tcod.event.K_RETURN, tcod.event.K_KP_ENTER):
+        if event.sym in (tcod.event.KeySym.RETURN, tcod.event.KeySym.KP_ENTER):
             self.bsp_generate()
-        elif event.sym == ord(" "):
+        elif event.sym == tcod.event.KeySym.SPACE:
             self.bsp_refresh()
-        elif event.sym in (tcod.event.K_EQUALS, tcod.event.K_KP_PLUS):
+        elif event.sym in (tcod.event.KeySym.EQUALS, tcod.event.KeySym.KP_PLUS):
             bsp_depth += 1
             self.bsp_generate()
-        elif event.sym in (tcod.event.K_MINUS, tcod.event.K_KP_MINUS):
+        elif event.sym in (tcod.event.KeySym.MINUS, tcod.event.KeySym.KP_MINUS):
             bsp_depth = max(1, bsp_depth - 1)
             self.bsp_generate()
-        elif event.sym in (tcod.event.K_8, tcod.event.K_KP_MULTIPLY):
+        elif event.sym in (tcod.event.KeySym.N8, tcod.event.KeySym.KP_MULTIPLY):
             bsp_min_room_size += 1
             self.bsp_generate()
-        elif event.sym in (tcod.event.K_SLASH, tcod.event.K_KP_DIVIDE):
+        elif event.sym in (tcod.event.KeySym.SLASH, tcod.event.KeySym.KP_DIVIDE):
             bsp_min_room_size = max(2, bsp_min_room_size - 1)
             self.bsp_generate()
-        elif event.sym in (tcod.event.K_1, tcod.event.K_KP_1):
+        elif event.sym in (tcod.event.KeySym.N1, tcod.event.KeySym.KP_1):
             bsp_random_room = not bsp_random_room
             if not bsp_random_room:
                 bsp_room_walls = True
             self.bsp_refresh()
-        elif event.sym in (tcod.event.K_2, tcod.event.K_KP_2):
+        elif event.sym in (tcod.event.KeySym.N2, tcod.event.KeySym.KP_2):
             bsp_room_walls = not bsp_room_walls
             self.bsp_refresh()
         else:
@@ -1126,9 +1126,9 @@ class MouseSample(Sample):
         )
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        if event.sym == ord("1"):
+        if event.sym == tcod.event.KeySym.N1:
             tcod.mouse_show_cursor(False)
-        elif event.sym == ord("2"):
+        elif event.sym == tcod.event.KeySym.N2:
             tcod.mouse_show_cursor(True)
         else:
             super().ev_keydown(event)
@@ -1177,10 +1177,10 @@ class NameGeneratorSample(Sample):
             self.names.append(tcod.namegen_generate(self.sets[self.curset]))
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        if event.sym == ord("="):
+        if event.sym == tcod.event.KeySym.EQUALS:
             self.curset += 1
             self.names.append("======")
-        elif event.sym == ord("-"):
+        elif event.sym == tcod.event.KeySym.MINUS:
             self.curset -= 1
             self.names.append("======")
         else:
@@ -1363,11 +1363,11 @@ class FastRenderSample(Sample):
 #############################################
 
 RENDERER_KEYS = {
-    tcod.event.K_F1: tcod.RENDERER_GLSL,
-    tcod.event.K_F2: tcod.RENDERER_OPENGL,
-    tcod.event.K_F3: tcod.RENDERER_SDL,
-    tcod.event.K_F4: tcod.RENDERER_SDL2,
-    tcod.event.K_F5: tcod.RENDERER_OPENGL2,
+    tcod.event.KeySym.F1: tcod.RENDERER_GLSL,
+    tcod.event.KeySym.F2: tcod.RENDERER_OPENGL,
+    tcod.event.KeySym.F3: tcod.RENDERER_SDL,
+    tcod.event.KeySym.F4: tcod.RENDERER_SDL2,
+    tcod.event.KeySym.F5: tcod.RENDERER_OPENGL2,
 }
 
 RENDERER_NAMES = (

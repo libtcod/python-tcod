@@ -1,7 +1,7 @@
 """A light-weight implementation of event handling built on calls to SDL.
 
 Many event constants are derived directly from SDL.
-For example: ``tcod.event.K_UP`` and ``tcod.event.SCANCODE_A`` refer to
+For example: ``tcod.event.KeySym.UP`` and ``tcod.event.Scancode.A`` refer to
 SDL's ``SDLK_UP`` and ``SDL_SCANCODE_A`` respectfully.
 `See this table for all of SDL's keyboard constants.
 <https://wiki.libsdl.org/SDL_Keycode>`_
@@ -1279,35 +1279,35 @@ class EventDispatch(Generic[T]):
 
         MOVE_KEYS = {  # key_symbol: (x, y)
             # Arrow keys.
-            tcod.event.K_LEFT: (-1, 0),
-            tcod.event.K_RIGHT: (1, 0),
-            tcod.event.K_UP: (0, -1),
-            tcod.event.K_DOWN: (0, 1),
-            tcod.event.K_HOME: (-1, -1),
-            tcod.event.K_END: (-1, 1),
-            tcod.event.K_PAGEUP: (1, -1),
-            tcod.event.K_PAGEDOWN: (1, 1),
-            tcod.event.K_PERIOD: (0, 0),
+            tcod.event.KeySym.LEFT: (-1, 0),
+            tcod.event.KeySym.RIGHT: (1, 0),
+            tcod.event.KeySym.UP: (0, -1),
+            tcod.event.KeySym.DOWN: (0, 1),
+            tcod.event.KeySym.HOME: (-1, -1),
+            tcod.event.KeySym.END: (-1, 1),
+            tcod.event.KeySym.PAGEUP: (1, -1),
+            tcod.event.KeySym.PAGEDOWN: (1, 1),
+            tcod.event.KeySym.PERIOD: (0, 0),
             # Numpad keys.
-            tcod.event.K_KP_1: (-1, 1),
-            tcod.event.K_KP_2: (0, 1),
-            tcod.event.K_KP_3: (1, 1),
-            tcod.event.K_KP_4: (-1, 0),
-            tcod.event.K_KP_5: (0, 0),
-            tcod.event.K_KP_6: (1, 0),
-            tcod.event.K_KP_7: (-1, -1),
-            tcod.event.K_KP_8: (0, -1),
-            tcod.event.K_KP_9: (1, -1),
-            tcod.event.K_CLEAR: (0, 0),  # Numpad `clear` key.
+            tcod.event.KeySym.KP_1: (-1, 1),
+            tcod.event.KeySym.KP_2: (0, 1),
+            tcod.event.KeySym.KP_3: (1, 1),
+            tcod.event.KeySym.KP_4: (-1, 0),
+            tcod.event.KeySym.KP_5: (0, 0),
+            tcod.event.KeySym.KP_6: (1, 0),
+            tcod.event.KeySym.KP_7: (-1, -1),
+            tcod.event.KeySym.KP_8: (0, -1),
+            tcod.event.KeySym.KP_9: (1, -1),
+            tcod.event.KeySym.CLEAR: (0, 0),  # Numpad `clear` key.
             # Vi Keys.
-            tcod.event.K_h: (-1, 0),
-            tcod.event.K_j: (0, 1),
-            tcod.event.K_k: (0, -1),
-            tcod.event.K_l: (1, 0),
-            tcod.event.K_y: (-1, -1),
-            tcod.event.K_u: (1, -1),
-            tcod.event.K_b: (-1, 1),
-            tcod.event.K_n: (1, 1),
+            tcod.event.KeySym.h: (-1, 0),
+            tcod.event.KeySym.j: (0, 1),
+            tcod.event.KeySym.k: (0, -1),
+            tcod.event.KeySym.l: (1, 0),
+            tcod.event.KeySym.y: (-1, -1),
+            tcod.event.KeySym.u: (1, -1),
+            tcod.event.KeySym.b: (-1, 1),
+            tcod.event.KeySym.n: (1, 1),
         }
 
 
@@ -1333,7 +1333,7 @@ class EventDispatch(Generic[T]):
                 if event.sym in MOVE_KEYS:
                     # Send movement keys to the cmd_move method with parameters.
                     self.cmd_move(*MOVE_KEYS[event.sym])
-                elif event.sym == tcod.event.K_ESCAPE:
+                elif event.sym == tcod.event.KeySym.ESCAPE:
                     self.cmd_escape()
 
             def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> None:
