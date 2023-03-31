@@ -7,6 +7,9 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 ### Added
 - Added support for `tcod.sdl` namespace packages.
 
+### Fixed
+- ``Renderer.read_pixels`` method was completely broken.
+
 ## [15.0.0] - 2023-01-04
 ### Changed
 - Modified the letter case of window event types to match their type annotations.

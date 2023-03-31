@@ -9,7 +9,7 @@ from typing import Any, Optional, Tuple, Union
 
 import numpy as np
 from numpy.typing import NDArray
-from typing_extensions import Final
+from typing_extensions import Final, Literal
 
 import tcod.sdl.video
 from tcod.loader import ffi, lib
@@ -484,15 +484,33 @@ class Renderer:
     def read_pixels(
         self,
         *,
-        rect: Optional[Tuple[int, int, int, int]] = None,
-        format: Optional[int] = None,
-        out: Optional[NDArray[Any]] = None,
-    ) -> NDArray[Any]:
+        rect: tuple[int, int, int, int] | None = None,
+        format: int | Literal["RGB", "RGBA"] = "RGBA",
+        out: NDArray[np.uint8] | None = None,
+    ) -> NDArray[np.uint8]:
+        """Fetch the pixel contents of the current rendering target to an array.
+
+        By default returns an RGBA pixel array of the full target in the shape: ``(height, width, rgba)``.
+        The target can be changed with :any:`set_render_target`
+
+        Args:
+            rect: The ``(left, top, width, height)`` region of the target to fetch, or None for the entire target.
+            format: The pixel format.  Defaults to ``"RGBA"``.
+            out: The output array.
+                Can be None or must be an ``np.uint8`` array of shape: ``(height, width, channels)``.
+                Must be C contiguous along the ``(width, channels)`` axes.
+
+        This operation is slow due to coping from VRAM to RAM.
+        When reading the main rendering target this should be called after rendering and before :any:`present`.
+        See https://wiki.libsdl.org/SDL2/SDL_RenderReadPixels
+
+        Returns:
+            The output uint8 array of shape: ``(height, width, channels)`` with the fetched pixels.
+
+        .. versionadded:: Unreleased
         """
-        .. versionadded:: 13.5
-        """
-        if format is None:
-            format = lib.SDL_PIXELFORMAT_RGBA32
+        FORMATS: Final = {"RGB": lib.SDL_PIXELFORMAT_RGB24, "RGBA": lib.SDL_PIXELFORMAT_RGBA32}
+        sdl_format = FORMATS.get(format) if isinstance(format, str) else format
         if rect is None:
             texture_p = lib.SDL_GetRenderTarget(self.p)
             if texture_p:
@@ -502,15 +520,31 @@ class Renderer:
                 rect = (0, 0, *self.output_size)
         width, height = rect[2:4]
         if out is None:
-            if format == lib.SDL_PIXELFORMAT_RGBA32:
+            if sdl_format == lib.SDL_PIXELFORMAT_RGBA32:
                 out = np.empty((height, width, 4), dtype=np.uint8)
-            elif format == lib.SDL_PIXELFORMAT_RGB24:
+            elif sdl_format == lib.SDL_PIXELFORMAT_RGB24:
                 out = np.empty((height, width, 3), dtype=np.uint8)
             else:
-                raise TypeError("Pixel format not supported yet.")
-        assert out.shape[:2] == (height, width)
-        assert out[0].flags.c_contiguous
-        _check(lib.SDL_RenderReadPixels(self.p, format, ffi.cast("void*", out.ctypes.data), out.strides[0]))
+                msg = f"Pixel format {format!r} not supported by tcod."
+                raise TypeError(msg)
+        if out.dtype != np.uint8:
+            msg = "`out` must be a uint8 array."
+            raise TypeError(msg)
+        expected_shape = (height, width, {lib.SDL_PIXELFORMAT_RGB24: 3, lib.SDL_PIXELFORMAT_RGBA32: 4}[sdl_format])
+        if out.shape != expected_shape:
+            msg = f"Expected `out` to be an array of shape {expected_shape}, got {out.shape} instead."
+            raise TypeError(msg)
+        if not out[0].flags.c_contiguous:
+            msg = "`out` array must be C contiguous."
+        _check(
+            lib.SDL_RenderReadPixels(
+                self.p,
+                (rect,),
+                sdl_format,
+                ffi.cast("void*", out.ctypes.data),
+                out.strides[0],
+            )
+        )
         return out
 
     def clear(self) -> None:
@@ -522,6 +556,7 @@ class Renderer:
 
     def fill_rect(self, rect: Tuple[float, float, float, float]) -> None:
         """Fill a rectangle with :any:`draw_color`.
+
         .. versionadded:: 13.5
         """
         _check(lib.SDL_RenderFillRectF(self.p, (rect,)))

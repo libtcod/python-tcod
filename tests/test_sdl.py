@@ -70,6 +70,10 @@ def test_sdl_render() -> None:
     with pytest.raises(TypeError):
         render.upload_texture(np.zeros((8, 8, 5), np.uint8))
 
+    assert (render.read_pixels() == (0, 0, 0, 255)).all()
+    assert (render.read_pixels(format="RGB") == (0, 0, 0)).all()
+    assert render.read_pixels(rect=(1, 2, 3, 4)).shape == (4, 3, 4)
+
 
 def test_sdl_render_bad_types() -> None:
     with pytest.raises(TypeError):
