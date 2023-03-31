@@ -4,6 +4,8 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+
+## [15.0.1] - 2023-03-30
 ### Added
 - Added support for `tcod.sdl` namespace packages.
 

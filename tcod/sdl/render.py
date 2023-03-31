@@ -507,7 +507,7 @@ class Renderer:
         Returns:
             The output uint8 array of shape: ``(height, width, channels)`` with the fetched pixels.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 15.0
         """
         FORMATS: Final = {"RGB": lib.SDL_PIXELFORMAT_RGB24, "RGBA": lib.SDL_PIXELFORMAT_RGBA32}
         sdl_format = FORMATS.get(format) if isinstance(format, str) else format
