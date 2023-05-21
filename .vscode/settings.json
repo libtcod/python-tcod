@@ -14,7 +14,7 @@
         "--follow-imports=silent",
         "--show-column-numbers"
     ],
-    "python.formatting.provider": "black",
+    "python.formatting.provider": "none",
     "files.associations": {
         "*.spec": "python",
     },
@@ -424,5 +424,8 @@
     ],
     "python.testing.pytestArgs": [],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    }
 }

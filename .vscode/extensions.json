@@ -6,6 +6,7 @@
         "austin.code-gnu-global",
         "editorconfig.editorconfig",
         "ms-python.python",
+        "ms-python.black-formatter",
         "ms-python.vscode-pylance",
         "ms-vscode.cpptools",
         "redhat.vscode-yaml",
