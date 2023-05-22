@@ -256,9 +256,8 @@ def find_sdl_attrs(prefix: str) -> Iterator[Tuple[str, Union[int, str, Any]]]:
             yield attr[name_starts_at:], getattr(lib, attr)
 
 
-def parse_sdl_attrs(prefix: str, all_names: List[str]) -> Tuple[str, str]:
-    """Return the name/value pairs, and the final dictionary string for the
-    library attributes with `prefix`.
+def parse_sdl_attrs(prefix: str, all_names: list[str] | None) -> tuple[str, str]:
+    """Return the name/value pairs, and the final dictionary string for the library attributes with `prefix`.
 
     Append matching names to the `all_names` list.
     """
@@ -267,10 +266,11 @@ def parse_sdl_attrs(prefix: str, all_names: List[str]) -> Tuple[str, str]:
     for name, value in sorted(find_sdl_attrs(prefix), key=lambda item: item[1]):
         if name == "KMOD_RESERVED":
             continue
-        all_names.append(name)
+        if all_names is not None:
+            all_names.append(name)
         names.append(f"{name} = {value}")
         lookup.append(f'{value}: "{name}"')
-    return "\n".join(names), "{\n    %s,\n}" % (",\n    ".join(lookup),)
+    return "\n".join(names), "{{\n    {},\n}}".format(",\n    ".join(lookup))
 
 
 EXCLUDE_CONSTANTS = [
@@ -370,10 +370,10 @@ def write_library_constants() -> None:
         all_names = []
         f.write(EVENT_CONSTANT_MODULE_HEADER)
         f.write("\n# --- SDL scancodes ---\n")
-        f.write(f"""{parse_sdl_attrs("SDL_SCANCODE", all_names)[0]}\n""")
+        f.write(f"""{parse_sdl_attrs("SDL_SCANCODE", None)[0]}\n""")
 
         f.write("\n# --- SDL keyboard symbols ---\n")
-        f.write(f"""{parse_sdl_attrs("SDLK", all_names)[0]}\n""")
+        f.write(f"""{parse_sdl_attrs("SDLK", None)[0]}\n""")
 
         f.write("\n# --- SDL keyboard modifiers ---\n")
         f.write("%s\n_REVERSE_MOD_TABLE = %s\n" % parse_sdl_attrs("KMOD", all_names))

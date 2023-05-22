@@ -5,7 +5,9 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 ### Deprecated
-- Deprecated all color constants
+- Deprecated all libtcod color constants.  Replace these with your own manually defined colors.
+  Using a color will tell you the color values of the deprecated color in the warning.
+- Deprecated older scancode and keysym constants.  These were replaced with the Scancode and KeySym enums.
 
 ### Fixed
 - DLL loader could fail to load `SDL2.dll` when other tcod namespace packages were installed.
