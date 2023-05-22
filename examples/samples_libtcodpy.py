@@ -1268,7 +1268,7 @@ def render_name(first, key, mouse):
     if ng_nbsets == 0:
         # parse all *.cfg files in data/namegen
         for file in os.listdir(get_data("namegen")):
-            if file.find(b".cfg") > 0:
+            if file.find(".cfg") > 0:
                 libtcod.namegen_parse(get_data(os.path.join("namegen", file)))
         # get the sets list
         ng_sets = libtcod.namegen_get_sets()
@@ -1597,7 +1597,7 @@ while not libtcod.console_is_window_closed():
     libtcod.console_set_default_foreground(None, libtcod.grey)
     libtcod.console_set_default_background(None, libtcod.black)
     libtcod.console_print_ex(None, 42, 46 - (libtcod.NB_RENDERERS + 1), libtcod.BKGND_SET, libtcod.LEFT, "Renderer :")
-    for i in range(libtcod.NB_RENDERERS):
+    for i in range(len(renderer_name)):
         if i == cur_renderer:
             libtcod.console_set_default_foreground(None, libtcod.white)
             libtcod.console_set_default_background(None, libtcod.light_blue)
