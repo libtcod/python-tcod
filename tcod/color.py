@@ -1,6 +1,4 @@
-"""
-
-"""
+"""Old libtcod color management."""
 from __future__ import annotations
 
 import warnings
@@ -32,7 +30,7 @@ class Color(List[int]):
         return int(self[0])
 
     @r.setter
-    @deprecate("Setting color attributes has been deprecated.")
+    @deprecate("Setting color attributes has been deprecated.", FutureWarning)
     def r(self, value: int) -> None:
         self[0] = value & 0xFF
 
@@ -46,7 +44,7 @@ class Color(List[int]):
         return int(self[1])
 
     @g.setter
-    @deprecate("Setting color attributes has been deprecated.")
+    @deprecate("Setting color attributes has been deprecated.", FutureWarning)
     def g(self, value: int) -> None:
         self[1] = value & 0xFF
 
@@ -60,35 +58,35 @@ class Color(List[int]):
         return int(self[2])
 
     @b.setter
-    @deprecate("Setting color attributes has been deprecated.")
+    @deprecate("Setting color attributes has been deprecated.", FutureWarning)
     def b(self, value: int) -> None:
         self[2] = value & 0xFF
 
     @classmethod
-    def _new_from_cdata(cls, cdata: Any) -> Color:
+    def _new_from_cdata(cls, cdata: Any) -> Color:  # noqa: ANN401
         return cls(cdata.r, cdata.g, cdata.b)
 
-    def __getitem__(self, index: Any) -> Any:
-        """
+    def __getitem__(self, index: Any) -> Any:  # noqa: ANN401
+        """Return a color channel.
+
         .. deprecated:: 9.2
             Accessing colors via a letter index is deprecated.
         """
-        try:
-            return super().__getitem__(index)
-        except TypeError:
+        if isinstance(index, str):
             warnings.warn(
                 "Accessing colors via a letter index is deprecated",
                 DeprecationWarning,
                 stacklevel=2,
             )
             return super().__getitem__("rgb".index(index))
+        return super().__getitem__(index)
 
-    @deprecate("This class will not be mutable in the future.")
-    def __setitem__(self, index: Any, value: Any) -> None:
-        try:
-            super().__setitem__(index, value)
-        except TypeError:
+    @deprecate("This class will not be mutable in the future.", FutureWarning)
+    def __setitem__(self, index: Any, value: Any) -> None:  # noqa: ANN401
+        if isinstance(index, str):
             super().__setitem__("rgb".index(index), value)
+        else:
+            super().__setitem__(index, value)
 
     def __eq__(self, other: Any) -> bool:
         """Compare equality between colors.
@@ -100,7 +98,7 @@ class Color(List[int]):
         except TypeError:
             return False
 
-    @deprecate("Use NumPy instead for color math operations.")
+    @deprecate("Use NumPy instead for color math operations.", FutureWarning)
     def __add__(self, other: Any) -> Color:  # type: ignore[override]
         """Add two colors together.
 
@@ -109,7 +107,7 @@ class Color(List[int]):
         """
         return Color._new_from_cdata(lib.TCOD_color_add(self, other))
 
-    @deprecate("Use NumPy instead for color math operations.")
+    @deprecate("Use NumPy instead for color math operations.", FutureWarning)
     def __sub__(self, other: Any) -> Color:
         """Subtract one color from another.
 
@@ -118,7 +116,7 @@ class Color(List[int]):
         """
         return Color._new_from_cdata(lib.TCOD_color_subtract(self, other))
 
-    @deprecate("Use NumPy instead for color math operations.")
+    @deprecate("Use NumPy instead for color math operations.", FutureWarning)
     def __mul__(self, other: Any) -> Color:
         """Multiply with a scaler or another color.
 
@@ -127,14 +125,8 @@ class Color(List[int]):
         """
         if isinstance(other, (Color, list, tuple)):
             return Color._new_from_cdata(lib.TCOD_color_multiply(self, other))
-        else:
-            return Color._new_from_cdata(lib.TCOD_color_multiply_scalar(self, other))
+        return Color._new_from_cdata(lib.TCOD_color_multiply_scalar(self, other))
 
     def __repr__(self) -> str:
         """Return a printable representation of the current color."""
-        return "%s(%r, %r, %r)" % (
-            self.__class__.__name__,
-            self.r,
-            self.g,
-            self.b,
-        )
+        return f"{self.__class__.__name__}({self.r!r}, {self.g!r}, {self.b!r})"

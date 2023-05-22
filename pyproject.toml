@@ -135,6 +135,7 @@ ignore = [
     "E501",   # line-too-long
     "S101",   # assert
     "ANN101", # missing-type-self
+    "ANN102", # missing-type-cls
     "D203",   # one-blank-line-before-class
     "D204",   # one-blank-line-after-class
     "D213",   # multi-line-summary-second-line

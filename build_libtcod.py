@@ -360,7 +360,6 @@ def write_library_constants() -> None:
                 continue
             color = tcod.color.Color._new_from_cdata(value)
             f.write(f"{name[5:]} = {color!r}\n")
-            all_names.append(name[5:])
 
         all_names_merged = ",\n    ".join(f'"{name}"' for name in all_names)
         f.write(f"\n__all__ = [\n    {all_names_merged},\n]\n")
