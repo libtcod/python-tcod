@@ -69,7 +69,7 @@ jobs:
         uses: liskin/gh-problem-matcher-wrap@v2
         with:
           linters: mypy
-          run: mypy --show-column-numbers .
+          run: mypy --show-column-numbers
 
   # This makes sure that the latest versions of the SDL headers parse correctly.
   parse_sdl:

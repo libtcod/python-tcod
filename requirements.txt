@@ -3,6 +3,7 @@ numpy>=1.21.4
 pycparser>=2.14
 requests>=2.28.1
 setuptools==65.5.1
+types-cffi
 types-requests
 types-setuptools
 types-tabulate

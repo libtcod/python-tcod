@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 from typing import Any  # noqa: F401
 
-import cffi  # type: ignore
+import cffi
 
 __sdl_version__ = ""
 
@@ -29,12 +29,13 @@ void SDL_GetVersion(SDL_version * ver);
 def verify_dependencies() -> None:
     """Try to make sure dependencies exist on this system."""
     if sys.platform == "win32":
-        lib_test = ffi_check.dlopen("SDL2.dll")  # Make sure SDL2.dll is here.
-        version = ffi_check.new("struct SDL_version*")
+        lib_test: Any = ffi_check.dlopen("SDL2.dll")  # Make sure SDL2.dll is here.
+        version: Any = ffi_check.new("struct SDL_version*")
         lib_test.SDL_GetVersion(version)  # Need to check this version.
-        version = version.major, version.minor, version.patch
-        if version < (2, 0, 5):
-            raise RuntimeError("Tried to load an old version of SDL %r" % (version,))
+        version_tuple = version.major, version.minor, version.patch
+        if version_tuple < (2, 0, 5):
+            msg = f"Tried to load an old version of SDL {version_tuple!r}"
+            raise RuntimeError(msg)
 
 
 def get_architecture() -> str:

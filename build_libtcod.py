@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, List, Set, Tuple, Union
 
-from cffi import FFI  # type: ignore
+from cffi import FFI
 
 sys.path.append(str(Path(__file__).parent))  # Allow importing local modules.
 
