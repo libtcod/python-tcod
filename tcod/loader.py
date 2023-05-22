@@ -4,11 +4,10 @@ from __future__ import annotations
 import os
 import platform
 import sys
+from pathlib import Path
 from typing import Any  # noqa: F401
 
 import cffi  # type: ignore
-
-from tcod import __path__
 
 __sdl_version__ = ""
 
@@ -46,20 +45,12 @@ def get_architecture() -> str:
 def get_sdl_version() -> str:
     sdl_version = ffi.new("SDL_version*")
     lib.SDL_GetVersion(sdl_version)
-    return "%s.%s.%s" % (
-        sdl_version.major,
-        sdl_version.minor,
-        sdl_version.patch,
-    )
+    return f"{sdl_version.major}.{sdl_version.minor}.{sdl_version.patch}"
 
 
 if sys.platform == "win32":
     # add Windows dll's to PATH
-    _bits, _linkage = platform.architecture()
-    os.environ["PATH"] = "%s;%s" % (
-        os.path.join(__path__[0], get_architecture()),
-        os.environ["PATH"],
-    )
+    os.environ["PATH"] = f"""{Path(__file__).parent / get_architecture()}{os.pathsep}{os.environ["PATH"]}"""
 
 
 class _Mock(object):
