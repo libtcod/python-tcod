@@ -255,6 +255,9 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 - Prevent division by zero from recommended-console-size functions.
 
 ## [12.0.0] - 2021-03-05
+### Added
+- Now includes PyInstaller hooks within the package itself.
+
 ### Deprecated
 - The Random class will now warn if the seed it's given will not used
    deterministically. It will no longer accept non-integer seeds in the future.

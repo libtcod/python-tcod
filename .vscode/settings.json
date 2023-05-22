@@ -155,6 +155,7 @@
         "heapify",
         "heightmap",
         "hflip",
+        "hiddenimports",
         "HIGHDPI",
         "hillclimb",
         "hline",

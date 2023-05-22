@@ -1,8 +1,9 @@
 """PyInstaller entry point for tcod."""
-import os
-from typing import List
+from __future__ import annotations
+
+from pathlib import Path
 
 
-def get_hook_dirs() -> List[str]:
+def get_hook_dirs() -> list[str]:
     """Return the current directory."""
-    return [os.path.dirname(__file__)]
+    return [str(Path(__file__).parent)]

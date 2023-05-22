@@ -1,8 +1,8 @@
 """PyInstaller hook for tcod.
 
-Added here after tcod 12.0.0.
+There were added since tcod 12.0.0.
 
-If this hook is modified then the contributed hook needs to be removed from:
+If this hook is ever modified then the contributed hook needs to be removed from:
 https://github.com/pyinstaller/pyinstaller-hooks-contrib
 """
 from PyInstaller.utils.hooks import collect_dynamic_libs  # type: ignore
