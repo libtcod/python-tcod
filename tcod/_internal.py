@@ -1,21 +1,23 @@
-"""This module internal helper functions used by the rest of the library."""
+"""Internal helper functions used by the rest of the library."""
 from __future__ import annotations
 
 import functools
 import warnings
-from typing import Any, AnyStr, Callable, TypeVar, cast
+from types import TracebackType
+from typing import Any, AnyStr, Callable, NoReturn, SupportsInt, TypeVar, cast
 
 import numpy as np
-from numpy.typing import NDArray
-from typing_extensions import Literal, NoReturn
+from numpy.typing import ArrayLike, NDArray
+from typing_extensions import Literal
 
 from tcod.loader import ffi, lib
 
 FuncType = Callable[..., Any]
 F = TypeVar("F", bound=FuncType)
+T = TypeVar("T")
 
 
-def deprecate(message: str, category: Any = DeprecationWarning, stacklevel: int = 0) -> Callable[[F], F]:
+def deprecate(message: str, category: type[Warning] = DeprecationWarning, stacklevel: int = 0) -> Callable[[F], F]:
     """Return a decorator which adds a warning to functions."""
 
     def decorator(func: F) -> F:
@@ -23,7 +25,7 @@ def deprecate(message: str, category: Any = DeprecationWarning, stacklevel: int 
             return func
 
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):  # type: ignore
+        def wrapper(*args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
             warnings.warn(message, category, stacklevel=stacklevel + 2)
             return func(*args, **kwargs)
 
@@ -35,7 +37,7 @@ def deprecate(message: str, category: Any = DeprecationWarning, stacklevel: int 
 def pending_deprecate(
     message: str = "This function may be deprecated in the future."
     " Consider raising an issue on GitHub if you need this feature.",
-    category: Any = PendingDeprecationWarning,
+    category: type[Warning] = PendingDeprecationWarning,
     stacklevel: int = 0,
 ) -> Callable[[F], F]:
     """Like deprecate, but the default parameters are filled out for a generic pending deprecation warning."""
@@ -43,9 +45,11 @@ def pending_deprecate(
 
 
 def verify_order(order: Literal["C", "F"]) -> Literal["C", "F"]:
+    """Verify and return a Numpy order string."""
     order = order.upper()  # type: ignore
     if order not in ("C", "F"):
-        raise TypeError("order must be 'C' or 'F', not %r" % (order,))
+        msg = f"order must be 'C' or 'F', not {order!r}"
+        raise TypeError(msg)
     return order
 
 
@@ -61,7 +65,7 @@ def _check(error: int) -> int:
     return error
 
 
-def _check_p(pointer: Any) -> Any:
+def _check_p(pointer: T) -> T:
     """Treats NULL pointers as errors and raises a libtcod exception."""
     if not pointer:
         _raise_tcod_error()
@@ -79,19 +83,19 @@ def _check_warn(error: int, stacklevel: int = 2) -> int:
     return error
 
 
-def _unpack_char_p(char_p: Any) -> str:
+def _unpack_char_p(char_p: Any) -> str:  # noqa: ANN401
     if char_p == ffi.NULL:
         return ""
     return ffi.string(char_p).decode()  # type: ignore
 
 
-def _int(int_or_str: Any) -> int:
+def _int(int_or_str: SupportsInt | str | bytes) -> int:
     """Return an integer where a single character string may be expected."""
     if isinstance(int_or_str, str):
         return ord(int_or_str)
     if isinstance(int_or_str, bytes):
         return int_or_str[0]
-    return int(int_or_str)  # check for __count__
+    return int(int_or_str)
 
 
 def _bytes(string: AnyStr) -> bytes:
@@ -103,8 +107,8 @@ def _bytes(string: AnyStr) -> bytes:
 def _unicode(string: AnyStr, stacklevel: int = 2) -> str:
     if isinstance(string, bytes):
         warnings.warn(
-            ("Passing byte strings as parameters to Unicode functions is " "deprecated."),
-            DeprecationWarning,
+            "Passing byte strings as parameters to Unicode functions is deprecated.",
+            FutureWarning,
             stacklevel=stacklevel + 1,
         )
         return string.decode("latin-1")
@@ -114,8 +118,8 @@ def _unicode(string: AnyStr, stacklevel: int = 2) -> str:
 def _fmt(string: str, stacklevel: int = 2) -> bytes:
     if isinstance(string, bytes):
         warnings.warn(
-            ("Passing byte strings as parameters to Unicode functions is " "deprecated."),
-            DeprecationWarning,
+            "Passing byte strings as parameters to Unicode functions is deprecated.",
+            FutureWarning,
             stacklevel=stacklevel + 1,
         )
         string = string.decode("latin-1")
@@ -135,51 +139,46 @@ class _PropagateException:
     """
 
     def __init__(self) -> None:
-        # (exception, exc_value, traceback)
-        self.exc_info = None  # type: Any
+        self.caught: BaseException | None = None
 
-    def propagate(self, *exc_info: Any) -> None:
+    def propagate(self, *exc_info: Any) -> None:  # noqa: ANN401
         """Set an exception to be raised once this context exits.
 
         If multiple errors are caught, only keep the first exception raised.
         """
-        if not self.exc_info:
-            self.exc_info = exc_info
+        if self.caught is None:
+            self.caught = exc_info[1]
 
     def __enter__(self) -> Callable[[Any], None]:
         """Once in context, only the propagate call is needed to use this class effectively."""
         return self.propagate
 
-    def __exit__(self, type: Any, value: Any, traceback: Any) -> None:
+    def __exit__(
+        self, type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None
+    ) -> None:
         """If we're holding on to an exception, raise it now.
 
-        Prefers our held exception over any current raising error.
-
-        self.exc_info is reset now in case of nested manager shenanigans.
+        self.caught is reset now in case of nested manager shenanigans.
         """
-        if self.exc_info:
-            type, value, traceback = self.exc_info
-            self.exc_info = None
-        if type:
-            # Python 2/3 compatible throw
-            exception = type(value)
-            exception.__traceback__ = traceback
-            raise exception
+        to_raise, self.caught = self.caught, None
+        if to_raise is not None:
+            raise to_raise from value
 
 
-class _CDataWrapper(object):
-    def __init__(self, *args: Any, **kwargs: Any):
+class _CDataWrapper:
+    """A generally deprecated CData wrapper class used by libtcodpy."""
+
+    def __init__(self, *args: Any, **kwargs: Any):  # noqa: ANN401
         self.cdata = self._get_cdata_from_args(*args, **kwargs)
         if self.cdata is None:
             self.cdata = ffi.NULL
-        super(_CDataWrapper, self).__init__()
+        super().__init__()
 
     @staticmethod
-    def _get_cdata_from_args(*args: Any, **kwargs: Any) -> Any:
+    def _get_cdata_from_args(*args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
         if len(args) == 1 and isinstance(args[0], ffi.CData) and not kwargs:
             return args[0]
-        else:
-            return None
+        return None
 
     def __hash__(self) -> int:
         return hash(self.cdata)
@@ -199,11 +198,11 @@ class _CDataWrapper(object):
         if hasattr(self, "cdata") and hasattr(self.cdata, attr):
             setattr(self.cdata, attr, value)
         else:
-            super(_CDataWrapper, self).__setattr__(attr, value)
+            super().__setattr__(attr, value)
 
 
-def _console(console: Any) -> Any:
-    """Return a cffi console."""
+def _console(console: Any) -> Any:  # noqa: ANN401
+    """Return a cffi console pointer."""
     try:
         return console.console_c
     except AttributeError:
@@ -219,14 +218,16 @@ def _console(console: Any) -> Any:
         return ffi.NULL
 
 
-class TempImage(object):
+class TempImage:
     """An Image-like container for NumPy arrays."""
 
-    def __init__(self, array: Any):
+    def __init__(self, array: ArrayLike) -> None:
+        """Initialize an image from the given array.  May copy or reference the array."""
         self._array: NDArray[np.uint8] = np.ascontiguousarray(array, dtype=np.uint8)
         height, width, depth = self._array.shape
         if depth != 3:
-            raise TypeError("Array must have RGB channels.  Shape is: %r" % (self._array.shape,))
+            msg = f"Array must have RGB channels.  Shape is: {self._array.shape!r}"
+            raise TypeError(msg)
         self._buffer = ffi.from_buffer("TCOD_color_t[]", self._array)
         self._mipmaps = ffi.new(
             "struct TCOD_mipmap_*",
