@@ -73,6 +73,7 @@ jobs:
 
   # This makes sure that the latest versions of the SDL headers parse correctly.
   parse_sdl:
+    needs: [black, isort, flake8, mypy]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -94,6 +95,7 @@ jobs:
         run: python -m build
         env:
           SDL_VERSION: ${{ matrix.sdl-version }}
+          TDL_BUILD: DEBUG
 
   build:
     needs: [black, isort, flake8, mypy]
@@ -204,6 +206,7 @@ jobs:
 
   linux-wheels:
     needs: build # These take a while to build/test, so wait for normal tests to pass first.
+    if: startsWith(github.event.ref, 'refs/tags/')
     runs-on: "ubuntu-latest"
     strategy:
       matrix:
