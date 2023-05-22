@@ -253,7 +253,7 @@ jobs:
 
   build-macos:
     needs: [black, isort, flake8, mypy]
-    runs-on: "macos-10.15"
+    runs-on: "macos-11"
     strategy:
       fail-fast: true
       matrix:
@@ -274,7 +274,7 @@ jobs:
         # Downloads SDL2 for the later step.
         run: python3 setup.py check
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.0.0a4
+        uses: pypa/cibuildwheel@v2.12.3
         env:
           CIBW_BUILD: ${{ matrix.python }}
           CIBW_ARCHS_MACOS: x86_64 arm64 universal2
