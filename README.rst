@@ -6,7 +6,7 @@
 ========
 |VersionsBadge| |ImplementationBadge| |LicenseBadge|
 
-|PyPI| |RTD| |Codecov| |Pyup|
+|PyPI| |RTD| |Codecov| |Pyup| |CommitsSinceLastRelease|
 
 =======
  About
@@ -100,3 +100,6 @@ python-tcod is distributed under the `Simplified 2-clause FreeBSD license
 .. |Pyup| image:: https://pyup.io/repos/github/libtcod/python-tcod/shield.svg
     :target: https://pyup.io/repos/github/libtcod/python-tcod/
     :alt: Updates
+
+.. |CommitsSinceLastRelease| image:: https://img.shields.io/github/commits-since/libtcod/python-tcod/latest
+    :target: https://github.com/libtcod/python-tcod/blob/main/CHANGELOG.md
