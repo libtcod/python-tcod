@@ -428,5 +428,8 @@
     "python.testing.pytestEnabled": true,
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter"
-    }
+    },
+    "cSpell.enableFiletypes": [
+        "github-actions-workflow"
+    ]
 }
