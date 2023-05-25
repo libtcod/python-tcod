@@ -1,10 +1,12 @@
 ## Code style
 
-New and refactored Python code should follow the
-[PEP 8](https://www.python.org/dev/peps/pep-0008/) guidelines.
+Code styles are enforced using black and linters.
+These are best enabled with a pre-commit which you can setup with:
 
-It's recommended to use an editor supporting
-[EditorConfig](https://editorconfig.org/).
+```sh
+pip install pre-commit
+pre-commit install
+```
 
 ## Building python-tcod
 
