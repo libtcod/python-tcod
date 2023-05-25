@@ -3,8 +3,10 @@ from __future__ import annotations
 
 import pytest
 
+import libtcodpy
 import tcod
 import tcod.event
+import tcod.libtcodpy
 
 # ruff: noqa: D103
 
@@ -13,6 +15,10 @@ import tcod.event
 def test_deprecate_color() -> None:
     with pytest.raises(FutureWarning, match=r".*\(0, 0, 0\)"):
         _ = tcod.black
+    with pytest.raises(FutureWarning, match=r".*\(0, 0, 0\)"):
+        _ = tcod.libtcodpy.black
+    with pytest.raises(FutureWarning, match=r".*\(0, 0, 0\)"):
+        _ = libtcodpy.black
 
 
 @pytest.mark.filterwarnings("error")

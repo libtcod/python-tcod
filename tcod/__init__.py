@@ -25,7 +25,7 @@ except ImportError:  # Gets imported without version.py by ReadTheDocs
     __version__ = ""
 
 
-def __getattr__(name: str) -> color.Color:
+def __getattr__(name: str, stacklevel: int = 1) -> color.Color:
     """Mark access to color constants as deprecated."""
     value: color.Color | None = getattr(constants, name, None)
     if value is None:
@@ -34,7 +34,7 @@ def __getattr__(name: str) -> color.Color:
     warnings.warn(
         f"Color constants will be removed from future releases.\nReplace `tcod.{name}` with `{tuple(value)}`.",
         FutureWarning,
-        stacklevel=2,
+        stacklevel=stacklevel + 1,
     )
     return value
 

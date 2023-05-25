@@ -99,6 +99,7 @@ filterwarnings = [
     "ignore::DeprecationWarning:tcod.libtcodpy",
     "ignore::PendingDeprecationWarning:tcod.libtcodpy",
     "ignore:This class may perform poorly and is no longer needed.::tcod.map",
+    "ignore:'import tcod as libtcodpy' is preferred.",
 ]
 
 [tool.mypy]

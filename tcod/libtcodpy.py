@@ -4201,6 +4201,15 @@ def _atexit_verify() -> None:
         lib.TCOD_console_delete(ffi.NULL)
 
 
+def __getattr__(name: str) -> Color:
+    """Mark access to color constants as deprecated."""
+    try:
+        return tcod.__getattr__(name, stacklevel=2)  # type: ignore[call-arg]
+    except AttributeError:
+        msg = f"module {__name__!r} has no attribute {name!r}"
+        raise AttributeError(msg) from None
+
+
 __all__ = [  # noqa: F405
     "Color",
     "Bsp",
