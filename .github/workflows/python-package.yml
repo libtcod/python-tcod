@@ -128,7 +128,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest pytest-cov pytest-benchmark build twine
+          pip install pytest pytest-cov pytest-benchmark build
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Initialize package
         run: |
@@ -148,13 +148,6 @@ jobs:
         if: runner.os != 'Windows'
         run: cat /tmp/xvfb.log
       - uses: codecov/codecov-action@v3
-      - name: Upload to PyPI
-        if: startsWith(github.ref, 'refs/tags/') && runner.os != 'Linux'
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: |
-          twine upload --skip-existing dist/*
       - uses: actions/upload-artifact@v3
         if: runner.os == 'Linux'
         with:
@@ -223,7 +216,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install twine cibuildwheel==2.3.1
+          pip install cibuildwheel==2.3.1
       - name: Build wheels
         run: |
           python -m cibuildwheel --output-dir wheelhouse
@@ -245,13 +238,6 @@ jobs:
           name: wheels-linux
           path: wheelhouse/*.whl
           retention-days: 7
-      - name: Upload to PyPI
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: |
-          twine upload --skip-existing wheelhouse/*
 
   build-macos:
     needs: [black, isort, flake8, mypy]
@@ -271,7 +257,7 @@ jobs:
         # https://github.com/actions/checkout/issues/290
         run: git describe --tags
       - name: Install Python dependencies
-        run: pip3 install wheel twine -r requirements.txt
+        run: pip3 install -r requirements.txt
       - name: Prepare package
         # Downloads SDL2 for the later step.
         run: python3 setup.py || true
@@ -290,12 +276,6 @@ jobs:
           name: wheels-macos
           path: wheelhouse/*.whl
           retention-days: 7
-      - name: Upload to PyPI
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: twine upload --skip-existing wheelhouse/*
 
   publish:
       needs: [build]
