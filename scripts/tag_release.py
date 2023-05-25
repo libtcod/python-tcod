@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Automate tagged releases of this project."""
 from __future__ import annotations
 
 import argparse
@@ -8,7 +9,8 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Tuple
+
+# ruff: noqa: INP001, S603, S607
 
 PROJECT_DIR = Path(__file__).parent.parent
 
@@ -23,7 +25,7 @@ parser.add_argument("-n", "--dry-run", action="store_true", help="Don't modify f
 parser.add_argument("-v", "--verbose", action="store_true", help="Print debug information.")
 
 
-def parse_changelog(args: argparse.Namespace) -> Tuple[str, str]:
+def parse_changelog(args: argparse.Namespace) -> tuple[str, str]:
     """Return an updated changelog and and the list of changes."""
     match = re.match(
         pattern=r"(.*?## \[Unreleased]\n)(.+?\n)(\n*## \[.*)",
@@ -32,9 +34,9 @@ def parse_changelog(args: argparse.Namespace) -> Tuple[str, str]:
     )
     assert match
     header, changes, tail = match.groups()
-    tagged = "\n## [%s] - %s\n%s" % (
+    tagged = "\n## [{}] - {}\n{}".format(
         args.tag,
-        datetime.date.today().isoformat(),
+        datetime.date.today().isoformat(),  # Local timezone is fine, probably.  # noqa: DTZ011
         changes,
     )
     if args.verbose:
@@ -45,6 +47,7 @@ def parse_changelog(args: argparse.Namespace) -> Tuple[str, str]:
 
 
 def replace_unreleased_tags(tag: str, dry_run: bool) -> None:
+    """Walk though sources and replace pending tags with the new tag."""
     match = re.match(r"\d+\.\d+", tag)
     assert match
     short_tag = match.group()
@@ -62,7 +65,8 @@ def replace_unreleased_tags(tag: str, dry_run: bool) -> None:
 
 
 def main() -> None:
-    if len(sys.argv) == 1:
+    """Entry function."""
+    if len(sys.argv) <= 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
 
@@ -79,8 +83,8 @@ def main() -> None:
     if not args.dry_run:
         (PROJECT_DIR / "CHANGELOG.md").write_text(new_changelog, encoding="utf-8")
         edit = ["-e"] if args.edit else []
-        subprocess.check_call(["git", "commit", "-avm", "Prepare %s release." % args.tag] + edit)
-        subprocess.check_call(["git", "tag", args.tag, "-am", "%s\n\n%s" % (args.tag, changes)] + edit)
+        subprocess.check_call(["git", "commit", "-avm", f"Prepare {args.tag} release.", *edit])
+        subprocess.check_call(["git", "tag", args.tag, "-am", f"{args.tag}\n\n{changes}", *edit])
 
 
 if __name__ == "__main__":
