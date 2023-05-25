@@ -4,6 +4,8 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+
+## [15.0.2] - 2023-05-25
 ### Deprecated
 - Deprecated all libtcod color constants.  Replace these with your own manually defined colors.
   Using a color will tell you the color values of the deprecated color in the warning.
