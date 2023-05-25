@@ -2,10 +2,11 @@
 from pathlib import Path
 
 import numpy as np
+from PIL import Image, ImageDraw, ImageFont  # type: ignore  # pip install Pillow
+
 import tcod
 import tcod.sdl.render
 import tcod.sdl.video
-from PIL import Image, ImageDraw, ImageFont  # type: ignore  # pip install Pillow
 
 CURRENT_DIR = Path(__file__).parent  # Directory of this script.
 font = ImageFont.truetype(bytes(CURRENT_DIR / "DejaVuSerif.ttf"), size=18)  # Preloaded font file.

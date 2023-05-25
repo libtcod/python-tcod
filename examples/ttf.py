@@ -12,8 +12,9 @@ from typing import Tuple
 
 import freetype  # type: ignore  # pip install freetype-py
 import numpy as np
-import tcod
 from numpy.typing import NDArray
+
+import tcod
 
 FONT = "VeraMono.ttf"
 

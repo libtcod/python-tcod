@@ -15,10 +15,11 @@ import warnings
 from typing import Any, List
 
 import numpy as np
+from numpy.typing import NDArray
+
 import tcod
 import tcod.render
 import tcod.sdl.render
-from numpy.typing import NDArray
 
 if not sys.warnoptions:
     warnings.simplefilter("default")  # Show all warnings.

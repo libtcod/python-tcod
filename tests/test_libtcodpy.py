@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from typing import Any, Callable, Iterator, List, Optional, Tuple, Union
 
 import numpy

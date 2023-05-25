@@ -7,6 +7,9 @@
     "editor.codeActionsOnSave": {
         "source.organizeImports": true
     },
+    "files.trimFinalNewlines": true,
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
     "python.linting.enabled": true,
     "python.linting.flake8Enabled": true,
     "python.linting.mypyEnabled": true,

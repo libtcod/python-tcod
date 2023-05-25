@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import os
 
 curdir = os.path.dirname(__file__)

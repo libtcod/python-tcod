@@ -4,6 +4,7 @@
 # This code demonstrates various usages of libtcod modules
 # It's in the public domain.
 #
+# ruff: noqa
 from __future__ import division
 
 import math

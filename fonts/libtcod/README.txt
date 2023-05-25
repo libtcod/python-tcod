@@ -1,5 +1,5 @@
 This directory contains antialiased fonts for libtcod.
-These fonts are in public domain. 
+These fonts are in public domain.
 
 The file names are composed with :
 <font_name><font_size>_<type>_<layout>.png
