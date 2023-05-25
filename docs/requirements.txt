@@ -1,2 +1,2 @@
-sphinx>=5.0.2,!=5.1.0
-sphinx_rtd_theme
+sphinx>=5.0.2,!=5.1.0,<6.1  # https://github.com/readthedocs/sphinx_rtd_theme/issues/1463
+sphinx_rtd_theme>=1.2.1
