@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Build script to parse SDL headers and generate CFFI bindings."""
 from __future__ import annotations
 
 import io
@@ -10,12 +11,14 @@ import subprocess
 import sys
 import zipfile
 from pathlib import Path
-from typing import Any, Dict, List, Set
+from typing import Any
 
 import pcpp  # type: ignore
 import requests
 
-BITSIZE, LINKAGE = platform.architecture()
+# ruff: noqa: S603, S607  # This script calls a lot of programs.
+
+BIT_SIZE, LINKAGE = platform.architecture()
 
 # Reject versions of SDL older than this, update the requirements in the readme if you change this.
 SDL_MIN_VERSION = (2, 0, 10)
@@ -80,19 +83,21 @@ def check_sdl_version() -> None:
     needed_version = f"{SDL_MIN_VERSION[0]}.{SDL_MIN_VERSION[1]}.{SDL_MIN_VERSION[2]}"
     try:
         sdl_version_str = subprocess.check_output(["sdl2-config", "--version"], universal_newlines=True).strip()
-    except FileNotFoundError:
-        raise RuntimeError(
-            "libsdl2-dev or equivalent must be installed on your system"
-            f" and must be at least version {needed_version}."
-            "\nsdl2-config must be on PATH."
+    except FileNotFoundError as exc:
+        msg = (
+            "libsdl2-dev or equivalent must be installed on your system and must be at least version"
+            f" {needed_version}.\nsdl2-config must be on PATH."
         )
+        raise RuntimeError(msg) from exc
     print(f"Found SDL {sdl_version_str}.")
     sdl_version = tuple(int(s) for s in sdl_version_str.split("."))
     if sdl_version < SDL_MIN_VERSION:
-        raise RuntimeError("SDL version must be at least %s, (found %s)" % (needed_version, sdl_version_str))
+        msg = f"SDL version must be at least {needed_version}, (found {sdl_version_str})"
+        raise RuntimeError(msg)
 
 
 def get_sdl2_file(version: str) -> Path:
+    """Return a path to an SDL2 archive for the current platform.  The archive is downloaded if missing."""
     if sys.platform == "win32":
         sdl2_file = f"SDL2-devel-{version}-VC.zip"
     else:
@@ -102,14 +107,15 @@ def get_sdl2_file(version: str) -> Path:
     sdl2_remote_file = f"https://www.libsdl.org/release/{sdl2_file}"
     if not sdl2_local_file.exists():
         print(f"Downloading {sdl2_remote_file}")
-        os.makedirs("dependencies/", exist_ok=True)
-        with requests.get(sdl2_remote_file) as response:
+        Path("dependencies/").mkdir(parents=True, exist_ok=True)
+        with requests.get(sdl2_remote_file) as response:  # noqa: S113
             response.raise_for_status()
             sdl2_local_file.write_bytes(response.content)
     return sdl2_local_file
 
 
 def unpack_sdl2(version: str) -> Path:
+    """Return the path to an extracted SDL distribution.  Creates it if missing."""
     sdl2_path = Path(f"dependencies/SDL2-{version}")
     if sys.platform == "darwin":
         sdl2_dir = sdl2_path
@@ -134,10 +140,11 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore
     """A modified preprocessor to output code in a format for CFFI."""
 
     def __init__(self) -> None:
+        """Initialise the object with empty values."""
         super().__init__()
         self.line_directive = None  # Don't output line directives.
-        self.known_string_defines: Dict[str, str] = {}
-        self.known_defines: Set[str] = set()
+        self.known_string_defines: dict[str, str] = {}
+        self.known_defines: set[str] = set()
 
     def get_output(self) -> str:
         """Return this objects current tokens as a string."""
@@ -151,7 +158,7 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore
         """Remove bad includes such as stddef.h and stdarg.h."""
         raise pcpp.OutputDirective(pcpp.Action.IgnoreAndRemove)
 
-    def _should_track_define(self, tokens: List[Any]) -> bool:
+    def _should_track_define(self, tokens: list[Any]) -> bool:
         if len(tokens) < 3:
             return False
         if tokens[0].value in IGNORE_DEFINES:
@@ -175,8 +182,9 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore
         )
 
     def on_directive_handle(
-        self, directive: Any, tokens: List[Any], if_passthru: bool, preceding_tokens: List[Any]
-    ) -> Any:
+        self, directive: Any, tokens: list[Any], if_passthru: bool, preceding_tokens: list[Any]  # noqa: ANN401
+    ) -> Any:  # noqa: ANN401
+        """Catch and store definitions."""
         if directive.value == "define" and self._should_track_define(tokens):
             if tokens[2].type == "CPP_STRING":
                 self.known_string_defines[tokens[0].value] = tokens[2].value
@@ -204,7 +212,7 @@ else:  # Unix
     assert matches
 
     for match in matches:
-        if os.path.isfile(Path(match, "SDL_stdinc.h")):
+        if Path(match, "SDL_stdinc.h").is_file():
             SDL2_INCLUDE = match
     assert SDL2_INCLUDE
 
@@ -224,6 +232,7 @@ int _sdl_event_watcher(void* userdata, SDL_Event* event);
 
 
 def get_cdef() -> str:
+    """Return the parsed code of SDL for CFFI."""
     parser = SDLParser()
     parser.add_path(SDL2_INCLUDE)
     parser.parse(
@@ -261,12 +270,12 @@ def get_cdef() -> str:
     return sdl2_cdef + EXTRA_CDEF
 
 
-include_dirs: List[str] = []
-extra_compile_args: List[str] = []
-extra_link_args: List[str] = []
+include_dirs: list[str] = []
+extra_compile_args: list[str] = []
+extra_link_args: list[str] = []
 
-libraries: List[str] = []
-library_dirs: List[str] = []
+libraries: list[str] = []
+library_dirs: list[str] = []
 
 
 if sys.platform == "darwin":
@@ -278,16 +287,16 @@ else:
 if sys.platform == "win32":
     include_dirs.append(str(SDL2_INCLUDE))
     ARCH_MAPPING = {"32bit": "x86", "64bit": "x64"}
-    SDL2_LIB_DIR = Path(SDL2_BUNDLE_PATH, "lib/", ARCH_MAPPING[BITSIZE])
+    SDL2_LIB_DIR = Path(SDL2_BUNDLE_PATH, "lib/", ARCH_MAPPING[BIT_SIZE])
     library_dirs.append(str(SDL2_LIB_DIR))
-    SDL2_LIB_DEST = Path("tcod", ARCH_MAPPING[BITSIZE])
+    SDL2_LIB_DEST = Path("tcod", ARCH_MAPPING[BIT_SIZE])
     SDL2_LIB_DEST.mkdir(exist_ok=True)
     shutil.copy(SDL2_LIB_DIR / "SDL2.dll", SDL2_LIB_DEST)
 
 # Link to the SDL2 framework on MacOS.
 # Delocate will bundle the binaries in a later step.
 if sys.platform == "darwin":
-    HEADER_DIR = os.path.join(SDL2_PARSE_PATH, "Headers")
+    HEADER_DIR = Path(SDL2_PARSE_PATH, "Headers")
     include_dirs.append(HEADER_DIR)
     extra_link_args += [f"-F{SDL2_BUNDLE_PATH}/.."]
     extra_link_args += ["-rpath", f"{SDL2_BUNDLE_PATH}/.."]
