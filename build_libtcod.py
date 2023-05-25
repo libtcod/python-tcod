@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
+"""Parse and compile libtcod and SDL sources for CFFI."""
 from __future__ import annotations
 
+import contextlib
 import glob
 import os
 import platform
 import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, List, Set, Tuple, Union
+from typing import Any, Iterable, Iterator
 
 from cffi import FFI
 
@@ -20,7 +22,7 @@ Py_LIMITED_API = 0x03060000
 HEADER_PARSE_PATHS = ("tcod/", "libtcod/src/libtcod/")
 HEADER_PARSE_EXCLUDES = ("gl2_ext_.h", "renderer_gl_internal.h", "event.h")
 
-BITSIZE, LINKAGE = platform.architecture()
+BIT_SIZE, LINKAGE = platform.architecture()
 
 # Regular expressions to parse the headers for cffi.
 RE_COMMENT = re.compile(r"\s*/\*.*?\*/|\s*//*?$", re.DOTALL | re.MULTILINE)
@@ -43,18 +45,18 @@ class ParsedHeader:
     """
 
     # Class dictionary of all parsed headers.
-    all_headers: Dict[Path, ParsedHeader] = {}
+    all_headers: dict[Path, ParsedHeader] = {}
 
     def __init__(self, path: Path) -> None:
+        """Initialize and organize a header file."""
         self.path = path = path.resolve(True)
         directory = path.parent
         depends = set()
-        with open(self.path, "r", encoding="utf-8") as f:
-            header = f.read()
+        header = self.path.read_text(encoding="utf-8")
         header = RE_COMMENT.sub("", header)
         header = RE_CPLUSPLUS.sub("", header)
         for dependency in RE_INCLUDE.findall(header):
-            depends.add((directory / dependency).resolve(True))
+            depends.add((directory / str(dependency)).resolve(True))
         header = RE_PREPROCESSOR.sub("", header)
         header = RE_TAGS.sub("", header)
         header = RE_VAFUNC.sub("", header)
@@ -63,22 +65,22 @@ class ParsedHeader:
         self.depends = frozenset(depends)
         self.all_headers[self.path] = self
 
-    def parsed_depends(self) -> Iterator["ParsedHeader"]:
+    def parsed_depends(self) -> Iterator[ParsedHeader]:
         """Return dependencies excluding ones that were not loaded."""
         for dep in self.depends:
-            try:
+            with contextlib.suppress(KeyError):
                 yield self.all_headers[dep]
-            except KeyError:
-                pass
 
     def __str__(self) -> str:
-        return "Parsed harder at '%s'\n Depends on: %s" % (
+        """Return useful info on this object."""
+        return "Parsed harder at '{}'\n Depends on: {}".format(
             self.path,
-            "\n\t".join(self.depends),
+            "\n\t".join(str(d) for d in self.depends),
         )
 
     def __repr__(self) -> str:
-        return f"ParsedHeader({self.path})"
+        """Return the representation of this object."""
+        return f"ParsedHeader({self.path!r})"
 
 
 def walk_includes(directory: str) -> Iterator[ParsedHeader]:
@@ -93,10 +95,10 @@ def walk_includes(directory: str) -> Iterator[ParsedHeader]:
 
 def resolve_dependencies(
     includes: Iterable[ParsedHeader],
-) -> List[ParsedHeader]:
+) -> list[ParsedHeader]:
     """Sort headers by their correct include order."""
     unresolved = set(includes)
-    resolved: Set[ParsedHeader] = set()
+    resolved: set[ParsedHeader] = set()
     result = []
     while unresolved:
         for item in unresolved:
@@ -104,26 +106,29 @@ def resolve_dependencies(
                 resolved.add(item)
                 result.append(item)
         if not unresolved & resolved:
-            raise RuntimeError(
-                "Could not resolve header load order.\n"
-                f"Possible cyclic dependency with the unresolved headers:\n{unresolved}"
+            msg = (
+                "Could not resolve header load order."
+                "\nPossible cyclic dependency with the unresolved headers:"
+                f"\n{unresolved}"
             )
+            raise RuntimeError(msg)
         unresolved -= resolved
     return result
 
 
-def parse_includes() -> List[ParsedHeader]:
+def parse_includes() -> list[ParsedHeader]:
     """Collect all parsed header files and return them.
 
     Reads HEADER_PARSE_PATHS and HEADER_PARSE_EXCLUDES.
     """
-    includes: List[ParsedHeader] = []
+    includes: list[ParsedHeader] = []
     for dirpath in HEADER_PARSE_PATHS:
         includes.extend(walk_includes(dirpath))
     return resolve_dependencies(includes)
 
 
 def walk_sources(directory: str) -> Iterator[str]:
+    """Iterate over the C sources of a directory recursively."""
     for path, _dirs, files in os.walk(directory):
         for source in files:
             if source.endswith(".c"):
@@ -133,7 +138,7 @@ def walk_sources(directory: str) -> Iterator[str]:
 includes = parse_includes()
 
 module_name = "tcod._libtcod"
-include_dirs: List[str] = [
+include_dirs: list[str] = [
     ".",
     "libtcod/src/vendor/",
     "libtcod/src/vendor/utf8proc",
@@ -141,13 +146,13 @@ include_dirs: List[str] = [
     *build_sdl.include_dirs,
 ]
 
-extra_compile_args: List[str] = [*build_sdl.extra_compile_args]
-extra_link_args: List[str] = [*build_sdl.extra_link_args]
-sources: List[str] = []
+extra_compile_args: list[str] = [*build_sdl.extra_compile_args]
+extra_link_args: list[str] = [*build_sdl.extra_link_args]
+sources: list[str] = []
 
-libraries: List[str] = [*build_sdl.libraries]
-library_dirs: List[str] = [*build_sdl.library_dirs]
-define_macros: List[Tuple[str, Any]] = [("Py_LIMITED_API", Py_LIMITED_API)]
+libraries: list[str] = [*build_sdl.libraries]
+library_dirs: list[str] = [*build_sdl.library_dirs]
+define_macros: list[tuple[str, Any]] = [("Py_LIMITED_API", Py_LIMITED_API)]
 
 sources += walk_sources("tcod/")
 sources += walk_sources("libtcod/src/libtcod/")
@@ -173,7 +178,7 @@ if sys.platform == "darwin":
 tdl_build = os.environ.get("TDL_BUILD", "RELEASE").upper()
 
 MSVC_CFLAGS = {"DEBUG": ["/Od"], "RELEASE": ["/GL", "/O2", "/GS-", "/wd4996"]}
-MSVC_LDFLAGS: Dict[str, List[str]] = {"DEBUG": [], "RELEASE": ["/LTCG"]}
+MSVC_LDFLAGS: dict[str, list[str]] = {"DEBUG": [], "RELEASE": ["/LTCG"]}
 GCC_CFLAGS = {
     "DEBUG": ["-std=c99", "-Og", "-g", "-fPIC"],
     "RELEASE": [
@@ -238,7 +243,7 @@ This module is auto-generated by `build_libtcod.py`.
 '''
 
 
-def find_sdl_attrs(prefix: str) -> Iterator[Tuple[str, Union[int, str, Any]]]:
+def find_sdl_attrs(prefix: str) -> Iterator[tuple[str, int | str | Any]]:
     """Return names and values from `tcod.lib`.
 
     `prefix` is used to filter out which names to copy.
@@ -294,24 +299,22 @@ EXCLUDE_CONSTANT_PREFIXES = [
 ]
 
 
-def update_module_all(filename: str, new_all: str) -> None:
+def update_module_all(filename: Path, new_all: str) -> None:
     """Update the __all__ of a file with the constants from new_all."""
     RE_CONSTANTS_ALL = re.compile(
         r"(.*# --- From constants.py ---).*(# --- End constants.py ---.*)",
         re.DOTALL,
     )
-    with open(filename, "r", encoding="utf-8") as f:
-        match = RE_CONSTANTS_ALL.match(f.read())
+    match = RE_CONSTANTS_ALL.match(filename.read_text(encoding="utf-8"))
     assert match, f"Can't determine __all__ subsection in {filename}!"
     header, footer = match.groups()
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write(f"{header}\n    {new_all},\n    {footer}")
+    filename.write_text(f"{header}\n    {new_all},\n    {footer}", encoding="utf-8")
 
 
 def generate_enums(prefix: str) -> Iterator[str]:
     """Generate attribute assignments suitable for a Python enum."""
-    for name, value in sorted(find_sdl_attrs(prefix), key=lambda item: item[1]):
-        name = name.split("_", 1)[1]
+    for symbol, value in sorted(find_sdl_attrs(prefix), key=lambda item: item[1]):
+        _, name = symbol.split("_", 1)
         if name.isdigit():
             name = f"N{name}"
         if name in "IOl":  # Handle Flake8 warnings.
@@ -325,7 +328,7 @@ def write_library_constants() -> None:
     import tcod.color
     from tcod._libtcod import ffi, lib
 
-    with open("tcod/constants.py", "w", encoding="utf-8") as f:
+    with Path("tcod/constants.py").open("w", encoding="utf-8") as f:
         all_names = []
         f.write(CONSTANT_MODULE_HEADER)
         for name in dir(lib):
@@ -363,10 +366,10 @@ def write_library_constants() -> None:
 
         all_names_merged = ",\n    ".join(f'"{name}"' for name in all_names)
         f.write(f"\n__all__ = [\n    {all_names_merged},\n]\n")
-        update_module_all("tcod/__init__.py", all_names_merged)
-        update_module_all("tcod/libtcodpy.py", all_names_merged)
+        update_module_all(Path("tcod/__init__.py"), all_names_merged)
+        update_module_all(Path("tcod/libtcodpy.py"), all_names_merged)
 
-    with open("tcod/event_constants.py", "w", encoding="utf-8") as f:
+    with Path("tcod/event_constants.py").open("w", encoding="utf-8") as f:
         all_names = []
         f.write(EVENT_CONSTANT_MODULE_HEADER)
         f.write("\n# --- SDL scancodes ---\n")
@@ -376,10 +379,10 @@ def write_library_constants() -> None:
         f.write(f"""{parse_sdl_attrs("SDLK", None)[0]}\n""")
 
         f.write("\n# --- SDL keyboard modifiers ---\n")
-        f.write("%s\n_REVERSE_MOD_TABLE = %s\n" % parse_sdl_attrs("KMOD", all_names))
+        f.write("{}\n_REVERSE_MOD_TABLE = {}\n".format(*parse_sdl_attrs("KMOD", all_names)))
 
         f.write("\n# --- SDL wheel ---\n")
-        f.write("%s\n_REVERSE_WHEEL_TABLE = %s\n" % parse_sdl_attrs("SDL_MOUSEWHEEL", all_names))
+        f.write("{}\n_REVERSE_WHEEL_TABLE = {}\n".format(*parse_sdl_attrs("SDL_MOUSEWHEEL", all_names)))
         all_names_merged = ",\n    ".join(f'"{name}"' for name in all_names)
         f.write(f"\n__all__ = [\n    {all_names_merged},\n]\n")
 
