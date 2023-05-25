@@ -5,6 +5,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [15.0.3] - 2023-05-25
+
 ## [15.0.2] - 2023-05-25
 ### Deprecated
 - Deprecated all libtcod color constants.  Replace these with your own manually defined colors.
