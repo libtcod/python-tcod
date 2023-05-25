@@ -178,4 +178,3 @@ ignore = [
     "D409",   # section-underline-matches-section-length
 ]
 line-length = 120
-target-version = "py37"
