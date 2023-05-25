@@ -55,16 +55,36 @@ jobs:
       - uses: actions/checkout@v3
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
-      - name: Install Python dependencies
+      - name: Install typing dependencies
         run: pip install mypy pytest -r requirements.txt
-      - name: Fake initialize package
-        run: |
-          echo '__version__ = ""' > tcod/version.py
       - name: Mypy
         uses: liskin/gh-problem-matcher-wrap@v2
         with:
           linters: mypy
           run: mypy --show-column-numbers
+
+  sdist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: APT update
+        run: sudo apt-get update
+      - name: Install APT dependencies
+        run: sudo apt-get install libsdl2-dev
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ env.git-depth }}
+      - name: Checkout submodules
+        run: git submodule update --init --recursive --depth 1
+      - name: Install build
+        run: pip install build
+      - name: Build source distribution
+        run: python -m build --sdist
+      - uses: actions/upload-artifact@v3
+        with:
+          name: sdist
+          path: dist/tcod-*.tar.gz
+          retention-days: 7
+
 
   # This makes sure that the latest versions of the SDL headers parse correctly.
   parse_sdl:
@@ -133,7 +153,7 @@ jobs:
       - name: Initialize package
         run: |
           pip install -e .  # Install the package in-place.
-      - name: Build package.
+      - name: Build package
         run: |
           python -m build
       - name: Test with pytest
@@ -149,12 +169,6 @@ jobs:
         run: cat /tmp/xvfb.log
       - uses: codecov/codecov-action@v3
       - uses: actions/upload-artifact@v3
-        if: runner.os == 'Linux'
-        with:
-          name: sdist
-          path: dist/tcod-*.tar.gz
-          retention-days: 7
-      - uses: actions/upload-artifact@v3
         if: runner.os == 'Windows'
         with:
           name: wheels-windows
@@ -162,7 +176,7 @@ jobs:
           retention-days: 7
 
   isolated: # Test installing the package from source.
-    needs: build
+    needs: [black, isort, flake8, mypy, sdist]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -192,8 +206,7 @@ jobs:
           python -c "import tcod"
 
   linux-wheels:
-    needs: build # These take a while to build/test, so wait for normal tests to pass first.
-    if: startsWith(github.event.ref, 'refs/tags/')
+    needs: [black, isort, flake8, mypy]
     runs-on: "ubuntu-latest"
     strategy:
       matrix:
@@ -232,6 +245,8 @@ jobs:
             yum install -y SDL2-devel
           CIBW_BEFORE_TEST: pip install numpy
           CIBW_TEST_COMMAND: python -c "import tcod"
+          # Skip test on emulated architectures
+          CIBW_TEST_SKIP: "*_aarch64"
       - name: Archive wheel
         uses: actions/upload-artifact@v3
         with:
@@ -252,15 +267,11 @@ jobs:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
-      - name: Print git describe
-        # "--tags" is required to workaround actions/checkout's broken annotated tag handing.
-        # https://github.com/actions/checkout/issues/290
-        run: git describe --tags
       - name: Install Python dependencies
         run: pip3 install -r requirements.txt
       - name: Prepare package
         # Downloads SDL2 for the later step.
-        run: python3 setup.py || true
+        run: python3 build_sdl.py
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.3
         env:
@@ -278,7 +289,7 @@ jobs:
           retention-days: 7
 
   publish:
-      needs: [build]
+      needs: [sdist, build, build-macos, linux-wheels]
       runs-on: ubuntu-latest
       if: startsWith(github.ref, 'refs/tags/')
       environment:
@@ -295,42 +306,14 @@ jobs:
         with:
           name: wheels-windows
           path: dist/
+      - uses: actions/download-artifact@v3
+        with:
+          name: wheels-macos
+          path: dist/
+      - uses: actions/download-artifact@v3
+        with:
+          name: wheels-linux
+          path: dist/
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           skip-existing: true
-
-  publish-macos:
-    needs: [build-macos]
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    environment:
-      name: release
-      url: https://pypi.org/p/tcod
-    permissions:
-      id-token: write
-    steps:
-    - uses: actions/download-artifact@v3
-      with:
-        name: wheels-macos
-        path: dist/
-    - uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        skip-existing: true
-
-  publish-linux:
-    needs: [linux-wheels]
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    environment:
-      name: release
-      url: https://pypi.org/p/tcod
-    permissions:
-      id-token: write
-    steps:
-    - uses: actions/download-artifact@v3
-      with:
-        name: wheels-linux
-        path: dist/
-    - uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        skip-existing: true

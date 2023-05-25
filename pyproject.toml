@@ -134,6 +134,10 @@ exclude = [
 module = "numpy.*"
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = "tcod.version"
+ignore_missing_imports = true
+
 
 [tool.ruff]
 # https://beta.ruff.rs/docs/rules/
