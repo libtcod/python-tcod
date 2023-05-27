@@ -1131,6 +1131,7 @@ class Pathfinder:
         Example::
 
             # This example demonstrates the purpose of the traversal array.
+            >>> import tcod.path
             >>> graph = tcod.path.SimpleGraph(
             ...     cost=np.ones((5, 5), np.int8), cardinal=2, diagonal=3,
             ... )
@@ -1240,6 +1241,7 @@ class Pathfinder:
 
         Example::
 
+            >>> import tcod.path
             >>> graph = tcod.path.SimpleGraph(
             ...     cost=np.ones((4, 4), np.int8), cardinal=2, diagonal=3,
             ... )
@@ -1300,6 +1302,7 @@ class Pathfinder:
 
         Example::
 
+            >>> import tcod.path
             >>> cost = np.ones((5, 5), dtype=np.int8)
             >>> cost[:, 3:] = 0
             >>> graph = tcod.path.SimpleGraph(cost=cost, cardinal=2, diagonal=3)
@@ -1344,6 +1347,7 @@ class Pathfinder:
 
         Example::
 
+            >>> import tcod.path
             >>> graph = tcod.path.SimpleGraph(
             ...     cost=np.ones((5, 5), np.int8), cardinal=2, diagonal=3,
             ... )
