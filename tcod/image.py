@@ -288,13 +288,16 @@ class Image:
             img_height,
         )
 
-    def save_as(self, filename: str) -> None:
+    def save_as(self, filename: str | PathLike[str]) -> None:
         """Save the Image to a 32-bit .bmp or .png file.
 
         Args:
             filename (Text): File path to same this Image.
+
+        .. versionchanged:: Unreleased
+            Added PathLike support.
         """
-        lib.TCOD_image_save(self.image_c, filename.encode("utf-8"))
+        lib.TCOD_image_save(self.image_c, bytes(Path(filename)))
 
     @property
     def __array_interface__(self) -> dict[str, Any]:

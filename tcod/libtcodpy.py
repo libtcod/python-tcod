@@ -5,8 +5,9 @@ import atexit
 import sys
 import threading
 import warnings
+from os import PathLike
 from pathlib import Path
-from typing import Any, AnyStr, Callable, Hashable, Iterable, Iterator, Sequence
+from typing import Any, Callable, Hashable, Iterable, Iterator, Sequence
 
 import numpy as np
 from numpy.typing import NDArray
@@ -954,7 +955,7 @@ See the Getting Started documentation:
 https://python-tcod.readthedocs.io/en/latest/tcod/getting-started.html"""
 )
 def console_set_custom_font(
-    fontFile: AnyStr,
+    fontFile: str | PathLike[str],
     flags: int = FONT_LAYOUT_ASCII_INCOL,
     nb_char_horiz: int = 0,
     nb_char_vertic: int = 0,
@@ -983,9 +984,12 @@ def console_set_custom_font(
     .. deprecated:: 11.13
         Load fonts using :any:`tcod.tileset.load_tilesheet` instead.
         See :ref:`getting-started` for more info.
+
+    .. versionchanged:: Unreleased
+        Added PathLike support.  `fontFile` no longer takes bytes.
     """
-    path = Path(_unicode(fontFile)).resolve(strict=True)
-    _check(lib.TCOD_console_set_custom_font(path, flags, nb_char_horiz, nb_char_vertic))
+    fontFile = Path(fontFile).resolve(strict=True)
+    _check(lib.TCOD_console_set_custom_font(bytes(fontFile), flags, nb_char_horiz, nb_char_vertic))
 
 
 @deprecate("Check `con.width` instead.")
@@ -1780,7 +1784,7 @@ def console_new(w: int, h: int) -> tcod.console.Console:
 
 
 @deprecate("This loading method is no longer supported, use tcod.console_load_xp instead.")
-def console_from_file(filename: str) -> tcod.console.Console:
+def console_from_file(filename: str | PathLike[str]) -> tcod.console.Console:
     """Return a new console object from a filename.
 
     The file format is automatically determined.  This can load REXPaint `.xp`,
@@ -1795,9 +1799,12 @@ def console_from_file(filename: str) -> tcod.console.Console:
         Use :any:`tcod.console_load_xp` to load REXPaint consoles.
 
         Other formats are not actively supported.
+
+    .. versionchanged:: Unreleased
+        Added PathLike support.
     """
-    path = Path(filename).resolve(strict=True)
-    return tcod.console.Console._from_cdata(_check_p(lib.TCOD_console_from_file(bytes(path))))
+    filename = Path(filename).resolve(strict=True)
+    return tcod.console.Console._from_cdata(_check_p(lib.TCOD_console_from_file(bytes(filename))))
 
 
 @deprecate("Call the `Console.blit` method instead.")
@@ -1966,76 +1973,106 @@ def console_fill_char(con: tcod.console.Console, arr: Sequence[int]) -> None:
 
 
 @deprecate("This format is not actively supported")
-def console_load_asc(con: tcod.console.Console, filename: str) -> bool:
+def console_load_asc(con: tcod.console.Console, filename: str | PathLike[str]) -> bool:
     """Update a console from a non-delimited ASCII `.asc` file.
 
     .. deprecated:: 12.7
         This format is no longer supported.
+
+    .. versionchanged:: Unreleased
+        Added PathLike support.
     """
-    return bool(lib.TCOD_console_load_asc(_console(con), filename.encode("utf-8")))
+    filename = Path(filename).resolve(strict=True)
+    return bool(lib.TCOD_console_load_asc(_console(con), bytes(filename)))
 
 
 @deprecate("This format is not actively supported")
-def console_save_asc(con: tcod.console.Console, filename: str) -> bool:
+def console_save_asc(con: tcod.console.Console, filename: str | PathLike[str]) -> bool:
     """Save a console to a non-delimited ASCII `.asc` file.
 
     .. deprecated:: 12.7
         This format is no longer supported.
+
+    .. versionchanged:: Unreleased
+        Added PathLike support.
     """
-    return bool(lib.TCOD_console_save_asc(_console(con), filename.encode("utf-8")))
+    return bool(lib.TCOD_console_save_asc(_console(con), bytes(Path(filename))))
 
 
 @deprecate("This format is not actively supported")
-def console_load_apf(con: tcod.console.Console, filename: str) -> bool:
+def console_load_apf(con: tcod.console.Console, filename: str | PathLike[str]) -> bool:
     """Update a console from an ASCII Paint `.apf` file.
 
     .. deprecated:: 12.7
         This format is no longer supported.
+
+    .. versionchanged:: Unreleased
+        Added PathLike support.
     """
-    return bool(lib.TCOD_console_load_apf(_console(con), filename.encode("utf-8")))
+    filename = Path(filename).resolve(strict=True)
+    return bool(lib.TCOD_console_load_apf(_console(con), bytes(filename)))
 
 
 @deprecate("This format is not actively supported")
-def console_save_apf(con: tcod.console.Console, filename: str) -> bool:
+def console_save_apf(con: tcod.console.Console, filename: str | PathLike[str]) -> bool:
     """Save a console to an ASCII Paint `.apf` file.
 
     .. deprecated:: 12.7
         This format is no longer supported.
+
+    .. versionchanged:: Unreleased
+        Added PathLike support.
     """
-    return bool(lib.TCOD_console_save_apf(_console(con), filename.encode("utf-8")))
+    return bool(lib.TCOD_console_save_apf(_console(con), bytes(Path(filename))))
 
 
 @deprecate("Use tcod.console.load_xp to load this file.")
-def console_load_xp(con: tcod.console.Console, filename: str) -> bool:
+def console_load_xp(con: tcod.console.Console, filename: str | PathLike[str]) -> bool:
     """Update a console from a REXPaint `.xp` file.
 
     .. deprecated:: 11.18
         Functions modifying console objects in-place are deprecated.
         Use :any:`tcod.console_from_xp` to load a Console from a file.
+
+    .. versionchanged:: Unreleased
+        Added PathLike support.
     """
-    return bool(lib.TCOD_console_load_xp(_console(con), filename.encode("utf-8")))
+    filename = Path(filename).resolve(strict=True)
+    return bool(lib.TCOD_console_load_xp(_console(con), bytes(filename)))
 
 
 @deprecate("Use tcod.console.save_xp to save this console.")
-def console_save_xp(con: tcod.console.Console, filename: str, compress_level: int = 9) -> bool:
-    """Save a console to a REXPaint `.xp` file."""
-    return bool(lib.TCOD_console_save_xp(_console(con), filename.encode("utf-8"), compress_level))
+def console_save_xp(con: tcod.console.Console, filename: str | PathLike[str], compress_level: int = 9) -> bool:
+    """Save a console to a REXPaint `.xp` file.
+
+    .. versionchanged:: Unreleased
+        Added PathLike support.
+    """
+    return bool(lib.TCOD_console_save_xp(_console(con), bytes(Path(filename)), compress_level))
 
 
 @deprecate("Use tcod.console.load_xp to load this file.")
-def console_from_xp(filename: str) -> tcod.console.Console:
-    """Return a single console from a REXPaint `.xp` file."""
-    path = Path(filename).resolve(strict=True)
-    return tcod.console.Console._from_cdata(_check_p(lib.TCOD_console_from_xp(bytes(path))))
+def console_from_xp(filename: str | PathLike[str]) -> tcod.console.Console:
+    """Return a single console from a REXPaint `.xp` file.
+
+    .. versionchanged:: Unreleased
+        Added PathLike support.
+    """
+    filename = Path(filename).resolve(strict=True)
+    return tcod.console.Console._from_cdata(_check_p(lib.TCOD_console_from_xp(bytes(filename))))
 
 
 @deprecate("Use tcod.console.load_xp to load this file.")
 def console_list_load_xp(
-    filename: str,
+    filename: str | PathLike[str],
 ) -> list[tcod.console.Console] | None:
-    """Return a list of consoles from a REXPaint `.xp` file."""
-    path = Path(filename).resolve(strict=True)
-    tcod_list = lib.TCOD_console_list_from_xp(bytes(path))
+    """Return a list of consoles from a REXPaint `.xp` file.
+
+    .. versionchanged:: Unreleased
+        Added PathLike support.
+    """
+    filename = Path(filename).resolve(strict=True)
+    tcod_list = lib.TCOD_console_list_from_xp(bytes(filename))
     if tcod_list == ffi.NULL:
         return None
     try:
@@ -2051,15 +2088,19 @@ def console_list_load_xp(
 @deprecate("Use tcod.console.save_xp to save these consoles.")
 def console_list_save_xp(
     console_list: Sequence[tcod.console.Console],
-    filename: str,
+    filename: str | PathLike[str],
     compress_level: int = 9,
 ) -> bool:
-    """Save a list of consoles to a REXPaint `.xp` file."""
+    """Save a list of consoles to a REXPaint `.xp` file.
+
+    .. versionchanged:: Unreleased
+        Added PathLike support.
+    """
     tcod_list = lib.TCOD_list_new()
     try:
         for console in console_list:
             lib.TCOD_list_push(tcod_list, _console(console))
-        return bool(lib.TCOD_console_list_save_xp(tcod_list, filename.encode("utf-8"), compress_level))
+        return bool(lib.TCOD_console_list_save_xp(tcod_list, bytes(Path(filename)), compress_level))
     finally:
         lib.TCOD_list_delete(tcod_list)
 
@@ -2992,13 +3033,17 @@ def image_is_pixel_transparent(image: tcod.image.Image, x: int, y: int) -> bool:
     "This function may be removed in the future."
     "  It's recommended to load images with a more complete image library such as python-Pillow or python-imageio."
 )
-def image_load(filename: str) -> tcod.image.Image:
+def image_load(filename: str | PathLike[str]) -> tcod.image.Image:
     """Load an image file into an Image instance and return it.
 
     Args:
-        filename (AnyStr): Path to a .bmp or .png image file.
+        filename: Path to a .bmp or .png image file.
+
+    .. versionchanged:: Unreleased
+        Added PathLike support.
     """
-    return tcod.image.Image._from_cdata(ffi.gc(lib.TCOD_image_load(_bytes(filename)), lib.TCOD_image_delete))
+    filename = Path(filename).resolve(strict=True)
+    return tcod.image.Image._from_cdata(ffi.gc(lib.TCOD_image_load(bytes(filename)), lib.TCOD_image_delete))
 
 
 @pending_deprecate()
@@ -3085,7 +3130,7 @@ def image_blit_2x(
 
 
 @pending_deprecate()
-def image_save(image: tcod.image.Image, filename: str) -> None:
+def image_save(image: tcod.image.Image, filename: str | PathLike[str]) -> None:
     image.save_as(filename)
 
 
@@ -3382,8 +3427,8 @@ def mouse_get_status() -> Mouse:
 
 
 @pending_deprecate()
-def namegen_parse(filename: str, random: tcod.random.Random | None = None) -> None:
-    lib.TCOD_namegen_parse(_bytes(filename), random or ffi.NULL)
+def namegen_parse(filename: str | PathLike[str], random: tcod.random.Random | None = None) -> None:
+    lib.TCOD_namegen_parse(bytes(Path(filename)), random or ffi.NULL)
 
 
 @pending_deprecate()
@@ -3583,10 +3628,10 @@ def _pycall_parser_error(msg: Any) -> None:
 
 
 @deprecate("Parser functions have been deprecated.")
-def parser_run(parser: Any, filename: str, listener: Any = None) -> None:
+def parser_run(parser: Any, filename: str | PathLike[str], listener: Any = None) -> None:
     global _parser_listener
     if not listener:
-        lib.TCOD_parser_run(parser, _bytes(filename), ffi.NULL)
+        lib.TCOD_parser_run(parser, bytes(Path(filename)), ffi.NULL)
         return
 
     propagate_manager = _PropagateException()
@@ -3605,7 +3650,7 @@ def parser_run(parser: Any, filename: str, listener: Any = None) -> None:
     with _parser_callback_lock:
         _parser_listener = listener
         with propagate_manager:
-            lib.TCOD_parser_run(parser, _bytes(filename), c_listener)
+            lib.TCOD_parser_run(parser, bytes(Path(filename)), c_listener)
 
 
 @deprecate("libtcod objects are deleted automatically.")
@@ -4007,7 +4052,7 @@ def sys_get_renderer() -> int:
 
 # easy screenshots
 @deprecate("This function is not supported if contexts are being used.")
-def sys_save_screenshot(name: str | None = None) -> None:
+def sys_save_screenshot(name: str | PathLike[str] | None = None) -> None:
     """Save a screenshot to a file.
 
     By default this will automatically save screenshots in the working
@@ -4022,6 +4067,9 @@ def sys_save_screenshot(name: str | None = None) -> None:
     .. deprecated:: 11.13
         This function is not supported by contexts.
         Use :any:`Context.save_screenshot` instead.
+
+    .. versionchanged:: Unreleased
+        Added PathLike support.
     """
     lib.TCOD_sys_save_screenshot(bytes(Path(name)) if name is not None else ffi.NULL)
 

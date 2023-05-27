@@ -4,6 +4,11 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+### Added
+- Added PathLike support to more libtcodpy functions.
+
+### Removed
+- `tcod.console_set_custom_font` can no longer take bytes.
 
 ## [15.0.3] - 2023-05-25
 ### Deprecated
