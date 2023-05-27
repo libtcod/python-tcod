@@ -42,7 +42,7 @@ def test_fov_single(maps: List[tcod.map.Map]) -> None:
 
 
 def test_fov_threads(executor: concurrent.futures.Executor, maps: List[tcod.map.Map]) -> None:
-    for result in executor.map(test_fov, maps):
+    for _result in executor.map(test_fov, maps):
         pass
 
 
@@ -57,7 +57,7 @@ def test_astar_single(maps: List[tcod.map.Map]) -> None:
 
 
 def test_astar_threads(executor: concurrent.futures.Executor, maps: List[tcod.map.Map]) -> None:
-    for result in executor.map(test_astar, maps):
+    for _result in executor.map(test_astar, maps):
         pass
 
 
@@ -66,8 +66,7 @@ def run_test(
     single_func: Callable[[List[tcod.map.Map]], None],
     multi_func: Callable[[concurrent.futures.Executor, List[tcod.map.Map]], None],
 ) -> None:
-    """Run a function designed for a single thread and compare it to a threaded
-    version.
+    """Run a function designed for a single thread and compare it to a threaded version.
 
     This prints the results of these tests.
     """

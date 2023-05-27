@@ -145,6 +145,7 @@
         "fmean",
         "fontx",
         "fonty",
+        "freetype",
         "frombuffer",
         "fullscreen",
         "fwidth",

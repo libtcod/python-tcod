@@ -3,8 +3,7 @@
 # copyright and related or neighboring rights for this example.  This work is
 # published from: United States.
 # https://creativecommons.org/publicdomain/zero/1.0/
-"""A system to control time since the original libtcod tools are deprecated.
-"""
+"""A system to control time since the original libtcod tools are deprecated."""
 import statistics
 import time
 from collections import deque
@@ -23,6 +22,7 @@ class Clock:
     """
 
     def __init__(self) -> None:
+        """Initialize this object with empty data."""
         self.last_time = time.perf_counter()  # Last time this was synced.
         self.time_samples: Deque[float] = deque()  # Delta time samples.
         self.max_samples = 64  # Number of fps samples to log.  Can be changed.
@@ -138,7 +138,7 @@ def main() -> None:
                 context.convert_event(event)  # Set tile coordinates for event.
                 if isinstance(event, tcod.event.Quit):
                     raise SystemExit()
-                elif isinstance(event, tcod.event.MouseWheel):
+                if isinstance(event, tcod.event.MouseWheel):
                     desired_fps = max(1, desired_fps + event.y)
 
 

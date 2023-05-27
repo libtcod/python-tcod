@@ -7,12 +7,12 @@ from __future__ import annotations
 
 import copy
 import math
-import os
 import random
 import sys
 import time
 import warnings
-from typing import Any, List
+from pathlib import Path
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
@@ -21,19 +21,15 @@ import tcod
 import tcod.render
 import tcod.sdl.render
 
+# ruff: noqa: S311
+
 if not sys.warnoptions:
     warnings.simplefilter("default")  # Show all warnings.
 
+DATA_DIR = Path(__file__).parent / "../libtcod/data"
+"""Path of the samples data directory."""
 
-def get_data(path: str) -> str:
-    """Return the path to a resource in the libtcod data directory,"""
-    SCRIPT_DIR = os.path.dirname(__file__)
-    DATA_DIR = os.path.join(SCRIPT_DIR, "../libtcod/data")
-    assert os.path.exists(DATA_DIR), (
-        "Data directory is missing," " did you forget to run `git submodule update --init`?"
-    )
-    return os.path.join(DATA_DIR, path)
-
+assert DATA_DIR.exists(), "Data directory is missing, did you forget to run `git submodule update --init`?"
 
 WHITE = (255, 255, 255)
 GREY = (127, 127, 127)
@@ -45,7 +41,7 @@ SAMPLE_SCREEN_WIDTH = 46
 SAMPLE_SCREEN_HEIGHT = 20
 SAMPLE_SCREEN_X = 20
 SAMPLE_SCREEN_Y = 10
-FONT = get_data("fonts/dejavu10x10_gs_tc.png")
+FONT = DATA_DIR / "fonts/dejavu10x10_gs_tc.png"
 
 # Mutable global names.
 context: tcod.context.Context
@@ -564,10 +560,9 @@ class FOVSample(Sample):
             1,
             1,
             "IJKL : move around\n"
-            "T : torch fx %s\n"
-            "W : light walls %s\n"
-            "+-: algo %s"
-            % (
+            "T : torch fx {}\n"
+            "W : light walls {}\n"
+            "+-: algo {}".format(
                 "on " if self.torch else "off",
                 "on " if self.light_walls else "off",
                 FOV_ALGO_NAMES[self.algo_num],
@@ -1032,9 +1027,9 @@ class ImageSample(Sample):
     def __init__(self) -> None:
         self.name = "Image toolkit"
 
-        self.img = tcod.image_load(get_data("img/skull.png"))
+        self.img = tcod.image_load(DATA_DIR / "img/skull.png")
         self.img.set_key_color(BLACK)
-        self.circle = tcod.image_load(get_data("img/circle.png"))
+        self.circle = tcod.image_load(DATA_DIR / "img/circle.png")
 
     def on_draw(self) -> None:
         sample_console.clear()
@@ -1068,7 +1063,7 @@ class MouseSample(Sample):
 
         self.motion = tcod.event.MouseMotion()
         self.mouse_left = self.mouse_middle = self.mouse_right = 0
-        self.log: List[str] = []
+        self.log: list[str] = []
 
     def on_enter(self) -> None:
         tcod.mouse_move(320, 200)
@@ -1141,15 +1136,15 @@ class NameGeneratorSample(Sample):
 
         self.curset = 0
         self.delay = 0.0
-        self.names: List[str] = []
-        self.sets: List[str] = []
+        self.names: list[str] = []
+        self.sets: list[str] = []
 
     def on_draw(self) -> None:
         if not self.sets:
             # parse all *.cfg files in data/namegen
-            for file in os.listdir(get_data("namegen")):
-                if file.find(".cfg") > 0:
-                    tcod.namegen_parse(get_data(os.path.join("namegen", file)))
+            for file in (DATA_DIR / "namegen").iterdir():
+                if file.suffix == ".cfg":
+                    tcod.namegen_parse(file)
             # get the sets list
             self.sets = tcod.namegen_get_sets()
             print(self.sets)
@@ -1254,7 +1249,7 @@ class FastRenderSample(Sample):
         self.frac_t: float = RES_V - 1
         self.abs_t: float = RES_V - 1
         # light and current color of the tunnel texture
-        self.lights: List[Light] = []
+        self.lights: list[Light] = []
         self.tex_r = 0.0
         self.tex_g = 0.0
         self.tex_b = 0.0

@@ -1,5 +1,4 @@
-"""
-Implementation of Termbox Python API in tdl.
+"""Implementation of Termbox Python API in tdl.
 
 See README.md for details.
 """
@@ -18,10 +17,10 @@ Implementation status:
 
 
 class TermboxException(Exception):
-    def __init__(self, msg):
+    def __init__(self, msg) -> None:
         self.msg = msg
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.msg
 
 
@@ -153,7 +152,7 @@ EVENT_MOUSE = 3
 
 
 class Event:
-    """Aggregate for Termbox Event structure"""
+    """Aggregate for Termbox Event structure."""
 
     type = None
     ch = None
@@ -169,10 +168,11 @@ class Event:
 
 
 class Termbox:
-    def __init__(self, width=132, height=60):
+    def __init__(self, width=132, height=60) -> None:
         global _instance
         if _instance:
-            raise TermboxException("It is possible to create only one instance of Termbox")
+            msg = "It is possible to create only one instance of Termbox"
+            raise TermboxException(msg)
 
         try:
             self.console = tdl.init(width, height)
@@ -183,7 +183,7 @@ class Termbox:
 
         _instance = self
 
-    def __del__(self):
+    def __del__(self) -> None:
         self.close()
 
     def __exit__(self, *args):  # t, value, traceback):
@@ -289,5 +289,6 @@ class Termbox:
             if e.type == "KEYDOWN":
                 self.e.key = e.key
                 return self.e.gettuple()
+        return None
 
         # return (e.type, uch, e.key, e.mod, e.w, e.h, e.x, e.y)

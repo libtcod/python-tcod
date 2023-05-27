@@ -59,6 +59,7 @@ def load_ttf(path: str, size: Tuple[int, int]) -> tcod.tileset.Tileset:
 
 
 def main() -> None:
+    """True-type font example script."""
     console = tcod.Console(16, 12, order="F")
     with tcod.context.new(
         columns=console.width,

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- encoding: utf-8 -*-
 
 import termbox
 
@@ -17,8 +16,8 @@ def print_line(t, msg, y, fg, bg):
         t.change_cell(x + i, y, c, fg, bg)
 
 
-class SelectBox(object):
-    def __init__(self, tb, choices, active=-1):
+class SelectBox:
+    def __init__(self, tb, choices, active=-1) -> None:
         self.tb = tb
         self.active = active
         self.choices = choices
