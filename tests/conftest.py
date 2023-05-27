@@ -1,18 +1,21 @@
+"""Test directory configuration."""
 import random
 import warnings
-from typing import Any, Callable, Iterator, Union
+from typing import Callable, Iterator, Union
 
 import pytest
 
 import tcod
 
+# ruff: noqa: D103
 
-def pytest_addoption(parser: Any) -> None:
+
+def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--no-window", action="store_true", help="Skip tests which need a rendering context.")
 
 
 @pytest.fixture(scope="session", params=["SDL", "SDL2"])
-def session_console(request: Any) -> Iterator[tcod.console.Console]:
+def session_console(request: pytest.FixtureRequest) -> Iterator[tcod.console.Console]:
     if request.config.getoption("--no-window"):
         pytest.skip("This test needs a rendering context.")
     FONT_FILE = "libtcod/terminal.png"
@@ -27,7 +30,7 @@ def session_console(request: Any) -> Iterator[tcod.console.Console]:
         yield con
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def console(session_console: tcod.console.Console) -> tcod.console.Console:
     console = session_console
     tcod.console_flush()
@@ -81,6 +84,6 @@ def ch_latin1_str() -> str:
         "latin1_str",
     ]
 )
-def ch(request: Any) -> Callable[[], Union[int, str]]:
-    """Test with multiple types of ascii/latin1 characters"""
+def ch(request: pytest.FixtureRequest) -> Callable[[], Union[int, str]]:
+    """Test with multiple types of ascii/latin1 characters."""
     return globals()["ch_%s" % request.param]()  # type: ignore

@@ -1,3 +1,4 @@
+"""Tests for newer tcod API."""
 import copy
 import pickle
 from typing import Any, NoReturn
@@ -8,15 +9,15 @@ from numpy.typing import DTypeLike, NDArray
 
 import tcod
 
+# ruff: noqa: D103
 
-def raise_Exception(*args: Any) -> NoReturn:
-    raise RuntimeError("testing exception")
+
+def raise_Exception(*args: object) -> NoReturn:
+    raise RuntimeError("testing exception")  # noqa: TRY003, EM101
 
 
 def test_line_error() -> None:
-    """
-    test exception propagation
-    """
+    """Test exception propagation."""
     with pytest.raises(RuntimeError):
         tcod.line(0, 0, 10, 10, py_callback=raise_Exception)
 
@@ -24,9 +25,7 @@ def test_line_error() -> None:
 @pytest.mark.filterwarnings("ignore:Iterate over nodes using")
 @pytest.mark.filterwarnings("ignore:Use pre_order method instead of walk.")
 def test_tcod_bsp() -> None:
-    """
-    test tcod additions to BSP
-    """
+    """Test tcod additions to BSP."""
     bsp = tcod.bsp.BSP(0, 0, 32, 32)
 
     assert bsp.level == 0
@@ -45,7 +44,7 @@ def test_tcod_bsp() -> None:
     # test that operations on deep BSP nodes preserve depth
     sub_bsp = bsp.children[0]
     sub_bsp.split_recursive(3, 2, 2, 1, 1)
-    assert sub_bsp.children[0].level == 2
+    assert sub_bsp.children[0].level == 2  # noqa: PLR2004
 
     # cover find_node method
     assert bsp.find_node(0, 0)
@@ -112,7 +111,7 @@ def test_color_class() -> None:
     assert tcod.white * 1 == tcod.white
     assert tcod.white * tcod.black == tcod.black
     assert tcod.white - tcod.white == tcod.black
-    assert tcod.black + (2, 2, 2) - (1, 1, 1) == (1, 1, 1)
+    assert tcod.black + (2, 2, 2) - (1, 1, 1) == (1, 1, 1)  # noqa: RUF005
 
     color = tcod.Color()
     color.r = 1
@@ -129,17 +128,17 @@ def test_path_numpy(dtype: DTypeLike) -> None:
     astar = tcod.path.AStar(map_np, 0)
     astar = pickle.loads(pickle.dumps(astar))  # test pickle
     astar = tcod.path.AStar(astar.cost, 0)  # use existing cost attribute
-    assert len(astar.get_path(0, 0, 5, 5)) == 10
+    assert len(astar.get_path(0, 0, 5, 5)) == 10  # noqa: PLR2004
 
     dijkstra = tcod.path.Dijkstra(map_np, 0)
     dijkstra.set_goal(0, 0)
-    assert len(dijkstra.get_path(5, 5)) == 10
+    assert len(dijkstra.get_path(5, 5)) == 10  # noqa: PLR2004
     repr(dijkstra)  # cover __repr__ methods
 
     # cover errors
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Array must have a 2d shape, shape is \(3, 3, 3\)"):
         tcod.path.AStar(np.ones((3, 3, 3), dtype=dtype))
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"dtype must be one of dict_keys"):
         tcod.path.AStar(np.ones((2, 2), dtype=np.float64))
 
 
@@ -158,7 +157,7 @@ def test_key_repr() -> None:
     Key = tcod.Key
     key = Key(vk=1, c=2, shift=True)
     assert key.vk == 1
-    assert key.c == 2
+    assert key.c == 2  # noqa: PLR2004
     assert key.shift
     key_copy = eval(repr(key))
     assert key.vk == key_copy.vk
@@ -193,8 +192,8 @@ def test_context() -> None:
     with tcod.context.new_terminal(columns=WIDTH, rows=HEIGHT, renderer=tcod.RENDERER_SDL2) as context:
         console = tcod.Console(*context.recommended_console_size())
         context.present(console)
-        context.sdl_window_p
-        context.renderer_type
+        assert context.sdl_window_p is not None
+        assert context.renderer_type >= 0
         context.change_tileset(tcod.tileset.Tileset(16, 16))
         context.pixel_to_tile(0, 0)
         context.pixel_to_subtile(0, 0)

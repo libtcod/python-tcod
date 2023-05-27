@@ -1,14 +1,19 @@
+"""Test random number generators."""
 import copy
-import pathlib
 import pickle
+from pathlib import Path
 
 import tcod
+
+# ruff: noqa: D103
+
+SCRIPT_DIR = Path(__file__).parent
 
 
 def test_tcod_random() -> None:
     rand = tcod.random.Random(tcod.random.COMPLEMENTARY_MULTIPLY_WITH_CARRY)
-    assert 0 <= rand.randint(0, 100) <= 100
-    assert 0 <= rand.uniform(0, 100) <= 100
+    assert 0 <= rand.randint(0, 100) <= 100  # noqa: PLR2004
+    assert 0 <= rand.uniform(0, 100) <= 100  # noqa: PLR2004
     rand.guass(0, 1)
     rand.inverse_guass(0, 1)
 
@@ -30,7 +35,6 @@ def test_tcod_random_pickle() -> None:
 
 
 def test_load_rng_v13_1() -> None:
-    with open(pathlib.Path(__file__).parent / "data/random_v13.pkl", "rb") as f:
-        rand: tcod.random.Random = pickle.load(f)
-    assert rand.randint(0, 0xFFFF) == 56422
-    assert rand.randint(0, 0xFFFF) == 15795
+    rand: tcod.random.Random = pickle.loads((SCRIPT_DIR / "data/random_v13.pkl").read_bytes())
+    assert rand.randint(0, 0xFFFF) == 56422  # noqa: PLR2004
+    assert rand.randint(0, 0xFFFF) == 15795  # noqa: PLR2004

@@ -1,3 +1,4 @@
+"""Tests for the tcod.noise module."""
 import copy
 import pickle
 
@@ -5,6 +6,8 @@ import numpy as np
 import pytest
 
 import tcod
+
+# ruff: noqa: D103
 
 
 @pytest.mark.parametrize("implementation", tcod.noise.Implementation)
@@ -28,7 +31,7 @@ def test_noise_class(
         octaves=octaves,
     )
     # cover attributes
-    assert noise.dimensions == 2
+    assert noise.dimensions == 2  # noqa: PLR2004
     noise.algorithm = noise.algorithm
     noise.implementation = noise.implementation
     noise.octaves = noise.octaves
@@ -57,14 +60,14 @@ def test_noise_samples() -> None:
 
 
 def test_noise_errors() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"dimensions must be in range"):
         tcod.noise.Noise(0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"-1 is not a valid implementation"):
         tcod.noise.Noise(1, implementation=-1)
     noise = tcod.noise.Noise(2)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"mgrid.shape\[0\] must equal self.dimensions"):
         noise.sample_mgrid(np.mgrid[:2, :2, :2])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"len\(ogrid\) must equal self.dimensions"):
         noise.sample_ogrid(np.ogrid[:2, :2, :2])
     with pytest.raises(IndexError):
         noise[0, 0, 0, 0, 0]

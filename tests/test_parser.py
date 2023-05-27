@@ -1,9 +1,12 @@
-import os
+"""Test old libtcodpy parser."""
+from pathlib import Path
 from typing import Any
 
 import pytest
 
 import tcod as libtcod
+
+# ruff: noqa: D103
 
 
 @pytest.mark.filterwarnings("ignore")
@@ -27,7 +30,7 @@ def test_parser() -> None:
 
     # default listener
     print("***** Default listener *****")
-    libtcod.parser_run(parser, os.path.join("libtcod", "data", "cfg", "sample.cfg"))
+    libtcod.parser_run(parser, Path("libtcod/data/cfg/sample.cfg"))
     print("bool_field : ", libtcod.parser_get_bool_property(parser, "myStruct.bool_field"))
     print("char_field : ", libtcod.parser_get_char_property(parser, "myStruct.char_field"))
     print("int_field : ", libtcod.parser_get_int_property(parser, "myStruct.int_field"))
@@ -46,7 +49,7 @@ def test_parser() -> None:
     print("***** Custom listener *****")
 
     class MyListener:
-        def new_struct(self, struct: Any, name: str) -> bool:
+        def new_struct(self, struct: Any, name: str) -> bool:  # noqa: ANN401
             print("new structure type", libtcod.struct_get_name(struct), " named ", name)
             return True
 
@@ -54,7 +57,7 @@ def test_parser() -> None:
             print("new flag named ", name)
             return True
 
-        def new_property(self, name: str, typ: int, value: Any) -> bool:
+        def new_property(self, name: str, typ: int, value: Any) -> bool:  # noqa: ANN401
             type_names = ["NONE", "BOOL", "CHAR", "INT", "FLOAT", "STRING", "COLOR", "DICE"]
             type_name = type_names[typ & 0xFF]
             if typ & libtcod.TYPE_LIST:
@@ -62,7 +65,7 @@ def test_parser() -> None:
             print("new property named ", name, " type ", type_name, " value ", value)
             return True
 
-        def end_struct(self, struct: Any, name: str) -> bool:
+        def end_struct(self, struct: Any, name: str) -> bool:  # noqa: ANN401
             print("end structure type", libtcod.struct_get_name(struct), " named ", name)
             return True
 
@@ -70,7 +73,7 @@ def test_parser() -> None:
             print("error : ", msg)
             return True
 
-    libtcod.parser_run(parser, os.path.join("libtcod", "data", "cfg", "sample.cfg"), MyListener())
+    libtcod.parser_run(parser, Path("libtcod/data/cfg/sample.cfg"), MyListener())
 
 
 if __name__ == "__main__":

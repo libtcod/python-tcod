@@ -1,4 +1,7 @@
+"""Test for tcod.tileset module."""
 import tcod
+
+# ruff: noqa: D103
 
 
 def test_proc_block_elements() -> None:

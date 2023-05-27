@@ -1,3 +1,4 @@
+"""Test SDL specific features."""
 import contextlib
 import sys
 
@@ -8,6 +9,8 @@ import tcod.sdl.audio
 import tcod.sdl.render
 import tcod.sdl.sys
 import tcod.sdl.video
+
+# ruff: noqa: D103
 
 
 def test_sdl_window() -> None:
@@ -22,14 +25,14 @@ def test_sdl_window() -> None:
     assert window.title == sys.argv[0]
     window.title = "Title"
     assert window.title == "Title"
-    assert window.opacity == 1.0
+    assert window.opacity == 1.0  # noqa: PLR2004
     window.position = window.position
     window.fullscreen = window.fullscreen
     window.resizable = window.resizable
     window.size = window.size
     window.min_size = window.min_size
     window.max_size = window.max_size
-    window.border_size
+    window.border_size  # noqa: B018
     window.set_icon(np.zeros((32, 32, 3), dtype=np.uint8))
     with pytest.raises(TypeError):
         window.set_icon(np.zeros((32, 32, 5), dtype=np.uint8))
@@ -84,9 +87,9 @@ def test_sdl_render_bad_types() -> None:
 
 def test_sdl_audio_device() -> None:
     with contextlib.closing(tcod.sdl.audio.open(frequency=44100, format=np.float32, channels=2, paused=True)) as device:
-        assert device.convert(np.zeros(4, dtype=np.float32), 22050).shape[0] == 8
+        assert device.convert(np.zeros(4, dtype=np.float32), 22050).shape[0] == 8  # noqa: PLR2004
         assert device.convert(np.zeros((4, 4), dtype=np.float32)).shape == (4, 2)
-        assert device.convert(np.zeros(4, dtype=np.int8)).shape[0] == 4
+        assert device.convert(np.zeros(4, dtype=np.int8)).shape[0] == 4  # noqa: PLR2004
         device.paused = False
         device.paused = True
         assert device.queued_samples == 0

@@ -1,12 +1,15 @@
+"""Tests for the libtcodpy API."""
+from pathlib import Path
 from typing import Any, Callable, Iterator, List, Optional, Tuple, Union
 
-import numpy
 import numpy as np
 import pytest
 from numpy.typing import NDArray
 
 import tcod
 import tcod as libtcodpy
+
+# ruff: noqa: D103
 
 pytestmark = [
     pytest.mark.filterwarnings("ignore::DeprecationWarning"),
@@ -29,7 +32,7 @@ def test_credits(console: tcod.console.Console) -> None:
     libtcodpy.console_credits_reset()
 
 
-def assert_char(
+def assert_char(  # noqa: PLR0913
     console: tcod.console.Console,
     x: int,
     y: int,
@@ -143,20 +146,20 @@ def test_console_blit(console: tcod.console.Console, offscreen: tcod.console.Con
 
 
 @pytest.mark.filterwarnings("ignore")
-def test_console_asc_read_write(console: tcod.console.Console, offscreen: tcod.console.Console, tmpdir: Any) -> None:
+def test_console_asc_read_write(console: tcod.console.Console, offscreen: tcod.console.Console, tmp_path: Path) -> None:
     libtcodpy.console_print(console, 0, 0, "test")
 
-    asc_file = tmpdir.join("test.asc").strpath
+    asc_file = tmp_path / "test.asc"
     assert libtcodpy.console_save_asc(console, asc_file)
     assert libtcodpy.console_load_asc(offscreen, asc_file)
     assertConsolesEqual(console, offscreen)
 
 
 @pytest.mark.filterwarnings("ignore")
-def test_console_apf_read_write(console: tcod.console.Console, offscreen: tcod.console.Console, tmpdir: Any) -> None:
+def test_console_apf_read_write(console: tcod.console.Console, offscreen: tcod.console.Console, tmp_path: Path) -> None:
     libtcodpy.console_print(console, 0, 0, "test")
 
-    apf_file = tmpdir.join("test.apf").strpath
+    apf_file = tmp_path / "test.apf"
     assert libtcodpy.console_save_apf(console, apf_file)
     assert libtcodpy.console_load_apf(offscreen, apf_file)
     assertConsolesEqual(console, offscreen)
@@ -176,14 +179,14 @@ def test_console_rexpaint_load_test_file(console: tcod.console.Console) -> None:
 @pytest.mark.filterwarnings("ignore")
 def test_console_rexpaint_save_load(
     console: tcod.console.Console,
-    tmpdir: Any,
+    tmp_path: Path,
     ch: int,
     fg: Tuple[int, int, int],
     bg: Tuple[int, int, int],
 ) -> None:
     libtcodpy.console_print(console, 0, 0, "test")
     libtcodpy.console_put_char_ex(console, 1, 1, ch, fg, bg)
-    xp_file = tmpdir.join("test.xp").strpath
+    xp_file = tmp_path / "test.xp"
     assert libtcodpy.console_save_xp(console, xp_file, 1)
     xp_console = libtcodpy.console_from_xp(xp_file)
     assert xp_console
@@ -193,12 +196,12 @@ def test_console_rexpaint_save_load(
 
 
 @pytest.mark.filterwarnings("ignore")
-def test_console_rexpaint_list_save_load(console: tcod.console.Console, tmpdir: Any) -> None:
+def test_console_rexpaint_list_save_load(console: tcod.console.Console, tmp_path: Path) -> None:
     con1 = libtcodpy.console_new(8, 2)
     con2 = libtcodpy.console_new(8, 2)
     libtcodpy.console_print(con1, 0, 0, "hello")
     libtcodpy.console_print(con2, 0, 0, "world")
-    xp_file = tmpdir.join("test.xp").strpath
+    xp_file = tmp_path / "test.xp"
     assert libtcodpy.console_list_save_xp([con1, con2], xp_file, 1)
     loaded_consoles = libtcodpy.console_list_load_xp(xp_file)
     assert loaded_consoles
@@ -252,7 +255,7 @@ def test_console_fill(console: tcod.console.Console) -> None:
 def test_console_fill_numpy(console: tcod.console.Console) -> None:
     width = libtcodpy.console_get_width(console)
     height = libtcodpy.console_get_height(console)
-    fill: NDArray[np.intc] = numpy.zeros((height, width), dtype=np.intc)
+    fill: NDArray[np.intc] = np.zeros((height, width), dtype=np.intc)
     for y in range(height):
         fill[y, :] = y % 256
 
@@ -261,9 +264,9 @@ def test_console_fill_numpy(console: tcod.console.Console) -> None:
     libtcodpy.console_fill_char(console, fill)  # type: ignore
 
     # verify fill
-    bg: NDArray[np.intc] = numpy.zeros((height, width), dtype=numpy.intc)
-    fg: NDArray[np.intc] = numpy.zeros((height, width), dtype=numpy.intc)
-    ch: NDArray[np.intc] = numpy.zeros((height, width), dtype=numpy.intc)
+    bg: NDArray[np.intc] = np.zeros((height, width), dtype=np.intc)
+    fg: NDArray[np.intc] = np.zeros((height, width), dtype=np.intc)
+    ch: NDArray[np.intc] = np.zeros((height, width), dtype=np.intc)
     for y in range(height):
         for x in range(width):
             bg[y, x] = libtcodpy.console_get_char_background(console, x, y)[0]
@@ -291,7 +294,7 @@ def test_console_buffer(console: tcod.console.Console) -> None:
 @pytest.mark.filterwarnings("ignore:Console array attributes perform better")
 def test_console_buffer_error(console: tcod.console.Console) -> None:
     buffer = libtcodpy.ConsoleBuffer(0, 0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r".*Destination console has an incorrect size."):
         buffer.blit(console)
 
 
@@ -322,8 +325,8 @@ def test_sys_time(console: tcod.console.Console) -> None:
 
 
 @pytest.mark.filterwarnings("ignore")
-def test_sys_screenshot(console: tcod.console.Console, tmpdir: Any) -> None:
-    libtcodpy.sys_save_screenshot(tmpdir.join("test.png").strpath)
+def test_sys_screenshot(console: tcod.console.Console, tmp_path: Path) -> None:
+    libtcodpy.sys_save_screenshot(tmp_path / "test.png")
 
 
 @pytest.mark.filterwarnings("ignore")
@@ -333,7 +336,7 @@ def test_sys_custom_render(console: tcod.console.Console) -> None:
 
     escape = []
 
-    def sdl_callback(sdl_surface: Any) -> None:
+    def sdl_callback(sdl_surface: object) -> None:
         escape.append(True)
 
     libtcodpy.sys_register_SDL_renderer(sdl_callback)
@@ -342,7 +345,7 @@ def test_sys_custom_render(console: tcod.console.Console) -> None:
 
 
 @pytest.mark.filterwarnings("ignore")
-def test_image(console: tcod.console.Console, tmpdir: Any) -> None:
+def test_image(console: tcod.console.Console, tmp_path: Path) -> None:
     img = libtcodpy.image_new(16, 16)
     libtcodpy.image_clear(img, (0, 0, 0))
     libtcodpy.image_invert(img)
@@ -360,7 +363,7 @@ def test_image(console: tcod.console.Console, tmpdir: Any) -> None:
     libtcodpy.image_blit(img, console, 0, 0, libtcodpy.BKGND_SET, 1, 1, 0)
     libtcodpy.image_blit_rect(img, console, 0, 0, 16, 16, libtcodpy.BKGND_SET)
     libtcodpy.image_blit_2x(img, console, 0, 0)
-    libtcodpy.image_save(img, tmpdir.join("test.png").strpath)
+    libtcodpy.image_save(img, tmp_path / "test.png")
     libtcodpy.image_delete(img)
 
     img = libtcodpy.image_from_console(console)
@@ -385,14 +388,12 @@ def test_clipboard(console: tcod.console.Console, sample: str) -> None:
 # arguments to test with and the results expected from these arguments
 LINE_ARGS = (-5, 0, 5, 10)
 EXCLUSIVE_RESULTS = [(-4, 1), (-3, 2), (-2, 3), (-1, 4), (0, 5), (1, 6), (2, 7), (3, 8), (4, 9), (5, 10)]
-INCLUSIVE_RESULTS = [(-5, 0)] + EXCLUSIVE_RESULTS
+INCLUSIVE_RESULTS = [(-5, 0), *EXCLUSIVE_RESULTS]
 
 
 @pytest.mark.filterwarnings("ignore")
 def test_line_step() -> None:
-    """
-    libtcodpy.line_init and libtcodpy.line_step
-    """
+    """libtcodpy.line_init and libtcodpy.line_step."""
     libtcodpy.line_init(*LINE_ARGS)
     for expected_xy in EXCLUSIVE_RESULTS:
         assert libtcodpy.line_step() == expected_xy
@@ -401,9 +402,7 @@ def test_line_step() -> None:
 
 @pytest.mark.filterwarnings("ignore")
 def test_line() -> None:
-    """
-    tests normal use, lazy evaluation, and error propagation
-    """
+    """Tests normal use, lazy evaluation, and error propagation."""
     # test normal results
     test_result: List[Tuple[int, int]] = []
 
@@ -427,17 +426,13 @@ def test_line() -> None:
 
 @pytest.mark.filterwarnings("ignore")
 def test_line_iter() -> None:
-    """
-    libtcodpy.line_iter
-    """
+    """libtcodpy.line_iter."""
     assert list(libtcodpy.line_iter(*LINE_ARGS)) == INCLUSIVE_RESULTS
 
 
 @pytest.mark.filterwarnings("ignore")
 def test_bsp() -> None:
-    """
-    commented out statements work in libtcod-cffi
-    """
+    """Commented out statements work in libtcod-cffi."""
     bsp = libtcodpy.bsp_new_with_size(0, 0, 64, 64)
     repr(bsp)  # test __repr__ on leaf
     libtcodpy.bsp_resize(bsp, 0, 0, 32, 32)
@@ -479,7 +474,7 @@ def test_bsp() -> None:
     libtcodpy.bsp_split_recursive(bsp, None, 4, 2, 2, 1.0, 1.0)
 
     # cover bsp_traverse
-    def traverse(node: tcod.bsp.BSP, user_data: Any) -> None:
+    def traverse(node: tcod.bsp.BSP, user_data: object) -> None:
         return None
 
     libtcodpy.bsp_traverse_pre_order(bsp, traverse)
@@ -498,9 +493,10 @@ def test_bsp() -> None:
 
 @pytest.mark.filterwarnings("ignore")
 def test_map() -> None:
-    map = libtcodpy.map_new(16, 16)
-    assert libtcodpy.map_get_width(map) == 16
-    assert libtcodpy.map_get_height(map) == 16
+    WIDTH, HEIGHT = 13, 17
+    map = libtcodpy.map_new(WIDTH, HEIGHT)
+    assert libtcodpy.map_get_width(map) == WIDTH
+    assert libtcodpy.map_get_height(map) == HEIGHT
     libtcodpy.map_copy(map, map)
     libtcodpy.map_clear(map)
     libtcodpy.map_set_properties(map, 0, 0, True, True)

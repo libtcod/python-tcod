@@ -1,11 +1,13 @@
+"""Tests for tcod.console."""
 import pickle
 from pathlib import Path
 
 import numpy as np
 import pytest
-from numpy import array
 
 import tcod
+
+# ruff: noqa: D103
 
 
 @pytest.mark.filterwarnings("ignore:Directly access a consoles")
@@ -95,7 +97,8 @@ def test_console_pickle_fortran() -> None:
 
 
 def test_console_repr() -> None:
-    array  # Needed for eval.
+    from numpy import array  # noqa: F401  # Used for eval
+
     eval(repr(tcod.console.Console(10, 2)))
 
 
