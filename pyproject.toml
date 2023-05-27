@@ -69,6 +69,9 @@ Source = "https://github.com/libtcod/python-tcod"
 Tracker = "https://github.com/libtcod/python-tcod/issues"
 Forum = "https://github.com/libtcod/python-tcod/discussions"
 
+[tool.distutils.bdist_wheel]
+py-limited-api = "cp37"
+
 [tool.setuptools_scm]
 write_to = "tcod/version.py"
 
