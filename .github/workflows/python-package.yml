@@ -37,18 +37,6 @@ jobs:
           linters: isort
           run: isort scripts/ tcod/ tests/ examples/ --check --diff
 
-  flake8:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install Flake8
-        run: pip install Flake8
-      - name: Flake8
-        uses: liskin/gh-problem-matcher-wrap@v2
-        with:
-          linters: flake8
-          run: flake8 scripts/ tcod/ tests/
-
   mypy:
     runs-on: ubuntu-latest
     steps:
@@ -88,7 +76,7 @@ jobs:
 
   # This makes sure that the latest versions of the SDL headers parse correctly.
   parse_sdl:
-    needs: [black, isort, flake8, mypy]
+    needs: [black, isort, mypy]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -112,7 +100,7 @@ jobs:
           SDL_VERSION: ${{ matrix.sdl-version }}
 
   build:
-    needs: [black, isort, flake8, mypy]
+    needs: [black, isort, mypy]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -176,7 +164,7 @@ jobs:
           retention-days: 7
 
   isolated: # Test installing the package from source.
-    needs: [black, isort, flake8, mypy, sdist]
+    needs: [black, isort, mypy, sdist]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -206,7 +194,7 @@ jobs:
           python -c "import tcod"
 
   linux-wheels:
-    needs: [black, isort, flake8, mypy]
+    needs: [black, isort, mypy]
     runs-on: "ubuntu-latest"
     strategy:
       matrix:
@@ -255,7 +243,7 @@ jobs:
           retention-days: 7
 
   build-macos:
-    needs: [black, isort, flake8, mypy]
+    needs: [black, isort, mypy]
     runs-on: "macos-11"
     strategy:
       fail-fast: true

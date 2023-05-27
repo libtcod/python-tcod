@@ -317,7 +317,7 @@ def generate_enums(prefix: str) -> Iterator[str]:
         _, name = symbol.split("_", 1)
         if name.isdigit():
             name = f"N{name}"
-        if name in "IOl":  # Handle Flake8 warnings.
+        if name in "IOl":  # Ignore ambiguous variable name warnings.
             yield f"{name} = {value}  # noqa: E741"
         else:
             yield f"{name} = {value}"
