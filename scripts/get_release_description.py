@@ -5,8 +5,6 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-# ruff: noqa: INP001
-
 TAG_BANNER = r"## \[[\w.]*\] - \d+-\d+-\d+\n"
 
 RE_BODY = re.compile(rf".*?{TAG_BANNER}(.*?){TAG_BANNER}", re.DOTALL)

@@ -10,7 +10,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-# ruff: noqa: INP001, S603, S607
+# ruff: noqa: S603, S607
 
 PROJECT_DIR = Path(__file__).parent.parent
 
