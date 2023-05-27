@@ -1,10 +1,11 @@
-r"""
+r"""Libtcod's Binary Space Partitioning.
+
 The following example shows how to traverse the BSP tree using Python.  This
 assumes `create_room` and `connect_rooms` will be replaced by custom code.
 
 Example::
 
-    import tcod
+    import tcod.bsp
 
     bsp = tcod.bsp.BSP(x=0, y=0, width=80, height=60)
     bsp.split_recursive(
@@ -25,14 +26,14 @@ Example::
 """
 from __future__ import annotations
 
-from typing import Any, Iterator, List, Optional, Tuple, Union  # noqa: F401
+from typing import Any, Iterator
 
 import tcod.random
 from tcod._internal import deprecate
 from tcod.loader import ffi, lib
 
 
-class BSP(object):
+class BSP:
     """A binary space partitioning tree which can be used for simple dungeon generation.
 
     Attributes:
@@ -55,7 +56,8 @@ class BSP(object):
         height (int): Rectangle height.
     """
 
-    def __init__(self, x: int, y: int, width: int, height: int):
+    def __init__(self, x: int, y: int, width: int, height: int) -> None:
+        """Initialize a root node of a BSP tree."""
         self.x = x
         self.y = y
         self.width = width
@@ -65,11 +67,12 @@ class BSP(object):
         self.position = 0
         self.horizontal = False
 
-        self.parent: Optional[BSP] = None
-        self.children: Union[Tuple[()], Tuple[BSP, BSP]] = ()
+        self.parent: BSP | None = None
+        self.children: tuple[()] | tuple[BSP, BSP] = ()
 
     @property
-    def w(self) -> int:
+    @deprecate("This attribute has been renamed to `width`.", FutureWarning)
+    def w(self) -> int:  # noqa: D102
         return self.width
 
     @w.setter
@@ -77,7 +80,8 @@ class BSP(object):
         self.width = value
 
     @property
-    def h(self) -> int:
+    @deprecate("This attribute has been renamed to `height`.", FutureWarning)
+    def h(self) -> int:  # noqa: D102
         return self.height
 
     @h.setter
@@ -92,7 +96,7 @@ class BSP(object):
         cdata.level = self.level
         return cdata
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         """Provide a useful readout when printed."""
         status = "leaf"
         if self.children:
@@ -101,7 +105,7 @@ class BSP(object):
                 self.horizontal,
             )
 
-        return "<%s(x=%i,y=%i,width=%i,height=%i)level=%i,%s>" % (
+        return "<%s(x=%i,y=%i,width=%i,height=%i) level=%i %s>" % (
             self.__class__.__name__,
             self.x,
             self.y,
@@ -131,21 +135,21 @@ class BSP(object):
         """Split this partition into 2 sub-partitions.
 
         Args:
-            horizontal (bool):
-            position (int):
+            horizontal (bool): If True then the sub-partition is split into an upper and bottom half.
+            position (int): The position of where to put the divider relative to the current node.
         """
         cdata = self._as_cdata()
         lib.TCOD_bsp_split_once(cdata, horizontal, position)
         self._unpack_bsp_tree(cdata)
 
-    def split_recursive(
+    def split_recursive(  # noqa: PLR0913
         self,
         depth: int,
         min_width: int,
         min_height: int,
         max_horizontal_ratio: float,
         max_vertical_ratio: float,
-        seed: Optional[tcod.random.Random] = None,
+        seed: tcod.random.Random | None = None,
     ) -> None:
         """Divide this partition recursively.
 
@@ -229,7 +233,7 @@ class BSP(object):
 
         .. versionadded:: 8.3
         """
-        levels: List[List[BSP]] = []
+        levels: list[list[BSP]] = []
         next = [self]
         while next:
             levels.append(next)
@@ -253,16 +257,16 @@ class BSP(object):
         """
         return self.x <= x < self.x + self.width and self.y <= y < self.y + self.height
 
-    def find_node(self, x: int, y: int) -> Optional[BSP]:
+    def find_node(self, x: int, y: int) -> BSP | None:
         """Return the deepest node which contains these coordinates.
 
         Returns:
-            Optional[BSP]: BSP object or None.
+            BSP object or None.
         """
         if not self.contains(x, y):
             return None
         for child in self.children:
-            found: Optional[BSP] = child.find_node(x, y)
+            found = child.find_node(x, y)
             if found:
                 return found
         return self

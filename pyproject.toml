@@ -182,3 +182,7 @@ ignore = [
     "D409",   # section-underline-matches-section-length
 ]
 line-length = 120
+
+[tool.ruff.pydocstyle]
+# Use Google-style docstrings.
+convention = "google"

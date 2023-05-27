@@ -14,10 +14,10 @@ from pkgutil import extend_path
 __path__ = extend_path(__path__, __name__)
 
 from tcod import bsp, color, console, constants, context, event, image, los, map, noise, path, random, tileset
-from tcod.console import Console  # noqa: F401
-from tcod.constants import *  # noqa: F4
-from tcod.libtcodpy import *  # noqa: F4
-from tcod.loader import __sdl_version__, ffi, lib  # noqa: F4
+from tcod.console import Console
+from tcod.constants import *  # noqa: F403
+from tcod.libtcodpy import *  # noqa: F403
+from tcod.loader import __sdl_version__, ffi, lib
 
 try:
     from tcod.version import __version__
@@ -41,6 +41,7 @@ def __getattr__(name: str, stacklevel: int = 1) -> color.Color:
 
 __all__ = [  # noqa: F405
     "__version__",
+    "__sdl_version__",
     "lib",
     "ffi",
     "bsp",

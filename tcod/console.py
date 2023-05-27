@@ -8,7 +8,7 @@ from __future__ import annotations
 import warnings
 from os import PathLike
 from pathlib import Path
-from typing import Any, Iterable, Optional, Sequence, Tuple, Union
+from typing import Any, Iterable
 
 import numpy as np
 from numpy.typing import NDArray
@@ -116,9 +116,9 @@ class Console:
         width: int,
         height: int,
         order: Literal["C", "F"] = "C",
-        buffer: Optional[NDArray[Any]] = None,
+        buffer: NDArray[Any] | None = None,
     ):
-        self._key_color: Optional[Tuple[int, int, int]] = None
+        self._key_color: tuple[int, int, int] | None = None
         self._order = tcod._internal.verify_order(order)
         if buffer is not None:
             if self._order == "F":
@@ -152,7 +152,7 @@ class Console:
             self.clear()
 
     @classmethod
-    def _from_cdata(cls, cdata: Any, order: Literal["C", "F"] = "C") -> Console:
+    def _from_cdata(cls, cdata: Any, order: Literal["C", "F"] = "C") -> Console:  # noqa: ANN401
         """Return a Console instance which wraps this `TCOD_Console*` object."""
         if isinstance(cdata, cls):
             return cdata
@@ -162,7 +162,7 @@ class Console:
         return self
 
     @classmethod
-    def _get_root(cls, order: Optional[Literal["C", "F"]] = None) -> Console:
+    def _get_root(cls, order: Literal["C", "F"] | None = None) -> Console:
         """Return a root console singleton with valid buffers.
 
         This function will also update an already active root console.
@@ -196,12 +196,12 @@ class Console:
 
     @property
     def width(self) -> int:
-        """int: The width of this Console. (read-only)"""
+        """The width of this Console."""
         return lib.TCOD_console_get_width(self.console_c)  # type: ignore
 
     @property
     def height(self) -> int:
-        """int: The height of this Console. (read-only)"""
+        """The height of this Console."""
         return lib.TCOD_console_get_height(self.console_c)  # type: ignore
 
     @property
@@ -341,25 +341,25 @@ class Console:
         return self.rgba.view(self._DTYPE_RGB)
 
     @property
-    def default_bg(self) -> Tuple[int, int, int]:
+    def default_bg(self) -> tuple[int, int, int]:
         """Tuple[int, int, int]: The default background color."""
         color = self._console_data.back
         return color.r, color.g, color.b
 
     @default_bg.setter
     @deprecate("Console defaults have been deprecated.")
-    def default_bg(self, color: Tuple[int, int, int]) -> None:
+    def default_bg(self, color: tuple[int, int, int]) -> None:
         self._console_data.back = color
 
     @property
-    def default_fg(self) -> Tuple[int, int, int]:
+    def default_fg(self) -> tuple[int, int, int]:
         """Tuple[int, int, int]: The default foreground color."""
         color = self._console_data.fore
         return color.r, color.g, color.b
 
     @default_fg.setter
     @deprecate("Console defaults have been deprecated.")
-    def default_fg(self, color: Tuple[int, int, int]) -> None:
+    def default_fg(self, color: tuple[int, int, int]) -> None:
         self._console_data.fore = color
 
     @property
@@ -382,10 +382,10 @@ class Console:
     def default_alignment(self, value: int) -> None:
         self._console_data.alignment = value
 
-    def __clear_warning(self, name: str, value: Tuple[int, int, int]) -> None:
+    def __clear_warning(self, name: str, value: tuple[int, int, int]) -> None:
         """Raise a warning for bad default values during calls to clear."""
         warnings.warn(
-            "Clearing with the console default values is deprecated.\n" "Add %s=%r to this call." % (name, value),
+            f"Clearing with the console default values is deprecated.\nAdd {name}={value!r} to this call.",
             DeprecationWarning,
             stacklevel=3,
         )
@@ -393,8 +393,8 @@ class Console:
     def clear(
         self,
         ch: int = 0x20,
-        fg: Tuple[int, int, int] = ...,  # type: ignore
-        bg: Tuple[int, int, int] = ...,  # type: ignore
+        fg: tuple[int, int, int] = ...,  # type: ignore
+        bg: tuple[int, int, int] = ...,  # type: ignore
     ) -> None:
         """Reset all values in this console to a single value.
 
@@ -459,25 +459,22 @@ class Console:
         13: "tcod.BKGND_DEFAULT",
     }
 
-    def __deprecate_defaults(
+    def __deprecate_defaults(  # noqa: C901, PLR0912
         self,
         new_func: str,
-        bg_blend: Any,
-        alignment: Any = ...,
-        clear: Any = ...,
+        bg_blend: Any,  # noqa: ANN401
+        alignment: Any = ...,  # noqa: ANN401
+        clear: Any = ...,  # noqa: ANN401
     ) -> None:
         """Return the parameters needed to recreate the current default state."""
         if not __debug__:
             return
 
-        fg: Optional[Tuple[int, int, int]] = self.default_fg
-        bg: Optional[Tuple[int, int, int]] = self.default_bg
+        fg: tuple[int, int, int] | None = self.default_fg
+        bg: tuple[int, int, int] | None = self.default_bg
         if bg_blend == tcod.constants.BKGND_NONE:
             bg = None
-        if bg_blend == tcod.constants.BKGND_DEFAULT:
-            bg_blend = self.default_bg_blend
-        else:
-            bg_blend = None
+        bg_blend = self.default_bg_blend if bg_blend == tcod.constants.BKGND_DEFAULT else None
         if bg_blend == tcod.constants.BKGND_NONE:
             bg = None
             bg_blend = None
@@ -497,22 +494,19 @@ class Console:
         if clear is False:
             params.append("ch=0")
         if fg is not None:
-            params.append("fg=%s" % (fg,))
+            params.append(f"fg={fg}")
         if bg is not None:
-            params.append("bg=%s" % (bg,))
+            params.append(f"bg={bg}")
         if bg_blend is not None:
-            params.append("bg_blend=%s" % (self.__BG_BLEND_LOOKUP[bg_blend],))
+            params.append(f"bg_blend={self.__BG_BLEND_LOOKUP[bg_blend]}")
         if alignment is not None:
-            params.append("alignment=%s" % (self.__ALIGNMENT_LOOKUP[alignment],))
+            params.append(f"alignment={self.__ALIGNMENT_LOOKUP[alignment]}")
         param_str = ", ".join(params)
-        if not param_str:
-            param_str = "."
-        else:
-            param_str = " and add the following parameters:\n%s" % (param_str,)
+        param_str = "." if not param_str else f" and add the following parameters:\n{param_str}"
         warnings.warn(
             "Console functions using default values have been deprecated.\n"
-            "Replace this method with `Console.%s`%s" % (new_func, param_str),
-            DeprecationWarning,
+            f"Replace this method with `Console.{new_func}`{param_str}",
+            FutureWarning,
             stacklevel=3,
         )
 
@@ -522,7 +516,7 @@ class Console:
         y: int,
         string: str,
         bg_blend: int = tcod.constants.BKGND_DEFAULT,
-        alignment: Optional[int] = None,
+        alignment: int | None = None,
     ) -> None:
         """Print a color formatted string on a console.
 
@@ -551,7 +545,7 @@ class Console:
         height: int,
         string: str,
         bg_blend: int = tcod.constants.BKGND_DEFAULT,
-        alignment: Optional[int] = None,
+        alignment: int | None = None,
     ) -> int:
         """Print a string constrained to a rectangle.
 
@@ -748,7 +742,7 @@ class Console:
         height: int = 0,
         fg_alpha: float = 1.0,
         bg_alpha: float = 1.0,
-        key_color: Optional[Tuple[int, int, int]] = None,
+        key_color: tuple[int, int, int] | None = None,
     ) -> None:
         """Blit from this console onto the ``dest`` console.
 
@@ -828,7 +822,7 @@ class Console:
             )
 
     @deprecate("Pass the key color to Console.blit instead of calling this function.")
-    def set_key_color(self, color: Optional[Tuple[int, int, int]]) -> None:
+    def set_key_color(self, color: tuple[int, int, int] | None) -> None:
         """Set a consoles blit transparent color.
 
         `color` is the (r, g, b) color, or None to disable key color.
@@ -853,7 +847,8 @@ class Console:
             :any:`tcod.console_init_root`
         """
         if self.console_c != ffi.NULL:
-            raise NotImplementedError("Only the root console has a context.")
+            msg = "Only the root console has a context."
+            raise NotImplementedError(msg)
         return self
 
     def close(self) -> None:
@@ -865,7 +860,8 @@ class Console:
         .. versionadded:: 11.11
         """
         if self.console_c != ffi.NULL:
-            raise NotImplementedError("Only the root console can be used to close libtcod's window.")
+            msg = "Only the root console can be used to close libtcod's window."
+            raise NotImplementedError(msg)
         lib.TCOD_console_delete(self.console_c)
 
     def __exit__(self, *args: Any) -> None:
@@ -882,7 +878,7 @@ class Console:
         """
         return bool(self.console_c != ffi.NULL)
 
-    def __getstate__(self) -> Any:
+    def __getstate__(self) -> dict[str, Any]:
         state = self.__dict__.copy()
         del state["console_c"]
         state["_console_data"] = {
@@ -897,7 +893,7 @@ class Console:
             state["_tiles"] = np.array(self._tiles, copy=True)
         return state
 
-    def __setstate__(self, state: Any) -> None:
+    def __setstate__(self, state: dict[str, Any]) -> None:
         self._key_color = None
         if "_tiles" not in state:
             tiles: NDArray[Any] = np.ndarray((self.height, self.width), dtype=self.DTYPE)
@@ -933,8 +929,8 @@ class Console:
         x: int,
         y: int,
         string: str,
-        fg: Optional[Tuple[int, int, int]] = None,
-        bg: Optional[Tuple[int, int, int]] = None,
+        fg: tuple[int, int, int] | None = None,
+        bg: tuple[int, int, int] | None = None,
         bg_blend: int = tcod.constants.BKGND_SET,
         alignment: int = tcod.constants.LEFT,
     ) -> None:
@@ -984,8 +980,8 @@ class Console:
         width: int,
         height: int,
         string: str,
-        fg: Optional[Tuple[int, int, int]] = None,
-        bg: Optional[Tuple[int, int, int]] = None,
+        fg: tuple[int, int, int] | None = None,
+        bg: tuple[int, int, int] | None = None,
         bg_blend: int = tcod.constants.BKGND_SET,
         alignment: int = tcod.constants.LEFT,
     ) -> int:
@@ -1044,11 +1040,11 @@ class Console:
         height: int,
         title: str = "",
         clear: bool = True,
-        fg: Optional[Tuple[int, int, int]] = None,
-        bg: Optional[Tuple[int, int, int]] = None,
+        fg: tuple[int, int, int] | None = None,
+        bg: tuple[int, int, int] | None = None,
         bg_blend: int = tcod.constants.BKGND_SET,
         *,
-        decoration: Union[str, Tuple[int, int, int, int, int, int, int, int, int]] = "┌─┐│ │└─┘",
+        decoration: str | tuple[int, int, int, int, int, int, int, int, int] = "┌─┐│ │└─┘",
     ) -> None:
         r"""Draw a framed rectangle with an optional title.
 
@@ -1111,9 +1107,8 @@ class Console:
              └─┤Lower├──┘>
         """
         if title and decoration != "┌─┐│ │└─┘":
-            raise TypeError(
-                "The title and decoration parameters are mutually exclusive.  You should print the title manually."
-            )
+            msg = "The title and decoration parameters are mutually exclusive.  You should print the title manually."
+            raise TypeError(msg)
         if title:
             warnings.warn(
                 "The title parameter will be removed in the future since the style is hard-coded.",
@@ -1135,13 +1130,10 @@ class Console:
                 clear,
             )
             return
-        decoration_: Sequence[int]
-        if isinstance(decoration, str):
-            decoration_ = [ord(c) for c in decoration]
-        else:
-            decoration_ = decoration
+        decoration_ = [ord(c) for c in decoration] if isinstance(decoration, str) else decoration
         if len(decoration_) != 9:
-            raise TypeError(f"Decoration must have a length of 9 (len(decoration) is {len(decoration_)}.)")
+            msg = f"Decoration must have a length of 9 (len(decoration) is {len(decoration_)}.)"
+            raise TypeError(msg)
         _check(
             lib.TCOD_console_draw_frame_rgb(
                 self.console_c,
@@ -1164,8 +1156,8 @@ class Console:
         width: int,
         height: int,
         ch: int,
-        fg: Optional[Tuple[int, int, int]] = None,
-        bg: Optional[Tuple[int, int, int]] = None,
+        fg: tuple[int, int, int] | None = None,
+        bg: tuple[int, int, int] | None = None,
         bg_blend: int = tcod.constants.BKGND_SET,
     ) -> None:
         """Draw characters and colors over a rectangular region.
@@ -1234,7 +1226,7 @@ def get_height_rect(width: int, string: str) -> int:
 
 
 @deprecate("This function does not support contexts.")
-def recommended_size() -> Tuple[int, int]:
+def recommended_size() -> tuple[int, int]:
     """Return the recommended size of a console for the current active window.
 
     The return is determined from the active tileset size and active window
@@ -1253,7 +1245,8 @@ def recommended_size() -> Tuple[int, int]:
         Use :any:`Context.recommended_console_size` instead.
     """
     if not lib.TCOD_ctx.engine:
-        raise RuntimeError("The libtcod engine was not initialized first.")
+        msg = "The libtcod engine was not initialized first."
+        raise RuntimeError(msg)
     window = lib.TCOD_sys_get_sdl_window()
     renderer = lib.TCOD_sys_get_sdl_renderer()
     with ffi.new("int[2]") as xy:
@@ -1266,7 +1259,7 @@ def recommended_size() -> Tuple[int, int]:
     return w, h
 
 
-def load_xp(path: Union[str, PathLike[str]], order: Literal["C", "F"] = "C") -> Tuple[Console, ...]:
+def load_xp(path: str | PathLike[str], order: Literal["C", "F"] = "C") -> tuple[Console, ...]:
     """Load a REXPaint file as a tuple of consoles.
 
     `path` is the name of the REXPaint file to load.
@@ -1299,9 +1292,7 @@ def load_xp(path: Union[str, PathLike[str]], order: Literal["C", "F"] = "C") -> 
         is_transparent = (console.rgb["bg"] == KEY_COLOR).all(axis=-1)
         console.rgba[is_transparent] = (ord(" "), (0,), (0,))
     """
-    path = Path(path)
-    if not path.exists():
-        raise FileNotFoundError(f"File not found:\n\t{path.resolve()}")
+    path = Path(path).resolve(strict=True)
     layers = _check(tcod.lib.TCOD_load_xp(bytes(path), 0, ffi.NULL))
     consoles = ffi.new("TCOD_Console*[]", layers)
     _check(tcod.lib.TCOD_load_xp(bytes(path), layers, consoles))
@@ -1309,7 +1300,7 @@ def load_xp(path: Union[str, PathLike[str]], order: Literal["C", "F"] = "C") -> 
 
 
 def save_xp(
-    path: Union[str, PathLike[str]],
+    path: str | PathLike[str],
     consoles: Iterable[Console],
     compress_level: int = 9,
 ) -> None:

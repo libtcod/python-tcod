@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from os import PathLike
 from pathlib import Path
-from typing import Any, Dict, Tuple, Union
+from typing import Any
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -22,8 +22,9 @@ from tcod._internal import _console, deprecate
 from tcod.loader import ffi, lib
 
 
-class Image(object):
-    """
+class Image:
+    """A libtcod image.
+
     Args:
         width (int): Width of the new Image.
         height (int): Height of the new Image.
@@ -33,7 +34,8 @@ class Image(object):
         height (int): Read only height of this Image.
     """
 
-    def __init__(self, width: int, height: int):
+    def __init__(self, width: int, height: int) -> None:
+        """Initialize a blank image."""
         self.width, self.height = width, height
         self.image_c = ffi.gc(lib.TCOD_image_new(width, height), lib.TCOD_image_delete)
 
@@ -63,7 +65,7 @@ class Image(object):
         image_array[...] = array
         return image
 
-    def clear(self, color: Tuple[int, int, int]) -> None:
+    def clear(self, color: tuple[int, int, int]) -> None:
         """Fill this entire Image with color.
 
         Args:
@@ -102,7 +104,7 @@ class Image(object):
         lib.TCOD_image_scale(self.image_c, width, height)
         self.width, self.height = width, height
 
-    def set_key_color(self, color: Tuple[int, int, int]) -> None:
+    def set_key_color(self, color: tuple[int, int, int]) -> None:
         """Set a color to be transparent during blitting functions.
 
         Args:
@@ -138,7 +140,7 @@ class Image(object):
         """
         lib.TCOD_image_refresh_console(self.image_c, _console(console))
 
-    def _get_size(self) -> Tuple[int, int]:
+    def _get_size(self) -> tuple[int, int]:
         """Return the (width, height) for this Image.
 
         Returns:
@@ -149,7 +151,7 @@ class Image(object):
         lib.TCOD_image_get_size(self.image_c, w, h)
         return w[0], h[0]
 
-    def get_pixel(self, x: int, y: int) -> Tuple[int, int, int]:
+    def get_pixel(self, x: int, y: int) -> tuple[int, int, int]:
         """Get the color of a pixel in this Image.
 
         Args:
@@ -164,7 +166,7 @@ class Image(object):
         color = lib.TCOD_image_get_pixel(self.image_c, x, y)
         return color.r, color.g, color.b
 
-    def get_mipmap_pixel(self, left: float, top: float, right: float, bottom: float) -> Tuple[int, int, int]:
+    def get_mipmap_pixel(self, left: float, top: float, right: float, bottom: float) -> tuple[int, int, int]:
         """Get the average color of a rectangle in this Image.
 
         Parameters should stay within the following limits:
@@ -185,7 +187,7 @@ class Image(object):
         color = lib.TCOD_image_get_mipmap_pixel(self.image_c, left, top, right, bottom)
         return (color.r, color.g, color.b)
 
-    def put_pixel(self, x: int, y: int, color: Tuple[int, int, int]) -> None:
+    def put_pixel(self, x: int, y: int, color: tuple[int, int, int]) -> None:
         """Change a pixel on this Image.
 
         Args:
@@ -295,7 +297,7 @@ class Image(object):
         lib.TCOD_image_save(self.image_c, filename.encode("utf-8"))
 
     @property
-    def __array_interface__(self) -> Dict[str, Any]:
+    def __array_interface__(self) -> dict[str, Any]:
         """Return an interface for this images pixel buffer.
 
         Use :any:`numpy.asarray` to get the read-write array of this Image.
@@ -314,7 +316,8 @@ class Image(object):
             depth = 3
             data = int(ffi.cast("size_t", self.image_c.mipmaps[0].buf))
         else:
-            raise TypeError("Image has no initialized data.")
+            msg = "Image has no initialized data."
+            raise TypeError(msg)
         return {
             "shape": (self.height, self.width, depth),
             "typestr": "|u1",
@@ -329,7 +332,7 @@ def _get_format_name(format: int) -> str:
     for attr in dir(lib):
         if not attr.startswith("SDL_PIXELFORMAT"):
             continue
-        if not getattr(lib, attr) == format:
+        if getattr(lib, attr) != format:
             continue
         return attr
     return str(format)
@@ -340,7 +343,7 @@ def _get_format_name(format: int) -> str:
     "  It's recommended to load images with a more complete image library such as python-Pillow or python-imageio.",
     category=PendingDeprecationWarning,
 )
-def load(filename: Union[str, PathLike[str]]) -> NDArray[np.uint8]:
+def load(filename: str | PathLike[str]) -> NDArray[np.uint8]:
     """Load a PNG file as an RGBA array.
 
     `filename` is the name of the file to load.

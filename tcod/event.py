@@ -83,7 +83,7 @@ from __future__ import annotations
 
 import enum
 import warnings
-from typing import Any, Callable, Dict, Generic, Iterator, Mapping, NamedTuple, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, Generic, Iterator, Mapping, NamedTuple, TypeVar
 
 import numpy as np
 from numpy.typing import NDArray
@@ -91,7 +91,7 @@ from typing_extensions import Final, Literal
 
 import tcod.event_constants
 import tcod.sdl.joystick
-from tcod.event_constants import *  # noqa: F4
+from tcod.event_constants import *  # noqa: F403
 from tcod.event_constants import KMOD_ALT, KMOD_CTRL, KMOD_GUI, KMOD_SHIFT
 from tcod.loader import ffi, lib
 from tcod.sdl.joystick import _HAT_DIRECTIONS
@@ -100,7 +100,7 @@ T = TypeVar("T")
 
 
 class _ConstantsWithPrefix(Mapping[int, str]):
-    def __init__(self, constants: Mapping[int, str]):
+    def __init__(self, constants: Mapping[int, str]) -> None:
         self.constants = constants
 
     def __getitem__(self, key: int) -> str:
@@ -133,7 +133,7 @@ def _describe_bitmask(bits: int, table: Mapping[int, str], default: str = "0") -
     return "|".join(result)
 
 
-def _pixel_to_tile(x: float, y: float) -> Optional[Tuple[float, float]]:
+def _pixel_to_tile(x: float, y: float) -> tuple[float, float] | None:
     """Convert pixel coordinates to tile coordinates."""
     if not lib.TCOD_ctx.engine:
         return None
@@ -155,7 +155,7 @@ class Point(NamedTuple):
     """A pixel or tile coordinate starting with zero as the top-most position."""
 
 
-def _verify_tile_coordinates(xy: Optional[Point]) -> Point:
+def _verify_tile_coordinates(xy: Point | None) -> Point:
     """Check if an events tile coordinate is initialized and warn if not.
 
     Always returns a valid Point object for backwards compatibility.
@@ -291,7 +291,7 @@ class Event:
                    pointer.  All sub-classes have this attribute.
     """
 
-    def __init__(self, type: Optional[str] = None):
+    def __init__(self, type: str | None = None) -> None:
         if type is None:
             type = self.__class__.__name__.upper()
         self.type: Final = type
@@ -323,11 +323,12 @@ class Quit(Event):
         return self
 
     def __repr__(self) -> str:
-        return "tcod.event.%s()" % (self.__class__.__name__,)
+        return f"tcod.event.{self.__class__.__name__}()"
 
 
 class KeyboardEvent(Event):
-    """
+    """Base keyboard event.
+
     Attributes:
         type (str): Will be "KEYDOWN" or "KEYUP", depending on the event.
         scancode (Scancode): The keyboard scan-code, this is the physical location
@@ -345,7 +346,7 @@ class KeyboardEvent(Event):
         `scancode`, `sym`, and `mod` now use their respective enums.
     """
 
-    def __init__(self, scancode: int, sym: int, mod: int, repeat: bool = False):
+    def __init__(self, scancode: int, sym: int, mod: int, repeat: bool = False) -> None:
         super().__init__()
         self.scancode = Scancode(scancode)
         self.sym = KeySym(sym)
@@ -360,7 +361,7 @@ class KeyboardEvent(Event):
         return self
 
     def __repr__(self) -> str:
-        return "tcod.event.%s(scancode=%r, sym=%r, mod=%s%s)" % (
+        return "tcod.event.{}(scancode={!r}, sym={!r}, mod={}{})".format(
             self.__class__.__name__,
             self.scancode,
             self.sym,
@@ -381,7 +382,8 @@ class KeyUp(KeyboardEvent):
 
 
 class MouseState(Event):
-    """
+    """Mouse state.
+
     Attributes:
         type (str): Always "MOUSESTATE".
         position (Point): The position coordinates of the mouse.
@@ -404,10 +406,10 @@ class MouseState(Event):
 
     def __init__(
         self,
-        position: Tuple[int, int] = (0, 0),
-        tile: Optional[Tuple[int, int]] = (0, 0),
+        position: tuple[int, int] = (0, 0),
+        tile: tuple[int, int] | None = (0, 0),
         state: int = 0,
-    ):
+    ) -> None:
         super().__init__()
         self.position = Point(*position)
         self.__tile = Point(*tile) if tile is not None else None
@@ -441,7 +443,7 @@ class MouseState(Event):
         return _verify_tile_coordinates(self.__tile)
 
     @tile.setter
-    def tile(self, xy: Tuple[int, int]) -> None:
+    def tile(self, xy: tuple[int, int]) -> None:
         warnings.warn(
             "The mouse.tile attribute is deprecated.  Use mouse.position of the event returned by context.convert_event instead.",
             DeprecationWarning,
@@ -450,7 +452,7 @@ class MouseState(Event):
         self.__tile = Point(*xy)
 
     def __repr__(self) -> str:
-        return ("tcod.event.%s(position=%r, tile=%r, state=%s)") % (
+        return ("tcod.event.{}(position={!r}, tile={!r}, state={})").format(
             self.__class__.__name__,
             tuple(self.position),
             tuple(self.tile),
@@ -467,7 +469,8 @@ class MouseState(Event):
 
 
 class MouseMotion(MouseState):
-    """
+    """Mouse motion event.
+
     Attributes:
         type (str): Always "MOUSEMOTION".
         position (Point): The pixel coordinates of the mouse.
@@ -491,12 +494,12 @@ class MouseMotion(MouseState):
 
     def __init__(
         self,
-        position: Tuple[int, int] = (0, 0),
-        motion: Tuple[int, int] = (0, 0),
-        tile: Optional[Tuple[int, int]] = (0, 0),
-        tile_motion: Optional[Tuple[int, int]] = (0, 0),
+        position: tuple[int, int] = (0, 0),
+        motion: tuple[int, int] = (0, 0),
+        tile: tuple[int, int] | None = (0, 0),
+        tile_motion: tuple[int, int] | None = (0, 0),
         state: int = 0,
-    ):
+    ) -> None:
         super().__init__(position, tile, state)
         self.motion = Point(*motion)
         self.__tile_motion = Point(*tile_motion) if tile_motion is not None else None
@@ -530,7 +533,7 @@ class MouseMotion(MouseState):
         return _verify_tile_coordinates(self.__tile_motion)
 
     @tile_motion.setter
-    def tile_motion(self, xy: Tuple[int, int]) -> None:
+    def tile_motion(self, xy: tuple[int, int]) -> None:
         warnings.warn(
             "The mouse.tile_motion attribute is deprecated."
             "  Use mouse.motion of the event returned by context.convert_event instead.",
@@ -559,7 +562,7 @@ class MouseMotion(MouseState):
         return self
 
     def __repr__(self) -> str:
-        return ("tcod.event.%s(position=%r, motion=%r, tile=%r, tile_motion=%r, state=%s)") % (
+        return ("tcod.event.{}(position={!r}, motion={!r}, tile={!r}, tile_motion={!r}, state={})").format(
             self.__class__.__name__,
             tuple(self.position),
             tuple(self.motion),
@@ -577,7 +580,8 @@ class MouseMotion(MouseState):
 
 
 class MouseButtonEvent(MouseState):
-    """
+    """Mouse button event.
+
     Attributes:
         type (str): Will be "MOUSEBUTTONDOWN" or "MOUSEBUTTONUP",
                     depending on the event.
@@ -597,10 +601,10 @@ class MouseButtonEvent(MouseState):
 
     def __init__(
         self,
-        pixel: Tuple[int, int] = (0, 0),
-        tile: Optional[Tuple[int, int]] = (0, 0),
+        pixel: tuple[int, int] = (0, 0),
+        tile: tuple[int, int] | None = (0, 0),
         button: int = 0,
-    ):
+    ) -> None:
         super().__init__(pixel, tile, button)
 
     @property
@@ -617,7 +621,7 @@ class MouseButtonEvent(MouseState):
         pixel = button.x, button.y
         subtile = _pixel_to_tile(*pixel)
         if subtile is None:
-            tile: Optional[Tuple[int, int]] = None
+            tile: tuple[int, int] | None = None
         else:
             tile = int(subtile[0]), int(subtile[1])
         self = cls(pixel, tile, button.button)
@@ -625,7 +629,7 @@ class MouseButtonEvent(MouseState):
         return self
 
     def __repr__(self) -> str:
-        return "tcod.event.%s(position=%r, tile=%r, button=%s)" % (
+        return "tcod.event.{}(position={!r}, tile={!r}, button={})".format(
             self.__class__.__name__,
             tuple(self.position),
             tuple(self.tile),
@@ -650,7 +654,8 @@ class MouseButtonUp(MouseButtonEvent):
 
 
 class MouseWheel(Event):
-    """
+    """Mouse wheel event.
+
     Attributes:
         type (str): Always "MOUSEWHEEL".
         x (int): Horizontal scrolling. A positive value means scrolling right.
@@ -661,7 +666,7 @@ class MouseWheel(Event):
                         the Operating System.
     """
 
-    def __init__(self, x: int, y: int, flipped: bool = False):
+    def __init__(self, x: int, y: int, flipped: bool = False) -> None:
         super().__init__()
         self.x = x
         self.y = y
@@ -692,13 +697,14 @@ class MouseWheel(Event):
 
 
 class TextInput(Event):
-    """
+    """SDL text input event.
+
     Attributes:
         type (str): Always "TEXTINPUT".
         text (str): A Unicode string with the input.
     """
 
-    def __init__(self, text: str):
+    def __init__(self, text: str) -> None:
         super().__init__()
         self.text = text
 
@@ -709,10 +715,10 @@ class TextInput(Event):
         return self
 
     def __repr__(self) -> str:
-        return "tcod.event.%s(text=%r)" % (self.__class__.__name__, self.text)
+        return f"tcod.event.{self.__class__.__name__}(text={self.text!r})"
 
     def __str__(self) -> str:
-        return "<%s, text=%r)" % (super().__str__().strip("<>"), self.text)
+        return "<{}, text={!r})".format(super().__str__().strip("<>"), self.text)
 
 
 class WindowEvent(Event):
@@ -741,7 +747,7 @@ class WindowEvent(Event):
     """The current window event. This can be one of various options."""
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> Union[WindowEvent, Undefined]:
+    def from_sdl_event(cls, sdl_event: Any) -> WindowEvent | Undefined:
         if sdl_event.window.event not in cls.__WINDOW_TYPES:
             return Undefined.from_sdl_event(sdl_event)
         event_type: Final = cls.__WINDOW_TYPES[sdl_event.window.event]
@@ -759,7 +765,7 @@ class WindowEvent(Event):
         return self
 
     def __repr__(self) -> str:
-        return "tcod.event.%s(type=%r)" % (self.__class__.__name__, self.type)
+        return f"tcod.event.{self.__class__.__name__}(type={self.type!r})"
 
     __WINDOW_TYPES = {
         lib.SDL_WINDOWEVENT_SHOWN: "WindowShown",
@@ -782,7 +788,8 @@ class WindowEvent(Event):
 
 
 class WindowMoved(WindowEvent):
-    """
+    """Window moved event.
+
     Attributes:
         x (int): Movement on the x-axis.
         y (int): Movement on the y-axis.
@@ -797,7 +804,7 @@ class WindowMoved(WindowEvent):
         self.y = y
 
     def __repr__(self) -> str:
-        return "tcod.event.%s(type=%r, x=%r, y=%r)" % (
+        return "tcod.event.{}(type={!r}, x={!r}, y={!r})".format(
             self.__class__.__name__,
             self.type,
             self.x,
@@ -805,7 +812,7 @@ class WindowMoved(WindowEvent):
         )
 
     def __str__(self) -> str:
-        return "<%s, x=%r, y=%r)" % (
+        return "<{}, x={!r}, y={!r})".format(
             super().__str__().strip("<>"),
             self.x,
             self.y,
@@ -813,7 +820,8 @@ class WindowMoved(WindowEvent):
 
 
 class WindowResized(WindowEvent):
-    """
+    """Window resized event.
+
     Attributes:
         width (int): The current width of the window.
         height (int): The current height of the window.
@@ -828,7 +836,7 @@ class WindowResized(WindowEvent):
         self.height = height
 
     def __repr__(self) -> str:
-        return "tcod.event.%s(type=%r, width=%r, height=%r)" % (
+        return "tcod.event.{}(type={!r}, width={!r}, height={!r})".format(
             self.__class__.__name__,
             self.type,
             self.width,
@@ -836,7 +844,7 @@ class WindowResized(WindowEvent):
         )
 
     def __str__(self) -> str:
-        return "<%s, width=%r, height=%r)" % (
+        return "<{}, width={!r}, height={!r})".format(
             super().__str__().strip("<>"),
             self.width,
             self.height,
@@ -849,7 +857,7 @@ class JoystickEvent(Event):
     .. versionadded:: 13.8
     """
 
-    def __init__(self, type: str, which: int):
+    def __init__(self, type: str, which: int) -> None:
         super().__init__(type)
         self.which = which
         """The ID of the joystick this event is for."""
@@ -880,7 +888,7 @@ class JoystickAxis(JoystickEvent):
     which: int
     """The ID of the joystick this event is for."""
 
-    def __init__(self, type: str, which: int, axis: int, value: int):
+    def __init__(self, type: str, which: int, axis: int, value: int) -> None:
         super().__init__(type, which)
         self.axis = axis
         """The index of the changed axis."""
@@ -914,7 +922,7 @@ class JoystickBall(JoystickEvent):
     which: int
     """The ID of the joystick this event is for."""
 
-    def __init__(self, type: str, which: int, ball: int, dx: int, dy: int):
+    def __init__(self, type: str, which: int, ball: int, dx: int, dy: int) -> None:
         super().__init__(type, which)
         self.ball = ball
         """The index of the moved ball."""
@@ -952,7 +960,7 @@ class JoystickHat(JoystickEvent):
     which: int
     """The ID of the joystick this event is for."""
 
-    def __init__(self, type: str, which: int, x: Literal[-1, 0, 1], y: Literal[-1, 0, 1]):
+    def __init__(self, type: str, which: int, x: Literal[-1, 0, 1], y: Literal[-1, 0, 1]) -> None:
         super().__init__(type, which)
         self.x = x
         """The new X direction of the hat."""
@@ -991,7 +999,7 @@ class JoystickButton(JoystickEvent):
     which: int
     """The ID of the joystick this event is for."""
 
-    def __init__(self, type: str, which: int, button: int):
+    def __init__(self, type: str, which: int, button: int) -> None:
         super().__init__(type, which)
         self.button = button
         """The index of the button this event is for."""
@@ -1049,7 +1057,7 @@ class ControllerEvent(Event):
     .. versionadded:: 13.8
     """
 
-    def __init__(self, type: str, which: int):
+    def __init__(self, type: str, which: int) -> None:
         super().__init__(type)
         self.which = which
         """The ID of the joystick this event is for."""
@@ -1077,7 +1085,7 @@ class ControllerAxis(ControllerEvent):
 
     type: Final[Literal["CONTROLLERAXISMOTION"]]  # type: ignore[misc]
 
-    def __init__(self, type: str, which: int, axis: tcod.sdl.joystick.ControllerAxis, value: int):
+    def __init__(self, type: str, which: int, axis: tcod.sdl.joystick.ControllerAxis, value: int) -> None:
         super().__init__(type, which)
         self.axis = axis
         """Which axis is being moved.  One of :any:`ControllerAxis`."""
@@ -1114,7 +1122,7 @@ class ControllerButton(ControllerEvent):
 
     type: Final[Literal["CONTROLLERBUTTONDOWN", "CONTROLLERBUTTONUP"]]  # type: ignore[misc]
 
-    def __init__(self, type: str, which: int, button: tcod.sdl.joystick.ControllerButton, pressed: bool):
+    def __init__(self, type: str, which: int, button: tcod.sdl.joystick.ControllerButton, pressed: bool) -> None:
         super().__init__(type, which)
         self.button = button
         """The button for this event.  One of :any:`ControllerButton`."""
@@ -1164,9 +1172,7 @@ class ControllerDevice(ControllerEvent):
 
 
 class Undefined(Event):
-    """This class is a place holder for SDL events without their own tcod.event
-    class.
-    """
+    """This class is a place holder for SDL events without their own tcod.event class."""
 
     def __init__(self) -> None:
         super().__init__("")
@@ -1183,7 +1189,7 @@ class Undefined(Event):
         return "<Undefined>"
 
 
-_SDL_TO_CLASS_TABLE: Dict[int, Type[Event]] = {
+_SDL_TO_CLASS_TABLE: dict[int, type[Event]] = {
     lib.SDL_QUIT: Quit,
     lib.SDL_KEYDOWN: KeyDown,
     lib.SDL_KEYUP: KeyUp,
@@ -1232,7 +1238,7 @@ def get() -> Iterator[Any]:
             yield Undefined.from_sdl_event(sdl_event)
 
 
-def wait(timeout: Optional[float] = None) -> Iterator[Any]:
+def wait(timeout: float | None = None) -> Iterator[Any]:
     """Block until events exist, then return an event iterator.
 
     `timeout` is the maximum number of seconds to wait as a floating point
@@ -1365,9 +1371,9 @@ class EventDispatch(Generic[T]):
             tcod.console_flush()
             for event in tcod.event.wait():
                 state.dispatch(event)
-    '''  # noqa: E501
+    '''
 
-    def dispatch(self, event: Any) -> Optional[T]:
+    def dispatch(self, event: Any) -> T | None:
         """Send an event to an `ev_*` method.
 
         `*` will be the `event.type` attribute converted to lower-case.
@@ -1387,7 +1393,7 @@ class EventDispatch(Generic[T]):
             )
             return None
         func_name = f"ev_{event.type.lower()}"
-        func: Optional[Callable[[Any], Optional[T]]] = getattr(self, func_name, None)
+        func: Callable[[Any], T | None] | None = getattr(self, func_name, None)
         if func is None:
             warnings.warn(f"{func_name} is missing from this EventDispatch object.", RuntimeWarning, stacklevel=2)
             return None
@@ -1397,151 +1403,164 @@ class EventDispatch(Generic[T]):
         for event in get():
             self.dispatch(event)
 
-    def event_wait(self, timeout: Optional[float]) -> None:
+    def event_wait(self, timeout: float | None) -> None:
         wait(timeout)
         self.event_get()
 
-    def ev_quit(self, event: tcod.event.Quit) -> Optional[T]:
+    def ev_quit(self, event: tcod.event.Quit) -> T | None:
         """Called when the termination of the program is requested."""
 
-    def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[T]:
+    def ev_keydown(self, event: tcod.event.KeyDown) -> T | None:
         """Called when a keyboard key is pressed or repeated."""
 
-    def ev_keyup(self, event: tcod.event.KeyUp) -> Optional[T]:
+    def ev_keyup(self, event: tcod.event.KeyUp) -> T | None:
         """Called when a keyboard key is released."""
 
-    def ev_mousemotion(self, event: tcod.event.MouseMotion) -> Optional[T]:
+    def ev_mousemotion(self, event: tcod.event.MouseMotion) -> T | None:
         """Called when the mouse is moved."""
 
-    def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> Optional[T]:
+    def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> T | None:
         """Called when a mouse button is pressed."""
 
-    def ev_mousebuttonup(self, event: tcod.event.MouseButtonUp) -> Optional[T]:
+    def ev_mousebuttonup(self, event: tcod.event.MouseButtonUp) -> T | None:
         """Called when a mouse button is released."""
 
-    def ev_mousewheel(self, event: tcod.event.MouseWheel) -> Optional[T]:
+    def ev_mousewheel(self, event: tcod.event.MouseWheel) -> T | None:
         """Called when the mouse wheel is scrolled."""
 
-    def ev_textinput(self, event: tcod.event.TextInput) -> Optional[T]:
+    def ev_textinput(self, event: tcod.event.TextInput) -> T | None:
         """Called to handle Unicode input."""
 
-    def ev_windowshown(self, event: tcod.event.WindowEvent) -> Optional[T]:
+    def ev_windowshown(self, event: tcod.event.WindowEvent) -> T | None:
         """Called when the window is shown."""
 
-    def ev_windowhidden(self, event: tcod.event.WindowEvent) -> Optional[T]:
+    def ev_windowhidden(self, event: tcod.event.WindowEvent) -> T | None:
         """Called when the window is hidden."""
 
-    def ev_windowexposed(self, event: tcod.event.WindowEvent) -> Optional[T]:
+    def ev_windowexposed(self, event: tcod.event.WindowEvent) -> T | None:
         """Called when a window is exposed, and needs to be refreshed.
 
         This usually means a call to :any:`tcod.console_flush` is necessary.
         """
 
-    def ev_windowmoved(self, event: tcod.event.WindowMoved) -> Optional[T]:
+    def ev_windowmoved(self, event: tcod.event.WindowMoved) -> T | None:
         """Called when the window is moved."""
 
-    def ev_windowresized(self, event: tcod.event.WindowResized) -> Optional[T]:
+    def ev_windowresized(self, event: tcod.event.WindowResized) -> T | None:
         """Called when the window is resized."""
 
-    def ev_windowsizechanged(self, event: tcod.event.WindowResized) -> Optional[T]:
+    def ev_windowsizechanged(self, event: tcod.event.WindowResized) -> T | None:
         """Called when the system or user changes the size of the window."""
 
-    def ev_windowminimized(self, event: tcod.event.WindowEvent) -> Optional[T]:
+    def ev_windowminimized(self, event: tcod.event.WindowEvent) -> T | None:
         """Called when the window is minimized."""
 
-    def ev_windowmaximized(self, event: tcod.event.WindowEvent) -> Optional[T]:
+    def ev_windowmaximized(self, event: tcod.event.WindowEvent) -> T | None:
         """Called when the window is maximized."""
 
-    def ev_windowrestored(self, event: tcod.event.WindowEvent) -> Optional[T]:
+    def ev_windowrestored(self, event: tcod.event.WindowEvent) -> T | None:
         """Called when the window is restored."""
 
-    def ev_windowenter(self, event: tcod.event.WindowEvent) -> Optional[T]:
+    def ev_windowenter(self, event: tcod.event.WindowEvent) -> T | None:
         """Called when the window gains mouse focus."""
 
-    def ev_windowleave(self, event: tcod.event.WindowEvent) -> Optional[T]:
+    def ev_windowleave(self, event: tcod.event.WindowEvent) -> T | None:
         """Called when the window loses mouse focus."""
 
-    def ev_windowfocusgained(self, event: tcod.event.WindowEvent) -> Optional[T]:
+    def ev_windowfocusgained(self, event: tcod.event.WindowEvent) -> T | None:
         """Called when the window gains keyboard focus."""
 
-    def ev_windowfocuslost(self, event: tcod.event.WindowEvent) -> Optional[T]:
+    def ev_windowfocuslost(self, event: tcod.event.WindowEvent) -> T | None:
         """Called when the window loses keyboard focus."""
 
-    def ev_windowclose(self, event: tcod.event.WindowEvent) -> Optional[T]:
+    def ev_windowclose(self, event: tcod.event.WindowEvent) -> T | None:
         """Called when the window manager requests the window to be closed."""
 
-    def ev_windowtakefocus(self, event: tcod.event.WindowEvent) -> Optional[T]:
+    def ev_windowtakefocus(self, event: tcod.event.WindowEvent) -> T | None:
         pass
 
-    def ev_windowhittest(self, event: tcod.event.WindowEvent) -> Optional[T]:
+    def ev_windowhittest(self, event: tcod.event.WindowEvent) -> T | None:
         pass
 
-    def ev_joyaxismotion(self, event: tcod.event.JoystickAxis) -> Optional[T]:
-        """
+    def ev_joyaxismotion(self, event: tcod.event.JoystickAxis) -> T | None:
+        """Called when a joystick analog is moved.
+
         .. versionadded:: 13.8
         """
 
-    def ev_joyballmotion(self, event: tcod.event.JoystickBall) -> Optional[T]:
-        """
+    def ev_joyballmotion(self, event: tcod.event.JoystickBall) -> T | None:
+        """Called when a joystick ball is moved.
+
         .. versionadded:: 13.8
         """
 
-    def ev_joyhatmotion(self, event: tcod.event.JoystickHat) -> Optional[T]:
-        """
+    def ev_joyhatmotion(self, event: tcod.event.JoystickHat) -> T | None:
+        """Called when a joystick hat is moved.
+
         .. versionadded:: 13.8
         """
 
-    def ev_joybuttondown(self, event: tcod.event.JoystickButton) -> Optional[T]:
-        """
+    def ev_joybuttondown(self, event: tcod.event.JoystickButton) -> T | None:
+        """Called when a joystick button is pressed.
+
         .. versionadded:: 13.8
         """
 
-    def ev_joybuttonup(self, event: tcod.event.JoystickButton) -> Optional[T]:
-        """
+    def ev_joybuttonup(self, event: tcod.event.JoystickButton) -> T | None:
+        """Called when a joystick button is released.
+
         .. versionadded:: 13.8
         """
 
-    def ev_joydeviceadded(self, event: tcod.event.JoystickDevice) -> Optional[T]:
-        """
+    def ev_joydeviceadded(self, event: tcod.event.JoystickDevice) -> T | None:
+        """Called when a joystick is added.
+
         .. versionadded:: 13.8
         """
 
-    def ev_joydeviceremoved(self, event: tcod.event.JoystickDevice) -> Optional[T]:
-        """
+    def ev_joydeviceremoved(self, event: tcod.event.JoystickDevice) -> T | None:
+        """Called when a joystick is removed.
+
         .. versionadded:: 13.8
         """
 
-    def ev_controlleraxismotion(self, event: tcod.event.ControllerAxis) -> Optional[T]:
-        """
+    def ev_controlleraxismotion(self, event: tcod.event.ControllerAxis) -> T | None:
+        """Called when a controller analog is moved.
+
         .. versionadded:: 13.8
         """
 
-    def ev_controllerbuttondown(self, event: tcod.event.ControllerButton) -> Optional[T]:
-        """
+    def ev_controllerbuttondown(self, event: tcod.event.ControllerButton) -> T | None:
+        """Called when a controller button is pressed.
+
         .. versionadded:: 13.8
         """
 
-    def ev_controllerbuttonup(self, event: tcod.event.ControllerButton) -> Optional[T]:
-        """
+    def ev_controllerbuttonup(self, event: tcod.event.ControllerButton) -> T | None:
+        """Called when a controller button is released.
+
         .. versionadded:: 13.8
         """
 
-    def ev_controllerdeviceadded(self, event: tcod.event.ControllerDevice) -> Optional[T]:
-        """
+    def ev_controllerdeviceadded(self, event: tcod.event.ControllerDevice) -> T | None:
+        """Called when a standard controller is added.
+
         .. versionadded:: 13.8
         """
 
-    def ev_controllerdeviceremoved(self, event: tcod.event.ControllerDevice) -> Optional[T]:
-        """
+    def ev_controllerdeviceremoved(self, event: tcod.event.ControllerDevice) -> T | None:
+        """Called when a standard controller is removed.
+
         .. versionadded:: 13.8
         """
 
-    def ev_controllerdeviceremapped(self, event: tcod.event.ControllerDevice) -> Optional[T]:
-        """
+    def ev_controllerdeviceremapped(self, event: tcod.event.ControllerDevice) -> T | None:
+        """Called when a standard controller is remapped.
+
         .. versionadded:: 13.8
         """
 
-    def ev_(self, event: Any) -> Optional[T]:
+    def ev_(self, event: Any) -> T | None:
         pass
 
 
@@ -1566,7 +1585,7 @@ def _sdl_event_watcher(userdata: Any, sdl_event: Any) -> int:
 
 
 _EventCallback = TypeVar("_EventCallback", bound=Callable[[Event], None])
-_event_watch_handles: Dict[Callable[[Event], None], Any] = {}  # Callbacks and their FFI handles.
+_event_watch_handles: dict[Callable[[Event], None], Any] = {}  # Callbacks and their FFI handles.
 
 
 def add_watch(callback: _EventCallback) -> _EventCallback:
@@ -2192,7 +2211,7 @@ class Scancode(enum.IntEnum):
         return self
 
     @classmethod
-    def _missing_(cls, value: object) -> Optional[Scancode]:
+    def _missing_(cls, value: object) -> Scancode | None:
         if not isinstance(value, int):
             return None
         result = cls(0)
@@ -2201,9 +2220,8 @@ class Scancode(enum.IntEnum):
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, KeySym):
-            raise TypeError(
-                "Scancode and KeySym enums can not be compared directly." " Convert one or the other to the same type."
-            )
+            msg = "Scancode and KeySym enums can not be compared directly. Convert one or the other to the same type."
+            raise TypeError(msg)
         return super().__eq__(other)
 
     def __hash__(self) -> int:
@@ -2747,7 +2765,7 @@ class KeySym(enum.IntEnum):
         return Scancode(lib.SDL_GetScancodeFromKey(self.value))
 
     @classmethod
-    def _missing_(cls, value: object) -> Optional[KeySym]:
+    def _missing_(cls, value: object) -> KeySym | None:
         if not isinstance(value, int):
             return None
         result = cls(0)
@@ -2756,9 +2774,8 @@ class KeySym(enum.IntEnum):
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, Scancode):
-            raise TypeError(
-                "Scancode and KeySym enums can not be compared directly." " Convert one or the other to the same type."
-            )
+            msg = "Scancode and KeySym enums can not be compared directly. Convert one or the other to the same type."
+            raise TypeError(msg)
         return super().__eq__(other)
 
     def __hash__(self) -> int:

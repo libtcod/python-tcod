@@ -46,17 +46,17 @@ to setup the size of the console.  You should use
     :any:`tcod.mouse_get_status`.
 
 .. versionadded:: 11.12
-"""  # noqa: E501
+"""
 from __future__ import annotations
 
 import copy
-import os
 import pickle
 import sys
 import warnings
-from typing import Any, Iterable, List, Optional, Tuple, TypeVar
+from pathlib import Path
+from typing import Any, Iterable, NoReturn, TypeVar
 
-from typing_extensions import Literal, NoReturn
+from typing_extensions import Literal
 
 import tcod
 import tcod.event
@@ -149,18 +149,18 @@ It is not recommended to use this renderer on Windows.
 """
 
 
-def _handle_tileset(tileset: Optional[tcod.tileset.Tileset]) -> Any:
+def _handle_tileset(tileset: tcod.tileset.Tileset | None) -> Any:
     """Get the TCOD_Tileset pointer from a Tileset or return a NULL pointer."""
     return tileset._tileset_p if tileset else ffi.NULL
 
 
-def _handle_title(title: Optional[str]) -> Any:
+def _handle_title(title: str | None) -> Any:
     """Return title as a CFFI string.
 
     If title is None then return a decent default title is returned.
     """
     if title is None:
-        title = os.path.basename(sys.argv[0])
+        title = Path(sys.argv[0]).name
     return ffi.new("char[]", title.encode("utf-8"))
 
 
@@ -170,7 +170,7 @@ class Context:
     Use :any:`tcod.context.new` to create a new context.
     """
 
-    def __init__(self, context_p: Any):
+    def __init__(self, context_p: Any) -> None:
         """Create a context from a cffi pointer."""
         self._context_p = context_p
 
@@ -201,8 +201,8 @@ class Context:
         *,
         keep_aspect: bool = False,
         integer_scaling: bool = False,
-        clear_color: Tuple[int, int, int] = (0, 0, 0),
-        align: Tuple[float, float] = (0.5, 0.5),
+        clear_color: tuple[int, int, int] = (0, 0, 0),
+        align: tuple[float, float] = (0.5, 0.5),
     ) -> None:
         """Present a console to this context's display.
 
@@ -238,13 +238,13 @@ class Context:
         )
         _check(lib.TCOD_context_present(self._context_p, console.console_c, viewport_args))
 
-    def pixel_to_tile(self, x: int, y: int) -> Tuple[int, int]:
+    def pixel_to_tile(self, x: int, y: int) -> tuple[int, int]:
         """Convert window pixel coordinates to tile coordinates."""
         with ffi.new("int[2]", (x, y)) as xy:
             _check(lib.TCOD_context_screen_pixel_to_tile_i(self._context_p, xy, xy + 1))
             return xy[0], xy[1]
 
-    def pixel_to_subtile(self, x: int, y: int) -> Tuple[float, float]:
+    def pixel_to_subtile(self, x: int, y: int) -> tuple[float, float]:
         """Convert window pixel coordinates to sub-tile coordinates."""
         with ffi.new("double[2]", (x, y)) as xy:
             _check(lib.TCOD_context_screen_pixel_to_tile_d(self._context_p, xy, xy + 1))
@@ -283,12 +283,12 @@ class Context:
             )
         return event_copy
 
-    def save_screenshot(self, path: Optional[str] = None) -> None:
+    def save_screenshot(self, path: str | None = None) -> None:
         """Save a screen-shot to the given file path."""
         c_path = path.encode("utf-8") if path is not None else ffi.NULL
         _check(lib.TCOD_context_save_screenshot(self._context_p, c_path))
 
-    def change_tileset(self, tileset: Optional[tcod.tileset.Tileset]) -> None:
+    def change_tileset(self, tileset: tcod.tileset.Tileset | None) -> None:
         """Change the active tileset used by this context.
 
         The new tileset will take effect on the next call to :any:`present`.
@@ -363,7 +363,7 @@ class Context:
         width, height = max(min_columns, size[0]), max(min_rows, size[1])
         return tcod.console.Console(width, height, order=order)
 
-    def recommended_console_size(self, min_columns: int = 1, min_rows: int = 1) -> Tuple[int, int]:
+    def recommended_console_size(self, min_columns: int = 1, min_rows: int = 1) -> tuple[int, int]:
         """Return the recommended (columns, rows) of a console for this context.
 
         `min_columns`, `min_rows` are the lowest values which will be returned.
@@ -406,11 +406,11 @@ class Context:
                     0 if fullscreen else tcod.lib.SDL_WINDOW_FULLSCREEN_DESKTOP,
                 )
 
-        '''  # noqa: E501
+        '''
         return lib.TCOD_context_get_sdl_window(self._context_p)
 
     @property
-    def sdl_window(self) -> Optional[tcod.sdl.video.Window]:
+    def sdl_window(self) -> tcod.sdl.video.Window | None:
         '''Return a :any:`tcod.sdl.video.Window` referencing this contexts SDL window if it exists.
 
         Example::
@@ -434,7 +434,7 @@ class Context:
         return tcod.sdl.video.Window(p) if p else None
 
     @property
-    def sdl_renderer(self) -> Optional[tcod.sdl.render.Renderer]:
+    def sdl_renderer(self) -> tcod.sdl.render.Renderer | None:
         """Return a :any:`tcod.sdl.render.Renderer` referencing this contexts SDL renderer if it exists.
 
         .. versionadded:: 13.4
@@ -443,7 +443,7 @@ class Context:
         return tcod.sdl.render.Renderer(p) if p else None
 
     @property
-    def sdl_atlas(self) -> Optional[tcod.render.SDLTilesetAtlas]:
+    def sdl_atlas(self) -> tcod.render.SDLTilesetAtlas | None:
         """Return a :any:`tcod.render.SDLTilesetAtlas` referencing libtcod's SDL texture atlas if it exists.
 
         .. versionadded:: 13.5
@@ -455,7 +455,8 @@ class Context:
 
     def __reduce__(self) -> NoReturn:
         """Contexts can not be pickled, so this class will raise :class:`pickle.PicklingError`."""
-        raise pickle.PicklingError("Python-tcod contexts can not be pickled.")
+        msg = "Python-tcod contexts can not be pickled."
+        raise pickle.PicklingError(msg)
 
 
 @ffi.def_extern()  # type: ignore
@@ -464,25 +465,25 @@ def _pycall_cli_output(catch_reference: Any, output: Any) -> None:
 
     Catches the CLI output.
     """
-    catch: List[str] = ffi.from_handle(catch_reference)
+    catch: list[str] = ffi.from_handle(catch_reference)
     catch.append(ffi.string(output).decode("utf-8"))
 
 
 def new(
     *,
-    x: Optional[int] = None,
-    y: Optional[int] = None,
-    width: Optional[int] = None,
-    height: Optional[int] = None,
-    columns: Optional[int] = None,
-    rows: Optional[int] = None,
-    renderer: Optional[int] = None,
-    tileset: Optional[tcod.tileset.Tileset] = None,
+    x: int | None = None,
+    y: int | None = None,
+    width: int | None = None,
+    height: int | None = None,
+    columns: int | None = None,
+    rows: int | None = None,
+    renderer: int | None = None,
+    tileset: tcod.tileset.Tileset | None = None,
     vsync: bool = True,
-    sdl_window_flags: Optional[int] = None,
-    title: Optional[str] = None,
-    argv: Optional[Iterable[str]] = None,
-    console: Optional[tcod.Console] = None,
+    sdl_window_flags: int | None = None,
+    title: str | None = None,
+    argv: Iterable[str] | None = None,
+    console: tcod.Console | None = None,
 ) -> Context:
     """Create a new context with the desired pixel size.
 
@@ -550,7 +551,7 @@ def new(
     argv_encoded = [ffi.new("char[]", arg.encode("utf-8")) for arg in argv]  # Needs to be kept alive for argv_c.
     argv_c = ffi.new("char*[]", argv_encoded)
 
-    catch_msg: List[str] = []
+    catch_msg: list[str] = []
     catch_handle = ffi.new_handle(catch_msg)  # Keep alive.
 
     title_p = _handle_title(title)  # Keep alive.
@@ -590,11 +591,11 @@ def new_window(
     width: int,
     height: int,
     *,
-    renderer: Optional[int] = None,
-    tileset: Optional[tcod.tileset.Tileset] = None,
+    renderer: int | None = None,
+    tileset: tcod.tileset.Tileset | None = None,
     vsync: bool = True,
-    sdl_window_flags: Optional[int] = None,
-    title: Optional[str] = None,
+    sdl_window_flags: int | None = None,
+    title: str | None = None,
 ) -> Context:
     """Create a new context with the desired pixel size.
 
@@ -617,11 +618,11 @@ def new_terminal(
     columns: int,
     rows: int,
     *,
-    renderer: Optional[int] = None,
-    tileset: Optional[tcod.tileset.Tileset] = None,
+    renderer: int | None = None,
+    tileset: tcod.tileset.Tileset | None = None,
     vsync: bool = True,
-    sdl_window_flags: Optional[int] = None,
-    title: Optional[str] = None,
+    sdl_window_flags: int | None = None,
+    title: str | None = None,
 ) -> Context:
     """Create a new context with the desired console size.
 
