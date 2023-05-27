@@ -29,7 +29,7 @@ Example::
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from typing_extensions import Final
 
@@ -72,8 +72,8 @@ class SDLConsoleRender:
         .. versionadded:: 13.7
         """
         self._renderer = atlas._renderer
-        self._cache_console: Optional[tcod.console.Console] = None
-        self._texture: Optional[tcod.sdl.render.Texture] = None
+        self._cache_console: tcod.console.Console | None = None
+        self._texture: tcod.sdl.render.Texture | None = None
 
     def render(self, console: tcod.console.Console) -> tcod.sdl.render.Texture:
         """Render a console to a cached Texture and then return the Texture.

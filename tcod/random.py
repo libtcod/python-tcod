@@ -11,7 +11,7 @@ from __future__ import annotations
 import os
 import random
 import warnings
-from typing import Any, Hashable, Optional
+from typing import Any, Hashable
 
 import tcod.constants
 from tcod.loader import ffi, lib
@@ -21,7 +21,7 @@ COMPLEMENTARY_MULTIPLY_WITH_CARRY = tcod.constants.RNG_CMWC
 MULTIPLY_WITH_CARRY = tcod.constants.RNG_CMWC
 
 
-class Random(object):
+class Random:
     """The libtcod random number generator.
 
     `algorithm` defaults to Mersenne Twister, it can be one of:
@@ -49,8 +49,8 @@ class Random(object):
     def __init__(
         self,
         algorithm: int = MERSENNE_TWISTER,
-        seed: Optional[Hashable] = None,
-    ):
+        seed: Hashable | None = None,
+    ) -> None:
         """Create a new instance using this algorithm and seed."""
         if seed is None:
             seed = random.getrandbits(32)

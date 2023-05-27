@@ -15,7 +15,7 @@ from __future__ import annotations
 import itertools
 from os import PathLike
 from pathlib import Path
-from typing import Any, Iterable, Optional, Tuple, Union
+from typing import Any, Iterable
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -42,7 +42,8 @@ class Tileset:
         """Return a new Tileset that owns the provided TCOD_Tileset* object."""
         self = object.__new__(cls)
         if cdata == ffi.NULL:
-            raise RuntimeError("Tileset initialized with nullptr.")
+            msg = "Tileset initialized with nullptr."
+            raise RuntimeError(msg)
         self._tileset_p = ffi.gc(cdata, lib.TCOD_tileset_delete)
         return self
 
@@ -63,7 +64,7 @@ class Tileset:
         return int(lib.TCOD_tileset_get_tile_height_(self._tileset_p))
 
     @property
-    def tile_shape(self) -> Tuple[int, int]:
+    def tile_shape(self) -> tuple[int, int]:
         """Shape (height, width) of the tile in pixels."""
         return self.tile_height, self.tile_width
 
@@ -80,7 +81,7 @@ class Tileset:
         uint8.  Note that most grey-scale tiles will only use the alpha
         channel and will usually have a solid white color channel.
         """
-        tile: NDArray[np.uint8] = np.zeros(self.tile_shape + (4,), dtype=np.uint8)
+        tile: NDArray[np.uint8] = np.zeros((*self.tile_shape, 4), dtype=np.uint8)
         lib.TCOD_tileset_get_tile_(
             self._tileset_p,
             codepoint,
@@ -88,7 +89,7 @@ class Tileset:
         )
         return tile
 
-    def set_tile(self, codepoint: int, tile: Union[ArrayLike, NDArray[np.uint8]]) -> None:
+    def set_tile(self, codepoint: int, tile: ArrayLike | NDArray[np.uint8]) -> None:
         """Upload a tile into this array.
 
         Args:
@@ -139,11 +140,11 @@ class Tileset:
         """
         tile = np.ascontiguousarray(tile, dtype=np.uint8)
         if tile.shape == self.tile_shape:
-            full_tile: NDArray[np.uint8] = np.empty(self.tile_shape + (4,), dtype=np.uint8)
+            full_tile: NDArray[np.uint8] = np.empty((*self.tile_shape, 4), dtype=np.uint8)
             full_tile[:, :, :3] = 255
             full_tile[:, :, 3] = tile
             return self.set_tile(codepoint, full_tile)
-        required = self.tile_shape + (4,)
+        required = (*self.tile_shape, 4)
         if tile.shape != required:
             note = ""
             if len(tile.shape) == 3 and tile.shape[2] == 3:
@@ -151,12 +152,14 @@ class Tileset:
                     "\nNote: An RGB array is too ambiguous,"
                     " an alpha channel must be added to this array to divide the background/foreground areas."
                 )
-            raise ValueError(f"Tile shape must be {required} or {self.tile_shape}, got {tile.shape}.{note}")
+            msg = f"Tile shape must be {required} or {self.tile_shape}, got {tile.shape}.{note}"
+            raise ValueError(msg)
         lib.TCOD_tileset_set_tile_(
             self._tileset_p,
             codepoint,
             ffi.from_buffer("struct TCOD_ColorRGBA*", tile),
         )
+        return None
 
     def render(self, console: tcod.console.Console) -> NDArray[np.uint8]:
         """Render an RGBA array, using console with this tileset.
@@ -170,7 +173,8 @@ class Tileset:
         .. versionadded:: 11.9
         """
         if not console:
-            raise ValueError("'console' must not be the root console.")
+            msg = "'console' must not be the root console."
+            raise ValueError(msg)
         width = console.width * self.tile_width
         height = console.height * self.tile_height
         out: NDArray[np.uint8] = np.empty((height, width, 4), np.uint8)
@@ -186,16 +190,15 @@ class Tileset:
             ),
             lib.SDL_FreeSurface,
         )
-        with surface_p:
-            with ffi.new("SDL_Surface**", surface_p) as surface_p_p:
-                _check(
-                    lib.TCOD_tileset_render_to_surface(
-                        self._tileset_p,
-                        _console(console),
-                        ffi.NULL,
-                        surface_p_p,
-                    )
+        with surface_p, ffi.new("SDL_Surface**", surface_p) as surface_p_p:
+            _check(
+                lib.TCOD_tileset_render_to_surface(
+                    self._tileset_p,
+                    _console(console),
+                    ffi.NULL,
+                    surface_p_p,
                 )
+            )
         return out
 
     def remap(self, codepoint: int, x: int, y: int = 0) -> None:
@@ -256,7 +259,7 @@ def set_default(tileset: Tileset) -> None:
     lib.TCOD_set_default_tileset(tileset._tileset_p)
 
 
-def load_truetype_font(path: Union[str, PathLike[str]], tile_width: int, tile_height: int) -> Tileset:
+def load_truetype_font(path: str | PathLike[str], tile_width: int, tile_height: int) -> Tileset:
     """Return a new Tileset from a `.ttf` or `.otf` file.
 
     Same as :any:`set_truetype_font`, but returns a :any:`Tileset` instead.
@@ -264,9 +267,7 @@ def load_truetype_font(path: Union[str, PathLike[str]], tile_width: int, tile_he
 
     This function is provisional.  The API may change.
     """
-    path = Path(path)
-    if not path.exists():
-        raise RuntimeError(f"File not found:\n\t{path.resolve()}")
+    path = Path(path).resolve(strict=True)
     cdata = lib.TCOD_load_truetype_font_(bytes(path), tile_width, tile_height)
     if not cdata:
         raise RuntimeError(ffi.string(lib.TCOD_get_error()))
@@ -274,7 +275,7 @@ def load_truetype_font(path: Union[str, PathLike[str]], tile_width: int, tile_he
 
 
 @deprecate("Accessing the default tileset is deprecated.")
-def set_truetype_font(path: Union[str, PathLike[str]], tile_width: int, tile_height: int) -> None:
+def set_truetype_font(path: str | PathLike[str], tile_width: int, tile_height: int) -> None:
     """Set the default tileset from a `.ttf` or `.otf` file.
 
     `path` is the file path for the font file.
@@ -294,14 +295,12 @@ def set_truetype_font(path: Union[str, PathLike[str]], tile_width: int, tile_hei
         This function does not support contexts.
         Use :any:`load_truetype_font` instead.
     """
-    path = Path(path)
-    if not path.exists():
-        raise RuntimeError(f"File not found:\n\t{path.resolve()}")
+    path = Path(path).resolve(strict=True)
     if lib.TCOD_tileset_load_truetype_(bytes(path), tile_width, tile_height):
         raise RuntimeError(ffi.string(lib.TCOD_get_error()))
 
 
-def load_bdf(path: Union[str, PathLike[str]]) -> Tileset:
+def load_bdf(path: str | PathLike[str]) -> Tileset:
     """Return a new Tileset from a `.bdf` file.
 
     For the best results the font should be monospace, cell-based, and
@@ -313,19 +312,15 @@ def load_bdf(path: Union[str, PathLike[str]]) -> Tileset:
     take effect when `tcod.console_init_root` is called.
 
     .. versionadded:: 11.10
-    """  # noqa: E501
-    path = Path(path)
-    if not path.exists():
-        raise RuntimeError(f"File not found:\n\t{path.resolve()}")
+    """
+    path = Path(path).resolve(strict=True)
     cdata = lib.TCOD_load_bdf(bytes(path))
     if not cdata:
         raise RuntimeError(ffi.string(lib.TCOD_get_error()).decode())
     return Tileset._claim(cdata)
 
 
-def load_tilesheet(
-    path: Union[str, PathLike[str]], columns: int, rows: int, charmap: Optional[Iterable[int]]
-) -> Tileset:
+def load_tilesheet(path: str | PathLike[str], columns: int, rows: int, charmap: Iterable[int] | None) -> Tileset:
     """Return a new Tileset from a simple tilesheet image.
 
     `path` is the file path to a PNG file with the tileset.
@@ -344,9 +339,7 @@ def load_tilesheet(
 
     .. versionadded:: 11.12
     """
-    path = Path(path)
-    if not path.exists():
-        raise RuntimeError(f"File not found:\n\t{path.resolve()}")
+    path = Path(path).resolve(strict=True)
     mapping = []
     if charmap is not None:
         mapping = list(itertools.islice(charmap, columns * rows))

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from pkgutil import extend_path
-from typing import Any, Callable, Tuple, TypeVar
+from typing import Any, Callable, TypeVar
 
 from tcod.loader import ffi, lib
 
@@ -51,34 +51,32 @@ if lib._sdl_log_output_function:
     lib.SDL_LogSetOutputFunction(lib._sdl_log_output_function, ffi.NULL)
 
 
-def _compiled_version() -> Tuple[int, int, int]:
+def _compiled_version() -> tuple[int, int, int]:
     return int(lib.SDL_MAJOR_VERSION), int(lib.SDL_MINOR_VERSION), int(lib.SDL_PATCHLEVEL)
 
 
-def _linked_version() -> Tuple[int, int, int]:
+def _linked_version() -> tuple[int, int, int]:
     sdl_version = ffi.new("SDL_version*")
     lib.SDL_GetVersion(sdl_version)
     return int(sdl_version.major), int(sdl_version.minor), int(sdl_version.patch)
 
 
-def _version_at_least(required: Tuple[int, int, int]) -> None:
+def _version_at_least(required: tuple[int, int, int]) -> None:
     """Raise an error if the compiled version is less than required.  Used to guard recently defined SDL functions."""
     if required <= _compiled_version():
         return
-    raise RuntimeError(
-        f"This feature requires SDL version {required}, but tcod was compiled with version {_compiled_version()}"
-    )
+    msg = f"This feature requires SDL version {required}, but tcod was compiled with version {_compiled_version()}"
+    raise RuntimeError(msg)
 
 
-def _required_version(required: Tuple[int, int, int]) -> Callable[[T], T]:
+def _required_version(required: tuple[int, int, int]) -> Callable[[T], T]:
     if not lib:  # Read the docs mock object.
         return lambda x: x
     if required <= _compiled_version():
         return lambda x: x
 
     def replacement(*_args: Any, **_kwargs: Any) -> Any:
-        raise RuntimeError(
-            f"This feature requires SDL version {required}, but tcod was compiled with version {_compiled_version()}"
-        )
+        msg = f"This feature requires SDL version {required}, but tcod was compiled with version {_compiled_version()}"
+        raise RuntimeError(msg)
 
     return lambda x: replacement  # type: ignore[return-value]

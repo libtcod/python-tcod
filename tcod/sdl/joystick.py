@@ -1,11 +1,11 @@
-"""SDL Joystick Support
+"""SDL Joystick Support.
 
 .. versionadded:: 13.8
 """
 from __future__ import annotations
 
 import enum
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any
 
 from typing_extensions import Final, Literal
 
@@ -13,7 +13,7 @@ import tcod.sdl.sys
 from tcod.loader import ffi, lib
 from tcod.sdl import _check, _check_p
 
-_HAT_DIRECTIONS: Dict[int, Tuple[Literal[-1, 0, 1], Literal[-1, 0, 1]]] = {
+_HAT_DIRECTIONS: dict[int, tuple[Literal[-1, 0, 1], Literal[-1, 0, 1]]] = {
     lib.SDL_HAT_CENTERED or 0: (0, 0),
     lib.SDL_HAT_UP or 0: (0, -1),
     lib.SDL_HAT_RIGHT or 0: (1, 0),
@@ -122,7 +122,7 @@ class Joystick:
         https://wiki.libsdl.org/CategoryJoystick
     """
 
-    def __init__(self, sdl_joystick_p: Any):
+    def __init__(self, sdl_joystick_p: Any) -> None:
         self.sdl_joystick_p: Final = sdl_joystick_p
         """The CFFI pointer to an SDL_Joystick struct."""
         self.axes: Final[int] = _check(lib.SDL_JoystickNumAxes(self.sdl_joystick_p))
@@ -173,7 +173,7 @@ class Joystick:
         """Return the raw value of `axis` in the range -32768 to 32767."""
         return int(lib.SDL_JoystickGetAxis(self.sdl_joystick_p, axis))
 
-    def get_ball(self, ball: int) -> Tuple[int, int]:
+    def get_ball(self, ball: int) -> tuple[int, int]:
         """Return the values (delta_x, delta_y) of `ball` since the last poll."""
         xy = ffi.new("int[2]")
         _check(lib.SDL_JoystickGetBall(ball, xy, xy + 1))
@@ -183,7 +183,7 @@ class Joystick:
         """Return True if `button` is currently held."""
         return bool(lib.SDL_JoystickGetButton(self.sdl_joystick_p, button))
 
-    def get_hat(self, hat: int) -> Tuple[Literal[-1, 0, 1], Literal[-1, 0, 1]]:
+    def get_hat(self, hat: int) -> tuple[Literal[-1, 0, 1], Literal[-1, 0, 1]]:
         """Return the direction of `hat` as (x, y).  With (-1, -1) being in the upper-left."""
         return _HAT_DIRECTIONS[lib.SDL_JoystickGetHat(self.sdl_joystick_p, hat)]
 
@@ -191,7 +191,7 @@ class Joystick:
 class GameController:
     """A standard interface for an Xbox 360 style game controller."""
 
-    def __init__(self, sdl_controller_p: Any):
+    def __init__(self, sdl_controller_p: Any) -> None:
         self.sdl_controller_p: Final = sdl_controller_p
         self.joystick: Final = Joystick(lib.SDL_GameControllerGetJoystick(self.sdl_controller_p))
         """The :any:`Joystick` associated with this controller."""
@@ -228,32 +228,32 @@ class GameController:
     # These could exist as convenience functions, but the get_X functions are probably better.
     @property
     def _left_x(self) -> int:
-        "Return the position of this axis. (-32768 to 32767)"
+        """Return the position of this axis (-32768 to 32767)."""
         return int(lib.SDL_GameControllerGetAxis(self.sdl_controller_p, lib.SDL_CONTROLLER_AXIS_LEFTX))
 
     @property
     def _left_y(self) -> int:
-        "Return the position of this axis. (-32768 to 32767)"
+        """Return the position of this axis (-32768 to 32767)."""
         return int(lib.SDL_GameControllerGetAxis(self.sdl_controller_p, lib.SDL_CONTROLLER_AXIS_LEFTY))
 
     @property
     def _right_x(self) -> int:
-        "Return the position of this axis. (-32768 to 32767)"
+        """Return the position of this axis (-32768 to 32767)."""
         return int(lib.SDL_GameControllerGetAxis(self.sdl_controller_p, lib.SDL_CONTROLLER_AXIS_RIGHTX))
 
     @property
     def _right_y(self) -> int:
-        "Return the position of this axis. (-32768 to 32767)"
+        """Return the position of this axis (-32768 to 32767)."""
         return int(lib.SDL_GameControllerGetAxis(self.sdl_controller_p, lib.SDL_CONTROLLER_AXIS_RIGHTY))
 
     @property
     def _trigger_left(self) -> int:
-        "Return the position of this trigger. (0 to 32767)"
+        """Return the position of this trigger (0 to 32767)."""
         return int(lib.SDL_GameControllerGetAxis(self.sdl_controller_p, lib.SDL_CONTROLLER_AXIS_TRIGGERLEFT))
 
     @property
     def _trigger_right(self) -> int:
-        "Return the position of this trigger. (0 to 32767)"
+        """Return the position of this trigger (0 to 32767)."""
         return int(lib.SDL_GameControllerGetAxis(self.sdl_controller_p, lib.SDL_CONTROLLER_AXIS_TRIGGERRIGHT))
 
     @property
@@ -312,7 +312,7 @@ class GameController:
         return bool(lib.SDL_GameControllerGetButton(self.sdl_controller_p, lib.SDL_CONTROLLER_BUTTON_RIGHTSHOULDER))
 
     @property
-    def _dpad(self) -> Tuple[Literal[-1, 0, 1], Literal[-1, 0, 1]]:
+    def _dpad(self) -> tuple[Literal[-1, 0, 1], Literal[-1, 0, 1]]:
         return (
             lib.SDL_GameControllerGetButton(self.sdl_controller_p, lib.SDL_CONTROLLER_BUTTON_DPAD_RIGHT)
             - lib.SDL_GameControllerGetButton(self.sdl_controller_p, lib.SDL_CONTROLLER_BUTTON_DPAD_LEFT),
@@ -362,12 +362,12 @@ def _get_number() -> int:
     return _check(lib.SDL_NumJoysticks())
 
 
-def get_joysticks() -> List[Joystick]:
+def get_joysticks() -> list[Joystick]:
     """Return a list of all connected joystick devices."""
     return [Joystick._open(i) for i in range(_get_number())]
 
 
-def get_controllers() -> List[GameController]:
+def get_controllers() -> list[GameController]:
     """Return a list of all connected game controllers.
 
     This ignores joysticks without a game controller mapping.
@@ -375,7 +375,7 @@ def get_controllers() -> List[GameController]:
     return [GameController._open(i) for i in range(_get_number()) if lib.SDL_IsGameController(i)]
 
 
-def _get_all() -> List[Union[Joystick, GameController]]:
+def _get_all() -> list[Joystick | GameController]:
     """Return a list of all connected joystick or controller devices.
 
     If the joystick has a controller mapping then it is returned as a :any:`GameController`.
@@ -384,7 +384,7 @@ def _get_all() -> List[Union[Joystick, GameController]]:
     return [GameController._open(i) if lib.SDL_IsGameController(i) else Joystick._open(i) for i in range(_get_number())]
 
 
-def joystick_event_state(new_state: Optional[bool] = None) -> bool:
+def joystick_event_state(new_state: bool | None = None) -> bool:
     """Check or set joystick event polling.
 
     .. seealso::
@@ -394,7 +394,7 @@ def joystick_event_state(new_state: Optional[bool] = None) -> bool:
     return bool(_check(lib.SDL_JoystickEventState(_OPTIONS[new_state])))
 
 
-def controller_event_state(new_state: Optional[bool] = None) -> bool:
+def controller_event_state(new_state: bool | None = None) -> bool:
     """Check or set game controller event polling.
 
     .. seealso::

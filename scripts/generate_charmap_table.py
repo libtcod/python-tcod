@@ -13,6 +13,8 @@ from tabulate import tabulate
 
 import tcod.tileset
 
+# ruff: noqa: INP001
+
 
 def get_charmaps() -> Iterator[str]:
     """Return an iterator of the current character maps from tcod.tilest."""
@@ -53,6 +55,7 @@ def generate_table(charmap: Iterable[int]) -> str:
 
 
 def main() -> None:
+    """Main entry point."""
     parser = argparse.ArgumentParser(
         description="Generate an RST table for a tcod character map.",
     )

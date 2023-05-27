@@ -168,7 +168,7 @@ class _PropagateException:
 class _CDataWrapper:
     """A generally deprecated CData wrapper class used by libtcodpy."""
 
-    def __init__(self, *args: Any, **kwargs: Any):  # noqa: ANN401
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
         self.cdata = self._get_cdata_from_args(*args, **kwargs)
         if self.cdata is None:
             self.cdata = ffi.NULL

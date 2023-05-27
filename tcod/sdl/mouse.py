@@ -9,7 +9,7 @@ You can also set the cursor icon to an OS-defined or custom icon.
 from __future__ import annotations
 
 import enum
-from typing import Any, Optional, Tuple, Union
+from typing import Any
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -23,11 +23,13 @@ from tcod.sdl import _check, _check_p
 class Cursor:
     """A cursor icon for use with :any:`set_cursor`."""
 
-    def __init__(self, sdl_cursor_p: Any):
+    def __init__(self, sdl_cursor_p: Any) -> None:
         if ffi.typeof(sdl_cursor_p) is not ffi.typeof("struct SDL_Cursor*"):
-            raise TypeError(f"Expected a {ffi.typeof('struct SDL_Cursor*')} type (was {ffi.typeof(sdl_cursor_p)}).")
+            msg = f"Expected a {ffi.typeof('struct SDL_Cursor*')} type (was {ffi.typeof(sdl_cursor_p)})."
+            raise TypeError(msg)
         if not sdl_cursor_p:
-            raise TypeError("C pointer must not be null.")
+            msg = "C pointer must not be null."
+            raise TypeError(msg)
         self.p = sdl_cursor_p
 
     def __eq__(self, other: Any) -> bool:
@@ -68,7 +70,7 @@ class SystemCursor(enum.IntEnum):
     """"""
 
 
-def new_cursor(data: NDArray[np.bool_], mask: NDArray[np.bool_], hot_xy: Tuple[int, int] = (0, 0)) -> Cursor:
+def new_cursor(data: NDArray[np.bool_], mask: NDArray[np.bool_], hot_xy: tuple[int, int] = (0, 0)) -> Cursor:
     """Return a new non-color Cursor from the provided parameters.
 
     Args:
@@ -81,9 +83,11 @@ def new_cursor(data: NDArray[np.bool_], mask: NDArray[np.bool_], hot_xy: Tuple[i
         https://wiki.libsdl.org/SDL_CreateCursor
     """
     if len(data.shape) != 2:
-        raise TypeError("Data and mask arrays must be 2D.")
+        msg = "Data and mask arrays must be 2D."
+        raise TypeError(msg)
     if data.shape != mask.shape:
-        raise TypeError("Data and mask arrays must have the same shape.")
+        msg = "Data and mask arrays must have the same shape."
+        raise TypeError(msg)
     height, width = data.shape
     data_packed = np.packbits(data, axis=0, bitorder="big")
     mask_packed = np.packbits(mask, axis=0, bitorder="big")
@@ -94,9 +98,8 @@ def new_cursor(data: NDArray[np.bool_], mask: NDArray[np.bool_], hot_xy: Tuple[i
     )
 
 
-def new_color_cursor(pixels: ArrayLike, hot_xy: Tuple[int, int]) -> Cursor:
-    """
-    Args:
+def new_color_cursor(pixels: ArrayLike, hot_xy: tuple[int, int]) -> Cursor:
+    """Args:
         pixels: A row-major array of RGB or RGBA pixels.
         hot_xy: The position of the pointer relative to the mouse sprite, starting from the upper-left at (0, 0).
 
@@ -116,7 +119,7 @@ def new_system_cursor(cursor: SystemCursor) -> Cursor:
     return Cursor._claim(lib.SDL_CreateSystemCursor(cursor))
 
 
-def set_cursor(cursor: Optional[Union[Cursor, SystemCursor]]) -> None:
+def set_cursor(cursor: Cursor | SystemCursor | None) -> None:
     """Change the active cursor to the one provided.
 
     Args:
@@ -134,7 +137,7 @@ def get_default_cursor() -> Cursor:
     return Cursor(_check_p(lib.SDL_GetDefaultCursor()))
 
 
-def get_cursor() -> Optional[Cursor]:
+def get_cursor() -> Cursor | None:
     """Return the active cursor, or None if these is no mouse."""
     cursor_p = lib.SDL_GetCursor()
     return Cursor(cursor_p) if cursor_p else None
@@ -214,7 +217,7 @@ def get_state() -> tcod.event.MouseState:
     return tcod.event.MouseState((xy[0], xy[1]), state=state)
 
 
-def get_focus() -> Optional[tcod.sdl.video.Window]:
+def get_focus() -> tcod.sdl.video.Window | None:
     """Return the window which currently has mouse focus."""
     window_p = lib.SDL_GetMouseFocus()
     return tcod.sdl.video.Window(window_p) if window_p else None

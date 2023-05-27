@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import enum
 import sys
-from typing import Any, Optional, Tuple
+from typing import Any
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -98,9 +98,11 @@ class _TempSurface:
     def __init__(self, pixels: ArrayLike) -> None:
         self._array: NDArray[np.uint8] = np.ascontiguousarray(pixels, dtype=np.uint8)
         if len(self._array.shape) != 3:
-            raise TypeError(f"NumPy shape must be 3D [y, x, ch] (got {self._array.shape})")
+            msg = f"NumPy shape must be 3D [y, x, ch] (got {self._array.shape})"
+            raise TypeError(msg)
         if not (3 <= self._array.shape[2] <= 4):
-            raise TypeError(f"NumPy array must have RGB or RGBA channels. (got {self._array.shape})")
+            msg = f"NumPy array must have RGB or RGBA channels. (got {self._array.shape})"
+            raise TypeError(msg)
         self.p = ffi.gc(
             lib.SDL_CreateRGBSurfaceFrom(
                 ffi.from_buffer("void*", self._array),
@@ -122,11 +124,13 @@ class Window:
 
     def __init__(self, sdl_window_p: Any) -> None:
         if ffi.typeof(sdl_window_p) is not ffi.typeof("struct SDL_Window*"):
-            raise TypeError(
-                "sdl_window_p must be %r type (was %r)." % (ffi.typeof("struct SDL_Window*"), ffi.typeof(sdl_window_p))
+            msg = "sdl_window_p must be {!r} type (was {!r}).".format(
+                ffi.typeof("struct SDL_Window*"), ffi.typeof(sdl_window_p)
             )
+            raise TypeError(msg)
         if not sdl_window_p:
-            raise TypeError("sdl_window_p can not be a null pointer.")
+            msg = "sdl_window_p can not be a null pointer."
+            raise TypeError(msg)
         self.p = sdl_window_p
 
     def __eq__(self, other: Any) -> bool:
@@ -142,7 +146,7 @@ class Window:
         lib.SDL_SetWindowIcon(self.p, surface.p)
 
     @property
-    def position(self) -> Tuple[int, int]:
+    def position(self) -> tuple[int, int]:
         """Get or set the (x, y) position of the window.
 
         This attribute can be set the move the window.
@@ -153,12 +157,12 @@ class Window:
         return xy[0], xy[1]
 
     @position.setter
-    def position(self, xy: Tuple[int, int]) -> None:
+    def position(self, xy: tuple[int, int]) -> None:
         x, y = xy
         lib.SDL_SetWindowPosition(self.p, x, y)
 
     @property
-    def size(self) -> Tuple[int, int]:
+    def size(self) -> tuple[int, int]:
         """Get or set the pixel (width, height) of the window client area.
 
         This attribute can be set to change the size of the window but the given size must be greater than (1, 1) or
@@ -169,32 +173,33 @@ class Window:
         return xy[0], xy[1]
 
     @size.setter
-    def size(self, xy: Tuple[int, int]) -> None:
+    def size(self, xy: tuple[int, int]) -> None:
         if any(i <= 0 for i in xy):
-            raise ValueError(f"Window size must be greater than zero, not {xy}")
+            msg = f"Window size must be greater than zero, not {xy}"
+            raise ValueError(msg)
         x, y = xy
         lib.SDL_SetWindowSize(self.p, x, y)
 
     @property
-    def min_size(self) -> Tuple[int, int]:
+    def min_size(self) -> tuple[int, int]:
         """Get or set this windows minimum client area."""
         xy = ffi.new("int[2]")
         lib.SDL_GetWindowMinimumSize(self.p, xy, xy + 1)
         return xy[0], xy[1]
 
     @min_size.setter
-    def min_size(self, xy: Tuple[int, int]) -> None:
+    def min_size(self, xy: tuple[int, int]) -> None:
         lib.SDL_SetWindowMinimumSize(self.p, xy[0], xy[1])
 
     @property
-    def max_size(self) -> Tuple[int, int]:
+    def max_size(self) -> tuple[int, int]:
         """Get or set this windows maximum client area."""
         xy = ffi.new("int[2]")
         lib.SDL_GetWindowMaximumSize(self.p, xy, xy + 1)
         return xy[0], xy[1]
 
     @max_size.setter
-    def max_size(self, xy: Tuple[int, int]) -> None:
+    def max_size(self, xy: tuple[int, int]) -> None:
         lib.SDL_SetWindowMaximumSize(self.p, xy[0], xy[1])
 
     @property
@@ -242,7 +247,7 @@ class Window:
         lib.SDL_SetWindowResizable(self.p, value)
 
     @property
-    def border_size(self) -> Tuple[int, int, int, int]:
+    def border_size(self) -> tuple[int, int, int, int]:
         """Get the (top, left, bottom, right) size of the window decorations around the client area.
 
         If this fails or the window doesn't have decorations yet then the value will be (0, 0, 0, 0).
@@ -283,7 +288,7 @@ class Window:
         lib.SDL_SetWindowGrab(self.p, value)
 
     @property
-    def mouse_rect(self) -> Optional[Tuple[int, int, int, int]]:
+    def mouse_rect(self) -> tuple[int, int, int, int] | None:
         """Get or set the mouse confinement area when the window has mouse focus.
 
         Setting this will not automatically grab the cursor.
@@ -295,7 +300,7 @@ class Window:
         return (rect.x, rect.y, rect.w, rect.h) if rect else None
 
     @mouse_rect.setter
-    def mouse_rect(self, rect: Optional[Tuple[int, int, int, int]]) -> None:
+    def mouse_rect(self, rect: tuple[int, int, int, int] | None) -> None:
         _version_at_least((2, 0, 18))
         _check(lib.SDL_SetWindowMouseRect(self.p, (rect,) if rect else ffi.NULL))
 
@@ -333,9 +338,9 @@ def new_window(
     width: int,
     height: int,
     *,
-    x: Optional[int] = None,
-    y: Optional[int] = None,
-    title: Optional[str] = None,
+    x: int | None = None,
+    y: int | None = None,
+    title: str | None = None,
     flags: int = 0,
 ) -> Window:
     """Initialize and return a new SDL Window.
@@ -366,13 +371,13 @@ def new_window(
     return Window(_check_p(window_p))
 
 
-def get_grabbed_window() -> Optional[Window]:
+def get_grabbed_window() -> Window | None:
     """Return the window which has input grab enabled, if any."""
     sdl_window_p = lib.SDL_GetGrabbedWindow()
     return Window(sdl_window_p) if sdl_window_p else None
 
 
-def screen_saver_allowed(allow: Optional[bool] = None) -> bool:
+def screen_saver_allowed(allow: bool | None = None) -> bool:
     """Allow or prevent a screen saver from being displayed and return the current allowed status.
 
     If `allow` is `None` then only the current state is returned.

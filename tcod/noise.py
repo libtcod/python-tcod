@@ -30,12 +30,12 @@ Example::
            [ 92,  35,  33,  71,  90],
            [ 76,  54,  85, 144, 164],
            [ 63,  94, 159, 209, 203]], dtype=uint8)
-"""  # noqa: E501
+"""
 from __future__ import annotations
 
 import enum
 import warnings
-from typing import Any, List, Optional, Sequence, Tuple, Union
+from typing import Any, Sequence
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -43,7 +43,6 @@ from typing_extensions import Literal
 
 import tcod.constants
 import tcod.random
-from tcod._internal import deprecate
 from tcod.loader import ffi, lib
 
 
@@ -92,14 +91,15 @@ def __getattr__(name: str) -> Implementation:
     if name in Implementation.__members__:
         warnings.warn(
             f"'tcod.noise.{name}' is deprecated," f" use 'tcod.noise.Implementation.{name}' instead.",
-            DeprecationWarning,
+            FutureWarning,
             stacklevel=2,
         )
         return Implementation[name]
-    raise AttributeError(f"module {__name__} has no attribute {name}")
+    msg = f"module {__name__} has no attribute {name}"
+    raise AttributeError(msg)
 
 
-class Noise(object):
+class Noise:
     """A configurable noise sampler.
 
     The ``hurst`` exponent describes the raggedness of the resultant noise,
@@ -130,10 +130,11 @@ class Noise(object):
         hurst: float = 0.5,
         lacunarity: float = 2.0,
         octaves: float = 4,
-        seed: Optional[Union[int, tcod.random.Random]] = None,
-    ):
+        seed: int | tcod.random.Random | None = None,
+    ) -> None:
         if not 0 < dimensions <= 4:
-            raise ValueError("dimensions must be in range 0 < n <= 4, got %r" % (dimensions,))
+            msg = f"dimensions must be in range 0 < n <= 4, got {dimensions}"
+            raise ValueError(msg)
         self._seed = seed
         self._random = self.__rng_from_seed(seed)
         _random_c = self._random.random_c
@@ -149,7 +150,7 @@ class Noise(object):
         self.implementation = implementation  # sanity check
 
     @staticmethod
-    def __rng_from_seed(seed: Union[None, int, tcod.random.Random]) -> tcod.random.Random:
+    def __rng_from_seed(seed: None | int | tcod.random.Random) -> tcod.random.Random:
         if seed is None or isinstance(seed, int):
             return tcod.random.Random(seed=seed, algorithm=tcod.random.MERSENNE_TWISTER)
         return seed
@@ -175,11 +176,6 @@ class Noise(object):
         return int(self._tdl_noise_c.dimensions)
 
     @property
-    @deprecate("This is a misspelling of 'dimensions'.", FutureWarning)
-    def dimentions(self) -> int:
-        return self.dimensions
-
-    @property
     def algorithm(self) -> int:
         noise_type = self.noise_c.noise_type
         return Algorithm(noise_type) if noise_type else Algorithm.SIMPLEX
@@ -195,7 +191,8 @@ class Noise(object):
     @implementation.setter
     def implementation(self, value: int) -> None:
         if not 0 <= value < 3:
-            raise ValueError("%r is not a valid implementation. " % (value,))
+            msg = f"{value!r} is not a valid implementation. "
+            raise ValueError(msg)
         self._tdl_noise_c.implementation = value
 
     @property
@@ -242,7 +239,8 @@ class Noise(object):
         c_input = [ffi.NULL, ffi.NULL, ffi.NULL, ffi.NULL]
         for i, index in enumerate(indexes):
             if index.dtype.type == np.object_:
-                raise TypeError("Index arrays can not be of dtype np.object_.")
+                msg = "Index arrays can not be of dtype np.object_."
+                raise TypeError(msg)
             indexes[i] = np.ascontiguousarray(index, dtype=np.float32)
             c_input[i] = ffi.from_buffer("float*", indexes[i])
 
@@ -296,12 +294,12 @@ class Noise(object):
         """
         mgrid = np.ascontiguousarray(mgrid, np.float32)
         if mgrid.shape[0] != self.dimensions:
-            raise ValueError(
-                "mgrid.shape[0] must equal self.dimensions, " "%r[0] != %r" % (mgrid.shape, self.dimensions)
-            )
+            msg = f"mgrid.shape[0] must equal self.dimensions, {mgrid.shape!r}[0] != {self.dimensions!r}"
+            raise ValueError(msg)
         out: np.ndarray[Any, np.dtype[np.float32]] = np.ndarray(mgrid.shape[1:], np.float32)
         if mgrid.shape[1:] != out.shape:
-            raise ValueError("mgrid.shape[1:] must equal out.shape, " "%r[1:] != %r" % (mgrid.shape, out.shape))
+            msg = f"mgrid.shape[1:] must equal out.shape, {mgrid.shape!r}[1:] != {out.shape!r}"
+            raise ValueError(msg)
         lib.NoiseSampleMeshGrid(
             self._tdl_noise_c,
             out.size,
@@ -323,8 +321,9 @@ class Noise(object):
             The ``dtype`` is `numpy.float32`.
         """
         if len(ogrid) != self.dimensions:
-            raise ValueError("len(ogrid) must equal self.dimensions, " "%r != %r" % (len(ogrid), self.dimensions))
-        ogrids: List[NDArray[np.float32]] = [np.ascontiguousarray(array, np.float32) for array in ogrid]
+            msg = f"len(ogrid) must equal self.dimensions, {len(ogrid)!r} != {self.dimensions!r}"
+            raise ValueError(msg)
+        ogrids: list[NDArray[np.float32]] = [np.ascontiguousarray(array, np.float32) for array in ogrid]
         out: np.ndarray[Any, np.dtype[np.float32]] = np.ndarray([array.size for array in ogrids], np.float32)
         lib.NoiseSampleOpenMeshGrid(
             self._tdl_noise_c,
@@ -335,7 +334,7 @@ class Noise(object):
         )
         return out
 
-    def __getstate__(self) -> Any:
+    def __getstate__(self) -> dict[str, Any]:
         state = self.__dict__.copy()
         if self.dimensions < 4 and self.noise_c.waveletTileData == ffi.NULL:
             # Trigger a side effect of wavelet, so that copies will be synced.
@@ -366,7 +365,7 @@ class Noise(object):
         }
         return state
 
-    def __setstate__(self, state: Any) -> None:
+    def __setstate__(self, state: dict[str, Any]) -> None:
         if isinstance(state, tuple):  # deprecated format
             return self._setstate_old(state)
         # unpack wavelet tile data if it exists
@@ -384,6 +383,7 @@ class Noise(object):
         state["_tdl_noise_c"]["noise"] = state["noise_c"]
         state["_tdl_noise_c"] = ffi.new("TDLNoise*", state["_tdl_noise_c"])
         self.__dict__.update(state)
+        return None
 
     def _setstate_old(self, state: Any) -> None:
         self._random = state[0]
@@ -403,11 +403,11 @@ class Noise(object):
 
 
 def grid(
-    shape: Tuple[int, ...],
-    scale: Union[Tuple[float, ...], float],
-    origin: Optional[Tuple[int, ...]] = None,
+    shape: tuple[int, ...],
+    scale: tuple[float, ...] | float,
+    origin: tuple[int, ...] | None = None,
     indexing: Literal["ij", "xy"] = "xy",
-) -> Tuple[NDArray[Any], ...]:
+) -> tuple[NDArray[Any], ...]:
     """Generate a mesh-grid of sample points to use with noise sampling.
 
     Args:
@@ -444,14 +444,16 @@ def grid(
               dtype=float32)
 
     .. versionadded:: 12.2
-    """  # noqa: E501
+    """
     if isinstance(scale, float):
         scale = (scale,) * len(shape)
     if origin is None:
         origin = (0,) * len(shape)
     if len(shape) != len(scale):
-        raise TypeError("shape must have the same length as scale")
+        msg = "shape must have the same length as scale"
+        raise TypeError(msg)
     if len(shape) != len(origin):
-        raise TypeError("shape must have the same length as origin")
+        msg = "shape must have the same length as origin"
+        raise TypeError(msg)
     indexes = (np.arange(i_shape) * i_scale + i_origin for i_shape, i_scale, i_origin in zip(shape, scale, origin))
     return tuple(np.meshgrid(*indexes, copy=False, sparse=True, indexing=indexing))

@@ -1,7 +1,7 @@
 """This modules holds functions for NumPy-based line of sight algorithms."""
 from __future__ import annotations
 
-from typing import Any, Tuple
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
@@ -9,7 +9,7 @@ from numpy.typing import NDArray
 from tcod.loader import ffi, lib
 
 
-def bresenham(start: Tuple[int, int], end: Tuple[int, int]) -> NDArray[np.intc]:
+def bresenham(start: tuple[int, int], end: tuple[int, int]) -> NDArray[np.intc]:
     """Return a thin Bresenham line as a NumPy array of shape (length, 2).
 
     `start` and `end` are the endpoints of the line.

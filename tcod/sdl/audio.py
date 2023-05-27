@@ -47,7 +47,7 @@ import enum
 import sys
 import threading
 import time
-from typing import Any, Callable, Dict, Hashable, Iterator, List, Optional, Tuple, Union
+from typing import Any, Callable, Hashable, Iterator
 
 import numpy as np
 from numpy.typing import ArrayLike, DTypeLike, NDArray
@@ -116,8 +116,9 @@ def convert_audio(
     in_array: NDArray[Any] = np.asarray(in_sound)
     if len(in_array.shape) == 1:
         in_array = in_array[:, np.newaxis]
-    if not len(in_array.shape) == 2:
-        raise TypeError(f"Expected a 1 or 2 ndim input, got {in_array.shape} instead.")
+    if len(in_array.shape) != 2:
+        msg = f"Expected a 1 or 2 ndim input, got {in_array.shape} instead."
+        raise TypeError(msg)
     cvt = ffi.new("SDL_AudioCVT*")
     in_channels = in_array.shape[1]
     in_format = _get_format(in_array.dtype)
@@ -150,7 +151,7 @@ class AudioDevice:
         device_id: int,
         capture: bool,
         spec: Any,  # SDL_AudioSpec*
-    ):
+    ) -> None:
         assert device_id >= 0
         assert ffi.typeof(spec) is ffi.typeof("SDL_AudioSpec*")
         assert spec
@@ -172,20 +173,22 @@ class AudioDevice:
         """The size of the audio buffer in samples."""
         self.buffer_bytes: Final[int] = int(spec.size)
         """The size of the audio buffer in bytes."""
-        self._handle: Optional[Any] = None
+        self._handle: Any | None = None
         self._callback: Callable[[AudioDevice, NDArray[Any]], None] = self.__default_callback
 
     @property
     def callback(self) -> Callable[[AudioDevice, NDArray[Any]], None]:
         """If the device was opened with a callback enabled, then you may get or set the callback with this attribute."""
         if self._handle is None:
-            raise TypeError("This AudioDevice was opened without a callback.")
+            msg = "This AudioDevice was opened without a callback."
+            raise TypeError(msg)
         return self._callback
 
     @callback.setter
     def callback(self, new_callback: Callable[[AudioDevice, NDArray[Any]], None]) -> None:
         if self._handle is None:
-            raise TypeError("This AudioDevice was opened without a callback.")
+            msg = "This AudioDevice was opened without a callback."
+            raise TypeError(msg)
         self._callback = new_callback
 
     @property
@@ -209,7 +212,8 @@ class AudioDevice:
 
     def _verify_array_format(self, samples: NDArray[Any]) -> NDArray[Any]:
         if samples.dtype != self.format:
-            raise TypeError(f"Expected an array of dtype {self.format}, got {samples.dtype} instead.")
+            msg = f"Expected an array of dtype {self.format}, got {samples.dtype} instead."
+            raise TypeError(msg)
         return samples
 
     def _convert_array(self, samples_: ArrayLike) -> NDArray[Any]:
@@ -220,7 +224,7 @@ class AudioDevice:
             samples = samples[:, np.newaxis]
         return np.ascontiguousarray(np.broadcast_to(samples, (samples.shape[0], self.channels)), dtype=self.format)
 
-    def convert(self, sound: ArrayLike, rate: Optional[int] = None) -> NDArray[Any]:
+    def convert(self, sound: ArrayLike, rate: int | None = None) -> NDArray[Any]:
         """Convert an audio sample into a format supported by this device.
 
         Returns the converted array.  This might be a reference to the input array if no conversion was needed.
@@ -290,7 +294,7 @@ class AudioDevice:
 
 
 class _LoopSoundFunc:
-    def __init__(self, sound: NDArray[Any], loops: int, on_end: Optional[Callable[[Channel], None]]):
+    def __init__(self, sound: NDArray[Any], loops: int, on_end: Callable[[Channel], None] | None) -> None:
         self.sound = sound
         self.loops = loops
         self.on_end = on_end
@@ -316,9 +320,9 @@ class Channel:
 
     def __init__(self) -> None:
         self._lock = threading.RLock()
-        self.volume: Union[float, Tuple[float, ...]] = 1.0
-        self.sound_queue: List[NDArray[Any]] = []
-        self.on_end_callback: Optional[Callable[[Channel], None]] = None
+        self.volume: float | tuple[float, ...] = 1.0
+        self.sound_queue: list[NDArray[Any]] = []
+        self.on_end_callback: Callable[[Channel], None] | None = None
 
     @property
     def busy(self) -> bool:
@@ -329,9 +333,9 @@ class Channel:
         self,
         sound: ArrayLike,
         *,
-        volume: Union[float, Tuple[float, ...]] = 1.0,
+        volume: float | tuple[float, ...] = 1.0,
         loops: int = 0,
-        on_end: Optional[Callable[[Channel], None]] = None,
+        on_end: Callable[[Channel], None] | None = None,
     ) -> None:
         """Play an audio sample, stopping any audio currently playing on this channel.
 
@@ -392,8 +396,8 @@ class BasicMixer(threading.Thread):
     .. versionadded:: 13.6
     """
 
-    def __init__(self, device: AudioDevice):
-        self.channels: Dict[Hashable, Channel] = {}
+    def __init__(self, device: AudioDevice) -> None:
+        self.channels: dict[Hashable, Channel] = {}
         assert device.format == np.float32
         super().__init__(daemon=True)
         self.device = device
@@ -445,9 +449,9 @@ class BasicMixer(threading.Thread):
         self,
         sound: ArrayLike,
         *,
-        volume: Union[float, Tuple[float, ...]] = 1.0,
+        volume: float | tuple[float, ...] = 1.0,
         loops: int = 0,
-        on_end: Optional[Callable[[Channel], None]] = None,
+        on_end: Callable[[Channel], None] | None = None,
     ) -> Channel:
         """Play a sound, return the channel the sound is playing on.
 
@@ -525,7 +529,7 @@ class AllowedChanges(enum.IntFlag):
 
 
 def open(
-    name: Optional[str] = None,
+    name: str | None = None,
     capture: bool = False,
     *,
     frequency: int = 44100,
@@ -534,7 +538,7 @@ def open(
     samples: int = 0,
     allowed_changes: AllowedChanges = AllowedChanges.NONE,
     paused: bool = False,
-    callback: Union[None, Literal[True], Callable[[AudioDevice, NDArray[Any]], None]] = None,
+    callback: None | Literal[True] | Callable[[AudioDevice, NDArray[Any]], None] = None,
 ) -> AudioDevice:
     """Open an audio device for playback or capture and return it.
 

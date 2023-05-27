@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 import enum
-from typing import Any, Optional, Tuple, Union
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
@@ -168,14 +168,14 @@ class Texture:
     def __eq__(self, other: Any) -> bool:
         return bool(self.p == getattr(other, "p", None))
 
-    def _query(self) -> Tuple[int, int, int, int]:
+    def _query(self) -> tuple[int, int, int, int]:
         """Return (format, access, width, height)."""
         format = ffi.new("uint32_t*")
         buffer = ffi.new("int[3]")
         lib.SDL_QueryTexture(self.p, format, buffer, buffer + 1, buffer + 2)
         return int(format[0]), int(buffer[0]), int(buffer[1]), int(buffer[2])
 
-    def update(self, pixels: NDArray[Any], rect: Optional[Tuple[int, int, int, int]] = None) -> None:
+    def update(self, pixels: NDArray[Any], rect: tuple[int, int, int, int] | None = None) -> None:
         """Update the pixel data of this texture.
 
         .. versionadded:: 13.5
@@ -214,14 +214,14 @@ class Texture:
         _check(lib.SDL_SetTextureBlendMode(self.p, value))
 
     @property
-    def color_mod(self) -> Tuple[int, int, int]:
+    def color_mod(self) -> tuple[int, int, int]:
         """Texture RGB color modulate values, can be set."""
         rgb = ffi.new("uint8_t[3]")
         _check(lib.SDL_GetTextureColorMod(self.p, rgb, rgb + 1, rgb + 2))
         return int(rgb[0]), int(rgb[1]), int(rgb[2])
 
     @color_mod.setter
-    def color_mod(self, rgb: Tuple[int, int, int]) -> None:
+    def color_mod(self, rgb: tuple[int, int, int]) -> None:
         _check(lib.SDL_SetTextureColorMod(self.p, rgb[0], rgb[1], rgb[2]))
 
 
@@ -244,9 +244,11 @@ class Renderer:
 
     def __init__(self, sdl_renderer_p: Any) -> None:
         if ffi.typeof(sdl_renderer_p) is not ffi.typeof("struct SDL_Renderer*"):
-            raise TypeError(f"Expected a {ffi.typeof('struct SDL_Window*')} type (was {ffi.typeof(sdl_renderer_p)}).")
+            msg = f"Expected a {ffi.typeof('struct SDL_Window*')} type (was {ffi.typeof(sdl_renderer_p)})."
+            raise TypeError(msg)
         if not sdl_renderer_p:
-            raise TypeError("C pointer must not be null.")
+            msg = "C pointer must not be null."
+            raise TypeError(msg)
         self.p = sdl_renderer_p
 
     def __eq__(self, other: Any) -> bool:
@@ -255,10 +257,10 @@ class Renderer:
     def copy(
         self,
         texture: Texture,
-        source: Optional[Tuple[float, float, float, float]] = None,
-        dest: Optional[Tuple[float, float, float, float]] = None,
+        source: tuple[float, float, float, float] | None = None,
+        dest: tuple[float, float, float, float] | None = None,
         angle: float = 0,
-        center: Optional[Tuple[float, float]] = None,
+        center: tuple[float, float] | None = None,
         flip: RendererFlip = RendererFlip.NONE,
     ) -> None:
         """Copy a texture to the rendering target.
@@ -297,9 +299,7 @@ class Renderer:
         _check(lib.SDL_SetRenderTarget(self.p, texture.p))
         return restore
 
-    def new_texture(
-        self, width: int, height: int, *, format: Optional[int] = None, access: Optional[int] = None
-    ) -> Texture:
+    def new_texture(self, width: int, height: int, *, format: int | None = None, access: int | None = None) -> Texture:
         """Allocate and return a new Texture for this renderer.
 
         Args:
@@ -316,9 +316,7 @@ class Renderer:
         texture_p = ffi.gc(lib.SDL_CreateTexture(self.p, format, access, width, height), lib.SDL_DestroyTexture)
         return Texture(texture_p, self.p)
 
-    def upload_texture(
-        self, pixels: NDArray[Any], *, format: Optional[int] = None, access: Optional[int] = None
-    ) -> Texture:
+    def upload_texture(self, pixels: NDArray[Any], *, format: int | None = None, access: int | None = None) -> Texture:
         """Return a new Texture from an array of pixels.
 
         Args:
@@ -335,7 +333,8 @@ class Renderer:
             elif pixels.shape[2] == 3:
                 format = int(lib.SDL_PIXELFORMAT_RGB24)
             else:
-                raise TypeError(f"Can't determine the format required for an array of shape {pixels.shape}.")
+                msg = f"Can't determine the format required for an array of shape {pixels.shape}."
+                raise TypeError(msg)
 
         texture = self.new_texture(pixels.shape[1], pixels.shape[0], format=format, access=access)
         if not pixels[0].flags["C_CONTIGUOUS"]:
@@ -346,7 +345,7 @@ class Renderer:
         return texture
 
     @property
-    def draw_color(self) -> Tuple[int, int, int, int]:
+    def draw_color(self) -> tuple[int, int, int, int]:
         """Get or set the active RGBA draw color for this renderer.
 
         .. versionadded:: 13.5
@@ -356,7 +355,7 @@ class Renderer:
         return tuple(rgba)  # type: ignore[return-value]
 
     @draw_color.setter
-    def draw_color(self, rgba: Tuple[int, int, int, int]) -> None:
+    def draw_color(self, rgba: tuple[int, int, int, int]) -> None:
         _check(lib.SDL_SetRenderDrawColor(self.p, *rgba))
 
     @property
@@ -374,7 +373,7 @@ class Renderer:
         _check(lib.SDL_SetRenderDrawBlendMode(self.p, value))
 
     @property
-    def output_size(self) -> Tuple[int, int]:
+    def output_size(self) -> tuple[int, int]:
         """Get the (width, height) pixel resolution of the rendering context.
 
         .. seealso::
@@ -387,7 +386,7 @@ class Renderer:
         return out[0], out[1]
 
     @property
-    def clip_rect(self) -> Optional[Tuple[int, int, int, int]]:
+    def clip_rect(self) -> tuple[int, int, int, int] | None:
         """Get or set the clipping rectangle of this renderer.
 
         Set to None to disable clipping.
@@ -401,7 +400,7 @@ class Renderer:
         return rect.x, rect.y, rect.w, rect.h
 
     @clip_rect.setter
-    def clip_rect(self, rect: Optional[Tuple[int, int, int, int]]) -> None:
+    def clip_rect(self, rect: tuple[int, int, int, int] | None) -> None:
         rect_p = ffi.NULL if rect is None else ffi.new("SDL_Rect*", rect)
         _check(lib.SDL_RenderSetClipRect(self.p, rect_p))
 
@@ -421,7 +420,7 @@ class Renderer:
         _check(lib.SDL_RenderSetIntegerScale(self.p, enable))
 
     @property
-    def logical_size(self) -> Tuple[int, int]:
+    def logical_size(self) -> tuple[int, int]:
         """Get or set a device independent (width, height) resolution.
 
         Might be (0, 0) if a resolution was never assigned.
@@ -436,11 +435,11 @@ class Renderer:
         return out[0], out[1]
 
     @logical_size.setter
-    def logical_size(self, size: Tuple[int, int]) -> None:
+    def logical_size(self, size: tuple[int, int]) -> None:
         _check(lib.SDL_RenderSetLogicalSize(self.p, *size))
 
     @property
-    def scale(self) -> Tuple[float, float]:
+    def scale(self) -> tuple[float, float]:
         """Get or set an (x_scale, y_scale) multiplier for drawing.
 
         .. seealso::
@@ -453,11 +452,11 @@ class Renderer:
         return out[0], out[1]
 
     @scale.setter
-    def scale(self, scale: Tuple[float, float]) -> None:
+    def scale(self, scale: tuple[float, float]) -> None:
         _check(lib.SDL_RenderSetScale(self.p, *scale))
 
     @property
-    def viewport(self) -> Optional[Tuple[int, int, int, int]]:
+    def viewport(self) -> tuple[int, int, int, int] | None:
         """Get or set the drawing area for the current rendering target.
 
         .. seealso::
@@ -470,7 +469,7 @@ class Renderer:
         return rect.x, rect.y, rect.w, rect.h
 
     @viewport.setter
-    def viewport(self, rect: Optional[Tuple[int, int, int, int]]) -> None:
+    def viewport(self, rect: tuple[int, int, int, int] | None) -> None:
         _check(lib.SDL_RenderSetViewport(self.p, (rect,)))
 
     @_required_version((2, 0, 18))
@@ -554,35 +553,35 @@ class Renderer:
         """
         _check(lib.SDL_RenderClear(self.p))
 
-    def fill_rect(self, rect: Tuple[float, float, float, float]) -> None:
+    def fill_rect(self, rect: tuple[float, float, float, float]) -> None:
         """Fill a rectangle with :any:`draw_color`.
 
         .. versionadded:: 13.5
         """
         _check(lib.SDL_RenderFillRectF(self.p, (rect,)))
 
-    def draw_rect(self, rect: Tuple[float, float, float, float]) -> None:
+    def draw_rect(self, rect: tuple[float, float, float, float]) -> None:
         """Draw a rectangle outline.
 
         .. versionadded:: 13.5
         """
         _check(lib.SDL_RenderDrawRectF(self.p, (rect,)))
 
-    def draw_point(self, xy: Tuple[float, float]) -> None:
+    def draw_point(self, xy: tuple[float, float]) -> None:
         """Draw a point.
 
         .. versionadded:: 13.5
         """
         _check(lib.SDL_RenderDrawPointF(self.p, (xy,)))
 
-    def draw_line(self, start: Tuple[float, float], end: Tuple[float, float]) -> None:
+    def draw_line(self, start: tuple[float, float], end: tuple[float, float]) -> None:
         """Draw a single line.
 
         .. versionadded:: 13.5
         """
         _check(lib.SDL_RenderDrawLineF(self.p, *start, *end))
 
-    def fill_rects(self, rects: NDArray[Union[np.intc, np.float32]]) -> None:
+    def fill_rects(self, rects: NDArray[np.intc | np.float32]) -> None:
         """Fill multiple rectangles from an array.
 
         .. versionadded:: 13.5
@@ -595,9 +594,10 @@ class Renderer:
         elif rects.dtype == np.float32:
             _check(lib.SDL_RenderFillRectsF(self.p, tcod.ffi.from_buffer("SDL_FRect*", rects), rects.shape[0]))
         else:
-            raise TypeError(f"Array must be an np.intc or np.float32 type, got {rects.dtype}.")
+            msg = f"Array must be an np.intc or np.float32 type, got {rects.dtype}."
+            raise TypeError(msg)
 
-    def draw_rects(self, rects: NDArray[Union[np.intc, np.float32]]) -> None:
+    def draw_rects(self, rects: NDArray[np.intc | np.float32]) -> None:
         """Draw multiple outlined rectangles from an array.
 
         .. versionadded:: 13.5
@@ -610,9 +610,10 @@ class Renderer:
         elif rects.dtype == np.float32:
             _check(lib.SDL_RenderDrawRectsF(self.p, tcod.ffi.from_buffer("SDL_FRect*", rects), rects.shape[0]))
         else:
-            raise TypeError(f"Array must be an np.intc or np.float32 type, got {rects.dtype}.")
+            msg = f"Array must be an np.intc or np.float32 type, got {rects.dtype}."
+            raise TypeError(msg)
 
-    def draw_points(self, points: NDArray[Union[np.intc, np.float32]]) -> None:
+    def draw_points(self, points: NDArray[np.intc | np.float32]) -> None:
         """Draw an array of points.
 
         .. versionadded:: 13.5
@@ -625,9 +626,10 @@ class Renderer:
         elif points.dtype == np.float32:
             _check(lib.SDL_RenderDrawRectsF(self.p, tcod.ffi.from_buffer("SDL_FPoint*", points), points.shape[0]))
         else:
-            raise TypeError(f"Array must be an np.intc or np.float32 type, got {points.dtype}.")
+            msg = f"Array must be an np.intc or np.float32 type, got {points.dtype}."
+            raise TypeError(msg)
 
-    def draw_lines(self, points: NDArray[Union[np.intc, np.float32]]) -> None:
+    def draw_lines(self, points: NDArray[np.intc | np.float32]) -> None:
         """Draw a connected series of lines from an array.
 
         .. versionadded:: 13.5
@@ -640,16 +642,17 @@ class Renderer:
         elif points.dtype == np.float32:
             _check(lib.SDL_RenderDrawRectsF(self.p, tcod.ffi.from_buffer("SDL_FPoint*", points), points.shape[0] - 1))
         else:
-            raise TypeError(f"Array must be an np.intc or np.float32 type, got {points.dtype}.")
+            msg = f"Array must be an np.intc or np.float32 type, got {points.dtype}."
+            raise TypeError(msg)
 
     @_required_version((2, 0, 18))
     def geometry(
         self,
-        texture: Optional[Texture],
+        texture: Texture | None,
         xy: NDArray[np.float32],
         color: NDArray[np.uint8],
         uv: NDArray[np.float32],
-        indices: Optional[NDArray[Union[np.uint8, np.uint16, np.uint32]]] = None,
+        indices: NDArray[np.uint8 | np.uint16 | np.uint32] | None = None,
     ) -> None:
         """Render triangles from texture and vertex data.
 
@@ -695,7 +698,7 @@ class Renderer:
 def new_renderer(
     window: tcod.sdl.video.Window,
     *,
-    driver: Optional[int] = None,
+    driver: int | None = None,
     software: bool = False,
     vsync: bool = True,
     target_textures: bool = False,

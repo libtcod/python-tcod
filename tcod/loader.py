@@ -5,7 +5,7 @@ import os
 import platform
 import sys
 from pathlib import Path
-from typing import Any  # noqa: F401
+from typing import Any
 
 import cffi
 
@@ -54,7 +54,7 @@ if sys.platform == "win32":
     os.environ["PATH"] = f"""{Path(__file__).parent / get_architecture()}{os.pathsep}{os.environ["PATH"]}"""
 
 
-class _Mock(object):
+class _Mock:
     """Mock object needed for ReadTheDocs."""
 
     @staticmethod
@@ -64,7 +64,6 @@ class _Mock(object):
 
     def __getattr__(self, attr: str) -> None:
         """Return None on any attribute."""
-        return None
 
     def __bool__(self) -> bool:
         """Allow checking for this mock object at import time."""
@@ -80,7 +79,7 @@ if os.environ.get("READTHEDOCS"):
     lib = ffi = _Mock()
 else:
     verify_dependencies()
-    from tcod._libtcod import ffi, lib  # type: ignore # noqa: F401
+    from tcod._libtcod import ffi, lib  # type: ignore
 
     __sdl_version__ = get_sdl_version()
 

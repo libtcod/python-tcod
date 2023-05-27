@@ -20,13 +20,12 @@ from __future__ import annotations
 import functools
 import itertools
 import warnings
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from typing_extensions import Literal
 
-import tcod.map  # noqa: F401
 from tcod._internal import _check
 from tcod.loader import ffi, lib
 
@@ -65,7 +64,7 @@ def _get_path_cost_func(
     return ffi.cast("TCOD_path_func_t", ffi.addressof(lib, name))  # type: ignore
 
 
-class _EdgeCostFunc(object):
+class _EdgeCostFunc:
     """Generic edge-cost function factory.
 
     `userdata` is the custom userdata to send to the C call.
@@ -75,16 +74,16 @@ class _EdgeCostFunc(object):
 
     _CALLBACK_P = lib._pycall_path_old
 
-    def __init__(self, userdata: Any, shape: Tuple[int, int]) -> None:
+    def __init__(self, userdata: Any, shape: tuple[int, int]) -> None:
         self._userdata = userdata
         self.shape = shape
 
-    def get_tcod_path_ffi(self) -> Tuple[Any, Any, Tuple[int, int]]:
+    def get_tcod_path_ffi(self) -> tuple[Any, Any, tuple[int, int]]:
         """Return (C callback, userdata handle, shape)."""
         return self._CALLBACK_P, ffi.new_handle(self._userdata), self.shape
 
     def __repr__(self) -> str:
-        return "%s(%r, shape=%r)" % (
+        return "{}({!r}, shape={!r})".format(
             self.__class__.__name__,
             self._userdata,
             self.shape,
@@ -109,10 +108,10 @@ class EdgeCostCallback(_EdgeCostFunc):
     def __init__(
         self,
         callback: Callable[[int, int, int, int], float],
-        shape: Tuple[int, int],
-    ):
+        shape: tuple[int, int],
+    ) -> None:
         self.callback = callback
-        super(EdgeCostCallback, self).__init__(callback, shape)
+        super().__init__(callback, shape)
 
 
 class NodeCostArray(np.ndarray):  # type: ignore
@@ -139,16 +138,15 @@ class NodeCostArray(np.ndarray):  # type: ignore
         return self
 
     def __repr__(self) -> str:
-        return "%s(%r)" % (
-            self.__class__.__name__,
-            repr(self.view(np.ndarray)),
-        )
+        return f"{self.__class__.__name__}({repr(self.view(np.ndarray))!r})"
 
-    def get_tcod_path_ffi(self) -> Tuple[Any, Any, Tuple[int, int]]:
+    def get_tcod_path_ffi(self) -> tuple[Any, Any, tuple[int, int]]:
         if len(self.shape) != 2:
-            raise ValueError("Array must have a 2d shape, shape is %r" % (self.shape,))
+            msg = f"Array must have a 2d shape, shape is {self.shape!r}"
+            raise ValueError(msg)
         if self.dtype.type not in self._C_ARRAY_CALLBACKS:
-            raise ValueError("dtype must be one of %r, dtype is %r" % (self._C_ARRAY_CALLBACKS.keys(), self.dtype.type))
+            msg = f"dtype must be one of {self._C_ARRAY_CALLBACKS.keys()!r}, dtype is {self.dtype.type!r}"
+            raise ValueError(msg)
 
         array_type, callback = self._C_ARRAY_CALLBACKS[self.dtype.type]
         userdata = ffi.new(
@@ -158,10 +156,10 @@ class NodeCostArray(np.ndarray):  # type: ignore
         return callback, userdata, (self.shape[0], self.shape[1])
 
 
-class _PathFinder(object):
+class _PathFinder:
     """A class sharing methods used by AStar and Dijkstra."""
 
-    def __init__(self, cost: Any, diagonal: float = 1.41):
+    def __init__(self, cost: Any, diagonal: float = 1.41) -> None:
         self.cost = cost
         self.diagonal = diagonal
         self._path_c: Any = None
@@ -198,11 +196,7 @@ class _PathFinder(object):
         )
 
     def __repr__(self) -> str:
-        return "%s(cost=%r, diagonal=%r)" % (
-            self.__class__.__name__,
-            self.cost,
-            self.diagonal,
-        )
+        return f"{self.__class__.__name__}(cost={self.cost!r}, diagonal={self.diagonal!r})"
 
     def __getstate__(self) -> Any:
         state = self.__dict__.copy()
@@ -222,14 +216,15 @@ class _PathFinder(object):
 
 
 class AStar(_PathFinder):
-    """
+    """The older libtcod A* pathfinder.
+
     Args:
         cost (Union[tcod.map.Map, numpy.ndarray, Any]):
         diagonal (float): Multiplier for diagonal movement.
             A value of 0 will disable diagonal movement entirely.
     """
 
-    def get_path(self, start_x: int, start_y: int, goal_x: int, goal_y: int) -> List[Tuple[int, int]]:
+    def get_path(self, start_x: int, start_y: int, goal_x: int, goal_y: int) -> list[tuple[int, int]]:
         """Return a list of (x, y) steps to reach the goal point, if possible.
 
         Args:
@@ -237,6 +232,7 @@ class AStar(_PathFinder):
             start_y (int): Starting Y position.
             goal_x (int): Destination X position.
             goal_y (int): Destination Y position.
+
         Returns:
             List[Tuple[int, int]]:
                 A list of points, or an empty list if there is no valid path.
@@ -251,7 +247,8 @@ class AStar(_PathFinder):
 
 
 class Dijkstra(_PathFinder):
-    """
+    """The older libtcod Dijkstra pathfinder.
+
     Args:
         cost (Union[tcod.map.Map, numpy.ndarray, Any]):
         diagonal (float): Multiplier for diagonal movement.
@@ -266,7 +263,7 @@ class Dijkstra(_PathFinder):
         """Set the goal point and recompute the Dijkstra path-finder."""
         lib.TCOD_dijkstra_compute(self._path_c, x, y)
 
-    def get_path(self, x: int, y: int) -> List[Tuple[int, int]]:
+    def get_path(self, x: int, y: int) -> list[tuple[int, int]]:
         """Return a list of (x, y) steps to reach the goal point, if possible."""
         lib.TCOD_dijkstra_path_set(self._path_c, x, y)
         path = []
@@ -292,7 +289,7 @@ _INT_TYPES = {
 
 
 def maxarray(
-    shape: Tuple[int, ...],
+    shape: tuple[int, ...],
     dtype: Any = np.int32,
     order: Literal["C", "F"] = "C",
 ) -> NDArray[Any]:
@@ -314,10 +311,11 @@ def maxarray(
     return np.full(shape, np.iinfo(dtype).max, dtype, order)
 
 
-def _export_dict(array: NDArray[Any]) -> Dict[str, Any]:
+def _export_dict(array: NDArray[Any]) -> dict[str, Any]:
     """Convert a NumPy array into a format compatible with CFFI."""
     if array.dtype.type not in _INT_TYPES:
-        raise TypeError("dtype was %s, but must be one of %s." % (array.dtype.type, tuple(_INT_TYPES.keys())))
+        msg = f"dtype was {array.dtype.type}, but must be one of {tuple(_INT_TYPES.keys())}."
+        raise TypeError(msg)
     return {
         "type": _INT_TYPES[array.dtype.type],
         "ndim": array.ndim,
@@ -332,7 +330,7 @@ def _export(array: NDArray[Any]) -> Any:
     return ffi.new("struct NArray*", _export_dict(array))
 
 
-def _compile_cost_edges(edge_map: Any) -> Tuple[Any, int]:
+def _compile_cost_edges(edge_map: Any) -> tuple[Any, int]:
     """Return an edge_cost array using an integer map."""
     edge_map = np.array(edge_map, copy=True)
     if edge_map.ndim != 2:
@@ -353,11 +351,11 @@ def _compile_cost_edges(edge_map: Any) -> Tuple[Any, int]:
 def dijkstra2d(
     distance: ArrayLike,
     cost: ArrayLike,
-    cardinal: Optional[int] = None,
-    diagonal: Optional[int] = None,
+    cardinal: int | None = None,
+    diagonal: int | None = None,
     *,
     edge_map: Any = None,
-    out: Optional[np.ndarray] = ...,  # type: ignore
+    out: np.ndarray | None = ...,  # type: ignore
 ) -> NDArray[Any]:
     """Return the computed distance of all nodes on a 2D Dijkstra grid.
 
@@ -491,14 +489,17 @@ def dijkstra2d(
         out[...] = dist
 
     if dist.shape != out.shape:
-        raise TypeError("distance and output must have the same shape %r != %r" % (dist.shape, out.shape))
+        msg = f"distance and output must have the same shape {dist.shape!r} != {out.shape!r}"
+        raise TypeError(msg)
     cost = np.asarray(cost)
     if dist.shape != cost.shape:
-        raise TypeError("output and cost must have the same shape %r != %r" % (out.shape, cost.shape))
+        msg = f"output and cost must have the same shape {out.shape!r} != {cost.shape!r}"
+        raise TypeError(msg)
     c_dist = _export(out)
     if edge_map is not None:
         if cardinal is not None or diagonal is not None:
-            raise TypeError("`edge_map` can not be set at the same time as" " `cardinal` or `diagonal`.")
+            msg = "`edge_map` can not be set at the same time as `cardinal` or `diagonal`."
+            raise TypeError(msg)
         c_edges, n_edges = _compile_cost_edges(edge_map)
         _check(lib.dijkstra2d(c_dist, _export(cost), n_edges, c_edges))
     else:
@@ -510,7 +511,7 @@ def dijkstra2d(
     return out
 
 
-def _compile_bool_edges(edge_map: ArrayLike) -> Tuple[Any, int]:
+def _compile_bool_edges(edge_map: ArrayLike) -> tuple[Any, int]:
     """Return an edge array using a boolean map."""
     edge_map = np.array(edge_map, copy=True)
     edge_center = edge_map.shape[0] // 2, edge_map.shape[1] // 2
@@ -522,9 +523,9 @@ def _compile_bool_edges(edge_map: ArrayLike) -> Tuple[Any, int]:
 
 def hillclimb2d(
     distance: ArrayLike,
-    start: Tuple[int, int],
-    cardinal: Optional[bool] = None,
-    diagonal: Optional[bool] = None,
+    start: tuple[int, int],
+    cardinal: bool | None = None,
+    diagonal: bool | None = None,
     *,
     edge_map: Any = None,
 ) -> NDArray[Any]:
@@ -562,11 +563,13 @@ def hillclimb2d(
     x, y = start
     dist: NDArray[Any] = np.asarray(distance)
     if not (0 <= x < dist.shape[0] and 0 <= y < dist.shape[1]):
-        raise IndexError("Starting point %r not in shape %r" % (start, dist.shape))
+        msg = f"Starting point {start!r} not in shape {dist.shape!r}"
+        raise IndexError(msg)
     c_dist = _export(dist)
     if edge_map is not None:
         if cardinal is not None or diagonal is not None:
-            raise TypeError("`edge_map` can not be set at the same time as" " `cardinal` or `diagonal`.")
+            msg = "`edge_map` can not be set at the same time as `cardinal` or `diagonal`."
+            raise TypeError(msg)
         c_edges, n_edges = _compile_bool_edges(edge_map)
         func = functools.partial(lib.hillclimb2d, c_dist, x, y, n_edges, c_edges)
     else:
@@ -578,7 +581,7 @@ def hillclimb2d(
     return path
 
 
-def _world_array(shape: Tuple[int, ...], dtype: Any = np.int32) -> NDArray[Any]:
+def _world_array(shape: tuple[int, ...], dtype: Any = np.int32) -> NDArray[Any]:
     """Return an array where ``ij == arr[ij]``."""
     return np.ascontiguousarray(
         np.transpose(
@@ -592,7 +595,7 @@ def _world_array(shape: Tuple[int, ...], dtype: Any = np.int32) -> NDArray[Any]:
     )
 
 
-def _as_hashable(obj: Optional[np.ndarray[Any, Any]]) -> Optional[Any]:
+def _as_hashable(obj: np.ndarray[Any, Any] | None) -> Any | None:
     """Return NumPy arrays as a more hashable form."""
     if obj is None:
         return obj
@@ -661,18 +664,19 @@ class CustomGraph:
         Added the `order` parameter.
     """
 
-    def __init__(self, shape: Tuple[int, ...], *, order: str = "C"):
+    def __init__(self, shape: tuple[int, ...], *, order: str = "C") -> None:
         self._shape = self._shape_c = tuple(shape)
         self._ndim = len(self._shape)
         self._order = order
         if self._order == "F":
             self._shape_c = self._shape_c[::-1]
         if not 0 < self._ndim <= 4:
-            raise TypeError("Graph dimensions must be 1 <= n <= 4.")
-        self._graph: Dict[Tuple[Any, ...], Dict[str, Any]] = {}
-        self._edge_rules_keep_alive: List[Any] = []
+            msg = "Graph dimensions must be 1 <= n <= 4."
+            raise TypeError(msg)
+        self._graph: dict[tuple[Any, ...], dict[str, Any]] = {}
+        self._edge_rules_keep_alive: list[Any] = []
         self._edge_rules_p: Any = None
-        self._heuristic: Optional[Tuple[int, int, int, int]] = None
+        self._heuristic: tuple[int, int, int, int] | None = None
 
     @property
     def ndim(self) -> int:
@@ -680,17 +684,17 @@ class CustomGraph:
         return self._ndim
 
     @property
-    def shape(self) -> Tuple[int, ...]:
+    def shape(self) -> tuple[int, ...]:
         """Return the shape of this graph."""
         return self._shape
 
     def add_edge(
         self,
-        edge_dir: Tuple[int, ...],
+        edge_dir: tuple[int, ...],
         edge_cost: int = 1,
         *,
         cost: NDArray[Any],
-        condition: Optional[ArrayLike] = None,
+        condition: ArrayLike | None = None,
     ) -> None:
         """Add a single edge rule.
 
@@ -742,20 +746,23 @@ class CustomGraph:
         but bidirectional edges are not a requirement for the graph.
         One directional edges such as pits can be added which will
         only allow movement outwards from the root nodes of the pathfinder.
-        """  # noqa: E501
+        """
         self._edge_rules_p = None
         edge_dir = tuple(edge_dir)
         cost = np.asarray(cost)
         if len(edge_dir) != self._ndim:
             raise TypeError("edge_dir must have exactly %i items, got %r" % (self._ndim, edge_dir))
         if edge_cost <= 0:
-            raise ValueError("edge_cost must be greater than zero, got %r" % (edge_cost,))
+            msg = f"edge_cost must be greater than zero, got {edge_cost!r}"
+            raise ValueError(msg)
         if cost.shape != self._shape:
-            raise TypeError("cost array must be shape %r, got %r" % (self._shape, cost.shape))
+            msg = f"cost array must be shape {self._shape!r}, got {cost.shape!r}"
+            raise TypeError(msg)
         if condition is not None:
             condition = np.asarray(condition)
             if condition.shape != self._shape:
-                raise TypeError("condition array must be shape %r, got %r" % (self._shape, condition.shape))
+                msg = f"condition array must be shape {self._shape!r}, got {condition.shape!r}"
+                raise TypeError(msg)
         if self._order == "F":
             # Inputs need to be converted to C.
             edge_dir = edge_dir[::-1]
@@ -772,7 +779,7 @@ class CustomGraph:
             }
             if condition is not None:
                 rule["condition"] = condition
-        edge = edge_dir + (edge_cost,)
+        edge = (*edge_dir, edge_cost)
         if edge not in rule["edge_list"]:
             rule["edge_list"].append(edge)
 
@@ -781,7 +788,7 @@ class CustomGraph:
         *,
         edge_map: ArrayLike,
         cost: NDArray[Any],
-        condition: Optional[ArrayLike] = None,
+        condition: ArrayLike | None = None,
     ) -> None:
         """Add a rule with multiple edges.
 
@@ -943,13 +950,15 @@ class CustomGraph:
         that's because those nodes are only partially evaluated, but
         pathfinding to those nodes will work correctly as long as the heuristic
         isn't greedy.
-        """  # noqa: E501
+        """
         if 0 == cardinal == diagonal == z == w:
             self._heuristic = None
         if diagonal and cardinal > diagonal:
-            raise ValueError("Diagonal parameter can not be lower than cardinal.")
+            msg = "Diagonal parameter can not be lower than cardinal."
+            raise ValueError(msg)
         if cardinal < 0 or diagonal < 0 or z < 0 or w < 0:
-            raise ValueError("Parameters can not be set to negative values..")
+            msg = "Parameters can not be set to negative values."
+            raise ValueError(msg)
         self._heuristic = (cardinal, diagonal, z, w)
 
     def _compile_rules(self) -> Any:
@@ -1022,12 +1031,14 @@ class SimpleGraph:
     .. versionadded:: 11.15
     """
 
-    def __init__(self, *, cost: ArrayLike, cardinal: int, diagonal: int, greed: int = 1):
+    def __init__(self, *, cost: ArrayLike, cardinal: int, diagonal: int, greed: int = 1) -> None:
         cost = np.asarray(cost)
         if cost.ndim != 2:
-            raise TypeError("The cost array must e 2 dimensional, array of shape %r given." % (cost.shape,))
+            msg = f"The cost array must e 2 dimensional, array of shape {cost.shape!r} given."
+            raise TypeError(msg)
         if greed <= 0:
-            raise ValueError("Greed must be greater than zero, got %r" % (greed,))
+            msg = f"Greed must be greater than zero, got {greed}"
+            raise ValueError(msg)
         edge_map = (
             (diagonal, cardinal, diagonal),
             (cardinal, 0, cardinal),
@@ -1046,11 +1057,11 @@ class SimpleGraph:
         return 2
 
     @property
-    def shape(self) -> Tuple[int, int]:
+    def shape(self) -> tuple[int, int]:
         return self._shape
 
     @property
-    def _heuristic(self) -> Optional[Tuple[int, int, int, int]]:
+    def _heuristic(self) -> tuple[int, int, int, int] | None:
         return self._subgraph._heuristic
 
     def set_heuristic(self, *, cardinal: int, diagonal: int) -> None:
@@ -1079,7 +1090,7 @@ class Pathfinder:
     .. versionadded:: 11.13
     """
 
-    def __init__(self, graph: Union[CustomGraph, SimpleGraph]):
+    def __init__(self, graph: CustomGraph | SimpleGraph) -> None:
         self._graph = graph
         self._order = graph._order
         self._frontier_p = ffi.gc(lib.TCOD_frontier_new(self._graph._ndim), lib.TCOD_frontier_delete)
@@ -1087,7 +1098,7 @@ class Pathfinder:
         self._travel = _world_array(self._graph._shape_c)
         self._distance_p = _export(self._distance)
         self._travel_p = _export(self._travel)
-        self._heuristic: Optional[Tuple[int, int, int, int, Tuple[int, ...]]] = None
+        self._heuristic: tuple[int, int, int, int, tuple[int, ...]] | None = None
         self._heuristic_p: Any = ffi.NULL
 
     @property
@@ -1161,7 +1172,7 @@ class Pathfinder:
         self._travel = _world_array(self._graph._shape_c)
         lib.TCOD_frontier_clear(self._frontier_p)
 
-    def add_root(self, index: Tuple[int, ...], value: int = 0) -> None:
+    def add_root(self, index: tuple[int, ...], value: int = 0) -> None:
         """Add a root node and insert it into the pathfinder frontier.
 
         `index` is the root point to insert.  The length of `index` must match
@@ -1179,7 +1190,7 @@ class Pathfinder:
         self._update_heuristic(None)
         lib.TCOD_frontier_push(self._frontier_p, index, value, value)
 
-    def _update_heuristic(self, goal_ij: Optional[Tuple[int, ...]]) -> bool:
+    def _update_heuristic(self, goal_ij: tuple[int, ...] | None) -> bool:
         """Update the active heuristic.  Return True if the heuristic changed."""
         if goal_ij is None:
             heuristic = None
@@ -1212,7 +1223,7 @@ class Pathfinder:
         self._update_heuristic(None)
         _check(lib.rebuild_frontier_from_distance(self._frontier_p, self._distance_p))
 
-    def resolve(self, goal: Optional[Tuple[int, ...]] = None) -> None:
+    def resolve(self, goal: tuple[int, ...] | None = None) -> None:
         """Manually run the pathfinder algorithm.
 
         The :any:`path_from` and :any:`path_to` methods will automatically
@@ -1270,7 +1281,7 @@ class Pathfinder:
         self._update_heuristic(goal)
         self._graph._resolve(self)
 
-    def path_from(self, index: Tuple[int, ...]) -> NDArray[Any]:
+    def path_from(self, index: tuple[int, ...]) -> NDArray[Any]:
         """Return the shortest path from `index` to the nearest root.
 
         The returned array is of shape `(length, ndim)` where `length` is the
@@ -1303,7 +1314,7 @@ class Pathfinder:
             >>> pf.path_from((4, 4))[1:].tolist()  # Exclude the starting point so that a blocked path is an empty list.
             []
 
-        """  # noqa: E501
+        """
         index = tuple(index)  # Check for bad input.
         if len(index) != self._graph._ndim:
             raise TypeError("Index must be %i items, got %r" % (self._distance.ndim, index))
@@ -1322,7 +1333,7 @@ class Pathfinder:
         )
         return path[:, ::-1] if self._order == "F" else path
 
-    def path_to(self, index: Tuple[int, ...]) -> NDArray[Any]:
+    def path_to(self, index: tuple[int, ...]) -> NDArray[Any]:
         """Return the shortest path from the nearest root to `index`.
 
         See :any:`path_from`.
@@ -1346,5 +1357,5 @@ class Pathfinder:
             [[1, 1], [2, 2], [3, 3]]
             >>> pf.path_to((0, 0))[1:].tolist()  # Exclude the starting point so that a blocked path is an empty list.
             []
-        """  # noqa: E501
+        """
         return self.path_from(index)[::-1]

@@ -1,11 +1,8 @@
-"""libtcod map attributes and field-of-view functions.
-
-
-"""
+"""libtcod map attributes and field-of-view functions."""
 from __future__ import annotations
 
 import warnings
-from typing import Any, Tuple
+from typing import Any
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -16,7 +13,7 @@ import tcod.constants
 from tcod.loader import ffi, lib
 
 
-class Map(object):
+class Map:
     """A map containing libtcod attributes.
 
     .. versionchanged:: 4.1
@@ -77,7 +74,7 @@ class Map(object):
         width: int,
         height: int,
         order: Literal["C", "F"] = "C",
-    ):
+    ) -> None:
         warnings.warn(
             "This class may perform poorly and is no longer needed.",
             DeprecationWarning,
@@ -140,15 +137,15 @@ class Map(object):
         """
         if not (0 <= x < self.width and 0 <= y < self.height):
             warnings.warn(
-                "Index (%r, %r) is outside of this maps shape (%r, %r)."
-                "\nThis will raise an error in future versions." % (x, y, self.width, self.height),
+                "Index ({}, {}) is outside of this maps shape ({}, {})."
+                "\nThis will raise an error in future versions.".format(x, y, self.width, self.height),
                 RuntimeWarning,
                 stacklevel=2,
             )
 
         lib.TCOD_map_compute_fov(self.map_c, x, y, radius, light_walls, algorithm)
 
-    def __setstate__(self, state: Any) -> None:
+    def __setstate__(self, state: dict[str, Any]) -> None:
         if "_Map__buffer" not in state:  # deprecated
             # remove this check on major version update
             self.__buffer = np.zeros((state["height"], state["width"], 3), dtype=np.bool_)
@@ -157,12 +154,10 @@ class Map(object):
             self.__buffer[:, :, 2] = state["buffer"] & 0x04
             del state["buffer"]
             state["_order"] = "F"
-        if "_order" not in state:  # remove this check on major version update
-            raise RuntimeError("This Map was saved with a bad version of tdl.")
         self.__dict__.update(state)
         self.map_c = self.__as_cdata()
 
-    def __getstate__(self) -> Any:
+    def __getstate__(self) -> dict[str, Any]:
         state = self.__dict__.copy()
         del state["map_c"]
         return state
@@ -170,7 +165,7 @@ class Map(object):
 
 def compute_fov(
     transparency: ArrayLike,
-    pov: Tuple[int, int],
+    pov: tuple[int, int],
     radius: int = 0,
     light_walls: bool = True,
     algorithm: int = tcod.constants.FOV_RESTRICTIVE,
@@ -240,14 +235,12 @@ def compute_fov(
     if len(transparency.shape) != 2:
         raise TypeError("transparency must be an array of 2 dimensions" " (shape is %r)" % transparency.shape)
     if isinstance(pov, int):
-        raise TypeError(
-            "The tcod.map.compute_fov function has changed.  The `x` and `y`"
-            " parameters should now be given as a single tuple."
-        )
+        msg = "The tcod.map.compute_fov function has changed.  The `x` and `y` parameters should now be given as a single tuple."
+        raise TypeError(msg)
     if not (0 <= pov[0] < transparency.shape[0] and 0 <= pov[1] < transparency.shape[1]):
         warnings.warn(
-            "Given pov index %r is outside the array of shape %r."
-            "\nThis will raise an error in future versions." % (pov, transparency.shape),
+            "Given pov index {!r} is outside the array of shape {!r}."
+            "\nThis will raise an error in future versions.".format(pov, transparency.shape),
             RuntimeWarning,
             stacklevel=2,
         )

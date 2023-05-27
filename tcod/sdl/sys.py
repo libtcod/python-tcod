@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import enum
 import warnings
-from typing import Any, Tuple
+from typing import Any
 
 from tcod.loader import ffi, lib
 from tcod.sdl import _check, _get_error
@@ -56,7 +56,7 @@ class _PowerState(enum.IntEnum):
     CHARGED = enum.auto()
 
 
-def _get_power_info() -> Tuple[_PowerState, int, int]:
+def _get_power_info() -> tuple[_PowerState, int, int]:
     buffer = ffi.new("int[2]")
     power_state = _PowerState(lib.SDL_GetPowerInfo(buffer, buffer + 1))
     seconds_of_power = buffer[0]
@@ -68,7 +68,7 @@ def _get_clipboard() -> str:
     """Return the text of the clipboard."""
     text = str(ffi.string(lib.SDL_GetClipboardText()), encoding="utf-8")
     if not text:  # Show the reason for an empty return, this should probably be logged instead.
-        warnings.warn(f"Return string is empty because: {_get_error()}")
+        warnings.warn(f"Return string is empty because: {_get_error()}", RuntimeWarning, stacklevel=2)
     return text
 
 

@@ -1,5 +1,4 @@
-"""
-Libtcod consoles are a strictly tile-based representation of text and color.
+"""Libtcod consoles are a strictly tile-based representation of text and color.
 To render a console you need a tileset and a window to render to.
 See :ref:`getting-started` for info on how to set those up.
 """
@@ -117,7 +116,7 @@ class Console:
         height: int,
         order: Literal["C", "F"] = "C",
         buffer: NDArray[Any] | None = None,
-    ):
+    ) -> None:
         self._key_color: tuple[int, int, int] | None = None
         self._order = tcod._internal.verify_order(order)
         if buffer is not None:
