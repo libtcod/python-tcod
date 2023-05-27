@@ -6,9 +6,16 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 ## [Unreleased]
 ### Added
 - Added PathLike support to more libtcodpy functions.
+- New `tcod.sdl.mouse.show` function for querying or setting mouse visibility.
+
+### Deprecated
+- Deprecated the libtcodpy functions for images and noise generators.
 
 ### Removed
 - `tcod.console_set_custom_font` can no longer take bytes.
+
+### Fixed
+- Fix `tcod.sdl.mouse.warp_in_window` function.
 
 ## [15.0.3] - 2023-05-25
 ### Deprecated

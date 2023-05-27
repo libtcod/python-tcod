@@ -18,7 +18,12 @@ import numpy as np
 from numpy.typing import NDArray
 
 import tcod
+import tcod.constants
+import tcod.event
+import tcod.libtcodpy
+import tcod.noise
 import tcod.render
+import tcod.sdl.mouse
 import tcod.sdl.render
 
 # ruff: noqa: S311
@@ -48,7 +53,7 @@ context: tcod.context.Context
 tileset: tcod.tileset.Tileset
 console_render: tcod.render.SDLConsoleRender  # Optional SDL renderer.
 sample_minimap: tcod.sdl.render.Texture  # Optional minimap texture.
-root_console = tcod.Console(80, 50, order="F")
+root_console = tcod.console.Console(80, 50, order="F")
 sample_console = tcod.console.Console(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT, order="F")
 cur_sample = 0  # Current selected sample.
 frame_times = [time.perf_counter()]
@@ -191,7 +196,7 @@ class OffscreenConsoleSample(Sample):
             "You can render to an offscreen console and blit in on another " "one, simulating alpha transparency.",
             fg=WHITE,
             bg=None,
-            alignment=tcod.CENTER,
+            alignment=tcod.constants.CENTER,
         )
 
     def on_enter(self) -> None:
@@ -245,8 +250,8 @@ class LineDrawingSample(Sample):
 
     def __init__(self) -> None:
         self.name = "Line drawing"
-        self.mk_flag = tcod.BKGND_SET
-        self.bk_flag = tcod.BKGND_SET
+        self.mk_flag = tcod.constants.BKGND_SET
+        self.bk_flag = tcod.constants.BKGND_SET
 
         self.bk = tcod.console.Console(sample_console.width, sample_console.height, order="F")
         # initialize the colored background
@@ -291,7 +296,7 @@ class LineDrawingSample(Sample):
         yd = int(sample_console.height // 2 - sin_angle * sample_console.width // 2)
         # draw the line
         # in python the easiest way is to use the line iterator
-        for x, y in tcod.line_iter(xo, yo, xd, yd):
+        for x, y in tcod.los.bresenham((xo, yo), (xd, yd)).tolist():
             if 0 <= x < sample_console.width and 0 <= y < sample_console.height:
                 tcod.console_set_char_background(sample_console, x, y, LIGHT_BLUE, self.bk_flag)
         sample_console.print(
@@ -359,10 +364,10 @@ class NoiseSample(Sample):
         self.dy = 0.0
         self.octaves = 4.0
         self.zoom = 3.0
-        self.hurst = tcod.NOISE_DEFAULT_HURST
-        self.lacunarity = tcod.NOISE_DEFAULT_LACUNARITY
+        self.hurst = tcod.libtcodpy.NOISE_DEFAULT_HURST
+        self.lacunarity = tcod.libtcodpy.NOISE_DEFAULT_LACUNARITY
         self.noise = self.get_noise()
-        self.img = tcod.image_new(SAMPLE_SCREEN_WIDTH * 2, SAMPLE_SCREEN_HEIGHT * 2)
+        self.img = tcod.image.Image(SAMPLE_SCREEN_WIDTH * 2, SAMPLE_SCREEN_HEIGHT * 2)
 
     @property
     def algorithm(self) -> int:
@@ -537,7 +542,7 @@ class FOVSample(Sample):
         self.player_y = 10
         self.torch = False
         self.light_walls = True
-        self.algo_num = tcod.FOV_SYMMETRIC_SHADOWCAST
+        self.algo_num = tcod.constants.FOV_SYMMETRIC_SHADOWCAST
         self.noise = tcod.noise.Noise(1)  # 1D noise for the torch flickering.
 
         map_shape = (SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
@@ -668,17 +673,19 @@ class PathfindingSample(Sample):
         self.busy = 0.0
         self.oldchar = " "
 
-        self.map = tcod.map_new(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
+        self.map = tcod.map.Map(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
                 if SAMPLE_MAP[x, y] == " ":
                     # ground
-                    tcod.map_set_properties(self.map, x, y, True, True)
+                    self.map.walkable[y, x] = True
+                    self.map.transparent[y, x] = True
                 elif SAMPLE_MAP[x, y] == "=":
                     # window
-                    tcod.map_set_properties(self.map, x, y, True, False)
-        self.path = tcod.path_new_using_map(self.map)
-        self.dijkstra = tcod.dijkstra_new(self.map)
+                    self.map.walkable[y, x] = False
+                    self.map.transparent[y, x] = True
+        self.path = tcod.path.AStar(self.map)
+        self.dijkstra = tcod.path.Dijkstra(self.map)
 
     def on_enter(self) -> None:
         # we draw the foreground only the first time.
@@ -901,43 +908,41 @@ def traverse_node(bsp_map: NDArray[np.bool_], node: tcod.bsp.BSP) -> None:
         left, right = node.children
         node.x = min(left.x, right.x)
         node.y = min(left.y, right.y)
-        node.w = max(left.x + left.w, right.x + right.w) - node.x
-        node.h = max(left.y + left.h, right.y + right.h) - node.y
+        node.width = max(left.x + left.width, right.x + right.width) - node.x
+        node.height = max(left.y + left.height, right.y + right.height) - node.y
         # create a corridor between the two lower nodes
         if node.horizontal:
             # vertical corridor
-            if left.x + left.w - 1 < right.x or right.x + right.w - 1 < left.x:
+            if left.x + left.width - 1 < right.x or right.x + right.width - 1 < left.x:
                 # no overlapping zone. we need a Z shaped corridor
-                x1 = random.randint(left.x, left.x + left.w - 1)
-                x2 = random.randint(right.x, right.x + right.w - 1)
-                y = random.randint(left.y + left.h, right.y)
+                x1 = random.randint(left.x, left.x + left.width - 1)
+                x2 = random.randint(right.x, right.x + right.width - 1)
+                y = random.randint(left.y + left.height, right.y)
                 vline_up(bsp_map, x1, y - 1)
                 hline(bsp_map, x1, y, x2)
                 vline_down(bsp_map, x2, y + 1)
             else:
                 # straight vertical corridor
                 min_x = max(left.x, right.x)
-                max_x = min(left.x + left.w - 1, right.x + right.w - 1)
+                max_x = min(left.x + left.width - 1, right.x + right.width - 1)
                 x = random.randint(min_x, max_x)
                 vline_down(bsp_map, x, right.y)
                 vline_up(bsp_map, x, right.y - 1)
+        elif left.y + left.height - 1 < right.y or right.y + right.height - 1 < left.y:  # horizontal corridor
+            # no overlapping zone. we need a Z shaped corridor
+            y1 = random.randint(left.y, left.y + left.height - 1)
+            y2 = random.randint(right.y, right.y + right.height - 1)
+            x = random.randint(left.x + left.width, right.x)
+            hline_left(bsp_map, x - 1, y1)
+            vline(bsp_map, x, y1, y2)
+            hline_right(bsp_map, x + 1, y2)
         else:
-            # horizontal corridor
-            if left.y + left.h - 1 < right.y or right.y + right.h - 1 < left.y:
-                # no overlapping zone. we need a Z shaped corridor
-                y1 = random.randint(left.y, left.y + left.h - 1)
-                y2 = random.randint(right.y, right.y + right.h - 1)
-                x = random.randint(left.x + left.w, right.x)
-                hline_left(bsp_map, x - 1, y1)
-                vline(bsp_map, x, y1, y2)
-                hline_right(bsp_map, x + 1, y2)
-            else:
-                # straight horizontal corridor
-                min_y = max(left.y, right.y)
-                max_y = min(left.y + left.h - 1, right.y + right.h - 1)
-                y = random.randint(min_y, max_y)
-                hline_left(bsp_map, right.x - 1, y)
-                hline_right(bsp_map, right.x, y)
+            # straight horizontal corridor
+            min_y = max(left.y, right.y)
+            max_y = min(left.y + left.height - 1, right.y + right.height - 1)
+            y = random.randint(min_y, max_y)
+            hline_left(bsp_map, right.x - 1, y)
+            hline_right(bsp_map, right.x, y)
 
 
 class BSPSample(Sample):
@@ -1027,9 +1032,9 @@ class ImageSample(Sample):
     def __init__(self) -> None:
         self.name = "Image toolkit"
 
-        self.img = tcod.image_load(DATA_DIR / "img/skull.png")
+        self.img = tcod.image.Image.from_file(DATA_DIR / "img/skull.png")
         self.img.set_key_color(BLACK)
-        self.circle = tcod.image_load(DATA_DIR / "img/circle.png")
+        self.circle = tcod.image.Image.from_file(DATA_DIR / "img/circle.png")
 
     def on_draw(self) -> None:
         sample_console.clear()
@@ -1066,8 +1071,10 @@ class MouseSample(Sample):
         self.log: list[str] = []
 
     def on_enter(self) -> None:
-        tcod.mouse_move(320, 200)
-        tcod.mouse_show_cursor(True)
+        sdl_window = context.sdl_window
+        if sdl_window:
+            tcod.sdl.mouse.warp_in_window(sdl_window, 320, 200)
+        tcod.sdl.mouse.show(True)
 
     def ev_mousemotion(self, event: tcod.event.MouseMotion) -> None:
         self.motion = event
@@ -1123,9 +1130,9 @@ class MouseSample(Sample):
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym == tcod.event.KeySym.N1:
-            tcod.mouse_show_cursor(False)
+            tcod.sdl.mouse.show(False)
         elif event.sym == tcod.event.KeySym.N2:
-            tcod.mouse_show_cursor(True)
+            tcod.sdl.mouse.show(True)
         else:
             super().ev_keydown(event)
 
@@ -1215,7 +1222,7 @@ if numpy_available:
     xc = xc - HALF_W
     yc = yc - HALF_H
 
-noise2d = tcod.noise_new(2, 0.5, 2.0)
+noise2d = tcod.noise.Noise(2, hurst=0.5, lacunarity=2.0)
 if numpy_available:  # the texture starts empty
     texture = np.zeros((RES_U, RES_V))
 
@@ -1359,11 +1366,11 @@ class FastRenderSample(Sample):
 #############################################
 
 RENDERER_KEYS = {
-    tcod.event.KeySym.F1: tcod.RENDERER_GLSL,
-    tcod.event.KeySym.F2: tcod.RENDERER_OPENGL,
-    tcod.event.KeySym.F3: tcod.RENDERER_SDL,
-    tcod.event.KeySym.F4: tcod.RENDERER_SDL2,
-    tcod.event.KeySym.F5: tcod.RENDERER_OPENGL2,
+    tcod.event.KeySym.F1: tcod.constants.RENDERER_GLSL,
+    tcod.event.KeySym.F2: tcod.constants.RENDERER_OPENGL,
+    tcod.event.KeySym.F3: tcod.constants.RENDERER_SDL,
+    tcod.event.KeySym.F4: tcod.constants.RENDERER_SDL2,
+    tcod.event.KeySym.F5: tcod.constants.RENDERER_OPENGL2,
 }
 
 RENDERER_NAMES = (
@@ -1406,7 +1413,6 @@ def init_context(renderer: int) -> None:
         columns=root_console.width,
         rows=root_console.height,
         title=f"python-tcod samples (python-tcod {tcod.__version__}, libtcod {libtcod_version})",
-        renderer=renderer,
         vsync=False,  # VSync turned off since this is for benchmarking.
         tileset=tileset,
     )
@@ -1430,7 +1436,7 @@ def init_context(renderer: int) -> None:
 def main() -> None:
     global context, tileset
     tileset = tcod.tileset.load_tilesheet(FONT, 32, 8, tcod.tileset.CHARMAP_TCOD)
-    init_context(tcod.RENDERER_SDL2)
+    init_context(tcod.constants.RENDERER_SDL2)
     try:
         SAMPLES[cur_sample].on_enter()
 

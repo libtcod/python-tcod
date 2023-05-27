@@ -65,6 +65,11 @@ class Image:
         image_array[...] = array
         return image
 
+    @classmethod
+    def from_file(cls, path: str | PathLike[str]) -> Image:
+        path = Path(path).resolve(strict=True)
+        return cls._from_cdata(ffi.gc(lib.TCOD_image_load(bytes(path)), lib.TCOD_image_delete))
+
     def clear(self, color: tuple[int, int, int]) -> None:
         """Fill this entire Image with color.
 

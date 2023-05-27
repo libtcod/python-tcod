@@ -99,7 +99,9 @@ def new_cursor(data: NDArray[np.bool_], mask: NDArray[np.bool_], hot_xy: tuple[i
 
 
 def new_color_cursor(pixels: ArrayLike, hot_xy: tuple[int, int]) -> Cursor:
-    """Args:
+    """Create a new color cursor.
+
+    Args:
         pixels: A row-major array of RGB or RGBA pixels.
         hot_xy: The position of the pointer relative to the mouse sprite, starting from the upper-left at (0, 0).
 
@@ -230,4 +232,19 @@ def warp_global(x: int, y: int) -> None:
 
 def warp_in_window(window: tcod.sdl.video.Window, x: int, y: int) -> None:
     """Move the mouse cursor to a position within a window."""
-    _check(lib.SDL_WarpMouseInWindow(window.p, x, y))
+    lib.SDL_WarpMouseInWindow(window.p, x, y)
+
+
+def show(visible: bool | None = None) -> bool:
+    """Optionally show or hide the mouse cursor then return the state of the cursor.
+
+    Args:
+        visible: If None then only return the current state. Otherwise set the mouse visibility.
+
+    Returns:
+        True if the cursor is visible.
+
+    .. versionadded:: Unreleased
+    """
+    _OPTIONS = {None: lib.SDL_QUERY, False: lib.SDL_DISABLE, True: lib.SDL_ENABLE}
+    return _check(lib.SDL_ShowCursor(_OPTIONS[visible])) == int(lib.SDL_ENABLE)
