@@ -291,7 +291,10 @@ if sys.platform == "win32":
     library_dirs.append(str(SDL2_LIB_DIR))
     SDL2_LIB_DEST = Path("tcod", ARCH_MAPPING[BIT_SIZE])
     SDL2_LIB_DEST.mkdir(exist_ok=True)
-    shutil.copy(SDL2_LIB_DIR / "SDL2.dll", SDL2_LIB_DEST)
+    SDL2_LIB_DEST_FILE = SDL2_LIB_DEST / "SDL2.dll"
+    SDL2_LIB_FILE = SDL2_LIB_DIR / "SDL2.dll"
+    if not SDL2_LIB_DEST_FILE.exists() or SDL2_LIB_FILE.read_bytes() != SDL2_LIB_DEST_FILE.read_bytes():
+        shutil.copy(SDL2_LIB_FILE, SDL2_LIB_DEST_FILE)
 
 # Link to the SDL2 framework on MacOS.
 # Delocate will bundle the binaries in a later step.
