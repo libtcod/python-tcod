@@ -54,9 +54,7 @@ import pickle
 import sys
 import warnings
 from pathlib import Path
-from typing import Any, Iterable, NoReturn, TypeVar
-
-from typing_extensions import Literal
+from typing import Any, Iterable, Literal, NoReturn, TypeVar
 
 import tcod
 import tcod.event

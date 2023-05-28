@@ -83,11 +83,10 @@ from __future__ import annotations
 
 import enum
 import warnings
-from typing import Any, Callable, Generic, Iterator, Mapping, NamedTuple, TypeVar
+from typing import Any, Callable, Final, Generic, Iterator, Literal, Mapping, NamedTuple, TypeVar
 
 import numpy as np
 from numpy.typing import NDArray
-from typing_extensions import Final, Literal
 
 import tcod.event_constants
 import tcod.sdl.joystick

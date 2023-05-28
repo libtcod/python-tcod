@@ -5,9 +5,7 @@
 from __future__ import annotations
 
 import enum
-from typing import Any
-
-from typing_extensions import Final, Literal
+from typing import Any, Final, Literal
 
 import tcod.sdl.sys
 from tcod.loader import ffi, lib

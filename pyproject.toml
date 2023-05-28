@@ -18,7 +18,7 @@ dynamic = ["version"]
 description = "The official Python port of libtcod."
 authors = [{ name = "Kyle Benesch", email = "4b796c65+tcod@gmail.com" }]
 readme = "README.rst"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = { text = "Simplified BSD License" }
 dependencies = [
     "cffi>=1.15",
@@ -45,7 +45,6 @@ classifiers = [
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -70,18 +69,18 @@ Tracker = "https://github.com/libtcod/python-tcod/issues"
 Forum = "https://github.com/libtcod/python-tcod/discussions"
 
 [tool.distutils.bdist_wheel]
-py-limited-api = "cp37"
+py-limited-api = "cp38"
 
 [tool.setuptools_scm]
 write_to = "tcod/version.py"
 
 [tool.black]
 line-length = 120
-target-version = ["py37"]
+target-version = ["py38"]
 
 [tool.isort]
 profile = "black"
-py_version = "37"
+py_version = "38"
 skip_gitignore = true
 line_length = 120
 

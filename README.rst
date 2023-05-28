@@ -46,7 +46,7 @@ For the most part it's just::
 ==============
  Requirements
 ==============
-* Python 3.7+
+* Python 3.8+
 * Windows, Linux, or MacOS X 10.9+.
 * On Linux, requires libsdl2 (2.0.10+).
 

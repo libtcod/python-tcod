@@ -2,11 +2,10 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
-from typing_extensions import Literal
 
 import tcod._internal
 import tcod.constants

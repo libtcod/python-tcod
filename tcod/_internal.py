@@ -4,11 +4,10 @@ from __future__ import annotations
 import functools
 import warnings
 from types import TracebackType
-from typing import Any, AnyStr, Callable, NoReturn, SupportsInt, TypeVar, cast
+from typing import Any, AnyStr, Callable, Literal, NoReturn, SupportsInt, TypeVar, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
-from typing_extensions import Literal
 
 from tcod.loader import ffi, lib
 

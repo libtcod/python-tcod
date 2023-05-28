@@ -7,11 +7,10 @@ import threading
 import warnings
 from os import PathLike
 from pathlib import Path
-from typing import Any, Callable, Hashable, Iterable, Iterator, Sequence
+from typing import Any, Callable, Hashable, Iterable, Iterator, Literal, Sequence
 
 import numpy as np
 from numpy.typing import NDArray
-from typing_extensions import Literal
 
 import tcod.bsp
 import tcod.console

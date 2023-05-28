@@ -35,11 +35,10 @@ from __future__ import annotations
 
 import enum
 import warnings
-from typing import Any, Sequence
+from typing import Any, Literal, Sequence
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
-from typing_extensions import Literal
 
 import tcod.constants
 import tcod.random

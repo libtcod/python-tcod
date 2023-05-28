@@ -20,11 +20,10 @@ from __future__ import annotations
 import functools
 import itertools
 import warnings
-from typing import Any, Callable
+from typing import Any, Callable, Literal
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
-from typing_extensions import Literal
 
 from tcod._internal import _check
 from tcod.loader import ffi, lib

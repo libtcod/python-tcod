@@ -49,11 +49,11 @@ import threading
 import time
 from dataclasses import dataclass
 from types import TracebackType
-from typing import Any, Callable, Hashable, Iterator
+from typing import Any, Callable, Final, Hashable, Iterator, Literal
 
 import numpy as np
 from numpy.typing import ArrayLike, DTypeLike, NDArray
-from typing_extensions import Final, Literal, Self
+from typing_extensions import Self
 
 import tcod.sdl.sys
 from tcod.loader import ffi, lib
@@ -66,7 +66,7 @@ def _get_format(format: DTypeLike) -> int:
     assert dt.fields is None
     bitsize = dt.itemsize * 8
     assert 0 < bitsize <= lib.SDL_AUDIO_MASK_BITSIZE
-    if not dt.str[1] in "uif":
+    if dt.str[1] not in "uif":
         msg = f"Unexpected dtype: {dt}"
         raise TypeError(msg)
     is_signed = dt.str[1] != "u"
@@ -581,8 +581,6 @@ class _ProtectedContext:
         self, exc_type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None
     ) -> bool:
         if exc_type is None:
-            return False
-        if sys.version_info < (3, 8):
             return False
         sys.unraisablehook(_UnraisableHookArgs(exc_type, value, traceback, None, self.obj))  # type: ignore[arg-type]
         return True

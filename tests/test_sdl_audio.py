@@ -1,6 +1,5 @@
 """Test tcod.sdl.audio module."""
 import contextlib
-import sys
 import time
 from typing import Any
 
@@ -114,7 +113,6 @@ def test_audio_callback() -> None:
             time.sleep(0.001)
 
 
-@pytest.mark.skipif(sys.version_info < (3, 8), reason="Needs sys.unraisablehook support")
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
 @needs_audio_device
 def test_audio_callback_unraisable() -> None:

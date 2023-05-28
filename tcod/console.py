@@ -7,11 +7,10 @@ from __future__ import annotations
 import warnings
 from os import PathLike
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Literal
 
 import numpy as np
 from numpy.typing import NDArray
-from typing_extensions import Literal
 
 import tcod._internal
 import tcod.constants
