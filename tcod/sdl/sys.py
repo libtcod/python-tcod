@@ -60,8 +60,8 @@ def _get_power_info() -> tuple[_PowerState, int, int]:
     buffer = ffi.new("int[2]")
     power_state = _PowerState(lib.SDL_GetPowerInfo(buffer, buffer + 1))
     seconds_of_power = buffer[0]
-    percenage = buffer[1]
-    return power_state, seconds_of_power, percenage
+    percentage = buffer[1]
+    return power_state, seconds_of_power, percentage
 
 
 def _get_clipboard() -> str:

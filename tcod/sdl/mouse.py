@@ -148,7 +148,7 @@ def get_cursor() -> Cursor | None:
 def capture(enable: bool) -> None:
     """Enable or disable mouse capture to track the mouse outside of a window.
 
-    It is highly reccomended to read the related remarks section in the SDL docs before using this.
+    It is highly recommended to read the related remarks section in the SDL docs before using this.
 
     Example::
 

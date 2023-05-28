@@ -262,7 +262,7 @@ class Window:
 
     @property
     def opacity(self) -> float:
-        """Get or set this windows opacity.  0.0 is fully transarpent and 1.0 is fully opaque.
+        """Get or set this windows opacity.  0.0 is fully transparent and 1.0 is fully opaque.
 
         Will error if you try to set this and opacity isn't supported.
         """

@@ -1,11 +1,11 @@
 """SDL2 audio playback and recording tools.
 
-This module includes SDL's low-level audio API and a naive implentation of an SDL mixer.
+This module includes SDL's low-level audio API and a naive implementation of an SDL mixer.
 If you have experience with audio mixing then you might be better off writing your own mixer or
 modifying the existing one which was written using Python/Numpy.
 
 This module is designed to integrate with the wider Python ecosystem.
-It leaves the loading to sound samples to other libaries like
+It leaves the loading to sound samples to other libraries like
 `SoundFile <https://pysoundfile.readthedocs.io/en/latest/>`_.
 
 Example::
@@ -17,9 +17,9 @@ Example::
     import tcod.sdl.audio
 
     device = tcod.sdl.audio.open()  # Open the default output device.
-    sound, samplerate = soundfile.read("example_sound.wav", dtype="float32")  # Load an audio sample using SoundFile.
-    converted = device.convert(sound, samplerate)  # Convert this sample to the format expected by the device.
-    device.queue_audio(converted)  # Play audio syncroniously by appending it to the device buffer.
+    sound, sample_rate = soundfile.read("example_sound.wav", dtype="float32")  # Load an audio sample using SoundFile.
+    converted = device.convert(sound, sample_rate)  # Convert this sample to the format expected by the device.
+    device.queue_audio(converted)  # Play audio synchronously by appending it to the device buffer.
 
     while device.queued_samples:  # Wait until device is done playing.
         time.sleep(0.001)
@@ -33,8 +33,8 @@ Example::
     import tcod.sdl.audio
 
     mixer = tcod.sdl.audio.BasicMixer(tcod.sdl.audio.open())  # Setup BasicMixer with the default audio output.
-    sound, samplerate = soundfile.read("example_sound.wav")  # Load an audio sample using SoundFile.
-    sound = mixer.device.convert(sound, samplerate)  # Convert this sample to the format expected by the device.
+    sound, sample_rate = soundfile.read("example_sound.wav")  # Load an audio sample using SoundFile.
+    sound = mixer.device.convert(sound, sample_rate)  # Convert this sample to the format expected by the device.
     channel = mixer.play(sound)  # Start asynchronous playback, audio is mixed on a separate Python thread.
     while channel.busy:  # Wait until the sample is done playing.
         time.sleep(0.001)
@@ -59,7 +59,7 @@ from tcod.sdl import _check, _get_error
 
 
 def _get_format(format: DTypeLike) -> int:
-    """Return a SDL_AudioFormat bitfield from a NumPy dtype."""
+    """Return a SDL_AudioFormat bit-field from a NumPy dtype."""
     dt: Any = np.dtype(format)
     assert dt.fields is None
     bitsize = dt.itemsize * 8
@@ -83,7 +83,7 @@ def _dtype_from_format(format: int) -> np.dtype[Any]:
     """Return a dtype from a SDL_AudioFormat."""
     bitsize = format & lib.SDL_AUDIO_MASK_BITSIZE
     assert bitsize % 8 == 0
-    bytesize = bitsize // 8
+    byte_size = bitsize // 8
     byteorder = ">" if format & lib.SDL_AUDIO_MASK_ENDIAN else "<"
     if format & lib.SDL_AUDIO_MASK_DATATYPE:
         kind = "f"
@@ -91,7 +91,7 @@ def _dtype_from_format(format: int) -> np.dtype[Any]:
         kind = "i"
     else:
         kind = "u"
-    return np.dtype(f"{byteorder}{kind}{bytesize}")
+    return np.dtype(f"{byteorder}{kind}{byte_size}")
 
 
 def convert_audio(
@@ -103,8 +103,8 @@ def convert_audio(
 
     Args:
         in_sound: The input ArrayLike sound sample.  Input format and channels are derived from the array.
-        in_rate: The samplerate of the input array.
-        out_rate: The samplerate of the output array.
+        in_rate: The sample-rate of the input array.
+        out_rate: The sample-rate of the output array.
         out_format: The output format of the converted array.
         out_channels: The number of audio channels of the output array.
 
@@ -142,7 +142,7 @@ class AudioDevice:
 
     Open new audio devices using :any:`tcod.sdl.audio.open`.
 
-    When you use this object directly the audio passed to :any:`queue_audio` is always played syncroniously.
+    When you use this object directly the audio passed to :any:`queue_audio` is always played synchronously.
     For more typical asynchronous audio you should pass an AudioDevice to :any:`BasicMixer`.
     """
 
@@ -231,7 +231,7 @@ class AudioDevice:
 
         Args:
             sound: An ArrayLike sound sample.
-            rate: The samplerate of the input array.
+            rate: The sample-rate of the input array.
                   If None is given then it's assumed to be the same as the device.
 
         .. versionadded:: 13.6
