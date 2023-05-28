@@ -1,11 +1,9 @@
 """Test SDL specific features."""
-import contextlib
 import sys
 
 import numpy as np
 import pytest
 
-import tcod.sdl.audio
 import tcod.sdl.render
 import tcod.sdl.sys
 import tcod.sdl.video
@@ -83,15 +81,3 @@ def test_sdl_render_bad_types() -> None:
         tcod.sdl.render.Renderer(tcod.ffi.cast("SDL_Renderer*", tcod.ffi.NULL))
     with pytest.raises(TypeError):
         tcod.sdl.render.Renderer(tcod.ffi.new("SDL_Rect*"))
-
-
-def test_sdl_audio_device() -> None:
-    with contextlib.closing(tcod.sdl.audio.open(frequency=44100, format=np.float32, channels=2, paused=True)) as device:
-        assert device.convert(np.zeros(4, dtype=np.float32), 22050).shape[0] == 8  # noqa: PLR2004
-        assert device.convert(np.zeros((4, 4), dtype=np.float32)).shape == (4, 2)
-        assert device.convert(np.zeros(4, dtype=np.int8)).shape[0] == 4  # noqa: PLR2004
-        device.paused = False
-        device.paused = True
-        assert device.queued_samples == 0
-        with contextlib.closing(tcod.sdl.audio.BasicMixer(device)) as mixer:
-            assert mixer

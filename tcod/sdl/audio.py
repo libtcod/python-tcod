@@ -47,6 +47,7 @@ import enum
 import sys
 import threading
 import time
+from dataclasses import dataclass
 from types import TracebackType
 from typing import Any, Callable, Hashable, Iterator
 
@@ -65,7 +66,9 @@ def _get_format(format: DTypeLike) -> int:
     assert dt.fields is None
     bitsize = dt.itemsize * 8
     assert 0 < bitsize <= lib.SDL_AUDIO_MASK_BITSIZE
-    assert dt.str[1] in "uif"
+    if not dt.str[1] in "uif":
+        msg = f"Unexpected dtype: {dt}"
+        raise TypeError(msg)
     is_signed = dt.str[1] != "u"
     is_float = dt.str[1] == "f"
     byteorder = dt.byteorder
@@ -81,7 +84,21 @@ def _get_format(format: DTypeLike) -> int:
 
 
 def _dtype_from_format(format: int) -> np.dtype[Any]:
-    """Return a dtype from a SDL_AudioFormat."""
+    """Return a dtype from a SDL_AudioFormat.
+
+    >>> _dtype_from_format(tcod.lib.AUDIO_F32LSB)
+    dtype('float32')
+    >>> _dtype_from_format(tcod.lib.AUDIO_F32MSB)
+    dtype('>f4')
+    >>> _dtype_from_format(tcod.lib.AUDIO_S16LSB)
+    dtype('int16')
+    >>> _dtype_from_format(tcod.lib.AUDIO_S16MSB)
+    dtype('>i2')
+    >>> _dtype_from_format(tcod.lib.AUDIO_U16LSB)
+    dtype('uint16')
+    >>> _dtype_from_format(tcod.lib.AUDIO_U16MSB)
+    dtype('>u2')
+    """
     bitsize = format & lib.SDL_AUDIO_MASK_BITSIZE
     assert bitsize % 8 == 0
     byte_size = bitsize // 8
@@ -203,6 +220,8 @@ class AudioDevice:
 
     def __repr__(self) -> str:
         """Return a representation of this device."""
+        if self.stopped:
+            return f"<{self.__class__.__name__}() stopped=True>"
         items = [
             f"{self.__class__.__name__}(device_id={self.device_id})",
             f"frequency={self.frequency}",
@@ -211,7 +230,9 @@ class AudioDevice:
             f"channels={self.channels}",
             f"buffer_samples={self.buffer_samples}",
             f"buffer_bytes={self.buffer_bytes}",
+            f"paused={self.paused}",
         ]
+
         if self.silence:
             items.append(f"silence={self.silence}")
         if self._handle is not None:
@@ -241,7 +262,9 @@ class AudioDevice:
     @property
     def stopped(self) -> bool:
         """Is True if the device has failed or was closed."""
-        return bool(lib.SDL_GetAudioDeviceStatus(self.device_id) != lib.SDL_AUDIO_STOPPED)
+        if not hasattr(self, "device_id"):
+            return True
+        return bool(lib.SDL_GetAudioDeviceStatus(self.device_id) == lib.SDL_AUDIO_STOPPED)
 
     @property
     def paused(self) -> bool:
@@ -404,7 +427,9 @@ class Channel:
     def _verify_audio_sample(self, sample: ArrayLike) -> NDArray[Any]:
         """Verify an audio sample is valid and return it as a Numpy array."""
         array: NDArray[Any] = np.asarray(sample)
-        assert array.dtype == self.mixer.device.format
+        if array.dtype != self.mixer.device.format:
+            msg = f"Audio sample must be dtype={self.mixer.device.format}, input was dtype={array.dtype}"
+            raise TypeError(msg)
         if len(array.shape) == 1:
             array = array[:, np.newaxis]
         return array
@@ -434,7 +459,7 @@ class Channel:
             time_samples = round(time * self.mixer.device.frequency) + 1
             buffer: NDArray[np.float32] = np.zeros((time_samples, self.mixer.device.channels), np.float32)
             self._on_mix(buffer)
-            buffer *= np.linspace(1.0, 0.0, time_samples + 1, endpoint=False)[1:]
+            buffer *= np.linspace(1.0, 0.0, time_samples + 1, endpoint=False)[1:, np.newaxis]
             self.sound_queue[:] = [buffer]
 
     def stop(self) -> None:
@@ -536,13 +561,41 @@ class _AudioCallbackUserdata:
     device: AudioDevice
 
 
+@dataclass
+class _UnraisableHookArgs:
+    exc_type: type[BaseException]
+    exc_value: BaseException | None
+    exc_traceback: TracebackType | None
+    err_msg: str | None
+    object: object
+
+
+class _ProtectedContext:
+    def __init__(self, obj: object = None) -> None:
+        self.obj = obj
+
+    def __enter__(self) -> None:
+        pass
+
+    def __exit__(
+        self, exc_type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None
+    ) -> bool:
+        if exc_type is None:
+            return False
+        if sys.version_info < (3, 8):
+            return False
+        sys.unraisablehook(_UnraisableHookArgs(exc_type, value, traceback, None, self.obj))  # type: ignore[arg-type]
+        return True
+
+
 @ffi.def_extern()  # type: ignore
-def _sdl_audio_callback(userdata: Any, stream: Any, length: int) -> None:
+def _sdl_audio_callback(userdata: Any, stream: Any, length: int) -> None:  # noqa: ANN401
     """Handle audio device callbacks."""
     data: _AudioCallbackUserdata = ffi.from_handle(userdata)
     device = data.device
     buffer = np.frombuffer(ffi.buffer(stream, length), dtype=device.format).reshape(-1, device.channels)
-    device._callback(device, buffer)
+    with _ProtectedContext(device):
+        device._callback(device, buffer)
 
 
 def _get_devices(capture: bool) -> Iterator[str]:

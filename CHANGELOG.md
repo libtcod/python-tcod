@@ -4,6 +4,10 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+### Fixed
+- `AudioDevice.stopped` was inverted.
+- Fixed the audio mixer stop and fadeout methods.
+- Exceptions raised in the audio mixer callback no longer cause a messy crash, they now go to `sys.unraisablehook`.
 
 ## [16.0.0] - 2023-05-27
 ### Added
