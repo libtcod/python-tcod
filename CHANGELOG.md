@@ -8,6 +8,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 - Added PathLike support to more libtcodpy functions.
 - New `tcod.sdl.mouse.show` function for querying or setting mouse visibility.
 - New class method `tcod.image.Image.from_file` to load images with.  This replaces `tcod.image_load`.
+- `tcod.sdl.audio.AudioDevice` is now a context manager.
+
+### Changed
+- SDL audio conversion will now pass unconvertible floating types as float32 instead of raising.
 
 ### Deprecated
 - Deprecated the libtcodpy functions for images and noise generators.
@@ -17,6 +21,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ### Fixed
 - Fix `tcod.sdl.mouse.warp_in_window` function.
+- Fix `TypeError: '_AudioCallbackUserdata' object is not callable` when using an SDL audio device callback.
+  [#128](https://github.com/libtcod/python-tcod/issues/128)
 
 ## [15.0.3] - 2023-05-25
 ### Deprecated

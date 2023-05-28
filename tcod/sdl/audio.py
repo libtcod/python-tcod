@@ -47,11 +47,12 @@ import enum
 import sys
 import threading
 import time
+from types import TracebackType
 from typing import Any, Callable, Hashable, Iterator
 
 import numpy as np
 from numpy.typing import ArrayLike, DTypeLike, NDArray
-from typing_extensions import Final, Literal
+from typing_extensions import Final, Literal, Self
 
 import tcod.sdl.sys
 from tcod.loader import ffi, lib
@@ -110,6 +111,9 @@ def convert_audio(
 
     .. versionadded:: 13.6
 
+    .. versionchanged:: Unreleased
+        Now converts floating types to `np.float32` when SDL doesn't support the specific format.
+
     .. seealso::
         :any:`AudioDevice.convert`
     """
@@ -123,8 +127,26 @@ def convert_audio(
     in_channels = in_array.shape[1]
     in_format = _get_format(in_array.dtype)
     out_sdl_format = _get_format(out_format)
-    if _check(lib.SDL_BuildAudioCVT(cvt, in_format, in_channels, in_rate, out_sdl_format, out_channels, out_rate)) == 0:
-        return in_array  # No conversion needed.
+    try:
+        if (
+            _check(lib.SDL_BuildAudioCVT(cvt, in_format, in_channels, in_rate, out_sdl_format, out_channels, out_rate))
+            == 0
+        ):
+            return in_array  # No conversion needed.
+    except RuntimeError as exc:
+        if (  # SDL now only supports float32, but later versions may add more support for more formats.
+            exc.args[0] == "Invalid source format"
+            and np.issubdtype(in_array.dtype, np.floating)
+            and in_array.dtype != np.float32
+        ):
+            return convert_audio(  # Try again with float32
+                in_array.astype(np.float32),
+                in_rate,
+                out_rate=out_rate,
+                out_format=out_format,
+                out_channels=out_channels,
+            )
+        raise
     # Upload to the SDL_AudioCVT buffer.
     cvt.len = in_array.itemsize * in_array.size
     out_buffer = cvt.buf = ffi.new("uint8_t[]", cvt.len * cvt.len_mult)
@@ -144,6 +166,9 @@ class AudioDevice:
 
     When you use this object directly the audio passed to :any:`queue_audio` is always played synchronously.
     For more typical asynchronous audio you should pass an AudioDevice to :any:`BasicMixer`.
+
+    .. versionchanged:: Unreleased
+        Can now be used as a context which will close the device on exit.
     """
 
     def __init__(
@@ -175,6 +200,23 @@ class AudioDevice:
         """The size of the audio buffer in bytes."""
         self._handle: Any | None = None
         self._callback: Callable[[AudioDevice, NDArray[Any]], None] = self.__default_callback
+
+    def __repr__(self) -> str:
+        """Return a representation of this device."""
+        items = [
+            f"{self.__class__.__name__}(device_id={self.device_id})",
+            f"frequency={self.frequency}",
+            f"is_capture={self.is_capture}",
+            f"format={self.format}",
+            f"channels={self.channels}",
+            f"buffer_samples={self.buffer_samples}",
+            f"buffer_bytes={self.buffer_bytes}",
+        ]
+        if self.silence:
+            items.append(f"silence={self.silence}")
+        if self._handle is not None:
+            items.append(f"callback={self._callback}")
+        return f"""<{" ".join(items)}>"""
 
     @property
     def callback(self) -> Callable[[AudioDevice, NDArray[Any]], None]:
@@ -287,6 +329,16 @@ class AudioDevice:
             return
         lib.SDL_CloseAudioDevice(self.device_id)
         del self.device_id
+
+    def __enter__(self) -> Self:
+        """Return self and enter a managed context."""
+        return self
+
+    def __exit__(
+        self, type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None
+    ) -> None:
+        """Close the device when exiting the context."""
+        self.close()
 
     @staticmethod
     def __default_callback(device: AudioDevice, stream: NDArray[Any]) -> None:
@@ -487,7 +539,7 @@ class _AudioCallbackUserdata:
 @ffi.def_extern()  # type: ignore
 def _sdl_audio_callback(userdata: Any, stream: Any, length: int) -> None:
     """Handle audio device callbacks."""
-    data: _AudioCallbackUserdata = ffi.from_handle(userdata)()
+    data: _AudioCallbackUserdata = ffi.from_handle(userdata)
     device = data.device
     buffer = np.frombuffer(ffi.buffer(stream, length), dtype=device.format).reshape(-1, device.channels)
     device._callback(device, buffer)
