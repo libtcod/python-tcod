@@ -13,11 +13,20 @@ import tcod.sdl.audio
 # ruff: noqa: D103
 
 
+needs_audio_device = pytest.mark.xfail(
+    not list(tcod.sdl.audio.get_devices()), reason="This test requires an audio device"
+)
+needs_audio_capture = pytest.mark.xfail(
+    not list(tcod.sdl.audio.get_capture_devices()), reason="This test requires an audio capture device"
+)
+
+
 def test_devices() -> None:
     list(tcod.sdl.audio.get_devices())
     list(tcod.sdl.audio.get_capture_devices())
 
 
+@needs_audio_device
 def test_audio_device() -> None:
     with tcod.sdl.audio.open(frequency=44100, format=np.float32, channels=2, paused=True) as device:
         assert not device.stopped
@@ -47,14 +56,17 @@ def test_audio_device() -> None:
             mixer.stop()
 
 
+@needs_audio_capture
 def test_audio_capture() -> None:
     with tcod.sdl.audio.open(capture=True) as device:
         assert not device.stopped
         assert isinstance(device.dequeue_audio(), np.ndarray)
 
 
+@needs_audio_device
 def test_audio_device_repr() -> None:
     with tcod.sdl.audio.open(format=np.uint16, paused=True, callback=True) as device:
+        assert not device.stopped
         assert "silence=" in repr(device)
         assert "callback=" in repr(device)
     assert "stopped=" in repr(device)
@@ -83,6 +95,7 @@ def test_convert_float64() -> None:
     )
 
 
+@needs_audio_device
 def test_audio_callback() -> None:
     class CheckCalled:
         was_called: bool = False
@@ -95,6 +108,7 @@ def test_audio_callback() -> None:
 
     check_called = CheckCalled()
     with tcod.sdl.audio.open(callback=check_called, paused=False) as device:
+        assert not device.stopped
         device.callback = device.callback
         while not check_called.was_called:
             time.sleep(0.001)
@@ -102,6 +116,7 @@ def test_audio_callback() -> None:
 
 @pytest.mark.skipif(sys.version_info < (3, 8), reason="Needs sys.unraisablehook support")
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@needs_audio_device
 def test_audio_callback_unraisable() -> None:
     """Test unraisable error in audio callback.
 
@@ -116,6 +131,7 @@ def test_audio_callback_unraisable() -> None:
             raise Exception("Test unraisable error")  # noqa
 
     check_called = CheckCalled()
-    with tcod.sdl.audio.open(callback=check_called, paused=False):
+    with tcod.sdl.audio.open(callback=check_called, paused=False) as device:
+        assert not device.stopped
         while not check_called.was_called:
             time.sleep(0.001)
