@@ -244,7 +244,7 @@ def show(visible: bool | None = None) -> bool:
     Returns:
         True if the cursor is visible.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 16.0
     """
     _OPTIONS = {None: lib.SDL_QUERY, False: lib.SDL_DISABLE, True: lib.SDL_ENABLE}
     return _check(lib.SDL_ShowCursor(_OPTIONS[visible])) == int(lib.SDL_ENABLE)

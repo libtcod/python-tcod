@@ -69,7 +69,7 @@ class Image:
     def from_file(cls, path: str | PathLike[str]) -> Image:
         """Return a new Image loaded from the given `path`.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 16.0
         """
         path = Path(path).resolve(strict=True)
         return cls._from_cdata(ffi.gc(lib.TCOD_image_load(bytes(path)), lib.TCOD_image_delete))
@@ -303,7 +303,7 @@ class Image:
         Args:
             filename (Text): File path to same this Image.
 
-        .. versionchanged:: Unreleased
+        .. versionchanged:: 16.0
             Added PathLike support.
         """
         lib.TCOD_image_save(self.image_c, bytes(Path(filename)))

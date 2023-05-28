@@ -4,6 +4,8 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+
+## [16.0.0] - 2023-05-27
 ### Added
 - Added PathLike support to more libtcodpy functions.
 - New `tcod.sdl.mouse.show` function for querying or setting mouse visibility.
@@ -17,7 +19,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 - Deprecated the libtcodpy functions for images and noise generators.
 
 ### Removed
-- `tcod.console_set_custom_font` can no longer take bytes.
+- `tcod.console_set_custom_font` can no longer take bytes as the file path.
 
 ### Fixed
 - Fix `tcod.sdl.mouse.warp_in_window` function.

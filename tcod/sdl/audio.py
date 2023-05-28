@@ -111,7 +111,7 @@ def convert_audio(
 
     .. versionadded:: 13.6
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 16.0
         Now converts floating types to `np.float32` when SDL doesn't support the specific format.
 
     .. seealso::
@@ -167,7 +167,7 @@ class AudioDevice:
     When you use this object directly the audio passed to :any:`queue_audio` is always played synchronously.
     For more typical asynchronous audio you should pass an AudioDevice to :any:`BasicMixer`.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 16.0
         Can now be used as a context which will close the device on exit.
     """
 

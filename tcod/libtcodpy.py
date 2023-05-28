@@ -985,7 +985,7 @@ def console_set_custom_font(
         Load fonts using :any:`tcod.tileset.load_tilesheet` instead.
         See :ref:`getting-started` for more info.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 16.0
         Added PathLike support.  `fontFile` no longer takes bytes.
     """
     fontFile = Path(fontFile).resolve(strict=True)
@@ -1800,7 +1800,7 @@ def console_from_file(filename: str | PathLike[str]) -> tcod.console.Console:
 
         Other formats are not actively supported.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 16.0
         Added PathLike support.
     """
     filename = Path(filename).resolve(strict=True)
@@ -1979,7 +1979,7 @@ def console_load_asc(con: tcod.console.Console, filename: str | PathLike[str]) -
     .. deprecated:: 12.7
         This format is no longer supported.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 16.0
         Added PathLike support.
     """
     filename = Path(filename).resolve(strict=True)
@@ -1993,7 +1993,7 @@ def console_save_asc(con: tcod.console.Console, filename: str | PathLike[str]) -
     .. deprecated:: 12.7
         This format is no longer supported.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 16.0
         Added PathLike support.
     """
     return bool(lib.TCOD_console_save_asc(_console(con), bytes(Path(filename))))
@@ -2006,7 +2006,7 @@ def console_load_apf(con: tcod.console.Console, filename: str | PathLike[str]) -
     .. deprecated:: 12.7
         This format is no longer supported.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 16.0
         Added PathLike support.
     """
     filename = Path(filename).resolve(strict=True)
@@ -2020,7 +2020,7 @@ def console_save_apf(con: tcod.console.Console, filename: str | PathLike[str]) -
     .. deprecated:: 12.7
         This format is no longer supported.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 16.0
         Added PathLike support.
     """
     return bool(lib.TCOD_console_save_apf(_console(con), bytes(Path(filename))))
@@ -2034,7 +2034,7 @@ def console_load_xp(con: tcod.console.Console, filename: str | PathLike[str]) ->
         Functions modifying console objects in-place are deprecated.
         Use :any:`tcod.console_from_xp` to load a Console from a file.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 16.0
         Added PathLike support.
     """
     filename = Path(filename).resolve(strict=True)
@@ -2045,7 +2045,7 @@ def console_load_xp(con: tcod.console.Console, filename: str | PathLike[str]) ->
 def console_save_xp(con: tcod.console.Console, filename: str | PathLike[str], compress_level: int = 9) -> bool:
     """Save a console to a REXPaint `.xp` file.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 16.0
         Added PathLike support.
     """
     return bool(lib.TCOD_console_save_xp(_console(con), bytes(Path(filename)), compress_level))
@@ -2055,7 +2055,7 @@ def console_save_xp(con: tcod.console.Console, filename: str | PathLike[str], co
 def console_from_xp(filename: str | PathLike[str]) -> tcod.console.Console:
     """Return a single console from a REXPaint `.xp` file.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 16.0
         Added PathLike support.
     """
     filename = Path(filename).resolve(strict=True)
@@ -2068,7 +2068,7 @@ def console_list_load_xp(
 ) -> list[tcod.console.Console] | None:
     """Return a list of consoles from a REXPaint `.xp` file.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 16.0
         Added PathLike support.
     """
     filename = Path(filename).resolve(strict=True)
@@ -2093,7 +2093,7 @@ def console_list_save_xp(
 ) -> bool:
     """Save a list of consoles to a REXPaint `.xp` file.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 16.0
         Added PathLike support.
     """
     tcod_list = lib.TCOD_list_new()
@@ -3040,10 +3040,10 @@ def image_load(filename: str | PathLike[str]) -> tcod.image.Image:
     Args:
         filename: Path to a .bmp or .png image file.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 16.0
         Added PathLike support.
 
-    .. deprecated:: Unreleased
+    .. deprecated:: 16.0
         Use :any:`tcod.image.Image.from_file` instead.
     """
     return tcod.image.Image.from_file(filename)
@@ -3058,7 +3058,7 @@ def image_from_console(console: tcod.console.Console) -> tcod.image.Image:
     Args:
         console (Console): Any Console instance.
 
-    .. deprecated:: Unreleased
+    .. deprecated:: 16.0
         :any:`Tileset.render` is a better alternative.
     """
     return tcod.image.Image._from_cdata(
@@ -3073,7 +3073,7 @@ def image_from_console(console: tcod.console.Console) -> tcod.image.Image:
 def image_refresh_console(image: tcod.image.Image, console: tcod.console.Console) -> None:
     """Update an image made with :any:`image_from_console`.
 
-    .. deprecated:: Unreleased
+    .. deprecated:: 16.0
         This function is unnecessary, use :any:`Tileset.render` instead.
     """
     image.refresh_console(console)
@@ -3419,7 +3419,7 @@ def map_get_height(map: tcod.map.Map) -> int:
 def mouse_show_cursor(visible: bool) -> None:
     """Change the visibility of the mouse cursor.
 
-    .. deprecated:: Unreleased
+    .. deprecated:: 16.0
         Use :any:`tcod.sdl.mouse.show` instead.
     """
     lib.TCOD_mouse_show_cursor(visible)
@@ -3429,7 +3429,7 @@ def mouse_show_cursor(visible: bool) -> None:
 def mouse_is_cursor_visible() -> bool:
     """Return True if the mouse cursor is visible.
 
-    .. deprecated:: Unreleased
+    .. deprecated:: 16.0
         Use :any:`tcod.sdl.mouse.show` instead.
     """
     return bool(lib.TCOD_mouse_is_cursor_visible())
@@ -4087,7 +4087,7 @@ def sys_save_screenshot(name: str | PathLike[str] | None = None) -> None:
         This function is not supported by contexts.
         Use :any:`Context.save_screenshot` instead.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 16.0
         Added PathLike support.
     """
     lib.TCOD_sys_save_screenshot(bytes(Path(name)) if name is not None else ffi.NULL)
