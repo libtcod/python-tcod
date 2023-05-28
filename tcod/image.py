@@ -67,6 +67,10 @@ class Image:
 
     @classmethod
     def from_file(cls, path: str | PathLike[str]) -> Image:
+        """Return a new Image loaded from the given `path`.
+
+        .. versionadded:: Unreleased
+        """
         path = Path(path).resolve(strict=True)
         return cls._from_cdata(ffi.gc(lib.TCOD_image_load(bytes(path)), lib.TCOD_image_delete))
 

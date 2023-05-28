@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 ### Added
 - Added PathLike support to more libtcodpy functions.
 - New `tcod.sdl.mouse.show` function for querying or setting mouse visibility.
+- New class method `tcod.image.Image.from_file` to load images with.  This replaces `tcod.image_load`.
 
 ### Deprecated
 - Deprecated the libtcodpy functions for images and noise generators.
