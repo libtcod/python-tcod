@@ -6,7 +6,8 @@
 """An demonstration of event handling using the tcod.event module."""
 from typing import List, Set
 
-import tcod
+import tcod.context
+import tcod.event
 import tcod.sdl.joystick
 import tcod.sdl.sys
 

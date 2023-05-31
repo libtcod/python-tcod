@@ -1253,7 +1253,7 @@ def wait(timeout: float | None = None) -> Iterator[Any]:
 
         context: tcod.context.Context  # Context object initialized earlier.
         while True:  # Main game-loop.
-            console: tcod.Console  # Console used for rendering.
+            console: tcod.console.Console  # Console used for rendering.
             ...  # Render the frame to `console` and then:
             context.present(console)  # Show the console to the display.
             # The ordering to draw first before waiting for events is important.

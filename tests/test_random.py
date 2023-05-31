@@ -3,7 +3,7 @@ import copy
 import pickle
 from pathlib import Path
 
-import tcod
+import tcod.random
 
 # ruff: noqa: D103
 

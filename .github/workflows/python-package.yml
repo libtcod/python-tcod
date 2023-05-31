@@ -191,7 +191,7 @@ jobs:
           pip install tcod-*.tar.gz
       - name: Confirm package import
         run: |
-          python -c "import tcod"
+          python -c "import tcod.context"
 
   linux-wheels:
     needs: [black, isort, mypy]
@@ -232,7 +232,7 @@ jobs:
             yum-config-manager --enable epel &&
             yum install -y SDL2-devel
           CIBW_BEFORE_TEST: pip install numpy
-          CIBW_TEST_COMMAND: python -c "import tcod"
+          CIBW_TEST_COMMAND: python -c "import tcod.context"
           # Skip test on emulated architectures
           CIBW_TEST_SKIP: "*_aarch64"
       - name: Archive wheel
@@ -267,7 +267,7 @@ jobs:
           CIBW_ARCHS_MACOS: x86_64 arm64 universal2
           CIBW_BEFORE_BUILD_MACOS: pip install --upgrade delocate
           CIBW_BEFORE_TEST: pip install numpy
-          CIBW_TEST_COMMAND: python -c "import tcod"
+          CIBW_TEST_COMMAND: python -c "import tcod.context"
           CIBW_TEST_SKIP: "pp* *-macosx_arm64 *-macosx_universal2:arm64"
       - name: Archive wheel
         uses: actions/upload-artifact@v3

@@ -20,7 +20,7 @@ import sys
 import timeit
 from typing import Callable, List, Tuple
 
-import tcod
+import tcod.map
 
 THREADS = multiprocessing.cpu_count()
 

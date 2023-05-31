@@ -5,7 +5,7 @@ import pickle
 import numpy as np
 import pytest
 
-import tcod
+import tcod.noise
 
 # ruff: noqa: D103
 

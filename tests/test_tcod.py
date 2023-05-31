@@ -8,6 +8,7 @@ import pytest
 from numpy.typing import DTypeLike, NDArray
 
 import tcod
+import tcod.console
 
 # ruff: noqa: D103
 
@@ -190,7 +191,7 @@ def test_context() -> None:
         pass
     WIDTH, HEIGHT = 16, 4
     with tcod.context.new_terminal(columns=WIDTH, rows=HEIGHT, renderer=tcod.RENDERER_SDL2) as context:
-        console = tcod.Console(*context.recommended_console_size())
+        console = tcod.console.Console(*context.recommended_console_size())
         context.present(console)
         assert context.sdl_window_p is not None
         assert context.renderer_type >= 0

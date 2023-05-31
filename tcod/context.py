@@ -58,7 +58,7 @@ from typing import Any, Iterable, NoReturn, TypeVar
 
 from typing_extensions import Literal
 
-import tcod
+import tcod.console
 import tcod.event
 import tcod.render
 import tcod.sdl.render
@@ -483,7 +483,7 @@ def new(
     sdl_window_flags: int | None = None,
     title: str | None = None,
     argv: Iterable[str] | None = None,
-    console: tcod.Console | None = None,
+    console: tcod.console.Console | None = None,
 ) -> Context:
     """Create a new context with the desired pixel size.
 

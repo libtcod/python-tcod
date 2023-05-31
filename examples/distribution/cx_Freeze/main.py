@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """cx_Freeze main script example."""
-import tcod
+import tcod.console
+import tcod.context
+import tcod.event
+import tcod.tileset
 
 WIDTH, HEIGHT = 80, 60
 console = None

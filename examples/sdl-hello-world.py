@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont  # type: ignore  # pip install Pillow
 
-import tcod
+import tcod.event
 import tcod.sdl.render
 import tcod.sdl.video
 

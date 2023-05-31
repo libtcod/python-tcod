@@ -23,7 +23,10 @@ Example::
 
     #!/usr/bin/env python3
     # Make sure 'dejavu10x10_gs_tc.png' is in the same directory as this script.
-    import tcod
+    import tcod.console
+    import tcod.context
+    import tcod.event
+    import tcod.tileset
 
     WIDTH, HEIGHT = 80, 60  # Console width and height in tiles.
 
@@ -35,7 +38,7 @@ Example::
             "dejavu10x10_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD,
         )
         # Create the main console.
-        console = tcod.Console(WIDTH, HEIGHT, order="F")
+        console = tcod.console.Console(WIDTH, HEIGHT, order="F")
         # Create a window based on this console and tileset.
         with tcod.context.new(  # New window for a console of size columns×rows.
             columns=console.width, rows=console.height, tileset=tileset,
@@ -87,7 +90,8 @@ clearing the console every frame and replacing it only on resizing the window.
 Example::
 
     #!/usr/bin/env python3
-    import tcod
+    import tcod.context
+    import tcod.event
 
     WIDTH, HEIGHT = 720, 480  # Window pixel resolution (when not maximized.)
     FLAGS = tcod.context.SDL_WINDOW_RESIZABLE | tcod.context.SDL_WINDOW_MAXIMIZED

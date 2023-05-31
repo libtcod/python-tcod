@@ -7,7 +7,10 @@
 import sys
 from pathlib import Path
 
-import tcod
+import tcod.console
+import tcod.context
+import tcod.event
+import tcod.tileset
 
 WIDTH, HEIGHT = 80, 60
 

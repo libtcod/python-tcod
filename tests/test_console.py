@@ -6,23 +6,24 @@ import numpy as np
 import pytest
 
 import tcod
+import tcod.console
 
 # ruff: noqa: D103
 
 
-@pytest.mark.filterwarnings("ignore:Directly access a consoles")
-@pytest.mark.filterwarnings("ignore:This function may be deprecated in the fu")
 def test_array_read_write() -> None:
     console = tcod.console.Console(width=12, height=10)
     FG = (255, 254, 253)
     BG = (1, 2, 3)
     CH = ord("&")
-    tcod.console_put_char_ex(console, 0, 0, CH, FG, BG)
+    with pytest.warns():
+        tcod.console_put_char_ex(console, 0, 0, CH, FG, BG)
     assert console.ch[0, 0] == CH
     assert tuple(console.fg[0, 0]) == FG
     assert tuple(console.bg[0, 0]) == BG
 
-    tcod.console_put_char_ex(console, 1, 2, CH, FG, BG)
+    with pytest.warns():
+        tcod.console_put_char_ex(console, 1, 2, CH, FG, BG)
     assert console.ch[2, 1] == CH
     assert tuple(console.fg[2, 1]) == FG
     assert tuple(console.bg[2, 1]) == BG
@@ -37,9 +38,12 @@ def test_array_read_write() -> None:
     console.fg[1, ::2] = FG
     console.bg[...] = BG
 
-    assert tcod.console_get_char(console, 2, 1) == CH
-    assert tuple(tcod.console_get_char_foreground(console, 2, 1)) == FG
-    assert tuple(tcod.console_get_char_background(console, 2, 1)) == BG
+    with pytest.warns():
+        assert tcod.console_get_char(console, 2, 1) == CH
+    with pytest.warns():
+        assert tuple(tcod.console_get_char_foreground(console, 2, 1)) == FG
+    with pytest.warns():
+        assert tuple(tcod.console_get_char_background(console, 2, 1)) == BG
 
 
 @pytest.mark.filterwarnings("ignore")
@@ -137,7 +141,7 @@ def test_console_semigraphics() -> None:
 
 def test_rexpaint(tmp_path: Path) -> None:
     xp_path = tmp_path / "test.xp"
-    consoles = tcod.Console(80, 24, order="F"), tcod.Console(8, 8, order="F")
+    consoles = tcod.console.Console(80, 24, order="F"), tcod.console.Console(8, 8, order="F")
     tcod.console.save_xp(xp_path, consoles, compress_level=0)
     loaded = tcod.console.load_xp(xp_path, order="F")
     assert len(consoles) == len(loaded)
@@ -149,7 +153,7 @@ def test_rexpaint(tmp_path: Path) -> None:
 
 
 def test_draw_frame() -> None:
-    console = tcod.Console(3, 3, order="C")
+    console = tcod.console.Console(3, 3, order="C")
     with pytest.raises(TypeError):
         console.draw_frame(0, 0, 3, 3, title="test", decoration="123456789")
     with pytest.raises(TypeError):

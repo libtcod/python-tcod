@@ -1,5 +1,5 @@
 """Test for tcod.tileset module."""
-import tcod
+import tcod.tileset
 
 # ruff: noqa: D103
 

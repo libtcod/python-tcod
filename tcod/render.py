@@ -7,7 +7,7 @@ This includes rendering multiple tilesets in a single frame and rendering consol
 Example::
 
     tileset = tcod.tileset.load_tilesheet("dejavu16x16_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD)
-    console = tcod.Console(20, 8)
+    console = tcod.console.Console(20, 8)
     console.print(0, 0, "Hello World")
     sdl_window = tcod.sdl.video.new_window(
         console.width * tileset.tile_width,

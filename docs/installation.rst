@@ -50,9 +50,9 @@ You can then verify that ``tcod`` is importable from the Python interpreter::
 
     >python
 
-    >>> import tcod
+    >>> import tcod.context
 
-If ``import tcod`` doesn't throw an ``ImportError`` then ``tcod`` has been installed correctly to your system libraries.
+If ``import tcod.context`` doesn't throw an ``ImportError`` then ``tcod`` has been installed correctly to your system libraries.
 
 Some IDE's such as PyCharm will create a virtual environment which will ignore your system libraries and require tcod to be installed again in that new environment.
 

@@ -1087,7 +1087,7 @@ class Console:
 
         Example::
 
-            >>> console = tcod.Console(12, 6)
+            >>> console = tcod.console.Console(12, 6)
             >>> console.draw_frame(x=0, y=0, width=3, height=3)
             >>> console.draw_frame(x=3, y=0, width=3, height=3, decoration="╔═╗║ ║╚═╝")
             >>> console.draw_frame(x=6, y=0, width=3, height=3, decoration="123456789")
@@ -1272,7 +1272,8 @@ def load_xp(path: str | PathLike[str], order: Literal["C", "F"] = "C") -> tuple[
     Example::
 
         import numpy as np
-        import tcod
+        import tcod.console
+        import tcod.tileset
 
         path = "example.xp"  # REXPaint file with one layer.
 
@@ -1321,9 +1322,10 @@ def save_xp(
     Example::
 
         import numpy as np
-        import tcod
+        import tcod.console
+        import tcod.tileset
 
-        console = tcod.Console(80, 24)  # Example console.
+        console = tcod.console.Console(80, 24)  # Example console.
 
         # Convert from Unicode to REXPaint's encoding.
         # Required to load this console correctly in the REXPaint tool.

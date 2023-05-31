@@ -14,7 +14,10 @@ import freetype  # type: ignore  # pip install freetype-py
 import numpy as np
 from numpy.typing import NDArray
 
-import tcod
+import tcod.console
+import tcod.context
+import tcod.event
+import tcod.tileset
 
 FONT = "VeraMono.ttf"
 
@@ -60,7 +63,7 @@ def load_ttf(path: str, size: Tuple[int, int]) -> tcod.tileset.Tileset:
 
 def main() -> None:
     """True-type font example script."""
-    console = tcod.Console(16, 12, order="F")
+    console = tcod.console.Console(16, 12, order="F")
     with tcod.context.new(
         columns=console.width,
         rows=console.height,
