@@ -19,7 +19,7 @@ def raise_Exception(*args: object) -> NoReturn:
 
 def test_line_error() -> None:
     """Test exception propagation."""
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError), pytest.warns():
         tcod.line(0, 0, 10, 10, py_callback=raise_Exception)
 
 

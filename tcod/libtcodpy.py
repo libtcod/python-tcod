@@ -3260,19 +3260,6 @@ def line_where(x1: int, y1: int, x2: int, y2: int, inclusive: bool = True) -> tu
 
     If `inclusive` is true then the start point is included in the result.
 
-    Example:
-        >>> where = tcod.line_where(1, 0, 3, 4)
-        >>> where
-        (array([1, 1, 2, 2, 3]...), array([0, 1, 2, 3, 4]...))
-        >>> array = np.zeros((5, 5), dtype=np.int32)
-        >>> array[where] = np.arange(len(where[0])) + 1
-        >>> array
-        array([[0, 0, 0, 0, 0],
-               [1, 2, 0, 0, 0],
-               [0, 0, 3, 4, 0],
-               [0, 0, 0, 0, 5],
-               [0, 0, 0, 0, 0]]...)
-
     .. versionadded:: 4.6
 
     .. deprecated:: 11.14

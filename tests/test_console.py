@@ -106,11 +106,11 @@ def test_console_repr() -> None:
     eval(repr(tcod.console.Console(10, 2)))
 
 
-@pytest.mark.filterwarnings("ignore")
 def test_console_str() -> None:
     console = tcod.console.Console(10, 2)
     console.ch[:] = ord(".")
-    console.print_(0, 0, "Test")
+    with pytest.warns():
+        console.print_(0, 0, "Test")
     assert str(console) == ("<Test......\n" " ..........>")
 
 
@@ -161,4 +161,5 @@ def test_draw_frame() -> None:
 
     console.draw_frame(0, 0, 3, 3, decoration=(49, 50, 51, 52, 53, 54, 55, 56, 57))
     assert console.ch.tolist() == [[49, 50, 51], [52, 53, 54], [55, 56, 57]]
-    console.draw_frame(0, 0, 3, 3, title="T")
+    with pytest.warns():
+        console.draw_frame(0, 0, 3, 3, title="T")

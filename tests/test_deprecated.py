@@ -3,10 +3,12 @@ from __future__ import annotations
 
 import pytest
 
-import libtcodpy
 import tcod
 import tcod.event
 import tcod.libtcodpy
+
+with pytest.warns():
+    import libtcodpy
 
 # ruff: noqa: D103
 

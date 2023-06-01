@@ -304,10 +304,11 @@ class Console:
 
         Example:
             >>> con = tcod.console.Console(10, 2)
+            >>> WHITE, BLACK = (255, 255, 255), (0, 0, 0)
             >>> con.rgba[0, 0] = (
             ...     ord("X"),
-            ...     (*tcod.white, 255),
-            ...     (*tcod.black, 255),
+            ...     (*WHITE, 255),
+            ...     (*BLACK, 255),
             ... )
             >>> con.rgba[0, 0]
             (88, [255, 255, 255, 255], [  0,   0,   0, 255])
@@ -328,10 +329,11 @@ class Console:
 
         Example:
             >>> con = tcod.console.Console(10, 2)
-            >>> con.rgb[0, 0] = ord("@"), tcod.yellow, tcod.black
+            >>> BLUE, YELLOW, BLACK = (0, 0, 255), (255, 255, 0), (0, 0, 0)
+            >>> con.rgb[0, 0] = ord("@"), YELLOW, BLACK
             >>> con.rgb[0, 0]
             (64, [255, 255,   0], [0, 0, 0])
-            >>> con.rgb["bg"] = tcod.blue
+            >>> con.rgb["bg"] = BLUE
             >>> con.rgb[0, 0]
             (64, [255, 255,   0], [  0,   0, 255])
 
@@ -916,7 +918,7 @@ class Console:
             self.width,
             self.height,
             self._order,
-            self.tiles,
+            self.rgba,
         )
 
     def __str__(self) -> str:
