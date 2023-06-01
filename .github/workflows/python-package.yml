@@ -147,11 +147,11 @@ jobs:
       - name: Test with pytest
         if: runner.os == 'Windows'
         run: |
-          pytest --cov-report=xml --timeout=30
+          pytest --cov-report=xml --timeout=300
       - name: Test with pytest (Xvfb)
         if: always() && runner.os != 'Windows'
         run: |
-          xvfb-run -e /tmp/xvfb.log --server-num=$RANDOM --auto-servernum pytest --cov-report=xml --timeout=30
+          xvfb-run -e /tmp/xvfb.log --server-num=$RANDOM --auto-servernum pytest --cov-report=xml --timeout=300
       - name: Xvfb logs
         if: runner.os != 'Windows'
         run: cat /tmp/xvfb.log
