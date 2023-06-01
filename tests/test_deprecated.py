@@ -1,6 +1,7 @@
 """Test deprecated features."""
 from __future__ import annotations
 
+import numpy as np
 import pytest
 
 import tcod
@@ -29,3 +30,9 @@ def test_deprecate_key_constants() -> None:
         _ = tcod.event.K_1
     with pytest.raises(FutureWarning, match=r".*Scancode.N1"):
         _ = tcod.event.SCANCODE_1
+
+
+def test_line_where() -> None:
+    with pytest.warns():
+        where = tcod.libtcodpy.line_where(1, 0, 3, 4)
+    np.testing.assert_array_equal(where, [[1, 1, 2, 2, 3], [0, 1, 2, 3, 4]])
