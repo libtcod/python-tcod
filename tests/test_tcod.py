@@ -198,3 +198,5 @@ def test_context() -> None:
         context.change_tileset(tcod.tileset.Tileset(16, 16))
         context.pixel_to_tile(0, 0)
         context.pixel_to_subtile(0, 0)
+    with pytest.raises(RuntimeError, match=".*context has been closed"):
+        context.present(console)

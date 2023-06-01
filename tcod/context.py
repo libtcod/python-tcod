@@ -176,7 +176,17 @@ class Context:
 
     @classmethod
     def _claim(cls, context_p: Any) -> Context:
+        """Return a new instance wrapping a context pointer."""
         return cls(ffi.gc(context_p, lib.TCOD_context_delete))
+
+    @property
+    def _p(self) -> Any:  # noqa: ANN401
+        """Return the context pointer or raise if it is missing."""
+        try:
+            return self._context_p
+        except AttributeError:
+            msg = "This context has been closed can no longer be used."
+            raise RuntimeError(msg) from None
 
     def __enter__(self) -> Context:
         """Enter this context which will close on exiting."""
@@ -236,18 +246,18 @@ class Context:
                 "align_y": align[1],
             },
         )
-        _check(lib.TCOD_context_present(self._context_p, console.console_c, viewport_args))
+        _check(lib.TCOD_context_present(self._p, console.console_c, viewport_args))
 
     def pixel_to_tile(self, x: int, y: int) -> tuple[int, int]:
         """Convert window pixel coordinates to tile coordinates."""
         with ffi.new("int[2]", (x, y)) as xy:
-            _check(lib.TCOD_context_screen_pixel_to_tile_i(self._context_p, xy, xy + 1))
+            _check(lib.TCOD_context_screen_pixel_to_tile_i(self._p, xy, xy + 1))
             return xy[0], xy[1]
 
     def pixel_to_subtile(self, x: int, y: int) -> tuple[float, float]:
         """Convert window pixel coordinates to sub-tile coordinates."""
         with ffi.new("double[2]", (x, y)) as xy:
-            _check(lib.TCOD_context_screen_pixel_to_tile_d(self._context_p, xy, xy + 1))
+            _check(lib.TCOD_context_screen_pixel_to_tile_d(self._p, xy, xy + 1))
             return xy[0], xy[1]
 
     def convert_event(self, event: _Event) -> _Event:
@@ -286,7 +296,7 @@ class Context:
     def save_screenshot(self, path: str | None = None) -> None:
         """Save a screen-shot to the given file path."""
         c_path = path.encode("utf-8") if path is not None else ffi.NULL
-        _check(lib.TCOD_context_save_screenshot(self._context_p, c_path))
+        _check(lib.TCOD_context_save_screenshot(self._p, c_path))
 
     def change_tileset(self, tileset: tcod.tileset.Tileset | None) -> None:
         """Change the active tileset used by this context.
@@ -300,7 +310,7 @@ class Context:
         Using this method only one tileset is active per-frame.
         See :any:`tcod.render` if you want to renderer with multiple tilesets in a single frame.
         """
-        _check(lib.TCOD_context_change_tileset(self._context_p, _handle_tileset(tileset)))
+        _check(lib.TCOD_context_change_tileset(self._p, _handle_tileset(tileset)))
 
     def new_console(
         self,
@@ -359,7 +369,7 @@ class Context:
         if magnification < 0:
             raise ValueError("Magnification must be greater than zero. (Got %f)" % magnification)
         size = ffi.new("int[2]")
-        _check(lib.TCOD_context_recommended_console_size(self._context_p, magnification, size, size + 1))
+        _check(lib.TCOD_context_recommended_console_size(self._p, magnification, size, size + 1))
         width, height = max(min_columns, size[0]), max(min_rows, size[1])
         return tcod.console.Console(width, height, order=order)
 
@@ -371,13 +381,13 @@ class Context:
         If result is only used to create a new console then you may want to call :any:`Context.new_console` instead.
         """
         with ffi.new("int[2]") as size:
-            _check(lib.TCOD_context_recommended_console_size(self._context_p, 1.0, size, size + 1))
+            _check(lib.TCOD_context_recommended_console_size(self._p, 1.0, size, size + 1))
             return max(min_columns, size[0]), max(min_rows, size[1])
 
     @property
     def renderer_type(self) -> int:
         """Return the libtcod renderer type used by this context."""
-        return _check(lib.TCOD_context_get_renderer_type(self._context_p))
+        return _check(lib.TCOD_context_get_renderer_type(self._p))
 
     @property
     def sdl_window_p(self) -> Any:
@@ -407,7 +417,7 @@ class Context:
                 )
 
         '''
-        return lib.TCOD_context_get_sdl_window(self._context_p)
+        return lib.TCOD_context_get_sdl_window(self._p)
 
     @property
     def sdl_window(self) -> tcod.sdl.video.Window | None:
@@ -439,7 +449,7 @@ class Context:
 
         .. versionadded:: 13.4
         """
-        p = lib.TCOD_context_get_sdl_renderer(self._context_p)
+        p = lib.TCOD_context_get_sdl_renderer(self._p)
         return tcod.sdl.render.Renderer(p) if p else None
 
     @property
@@ -448,7 +458,7 @@ class Context:
 
         .. versionadded:: 13.5
         """
-        if self._context_p.type not in (lib.TCOD_RENDERER_SDL, lib.TCOD_RENDERER_SDL2):
+        if self._p.type not in (lib.TCOD_RENDERER_SDL, lib.TCOD_RENDERER_SDL2):
             return None
         context_data = ffi.cast("struct TCOD_RendererSDL2*", self._context_p.contextdata_)
         return tcod.render.SDLTilesetAtlas._from_ref(context_data.renderer, context_data.atlas)
