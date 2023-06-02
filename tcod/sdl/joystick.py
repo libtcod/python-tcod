@@ -5,7 +5,8 @@
 from __future__ import annotations
 
 import enum
-from typing import Any
+from typing import Any, ClassVar
+from weakref import WeakValueDictionary
 
 from typing_extensions import Final, Literal
 
@@ -122,6 +123,9 @@ class Joystick:
         https://wiki.libsdl.org/CategoryJoystick
     """
 
+    _by_instance_id: ClassVar[WeakValueDictionary[int, Joystick]] = WeakValueDictionary()
+    """Currently opened joysticks."""
+
     def __init__(self, sdl_joystick_p: Any) -> None:
         self.sdl_joystick_p: Final = sdl_joystick_p
         """The CFFI pointer to an SDL_Joystick struct."""
@@ -142,6 +146,8 @@ class Joystick:
         self._keep_alive: Any = None
         """The owner of this objects memory if this object does not own itself."""
 
+        self._by_instance_id[self.id] = self
+
     @classmethod
     def _open(cls, device_index: int) -> Joystick:
         tcod.sdl.sys.init(tcod.sdl.sys.Subsystem.JOYSTICK)
@@ -150,7 +156,7 @@ class Joystick:
 
     @classmethod
     def _from_instance_id(cls, instance_id: int) -> Joystick:
-        return cls(_check_p(ffi.gc(lib.SDL_JoystickFromInstanceID(instance_id), lib.SDL_JoystickClose)))
+        return cls._by_instance_id[instance_id]
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Joystick):
@@ -163,7 +169,7 @@ class Joystick:
     def _get_guid(self) -> str:
         guid_str = ffi.new("char[33]")
         lib.SDL_JoystickGetGUIDString(lib.SDL_JoystickGetGUID(self.sdl_joystick_p), guid_str, len(guid_str))
-        return str(tcod.ffi.string(guid_str), encoding="utf-8")
+        return str(ffi.string(guid_str), encoding="ascii")
 
     def get_current_power(self) -> Power:
         """Return the power level/state of this joystick.  See :any:`Power`."""
@@ -191,11 +197,15 @@ class Joystick:
 class GameController:
     """A standard interface for an Xbox 360 style game controller."""
 
+    _by_instance_id: ClassVar[WeakValueDictionary[int, GameController]] = WeakValueDictionary()
+    """Currently opened controllers."""
+
     def __init__(self, sdl_controller_p: Any) -> None:
         self.sdl_controller_p: Final = sdl_controller_p
         self.joystick: Final = Joystick(lib.SDL_GameControllerGetJoystick(self.sdl_controller_p))
         """The :any:`Joystick` associated with this controller."""
         self.joystick._keep_alive = self.sdl_controller_p  # This objects real owner needs to be kept alive.
+        self._by_instance_id[self.joystick.id] = self
 
     @classmethod
     def _open(cls, joystick_index: int) -> GameController:
@@ -203,7 +213,7 @@ class GameController:
 
     @classmethod
     def _from_instance_id(cls, instance_id: int) -> GameController:
-        return cls(_check_p(ffi.gc(lib.SDL_GameControllerFromInstanceID(instance_id), lib.SDL_GameControllerClose)))
+        return cls._by_instance_id[instance_id]
 
     def get_button(self, button: ControllerButton) -> bool:
         """Return True if `button` is currently held."""

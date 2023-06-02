@@ -4,6 +4,8 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+### Fixed
+- Joystick/controller device events would raise `RuntimeError` when accessed after removal.
 
 ## [16.0.1] - 2023-05-28
 ### Fixed
