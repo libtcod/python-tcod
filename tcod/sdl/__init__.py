@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import logging
+import sys as _sys
+from dataclasses import dataclass
 from pkgutil import extend_path
+from types import TracebackType
 from typing import Any, Callable, TypeVar
 
 from tcod.loader import ffi, lib
@@ -10,7 +13,7 @@ __path__ = extend_path(__path__, __name__)
 
 T = TypeVar("T")
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("tcod.sdl")
 
 _LOG_PRIORITY = {
     1: logging.DEBUG,  # SDL_LOG_PRIORITY_VERBOSE
@@ -21,11 +24,52 @@ _LOG_PRIORITY = {
     6: logging.CRITICAL,  # SDL_LOG_PRIORITY_CRITICAL
 }
 
+_LOG_CATEGORY = {
+    int(lib.SDL_LOG_CATEGORY_APPLICATION): "APPLICATION",
+    int(lib.SDL_LOG_CATEGORY_ERROR): "ERROR",
+    int(lib.SDL_LOG_CATEGORY_ASSERT): "ASSERT",
+    int(lib.SDL_LOG_CATEGORY_SYSTEM): "SYSTEM",
+    int(lib.SDL_LOG_CATEGORY_AUDIO): "AUDIO",
+    int(lib.SDL_LOG_CATEGORY_VIDEO): "VIDEO",
+    int(lib.SDL_LOG_CATEGORY_RENDER): "RENDER",
+    int(lib.SDL_LOG_CATEGORY_INPUT): "INPUT",
+    int(lib.SDL_LOG_CATEGORY_TEST): "TEST",
+    int(lib.SDL_LOG_CATEGORY_CUSTOM): "",
+}
+
+
+@dataclass
+class _UnraisableHookArgs:
+    exc_type: type[BaseException]
+    exc_value: BaseException | None
+    exc_traceback: TracebackType | None
+    err_msg: str | None
+    object: object
+
+
+class _ProtectedContext:
+    def __init__(self, obj: object = None) -> None:
+        self.obj = obj
+
+    def __enter__(self) -> None:
+        pass
+
+    def __exit__(
+        self, exc_type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None
+    ) -> bool:
+        if exc_type is None:
+            return False
+        if _sys.version_info < (3, 8):
+            return False
+        _sys.unraisablehook(_UnraisableHookArgs(exc_type, value, traceback, None, self.obj))  # type: ignore[arg-type]
+        return True
+
 
 @ffi.def_extern()  # type: ignore
-def _sdl_log_output_function(_userdata: Any, category: int, priority: int, message: Any) -> None:
+def _sdl_log_output_function(_userdata: None, category: int, priority: int, message_p: Any) -> None:  # noqa: ANN401
     """Pass logs sent by SDL to Python's logging system."""
-    logger.log(_LOG_PRIORITY.get(priority, 0), "%i:%s", category, ffi.string(message).decode("utf-8"))
+    message = str(ffi.string(message_p), encoding="utf-8")
+    logger.log(_LOG_PRIORITY.get(priority, 0), "%s:%s", _LOG_CATEGORY.get(category, ""), message)
 
 
 def _get_error() -> str:
@@ -49,6 +93,8 @@ def _check_p(result: Any) -> Any:
 
 if lib._sdl_log_output_function:
     lib.SDL_LogSetOutputFunction(lib._sdl_log_output_function, ffi.NULL)
+    if __debug__:
+        lib.SDL_LogSetAllPriority(lib.SDL_LOG_PRIORITY_VERBOSE)
 
 
 def _compiled_version() -> tuple[int, int, int]:

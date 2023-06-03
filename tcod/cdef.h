@@ -17,4 +17,7 @@ float _pycall_path_dest_only(int x1, int y1, int x2, int y2, void* user_data);
 void _pycall_sdl_hook(struct SDL_Surface*);
 
 void _pycall_cli_output(void* userdata, const char* output);
+
+// Libtcod log watch function.
+void _libtcod_log_watcher(const TCOD_LogMessage* message, void* userdata);
 }

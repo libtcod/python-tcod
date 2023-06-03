@@ -47,7 +47,6 @@ import enum
 import sys
 import threading
 import time
-from dataclasses import dataclass
 from types import TracebackType
 from typing import Any, Callable, Hashable, Iterator
 
@@ -57,7 +56,7 @@ from typing_extensions import Final, Literal, Self
 
 import tcod.sdl.sys
 from tcod.loader import ffi, lib
-from tcod.sdl import _check, _get_error
+from tcod.sdl import _check, _get_error, _ProtectedContext
 
 
 def _get_format(format: DTypeLike) -> int:
@@ -559,33 +558,6 @@ class BasicMixer(threading.Thread):
 
 class _AudioCallbackUserdata:
     device: AudioDevice
-
-
-@dataclass
-class _UnraisableHookArgs:
-    exc_type: type[BaseException]
-    exc_value: BaseException | None
-    exc_traceback: TracebackType | None
-    err_msg: str | None
-    object: object
-
-
-class _ProtectedContext:
-    def __init__(self, obj: object = None) -> None:
-        self.obj = obj
-
-    def __enter__(self) -> None:
-        pass
-
-    def __exit__(
-        self, exc_type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None
-    ) -> bool:
-        if exc_type is None:
-            return False
-        if sys.version_info < (3, 8):
-            return False
-        sys.unraisablehook(_UnraisableHookArgs(exc_type, value, traceback, None, self.obj))  # type: ignore[arg-type]
-        return True
 
 
 @ffi.def_extern()  # type: ignore

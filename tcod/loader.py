@@ -1,6 +1,7 @@
 """This module handles loading of the libtcod cffi API."""
 from __future__ import annotations
 
+import logging
 import os
 import platform
 import sys
@@ -8,6 +9,8 @@ from pathlib import Path
 from typing import Any
 
 import cffi
+
+logger = logging.getLogger("tcod")
 
 __sdl_version__ = ""
 
@@ -82,5 +85,19 @@ else:
     from tcod._libtcod import ffi, lib  # type: ignore
 
     __sdl_version__ = get_sdl_version()
+
+
+@ffi.def_extern()  # type: ignore
+def _libtcod_log_watcher(message: Any, userdata: None) -> None:
+    text = str(ffi.string(message.message), encoding="utf-8")
+    source = str(ffi.string(message.source), encoding="utf-8")
+    level = int(message.level)
+    lineno = int(message.lineno)
+    logger.log(level, "%s:%d:%s", source, lineno, text)
+
+
+if lib:
+    lib.TCOD_set_log_callback(lib._libtcod_log_watcher, ffi.NULL)
+    lib.TCOD_set_log_level(0)
 
 __all__ = ["ffi", "lib"]
