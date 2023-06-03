@@ -13,7 +13,7 @@ from typing_extensions import Final, Literal
 
 import tcod.sdl.video
 from tcod.loader import ffi, lib
-from tcod.sdl import _check, _check_p, _required_version
+from tcod.sdl._internal import _check, _check_p, _required_version
 
 
 class TextureAccess(enum.IntEnum):

@@ -56,7 +56,7 @@ from typing_extensions import Final, Literal, Self
 
 import tcod.sdl.sys
 from tcod.loader import ffi, lib
-from tcod.sdl import _check, _get_error, _ProtectedContext
+from tcod.sdl._internal import _check, _get_error, _ProtectedContext
 
 
 def _get_format(format: DTypeLike) -> int:

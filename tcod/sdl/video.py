@@ -16,7 +16,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from tcod.loader import ffi, lib
-from tcod.sdl import _check, _check_p, _required_version, _version_at_least
+from tcod.sdl._internal import _check, _check_p, _required_version, _version_at_least
 
 __all__ = (
     "WindowFlags",

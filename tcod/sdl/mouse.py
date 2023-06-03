@@ -17,7 +17,7 @@ from numpy.typing import ArrayLike, NDArray
 import tcod.event
 import tcod.sdl.video
 from tcod.loader import ffi, lib
-from tcod.sdl import _check, _check_p
+from tcod.sdl._internal import _check, _check_p
 
 
 class Cursor:
