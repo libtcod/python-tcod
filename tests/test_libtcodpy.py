@@ -7,7 +7,7 @@ import pytest
 from numpy.typing import NDArray
 
 import tcod
-import tcod as libtcodpy
+from tcod import libtcodpy
 
 # ruff: noqa: D103
 
@@ -17,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_console_behavior(console: tcod.Console) -> None:
+def test_console_behavior(console: tcod.console.Console) -> None:
     assert not console
 
 

@@ -15,6 +15,7 @@ from typing_extensions import Literal
 
 import tcod.bsp
 import tcod.console
+import tcod.constants
 import tcod.image
 import tcod.los
 import tcod.map
@@ -4274,11 +4275,16 @@ def _atexit_verify() -> None:
 
 def __getattr__(name: str) -> Color:
     """Mark access to color constants as deprecated."""
-    try:
-        return tcod.__getattr__(name, stacklevel=2)  # type: ignore[call-arg]
-    except AttributeError:
-        msg = f"module {__name__!r} has no attribute {name!r}"
-        raise AttributeError(msg) from None
+    value: object = getattr(tcod.constants, name, None)
+    if isinstance(value, Color):
+        warnings.warn(
+            f"Color constants will be removed from future releases.\nReplace 'tcod.{name}' with '{tuple(value)}'.",
+            FutureWarning,
+            stacklevel=2,
+        )
+        return value
+    msg = f"module {__name__!r} has no attribute {name!r}"
+    raise AttributeError(msg) from None
 
 
 __all__ = [  # noqa: F405

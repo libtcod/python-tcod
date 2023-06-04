@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 
 import tcod
+import tcod.constants
 import tcod.event
 import tcod.libtcodpy
 
@@ -14,21 +15,29 @@ with pytest.warns():
 # ruff: noqa: D103
 
 
-@pytest.mark.filterwarnings("error")
 def test_deprecate_color() -> None:
-    with pytest.raises(FutureWarning, match=r".*\(0, 0, 0\)"):
-        _ = tcod.black
-    with pytest.raises(FutureWarning, match=r".*\(0, 0, 0\)"):
-        _ = tcod.libtcodpy.black
-    with pytest.raises(FutureWarning, match=r".*\(0, 0, 0\)"):
-        _ = libtcodpy.black
+    with pytest.warns(FutureWarning, match=r"\(0, 0, 0\)"):
+        assert tcod.black is tcod.constants.black
+    with pytest.warns(FutureWarning, match=r"\(0, 0, 0\)"):
+        assert tcod.libtcodpy.black is tcod.constants.black
+    with pytest.warns(FutureWarning, match=r"\(0, 0, 0\)"):
+        assert libtcodpy.black is tcod.constants.black
 
 
-@pytest.mark.filterwarnings("error")
+def test_constants() -> None:
+    with pytest.warns(match=r"tcod.constants.RENDERER_SDL2"):
+        assert tcod.RENDERER_SDL2 is tcod.constants.RENDERER_SDL2
+
+
+def test_implicit_libtcodpy() -> None:
+    with pytest.warns(match=r"libtcodpy.console_init_root"):
+        assert tcod.console_init_root is tcod.libtcodpy.console_init_root
+
+
 def test_deprecate_key_constants() -> None:
-    with pytest.raises(FutureWarning, match=r".*KeySym.N1"):
+    with pytest.warns(FutureWarning, match=r"KeySym.N1"):
         _ = tcod.event.K_1
-    with pytest.raises(FutureWarning, match=r".*Scancode.N1"):
+    with pytest.warns(FutureWarning, match=r"Scancode.N1"):
         _ = tcod.event.SCANCODE_1
 
 

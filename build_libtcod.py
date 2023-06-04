@@ -366,7 +366,6 @@ def write_library_constants() -> None:
 
         all_names_merged = ",\n    ".join(f'"{name}"' for name in all_names)
         f.write(f"\n__all__ = [\n    {all_names_merged},\n]\n")
-        update_module_all(Path("tcod/__init__.py"), all_names_merged)
         update_module_all(Path("tcod/libtcodpy.py"), all_names_merged)
 
     with Path("tcod/event_constants.py").open("w", encoding="utf-8") as f:

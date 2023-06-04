@@ -25,6 +25,7 @@ import tcod.noise
 import tcod.render
 import tcod.sdl.mouse
 import tcod.sdl.render
+from tcod import libtcodpy
 
 # ruff: noqa: S311
 
@@ -746,76 +747,76 @@ class PathfindingSample(Sample):
             for y in range(SAMPLE_SCREEN_HEIGHT):
                 for x in range(SAMPLE_SCREEN_WIDTH):
                     if SAMPLE_MAP[x, y] != "#":
-                        tcod.console_set_char_background(
+                        libtcodpy.console_set_char_background(
                             sample_console,
                             x,
                             y,
-                            tcod.color_lerp(  # type: ignore
+                            libtcodpy.color_lerp(  # type: ignore
                                 LIGHT_GROUND,
                                 DARK_GROUND,
-                                0.9 * tcod.dijkstra_get_distance(self.dijkstra, x, y) / self.dijkstra_dist,
+                                0.9 * libtcodpy.dijkstra_get_distance(self.dijkstra, x, y) / self.dijkstra_dist,
                             ),
                             tcod.BKGND_SET,
                         )
-            for i in range(tcod.dijkstra_size(self.dijkstra)):
-                x, y = tcod.dijkstra_get(self.dijkstra, i)
-                tcod.console_set_char_background(sample_console, x, y, LIGHT_GROUND, tcod.BKGND_SET)
+            for i in range(libtcodpy.dijkstra_size(self.dijkstra)):
+                x, y = libtcodpy.dijkstra_get(self.dijkstra, i)
+                libtcodpy.console_set_char_background(sample_console, x, y, LIGHT_GROUND, tcod.constants.BKGND_SET)
 
         # move the creature
         self.busy -= frame_length[-1]
         if self.busy <= 0.0:
             self.busy = 0.2
             if self.using_astar:
-                if not tcod.path_is_empty(self.path):
-                    tcod.console_put_char(sample_console, self.px, self.py, " ", tcod.BKGND_NONE)
-                    self.px, self.py = tcod.path_walk(self.path, True)  # type: ignore
-                    tcod.console_put_char(sample_console, self.px, self.py, "@", tcod.BKGND_NONE)
+                if not libtcodpy.path_is_empty(self.path):
+                    libtcodpy.console_put_char(sample_console, self.px, self.py, " ", tcod.constants.BKGND_NONE)
+                    self.px, self.py = libtcodpy.path_walk(self.path, True)  # type: ignore
+                    libtcodpy.console_put_char(sample_console, self.px, self.py, "@", tcod.constants.BKGND_NONE)
             else:
-                if not tcod.dijkstra_is_empty(self.dijkstra):
-                    tcod.console_put_char(sample_console, self.px, self.py, " ", tcod.BKGND_NONE)
-                    self.px, self.py = tcod.dijkstra_path_walk(self.dijkstra)  # type: ignore
-                    tcod.console_put_char(sample_console, self.px, self.py, "@", tcod.BKGND_NONE)
+                if not libtcodpy.dijkstra_is_empty(self.dijkstra):
+                    libtcodpy.console_put_char(sample_console, self.px, self.py, " ", tcod.constants.BKGND_NONE)
+                    self.px, self.py = libtcodpy.dijkstra_path_walk(self.dijkstra)  # type: ignore
+                    libtcodpy.console_put_char(sample_console, self.px, self.py, "@", tcod.constants.BKGND_NONE)
                     self.recalculate = True
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym == tcod.event.KeySym.i and self.dy > 0:
             # destination move north
-            tcod.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.constants.BKGND_NONE)
             self.dy -= 1
             self.oldchar = sample_console.ch[self.dx, self.dy]
-            tcod.console_put_char(sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", tcod.constants.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
         elif event.sym == tcod.event.KeySym.k and self.dy < SAMPLE_SCREEN_HEIGHT - 1:
             # destination move south
-            tcod.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.constants.BKGND_NONE)
             self.dy += 1
             self.oldchar = sample_console.ch[self.dx, self.dy]
-            tcod.console_put_char(sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", tcod.constants.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
         elif event.sym == tcod.event.KeySym.j and self.dx > 0:
             # destination move west
-            tcod.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.constants.BKGND_NONE)
             self.dx -= 1
             self.oldchar = sample_console.ch[self.dx, self.dy]
-            tcod.console_put_char(sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", tcod.constants.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
         elif event.sym == tcod.event.KeySym.l and self.dx < SAMPLE_SCREEN_WIDTH - 1:
             # destination move east
-            tcod.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.constants.BKGND_NONE)
             self.dx += 1
             self.oldchar = sample_console.ch[self.dx, self.dy]
-            tcod.console_put_char(sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", tcod.constants.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
         elif event.sym == tcod.event.KeySym.TAB:
             self.using_astar = not self.using_astar
             if self.using_astar:
-                tcod.console_print(sample_console, 1, 4, "Using : A*      ")
+                libtcodpy.console_print(sample_console, 1, 4, "Using : A*      ")
             else:
-                tcod.console_print(sample_console, 1, 4, "Using : Dijkstra")
+                libtcodpy.console_print(sample_console, 1, 4, "Using : Dijkstra")
             self.recalculate = True
         else:
             super().ev_keydown(event)
@@ -824,11 +825,11 @@ class PathfindingSample(Sample):
         mx = event.tile.x - SAMPLE_SCREEN_X
         my = event.tile.y - SAMPLE_SCREEN_Y
         if 0 <= mx < SAMPLE_SCREEN_WIDTH and 0 <= my < SAMPLE_SCREEN_HEIGHT and (self.dx != mx or self.dy != my):
-            tcod.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.constants.BKGND_NONE)
             self.dx = mx
             self.dy = my
             self.oldchar = sample_console.ch[self.dx, self.dy]
-            tcod.console_put_char(sample_console, self.dx, self.dy, "+", tcod.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", tcod.constants.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
 

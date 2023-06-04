@@ -1,7 +1,7 @@
-"""Module alias for tcod."""
+"""Deprecated module alias for tcod.libtcodpy, use 'import tcod as libtcodpy' instead."""
 import warnings
 
-from tcod import *  # noqa: F4
+from tcod.libtcodpy import *  # noqa: F403
 from tcod.libtcodpy import __getattr__  # noqa: F401
 
 warnings.warn(
