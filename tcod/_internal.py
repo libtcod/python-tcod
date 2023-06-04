@@ -10,7 +10,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from typing_extensions import Literal
 
-from tcod.loader import ffi, lib
+from tcod.cffi import ffi, lib
 
 FuncType = Callable[..., Any]
 F = TypeVar("F", bound=FuncType)

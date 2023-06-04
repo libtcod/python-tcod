@@ -16,7 +16,7 @@ from typing_extensions import Literal
 import tcod._internal
 import tcod.constants
 from tcod._internal import _check, deprecate
-from tcod.loader import ffi, lib
+from tcod.cffi import ffi, lib
 
 
 def _fmt(string: str) -> bytes:

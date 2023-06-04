@@ -22,7 +22,7 @@ from numpy.typing import ArrayLike, NDArray
 
 import tcod.console
 from tcod._internal import _check, _console, _raise_tcod_error, deprecate
-from tcod.loader import ffi, lib
+from tcod.cffi import ffi, lib
 
 
 class Tileset:

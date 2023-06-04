@@ -15,7 +15,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from tcod.loader import ffi, lib
+from tcod.cffi import ffi, lib
 from tcod.sdl._internal import _check, _check_p, _required_version, _version_at_least
 
 __all__ = (

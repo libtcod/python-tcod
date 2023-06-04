@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from types import TracebackType
 from typing import Any, Callable, TypeVar
 
-from tcod.loader import ffi, lib
+from tcod.cffi import ffi, lib
 
 T = TypeVar("T")
 

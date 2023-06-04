@@ -65,7 +65,7 @@ import tcod.sdl.render
 import tcod.sdl.video
 import tcod.tileset
 from tcod._internal import _check, _check_warn, pending_deprecate
-from tcod.loader import ffi, lib
+from tcod.cffi import ffi, lib
 
 __all__ = (
     "Context",

@@ -11,7 +11,7 @@ from weakref import WeakValueDictionary
 from typing_extensions import Final, Literal
 
 import tcod.sdl.sys
-from tcod.loader import ffi, lib
+from tcod.cffi import ffi, lib
 from tcod.sdl._internal import _check, _check_p
 
 _HAT_DIRECTIONS: dict[int, tuple[Literal[-1, 0, 1], Literal[-1, 0, 1]]] = {

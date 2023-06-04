@@ -4,7 +4,7 @@ import enum
 import warnings
 from typing import Any
 
-from tcod.loader import ffi, lib
+from tcod.cffi import ffi, lib
 from tcod.sdl._internal import _check, _get_error
 
 

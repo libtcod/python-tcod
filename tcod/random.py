@@ -14,7 +14,7 @@ import warnings
 from typing import Any, Hashable
 
 import tcod.constants
-from tcod.loader import ffi, lib
+from tcod.cffi import ffi, lib
 
 MERSENNE_TWISTER = tcod.constants.RNG_MT
 COMPLEMENTARY_MULTIPLY_WITH_CARRY = tcod.constants.RNG_CMWC

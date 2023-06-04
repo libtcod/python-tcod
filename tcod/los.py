@@ -6,7 +6,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from tcod.loader import ffi, lib
+from tcod.cffi import ffi, lib
 
 
 def bresenham(start: tuple[int, int], end: tuple[int, int]) -> NDArray[np.intc]:

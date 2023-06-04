@@ -30,7 +30,7 @@ from typing import Any, Iterator
 
 import tcod.random
 from tcod._internal import deprecate
-from tcod.loader import ffi, lib
+from tcod.cffi import ffi, lib
 
 
 class BSP:

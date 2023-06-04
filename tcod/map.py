@@ -10,7 +10,7 @@ from typing_extensions import Literal
 
 import tcod._internal
 import tcod.constants
-from tcod.loader import ffi, lib
+from tcod.cffi import ffi, lib
 
 
 class Map:

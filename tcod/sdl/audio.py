@@ -55,7 +55,7 @@ from numpy.typing import ArrayLike, DTypeLike, NDArray
 from typing_extensions import Final, Literal, Self
 
 import tcod.sdl.sys
-from tcod.loader import ffi, lib
+from tcod.cffi import ffi, lib
 from tcod.sdl._internal import _check, _get_error, _ProtectedContext
 
 

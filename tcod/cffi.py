@@ -64,7 +64,7 @@ __sdl_version__ = get_sdl_version()
 
 
 @ffi.def_extern()  # type: ignore
-def _libtcod_log_watcher(message: Any, userdata: None) -> None:
+def _libtcod_log_watcher(message: Any, userdata: None) -> None:  # noqa: ANN401
     text = str(ffi.string(message.message), encoding="utf-8")
     source = str(ffi.string(message.source), encoding="utf-8")
     level = int(message.level)

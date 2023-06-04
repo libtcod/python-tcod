@@ -19,7 +19,7 @@ from numpy.typing import ArrayLike, NDArray
 
 import tcod.console
 from tcod._internal import _console, deprecate
-from tcod.loader import ffi, lib
+from tcod.cffi import ffi, lib
 
 
 class Image:

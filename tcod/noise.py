@@ -43,7 +43,7 @@ from typing_extensions import Literal
 
 import tcod.constants
 import tcod.random
-from tcod.loader import ffi, lib
+from tcod.cffi import ffi, lib
 
 
 class Algorithm(enum.IntEnum):

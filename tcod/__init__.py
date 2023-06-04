@@ -14,10 +14,10 @@ from pkgutil import extend_path
 __path__ = extend_path(__path__, __name__)
 
 from tcod import bsp, color, console, constants, context, event, image, los, map, noise, path, random, tileset
+from tcod.cffi import __sdl_version__, ffi, lib
 from tcod.console import Console
 from tcod.constants import *  # noqa: F403
 from tcod.libtcodpy import *  # noqa: F403
-from tcod.loader import __sdl_version__, ffi, lib
 from tcod.version import __version__
 
 

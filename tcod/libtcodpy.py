@@ -36,6 +36,7 @@ from tcod._internal import (
     deprecate,
     pending_deprecate,
 )
+from tcod.cffi import ffi, lib
 from tcod.color import Color
 from tcod.constants import *  # noqa: F403
 from tcod.constants import (
@@ -49,7 +50,6 @@ from tcod.constants import (
     KEY_RELEASED,
     NOISE_DEFAULT,
 )
-from tcod.loader import ffi, lib
 
 # ruff: noqa: ANN401 PLR0913  # Functions are too deprecated to make changes.
 
