@@ -4,6 +4,8 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+### Changed
+- Using `libtcod 1.24.0`.
 
 ## [16.0.3] - 2023-06-04
 ### Changed
