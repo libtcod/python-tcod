@@ -17,7 +17,7 @@ class Subsystem(enum.IntFlag):
     GAMECONTROLLER = 0x00002000
     EVENTS = 0x00004000
     SENSOR = 0x00008000
-    EVERYTHING = lib.SDL_INIT_EVERYTHING or 0
+    EVERYTHING = int(lib.SDL_INIT_EVERYTHING)
 
 
 def init(flags: int = Subsystem.EVERYTHING) -> None:

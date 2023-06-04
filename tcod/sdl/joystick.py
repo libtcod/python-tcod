@@ -15,69 +15,69 @@ from tcod.loader import ffi, lib
 from tcod.sdl._internal import _check, _check_p
 
 _HAT_DIRECTIONS: dict[int, tuple[Literal[-1, 0, 1], Literal[-1, 0, 1]]] = {
-    lib.SDL_HAT_CENTERED or 0: (0, 0),
-    lib.SDL_HAT_UP or 0: (0, -1),
-    lib.SDL_HAT_RIGHT or 0: (1, 0),
-    lib.SDL_HAT_DOWN or 0: (0, 1),
-    lib.SDL_HAT_LEFT or 0: (-1, 0),
-    lib.SDL_HAT_RIGHTUP or 0: (1, -1),
-    lib.SDL_HAT_RIGHTDOWN or 0: (1, 1),
-    lib.SDL_HAT_LEFTUP or 0: (-1, -1),
-    lib.SDL_HAT_LEFTDOWN or 0: (-1, 1),
+    int(lib.SDL_HAT_CENTERED): (0, 0),
+    int(lib.SDL_HAT_UP): (0, -1),
+    int(lib.SDL_HAT_RIGHT): (1, 0),
+    int(lib.SDL_HAT_DOWN): (0, 1),
+    int(lib.SDL_HAT_LEFT): (-1, 0),
+    int(lib.SDL_HAT_RIGHTUP): (1, -1),
+    int(lib.SDL_HAT_RIGHTDOWN): (1, 1),
+    int(lib.SDL_HAT_LEFTUP): (-1, -1),
+    int(lib.SDL_HAT_LEFTDOWN): (-1, 1),
 }
 
 
 class ControllerAxis(enum.IntEnum):
     """The standard axes for a game controller."""
 
-    INVALID = lib.SDL_CONTROLLER_AXIS_INVALID or -1
-    LEFTX = lib.SDL_CONTROLLER_AXIS_LEFTX or 0
+    INVALID = int(lib.SDL_CONTROLLER_AXIS_INVALID)
+    LEFTX = int(lib.SDL_CONTROLLER_AXIS_LEFTX)
     """"""
-    LEFTY = lib.SDL_CONTROLLER_AXIS_LEFTY or 1
+    LEFTY = int(lib.SDL_CONTROLLER_AXIS_LEFTY)
     """"""
-    RIGHTX = lib.SDL_CONTROLLER_AXIS_RIGHTX or 2
+    RIGHTX = int(lib.SDL_CONTROLLER_AXIS_RIGHTX)
     """"""
-    RIGHTY = lib.SDL_CONTROLLER_AXIS_RIGHTY or 3
+    RIGHTY = int(lib.SDL_CONTROLLER_AXIS_RIGHTY)
     """"""
-    TRIGGERLEFT = lib.SDL_CONTROLLER_AXIS_TRIGGERLEFT or 4
+    TRIGGERLEFT = int(lib.SDL_CONTROLLER_AXIS_TRIGGERLEFT)
     """"""
-    TRIGGERRIGHT = lib.SDL_CONTROLLER_AXIS_TRIGGERRIGHT or 5
+    TRIGGERRIGHT = int(lib.SDL_CONTROLLER_AXIS_TRIGGERRIGHT)
     """"""
 
 
 class ControllerButton(enum.IntEnum):
     """The standard buttons for a game controller."""
 
-    INVALID = lib.SDL_CONTROLLER_BUTTON_INVALID or -1
-    A = lib.SDL_CONTROLLER_BUTTON_A or 0
+    INVALID = int(lib.SDL_CONTROLLER_BUTTON_INVALID)
+    A = int(lib.SDL_CONTROLLER_BUTTON_A)
     """"""
-    B = lib.SDL_CONTROLLER_BUTTON_B or 1
+    B = int(lib.SDL_CONTROLLER_BUTTON_B)
     """"""
-    X = lib.SDL_CONTROLLER_BUTTON_X or 2
+    X = int(lib.SDL_CONTROLLER_BUTTON_X)
     """"""
-    Y = lib.SDL_CONTROLLER_BUTTON_Y or 3
+    Y = int(lib.SDL_CONTROLLER_BUTTON_Y)
     """"""
-    BACK = lib.SDL_CONTROLLER_BUTTON_BACK or 4
+    BACK = int(lib.SDL_CONTROLLER_BUTTON_BACK)
     """"""
-    GUIDE = lib.SDL_CONTROLLER_BUTTON_GUIDE or 5
+    GUIDE = int(lib.SDL_CONTROLLER_BUTTON_GUIDE)
     """"""
-    START = lib.SDL_CONTROLLER_BUTTON_START or 6
+    START = int(lib.SDL_CONTROLLER_BUTTON_START)
     """"""
-    LEFTSTICK = lib.SDL_CONTROLLER_BUTTON_LEFTSTICK or 7
+    LEFTSTICK = int(lib.SDL_CONTROLLER_BUTTON_LEFTSTICK)
     """"""
-    RIGHTSTICK = lib.SDL_CONTROLLER_BUTTON_RIGHTSTICK or 8
+    RIGHTSTICK = int(lib.SDL_CONTROLLER_BUTTON_RIGHTSTICK)
     """"""
-    LEFTSHOULDER = lib.SDL_CONTROLLER_BUTTON_LEFTSHOULDER or 9
+    LEFTSHOULDER = int(lib.SDL_CONTROLLER_BUTTON_LEFTSHOULDER)
     """"""
-    RIGHTSHOULDER = lib.SDL_CONTROLLER_BUTTON_RIGHTSHOULDER or 10
+    RIGHTSHOULDER = int(lib.SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)
     """"""
-    DPAD_UP = lib.SDL_CONTROLLER_BUTTON_DPAD_UP or 11
+    DPAD_UP = int(lib.SDL_CONTROLLER_BUTTON_DPAD_UP)
     """"""
-    DPAD_DOWN = lib.SDL_CONTROLLER_BUTTON_DPAD_DOWN or 12
+    DPAD_DOWN = int(lib.SDL_CONTROLLER_BUTTON_DPAD_DOWN)
     """"""
-    DPAD_LEFT = lib.SDL_CONTROLLER_BUTTON_DPAD_LEFT or 13
+    DPAD_LEFT = int(lib.SDL_CONTROLLER_BUTTON_DPAD_LEFT)
     """"""
-    DPAD_RIGHT = lib.SDL_CONTROLLER_BUTTON_DPAD_RIGHT or 14
+    DPAD_RIGHT = int(lib.SDL_CONTROLLER_BUTTON_DPAD_RIGHT)
     """"""
     MISC1 = 15
     """"""
@@ -100,19 +100,19 @@ class Power(enum.IntEnum):
         :any:`Joystick.get_current_power`
     """
 
-    UNKNOWN = lib.SDL_JOYSTICK_POWER_UNKNOWN or -1
+    UNKNOWN = int(lib.SDL_JOYSTICK_POWER_UNKNOWN)
     """Power state is unknown."""
-    EMPTY = lib.SDL_JOYSTICK_POWER_EMPTY or 0
+    EMPTY = int(lib.SDL_JOYSTICK_POWER_EMPTY)
     """<= 5% power."""
-    LOW = lib.SDL_JOYSTICK_POWER_LOW or 1
+    LOW = int(lib.SDL_JOYSTICK_POWER_LOW)
     """<= 20% power."""
-    MEDIUM = lib.SDL_JOYSTICK_POWER_MEDIUM or 2
+    MEDIUM = int(lib.SDL_JOYSTICK_POWER_MEDIUM)
     """<= 70% power."""
-    FULL = lib.SDL_JOYSTICK_POWER_FULL or 3
+    FULL = int(lib.SDL_JOYSTICK_POWER_FULL)
     """<= 100% power."""
-    WIRED = lib.SDL_JOYSTICK_POWER_WIRED or 4
+    WIRED = int(lib.SDL_JOYSTICK_POWER_WIRED)
     """"""
-    MAX = lib.SDL_JOYSTICK_POWER_MAX or 5
+    MAX = int(lib.SDL_JOYSTICK_POWER_MAX)
     """"""
 
 

@@ -57,34 +57,10 @@ if sys.platform == "win32":
     os.environ["PATH"] = f"""{Path(__file__).parent / get_architecture()}{os.pathsep}{os.environ["PATH"]}"""
 
 
-class _Mock:
-    """Mock object needed for ReadTheDocs."""
+verify_dependencies()
+from tcod._libtcod import ffi, lib  # noqa
 
-    @staticmethod
-    def def_extern() -> Any:
-        """Pass def_extern call silently."""
-        return lambda func: func
-
-    def __getattr__(self, attr: str) -> None:
-        """Return None on any attribute."""
-
-    def __bool__(self) -> bool:
-        """Allow checking for this mock object at import time."""
-        return False
-
-
-lib: Any = None
-ffi: Any = None
-
-if os.environ.get("READTHEDOCS"):
-    # Mock the lib and ffi objects needed to compile docs for readthedocs.io
-    # Allows an import without building the cffi module first.
-    lib = ffi = _Mock()
-else:
-    verify_dependencies()
-    from tcod._libtcod import ffi, lib  # type: ignore
-
-    __sdl_version__ = get_sdl_version()
+__sdl_version__ = get_sdl_version()
 
 
 @ffi.def_extern()  # type: ignore
@@ -96,8 +72,7 @@ def _libtcod_log_watcher(message: Any, userdata: None) -> None:
     logger.log(level, "%s:%d:%s", source, lineno, text)
 
 
-if lib:
-    lib.TCOD_set_log_callback(lib._libtcod_log_watcher, ffi.NULL)
-    lib.TCOD_set_log_level(0)
+lib.TCOD_set_log_callback(lib._libtcod_log_watcher, ffi.NULL)
+lib.TCOD_set_log_level(0)
 
-__all__ = ["ffi", "lib"]
+__all__ = ["ffi", "lib", "__sdl_version__"]

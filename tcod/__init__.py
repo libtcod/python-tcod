@@ -18,11 +18,7 @@ from tcod.console import Console
 from tcod.constants import *  # noqa: F403
 from tcod.libtcodpy import *  # noqa: F403
 from tcod.loader import __sdl_version__, ffi, lib
-
-try:
-    from tcod.version import __version__
-except ImportError:  # Gets imported without version.py by ReadTheDocs
-    __version__ = ""
+from tcod.version import __version__
 
 
 def __getattr__(name: str, stacklevel: int = 1) -> color.Color:

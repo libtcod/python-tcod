@@ -89,12 +89,6 @@ def _check_p(result: Any) -> Any:
     return result
 
 
-if lib._sdl_log_output_function:
-    lib.SDL_LogSetOutputFunction(lib._sdl_log_output_function, ffi.NULL)
-    if __debug__:
-        lib.SDL_LogSetAllPriority(lib.SDL_LOG_PRIORITY_VERBOSE)
-
-
 def _compiled_version() -> tuple[int, int, int]:
     return int(lib.SDL_MAJOR_VERSION), int(lib.SDL_MINOR_VERSION), int(lib.SDL_PATCHLEVEL)
 
@@ -124,3 +118,8 @@ def _required_version(required: tuple[int, int, int]) -> Callable[[T], T]:
         raise RuntimeError(msg)
 
     return lambda x: replacement  # type: ignore[return-value]
+
+
+lib.SDL_LogSetOutputFunction(lib._sdl_log_output_function, ffi.NULL)
+if __debug__:
+    lib.SDL_LogSetAllPriority(lib.SDL_LOG_PRIORITY_VERBOSE)

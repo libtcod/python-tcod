@@ -35,49 +35,49 @@ class WindowFlags(enum.IntFlag):
         https://wiki.libsdl.org/SDL_WindowFlags
     """
 
-    FULLSCREEN = lib.SDL_WINDOW_FULLSCREEN or 0
+    FULLSCREEN = int(lib.SDL_WINDOW_FULLSCREEN)
     """"""
-    FULLSCREEN_DESKTOP = lib.SDL_WINDOW_FULLSCREEN_DESKTOP or 0
+    FULLSCREEN_DESKTOP = int(lib.SDL_WINDOW_FULLSCREEN_DESKTOP)
     """"""
-    OPENGL = lib.SDL_WINDOW_OPENGL or 0
+    OPENGL = int(lib.SDL_WINDOW_OPENGL)
     """"""
-    SHOWN = lib.SDL_WINDOW_SHOWN or 0
+    SHOWN = int(lib.SDL_WINDOW_SHOWN)
     """"""
-    HIDDEN = lib.SDL_WINDOW_HIDDEN or 0
+    HIDDEN = int(lib.SDL_WINDOW_HIDDEN)
     """"""
-    BORDERLESS = lib.SDL_WINDOW_BORDERLESS or 0
+    BORDERLESS = int(lib.SDL_WINDOW_BORDERLESS)
     """"""
-    RESIZABLE = lib.SDL_WINDOW_RESIZABLE or 0
+    RESIZABLE = int(lib.SDL_WINDOW_RESIZABLE)
     """"""
-    MINIMIZED = lib.SDL_WINDOW_MINIMIZED or 0
+    MINIMIZED = int(lib.SDL_WINDOW_MINIMIZED)
     """"""
-    MAXIMIZED = lib.SDL_WINDOW_MAXIMIZED or 0
+    MAXIMIZED = int(lib.SDL_WINDOW_MAXIMIZED)
     """"""
-    MOUSE_GRABBED = lib.SDL_WINDOW_INPUT_GRABBED or 0
+    MOUSE_GRABBED = int(lib.SDL_WINDOW_INPUT_GRABBED)
     """"""
-    INPUT_FOCUS = lib.SDL_WINDOW_INPUT_FOCUS or 0
+    INPUT_FOCUS = int(lib.SDL_WINDOW_INPUT_FOCUS)
     """"""
-    MOUSE_FOCUS = lib.SDL_WINDOW_MOUSE_FOCUS or 0
+    MOUSE_FOCUS = int(lib.SDL_WINDOW_MOUSE_FOCUS)
     """"""
-    FOREIGN = lib.SDL_WINDOW_FOREIGN or 0
+    FOREIGN = int(lib.SDL_WINDOW_FOREIGN)
     """"""
-    ALLOW_HIGHDPI = lib.SDL_WINDOW_ALLOW_HIGHDPI or 0
+    ALLOW_HIGHDPI = int(lib.SDL_WINDOW_ALLOW_HIGHDPI)
     """"""
-    MOUSE_CAPTURE = lib.SDL_WINDOW_MOUSE_CAPTURE or 0
+    MOUSE_CAPTURE = int(lib.SDL_WINDOW_MOUSE_CAPTURE)
     """"""
-    ALWAYS_ON_TOP = lib.SDL_WINDOW_ALWAYS_ON_TOP or 0
+    ALWAYS_ON_TOP = int(lib.SDL_WINDOW_ALWAYS_ON_TOP)
     """"""
-    SKIP_TASKBAR = lib.SDL_WINDOW_SKIP_TASKBAR or 0
+    SKIP_TASKBAR = int(lib.SDL_WINDOW_SKIP_TASKBAR)
     """"""
-    UTILITY = lib.SDL_WINDOW_UTILITY or 0
+    UTILITY = int(lib.SDL_WINDOW_UTILITY)
     """"""
-    TOOLTIP = lib.SDL_WINDOW_TOOLTIP or 0
+    TOOLTIP = int(lib.SDL_WINDOW_TOOLTIP)
     """"""
-    POPUP_MENU = lib.SDL_WINDOW_POPUP_MENU or 0
+    POPUP_MENU = int(lib.SDL_WINDOW_POPUP_MENU)
     """"""
-    VULKAN = lib.SDL_WINDOW_VULKAN or 0
+    VULKAN = int(lib.SDL_WINDOW_VULKAN)
     """"""
-    METAL = getattr(lib, "SDL_WINDOW_METAL", None) or 0x20000000  # SDL >= 2.0.14
+    METAL = int(getattr(lib, "SDL_WINDOW_METAL", 0x20000000))  # SDL >= 2.0.14
     """"""
 
 

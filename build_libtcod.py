@@ -248,7 +248,7 @@ def find_sdl_attrs(prefix: str) -> Iterator[tuple[str, int | str | Any]]:
 
     `prefix` is used to filter out which names to copy.
     """
-    from tcod._libtcod import lib  # type: ignore
+    from tcod._libtcod import lib
 
     if prefix.startswith("SDL_"):
         name_starts_at = 4
