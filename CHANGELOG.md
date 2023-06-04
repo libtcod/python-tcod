@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 ### Deprecated
 - Deprecated using `tcod` as an implicit alias for `libtcodpy`.
   You should use `from tcod import libtcodpy` if you want to access this module.
-- Deprecated constants being held in `tcod`, get these from `tcod.constants` instead.
+- Deprecated constants being held in `tcod`, get these from `tcod.libtcodpy` instead.
 - Deprecated `tcod.Console` which should be accessed from `tcod.console.Console` instead.
 
 ## [16.0.2] - 2023-06-02

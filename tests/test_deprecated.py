@@ -25,7 +25,7 @@ def test_deprecate_color() -> None:
 
 
 def test_constants() -> None:
-    with pytest.warns(match=r"tcod.constants.RENDERER_SDL2"):
+    with pytest.warns(match=r"libtcodpy.RENDERER_SDL2"):
         assert tcod.RENDERER_SDL2 is tcod.constants.RENDERER_SDL2
     assert tcod.libtcodpy.RENDERER_SDL2 is tcod.constants.RENDERER_SDL2
 

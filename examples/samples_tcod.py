@@ -17,10 +17,8 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-import tcod
-import tcod.constants
+import tcod.cffi
 import tcod.event
-import tcod.libtcodpy
 import tcod.noise
 import tcod.render
 import tcod.sdl.mouse
@@ -82,14 +80,14 @@ class Sample(tcod.event.EventDispatch[None]):
             SAMPLES[cur_sample].on_enter()
             draw_samples_menu()
         elif event.sym == tcod.event.KeySym.RETURN and event.mod & tcod.event.KMOD_LALT:
-            tcod.console_set_fullscreen(not tcod.console_is_fullscreen())
+            libtcodpy.console_set_fullscreen(not libtcodpy.console_is_fullscreen())
         elif event.sym == tcod.event.KeySym.PRINTSCREEN or event.sym == tcod.event.KeySym.p:
             print("screenshot")
             if event.mod & tcod.event.KMOD_LALT:
-                tcod.console_save_apf(root_console, "samples.apf")
+                libtcodpy.console_save_apf(root_console, "samples.apf")
                 print("apf")
             else:
-                tcod.sys_save_screenshot()
+                libtcodpy.sys_save_screenshot()
                 print("png")
         elif event.sym == tcod.event.KeySym.ESCAPE:
             raise SystemExit()
@@ -197,7 +195,7 @@ class OffscreenConsoleSample(Sample):
             "You can render to an offscreen console and blit in on another " "one, simulating alpha transparency.",
             fg=WHITE,
             bg=None,
-            alignment=tcod.constants.CENTER,
+            alignment=libtcodpy.CENTER,
         )
 
     def on_enter(self) -> None:
@@ -251,8 +249,8 @@ class LineDrawingSample(Sample):
 
     def __init__(self) -> None:
         self.name = "Line drawing"
-        self.mk_flag = tcod.constants.BKGND_SET
-        self.bk_flag = tcod.constants.BKGND_SET
+        self.mk_flag = libtcodpy.BKGND_SET
+        self.bk_flag = libtcodpy.BKGND_SET
 
         self.bk = tcod.console.Console(sample_console.width, sample_console.height, order="F")
         # initialize the colored background
@@ -264,30 +262,30 @@ class LineDrawingSample(Sample):
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym in (tcod.event.KeySym.RETURN, tcod.event.KeySym.KP_ENTER):
             self.bk_flag += 1
-            if (self.bk_flag & 0xFF) > tcod.BKGND_ALPH:
-                self.bk_flag = tcod.BKGND_NONE
+            if (self.bk_flag & 0xFF) > libtcodpy.BKGND_ALPH:
+                self.bk_flag = libtcodpy.BKGND_NONE
         else:
             super().ev_keydown(event)
 
     def on_draw(self) -> None:
         alpha = 0.0
-        if (self.bk_flag & 0xFF) == tcod.BKGND_ALPH:
+        if (self.bk_flag & 0xFF) == libtcodpy.BKGND_ALPH:
             # for the alpha mode, update alpha every frame
             alpha = (1.0 + math.cos(time.time() * 2)) / 2.0
-            self.bk_flag = tcod.BKGND_ALPHA(int(alpha))
-        elif (self.bk_flag & 0xFF) == tcod.BKGND_ADDA:
+            self.bk_flag = libtcodpy.BKGND_ALPHA(int(alpha))
+        elif (self.bk_flag & 0xFF) == libtcodpy.BKGND_ADDA:
             # for the add alpha mode, update alpha every frame
             alpha = (1.0 + math.cos(time.time() * 2)) / 2.0
-            self.bk_flag = tcod.BKGND_ADDALPHA(int(alpha))
+            self.bk_flag = libtcodpy.BKGND_ADDALPHA(int(alpha))
 
         self.bk.blit(sample_console)
         rect_y = int((sample_console.height - 2) * ((1.0 + math.cos(time.time())) / 2.0))
         for x in range(sample_console.width):
             value = x * 255 // sample_console.width
             col = (value, value, value)
-            tcod.console_set_char_background(sample_console, x, rect_y, col, self.bk_flag)
-            tcod.console_set_char_background(sample_console, x, rect_y + 1, col, self.bk_flag)
-            tcod.console_set_char_background(sample_console, x, rect_y + 2, col, self.bk_flag)
+            libtcodpy.console_set_char_background(sample_console, x, rect_y, col, self.bk_flag)
+            libtcodpy.console_set_char_background(sample_console, x, rect_y + 1, col, self.bk_flag)
+            libtcodpy.console_set_char_background(sample_console, x, rect_y + 2, col, self.bk_flag)
         angle = time.time() * 2.0
         cos_angle = math.cos(angle)
         sin_angle = math.sin(angle)
@@ -365,8 +363,8 @@ class NoiseSample(Sample):
         self.dy = 0.0
         self.octaves = 4.0
         self.zoom = 3.0
-        self.hurst = tcod.libtcodpy.NOISE_DEFAULT_HURST
-        self.lacunarity = tcod.libtcodpy.NOISE_DEFAULT_LACUNARITY
+        self.hurst = libtcodpy.NOISE_DEFAULT_HURST
+        self.lacunarity = libtcodpy.NOISE_DEFAULT_LACUNARITY
         self.noise = self.get_noise()
         self.img = tcod.image.Image(SAMPLE_SCREEN_WIDTH * 2, SAMPLE_SCREEN_HEIGHT * 2)
 
@@ -415,7 +413,7 @@ class NoiseSample(Sample):
             ch=0,
             fg=None,
             bg=GREY,
-            bg_blend=tcod.BKGND_MULTIPLY,
+            bg_blend=libtcodpy.BKGND_MULTIPLY,
         )
         sample_console.fg[2 : 2 + rect_w, 2 : 2 + rect_h] = (
             sample_console.fg[2 : 2 + rect_w, 2 : 2 + rect_h] * GREY / 255
@@ -543,7 +541,7 @@ class FOVSample(Sample):
         self.player_y = 10
         self.torch = False
         self.light_walls = True
-        self.algo_num = tcod.constants.FOV_SYMMETRIC_SHADOWCAST
+        self.algo_num = libtcodpy.FOV_SYMMETRIC_SHADOWCAST
         self.noise = tcod.noise.Noise(1)  # 1D noise for the torch flickering.
 
         map_shape = (SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
@@ -710,39 +708,39 @@ class PathfindingSample(Sample):
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
                 if SAMPLE_MAP[x, y] == "=":
-                    tcod.console_put_char(sample_console, x, y, tcod.CHAR_DHLINE, tcod.BKGND_NONE)
+                    libtcodpy.console_put_char(sample_console, x, y, libtcodpy.CHAR_DHLINE, libtcodpy.BKGND_NONE)
         self.recalculate = True
 
     def on_draw(self) -> None:
         if self.recalculate:
             if self.using_astar:
-                tcod.path_compute(self.path, self.px, self.py, self.dx, self.dy)
+                libtcodpy.path_compute(self.path, self.px, self.py, self.dx, self.dy)
             else:
                 self.dijkstra_dist = 0.0
                 # compute dijkstra grid (distance from px,py)
-                tcod.dijkstra_compute(self.dijkstra, self.px, self.py)
+                libtcodpy.dijkstra_compute(self.dijkstra, self.px, self.py)
                 # get the maximum distance (needed for rendering)
                 for y in range(SAMPLE_SCREEN_HEIGHT):
                     for x in range(SAMPLE_SCREEN_WIDTH):
-                        d = tcod.dijkstra_get_distance(self.dijkstra, x, y)
+                        d = libtcodpy.dijkstra_get_distance(self.dijkstra, x, y)
                         if d > self.dijkstra_dist:
                             self.dijkstra_dist = d
                 # compute path from px,py to dx,dy
-                tcod.dijkstra_path_set(self.dijkstra, self.dx, self.dy)
+                libtcodpy.dijkstra_path_set(self.dijkstra, self.dx, self.dy)
             self.recalculate = False
             self.busy = 0.2
         # draw the dungeon
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
                 if SAMPLE_MAP[x, y] == "#":
-                    tcod.console_set_char_background(sample_console, x, y, DARK_WALL, tcod.BKGND_SET)
+                    libtcodpy.console_set_char_background(sample_console, x, y, DARK_WALL, libtcodpy.BKGND_SET)
                 else:
-                    tcod.console_set_char_background(sample_console, x, y, DARK_GROUND, tcod.BKGND_SET)
+                    libtcodpy.console_set_char_background(sample_console, x, y, DARK_GROUND, libtcodpy.BKGND_SET)
         # draw the path
         if self.using_astar:
-            for i in range(tcod.path_size(self.path)):
-                x, y = tcod.path_get(self.path, i)
-                tcod.console_set_char_background(sample_console, x, y, LIGHT_GROUND, tcod.BKGND_SET)
+            for i in range(libtcodpy.path_size(self.path)):
+                x, y = libtcodpy.path_get(self.path, i)
+                libtcodpy.console_set_char_background(sample_console, x, y, LIGHT_GROUND, libtcodpy.BKGND_SET)
         else:
             for y in range(SAMPLE_SCREEN_HEIGHT):
                 for x in range(SAMPLE_SCREEN_WIDTH):
@@ -756,11 +754,11 @@ class PathfindingSample(Sample):
                                 DARK_GROUND,
                                 0.9 * libtcodpy.dijkstra_get_distance(self.dijkstra, x, y) / self.dijkstra_dist,
                             ),
-                            tcod.BKGND_SET,
+                            libtcodpy.BKGND_SET,
                         )
             for i in range(libtcodpy.dijkstra_size(self.dijkstra)):
                 x, y = libtcodpy.dijkstra_get(self.dijkstra, i)
-                libtcodpy.console_set_char_background(sample_console, x, y, LIGHT_GROUND, tcod.constants.BKGND_SET)
+                libtcodpy.console_set_char_background(sample_console, x, y, LIGHT_GROUND, libtcodpy.BKGND_SET)
 
         # move the creature
         self.busy -= frame_length[-1]
@@ -768,47 +766,47 @@ class PathfindingSample(Sample):
             self.busy = 0.2
             if self.using_astar:
                 if not libtcodpy.path_is_empty(self.path):
-                    libtcodpy.console_put_char(sample_console, self.px, self.py, " ", tcod.constants.BKGND_NONE)
+                    libtcodpy.console_put_char(sample_console, self.px, self.py, " ", libtcodpy.BKGND_NONE)
                     self.px, self.py = libtcodpy.path_walk(self.path, True)  # type: ignore
-                    libtcodpy.console_put_char(sample_console, self.px, self.py, "@", tcod.constants.BKGND_NONE)
+                    libtcodpy.console_put_char(sample_console, self.px, self.py, "@", libtcodpy.BKGND_NONE)
             else:
                 if not libtcodpy.dijkstra_is_empty(self.dijkstra):
-                    libtcodpy.console_put_char(sample_console, self.px, self.py, " ", tcod.constants.BKGND_NONE)
+                    libtcodpy.console_put_char(sample_console, self.px, self.py, " ", libtcodpy.BKGND_NONE)
                     self.px, self.py = libtcodpy.dijkstra_path_walk(self.dijkstra)  # type: ignore
-                    libtcodpy.console_put_char(sample_console, self.px, self.py, "@", tcod.constants.BKGND_NONE)
+                    libtcodpy.console_put_char(sample_console, self.px, self.py, "@", libtcodpy.BKGND_NONE)
                     self.recalculate = True
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym == tcod.event.KeySym.i and self.dy > 0:
             # destination move north
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.constants.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, libtcodpy.BKGND_NONE)
             self.dy -= 1
             self.oldchar = sample_console.ch[self.dx, self.dy]
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", tcod.constants.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", libtcodpy.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
         elif event.sym == tcod.event.KeySym.k and self.dy < SAMPLE_SCREEN_HEIGHT - 1:
             # destination move south
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.constants.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, libtcodpy.BKGND_NONE)
             self.dy += 1
             self.oldchar = sample_console.ch[self.dx, self.dy]
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", tcod.constants.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", libtcodpy.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
         elif event.sym == tcod.event.KeySym.j and self.dx > 0:
             # destination move west
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.constants.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, libtcodpy.BKGND_NONE)
             self.dx -= 1
             self.oldchar = sample_console.ch[self.dx, self.dy]
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", tcod.constants.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", libtcodpy.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
         elif event.sym == tcod.event.KeySym.l and self.dx < SAMPLE_SCREEN_WIDTH - 1:
             # destination move east
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.constants.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, libtcodpy.BKGND_NONE)
             self.dx += 1
             self.oldchar = sample_console.ch[self.dx, self.dy]
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", tcod.constants.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", libtcodpy.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
         elif event.sym == tcod.event.KeySym.TAB:
@@ -825,11 +823,11 @@ class PathfindingSample(Sample):
         mx = event.tile.x - SAMPLE_SCREEN_X
         my = event.tile.y - SAMPLE_SCREEN_Y
         if 0 <= mx < SAMPLE_SCREEN_WIDTH and 0 <= my < SAMPLE_SCREEN_HEIGHT and (self.dx != mx or self.dy != my):
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, tcod.constants.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, libtcodpy.BKGND_NONE)
             self.dx = mx
             self.dy = my
             self.oldchar = sample_console.ch[self.dx, self.dy]
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", tcod.constants.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", libtcodpy.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
 
@@ -997,7 +995,7 @@ class BSPSample(Sample):
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
                 color = DARK_GROUND if self.bsp_map[x][y] else DARK_WALL
-                tcod.console_set_char_background(sample_console, x, y, color, tcod.BKGND_SET)
+                libtcodpy.console_set_char_background(sample_console, x, y, color, libtcodpy.BKGND_SET)
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         global bsp_random_room, bsp_room_walls, bsp_depth, bsp_min_room_size
@@ -1048,19 +1046,19 @@ class ImageSample(Sample):
             # split the color channels of circle.png
             # the red channel
             sample_console.draw_rect(0, 3, 15, 15, 0, None, (255, 0, 0))
-            self.circle.blit_rect(sample_console, 0, 3, -1, -1, tcod.BKGND_MULTIPLY)
+            self.circle.blit_rect(sample_console, 0, 3, -1, -1, libtcodpy.BKGND_MULTIPLY)
             # the green channel
             sample_console.draw_rect(15, 3, 15, 15, 0, None, (0, 255, 0))
-            self.circle.blit_rect(sample_console, 15, 3, -1, -1, tcod.BKGND_MULTIPLY)
+            self.circle.blit_rect(sample_console, 15, 3, -1, -1, libtcodpy.BKGND_MULTIPLY)
             # the blue channel
             sample_console.draw_rect(30, 3, 15, 15, 0, None, (0, 0, 255))
-            self.circle.blit_rect(sample_console, 30, 3, -1, -1, tcod.BKGND_MULTIPLY)
+            self.circle.blit_rect(sample_console, 30, 3, -1, -1, libtcodpy.BKGND_MULTIPLY)
         else:
             # render circle.png with normal blitting
-            self.circle.blit_rect(sample_console, 0, 3, -1, -1, tcod.BKGND_SET)
-            self.circle.blit_rect(sample_console, 15, 3, -1, -1, tcod.BKGND_SET)
-            self.circle.blit_rect(sample_console, 30, 3, -1, -1, tcod.BKGND_SET)
-        self.img.blit(sample_console, x, y, tcod.BKGND_SET, scalex, scaley, angle)
+            self.circle.blit_rect(sample_console, 0, 3, -1, -1, libtcodpy.BKGND_SET)
+            self.circle.blit_rect(sample_console, 15, 3, -1, -1, libtcodpy.BKGND_SET)
+            self.circle.blit_rect(sample_console, 30, 3, -1, -1, libtcodpy.BKGND_SET)
+        self.img.blit(sample_console, x, y, libtcodpy.BKGND_SET, scalex, scaley, angle)
 
 
 class MouseSample(Sample):
@@ -1152,9 +1150,9 @@ class NameGeneratorSample(Sample):
             # parse all *.cfg files in data/namegen
             for file in (DATA_DIR / "namegen").iterdir():
                 if file.suffix == ".cfg":
-                    tcod.namegen_parse(file)
+                    libtcodpy.namegen_parse(file)
             # get the sets list
-            self.sets = tcod.namegen_get_sets()
+            self.sets = libtcodpy.namegen_get_sets()
             print(self.sets)
         while len(self.names) > 15:
             self.names.pop(0)
@@ -1173,12 +1171,12 @@ class NameGeneratorSample(Sample):
                 self.names[i],
                 fg=WHITE,
                 bg=None,
-                alignment=tcod.RIGHT,
+                alignment=libtcodpy.RIGHT,
             )
         self.delay += frame_length[-1]
         if self.delay > 0.5:
             self.delay -= 0.5
-            self.names.append(tcod.namegen_generate(self.sets[self.curset]))
+            self.names.append(libtcodpy.namegen_generate(self.sets[self.curset]))
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym == tcod.event.KeySym.EQUALS:
@@ -1367,11 +1365,11 @@ class FastRenderSample(Sample):
 #############################################
 
 RENDERER_KEYS = {
-    tcod.event.KeySym.F1: tcod.constants.RENDERER_GLSL,
-    tcod.event.KeySym.F2: tcod.constants.RENDERER_OPENGL,
-    tcod.event.KeySym.F3: tcod.constants.RENDERER_SDL,
-    tcod.event.KeySym.F4: tcod.constants.RENDERER_SDL2,
-    tcod.event.KeySym.F5: tcod.constants.RENDERER_OPENGL2,
+    tcod.event.KeySym.F1: libtcodpy.RENDERER_GLSL,
+    tcod.event.KeySym.F2: libtcodpy.RENDERER_OPENGL,
+    tcod.event.KeySym.F3: libtcodpy.RENDERER_SDL,
+    tcod.event.KeySym.F4: libtcodpy.RENDERER_SDL2,
+    tcod.event.KeySym.F5: libtcodpy.RENDERER_OPENGL2,
 }
 
 RENDERER_NAMES = (
@@ -1406,9 +1404,9 @@ def init_context(renderer: int) -> None:
     if "context" in globals():
         context.close()
     libtcod_version = "%i.%i.%i" % (
-        tcod.lib.TCOD_MAJOR_VERSION,
-        tcod.lib.TCOD_MINOR_VERSION,
-        tcod.lib.TCOD_PATCHLEVEL,
+        tcod.cffi.lib.TCOD_MAJOR_VERSION,
+        tcod.cffi.lib.TCOD_MINOR_VERSION,
+        tcod.cffi.lib.TCOD_PATCHLEVEL,
     )
     context = tcod.context.new(
         columns=root_console.width,
@@ -1429,7 +1427,7 @@ def init_context(renderer: int) -> None:
         sample_minimap = context.sdl_renderer.new_texture(
             SAMPLE_SCREEN_WIDTH,
             SAMPLE_SCREEN_HEIGHT,
-            format=tcod.lib.SDL_PIXELFORMAT_RGB24,
+            format=tcod.cffi.lib.SDL_PIXELFORMAT_RGB24,
             access=tcod.sdl.render.TextureAccess.STREAMING,  # Updated every frame.
         )
 
@@ -1437,7 +1435,7 @@ def init_context(renderer: int) -> None:
 def main() -> None:
     global context, tileset
     tileset = tcod.tileset.load_tilesheet(FONT, 32, 8, tcod.tileset.CHARMAP_TCOD)
-    init_context(tcod.constants.RENDERER_SDL2)
+    init_context(libtcodpy.RENDERER_SDL2)
     try:
         SAMPLES[cur_sample].on_enter()
 
@@ -1522,7 +1520,7 @@ def draw_samples_menu() -> None:
             "  %s" % sample.name.ljust(19),
             fg,
             bg,
-            alignment=tcod.LEFT,
+            alignment=libtcodpy.LEFT,
         )
 
 
@@ -1536,21 +1534,21 @@ def draw_stats() -> None:
         46,
         "last frame :%5.1f ms (%4d fps)" % (frame_length[-1] * 1000.0, fps),
         fg=GREY,
-        alignment=tcod.RIGHT,
+        alignment=libtcodpy.RIGHT,
     )
     root_console.print(
         79,
         47,
         "elapsed : %8d ms %5.2fs" % (time.perf_counter() * 1000, time.perf_counter()),
         fg=GREY,
-        alignment=tcod.RIGHT,
+        alignment=libtcodpy.RIGHT,
     )
 
 
 def draw_renderer_menu() -> None:
     root_console.print(
         42,
-        46 - (tcod.NB_RENDERERS + 1),
+        46 - (libtcodpy.NB_RENDERERS + 1),
         "Renderer :",
         fg=GREY,
         bg=BLACK,
@@ -1562,7 +1560,7 @@ def draw_renderer_menu() -> None:
         else:
             fg = GREY
             bg = BLACK
-        root_console.print(42, 46 - tcod.NB_RENDERERS + i, name, fg, bg)
+        root_console.print(42, 46 - libtcodpy.NB_RENDERERS + i, name, fg, bg)
 
 
 if __name__ == "__main__":

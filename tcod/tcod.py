@@ -50,8 +50,8 @@ def __getattr__(name: str, stacklevel: int = 1) -> Any:  # noqa: ANN401
     if value is not None:
         warnings.warn(
             "Soon the 'tcod' module will no longer hold constants directly."
-            "\nAdd 'import tcod.constants' if you haven't already."
-            f"\nReplace 'tcod.{name}' with 'tcod.constants.{name}'",
+            "\nAdd 'from tcod import libtcodpy' if you haven't already."
+            f"\nReplace 'tcod.{name}' with 'libtcodpy.{name}'",
             FutureWarning,
             stacklevel=stacklevel + 1,
         )
