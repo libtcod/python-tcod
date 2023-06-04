@@ -188,6 +188,7 @@ ignore = [
     "D408",   # section-underline-after-name
     "D409",   # section-underline-matches-section-length
 ]
+extend-exclude = ["libtcod"] # Ignore submodule
 line-length = 120
 
 [tool.ruff.pydocstyle]

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # tdl documentation build configuration file, created by
 # sphinx-quickstart on Fri Nov 25 12:49:46 2016.
 #
@@ -68,9 +66,7 @@ author = "Kyle Benesch"
 # built documents.
 #
 # The full version, including alpha/beta/rc tags.
-git_describe = subprocess.run(
-    ["git", "describe", "--abbrev=0"], stdout=subprocess.PIPE, universal_newlines=True, check=True
-)
+git_describe = subprocess.run(["git", "describe", "--abbrev=0"], stdout=subprocess.PIPE, text=True, check=True)
 release = git_describe.stdout.strip()
 assert release
 print("release version: %r" % release)

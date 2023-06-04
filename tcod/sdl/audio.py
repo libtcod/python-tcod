@@ -65,7 +65,7 @@ def _get_format(format: DTypeLike) -> int:
     assert dt.fields is None
     bitsize = dt.itemsize * 8
     assert 0 < bitsize <= lib.SDL_AUDIO_MASK_BITSIZE
-    if not dt.str[1] in "uif":
+    if dt.str[1] not in "uif":
         msg = f"Unexpected dtype: {dt}"
         raise TypeError(msg)
     is_signed = dt.str[1] != "u"
