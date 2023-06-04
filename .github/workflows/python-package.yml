@@ -163,6 +163,31 @@ jobs:
           path: dist/*.whl
           retention-days: 7
 
+  test-docs:
+    needs: [black, isort, mypy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install APT dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install libsdl2-dev
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ env.git-depth }}
+      - name: Checkout submodules
+        run: git submodule update --init --recursive --depth 1
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r docs/requirements.txt
+      - name: Install package
+        run: pip install -e .
+        env:
+          TDL_BUILD: DEBUG
+      - name: Test doc generation
+        working-directory: docs
+        run: python -m sphinx -T -E -W --keep-going . _build/html
+
   isolated: # Test installing the package from source.
     needs: [black, isort, mypy, sdist]
     runs-on: ${{ matrix.os }}
