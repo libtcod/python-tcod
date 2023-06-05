@@ -149,6 +149,7 @@ class Texture:
     """
 
     def __init__(self, sdl_texture_p: Any, sdl_renderer_p: Any = None) -> None:
+        """Encapsulate an SDL_Texture pointer. This function is private."""
         self.p = sdl_texture_p
         self._sdl_renderer_p = sdl_renderer_p  # Keep alive.
         query = self._query()
@@ -165,8 +166,11 @@ class Texture:
         self.height: Final[int] = query[3]
         """Texture pixel height, read only."""
 
-    def __eq__(self, other: Any) -> bool:
-        return bool(self.p == getattr(other, "p", None))
+    def __eq__(self, other: object) -> bool:
+        """Return True if compared to the same texture."""
+        if isinstance(other, Texture):
+            return bool(self.p == other.p)
+        return NotImplemented
 
     def _query(self) -> tuple[int, int, int, int]:
         """Return (format, access, width, height)."""
@@ -243,6 +247,7 @@ class Renderer:
     """SDL Renderer."""
 
     def __init__(self, sdl_renderer_p: Any) -> None:
+        """Encapsulate an SDL_Renderer pointer. This function is private."""
         if ffi.typeof(sdl_renderer_p) is not ffi.typeof("struct SDL_Renderer*"):
             msg = f"Expected a {ffi.typeof('struct SDL_Window*')} type (was {ffi.typeof(sdl_renderer_p)})."
             raise TypeError(msg)
@@ -251,8 +256,11 @@ class Renderer:
             raise TypeError(msg)
         self.p = sdl_renderer_p
 
-    def __eq__(self, other: Any) -> bool:
-        return bool(self.p == getattr(other, "p", None))
+    def __eq__(self, other: object) -> bool:
+        """Return True if compared to the same renderer."""
+        if isinstance(other, Renderer):
+            return bool(self.p == other.p)
+        return NotImplemented
 
     def copy(
         self,
