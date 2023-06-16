@@ -72,4 +72,4 @@ Glossary
     color control
     color controls
         Libtcod's old system which assigns colors to specific codepoints.
-        See :any:`tcod.COLCTRL_STOP`, :any:`tcod.COLCTRL_FORE_RGB`, and :any:`tcod.COLCTRL_BACK_RGB` for examples.
+        See :any:`libtcodpy.COLCTRL_STOP`, :any:`libtcodpy.COLCTRL_FORE_RGB`, and :any:`libtcodpy.COLCTRL_BACK_RGB` for examples.

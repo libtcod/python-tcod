@@ -1365,10 +1365,10 @@ class EventDispatch(Generic[T]):
                 raise SystemExit()
 
 
-        root_console = tcod.console_init_root(80, 60)
+        root_console = libtcodpy.console_init_root(80, 60)
         state = State()
         while True:
-            tcod.console_flush()
+            libtcodpy.console_flush()
             for event in tcod.event.wait():
                 state.dispatch(event)
     '''
@@ -1440,7 +1440,7 @@ class EventDispatch(Generic[T]):
     def ev_windowexposed(self, event: tcod.event.WindowEvent) -> T | None:
         """Called when a window is exposed, and needs to be refreshed.
 
-        This usually means a call to :any:`tcod.console_flush` is necessary.
+        This usually means a call to :any:`libtcodpy.console_flush` is necessary.
         """
 
     def ev_windowmoved(self, event: tcod.event.WindowMoved) -> T | None:

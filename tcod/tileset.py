@@ -284,7 +284,7 @@ def set_truetype_font(path: str | PathLike[str], tile_width: int, tile_height: i
     tileset.  The font will be scaled to fit the given `tile_height` and
     `tile_width`.
 
-    This function must be called before :any:`tcod.console_init_root`.  Once
+    This function must be called before :any:`libtcodpy.console_init_root`.  Once
     the root console is setup you may call this function again to change the
     font.  The tileset can be changed but the window will not be resized
     automatically.
@@ -309,7 +309,7 @@ def load_bdf(path: str | PathLike[str]) -> Tileset:
     package.
 
     Pass the returned Tileset to :any:`tcod.tileset.set_default` and it will
-    take effect when `tcod.console_init_root` is called.
+    take effect when `libtcodpy.console_init_root` is called.
 
     .. versionadded:: 11.10
     """

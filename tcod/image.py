@@ -136,12 +136,12 @@ class Image:
         return lib.TCOD_image_get_alpha(self.image_c, x, y)  # type: ignore
 
     def refresh_console(self, console: tcod.console.Console) -> None:
-        """Update an Image created with :any:`tcod.image_from_console`.
+        """Update an Image created with :any:`libtcodpy.image_from_console`.
 
         The console used with this function should have the same width and
-        height as the Console given to :any:`tcod.image_from_console`.
+        height as the Console given to :any:`libtcodpy.image_from_console`.
         The font width and height must also be the same as when
-        :any:`tcod.image_from_console` was called.
+        :any:`libtcodpy.image_from_console` was called.
 
         Args:
             console (Console): A Console with a pixel width and height

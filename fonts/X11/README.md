@@ -9,6 +9,6 @@ import tcod.tileset
 tcod.tileset.set_default(tcod.tileset.load_bdf("file_to_load.bdf"))
 
 # Start python-tcod normally.
-with tcod.console_init_root(...) as root_console:
+with libtcodpy.console_init_root(...) as root_console:
     ...
 ```

@@ -906,7 +906,7 @@ def console_init_root(
 
     .. code-block:: python
 
-        with tcod.console_init_root(80, 50, vsync=True) as root_console:
+        with libtcodpy.console_init_root(80, 50, vsync=True) as root_console:
             ...  # Put your game loop here.
         ...  # Window closes at the end of the above block.
 
@@ -963,20 +963,20 @@ def console_set_custom_font(
 ) -> None:
     """Load the custom font file at `fontFile`.
 
-    Call this before function before calling :any:`tcod.console_init_root`.
+    Call this before function before calling :any:`libtcodpy.console_init_root`.
 
     Flags can be a mix of the following:
 
-    * tcod.FONT_LAYOUT_ASCII_INCOL:
+    * libtcodpy.FONT_LAYOUT_ASCII_INCOL:
       Decode tileset raw in column-major order.
-    * tcod.FONT_LAYOUT_ASCII_INROW:
+    * libtcodpy.FONT_LAYOUT_ASCII_INROW:
       Decode tileset raw in row-major order.
-    * tcod.FONT_TYPE_GREYSCALE:
+    * libtcodpy.FONT_TYPE_GREYSCALE:
       Force tileset to be read as greyscale.
-    * tcod.FONT_TYPE_GRAYSCALE
-    * tcod.FONT_LAYOUT_TCOD:
+    * libtcodpy.FONT_TYPE_GRAYSCALE
+    * libtcodpy.FONT_LAYOUT_TCOD:
       Unique layout used by libtcod.
-    * tcod.FONT_LAYOUT_CP437:
+    * libtcodpy.FONT_LAYOUT_CP437:
       Decode a row-major Code Page 437 tileset into Unicode.
 
     `nb_char_horiz` and `nb_char_vertic` are the columns and rows of the font
@@ -1212,7 +1212,7 @@ def console_flush(
         `clear_color` can now be an RGB tuple.
 
     .. seealso::
-        :any:`tcod.console_init_root`
+        :any:`libtcodpy.console_init_root`
         :any:`tcod.console.recommended_size`
 
     .. deprecated:: 11.13
@@ -1797,7 +1797,7 @@ def console_from_file(filename: str | PathLike[str]) -> tcod.console.Console:
     Returns: A new :any`Console` instance.
 
     .. deprecated:: 12.7
-        Use :any:`tcod.console_load_xp` to load REXPaint consoles.
+        Use :any:`libtcodpy.console_load_xp` to load REXPaint consoles.
 
         Other formats are not actively supported.
 
@@ -1863,7 +1863,7 @@ def console_delete(con: tcod.console.Console) -> None:
             "Instead of this call you should use Console.close,"
             " or use a with statement to ensure the root console closes,"
             " for example:"
-            "\n    with tcod.console_init_root(...) as root_console:"
+            "\n    with libtcodpy.console_init_root(...) as root_console:"
             "\n        ...",
             DeprecationWarning,
             stacklevel=2,
@@ -2033,7 +2033,7 @@ def console_load_xp(con: tcod.console.Console, filename: str | PathLike[str]) ->
 
     .. deprecated:: 11.18
         Functions modifying console objects in-place are deprecated.
-        Use :any:`tcod.console_from_xp` to load a Console from a file.
+        Use :any:`libtcodpy.console_from_xp` to load a Console from a file.
 
     .. versionchanged:: 16.0
         Added PathLike support.
@@ -3969,7 +3969,7 @@ def sys_get_fps() -> int:
     """Return the current frames per second.
 
     This the actual frame rate, not the frame limit set by
-    :any:`tcod.sys_set_fps`.
+    :any:`libtcodpy.sys_set_fps`.
 
     This number is updated every second.
 
@@ -4145,7 +4145,7 @@ def sys_update_char(
     """Dynamically update the current font with img.
 
     All cells using this asciiCode will be updated
-    at the next call to :any:`tcod.console_flush`.
+    at the next call to :any:`libtcodpy.console_flush`.
 
     Args:
         asciiCode (int): Ascii code corresponding to the character to update.
@@ -4174,7 +4174,7 @@ def sys_register_SDL_renderer(callback: Callable[[Any], None]) -> None:
     The callback will receive a CData `void*` pointer to an
     `SDL_Surface*` struct.
 
-    The callback is called on every call to :any:`tcod.console_flush`.
+    The callback is called on every call to :any:`libtcodpy.console_flush`.
 
     Args:
         callback Callable[[CData], None]:
