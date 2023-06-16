@@ -1,5 +1,5 @@
-tcod.path - Pathfinding
-=======================
+Pathfinding ``tcod.path``
+=========================
 
 .. automodule:: tcod.path
     :members:

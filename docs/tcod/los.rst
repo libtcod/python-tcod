@@ -1,5 +1,5 @@
-tcod.los - Line of Sight
-========================
+Line of Sight ``tcod.los``
+==========================
 
 .. automodule:: tcod.los
     :members:

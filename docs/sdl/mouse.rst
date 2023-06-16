@@ -1,5 +1,5 @@
-tcod.sdl.mouse - SDL Mouse Functions
-====================================
+SDL Mouse Functions ``tcod.sdl.mouse``
+======================================
 
 .. automodule:: tcod.sdl.mouse
     :members:

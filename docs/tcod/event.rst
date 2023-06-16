@@ -1,5 +1,5 @@
-tcod.event - SDL2 Event Handling
-================================
+SDL2 Event Handling ``tcod.event``
+==================================
 
 .. automodule:: tcod.event
     :members:

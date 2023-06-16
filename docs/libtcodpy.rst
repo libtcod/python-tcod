@@ -1,5 +1,5 @@
-libtcodpy - Old API Functions
-=============================
+Old API Functions ``libtcodpy``
+===============================
 
 This is all the functions included since the start of the Python port.
 This collection is often called :term:`libtcodpy`, the name of the original

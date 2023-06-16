@@ -1,3 +1,4 @@
+"""Sphinx config file."""
 # tdl documentation build configuration file, created by
 # sphinx-quickstart on Fri Nov 25 12:49:46 2016.
 #
@@ -14,13 +15,15 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+from __future__ import annotations
+
 import os
 import re
 import subprocess
 import sys
-from typing import Dict
+from pathlib import Path
 
-sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, str(Path("..").resolve(strict=True)))
 
 # -- General configuration ------------------------------------------------
 
@@ -66,7 +69,12 @@ author = "Kyle Benesch"
 # built documents.
 #
 # The full version, including alpha/beta/rc tags.
-git_describe = subprocess.run(["git", "describe", "--abbrev=0"], stdout=subprocess.PIPE, text=True, check=True)
+git_describe = subprocess.run(
+    ["git", "describe", "--abbrev=0"],  # noqa: S603, S607
+    stdout=subprocess.PIPE,
+    text=True,
+    check=True,
+)
 release = git_describe.stdout.strip()
 assert release
 print("release version: %r" % release)
@@ -143,7 +151,7 @@ autodoc_type_aliases = {
 # a list of builtin themes.
 #
 
-html_theme = "sphinx_rtd_theme"
+html_theme = "furo"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -263,7 +271,7 @@ htmlhelp_basename = "tcoddoc"
 
 # -- Options for LaTeX output ---------------------------------------------
 
-latex_elements: Dict[str, str] = {
+latex_elements: dict[str, str] = {
     # The paper size ('letterpaper' or 'a4paper').
     # 'papersize': 'letterpaper',
     # The font size ('10pt', '11pt' or '12pt').
@@ -374,8 +382,8 @@ rst_epilog = ".. include:: /epilog.rst"
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    "https://docs.python.org/3/": None,
-    "https://numpy.org/doc/stable/": None,
+    "python": ("https://docs.python.org/3/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
 }
 
 os.environ["READTHEDOCS"] = "True"

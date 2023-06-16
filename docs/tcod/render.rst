@@ -1,5 +1,5 @@
-tcod.render - Console Rendering Extension
-=========================================
+Console Rendering Extension ``tcod.render``
+===========================================
 
 .. automodule:: tcod.render
     :members:

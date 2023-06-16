@@ -1,5 +1,5 @@
-tcod.noise - Noise Map Generators
-=================================
+Noise Map Generators ``tcod.noise``
+===================================
 
 .. automodule:: tcod.noise
     :members:

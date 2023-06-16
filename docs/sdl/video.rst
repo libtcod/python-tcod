@@ -1,5 +1,5 @@
-tcod.sdl.video - SDL Window and Display API
-===========================================
+SDL Window and Display API ``tcod.sdl.video``
+=============================================
 
 .. automodule:: tcod.sdl.video
     :members:

@@ -1,5 +1,5 @@
-tcod.bsp - Binary Space Partitioning
-====================================
+Binary Space Partitioning ``tcod.bsp``
+======================================
 
 .. automodule:: tcod.bsp
     :members:

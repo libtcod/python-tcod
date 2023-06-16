@@ -1,5 +1,5 @@
-tcod.console - Tile Drawing/Printing
-====================================
+Tile Drawing/Printing ``tcod.console``
+======================================
 
 .. automodule:: tcod.console
     :members:

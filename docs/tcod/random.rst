@@ -1,5 +1,5 @@
-tcod.random - Random Number Generators
-======================================
+Random Number Generators ``tcod.random``
+========================================
 
 .. automodule:: tcod.random
     :members:

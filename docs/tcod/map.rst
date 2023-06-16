@@ -1,5 +1,5 @@
-tcod.map - Field of View
-========================
+Field of View ``tcod.map``
+==========================
 
 .. automodule:: tcod.map
     :members:

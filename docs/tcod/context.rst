@@ -1,5 +1,5 @@
-tcod.context - Window Management
-================================
+Window Management ``tcod.context``
+==================================
 
 .. automodule:: tcod.context
     :members:
