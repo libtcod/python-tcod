@@ -22,6 +22,13 @@ Contents:
 
 .. toctree::
     :maxdepth: 2
+    :caption: Tutorial
+    :glob:
+
+    tutorial/part-*
+
+.. toctree::
+    :maxdepth: 2
     :caption: python-tcod API
 
     tcod/getting-started
