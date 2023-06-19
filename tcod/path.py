@@ -330,7 +330,7 @@ def _export(array: NDArray[Any]) -> Any:
     return ffi.new("struct NArray*", _export_dict(array))
 
 
-def _compile_cost_edges(edge_map: Any) -> tuple[Any, int]:
+def _compile_cost_edges(edge_map: ArrayLike) -> tuple[NDArray[np.intc], int]:
     """Return an edge_cost array using an integer map."""
     edge_map = np.array(edge_map, copy=True)
     if edge_map.ndim != 2:

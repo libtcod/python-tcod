@@ -107,7 +107,7 @@ filterwarnings = [
 
 [tool.mypy]
 files = ["."]
-python_version = 3.8
+python_version = 3.9
 warn_unused_configs = true
 show_error_codes = true
 disallow_subclassing_any = true
