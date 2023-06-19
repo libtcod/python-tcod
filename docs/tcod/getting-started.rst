@@ -112,7 +112,7 @@ Example::
                     print(event)  # Print event names and attributes.
                     if isinstance(event, tcod.event.Quit):
                         raise SystemExit()
-                    elif isinstance(event, tcod.event.WindowResized) and event.type == "WINDOWRESIZED":
+                    elif isinstance(event, tcod.event.WindowResized) and event.type == "WindowSizeChanged":
                         pass  # The next call to context.new_console may return a different size.
 
 

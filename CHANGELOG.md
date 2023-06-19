@@ -7,6 +7,9 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 ### Changed
 - Using `libtcod 1.24.0`.
 
+### Fixed
+- `WindowResized` literal annotations were in the wrong case.
+
 ## [16.0.3] - 2023-06-04
 ### Changed
 - Enabled logging for libtcod and SDL.

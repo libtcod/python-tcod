@@ -827,8 +827,8 @@ class WindowResized(WindowEvent):
         height (int): The current height of the window.
     """
 
-    type: Final[Literal["WINDOWRESIZED", "WINDOWSIZECHANGED"]]  # type: ignore[assignment,misc]
-    """WINDOWRESIZED" or "WINDOWSIZECHANGED"""
+    type: Final[Literal["WindowResized", "WindowSizeChanged"]]  # type: ignore[misc]
+    """WindowResized" or "WindowSizeChanged"""
 
     def __init__(self, type: str, width: int, height: int) -> None:
         super().__init__(type)
