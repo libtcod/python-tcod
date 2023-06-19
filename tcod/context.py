@@ -256,15 +256,16 @@ class Context:
         event_copy = copy.copy(event)
         if isinstance(event, (tcod.event.MouseState, tcod.event.MouseMotion)):
             assert isinstance(event_copy, (tcod.event.MouseState, tcod.event.MouseMotion))
-            event_copy.position = event.tile = tcod.event.Point(*self.pixel_to_tile(*event.position))
+            event_copy.position = event._tile = tcod.event.Point(*self.pixel_to_tile(*event.position))
         if isinstance(event, tcod.event.MouseMotion):
             assert isinstance(event_copy, tcod.event.MouseMotion)
+            assert event._tile is not None
             prev_tile = self.pixel_to_tile(
                 event.position[0] - event.motion[0],
                 event.position[1] - event.motion[1],
             )
             event_copy.motion = event.tile_motion = tcod.event.Point(
-                event.tile[0] - prev_tile[0], event.tile[1] - prev_tile[1]
+                event._tile[0] - prev_tile[0], event._tile[1] - prev_tile[1]
             )
         return event_copy
 

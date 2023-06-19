@@ -412,7 +412,7 @@ class MouseState(Event):
     ) -> None:
         super().__init__()
         self.position = Point(*position)
-        self.__tile = Point(*tile) if tile is not None else None
+        self._tile = Point(*tile) if tile is not None else None
         self.state = state
 
     @property
@@ -426,11 +426,6 @@ class MouseState(Event):
 
     @pixel.setter
     def pixel(self, value: Point) -> None:
-        warnings.warn(
-            "The mouse.pixel attribute is deprecated.  Use mouse.position instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
         self.position = value
 
     @property
@@ -440,16 +435,11 @@ class MouseState(Event):
             DeprecationWarning,
             stacklevel=2,
         )
-        return _verify_tile_coordinates(self.__tile)
+        return _verify_tile_coordinates(self._tile)
 
     @tile.setter
     def tile(self, xy: tuple[int, int]) -> None:
-        warnings.warn(
-            "The mouse.tile attribute is deprecated.  Use mouse.position of the event returned by context.convert_event instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        self.__tile = Point(*xy)
+        self._tile = Point(*xy)
 
     def __repr__(self) -> str:
         return ("tcod.event.{}(position={!r}, tile={!r}, state={})").format(
