@@ -240,46 +240,48 @@ class Modifier(enum.IntFlag):
     """Alt graph."""
 
 
-# manually define names for SDL macros
-BUTTON_LEFT = 1
-BUTTON_MIDDLE = 2
-BUTTON_RIGHT = 3
-BUTTON_X1 = 4
-BUTTON_X2 = 5
-BUTTON_LMASK = 0x1
-BUTTON_MMASK = 0x2
-BUTTON_RMASK = 0x4
-BUTTON_X1MASK = 0x8
-BUTTON_X2MASK = 0x10
+class MouseButton(enum.IntEnum):
+    """An enum for mouse buttons.
 
-# reverse tables are used to get the tcod.event name from the value.
-_REVERSE_BUTTON_TABLE = {
-    BUTTON_LEFT: "BUTTON_LEFT",
-    BUTTON_MIDDLE: "BUTTON_MIDDLE",
-    BUTTON_RIGHT: "BUTTON_RIGHT",
-    BUTTON_X1: "BUTTON_X1",
-    BUTTON_X2: "BUTTON_X2",
-}
+    .. versionadded:: Unreleased
+    """
 
-_REVERSE_BUTTON_MASK_TABLE = {
-    BUTTON_LMASK: "BUTTON_LMASK",
-    BUTTON_MMASK: "BUTTON_MMASK",
-    BUTTON_RMASK: "BUTTON_RMASK",
-    BUTTON_X1MASK: "BUTTON_X1MASK",
-    BUTTON_X2MASK: "BUTTON_X2MASK",
-}
+    LEFT = 1
+    """Left mouse button."""
+    MIDDLE = 2
+    """Middle mouse button."""
+    RIGHT = 3
+    """Right mouse button."""
+    X1 = 4
+    """Back mouse button."""
+    X2 = 5
+    """Forward mouse button."""
 
-_REVERSE_BUTTON_TABLE_PREFIX = _ConstantsWithPrefix(_REVERSE_BUTTON_TABLE)
-_REVERSE_BUTTON_MASK_TABLE_PREFIX = _ConstantsWithPrefix(_REVERSE_BUTTON_MASK_TABLE)
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}.{self.name}"
 
 
-_REVERSE_MOD_TABLE = tcod.event_constants._REVERSE_MOD_TABLE.copy()
-del _REVERSE_MOD_TABLE[KMOD_SHIFT]
-del _REVERSE_MOD_TABLE[KMOD_CTRL]
-del _REVERSE_MOD_TABLE[KMOD_ALT]
-del _REVERSE_MOD_TABLE[KMOD_GUI]
+class MouseButtonMask(enum.IntFlag):
+    """A mask enum for held mouse buttons.
 
-_REVERSE_MOD_TABLE_PREFIX = _ConstantsWithPrefix(_REVERSE_MOD_TABLE)
+    .. versionadded:: Unreleased
+    """
+
+    LEFT = 0x1
+    """Left mouse button is held."""
+    MIDDLE = 0x2
+    """Middle mouse button is held."""
+    RIGHT = 0x4
+    """Right mouse button is held."""
+    X1 = 0x8
+    """Back mouse button is held."""
+    X2 = 0x10
+    """Forward mouse button is held."""
+
+    def __repr__(self) -> str:
+        if self == 0:
+            return f"{self.__class__.__name__}(0)"
+        return "|".join(f"{self.__class__.__name__}.{self.__class__(bit).name}" for bit in self.__class__ if bit & self)
 
 
 class Event:
@@ -361,11 +363,11 @@ class KeyboardEvent(Event):
         return self
 
     def __repr__(self) -> str:
-        return "tcod.event.{}(scancode={!r}, sym={!r}, mod={}{})".format(
+        return "tcod.event.{}(scancode={!r}, sym={!r}, mod={!r}{})".format(
             self.__class__.__name__,
             self.scancode,
             self.sym,
-            _describe_bitmask(self.mod, _REVERSE_MOD_TABLE_PREFIX),
+            self.mod,
             ", repeat=True" if self.repeat else "",
         )
 
@@ -446,7 +448,7 @@ class MouseState(Event):
             self.__class__.__name__,
             tuple(self.position),
             tuple(self.tile),
-            _describe_bitmask(self.state, _REVERSE_BUTTON_MASK_TABLE_PREFIX),
+            MouseButtonMask(self.state),
         )
 
     def __str__(self) -> str:
@@ -454,7 +456,7 @@ class MouseState(Event):
             super().__str__().strip("<>"),
             *self.position,
             *self.tile,
-            _describe_bitmask(self.state, _REVERSE_BUTTON_MASK_TABLE),
+            MouseButtonMask(self.state),
         )
 
 
@@ -552,13 +554,13 @@ class MouseMotion(MouseState):
         return self
 
     def __repr__(self) -> str:
-        return ("tcod.event.{}(position={!r}, motion={!r}, tile={!r}, tile_motion={!r}, state={})").format(
+        return ("tcod.event.{}(position={!r}, motion={!r}, tile={!r}, tile_motion={!r}, state={!r})").format(
             self.__class__.__name__,
             tuple(self.position),
             tuple(self.motion),
             tuple(self.tile),
             tuple(self.tile_motion),
-            _describe_bitmask(self.state, _REVERSE_BUTTON_MASK_TABLE_PREFIX),
+            MouseButtonMask(self.state),
         )
 
     def __str__(self) -> str:
@@ -619,19 +621,19 @@ class MouseButtonEvent(MouseState):
         return self
 
     def __repr__(self) -> str:
-        return "tcod.event.{}(position={!r}, tile={!r}, button={})".format(
+        return "tcod.event.{}(position={!r}, tile={!r}, button={!r})".format(
             self.__class__.__name__,
             tuple(self.position),
             tuple(self.tile),
-            _REVERSE_BUTTON_TABLE_PREFIX[self.button],
+            MouseButton(self.button),
         )
 
     def __str__(self) -> str:
-        return "<type=%r, position=(x=%i, y=%i), tile=(x=%i, y=%i), button=%s)" % (
+        return "<type=%r, position=(x=%i, y=%i), tile=(x=%i, y=%i), button=%r)" % (
             self.type,
             *self.position,
             *self.tile,
-            _REVERSE_BUTTON_TABLE[self.button],
+            MouseButton(self.button),
         )
 
 
@@ -2779,6 +2781,27 @@ class KeySym(enum.IntEnum):
 
 def __getattr__(name: str) -> int:
     """Migrate deprecated access of event constants."""
+    if name.startswith("BUTTON_"):
+        replacement = {
+            "BUTTON_LEFT": MouseButton.LEFT,
+            "BUTTON_MIDDLE": MouseButton.MIDDLE,
+            "BUTTON_RIGHT": MouseButton.RIGHT,
+            "BUTTON_X1": MouseButton.X1,
+            "BUTTON_X2": MouseButton.X2,
+            "BUTTON_LMASK": MouseButtonMask.LEFT,
+            "BUTTON_MMASK": MouseButtonMask.MIDDLE,
+            "BUTTON_RMASK": MouseButtonMask.RIGHT,
+            "BUTTON_X1MASK": MouseButtonMask.X1,
+            "BUTTON_X2MASK": MouseButtonMask.X2,
+        }[name]
+        warnings.warn(
+            "Key constants have been replaced with enums.\n"
+            f"'tcod.event.{name}' should be replaced with 'tcod.event.{replacement!r}'",
+            FutureWarning,
+            stacklevel=2,
+        )
+        return replacement
+
     value: int | None = getattr(tcod.event_constants, name, None)
     if not value:
         msg = f"module {__name__!r} has no attribute {name!r}"

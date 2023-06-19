@@ -4,8 +4,14 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+### Added
+- Added the enums `tcod.event.MouseButton` and `tcod.event.MouseButtonMask`.
+
 ### Changed
 - Using `libtcod 1.24.0`.
+
+### Deprecated
+- Mouse button and mask constants have been replaced by enums.
 
 ### Fixed
 - `WindowResized` literal annotations were in the wrong case.

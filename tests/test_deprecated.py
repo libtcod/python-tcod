@@ -42,6 +42,13 @@ def test_deprecate_key_constants() -> None:
         _ = tcod.event.SCANCODE_1
 
 
+def test_deprecate_mouse_constants() -> None:
+    with pytest.warns(FutureWarning, match=r"MouseButton.LEFT"):
+        _ = tcod.event.BUTTON_LEFT
+    with pytest.warns(FutureWarning, match=r"MouseButtonMask.LEFT"):
+        _ = tcod.event.BUTTON_LMASK
+
+
 def test_line_where() -> None:
     with pytest.warns():
         where = tcod.libtcodpy.line_where(1, 0, 3, 4)
