@@ -279,7 +279,7 @@ class MouseButtonMask(enum.IntFlag):
     """Forward mouse button is held."""
 
     def __repr__(self) -> str:
-        if self == 0:
+        if self.value == 0:
             return f"{self.__class__.__name__}(0)"
         return "|".join(f"{self.__class__.__name__}.{self.__class__(bit).name}" for bit in self.__class__ if bit & self)
 
