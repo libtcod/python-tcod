@@ -1,50 +1,29 @@
-Part 1
-==============================================================================
+Part 1 - Moving a player around the screen
+##############################################################################
 
 Initial script
-------------------------------------------------------------------------------
+==============================================================================
 
-First start with a modern top-level script:
+First start with a modern top-level script.
 
 .. code-block:: python
 
-    #!/usr/bin/env python3
-    """This script is invoked to start the program."""
-    from __future__ import annotations  # PEP 563
-
-
     def main() -> None:
-        """Main entry point function."""
-        pass  # Nothing yet
+        ...
 
 
-    if __name__ == "__main__":  # Top-level code environment
+    if __name__ == "__main__":
         main()
 
-The first line is a `shebang <https://en.wikipedia.org/wiki/Shebang_%28Unix%29>`_ which allows direct execution of the script and will hint certain Python launchers which version to use.
-If you always invoke Python directly then you do not need this line.
-
-The triple-quoted string is a `docstring <https://en.wikipedia.org/wiki/Docstring>`_.
-The one near the top documents the purpose for the module.
-The one in ``main`` documents that function.
-
-``from __future__ import annotations`` tells Python to use `Postponed Evaluation of Annotations <https://peps.python.org/pep-0563/>`_.
-This is required for specific type-hints, such as a class using itself in its own annotations.
-This will also speed up the initialization of code which uses type-hints.
-
-``def main() -> None:`` has no significance other than convention.
-Because this function returns nothing it is annotated with ``-> None``.
-
-``if __name__ == "__main__":`` checks for the `Top-level code environment <https://docs.python.org/3/library/__main__.html>`_.
-This prevents tools from accidentally launching the script when they just want to import it.
-This is the only required boilerplate, everything else is optional.
+You will replace body of the ``main`` function in the following section.
 
 Loading a tileset and opening a window
-------------------------------------------------------------------------------
+==============================================================================
 
 From here it is time to setup a ``tcod`` program.
 Download `Alloy_curses_12x12.png <https://raw.githubusercontent.com/HexDecimal/python-tcod-tutorial-2023/6b69bf9b5531963a0e5f09f9d8fe72a4001d4881/data/Alloy_curses_12x12.png>`_ and place this file in your projects ``data/`` directory.
-This tileset is from the `Dwarf Fortress tileset repository <https://dwarffortresswiki.org/index.php/DF2014:Tileset_repository>`_ and you may choose to use any other tileset from there as long is you keep track of the filename yourself.
+This tileset is from the `Dwarf Fortress tileset repository <https://dwarffortresswiki.org/index.php/DF2014:Tileset_repository>`_.
+These kinds of tilesets are always loaded with ``columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437``.
 
 Load the tileset with :any:`tcod.tileset.load_tilesheet` and then pass it to :any:`tcod.context.new`.
 These functions are part of modules which have not been imported yet, so new imports need to be added.
@@ -74,22 +53,22 @@ If you run this script now then a window will open and then immediately close.
 If that happens without seeing a traceback in your terminal then the script is correct.
 
 Configuring an event loop
-------------------------------------------------------------------------------
+==============================================================================
 
 The next step is to keep the window open until the user closes it.
 
 Since nothing is displayed yet a :any:`Console` should be created with ``"Hello World"`` printed to it.
 The size of the console can be used as a reference to create the context by adding the console to :any:`tcod.context.new`.
 
-To actually display the console to the window the :any:`Context.present` method must be called with the console.
-Be sure to check the additional a parameters of :any:`Context.present`, you can keep aspect or enforce integer scaling.
+Begin the main game loop with a ``while True:`` statement.
 
-Events are checked by iterating over all pending events.
-If your game is strictly turn-based then you should use :any:`tcod.event.wait`.
-If your game is real-time or has real-time animations then it should use :any:`tcod.event.get` instead.
+To actually display the console to the window the :any:`Context.present` method must be called with the console as a parameter.
+Do this first in the game loop before handing events.
 
-Test if an event is for closing the window with ``isinstance(event, tcod.event.Quit)``.
-If this is True then you should exit the function, either with ``return``, or with :any:`sys.exit`, or with ``raise SystemExit``.
+Events are checked by iterating over all pending events with :any:`tcod.event.wait`.
+Use the code ``for event in tcod.event.wait():`` to begin handing events.
+Test if an event is for closing the window with ``if isinstance(event, tcod.event.Quit):``.
+If this is True then you should exit the function with ``raise SystemExit``.
 
 .. code-block:: python
     :emphasize-lines: 2,3,11-18
@@ -118,13 +97,12 @@ If you run this then you get a window saying ``"Hello World"``.
 The window can be resized and the console will be stretched to fit the new resolution.
 
 An example game state
-------------------------------------------------------------------------------
+==============================================================================
 
 What exists now is not very interactive.
 The next step is to change state based on user input.
 
 Like ``tcod`` you'll need to install ``attrs`` with Pip, such as with ``pip install attrs``.
-Alternatively you can use :any:`dataclasses`, but this tutorial uses ``attrs`` since it has a more modern implementation.
 
 Start by adding an ``attrs`` class called ``ExampleState``.
 This a normal class with the ``@attrs.define(eq=False)`` decorator added.
@@ -135,8 +113,7 @@ The parameters for ``on_draw`` are ``self`` because this is an instance method a
 ``on_draw`` returns nothing, so be sure to add ``-> None``.
 
 :any:`Console.print` is the simplest way to draw the player because other options would require bounds-checking.
-
-If ``tcod.console.Console`` is too verbose then you can add ``from tcod.console import Console`` so that you can use just ``Console`` instead.
+Call this method using the players current coordinates and the ``"@"`` character.
 
 .. code-block:: python
 
@@ -189,13 +166,6 @@ Modify the drawing routine so that the console is cleared, then passed to ``Exam
     ...
 
 Now if you run the script you'll see ``@``.
-
-This code is sensitive to typing.
-If you wrote ``player_x=console.width / 2`` instead of ``player_x=console.width // 2`` (note the number of slashes) then ``player_x`` will be assigned as a float instead of an int.
-If ``player_x`` is a float then :any:`Console.print` will raise a TypeError.
-In this case the incorrect code is when ``ExampleState`` is created with an invalid type and not the print function call.
-Running ``mypy`` on your code will show you this type error at the correct position.
-Your IDE should also complain about a bad type if setup correctly.
 
 The next step is to move the player on events.
 A new method will be added to the ``ExampleState`` for this called ``on_event``.
