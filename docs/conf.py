@@ -378,7 +378,8 @@ napoleon_use_ivar = False
 napoleon_use_param = True
 napoleon_use_rtype = True
 
-rst_epilog = ".. include:: /epilog.rst"
+rst_prolog = ".. include:: /prolog.rst"  # Added to the beginning of every source file.
+rst_epilog = ".. include:: /epilog.rst"  # Added to the end of every source file.
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {

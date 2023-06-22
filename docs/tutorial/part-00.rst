@@ -1,3 +1,5 @@
+.. _part-0:
+
 Part 0 - Setting up a project
 ##############################################################################
 
@@ -18,7 +20,7 @@ First script
 ==============================================================================
 
 First start with a modern top-level script.
-Create a script in the project root folder called ``main.py`` which checks ``if __name__ == "__main__":`` and calls a ``main`` function.
+Create a script in the project root folder called ``main.py`` which checks :python:`if __name__ == "__main__":` and calls a ``main`` function.
 
 .. code-block:: python
 
@@ -33,6 +35,6 @@ In VSCode on the left sidebar is a **Run and Debug** tab.
 On this tab select **create a launch.json** file.
 This will prompt about what kind of program to launch.
 Pick ``Python``, then ``Module``, then when asked for the module name type ``main``.
-From now on the ``F5`` key will launch ``main.py`` in debug mode.
+From now on the :kbd:`F5` key will launch ``main.py`` in debug mode.
 
-Run the script now and ``"Hello World!"`` should be visible in the terminal output.
+Run the script now and ``Hello World!`` should be visible in the terminal output.
