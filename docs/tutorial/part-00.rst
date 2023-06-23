@@ -8,7 +8,7 @@ Part 0 - Setting up a project
 Starting tools
 ==============================================================================
 
-The IDE used for this tutorial is `Visual Studio Code <https://code.visualstudio.com/>`_ (not to be mistaken for Visual Studio).
+The IDE used for this tutorial is `Visual Studio Code <https://code.visualstudio.com/>`_ [#vscode]_ (not to be mistaken for Visual Studio).
 
 Git will be used for version control.
 `Follow the instructions here <https://git-scm.com/downloads>`_.
@@ -40,3 +40,8 @@ Pick ``Python``, then ``Module``, then when asked for the module name type ``mai
 From now on the :kbd:`F5` key will launch ``main.py`` in debug mode.
 
 Run the script now and ``Hello World!`` should be visible in the terminal output.
+
+.. rubric:: Footnotes
+
+.. [#vscode] Alternatives like `PyCharm <https://www.jetbrains.com/pycharm/>`_ were considered,
+             but VSCode works the best with Git projects since workspace settings are portable and can be committed without issues.
