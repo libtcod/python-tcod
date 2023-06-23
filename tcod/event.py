@@ -243,7 +243,7 @@ class Modifier(enum.IntFlag):
 class MouseButton(enum.IntEnum):
     """An enum for mouse buttons.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 16.1
     """
 
     LEFT = 1
@@ -264,7 +264,7 @@ class MouseButton(enum.IntEnum):
 class MouseButtonMask(enum.IntFlag):
     """A mask enum for held mouse buttons.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 16.1
     """
 
     LEFT = 0x1
