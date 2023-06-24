@@ -9,6 +9,7 @@ Initial script
 ==============================================================================
 
 First start with a modern top-level script.
+You should have ``main.py`` script from :ref:`part-0`:
 
 .. code-block:: python
 
@@ -25,7 +26,7 @@ Loading a tileset and opening a window
 ==============================================================================
 
 From here it is time to setup a ``tcod`` program.
-Download `Alloy_curses_12x12.png <https://raw.githubusercontent.com/HexDecimal/python-tcod-tutorial-2023/6b69bf9b5531963a0e5f09f9d8fe72a4001d4881/data/Alloy_curses_12x12.png>`_ and place this file in your projects ``data/`` directory.
+Download `Alloy_curses_12x12.png <https://raw.githubusercontent.com/HexDecimal/python-tcod-tutorial-2023/6b69bf9b5531963a0e5f09f9d8fe72a4001d4881/data/Alloy_curses_12x12.png>`_ [#tileset]_ and place this file in your projects ``data/`` directory.
 This tileset is from the `Dwarf Fortress tileset repository <https://dwarffortresswiki.org/index.php/DF2014:Tileset_repository>`_.
 These kinds of tilesets are always loaded with :python:`columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437`.
 
@@ -62,7 +63,7 @@ Configuring an event loop
 The next step is to keep the window open until the user closes it.
 
 Since nothing is displayed yet a :any:`Console` should be created with :python:`"Hello World"` printed to it.
-The size of the console can be used as a reference to create the context by adding the console to :any:`tcod.context.new`.
+The size of the console can be used as a reference to create the context by adding the console to :any:`tcod.context.new`. [#init_context]_
 
 Begin the main game loop with a :python:`while True:` statement.
 
@@ -71,11 +72,13 @@ Do this first in the game loop before handing events.
 
 Events are checked by iterating over all pending events with :any:`tcod.event.wait`.
 Use the code :python:`for event in tcod.event.wait():` to begin handing events.
-Test if an event is for closing the window with :python:`if isinstance(event, tcod.event.Quit):`.
-If this is True then you should exit the function with :python:`raise SystemExit`.
+
+In the event loop start with the line :python:`print(event)` so that all events can be viewed from the program output.
+Then test if an event is for closing the window with :python:`if isinstance(event, tcod.event.Quit):`.
+If this is True then you should exit the function with :python:`raise SystemExit()`. [#why_raise]_
 
 .. code-block:: python
-    :emphasize-lines: 2,3,11-18
+    :emphasize-lines: 2,3,11-19
 
     ...
     import tcod.console
@@ -93,12 +96,14 @@ If this is True then you should exit the function with :python:`raise SystemExit
             while True:  # Main loop
                 context.present(console)  # Render the console to the window and show it
                 for event in tcod.event.wait():  # Event loop, blocks until pending events exist
+                    print(event)
                     if isinstance(event, tcod.event.Quit):
                         raise SystemExit()
     ...
 
 If you run this then you get a window saying :python:`"Hello World"`.
 The window can be resized and the console will be stretched to fit the new resolution.
+When you do anything such as press a key or interact with the window the event for that action will be printed to the program output.
 
 An example game state
 ==============================================================================
@@ -165,6 +170,7 @@ Modify the drawing routine so that the console is cleared, then passed to :pytho
                 state.on_draw(console)  # Draw the current state
                 context.present(console)  # Display the console on the window
                 for event in tcod.event.wait():
+                    print(event)
                     if isinstance(event, tcod.event.Quit):
                         raise SystemExit()
     ...
@@ -182,6 +188,7 @@ Begin matching with :python:`match event:`.
 The equivalent to :python:`if isinstance(event, tcod.event.Quit):` is :python:`case tcod.event.Quit():`.
 Keyboard keys can be checked with :python:`case tcod.event.KeyDown(sym=tcod.event.KeySym.LEFT):`.
 Make a case for each arrow key: ``LEFT`` ``RIGHT`` ``UP`` ``DOWN`` and move the player in the direction of that key.
+Since events are printed you can check the :any:`KeySym` of a key by pressing that key and looking at the printed output.
 See :any:`KeySym` for a list of all keys.
 
 .. code-block:: python
@@ -209,7 +216,7 @@ See :any:`KeySym` for a list of all keys.
 Now replace the event handling code in ``main`` to defer to the states ``on_event`` method.
 
 .. code-block:: python
-    :emphasize-lines: 11
+    :emphasize-lines: 12
 
     ...
     def main() -> None:
@@ -221,9 +228,21 @@ Now replace the event handling code in ``main`` to defer to the states ``on_even
                 state.on_draw(console)
                 context.present(console)
                 for event in tcod.event.wait():
+                    print(event)
                     state.on_event(event)  # Pass events to the state
     ...
 
 Now when you run this script you have a player character you can move around with the arrow keys before closing the window.
 
 You can review the part-1 source code `here <https://github.com/HexDecimal/python-tcod-tutorial-2023/tree/part-1>`_.
+
+.. rubric:: Footnotes
+
+.. [#tileset] The choice of tileset came down to what looked nice while also being square.
+              Other options such as using a BDF font were considered, but in the end this tutorial won't go too much into Unicode.
+
+.. [#init_context] This tutorial follows the setup for a fixed-size console.
+                   The alternatives shown in :ref:`getting-started` are outside the scope of this tutorial.
+
+.. [#why_raise] You could use :python:`return` here to exit the ``main`` function and end the program, but :python:`raise SystemExit()` is used because it will close the program from anywhere.
+                :python:`raise SystemExit()` is also more useful to teach than :any:`sys.exit`.
