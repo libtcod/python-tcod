@@ -52,7 +52,8 @@ from tcod.constants import (
     NOISE_DEFAULT,
 )
 
-# ruff: noqa: ANN401 PLR0913  # Functions are too deprecated to make changes.
+# Functions are too deprecated to make changes.
+# ruff: noqa: ANN401 PLR0913
 
 Bsp = tcod.bsp.BSP
 

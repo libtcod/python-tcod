@@ -16,7 +16,8 @@ from typing import Any
 import pcpp  # type: ignore
 import requests
 
-# ruff: noqa: S603, S607  # This script calls a lot of programs.
+# This script calls a lot of programs.
+# ruff: noqa: S603, S607
 
 BIT_SIZE, LINKAGE = platform.architecture()
 
