@@ -1365,6 +1365,8 @@ class EventDispatch(Generic[T]):
                 state.dispatch(event)
     '''
 
+    __slots__ = ()
+
     def dispatch(self, event: Any) -> T | None:
         """Send an event to an `ev_*` method.
 

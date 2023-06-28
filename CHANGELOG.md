@@ -4,6 +4,8 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+### Changed
+- Added an empty `__slots__` to `EventDispatch`.
 
 ## [16.1.0] - 2023-06-23
 ### Added
