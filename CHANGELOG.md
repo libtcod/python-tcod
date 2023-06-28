@@ -7,6 +7,9 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 ### Changed
 - Added an empty `__slots__` to `EventDispatch`.
 
+### Removed
+- Dropped support for Python 3.7.
+
 ## [16.1.0] - 2023-06-23
 ### Added
 - Added the enums `tcod.event.MouseButton` and `tcod.event.MouseButtonMask`.
