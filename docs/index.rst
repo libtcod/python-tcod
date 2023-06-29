@@ -22,10 +22,9 @@ Contents:
 
 .. toctree::
     :maxdepth: 2
-    :caption: Tutorial
-    :glob:
+    :caption: How To
 
-    tutorial/part-*
+    tutorial/index
 
 .. toctree::
     :maxdepth: 2
