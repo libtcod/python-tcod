@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 ## [Unreleased]
 ### Changed
 - Added an empty `__slots__` to `EventDispatch`.
+- Bundle `SDL 2.28.1` on Windows and MacOS.
+
+### Fixed
+- Fixed "SDL failed to get a vertex buffer for this Direct3D 9 rendering batch!"
+  https://github.com/libtcod/python-tcod/issues/131
 
 ### Removed
 - Dropped support for Python 3.7.

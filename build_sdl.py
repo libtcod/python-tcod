@@ -26,7 +26,7 @@ SDL_MIN_VERSION = (2, 0, 10)
 # The SDL2 version to parse and export symbols from.
 SDL2_PARSE_VERSION = os.environ.get("SDL_VERSION", "2.0.20")
 # The SDL2 version to include in binary distributions.
-SDL2_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "2.26.0")
+SDL2_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "2.28.1")
 
 
 # Used to remove excessive newlines in debug outputs.
