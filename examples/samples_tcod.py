@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import copy
+import importlib.metadata
 import math
 import random
 import sys
@@ -18,6 +19,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 import tcod.cffi
+import tcod.context
 import tcod.event
 import tcod.noise
 import tcod.render
@@ -160,8 +162,8 @@ class TrueColorSample(Sample):
             string="The Doryen library uses 24 bits colors, for both " "background and foreground.",
             fg=WHITE,
             bg=GREY,
-            bg_blend=tcod.BKGND_MULTIPLY,
-            alignment=tcod.CENTER,
+            bg_blend=libtcodpy.BKGND_MULTIPLY,
+            alignment=libtcodpy.CENTER,
         )
 
 
@@ -297,7 +299,7 @@ class LineDrawingSample(Sample):
         # in python the easiest way is to use the line iterator
         for x, y in tcod.los.bresenham((xo, yo), (xd, yd)).tolist():
             if 0 <= x < sample_console.width and 0 <= y < sample_console.height:
-                tcod.console_set_char_background(sample_console, x, y, LIGHT_BLUE, self.bk_flag)
+                libtcodpy.console_set_char_background(sample_console, x, y, LIGHT_BLUE, self.bk_flag)
         sample_console.print(
             2,
             2,
@@ -581,8 +583,8 @@ class FOVSample(Sample):
         self.draw_ui()
         sample_console.print(self.player_x, self.player_y, "@")
         # Draw windows.
-        sample_console.tiles_rgb["ch"][SAMPLE_MAP == "="] = 0x2550  # BOX DRAWINGS DOUBLE HORIZONTAL
-        sample_console.tiles_rgb["fg"][SAMPLE_MAP == "="] = BLACK
+        sample_console.rgb["ch"][SAMPLE_MAP == "="] = 0x2550  # BOX DRAWINGS DOUBLE HORIZONTAL
+        sample_console.rgb["fg"][SAMPLE_MAP == "="] = BLACK
 
         # Get a 2D boolean array of visible cells.
         fov = tcod.map.compute_fov(
@@ -625,7 +627,7 @@ class FOVSample(Sample):
             dark_bg: NDArray[np.float16] = self.dark_map_bg.astype(np.float16)
 
             # Linear interpolation between colors.
-            sample_console.tiles_rgb["bg"] = dark_bg + (light_bg - dark_bg) * light[..., np.newaxis]
+            sample_console.rgb["bg"] = dark_bg + (light_bg - dark_bg) * light[..., np.newaxis]
         else:
             sample_console.bg[...] = np.where(fov[:, :, np.newaxis], self.light_map_bg, self.dark_map_bg)
 
@@ -1411,7 +1413,7 @@ def init_context(renderer: int) -> None:
     context = tcod.context.new(
         columns=root_console.width,
         rows=root_console.height,
-        title=f"python-tcod samples (python-tcod {tcod.__version__}, libtcod {libtcod_version})",
+        title=f"""python-tcod samples (python-tcod {importlib.metadata.version("tcod")}, libtcod {libtcod_version})""",
         vsync=False,  # VSync turned off since this is for benchmarking.
         tileset=tileset,
     )
