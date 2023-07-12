@@ -5,6 +5,10 @@ Part 1 - Moving a player around the screen
 
 .. include:: notice.rst
 
+In part 1 you will become familiar with the initialization, rendering, and event system of tcod.
+This will be done as a series of small implementations.
+It is recommend to save your progress after each section is finished and tested.
+
 Initial script
 ==============================================================================
 
@@ -29,10 +33,16 @@ From here it is time to setup a ``tcod`` program.
 Download `Alloy_curses_12x12.png <https://raw.githubusercontent.com/HexDecimal/python-tcod-tutorial-2023/6b69bf9b5531963a0e5f09f9d8fe72a4001d4881/data/Alloy_curses_12x12.png>`_ [#tileset]_ and place this file in your projects ``data/`` directory.
 This tileset is from the `Dwarf Fortress tileset repository <https://dwarffortresswiki.org/index.php/DF2014:Tileset_repository>`_.
 These kinds of tilesets are always loaded with :python:`columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437`.
+Use the string :python:`"data/Alloy_curses_12x12.png"` to refer to the path of the tileset. [#why_not_pathlib]_
 
-Load the tileset with :any:`tcod.tileset.load_tilesheet` and then pass it to :any:`tcod.context.new`.
-These functions are part of modules which have not been imported yet, so new imports need to be added.
-:any:`tcod.context.new` returns a :any:`Context` which is used with the ``with`` statement.
+Load the tileset with :any:`tcod.tileset.load_tilesheet`.
+Then pass the tileset to :any:`tcod.context.new`, you only need to provide the ``tileset`` parameter.
+
+:any:`tcod.context.new` returns a :any:`Context` which will be used with Python's :python:`with` statement.
+We want to keep the name of the context, so use the syntax: :python:`with tcod.context.new(tileset=tileset) as context:`.
+The new block can't be empty, so add :python:`pass` to the with statement body.
+
+These functions are part of modules which have not been imported yet, so new imports for ``tcod.context`` and ``tcod.tileset`` must be added to the top of the script.
 
 .. code-block:: python
     :emphasize-lines: 2,3,8-12
@@ -54,7 +64,7 @@ These functions are part of modules which have not been imported yet, so new imp
 If an import fails that means you do not have ``tcod`` installed on the Python environment you just used to run the script.
 If you use an IDE then make sure the Python environment it is using is correct and then run :shell:`pip install tcod` from the shell terminal within that IDE.
 
-If you run this script now then a window will open and then immediately close.
+There is no game loop, so if you run this script now then a window will open and then immediately close.
 If that happens without seeing a traceback in your terminal then the script is correct.
 
 Configuring an event loop
@@ -240,6 +250,11 @@ You can review the part-1 source code `here <https://github.com/HexDecimal/pytho
 
 .. [#tileset] The choice of tileset came down to what looked nice while also being square.
               Other options such as using a BDF font were considered, but in the end this tutorial won't go too much into Unicode.
+
+.. [#why_not_pathlib]
+    :any:`pathlib` is not used because this example is too simple for that.
+    The working directory will be the project root folder for the entire tutorial, including distributions.
+    :any:`pathlib` will be used later for saved games and configuration directories, and not for static data.
 
 .. [#init_context] This tutorial follows the setup for a fixed-size console.
                    The alternatives shown in :ref:`getting-started` are outside the scope of this tutorial.
