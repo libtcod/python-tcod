@@ -8,6 +8,7 @@ import tcod
 import tcod.constants
 import tcod.event
 import tcod.libtcodpy
+import tcod.random
 
 with pytest.warns():
     import libtcodpy
@@ -53,3 +54,11 @@ def test_line_where() -> None:
     with pytest.warns():
         where = tcod.libtcodpy.line_where(1, 0, 3, 4)
     np.testing.assert_array_equal(where, [[1, 1, 2, 2, 3], [0, 1, 2, 3, 4]])
+
+
+def test_gauss_typo() -> None:
+    rng = tcod.random.Random()
+    with pytest.warns(FutureWarning, match=r"gauss"):
+        rng.guass(1, 1)
+    with pytest.warns(FutureWarning, match=r"inverse_gauss"):
+        rng.inverse_guass(1, 1)

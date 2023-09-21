@@ -4,6 +4,8 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+### Changed
+- Renamed `gauss` methods to fix typos.
 
 ## [16.1.1] - 2023-07-10
 ### Changed

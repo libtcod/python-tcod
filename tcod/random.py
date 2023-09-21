@@ -14,6 +14,7 @@ import warnings
 from typing import Any, Hashable
 
 import tcod.constants
+from tcod._internal import deprecate
 from tcod.cffi import ffi, lib
 
 MERSENNE_TWISTER = tcod.constants.RNG_MT
@@ -110,7 +111,7 @@ class Random:
         """
         return float(lib.TCOD_random_get_double(self.random_c, low, high))
 
-    def guass(self, mu: float, sigma: float) -> float:
+    def gauss(self, mu: float, sigma: float) -> float:
         """Return a random number using Gaussian distribution.
 
         Args:
@@ -119,10 +120,17 @@ class Random:
 
         Returns:
             float: A random float.
+
+        .. versionchanged:: Unreleased
+            Renamed from `guass` to `gauss`.
         """
         return float(lib.TCOD_random_get_gaussian_double(self.random_c, mu, sigma))
 
-    def inverse_guass(self, mu: float, sigma: float) -> float:
+    @deprecate("This is a typo, rename this to 'gauss'", category=FutureWarning)
+    def guass(self, mu: float, sigma: float) -> float:  # noqa: D102
+        return self.gauss(mu, sigma)
+
+    def inverse_gauss(self, mu: float, sigma: float) -> float:
         """Return a random Gaussian number using the Box-Muller transform.
 
         Args:
@@ -131,8 +139,15 @@ class Random:
 
         Returns:
             float: A random float.
+
+        .. versionchanged:: Unreleased
+            Renamed from `inverse_guass` to `inverse_gauss`.
         """
         return float(lib.TCOD_random_get_gaussian_double_inv(self.random_c, mu, sigma))
+
+    @deprecate("This is a typo, rename this to 'inverse_gauss'", category=FutureWarning)
+    def inverse_guass(self, mu: float, sigma: float) -> float:  # noqa: D102
+        return self.inverse_gauss(mu, sigma)
 
     def __getstate__(self) -> Any:
         """Pack the self.random_c attribute into a portable state."""
