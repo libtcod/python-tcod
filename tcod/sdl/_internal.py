@@ -59,7 +59,7 @@ class _ProtectedContext:
             return False
         if _sys.version_info < (3, 8):
             return False
-        _sys.unraisablehook(_UnraisableHookArgs(exc_type, value, traceback, None, self.obj))  # type: ignore[arg-type]
+        _sys.unraisablehook(_UnraisableHookArgs(exc_type, value, traceback, None, self.obj))
         return True
 
 
