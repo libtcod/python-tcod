@@ -443,24 +443,28 @@ class Console:
         """
         lib.TCOD_console_put_char(self.console_c, x, y, ch, bg_blend)
 
-    __ALIGNMENT_LOOKUP = {0: "tcod.LEFT", 1: "tcod.RIGHT", 2: "tcod.CENTER"}
+    __ALIGNMENT_LOOKUP = (
+        "tcod.LEFT",
+        "tcod.RIGHT",
+        "tcod.CENTER",
+    )
 
-    __BG_BLEND_LOOKUP = {
-        0: "tcod.BKGND_NONE",
-        1: "tcod.BKGND_SET",
-        2: "tcod.BKGND_MULTIPLY",
-        3: "tcod.BKGND_LIGHTEN",
-        4: "tcod.BKGND_DARKEN",
-        5: "tcod.BKGND_SCREEN",
-        6: "tcod.BKGND_COLOR_DODGE",
-        7: "tcod.BKGND_COLOR_BURN",
-        8: "tcod.BKGND_ADD",
-        9: "tcod.BKGND_ADDA",
-        10: "tcod.BKGND_BURN",
-        11: "tcod.BKGND_OVERLAY",
-        12: "tcod.BKGND_ALPH",
-        13: "tcod.BKGND_DEFAULT",
-    }
+    __BG_BLEND_LOOKUP = (
+        "tcod.BKGND_NONE",
+        "tcod.BKGND_SET",
+        "tcod.BKGND_MULTIPLY",
+        "tcod.BKGND_LIGHTEN",
+        "tcod.BKGND_DARKEN",
+        "tcod.BKGND_SCREEN",
+        "tcod.BKGND_COLOR_DODGE",
+        "tcod.BKGND_COLOR_BURN",
+        "tcod.BKGND_ADD",
+        "tcod.BKGND_ADDA",
+        "tcod.BKGND_BURN",
+        "tcod.BKGND_OVERLAY",
+        "tcod.BKGND_ALPH",
+        "tcod.BKGND_DEFAULT",
+    )
 
     def __deprecate_defaults(  # noqa: C901, PLR0912
         self,
