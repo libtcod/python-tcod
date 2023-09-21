@@ -121,7 +121,7 @@ class Random:
         Returns:
             float: A random float.
 
-        .. versionchanged:: Unreleased
+        .. versionchanged:: 16.2
             Renamed from `guass` to `gauss`.
         """
         return float(lib.TCOD_random_get_gaussian_double(self.random_c, mu, sigma))
@@ -140,7 +140,7 @@ class Random:
         Returns:
             float: A random float.
 
-        .. versionchanged:: Unreleased
+        .. versionchanged:: 16.2
             Renamed from `inverse_guass` to `inverse_gauss`.
         """
         return float(lib.TCOD_random_get_gaussian_double_inv(self.random_c, mu, sigma))
