@@ -1,4 +1,6 @@
-"""Libtcod consoles are a strictly tile-based representation of text and color.
+"""Libtcod tile-based Consoles and printing functions.
+
+Libtcod consoles are a strictly tile-based representation of colored glyphs/tiles.
 To render a console you need a tileset and a window to render to.
 See :ref:`getting-started` for info on how to set those up.
 """
