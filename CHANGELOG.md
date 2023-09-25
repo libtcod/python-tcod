@@ -4,6 +4,8 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+
+## [16.2.1] - 2023-09-24
 ### Fixed
 - Fixed errors loading files where their paths are non-ASCII and the C locale is not UTF-8.
 
