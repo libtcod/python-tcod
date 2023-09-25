@@ -130,9 +130,11 @@ def _fmt(string: str, stacklevel: int = 2) -> bytes:
 
 
 def _path_encode(path: Path) -> bytes:
-    """Return a bytes file path for the current C locale."""
+    """Return a bytes file path for the current locale when on Windows, uses fsdecode for other platforms."""
+    if sys.platform != "win32":
+        return bytes(path)  # Sane and expected behavior for converting Path into bytes
     try:
-        return str(path).encode(locale.getlocale()[1] or "utf-8")
+        return str(path).encode(locale.getlocale()[1] or "utf-8")  # Stay classy, Windows
     except UnicodeEncodeError as exc:
         if sys.version_info >= (3, 11):
             exc.add_note("""Consider calling 'locale.setlocale(locale.LC_CTYPES, ".UTF8")' to support Unicode paths.""")

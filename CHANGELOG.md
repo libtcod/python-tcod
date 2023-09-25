@@ -4,10 +4,12 @@ Changes relevant to the users of python-tcod are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) since version `2.0.0`.
 
 ## [Unreleased]
+### Fixed
+- Ignore the locale when encoding file paths outside of Windows.
 
 ## [16.2.1] - 2023-09-24
 ### Fixed
-- Fixed errors loading files where their paths are non-ASCII and the C locale is not UTF-8.
+- Fixed errors loading files on Windows where their paths are non-ASCII and the locale is not UTF-8.
 
 ## [16.2.0] - 2023-09-20
 ### Changed
