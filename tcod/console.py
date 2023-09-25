@@ -17,7 +17,7 @@ from typing_extensions import Literal
 
 import tcod._internal
 import tcod.constants
-from tcod._internal import _check, deprecate
+from tcod._internal import _check, _path_encode, deprecate
 from tcod.cffi import ffi, lib
 
 
@@ -1301,9 +1301,9 @@ def load_xp(path: str | PathLike[str], order: Literal["C", "F"] = "C") -> tuple[
         console.rgba[is_transparent] = (ord(" "), (0,), (0,))
     """
     path = Path(path).resolve(strict=True)
-    layers = _check(tcod.lib.TCOD_load_xp(bytes(path), 0, ffi.NULL))
+    layers = _check(tcod.lib.TCOD_load_xp(_path_encode(path), 0, ffi.NULL))
     consoles = ffi.new("TCOD_Console*[]", layers)
-    _check(tcod.lib.TCOD_load_xp(bytes(path), layers, consoles))
+    _check(tcod.lib.TCOD_load_xp(_path_encode(path), layers, consoles))
     return tuple(Console._from_cdata(console_p, order=order) for console_p in consoles)
 
 
@@ -1364,7 +1364,7 @@ def save_xp(
         tcod.lib.TCOD_save_xp(
             len(consoles_c),
             consoles_c,
-            bytes(path),
+            _path_encode(path),
             compress_level,
         )
     )

@@ -18,7 +18,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 import tcod.console
-from tcod._internal import _console, deprecate
+from tcod._internal import _console, _path_encode, deprecate
 from tcod.cffi import ffi, lib
 
 
@@ -72,7 +72,7 @@ class Image:
         .. versionadded:: 16.0
         """
         path = Path(path).resolve(strict=True)
-        return cls._from_cdata(ffi.gc(lib.TCOD_image_load(bytes(path)), lib.TCOD_image_delete))
+        return cls._from_cdata(ffi.gc(lib.TCOD_image_load(_path_encode(path)), lib.TCOD_image_delete))
 
     def clear(self, color: tuple[int, int, int]) -> None:
         """Fill this entire Image with color.
@@ -306,7 +306,7 @@ class Image:
         .. versionchanged:: 16.0
             Added PathLike support.
         """
-        lib.TCOD_image_save(self.image_c, bytes(Path(filename)))
+        lib.TCOD_image_save(self.image_c, _path_encode(Path(filename)))
 
     @property
     def __array_interface__(self) -> dict[str, Any]:
@@ -364,7 +364,7 @@ def load(filename: str | PathLike[str]) -> NDArray[np.uint8]:
 
     .. versionadded:: 11.4
     """
-    image = Image._from_cdata(ffi.gc(lib.TCOD_image_load(bytes(Path(filename))), lib.TCOD_image_delete))
+    image = Image._from_cdata(ffi.gc(lib.TCOD_image_load(_path_encode(Path(filename))), lib.TCOD_image_delete))
     array: NDArray[np.uint8] = np.asarray(image, dtype=np.uint8)
     height, width, depth = array.shape
     if depth == 3:

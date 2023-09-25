@@ -21,7 +21,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 import tcod.console
-from tcod._internal import _check, _console, _raise_tcod_error, deprecate
+from tcod._internal import _check, _console, _path_encode, _raise_tcod_error, deprecate
 from tcod.cffi import ffi, lib
 
 
@@ -268,7 +268,7 @@ def load_truetype_font(path: str | PathLike[str], tile_width: int, tile_height: 
     This function is provisional.  The API may change.
     """
     path = Path(path).resolve(strict=True)
-    cdata = lib.TCOD_load_truetype_font_(bytes(path), tile_width, tile_height)
+    cdata = lib.TCOD_load_truetype_font_(_path_encode(path), tile_width, tile_height)
     if not cdata:
         raise RuntimeError(ffi.string(lib.TCOD_get_error()))
     return Tileset._claim(cdata)
@@ -296,7 +296,7 @@ def set_truetype_font(path: str | PathLike[str], tile_width: int, tile_height: i
         Use :any:`load_truetype_font` instead.
     """
     path = Path(path).resolve(strict=True)
-    if lib.TCOD_tileset_load_truetype_(bytes(path), tile_width, tile_height):
+    if lib.TCOD_tileset_load_truetype_(_path_encode(path), tile_width, tile_height):
         raise RuntimeError(ffi.string(lib.TCOD_get_error()))
 
 
@@ -314,7 +314,7 @@ def load_bdf(path: str | PathLike[str]) -> Tileset:
     .. versionadded:: 11.10
     """
     path = Path(path).resolve(strict=True)
-    cdata = lib.TCOD_load_bdf(bytes(path))
+    cdata = lib.TCOD_load_bdf(_path_encode(path))
     if not cdata:
         raise RuntimeError(ffi.string(lib.TCOD_get_error()).decode())
     return Tileset._claim(cdata)
@@ -343,7 +343,7 @@ def load_tilesheet(path: str | PathLike[str], columns: int, rows: int, charmap: 
     mapping = []
     if charmap is not None:
         mapping = list(itertools.islice(charmap, columns * rows))
-    cdata = lib.TCOD_tileset_load(bytes(path), columns, rows, len(mapping), mapping)
+    cdata = lib.TCOD_tileset_load(_path_encode(path), columns, rows, len(mapping), mapping)
     if not cdata:
         _raise_tcod_error()
     return Tileset._claim(cdata)

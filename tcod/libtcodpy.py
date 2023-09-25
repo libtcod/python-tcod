@@ -31,6 +31,7 @@ from tcod._internal import (
     _console,
     _fmt,
     _int,
+    _path_encode,
     _PropagateException,
     _unicode,
     _unpack_char_p,
@@ -991,7 +992,7 @@ def console_set_custom_font(
         Added PathLike support.  `fontFile` no longer takes bytes.
     """
     fontFile = Path(fontFile).resolve(strict=True)
-    _check(lib.TCOD_console_set_custom_font(bytes(fontFile), flags, nb_char_horiz, nb_char_vertic))
+    _check(lib.TCOD_console_set_custom_font(_path_encode(fontFile), flags, nb_char_horiz, nb_char_vertic))
 
 
 @deprecate("Check `con.width` instead.")
@@ -1806,7 +1807,7 @@ def console_from_file(filename: str | PathLike[str]) -> tcod.console.Console:
         Added PathLike support.
     """
     filename = Path(filename).resolve(strict=True)
-    return tcod.console.Console._from_cdata(_check_p(lib.TCOD_console_from_file(bytes(filename))))
+    return tcod.console.Console._from_cdata(_check_p(lib.TCOD_console_from_file(_path_encode(filename))))
 
 
 @deprecate("Call the `Console.blit` method instead.")
@@ -1985,7 +1986,7 @@ def console_load_asc(con: tcod.console.Console, filename: str | PathLike[str]) -
         Added PathLike support.
     """
     filename = Path(filename).resolve(strict=True)
-    return bool(lib.TCOD_console_load_asc(_console(con), bytes(filename)))
+    return bool(lib.TCOD_console_load_asc(_console(con), _path_encode(filename)))
 
 
 @deprecate("This format is not actively supported")
@@ -1998,7 +1999,7 @@ def console_save_asc(con: tcod.console.Console, filename: str | PathLike[str]) -
     .. versionchanged:: 16.0
         Added PathLike support.
     """
-    return bool(lib.TCOD_console_save_asc(_console(con), bytes(Path(filename))))
+    return bool(lib.TCOD_console_save_asc(_console(con), _path_encode(Path(filename))))
 
 
 @deprecate("This format is not actively supported")
@@ -2012,7 +2013,7 @@ def console_load_apf(con: tcod.console.Console, filename: str | PathLike[str]) -
         Added PathLike support.
     """
     filename = Path(filename).resolve(strict=True)
-    return bool(lib.TCOD_console_load_apf(_console(con), bytes(filename)))
+    return bool(lib.TCOD_console_load_apf(_console(con), _path_encode(filename)))
 
 
 @deprecate("This format is not actively supported")
@@ -2025,7 +2026,7 @@ def console_save_apf(con: tcod.console.Console, filename: str | PathLike[str]) -
     .. versionchanged:: 16.0
         Added PathLike support.
     """
-    return bool(lib.TCOD_console_save_apf(_console(con), bytes(Path(filename))))
+    return bool(lib.TCOD_console_save_apf(_console(con), _path_encode(Path(filename))))
 
 
 @deprecate("Use tcod.console.load_xp to load this file.")
@@ -2040,7 +2041,7 @@ def console_load_xp(con: tcod.console.Console, filename: str | PathLike[str]) ->
         Added PathLike support.
     """
     filename = Path(filename).resolve(strict=True)
-    return bool(lib.TCOD_console_load_xp(_console(con), bytes(filename)))
+    return bool(lib.TCOD_console_load_xp(_console(con), _path_encode(filename)))
 
 
 @deprecate("Use tcod.console.save_xp to save this console.")
@@ -2050,7 +2051,7 @@ def console_save_xp(con: tcod.console.Console, filename: str | PathLike[str], co
     .. versionchanged:: 16.0
         Added PathLike support.
     """
-    return bool(lib.TCOD_console_save_xp(_console(con), bytes(Path(filename)), compress_level))
+    return bool(lib.TCOD_console_save_xp(_console(con), _path_encode(Path(filename)), compress_level))
 
 
 @deprecate("Use tcod.console.load_xp to load this file.")
@@ -2061,7 +2062,7 @@ def console_from_xp(filename: str | PathLike[str]) -> tcod.console.Console:
         Added PathLike support.
     """
     filename = Path(filename).resolve(strict=True)
-    return tcod.console.Console._from_cdata(_check_p(lib.TCOD_console_from_xp(bytes(filename))))
+    return tcod.console.Console._from_cdata(_check_p(lib.TCOD_console_from_xp(_path_encode(filename))))
 
 
 @deprecate("Use tcod.console.load_xp to load this file.")
@@ -2074,7 +2075,7 @@ def console_list_load_xp(
         Added PathLike support.
     """
     filename = Path(filename).resolve(strict=True)
-    tcod_list = lib.TCOD_console_list_from_xp(bytes(filename))
+    tcod_list = lib.TCOD_console_list_from_xp(_path_encode(filename))
     if tcod_list == ffi.NULL:
         return None
     try:
@@ -2102,7 +2103,7 @@ def console_list_save_xp(
     try:
         for console in console_list:
             lib.TCOD_list_push(tcod_list, _console(console))
-        return bool(lib.TCOD_console_list_save_xp(tcod_list, bytes(Path(filename)), compress_level))
+        return bool(lib.TCOD_console_list_save_xp(tcod_list, _path_encode(Path(filename)), compress_level))
     finally:
         lib.TCOD_list_delete(tcod_list)
 
@@ -3436,7 +3437,7 @@ def mouse_get_status() -> Mouse:
 
 @pending_deprecate()
 def namegen_parse(filename: str | PathLike[str], random: tcod.random.Random | None = None) -> None:
-    lib.TCOD_namegen_parse(bytes(Path(filename)), random or ffi.NULL)
+    lib.TCOD_namegen_parse(_path_encode(Path(filename)), random or ffi.NULL)
 
 
 @pending_deprecate()
@@ -3639,7 +3640,7 @@ def _pycall_parser_error(msg: Any) -> None:
 def parser_run(parser: Any, filename: str | PathLike[str], listener: Any = None) -> None:
     global _parser_listener
     if not listener:
-        lib.TCOD_parser_run(parser, bytes(Path(filename)), ffi.NULL)
+        lib.TCOD_parser_run(parser, _path_encode(Path(filename)), ffi.NULL)
         return
 
     propagate_manager = _PropagateException()
@@ -3658,7 +3659,7 @@ def parser_run(parser: Any, filename: str | PathLike[str], listener: Any = None)
     with _parser_callback_lock:
         _parser_listener = listener
         with propagate_manager:
-            lib.TCOD_parser_run(parser, bytes(Path(filename)), c_listener)
+            lib.TCOD_parser_run(parser, _path_encode(Path(filename)), c_listener)
 
 
 @deprecate("libtcod objects are deleted automatically.")
@@ -4079,7 +4080,7 @@ def sys_save_screenshot(name: str | PathLike[str] | None = None) -> None:
     .. versionchanged:: 16.0
         Added PathLike support.
     """
-    lib.TCOD_sys_save_screenshot(bytes(Path(name)) if name is not None else ffi.NULL)
+    lib.TCOD_sys_save_screenshot(_path_encode(Path(name)) if name is not None else ffi.NULL)
 
 
 # custom fullscreen resolution

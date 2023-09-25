@@ -2,7 +2,10 @@
 from __future__ import annotations
 
 import functools
+import locale
+import sys
 import warnings
+from pathlib import Path
 from types import TracebackType
 from typing import Any, AnyStr, Callable, NoReturn, SupportsInt, TypeVar, cast
 
@@ -124,6 +127,16 @@ def _fmt(string: str, stacklevel: int = 2) -> bytes:
         )
         string = string.decode("latin-1")
     return string.encode("utf-8").replace(b"%", b"%%")
+
+
+def _path_encode(path: Path) -> bytes:
+    """Return a bytes file path for the current C locale."""
+    try:
+        return str(path).encode(locale.getlocale()[1] or "utf-8")
+    except UnicodeEncodeError as exc:
+        if sys.version_info >= (3, 11):
+            exc.add_note("""Consider calling 'locale.setlocale(locale.LC_CTYPES, ".UTF8")' to support Unicode paths.""")
+        raise
 
 
 class _PropagateException:
