@@ -1,3 +1,4 @@
+attrs>=23.1.0
 cffi>=1.15
 numpy>=1.21.4
 pycparser>=2.14
