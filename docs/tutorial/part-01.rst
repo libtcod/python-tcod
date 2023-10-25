@@ -17,6 +17,9 @@ You should have ``main.py`` script from :ref:`part-0`:
 
 .. code-block:: python
 
+    from __future__ import annotations
+
+
     def main() -> None:
         ...
 
@@ -36,6 +39,7 @@ These kinds of tilesets are always loaded with :python:`columns=16, rows=16, cha
 Use the string :python:`"data/Alloy_curses_12x12.png"` to refer to the path of the tileset. [#why_not_pathlib]_
 
 Load the tileset with :any:`tcod.tileset.load_tilesheet`.
+Pass the tileset to :any:`tcod.tileset.procedural_block_elements` which will fill in most `Block Elements <https://en.wikipedia.org/wiki/Block_Elements>`_ missing from `Code Page 437 <https://en.wikipedia.org/wiki/Code_page_437>`_.
 Then pass the tileset to :any:`tcod.context.new`, you only need to provide the ``tileset`` parameter.
 
 :any:`tcod.context.new` returns a :any:`Context` which will be used with Python's :python:`with` statement.
@@ -45,9 +49,10 @@ The new block can't be empty, so add :python:`pass` to the with statement body.
 These functions are part of modules which have not been imported yet, so new imports for ``tcod.context`` and ``tcod.tileset`` must be added to the top of the script.
 
 .. code-block:: python
-    :emphasize-lines: 2,3,8-12
+    :emphasize-lines: 3,4,8-14
 
-    ...
+    from __future__ import annotations
+
     import tcod.context  # Add these imports
     import tcod.tileset
 
@@ -57,9 +62,13 @@ These functions are part of modules which have not been imported yet, so new imp
         tileset = tcod.tileset.load_tilesheet(
             "data/Alloy_curses_12x12.png", columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437
         )
+        tcod.tileset.procedural_block_elements(tileset=tileset)
         with tcod.context.new(tileset=tileset) as context:
             pass  # The window will stay open for the duration of this block
-    ...
+
+
+    if __name__ == "__main__":
+        main()
 
 If an import fails that means you do not have ``tcod`` installed on the Python environment you just used to run the script.
 If you use an IDE then make sure the Python environment it is using is correct and then run :shell:`pip install tcod` from the shell terminal within that IDE.
@@ -88,11 +97,14 @@ Then test if an event is for closing the window with :python:`if isinstance(even
 If this is True then you should exit the function with :python:`raise SystemExit()`. [#why_raise]_
 
 .. code-block:: python
-    :emphasize-lines: 2,3,11-19
+    :emphasize-lines: 3,5,15-23
 
-    ...
+    from __future__ import annotations
+
     import tcod.console
+    import tcod.context
     import tcod.event
+    import tcod.tileset
 
 
     def main() -> None:
@@ -100,6 +112,7 @@ If this is True then you should exit the function with :python:`raise SystemExit
         tileset = tcod.tileset.load_tilesheet(
             "data/Alloy_curses_12x12.png", columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437
         )
+        tcod.tileset.procedural_block_elements(tileset=tileset)
         console = tcod.console.Console(80, 50)
         console.print(0, 0, "Hello World")  # Test text by printing "Hello World" to the console
         with tcod.context.new(console=console, tileset=tileset) as context:
@@ -109,7 +122,10 @@ If this is True then you should exit the function with :python:`raise SystemExit
                     print(event)
                     if isinstance(event, tcod.event.Quit):
                         raise SystemExit()
-    ...
+
+
+    if __name__ == "__main__":
+        main()
 
 If you run this then you get a window saying :python:`"Hello World"`.
 The window can be resized and the console will be stretched to fit the new resolution.
@@ -135,9 +151,15 @@ The parameters for ``on_draw`` are ``self`` because this is an instance method a
 Call this method using the players current coordinates and the :python:`"@"` character.
 
 .. code-block:: python
+    :emphasize-lines: 3,10-21
 
-    ...
+    from __future__ import annotations
+
     import attrs
+    import tcod.console
+    import tcod.context
+    import tcod.event
+    import tcod.tileset
 
 
     @attrs.define(eq=False)
@@ -152,6 +174,7 @@ Call this method using the players current coordinates and the :python:`"@"` cha
         def on_draw(self, console: tcod.console.Console) -> None:
             """Draw the player glyph."""
             console.print(self.player_x, self.player_y, "@")
+
     ...
 
 Now remove the :python:`console.print(0, 0, "Hello World")` line from ``main``.
@@ -183,7 +206,10 @@ Modify the drawing routine so that the console is cleared, then passed to :pytho
                     print(event)
                     if isinstance(event, tcod.event.Quit):
                         raise SystemExit()
-    ...
+
+
+    if __name__ == "__main__":
+        main()
 
 Now if you run the script you'll see ``@``.
 
@@ -201,12 +227,33 @@ Make a case for each arrow key: ``LEFT`` ``RIGHT`` ``UP`` ``DOWN`` and move the 
 Since events are printed you can check the :any:`KeySym` of a key by pressing that key and looking at the printed output.
 See :any:`KeySym` for a list of all keys.
 
-.. code-block:: python
+Finally replace the event handling code in ``main`` to defer to the states ``on_event`` method.
+The full script so far is:
 
-    ...
+.. code-block:: python
+    :emphasize-lines: 23-35,53
+
+    from __future__ import annotations
+
+    import attrs
+    import tcod.console
+    import tcod.context
+    import tcod.event
+    import tcod.tileset
+
+
     @attrs.define(eq=False)
     class ExampleState:
-        ...
+        """Example state with a hard-coded player position."""
+
+        player_x: int
+        """Player X position, left-most position is zero."""
+        player_y: int
+        """Player Y position, top-most position is zero."""
+
+        def on_draw(self, console: tcod.console.Console) -> None:
+            """Draw the player glyph."""
+            console.print(self.player_x, self.player_y, "@")
 
         def on_event(self, event: tcod.event.Event) -> None:
             """Move the player on events and handle exiting. Movement is hard-coded."""
@@ -221,16 +268,15 @@ See :any:`KeySym` for a list of all keys.
                     self.player_y -= 1
                 case tcod.event.KeyDown(sym=tcod.event.KeySym.DOWN):
                     self.player_y += 1
-    ...
 
-Now replace the event handling code in ``main`` to defer to the states ``on_event`` method.
 
-.. code-block:: python
-    :emphasize-lines: 12
-
-    ...
     def main() -> None:
-        ...
+        """Run ExampleState."""
+        tileset = tcod.tileset.load_tilesheet(
+            "data/Alloy_curses_12x12.png", columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437
+        )
+        tcod.tileset.procedural_block_elements(tileset=tileset)
+        console = tcod.console.Console(80, 50)
         state = ExampleState(player_x=console.width // 2, player_y=console.height // 2)
         with tcod.context.new(console=console, tileset=tileset) as context:
             while True:
@@ -240,7 +286,10 @@ Now replace the event handling code in ``main`` to defer to the states ``on_even
                 for event in tcod.event.wait():
                     print(event)
                     state.on_event(event)  # Pass events to the state
-    ...
+
+
+    if __name__ == "__main__":
+        main()
 
 Now when you run this script you have a player character you can move around with the arrow keys before closing the window.
 
@@ -253,7 +302,7 @@ You can review the part-1 source code `here <https://github.com/HexDecimal/pytho
 
 .. [#why_not_pathlib]
     :any:`pathlib` is not used because this example is too simple for that.
-    The working directory will be the project root folder for the entire tutorial, including distributions.
+    The working directory will always be the project root folder for the entire tutorial, including distributions.
     :any:`pathlib` will be used later for saved games and configuration directories, and not for static data.
 
 .. [#init_context] This tutorial follows the setup for a fixed-size console.

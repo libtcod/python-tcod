@@ -23,8 +23,12 @@ First script
 
 First start with a modern top-level script.
 Create a script in the project root folder called ``main.py`` which checks :python:`if __name__ == "__main__":` and calls a ``main`` function.
+Any modern script using type-hinting will also have :python:`from __future__ import annotations` near the top.
 
 .. code-block:: python
+
+    from __future__ import annotations
+
 
     def main() -> None:
         print("Hello World!")
