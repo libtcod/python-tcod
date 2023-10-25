@@ -186,7 +186,7 @@ def test_recommended_size(console: tcod.console.Console) -> None:
 
 
 @pytest.mark.filterwarnings("ignore")
-def test_context() -> None:
+def test_context(uses_window: None) -> None:
     with tcod.context.new_window(32, 32, renderer=tcod.RENDERER_SDL2):
         pass
     WIDTH, HEIGHT = 16, 4

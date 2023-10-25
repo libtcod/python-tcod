@@ -11,7 +11,7 @@ import tcod.sdl.video
 # ruff: noqa: D103
 
 
-def test_sdl_window() -> None:
+def test_sdl_window(uses_window: None) -> None:
     assert tcod.sdl.video.get_grabbed_window() is None
     window = tcod.sdl.video.new_window(1, 1)
     window.raise_window()
@@ -47,14 +47,14 @@ def test_sdl_window_bad_types() -> None:
         tcod.sdl.video.Window(tcod.ffi.new("SDL_Rect*"))
 
 
-def test_sdl_screen_saver() -> None:
+def test_sdl_screen_saver(uses_window: None) -> None:
     tcod.sdl.sys.init()
     assert tcod.sdl.video.screen_saver_allowed(False) is False
     assert tcod.sdl.video.screen_saver_allowed(True) is True
     assert tcod.sdl.video.screen_saver_allowed() is True
 
 
-def test_sdl_render() -> None:
+def test_sdl_render(uses_window: None) -> None:
     window = tcod.sdl.video.new_window(1, 1)
     render = tcod.sdl.render.new_renderer(window, software=True, vsync=False, target_textures=True)
     render.present()

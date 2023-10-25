@@ -14,6 +14,15 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--no-window", action="store_true", help="Skip tests which need a rendering context.")
 
 
+@pytest.fixture()
+def uses_window(request: pytest.FixtureRequest) -> Iterator[None]:
+    """Marks tests which require a rendering context."""
+    if request.config.getoption("--no-window"):
+        pytest.skip("This test needs a rendering context.")
+    yield None
+    return
+
+
 @pytest.fixture(scope="session", params=["SDL", "SDL2"])
 def session_console(request: pytest.FixtureRequest) -> Iterator[tcod.console.Console]:
     if request.config.getoption("--no-window"):

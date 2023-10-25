@@ -1,8 +1,8 @@
 [build-system]
 requires = [
-    # Newer versions of setuptools break editable installs
+    # setuptools >=64.0.0 might break editable installs
     # https://github.com/pypa/setuptools/issues/3548
-    "setuptools >=61.0.0, <64.0.0",
+    "setuptools >=61.0.0",
     "setuptools_scm[toml]>=6.2",
     "wheel>=0.37.1",
     "cffi>=1.15",
