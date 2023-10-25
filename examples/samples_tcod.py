@@ -1295,7 +1295,7 @@ class FastRenderSample(Sample):
             texture = np.roll(texture, -int_t, 1)
             # replace new stretch of texture with new values
             for v in range(RES_V - int_t, RES_V):
-                for u in range(0, RES_U):
+                for u in range(RES_U):
                     tex_v = (v + int_abs_t) / float(RES_V)
                     texture[u, v] = tcod.noise_get_fbm(noise2d, [u / float(RES_U), tex_v], 32.0) + tcod.noise_get_fbm(
                         noise2d, [1 - u / float(RES_U), tex_v], 32.0

@@ -264,7 +264,7 @@ class Termbox:
         else:
             uch = None
         """
-        pass  # return (e.type, uch, e.key, e.mod, e.w, e.h, e.x, e.y)
+        # return (e.type, uch, e.key, e.mod, e.w, e.h, e.x, e.y)
 
     def poll_event(self):
         """Wait for an event and return it.

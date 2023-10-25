@@ -48,11 +48,11 @@ import sys
 import threading
 import time
 from types import TracebackType
-from typing import Any, Callable, Hashable, Iterator
+from typing import Any, Callable, Final, Hashable, Iterator
 
 import numpy as np
 from numpy.typing import ArrayLike, DTypeLike, NDArray
-from typing_extensions import Final, Literal, Self
+from typing_extensions import Literal, Self
 
 import tcod.sdl.sys
 from tcod.cffi import ffi, lib

@@ -5,11 +5,11 @@
 from __future__ import annotations
 
 import enum
-from typing import Any
+from typing import Any, Final
 
 import numpy as np
 from numpy.typing import NDArray
-from typing_extensions import Final, Literal
+from typing_extensions import Literal
 
 import tcod.sdl.video
 from tcod.cffi import ffi, lib

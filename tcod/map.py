@@ -137,8 +137,8 @@ class Map:
         """
         if not (0 <= x < self.width and 0 <= y < self.height):
             warnings.warn(
-                "Index ({}, {}) is outside of this maps shape ({}, {})."
-                "\nThis will raise an error in future versions.".format(x, y, self.width, self.height),
+                f"Index ({x}, {y}) is outside of this maps shape ({self.width}, {self.height})."
+                "\nThis will raise an error in future versions.",
                 RuntimeWarning,
                 stacklevel=2,
             )
@@ -239,8 +239,8 @@ def compute_fov(
         raise TypeError(msg)
     if not (0 <= pov[0] < transparency.shape[0] and 0 <= pov[1] < transparency.shape[1]):
         warnings.warn(
-            "Given pov index {!r} is outside the array of shape {!r}."
-            "\nThis will raise an error in future versions.".format(pov, transparency.shape),
+            f"Given pov index {pov!r} is outside the array of shape {transparency.shape!r}."
+            "\nThis will raise an error in future versions.",
             RuntimeWarning,
             stacklevel=2,
         )

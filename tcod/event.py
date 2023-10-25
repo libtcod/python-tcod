@@ -83,11 +83,11 @@ from __future__ import annotations
 
 import enum
 import warnings
-from typing import Any, Callable, Generic, Iterator, Mapping, NamedTuple, TypeVar
+from typing import Any, Callable, Final, Generic, Iterator, Mapping, NamedTuple, TypeVar
 
 import numpy as np
 from numpy.typing import NDArray
-from typing_extensions import Final, Literal
+from typing_extensions import Literal
 
 import tcod.event_constants
 import tcod.sdl.joystick
@@ -796,12 +796,7 @@ class WindowMoved(WindowEvent):
         self.y = y
 
     def __repr__(self) -> str:
-        return "tcod.event.{}(type={!r}, x={!r}, y={!r})".format(
-            self.__class__.__name__,
-            self.type,
-            self.x,
-            self.y,
-        )
+        return f"tcod.event.{self.__class__.__name__}(type={self.type!r}, x={self.x!r}, y={self.y!r})"
 
     def __str__(self) -> str:
         return "<{}, x={!r}, y={!r})".format(
@@ -828,12 +823,7 @@ class WindowResized(WindowEvent):
         self.height = height
 
     def __repr__(self) -> str:
-        return "tcod.event.{}(type={!r}, width={!r}, height={!r})".format(
-            self.__class__.__name__,
-            self.type,
-            self.width,
-            self.height,
-        )
+        return f"tcod.event.{self.__class__.__name__}(type={self.type!r}, width={self.width!r}, height={self.height!r})"
 
     def __str__(self) -> str:
         return "<{}, width={!r}, height={!r})".format(

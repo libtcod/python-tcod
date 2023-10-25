@@ -83,11 +83,7 @@ class _EdgeCostFunc:
         return self._CALLBACK_P, ffi.new_handle(self._userdata), self.shape
 
     def __repr__(self) -> str:
-        return "{}({!r}, shape={!r})".format(
-            self.__class__.__name__,
-            self._userdata,
-            self.shape,
-        )
+        return f"{self.__class__.__name__}({self._userdata!r}, shape={self.shape!r})"
 
 
 class EdgeCostCallback(_EdgeCostFunc):
