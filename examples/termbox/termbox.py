@@ -15,6 +15,8 @@ Implementation status:
  [ ] not all keys/events are mapped
 """
 
+# ruff: noqa
+
 
 class TermboxException(Exception):
     def __init__(self, msg) -> None:

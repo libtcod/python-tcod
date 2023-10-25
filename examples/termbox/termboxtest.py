@@ -1,6 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import termbox
+
+# ruff: noqa
 
 spaceord = ord(" ")
 

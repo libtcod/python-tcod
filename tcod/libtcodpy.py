@@ -54,7 +54,7 @@ from tcod.constants import (
 )
 
 # Functions are too deprecated to make changes.
-# ruff: noqa: ANN401 PLR0913
+# ruff: noqa: ANN401 PLR0913 D102 D103 D105 D107
 
 Bsp = tcod.bsp.BSP
 
@@ -1477,6 +1477,9 @@ def console_print_ex(
         con (Console): Any Console instance.
         x (int): Character x position from the left.
         y (int): Character y position from the top.
+        flag: Blending mode to use.
+        alignment: The libtcod alignment constant.
+        fmt: A unicode or bytes string, optionally using color codes.
 
     .. deprecated:: 8.5
         Use :any:`Console.print_` instead.
@@ -1726,8 +1729,7 @@ def console_wait_for_keypress(flush: bool) -> Key:
     """Block until the user presses a key, then returns a new Key.
 
     Args:
-        flush bool: If True then the event queue is cleared before waiting
-                    for the next event.
+        flush: If True then the event queue is cleared before waiting for the next event.
 
     Returns:
         Key: A new Key instance.
@@ -2136,8 +2138,8 @@ def path_new_using_function(
     Args:
         w (int): Clipping width.
         h (int): Clipping height.
-        func (Callable[[int, int, int, int, Any], float]):
-        userData (Any):
+        func: Callback function with the format: `f(origin_x, origin_y, dest_x, dest_y, userData) -> float`
+        userData (Any): An object passed to the callback.
         dcost (float): A multiplier for the cost of diagonal movement.
                        Can be set to 0 to disable diagonal movement.
 
@@ -2485,6 +2487,7 @@ def heightmap_copy(hm1: NDArray[np.float32], hm2: NDArray[np.float32]) -> None:
     """Copy the heightmap ``hm1`` to ``hm2``.
 
     Args:
+        hm: A numpy.ndarray formatted for heightmap functions.
         hm1 (numpy.ndarray): The source heightmap.
         hm2 (numpy.ndarray): The destination heightmap.
 
@@ -2499,6 +2502,7 @@ def heightmap_normalize(hm: NDArray[np.float32], mi: float = 0.0, ma: float = 1.
     """Normalize heightmap values between ``mi`` and ``ma``.
 
     Args:
+        hm: A numpy.ndarray formatted for heightmap functions.
         mi (float): The lowest value after normalization.
         ma (float): The highest value after normalization.
     """
@@ -2944,7 +2948,7 @@ def heightmap_has_land_on_border(hm: NDArray[np.float32], waterlevel: float) -> 
 
     Args:
         hm (numpy.ndarray): A numpy.ndarray formatted for heightmap functions.
-        waterLevel (float): The water level to use.
+        waterlevel (float): The water level to use.
 
     Returns:
         bool: True if the map edges are below ``waterlevel``, otherwise False.
@@ -3493,6 +3497,7 @@ def noise_set_type(n: tcod.noise.Noise, typ: int) -> None:
     """Set a Noise objects default noise algorithm.
 
     Args:
+        n: Noise object.
         typ (int): Any NOISE_* constant.
     """
     n.algorithm = typ
@@ -3531,7 +3536,7 @@ def noise_get_fbm(
         n (Noise): A Noise instance.
         f (Sequence[float]): The point to sample the noise from.
         typ (int): The noise algorithm to use.
-        octaves (float): The level of level.  Should be more than 1.
+        oc (float): The level of level.  Should be more than 1.
 
     Returns:
         float: The sampled noise value.
@@ -3552,7 +3557,7 @@ def noise_get_turbulence(
         n (Noise): A Noise instance.
         f (Sequence[float]): The point to sample the noise from.
         typ (int): The noise algorithm to use.
-        octaves (float): The level of level.  Should be more than 1.
+        oc (float): The level of level.  Should be more than 1.
 
     Returns:
         float: The sampled noise value.
@@ -3781,8 +3786,8 @@ def random_get_int(rnd: tcod.random.Random | None, mi: int, ma: int) -> int:
 
     Args:
         rnd (Optional[Random]): A Random instance, or None to use the default.
-        low (int): The lower bound of the random range, inclusive.
-        high (int): The upper bound of the random range, inclusive.
+        mi (int): The lower bound of the random range, inclusive.
+        ma (int): The upper bound of the random range, inclusive.
 
     Returns:
         int: A random integer in the range ``mi`` <= n <= ``ma``.
@@ -3798,8 +3803,8 @@ def random_get_float(rnd: tcod.random.Random | None, mi: float, ma: float) -> fl
 
     Args:
         rnd (Optional[Random]): A Random instance, or None to use the default.
-        low (float): The lower bound of the random range, inclusive.
-        high (float): The upper bound of the random range, inclusive.
+        mi (float): The lower bound of the random range, inclusive.
+        ma (float): The upper bound of the random range, inclusive.
 
     Returns:
         float: A random double precision float
@@ -3827,8 +3832,8 @@ def random_get_int_mean(rnd: tcod.random.Random | None, mi: int, ma: int, mean: 
 
     Args:
         rnd (Optional[Random]): A Random instance, or None to use the default.
-        low (int): The lower bound of the random range, inclusive.
-        high (int): The upper bound of the random range, inclusive.
+        mi (int): The lower bound of the random range, inclusive.
+        ma (int): The upper bound of the random range, inclusive.
         mean (int): The mean return value.
 
     Returns:
@@ -3845,8 +3850,8 @@ def random_get_float_mean(rnd: tcod.random.Random | None, mi: float, ma: float, 
 
     Args:
         rnd (Optional[Random]): A Random instance, or None to use the default.
-        low (float): The lower bound of the random range, inclusive.
-        high (float): The upper bound of the random range, inclusive.
+        mi (float): The lower bound of the random range, inclusive.
+        ma (float): The upper bound of the random range, inclusive.
         mean (float): The mean return value.
 
     Returns:
@@ -4071,7 +4076,7 @@ def sys_save_screenshot(name: str | PathLike[str] | None = None) -> None:
     screenshot000.png, screenshot001.png, etc.  Whichever is available first.
 
     Args:
-        file Optional[AnyStr]: File path to save screenshot.
+        name: File path to save screenshot.
 
     .. deprecated:: 11.13
         This function is not supported by contexts.
@@ -4179,8 +4184,7 @@ def sys_register_SDL_renderer(callback: Callable[[Any], None]) -> None:
     The callback is called on every call to :any:`libtcodpy.console_flush`.
 
     Args:
-        callback Callable[[CData], None]:
-            A function which takes a single argument.
+        callback: A function which takes a single argument.
 
     .. deprecated:: 11.13
         This function is not supported by contexts.

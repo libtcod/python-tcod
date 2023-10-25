@@ -17,7 +17,7 @@ class Color(List[int]):
         b (int): Blue value, from 0 to 255.
     """
 
-    def __init__(self, r: int = 0, g: int = 0, b: int = 0) -> None:
+    def __init__(self, r: int = 0, g: int = 0, b: int = 0) -> None:  # noqa: D107
         list.__setitem__(self, slice(None), (r & 0xFF, g & 0xFF, b & 0xFF))
 
     @property
@@ -82,13 +82,13 @@ class Color(List[int]):
         return super().__getitem__(index)
 
     @deprecate("This class will not be mutable in the future.", FutureWarning)
-    def __setitem__(self, index: Any, value: Any) -> None:  # noqa: ANN401
+    def __setitem__(self, index: Any, value: Any) -> None:  # noqa: ANN401, D105
         if isinstance(index, str):
             super().__setitem__("rgb".index(index), value)
         else:
             super().__setitem__(index, value)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Compare equality between colors.
 
         Also compares with standard sequences such as 3-item tuples or lists.
@@ -99,7 +99,7 @@ class Color(List[int]):
             return False
 
     @deprecate("Use NumPy instead for color math operations.", FutureWarning)
-    def __add__(self, other: Any) -> Color:  # type: ignore[override]
+    def __add__(self, other: object) -> Color:  # type: ignore[override]
         """Add two colors together.
 
         .. deprecated:: 9.2
@@ -108,7 +108,7 @@ class Color(List[int]):
         return Color._new_from_cdata(lib.TCOD_color_add(self, other))
 
     @deprecate("Use NumPy instead for color math operations.", FutureWarning)
-    def __sub__(self, other: Any) -> Color:
+    def __sub__(self, other: object) -> Color:
         """Subtract one color from another.
 
         .. deprecated:: 9.2
@@ -117,7 +117,7 @@ class Color(List[int]):
         return Color._new_from_cdata(lib.TCOD_color_subtract(self, other))
 
     @deprecate("Use NumPy instead for color math operations.", FutureWarning)
-    def __mul__(self, other: Any) -> Color:
+    def __mul__(self, other: object) -> Color:
         """Multiply with a scaler or another color.
 
         .. deprecated:: 9.2

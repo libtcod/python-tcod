@@ -9,7 +9,7 @@ import platform
 import re
 import sys
 from pathlib import Path
-from typing import Any, Iterable, Iterator
+from typing import Any, ClassVar, Iterable, Iterator
 
 from cffi import FFI
 
@@ -45,7 +45,7 @@ class ParsedHeader:
     """
 
     # Class dictionary of all parsed headers.
-    all_headers: dict[Path, ParsedHeader] = {}
+    all_headers: ClassVar[dict[Path, ParsedHeader]] = {}
 
     def __init__(self, path: Path) -> None:
         """Initialize and organize a header file."""
