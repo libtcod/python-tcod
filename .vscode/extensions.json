@@ -6,13 +6,13 @@
         "austin.code-gnu-global",
         "editorconfig.editorconfig",
         "ms-python.python",
-        "ms-python.black-formatter",
         "ms-python.vscode-pylance",
         "ms-vscode.cpptools",
         "redhat.vscode-yaml",
         "streetsidesoftware.code-spell-checker",
         "tamasfe.even-better-toml",
         "xaver.clang-format",
+        "charliermarsh.ruff"
     ],
     // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
     "unwantedRecommendations": []

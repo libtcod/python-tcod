@@ -565,10 +565,7 @@ class FOVSample(Sample):
         sample_console.print(
             1,
             1,
-            "IJKL : move around\n"
-            "T : torch fx {}\n"
-            "W : light walls {}\n"
-            "+-: algo {}".format(
+            "IJKL : move around\nT : torch fx {}\nW : light walls {}\n+-: algo {}".format(
                 "on " if self.torch else "off",
                 "on " if self.light_walls else "off",
                 FOV_ALGO_NAMES[self.algo_num],

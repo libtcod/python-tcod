@@ -18,7 +18,6 @@
         "--follow-imports=silent",
         "--show-column-numbers"
     ],
-    "python.formatting.provider": "none",
     "files.associations": {
         "*.spec": "python",
     },
@@ -483,7 +482,7 @@
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter"
+        "editor.defaultFormatter": "charliermarsh.ruff"
     },
     "cSpell.enableFiletypes": [
         "github-actions-workflow"

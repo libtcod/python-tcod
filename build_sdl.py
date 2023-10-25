@@ -183,7 +183,11 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore
         )
 
     def on_directive_handle(
-        self, directive: Any, tokens: list[Any], if_passthru: bool, preceding_tokens: list[Any]  # noqa: ANN401
+        self,
+        directive: Any,  # noqa: ANN401
+        tokens: list[Any],
+        if_passthru: bool,
+        preceding_tokens: list[Any],
     ) -> Any:  # noqa: ANN401
         """Catch and store definitions."""
         if directive.value == "define" and self._should_track_define(tokens):
