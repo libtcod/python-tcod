@@ -360,7 +360,7 @@ class Renderer:
         """
         rgba = ffi.new("uint8_t[4]")
         _check(lib.SDL_GetRenderDrawColor(self.p, rgba, rgba + 1, rgba + 2, rgba + 3))
-        return tuple(rgba)  # type: ignore[return-value]
+        return tuple(rgba)
 
     @draw_color.setter
     def draw_color(self, rgba: tuple[int, int, int, int]) -> None:

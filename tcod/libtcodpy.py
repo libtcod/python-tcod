@@ -2920,7 +2920,7 @@ def heightmap_get_normal(hm: NDArray[np.float32], x: float, y: float, waterLevel
     """
     cn = ffi.new("float[3]")
     lib.TCOD_heightmap_get_normal(_heightmap_cdata(hm), x, y, cn, waterLevel)
-    return tuple(cn)  # type: ignore
+    return tuple(cn)
 
 
 @deprecate("This function is deprecated, see documentation.")
