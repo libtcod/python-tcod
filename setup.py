@@ -39,7 +39,7 @@ def check_sdl_version() -> None:
         return
     needed_version = "{}.{}.{}".format(*SDL_VERSION_NEEDED)
     try:
-        sdl_version_str = subprocess.check_output(["sdl2-config", "--version"], universal_newlines=True).strip()
+        sdl_version_str = subprocess.check_output(["sdl2-config", "--version"], universal_newlines=True).strip()  # noqa: S603, S607
     except FileNotFoundError as exc:
         msg = (
             f"libsdl2-dev or equivalent must be installed on your system and must be at least version {needed_version}."

@@ -14,8 +14,8 @@ from tabulate import tabulate
 import tcod.tileset
 
 
-def get_charmaps() -> Iterator[str]:
-    """Return an iterator of the current character maps from tcod.tilest."""
+def get_character_maps() -> Iterator[str]:
+    """Return an iterator of the current character maps from tcod.tileset."""
     for name in dir(tcod.tileset):
         if name.startswith("CHARMAP_"):
             yield name[len("CHARMAP_") :].lower()
@@ -60,7 +60,7 @@ def main() -> None:
     parser.add_argument(
         "charmap",
         action="store",
-        choices=list(get_charmaps()),
+        choices=list(get_character_maps()),
         type=str,
         help="which character map to generate a table from",
     )
