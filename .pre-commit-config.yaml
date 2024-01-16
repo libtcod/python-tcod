@@ -21,4 +21,4 @@ repos:
         args: [--fix-only, --exit-non-zero-on-fix]
       - id: ruff-format
 default_language_version:
-  python: python3.11
+  python: python3.12
