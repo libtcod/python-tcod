@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 ## [Unreleased]
 ### Fixed
 - Ignore the locale when encoding file paths outside of Windows.
+- Fix performance when calling joystick functions.
 
 ## [16.2.1] - 2023-09-24
 ### Fixed

@@ -363,7 +363,10 @@ class GameController:
 
 def init() -> None:
     """Initialize SDL's joystick and game controller subsystems."""
-    tcod.sdl.sys.init(tcod.sdl.sys.Subsystem.JOYSTICK | tcod.sdl.sys.Subsystem.GAMECONTROLLER)
+    CONTROLLER_SYSTEMS = tcod.sdl.sys.Subsystem.JOYSTICK | tcod.sdl.sys.Subsystem.GAMECONTROLLER
+    if tcod.sdl.sys.Subsystem(lib.SDL_WasInit(CONTROLLER_SYSTEMS)) == CONTROLLER_SYSTEMS:
+        return  # Already initialized
+    tcod.sdl.sys.init(CONTROLLER_SYSTEMS)
 
 
 def _get_number() -> int:
