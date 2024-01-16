@@ -49,6 +49,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
     "Topic :: Games/Entertainment",
@@ -106,7 +107,7 @@ filterwarnings = [
 
 [tool.mypy]
 files = ["."]
-python_version = 3.9
+python_version = "3.9"
 warn_unused_configs = true
 show_error_codes = true
 disallow_subclassing_any = true
