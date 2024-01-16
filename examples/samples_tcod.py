@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """This code demonstrates various usages of python-tcod."""
 # To the extent possible under law, the libtcod maintainers have waived all
 # copyright and related or neighboring rights to these samples.

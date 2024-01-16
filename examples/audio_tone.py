@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """Shows how to use tcod.sdl.audio to play a custom-made audio stream.
 
 Opens an audio device using SDL and plays a square wave for 1 second.

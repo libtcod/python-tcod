@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """cx_Freeze main script example."""
 import tcod.console
 import tcod.context

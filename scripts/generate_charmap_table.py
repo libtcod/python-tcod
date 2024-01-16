@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """This script is used to generate the tables for `charmap-reference.rst`.
 
 Uses the tabulate module from PyPI.

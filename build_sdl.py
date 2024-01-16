@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """Build script to parse SDL headers and generate CFFI bindings."""
 from __future__ import annotations
 

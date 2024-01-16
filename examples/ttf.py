@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """A TrueType Font example using the FreeType library.
 
 You will need to get this external library from PyPI:

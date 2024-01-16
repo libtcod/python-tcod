@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """Python-tcod setup script."""
 from __future__ import annotations
 

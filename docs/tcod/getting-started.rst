@@ -21,7 +21,7 @@ integer increments.
 
 Example::
 
-    #!/usr/bin/env python3
+    #!/usr/bin/env python
     # Make sure 'dejavu10x10_gs_tc.png' is in the same directory as this script.
     import tcod.console
     import tcod.context
@@ -89,7 +89,7 @@ clearing the console every frame and replacing it only on resizing the window.
 
 Example::
 
-    #!/usr/bin/env python3
+    #!/usr/bin/env python
     import tcod.context
     import tcod.event
 

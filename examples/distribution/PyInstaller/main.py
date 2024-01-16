@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # To the extent possible under law, the libtcod maintainers have waived all
 # copyright and related or neighboring rights for the "hello world" PyInstaller
 # example script.  This work is published from: United States.

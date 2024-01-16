@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import sys
 
 from cx_Freeze import Executable, setup  # type: ignore
