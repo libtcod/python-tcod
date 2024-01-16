@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [16.2.2] - 2024-01-16
+
 ### Fixed
 
 - Ignore the locale when encoding file paths outside of Windows.
