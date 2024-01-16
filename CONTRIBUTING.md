@@ -11,7 +11,7 @@ pre-commit install
 ## Building python-tcod
 
 To work with the tcod source, your environment must be set up to build
-Python C extensions.  You'll also need `cpp` installed for
+Python C extensions. You'll also need `cpp` installed for
 use with pycparser.
 
 ### Windows

@@ -4,7 +4,6 @@ The code here are modified files from
 [termbox repository](https://github.com/nsf/termbox/), so please consult
 it for the license and other info.
 
-
 The code consists of two part - `termbox.py` module with API, translation
 of official binding form the description below into `tld`:
 
@@ -13,7 +12,6 @@ https://github.com/nsf/termbox/blob/b20c0a11/src/python/termboxmodule.pyx
 And the example `termboxtest.py` which is copied verbatim from:
 
 https://github.com/nsf/termbox/blob/b20c0a11/test_termboxmodule.py
-
 
 ### API Mapping Notes
 
@@ -41,19 +39,19 @@ Notes taken while mapping the Termbox class:
 
 
 
-   init...
-     tdl doesn't allow to resize window (or rather libtcod)
-     tb works in existing terminal window and queries it rather than making own
+    init...
+      tdl doesn't allow to resize window (or rather libtcod)
+      tb works in existing terminal window and queries it rather than making own
 
-   colors...
-     tdl uses RGB values
-     tb uses it own constants
+    colors...
+      tdl uses RGB values
+      tb uses it own constants
 
-   event...
-     tb returns event one by one
-     tdl return an event iterator
+    event...
+      tb returns event one by one
+      tdl return an event iterator
 
 
-   tb Event                       tdl Event
-   .type                          .type
-     EVENT_KEY                      KEYDOWN
+    tb Event                       tdl Event
+    .type                          .type
+      EVENT_KEY                      KEYDOWN
