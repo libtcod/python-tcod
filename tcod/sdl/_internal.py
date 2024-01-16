@@ -57,8 +57,6 @@ class _ProtectedContext:
     ) -> bool:
         if exc_type is None:
             return False
-        if _sys.version_info < (3, 8):
-            return False
         _sys.unraisablehook(_UnraisableHookArgs(exc_type, value, traceback, None, self.obj))
         return True
 
