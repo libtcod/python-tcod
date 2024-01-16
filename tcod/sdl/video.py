@@ -97,10 +97,10 @@ class _TempSurface:
 
     def __init__(self, pixels: ArrayLike) -> None:
         self._array: NDArray[np.uint8] = np.ascontiguousarray(pixels, dtype=np.uint8)
-        if len(self._array.shape) != 3:
+        if len(self._array.shape) != 3:  # noqa: PLR2004
             msg = f"NumPy shape must be 3D [y, x, ch] (got {self._array.shape})"
             raise TypeError(msg)
-        if not (3 <= self._array.shape[2] <= 4):
+        if not (3 <= self._array.shape[2] <= 4):  # noqa: PLR2004
             msg = f"NumPy array must have RGB or RGBA channels. (got {self._array.shape})"
             raise TypeError(msg)
         self.p = ffi.gc(
@@ -113,7 +113,7 @@ class _TempSurface:
                 0x000000FF,
                 0x0000FF00,
                 0x00FF0000,
-                0xFF000000 if self._array.shape[2] == 4 else 0,
+                0xFF000000 if self._array.shape[2] == 4 else 0,  # noqa: PLR2004
             ),
             lib.SDL_FreeSurface,
         )
@@ -122,7 +122,7 @@ class _TempSurface:
 class Window:
     """An SDL2 Window object."""
 
-    def __init__(self, sdl_window_p: Any) -> None:
+    def __init__(self, sdl_window_p: Any) -> None:  # noqa: ANN401
         if ffi.typeof(sdl_window_p) is not ffi.typeof("struct SDL_Window*"):
             msg = "sdl_window_p must be {!r} type (was {!r}).".format(
                 ffi.typeof("struct SDL_Window*"), ffi.typeof(sdl_window_p)
@@ -334,7 +334,7 @@ class Window:
         lib.SDL_HideWindow(self.p)
 
 
-def new_window(
+def new_window(  # noqa: PLR0913
     width: int,
     height: int,
     *,

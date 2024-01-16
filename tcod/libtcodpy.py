@@ -1226,7 +1226,7 @@ def console_flush(
             DeprecationWarning,
             stacklevel=2,
         )
-    if len(clear_color) == 3:
+    if len(clear_color) == 3:  # noqa: PLR2004
         clear_color = clear_color[0], clear_color[1], clear_color[2], 255
     options = {
         "keep_aspect": keep_aspect,
@@ -2393,11 +2393,10 @@ def heightmap_new(w: int, h: int, order: str = "C") -> NDArray[np.float32]:
     """
     if order == "C":
         return np.zeros((h, w), np.float32, order="C")
-    elif order == "F":
+    if order == "F":
         return np.zeros((w, h), np.float32, order="F")
-    else:
-        msg = "Invalid order parameter, should be 'C' or 'F'."
-        raise ValueError(msg)
+    msg = "Invalid order parameter, should be 'C' or 'F'."
+    raise ValueError(msg)
 
 
 @deprecate("Assign to heightmaps as a NumPy array instead.")
@@ -2863,16 +2862,15 @@ def heightmap_get_value(hm: NDArray[np.float32], x: int, y: int) -> float:
             stacklevel=2,
         )
         return hm[y, x]  # type: ignore
-    elif hm.flags["F_CONTIGUOUS"]:
+    if hm.flags["F_CONTIGUOUS"]:
         warnings.warn(
             "Get a value from this heightmap with hm[x,y]",
             DeprecationWarning,
             stacklevel=2,
         )
         return hm[x, y]  # type: ignore
-    else:
-        msg = "This array is not contiguous."
-        raise ValueError(msg)
+    msg = "This array is not contiguous."
+    raise ValueError(msg)
 
 
 @pending_deprecate()
@@ -3574,26 +3572,25 @@ def noise_delete(n: tcod.noise.Noise) -> None:
     """
 
 
-def _unpack_union(type_: int, union: Any) -> Any:
+def _unpack_union(type_: int, union: Any) -> Any:  # noqa: PLR0911
     """Unpack items from parser new_property (value_converter)."""
     if type_ == lib.TCOD_TYPE_BOOL:
         return bool(union.b)
-    elif type_ == lib.TCOD_TYPE_CHAR:
+    if type_ == lib.TCOD_TYPE_CHAR:
         return union.c.decode("latin-1")
-    elif type_ == lib.TCOD_TYPE_INT:
+    if type_ == lib.TCOD_TYPE_INT:
         return union.i
-    elif type_ == lib.TCOD_TYPE_FLOAT:
+    if type_ == lib.TCOD_TYPE_FLOAT:
         return union.f
-    elif type_ == lib.TCOD_TYPE_STRING or lib.TCOD_TYPE_VALUELIST15 >= type_ >= lib.TCOD_TYPE_VALUELIST00:
+    if type_ == lib.TCOD_TYPE_STRING or lib.TCOD_TYPE_VALUELIST15 >= type_ >= lib.TCOD_TYPE_VALUELIST00:
         return _unpack_char_p(union.s)
-    elif type_ == lib.TCOD_TYPE_COLOR:
+    if type_ == lib.TCOD_TYPE_COLOR:
         return Color._new_from_cdata(union.col)
-    elif type_ == lib.TCOD_TYPE_DICE:
+    if type_ == lib.TCOD_TYPE_DICE:
         return Dice(union.dice)
-    elif type_ & lib.TCOD_TYPE_LIST:
+    if type_ & lib.TCOD_TYPE_LIST:
         return _convert_TCODList(union.list, type_ & 0xFF)
-    else:
-        raise RuntimeError("Unknown libtcod type: %i" % type_)
+    raise RuntimeError("Unknown libtcod type: %i" % type_)
 
 
 def _convert_TCODList(c_list: Any, type_: int) -> Any:
@@ -3643,7 +3640,7 @@ def _pycall_parser_error(msg: Any) -> None:
 
 @deprecate("Parser functions have been deprecated.")
 def parser_run(parser: Any, filename: str | PathLike[str], listener: Any = None) -> None:
-    global _parser_listener
+    global _parser_listener  # noqa: PLW0603
     if not listener:
         lib.TCOD_parser_run(parser, _path_encode(Path(filename)), ffi.NULL)
         return

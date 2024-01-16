@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import numpy as np
-from numpy.typing import NDArray
+from numpy.typing import ArrayLike, NDArray
 from typing_extensions import Literal
 
 import tcod._internal
@@ -168,7 +168,7 @@ class Console:
 
         This function will also update an already active root console.
         """
-        global _root_console
+        global _root_console  # noqa: PLW0603
         if _root_console is None:
             _root_console = object.__new__(cls)
         self: Console = _root_console
@@ -180,7 +180,7 @@ class Console:
 
     def _init_setup_console_data(self, order: Literal["C", "F"] = "C") -> None:
         """Setup numpy arrays over libtcod data buffers."""
-        global _root_console
+        global _root_console  # noqa: PLW0603
         self._key_color = None
         if self.console_c == ffi.NULL:
             _root_console = self
@@ -517,7 +517,7 @@ class Console:
             stacklevel=3,
         )
 
-    def print_(
+    def print_(  # noqa: PLR0913
         self,
         x: int,
         y: int,
@@ -544,7 +544,7 @@ class Console:
         alignment = self.default_alignment if alignment is None else alignment
         lib.TCOD_console_printf_ex(self.console_c, x, y, bg_blend, alignment, _fmt(string))
 
-    def print_rect(
+    def print_rect(  # noqa: PLR0913
         self,
         x: int,
         y: int,
@@ -594,7 +594,7 @@ class Console:
             )
         )
 
-    def get_height_rect(self, x: int, y: int, width: int, height: int, string: str) -> int:
+    def get_height_rect(self, x: int, y: int, width: int, height: int, string: str) -> int:  # noqa: PLR0913
         """Return the height of this text word-wrapped into this rectangle.
 
         Args:
@@ -610,7 +610,7 @@ class Console:
         string_ = string.encode("utf-8")
         return int(lib.TCOD_console_get_height_rect_n(self.console_c, x, y, width, height, len(string_), string_))
 
-    def rect(
+    def rect(  # noqa: PLR0913
         self,
         x: int,
         y: int,
@@ -696,7 +696,7 @@ class Console:
         self.__deprecate_defaults("draw_rect", bg_blend)
         lib.TCOD_console_vline(self.console_c, x, y, height, bg_blend)
 
-    def print_frame(
+    def print_frame(  # noqa: PLR0913
         self,
         x: int,
         y: int,
@@ -738,7 +738,7 @@ class Console:
         string = _fmt(string) if string else ffi.NULL
         _check(lib.TCOD_console_printf_frame(self.console_c, x, y, width, height, clear, bg_blend, string))
 
-    def blit(
+    def blit(  # noqa: PLR0913
         self,
         dest: Console,
         dest_x: int = 0,
@@ -871,7 +871,7 @@ class Console:
             raise NotImplementedError(msg)
         lib.TCOD_console_delete(self.console_c)
 
-    def __exit__(self, *args: Any) -> None:
+    def __exit__(self, *_: object) -> None:
         """Close the graphical window on exit.
 
         Some tcod functions may have undefined behavior after this point.
@@ -931,7 +931,7 @@ class Console:
         """Return a simplified representation of this consoles contents."""
         return "<%s>" % "\n ".join("".join(chr(c) for c in line) for line in self._tiles["ch"])
 
-    def print(
+    def print(  # noqa: PLR0913
         self,
         x: int,
         y: int,
@@ -980,7 +980,7 @@ class Console:
             alignment,
         )
 
-    def print_box(
+    def print_box(  # noqa: PLR0913
         self,
         x: int,
         y: int,
@@ -1039,7 +1039,7 @@ class Console:
             )
         )
 
-    def draw_frame(
+    def draw_frame(  # noqa: PLR0913
         self,
         x: int,
         y: int,
@@ -1138,7 +1138,7 @@ class Console:
             )
             return
         decoration_ = [ord(c) for c in decoration] if isinstance(decoration, str) else decoration
-        if len(decoration_) != 9:
+        if len(decoration_) != 9:  # noqa: PLR2004
             msg = f"Decoration must have a length of 9 (len(decoration) is {len(decoration_)}.)"
             raise TypeError(msg)
         _check(
@@ -1156,7 +1156,7 @@ class Console:
             )
         )
 
-    def draw_rect(
+    def draw_rect(  # noqa: PLR0913
         self,
         x: int,
         y: int,
@@ -1204,7 +1204,7 @@ class Console:
             bg_blend,
         )
 
-    def draw_semigraphics(self, pixels: Any, x: int = 0, y: int = 0) -> None:
+    def draw_semigraphics(self, pixels: ArrayLike | tcod.image.Image, x: int = 0, y: int = 0) -> None:
         """Draw a block of 2x2 semi-graphics into this console.
 
         `pixels` is an Image or an array-like object.  It will be down-sampled

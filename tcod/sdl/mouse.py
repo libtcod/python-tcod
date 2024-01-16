@@ -23,7 +23,7 @@ from tcod.sdl._internal import _check, _check_p
 class Cursor:
     """A cursor icon for use with :any:`set_cursor`."""
 
-    def __init__(self, sdl_cursor_p: Any) -> None:
+    def __init__(self, sdl_cursor_p: Any) -> None:  # noqa: ANN401
         if ffi.typeof(sdl_cursor_p) is not ffi.typeof("struct SDL_Cursor*"):
             msg = f"Expected a {ffi.typeof('struct SDL_Cursor*')} type (was {ffi.typeof(sdl_cursor_p)})."
             raise TypeError(msg)
@@ -82,7 +82,7 @@ def new_cursor(data: NDArray[np.bool_], mask: NDArray[np.bool_], hot_xy: tuple[i
         :any:`set_cursor`
         https://wiki.libsdl.org/SDL_CreateCursor
     """
-    if len(data.shape) != 2:
+    if len(data.shape) != 2:  # noqa: PLR2004
         msg = "Data and mask arrays must be 2D."
         raise TypeError(msg)
     if data.shape != mask.shape:

@@ -160,7 +160,7 @@ def test_key_repr() -> None:
     assert key.vk == 1
     assert key.c == 2  # noqa: PLR2004
     assert key.shift
-    key_copy = eval(repr(key))
+    key_copy = eval(repr(key))  # noqa: S307
     assert key.vk == key_copy.vk
     assert key.c == key_copy.c
     assert key.shift == key_copy.shift
@@ -169,7 +169,7 @@ def test_key_repr() -> None:
 def test_mouse_repr() -> None:
     Mouse = tcod.Mouse
     mouse = Mouse(x=1, lbutton=True)
-    mouse_copy = eval(repr(mouse))
+    mouse_copy = eval(repr(mouse))  # noqa: S307
     assert mouse.x == mouse_copy.x
     assert mouse.lbutton == mouse_copy.lbutton
 

@@ -124,12 +124,12 @@ It is not recommended to use this renderer on Windows.
 """
 
 
-def _handle_tileset(tileset: tcod.tileset.Tileset | None) -> Any:
+def _handle_tileset(tileset: tcod.tileset.Tileset | None) -> Any:  # noqa: ANN401
     """Get the TCOD_Tileset pointer from a Tileset or return a NULL pointer."""
     return tileset._tileset_p if tileset else ffi.NULL
 
 
-def _handle_title(title: str | None) -> Any:
+def _handle_title(title: str | None) -> Any:  # noqa: ANN401
     """Return title as a CFFI string.
 
     If title is None then return a decent default title is returned.
@@ -145,12 +145,12 @@ class Context:
     Use :any:`tcod.context.new` to create a new context.
     """
 
-    def __init__(self, context_p: Any) -> None:
+    def __init__(self, context_p: Any) -> None:  # noqa: ANN401
         """Create a context from a cffi pointer."""
         self._context_p = context_p
 
     @classmethod
-    def _claim(cls, context_p: Any) -> Context:
+    def _claim(cls, context_p: Any) -> Context:  # noqa: ANN401
         """Return a new instance wrapping a context pointer."""
         return cls(ffi.gc(context_p, lib.TCOD_context_delete))
 
@@ -176,11 +176,11 @@ class Context:
             ffi.release(self._context_p)
             del self._context_p
 
-    def __exit__(self, *args: Any) -> None:
+    def __exit__(self, *_: object) -> None:
         """Automatically close on the context on exit."""
         self.close()
 
-    def present(
+    def present(  # noqa: PLR0913
         self,
         console: tcod.console.Console,
         *,
@@ -366,7 +366,7 @@ class Context:
         return _check(lib.TCOD_context_get_renderer_type(self._p))
 
     @property
-    def sdl_window_p(self) -> Any:
+    def sdl_window_p(self) -> Any:  # noqa: ANN401
         '''A cffi `SDL_Window*` pointer.  This pointer might be NULL.
 
         This pointer will become invalid if the context is closed or goes out
@@ -446,7 +446,7 @@ class Context:
 
 
 @ffi.def_extern()  # type: ignore
-def _pycall_cli_output(catch_reference: Any, output: Any) -> None:
+def _pycall_cli_output(catch_reference: Any, output: Any) -> None:  # noqa: ANN401
     """Callback for the libtcod context CLI.
 
     Catches the CLI output.
@@ -455,7 +455,7 @@ def _pycall_cli_output(catch_reference: Any, output: Any) -> None:
     catch.append(ffi.string(output).decode("utf-8"))
 
 
-def new(
+def new(  # noqa: PLR0913
     *,
     x: int | None = None,
     y: int | None = None,
@@ -573,7 +573,7 @@ def new(
 
 
 @pending_deprecate("Call tcod.context.new with width and height as keyword parameters.")
-def new_window(
+def new_window(  # noqa: PLR0913
     width: int,
     height: int,
     *,
@@ -600,7 +600,7 @@ def new_window(
 
 
 @pending_deprecate("Call tcod.context.new with columns and rows as keyword parameters.")
-def new_terminal(
+def new_terminal(  # noqa: PLR0913
     columns: int,
     rows: int,
     *,

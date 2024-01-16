@@ -20,10 +20,10 @@ from __future__ import annotations
 import functools
 import itertools
 import warnings
-from typing import Any, Callable
+from typing import Any, Callable, Final
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
+from numpy.typing import ArrayLike, DTypeLike, NDArray
 from typing_extensions import Literal
 
 from tcod._internal import _check
@@ -31,26 +31,26 @@ from tcod.cffi import ffi, lib
 
 
 @ffi.def_extern()  # type: ignore
-def _pycall_path_old(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:
+def _pycall_path_old(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:  # noqa: ANN401
     """Libtcodpy style callback, needs to preserve the old userData issue."""
     func, userData = ffi.from_handle(handle)
     return func(x1, y1, x2, y2, userData)  # type: ignore
 
 
 @ffi.def_extern()  # type: ignore
-def _pycall_path_simple(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:
+def _pycall_path_simple(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:  # noqa: ANN401
     """Does less and should run faster, just calls the handle function."""
     return ffi.from_handle(handle)(x1, y1, x2, y2)  # type: ignore
 
 
 @ffi.def_extern()  # type: ignore
-def _pycall_path_swap_src_dest(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:
+def _pycall_path_swap_src_dest(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:  # noqa: ANN401
     """A TDL function dest comes first to match up with a dest only call."""
     return ffi.from_handle(handle)(x2, y2, x1, y1)  # type: ignore
 
 
 @ffi.def_extern()  # type: ignore
-def _pycall_path_dest_only(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:
+def _pycall_path_dest_only(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:  # noqa: ANN401
     """A TDL function which samples the dest coordinate only."""
     return ffi.from_handle(handle)(x2, y2)  # type: ignore
 
@@ -74,7 +74,7 @@ class _EdgeCostFunc:
 
     _CALLBACK_P = lib._pycall_path_old
 
-    def __init__(self, userdata: Any, shape: tuple[int, int]) -> None:
+    def __init__(self, userdata: object, shape: tuple[int, int]) -> None:
         self._userdata = userdata
         self.shape = shape
 
@@ -117,7 +117,7 @@ class NodeCostArray(np.ndarray):  # type: ignore
     A cost of 0 means the node is blocking.
     """
 
-    _C_ARRAY_CALLBACKS = {
+    _C_ARRAY_CALLBACKS: Final = {
         np.float32: ("float*", _get_path_cost_func("PathCostArrayFloat32")),
         np.bool_: ("int8_t*", _get_path_cost_func("PathCostArrayInt8")),
         np.int8: ("int8_t*", _get_path_cost_func("PathCostArrayInt8")),
@@ -130,14 +130,13 @@ class NodeCostArray(np.ndarray):  # type: ignore
 
     def __new__(cls, array: ArrayLike) -> NodeCostArray:
         """Validate a numpy array and setup a C callback."""
-        self = np.asarray(array).view(cls)
-        return self
+        return np.asarray(array).view(cls)
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({repr(self.view(np.ndarray))!r})"
 
     def get_tcod_path_ffi(self) -> tuple[Any, Any, tuple[int, int]]:
-        if len(self.shape) != 2:
+        if len(self.shape) != 2:  # noqa: PLR2004
             msg = f"Array must have a 2d shape, shape is {self.shape!r}"
             raise ValueError(msg)
         if self.dtype.type not in self._C_ARRAY_CALLBACKS:
@@ -194,7 +193,7 @@ class _PathFinder:
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(cost={self.cost!r}, diagonal={self.diagonal!r})"
 
-    def __getstate__(self) -> Any:
+    def __getstate__(self) -> dict[str, Any]:
         state = self.__dict__.copy()
         del state["_path_c"]
         del state["shape"]
@@ -202,7 +201,7 @@ class _PathFinder:
         del state["_userdata"]
         return state
 
-    def __setstate__(self, state: Any) -> None:
+    def __setstate__(self, state: dict[str, Any]) -> None:
         self.__dict__.update(state)
         self.__init__(self.cost, self.diagonal)  # type: ignore
 
@@ -286,7 +285,7 @@ _INT_TYPES = {
 
 def maxarray(
     shape: tuple[int, ...],
-    dtype: Any = np.int32,
+    dtype: DTypeLike = np.int32,
     order: Literal["C", "F"] = "C",
 ) -> NDArray[Any]:
     """Return a new array filled with the maximum finite value for `dtype`.
@@ -321,7 +320,7 @@ def _export_dict(array: NDArray[Any]) -> dict[str, Any]:
     }
 
 
-def _export(array: NDArray[Any]) -> Any:
+def _export(array: NDArray[Any]) -> Any:  # noqa: ANN401
     """Convert a NumPy array into a cffi object."""
     return ffi.new("struct NArray*", _export_dict(array))
 
@@ -329,7 +328,7 @@ def _export(array: NDArray[Any]) -> Any:
 def _compile_cost_edges(edge_map: ArrayLike) -> tuple[NDArray[np.intc], int]:
     """Return an edge_cost array using an integer map."""
     edge_map = np.array(edge_map, copy=True)
-    if edge_map.ndim != 2:
+    if edge_map.ndim != 2:  # noqa: PLR2004
         raise ValueError("edge_map must be 2 dimensional. (Got %i)" % edge_map.ndim)
     edge_center = edge_map.shape[0] // 2, edge_map.shape[1] // 2
     edge_map[edge_center] = 0
@@ -344,13 +343,13 @@ def _compile_cost_edges(edge_map: ArrayLike) -> tuple[NDArray[np.intc], int]:
     return c_edges, len(edge_array)
 
 
-def dijkstra2d(
+def dijkstra2d(  # noqa: PLR0913
     distance: ArrayLike,
     cost: ArrayLike,
     cardinal: int | None = None,
     diagonal: int | None = None,
     *,
-    edge_map: Any = None,
+    edge_map: ArrayLike | None = None,
     out: np.ndarray | None = ...,  # type: ignore
 ) -> NDArray[Any]:
     """Return the computed distance of all nodes on a 2D Dijkstra grid.
@@ -523,7 +522,7 @@ def hillclimb2d(
     cardinal: bool | None = None,
     diagonal: bool | None = None,
     *,
-    edge_map: Any = None,
+    edge_map: ArrayLike | None = None,
 ) -> NDArray[Any]:
     """Return a path on a grid from `start` to the lowest point.
 
@@ -577,7 +576,7 @@ def hillclimb2d(
     return path
 
 
-def _world_array(shape: tuple[int, ...], dtype: Any = np.int32) -> NDArray[Any]:
+def _world_array(shape: tuple[int, ...], dtype: DTypeLike = np.int32) -> NDArray[Any]:
     """Return an array where ``ij == arr[ij]``."""
     return np.ascontiguousarray(
         np.transpose(
@@ -666,7 +665,7 @@ class CustomGraph:
         self._order = order
         if self._order == "F":
             self._shape_c = self._shape_c[::-1]
-        if not 0 < self._ndim <= 4:
+        if not 0 < self._ndim <= 4:  # noqa: PLR2004
             msg = "Graph dimensions must be 1 <= n <= 4."
             raise TypeError(msg)
         self._graph: dict[tuple[Any, ...], dict[str, Any]] = {}
@@ -957,7 +956,7 @@ class CustomGraph:
             raise ValueError(msg)
         self._heuristic = (cardinal, diagonal, z, w)
 
-    def _compile_rules(self) -> Any:
+    def _compile_rules(self) -> Any:  # noqa: ANN401
         """Compile this graph into a C struct array."""
         if not self._edge_rules_p:
             self._edge_rules_keep_alive = []
@@ -1029,7 +1028,7 @@ class SimpleGraph:
 
     def __init__(self, *, cost: ArrayLike, cardinal: int, diagonal: int, greed: int = 1) -> None:
         cost = np.asarray(cost)
-        if cost.ndim != 2:
+        if cost.ndim != 2:  # noqa: PLR2004
             msg = f"The cost array must e 2 dimensional, array of shape {cost.shape!r} given."
             raise TypeError(msg)
         if greed <= 0:

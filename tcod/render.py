@@ -50,7 +50,7 @@ class SDLTilesetAtlas:
         )
 
     @classmethod
-    def _from_ref(cls, renderer_p: Any, atlas_p: Any) -> SDLTilesetAtlas:
+    def _from_ref(cls, renderer_p: Any, atlas_p: Any) -> SDLTilesetAtlas:  # noqa: ANN401
         self = object.__new__(cls)
         # Ignore Final reassignment type errors since this is an alternative constructor.
         # This could be a sign that the current constructor was badly implemented.

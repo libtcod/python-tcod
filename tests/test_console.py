@@ -103,7 +103,7 @@ def test_console_pickle_fortran() -> None:
 def test_console_repr() -> None:
     from numpy import array  # noqa: F401  # Used for eval
 
-    eval(repr(tcod.console.Console(10, 2)))
+    eval(repr(tcod.console.Console(10, 2)))  # noqa: S307
 
 
 def test_console_str() -> None:

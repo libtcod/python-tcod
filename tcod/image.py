@@ -40,7 +40,7 @@ class Image:
         self.image_c = ffi.gc(lib.TCOD_image_new(width, height), lib.TCOD_image_delete)
 
     @classmethod
-    def _from_cdata(cls, cdata: Any) -> Image:
+    def _from_cdata(cls, cdata: Any) -> Image:  # noqa: ANN401
         self: Image = object.__new__(cls)
         self.image_c = cdata
         self.width, self.height = self._get_size()
@@ -207,7 +207,7 @@ class Image:
         """
         lib.TCOD_image_put_pixel(self.image_c, x, y, color)
 
-    def blit(
+    def blit(  # noqa: PLR0913
         self,
         console: tcod.console.Console,
         x: float,
@@ -242,7 +242,7 @@ class Image:
             angle,
         )
 
-    def blit_rect(
+    def blit_rect(  # noqa: PLR0913
         self,
         console: tcod.console.Console,
         x: int,
@@ -263,7 +263,7 @@ class Image:
         """
         lib.TCOD_image_blit_rect(self.image_c, _console(console), x, y, width, height, bg_blend)
 
-    def blit_2x(
+    def blit_2x(  # noqa: PLR0913
         self,
         console: tcod.console.Console,
         dest_x: int,
@@ -367,7 +367,7 @@ def load(filename: str | PathLike[str]) -> NDArray[np.uint8]:
     image = Image._from_cdata(ffi.gc(lib.TCOD_image_load(_path_encode(Path(filename))), lib.TCOD_image_delete))
     array: NDArray[np.uint8] = np.asarray(image, dtype=np.uint8)
     height, width, depth = array.shape
-    if depth == 3:
+    if depth == 3:  # noqa: PLR2004
         array = np.concatenate(
             (
                 array,

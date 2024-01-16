@@ -38,7 +38,7 @@ class Tileset:
         )
 
     @classmethod
-    def _claim(cls, cdata: Any) -> Tileset:
+    def _claim(cls, cdata: Any) -> Tileset:  # noqa: ANN401
         """Return a new Tileset that owns the provided TCOD_Tileset* object."""
         self = object.__new__(cls)
         if cdata == ffi.NULL:
@@ -48,7 +48,7 @@ class Tileset:
         return self
 
     @classmethod
-    def _from_ref(cls, tileset_p: Any) -> Tileset:
+    def _from_ref(cls, tileset_p: Any) -> Tileset:  # noqa: ANN401
         self = object.__new__(cls)
         self._tileset_p = tileset_p
         return self
@@ -147,7 +147,7 @@ class Tileset:
         required = (*self.tile_shape, 4)
         if tile.shape != required:
             note = ""
-            if len(tile.shape) == 3 and tile.shape[2] == 3:
+            if len(tile.shape) == 3 and tile.shape[2] == 3:  # noqa: PLR2004
                 note = (
                     "\nNote: An RGB array is too ambiguous,"
                     " an alpha channel must be added to this array to divide the background/foreground areas."

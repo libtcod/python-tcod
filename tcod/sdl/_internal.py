@@ -5,7 +5,7 @@ import logging
 import sys as _sys
 from dataclasses import dataclass
 from types import TracebackType
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, NoReturn, TypeVar
 
 from tcod.cffi import ffi, lib
 
@@ -80,7 +80,7 @@ def _check(result: int) -> int:
     return result
 
 
-def _check_p(result: Any) -> Any:
+def _check_p(result: Any) -> Any:  # noqa: ANN401
     """Check if an SDL function returned NULL, and raise an exception if it did."""
     if not result:
         raise RuntimeError(_get_error())
@@ -111,7 +111,7 @@ def _required_version(required: tuple[int, int, int]) -> Callable[[T], T]:
     if required <= _compiled_version():
         return lambda x: x
 
-    def replacement(*_args: Any, **_kwargs: Any) -> Any:
+    def replacement(*_args: object, **_kwargs: object) -> NoReturn:
         msg = f"This feature requires SDL version {required}, but tcod was compiled with version {_compiled_version()}"
         raise RuntimeError(msg)
 

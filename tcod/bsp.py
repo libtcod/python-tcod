@@ -88,7 +88,7 @@ class BSP:
     def h(self, value: int) -> None:
         self.height = value
 
-    def _as_cdata(self) -> Any:
+    def _as_cdata(self) -> Any:  # noqa: ANN401
         cdata = ffi.gc(
             lib.TCOD_bsp_new_with_size(self.x, self.y, self.width, self.height),
             lib.TCOD_bsp_delete,
@@ -115,7 +115,7 @@ class BSP:
             status,
         )
 
-    def _unpack_bsp_tree(self, cdata: Any) -> None:
+    def _unpack_bsp_tree(self, cdata: Any) -> None:  # noqa: ANN401
         self.x = cdata.x
         self.y = cdata.y
         self.width = cdata.w

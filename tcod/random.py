@@ -81,7 +81,7 @@ class Random:
         )
 
     @classmethod
-    def _new_from_cdata(cls, cdata: Any) -> Random:
+    def _new_from_cdata(cls, cdata: Any) -> Random:  # noqa: ANN401
         """Return a new instance encapsulating this cdata."""
         self: Random = object.__new__(cls)
         self.random_c = cdata
@@ -149,7 +149,7 @@ class Random:
     def inverse_guass(self, mu: float, sigma: float) -> float:  # noqa: D102
         return self.inverse_gauss(mu, sigma)
 
-    def __getstate__(self) -> Any:
+    def __getstate__(self) -> dict[str, Any]:
         """Pack the self.random_c attribute into a portable state."""
         state = self.__dict__.copy()
         state["random_c"] = {
@@ -165,7 +165,7 @@ class Random:
         }
         return state
 
-    def __setstate__(self, state: Any) -> None:
+    def __setstate__(self, state: dict[str, Any]) -> None:
         """Create a new cdata object with the stored parameters."""
         if "algo" in state["random_c"]:
             # Handle old/deprecated format.  Covert to libtcod's new union type.

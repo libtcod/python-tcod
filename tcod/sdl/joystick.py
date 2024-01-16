@@ -126,7 +126,7 @@ class Joystick:
     _by_instance_id: ClassVar[WeakValueDictionary[int, Joystick]] = WeakValueDictionary()
     """Currently opened joysticks."""
 
-    def __init__(self, sdl_joystick_p: Any) -> None:
+    def __init__(self, sdl_joystick_p: Any) -> None:  # noqa: ANN401
         self.sdl_joystick_p: Final = sdl_joystick_p
         """The CFFI pointer to an SDL_Joystick struct."""
         self.axes: Final[int] = _check(lib.SDL_JoystickNumAxes(self.sdl_joystick_p))
@@ -200,7 +200,7 @@ class GameController:
     _by_instance_id: ClassVar[WeakValueDictionary[int, GameController]] = WeakValueDictionary()
     """Currently opened controllers."""
 
-    def __init__(self, sdl_controller_p: Any) -> None:
+    def __init__(self, sdl_controller_p: Any) -> None:  # noqa: ANN401
         self.sdl_controller_p: Final = sdl_controller_p
         self.joystick: Final = Joystick(lib.SDL_GameControllerGetJoystick(self.sdl_controller_p))
         """The :any:`Joystick` associated with this controller."""

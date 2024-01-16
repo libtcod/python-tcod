@@ -115,7 +115,7 @@ class BlendMode(enum.IntEnum):
     """"""
 
 
-def compose_blend_mode(
+def compose_blend_mode(  # noqa: PLR0913
     source_color_factor: BlendFactor,
     dest_color_factor: BlendFactor,
     color_operation: BlendOperation,
@@ -239,7 +239,7 @@ class _RestoreTargetContext:
     def __enter__(self) -> None:
         pass
 
-    def __exit__(self, *_: Any) -> None:
+    def __exit__(self, *_: object) -> None:
         _check(lib.SDL_SetRenderTarget(self.renderer.p, self.old_texture_p))
 
 
@@ -262,7 +262,7 @@ class Renderer:
             return bool(self.p == other.p)
         return NotImplemented
 
-    def copy(
+    def copy(  # noqa: PLR0913
         self,
         texture: Texture,
         source: tuple[float, float, float, float] | None = None,
@@ -334,11 +334,11 @@ class Renderer:
                     See :any:`TextureAccess` for more options.
         """
         if format is None:
-            assert len(pixels.shape) == 3
+            assert len(pixels.shape) == 3  # noqa: PLR2004
             assert pixels.dtype == np.uint8
-            if pixels.shape[2] == 4:
+            if pixels.shape[2] == 4:  # noqa: PLR2004
                 format = int(lib.SDL_PIXELFORMAT_RGBA32)
-            elif pixels.shape[2] == 3:
+            elif pixels.shape[2] == 3:  # noqa: PLR2004
                 format = int(lib.SDL_PIXELFORMAT_RGB24)
             else:
                 msg = f"Can't determine the format required for an array of shape {pixels.shape}."
@@ -594,8 +594,8 @@ class Renderer:
 
         .. versionadded:: 13.5
         """
-        assert len(rects.shape) == 2
-        assert rects.shape[1] == 4
+        assert len(rects.shape) == 2  # noqa: PLR2004
+        assert rects.shape[1] == 4  # noqa: PLR2004
         rects = np.ascontiguousarray(rects)
         if rects.dtype == np.intc:
             _check(lib.SDL_RenderFillRects(self.p, tcod.ffi.from_buffer("SDL_Rect*", rects), rects.shape[0]))
@@ -610,8 +610,8 @@ class Renderer:
 
         .. versionadded:: 13.5
         """
-        assert len(rects.shape) == 2
-        assert rects.shape[1] == 4
+        assert len(rects.shape) == 2  # noqa: PLR2004
+        assert rects.shape[1] == 4  # noqa: PLR2004
         rects = np.ascontiguousarray(rects)
         if rects.dtype == np.intc:
             _check(lib.SDL_RenderDrawRects(self.p, tcod.ffi.from_buffer("SDL_Rect*", rects), rects.shape[0]))
@@ -626,8 +626,8 @@ class Renderer:
 
         .. versionadded:: 13.5
         """
-        assert len(points.shape) == 2
-        assert points.shape[1] == 2
+        assert len(points.shape) == 2  # noqa: PLR2004
+        assert points.shape[1] == 2  # noqa: PLR2004
         points = np.ascontiguousarray(points)
         if points.dtype == np.intc:
             _check(lib.SDL_RenderDrawRects(self.p, tcod.ffi.from_buffer("SDL_Point*", points), points.shape[0]))
@@ -642,8 +642,8 @@ class Renderer:
 
         .. versionadded:: 13.5
         """
-        assert len(points.shape) == 2
-        assert points.shape[1] == 2
+        assert len(points.shape) == 2  # noqa: PLR2004
+        assert points.shape[1] == 2  # noqa: PLR2004
         points = np.ascontiguousarray(points)
         if points.dtype == np.intc:
             _check(lib.SDL_RenderDrawRects(self.p, tcod.ffi.from_buffer("SDL_Point*", points), points.shape[0] - 1))
@@ -654,7 +654,7 @@ class Renderer:
             raise TypeError(msg)
 
     @_required_version((2, 0, 18))
-    def geometry(
+    def geometry(  # noqa: PLR0913
         self,
         texture: Texture | None,
         xy: NDArray[np.float32],
@@ -667,18 +667,18 @@ class Renderer:
         .. versionadded:: 13.5
         """
         assert xy.dtype == np.float32
-        assert len(xy.shape) == 2
-        assert xy.shape[1] == 2
+        assert len(xy.shape) == 2  # noqa: PLR2004
+        assert xy.shape[1] == 2  # noqa: PLR2004
         assert xy[0].flags.c_contiguous
 
         assert color.dtype == np.uint8
-        assert len(color.shape) == 2
-        assert color.shape[1] == 4
+        assert len(color.shape) == 2  # noqa: PLR2004
+        assert color.shape[1] == 4  # noqa: PLR2004
         assert color[0].flags.c_contiguous
 
         assert uv.dtype == np.float32
-        assert len(uv.shape) == 2
-        assert uv.shape[1] == 2
+        assert len(uv.shape) == 2  # noqa: PLR2004
+        assert uv.shape[1] == 2  # noqa: PLR2004
         assert uv[0].flags.c_contiguous
         if indices is not None:
             assert indices.dtype.type in (np.uint8, np.uint16, np.uint32, np.int8, np.int16, np.int32)

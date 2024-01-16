@@ -7,13 +7,16 @@ import sys
 import warnings
 from pathlib import Path
 from types import TracebackType
-from typing import Any, AnyStr, Callable, NoReturn, SupportsInt, TypeVar, cast
+from typing import TYPE_CHECKING, Any, AnyStr, Callable, NoReturn, SupportsInt, TypeVar, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from typing_extensions import Literal
 
 from tcod.cffi import ffi, lib
+
+if TYPE_CHECKING:
+    import tcod.image
 
 FuncType = Callable[..., Any]
 F = TypeVar("F", bound=FuncType)
@@ -198,18 +201,17 @@ class _CDataWrapper:
     def __hash__(self) -> int:
         return hash(self.cdata)
 
-    def __eq__(self, other: Any) -> Any:
-        try:
-            return self.cdata == other.cdata
-        except AttributeError:
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, _CDataWrapper):
             return NotImplemented
+        return bool(self.cdata == other.cdata)
 
-    def __getattr__(self, attr: str) -> Any:
+    def __getattr__(self, attr: str) -> Any:  # noqa: ANN401
         if "cdata" in self.__dict__:
             return getattr(self.__dict__["cdata"], attr)
         raise AttributeError(attr)
 
-    def __setattr__(self, attr: str, value: Any) -> None:
+    def __setattr__(self, attr: str, value: Any) -> None:  # noqa: ANN401
         if hasattr(self, "cdata") and hasattr(self.cdata, attr):
             setattr(self.cdata, attr, value)
         else:
@@ -240,7 +242,7 @@ class TempImage:
         """Initialize an image from the given array.  May copy or reference the array."""
         self._array: NDArray[np.uint8] = np.ascontiguousarray(array, dtype=np.uint8)
         height, width, depth = self._array.shape
-        if depth != 3:
+        if depth != 3:  # noqa: PLR2004
             msg = f"Array must have RGB channels.  Shape is: {self._array.shape!r}"
             raise TypeError(msg)
         self._buffer = ffi.from_buffer("TCOD_color_t[]", self._array)
@@ -265,7 +267,7 @@ class TempImage:
         )
 
 
-def _as_image(image: Any) -> TempImage:
+def _as_image(image: ArrayLike | tcod.image.Image) -> TempImage | tcod.image.Image:
     """Convert this input into an Image-like object."""
     if hasattr(image, "image_c"):
         return image  # type: ignore

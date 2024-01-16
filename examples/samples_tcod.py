@@ -118,7 +118,7 @@ class TrueColorSample(Sample):
         self.slide_corner_colors()
         self.interpolate_corner_colors()
         self.darken_background_characters()
-        self.randomize_sample_conole()
+        self.randomize_sample_console()
         self.print_banner()
 
     def slide_corner_colors(self) -> None:
@@ -143,7 +143,7 @@ class TrueColorSample(Sample):
         sample_console.fg[:] = sample_console.bg[:]
         sample_console.fg[:] //= 2
 
-    def randomize_sample_conole(self) -> None:
+    def randomize_sample_console(self) -> None:
         # randomize sample console characters
         sample_console.ch[:] = np.random.randint(
             low=ord("a"),
@@ -406,7 +406,7 @@ class NoiseSample(Sample):
         rect_h = 13
         if self.implementation == tcod.noise.Implementation.SIMPLE:
             rect_h = 10
-        sample_console.draw_semigraphics(self.img)
+        sample_console.draw_semigraphics(np.asarray(self.img))
         sample_console.draw_rect(
             2,
             2,
@@ -669,7 +669,7 @@ class PathfindingSample(Sample):
         self.using_astar = True
         self.recalculate = False
         self.busy = 0.0
-        self.oldchar = " "
+        self.old_char = " "
 
         self.map = tcod.map.Map(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
         for y in range(SAMPLE_SCREEN_HEIGHT):
@@ -778,33 +778,33 @@ class PathfindingSample(Sample):
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym == tcod.event.KeySym.i and self.dy > 0:
             # destination move north
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, libtcodpy.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.old_char, libtcodpy.BKGND_NONE)
             self.dy -= 1
-            self.oldchar = sample_console.ch[self.dx, self.dy]
+            self.old_char = sample_console.ch[self.dx, self.dy]
             libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", libtcodpy.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
         elif event.sym == tcod.event.KeySym.k and self.dy < SAMPLE_SCREEN_HEIGHT - 1:
             # destination move south
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, libtcodpy.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.old_char, libtcodpy.BKGND_NONE)
             self.dy += 1
-            self.oldchar = sample_console.ch[self.dx, self.dy]
+            self.old_char = sample_console.ch[self.dx, self.dy]
             libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", libtcodpy.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
         elif event.sym == tcod.event.KeySym.j and self.dx > 0:
             # destination move west
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, libtcodpy.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.old_char, libtcodpy.BKGND_NONE)
             self.dx -= 1
-            self.oldchar = sample_console.ch[self.dx, self.dy]
+            self.old_char = sample_console.ch[self.dx, self.dy]
             libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", libtcodpy.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
         elif event.sym == tcod.event.KeySym.l and self.dx < SAMPLE_SCREEN_WIDTH - 1:
             # destination move east
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, libtcodpy.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.old_char, libtcodpy.BKGND_NONE)
             self.dx += 1
-            self.oldchar = sample_console.ch[self.dx, self.dy]
+            self.old_char = sample_console.ch[self.dx, self.dy]
             libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", libtcodpy.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
@@ -822,10 +822,10 @@ class PathfindingSample(Sample):
         mx = event.tile.x - SAMPLE_SCREEN_X
         my = event.tile.y - SAMPLE_SCREEN_Y
         if 0 <= mx < SAMPLE_SCREEN_WIDTH and 0 <= my < SAMPLE_SCREEN_HEIGHT and (self.dx != mx or self.dy != my):
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.oldchar, libtcodpy.BKGND_NONE)
+            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.old_char, libtcodpy.BKGND_NONE)
             self.dx = mx
             self.dy = my
-            self.oldchar = sample_console.ch[self.dx, self.dy]
+            self.old_char = sample_console.ch[self.dx, self.dy]
             libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", libtcodpy.BKGND_NONE)
             if SAMPLE_MAP[self.dx, self.dy] == " ":
                 self.recalculate = True
@@ -1139,7 +1139,7 @@ class NameGeneratorSample(Sample):
     def __init__(self) -> None:
         self.name = "Name generator"
 
-        self.curset = 0
+        self.current_set = 0
         self.delay = 0.0
         self.names: list[str] = []
         self.sets: list[str] = []
@@ -1159,7 +1159,7 @@ class NameGeneratorSample(Sample):
         sample_console.print(
             1,
             1,
-            "%s\n\n+ : next generator\n- : prev generator" % self.sets[self.curset],
+            "%s\n\n+ : next generator\n- : prev generator" % self.sets[self.current_set],
             fg=WHITE,
             bg=None,
         )
@@ -1175,18 +1175,18 @@ class NameGeneratorSample(Sample):
         self.delay += frame_length[-1]
         if self.delay > 0.5:
             self.delay -= 0.5
-            self.names.append(libtcodpy.namegen_generate(self.sets[self.curset]))
+            self.names.append(libtcodpy.namegen_generate(self.sets[self.current_set]))
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym == tcod.event.KeySym.EQUALS:
-            self.curset += 1
+            self.current_set += 1
             self.names.append("======")
         elif event.sym == tcod.event.KeySym.MINUS:
-            self.curset -= 1
+            self.current_set -= 1
             self.names.append("======")
         else:
             super().ev_keydown(event)
-        self.curset %= len(self.sets)
+        self.current_set %= len(self.sets)
 
 
 #############################################
@@ -1294,9 +1294,9 @@ class FastRenderSample(Sample):
             for v in range(RES_V - int_t, RES_V):
                 for u in range(RES_U):
                     tex_v = (v + int_abs_t) / float(RES_V)
-                    texture[u, v] = tcod.noise_get_fbm(noise2d, [u / float(RES_U), tex_v], 32.0) + tcod.noise_get_fbm(
-                        noise2d, [1 - u / float(RES_U), tex_v], 32.0
-                    )
+                    texture[u, v] = libtcodpy.noise_get_fbm(
+                        noise2d, [u / float(RES_U), tex_v], 32.0
+                    ) + libtcodpy.noise_get_fbm(noise2d, [1 - u / float(RES_U), tex_v], 32.0)
 
         # squared distance from center,
         # clipped to sensible minimum and maximum values
@@ -1324,9 +1324,9 @@ class FastRenderSample(Sample):
             y = random.uniform(-0.5, 0.5)
             strength = random.uniform(MIN_LIGHT_STRENGTH, 1.0)
 
-            color = tcod.Color(0, 0, 0)  # create bright colors with random hue
+            color = libtcodpy.Color(0, 0, 0)  # create bright colors with random hue
             hue = random.uniform(0, 360)
-            tcod.color_set_hsv(color, hue, 0.5, strength)
+            libtcodpy.color_set_hsv(color, hue, 0.5, strength)
             self.lights.append(Light(x, y, TEX_STRETCH, color.r, color.g, color.b, strength))
 
         # eliminate lights that are going to be out of view

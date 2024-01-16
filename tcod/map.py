@@ -87,7 +87,7 @@ class Map:
         self.__buffer: NDArray[np.bool_] = np.zeros((height, width, 3), dtype=np.bool_)
         self.map_c = self.__as_cdata()
 
-    def __as_cdata(self) -> Any:
+    def __as_cdata(self) -> Any:  # noqa: ANN401
         return ffi.new(
             "struct TCOD_Map*",
             (
@@ -113,7 +113,7 @@ class Map:
         buffer: np.ndarray[Any, np.dtype[np.bool_]] = self.__buffer[:, :, 2]
         return buffer.T if self._order == "F" else buffer
 
-    def compute_fov(
+    def compute_fov(  # noqa: PLR0913
         self,
         x: int,
         y: int,
@@ -232,7 +232,7 @@ def compute_fov(
         conditions.
     """
     transparency = np.asarray(transparency)
-    if len(transparency.shape) != 2:
+    if len(transparency.shape) != 2:  # noqa: PLR2004
         raise TypeError("transparency must be an array of 2 dimensions" " (shape is %r)" % transparency.shape)
     if isinstance(pov, int):
         msg = "The tcod.map.compute_fov function has changed.  The `x` and `y` parameters should now be given as a single tuple."

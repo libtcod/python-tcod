@@ -122,7 +122,7 @@ class Noise:
         noise_c (CData): A cffi pointer to a TCOD_noise_t object.
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         dimensions: int,
         algorithm: int = Algorithm.SIMPLEX,
@@ -132,7 +132,7 @@ class Noise:
         octaves: float = 4,
         seed: int | tcod.random.Random | None = None,
     ) -> None:
-        if not 0 < dimensions <= 4:
+        if not 0 < dimensions <= 4:  # noqa: PLR2004
             msg = f"dimensions must be in range 0 < n <= 4, got {dimensions}"
             raise ValueError(msg)
         self._seed = seed
@@ -190,7 +190,7 @@ class Noise:
 
     @implementation.setter
     def implementation(self, value: int) -> None:
-        if not 0 <= value < 3:
+        if not 0 <= value < 3:  # noqa: PLR2004
             msg = f"{value!r} is not a valid implementation. "
             raise ValueError(msg)
         self._tdl_noise_c.implementation = value
@@ -336,7 +336,7 @@ class Noise:
 
     def __getstate__(self) -> dict[str, Any]:
         state = self.__dict__.copy()
-        if self.dimensions < 4 and self.noise_c.waveletTileData == ffi.NULL:
+        if self.dimensions < 4 and self.noise_c.waveletTileData == ffi.NULL:  # noqa: PLR2004
             # Trigger a side effect of wavelet, so that copies will be synced.
             saved_algo = self.algorithm
             self.algorithm = tcod.constants.NOISE_WAVELET
@@ -385,7 +385,7 @@ class Noise:
         self.__dict__.update(state)
         return None
 
-    def _setstate_old(self, state: Any) -> None:
+    def _setstate_old(self, state: tuple[Any, ...]) -> None:
         self._random = state[0]
         self.noise_c = ffi.new("struct TCOD_Noise*")
         self.noise_c.ndim = state[3]

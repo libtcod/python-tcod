@@ -136,7 +136,7 @@ def convert_audio(
     in_array: NDArray[Any] = np.asarray(in_sound)
     if len(in_array.shape) == 1:
         in_array = in_array[:, np.newaxis]
-    if len(in_array.shape) != 2:
+    if len(in_array.shape) != 2:  # noqa: PLR2004
         msg = f"Expected a 1 or 2 ndim input, got {in_array.shape} instead."
         raise TypeError(msg)
     cvt = ffi.new("SDL_AudioCVT*")
@@ -191,7 +191,7 @@ class AudioDevice:
         self,
         device_id: int,
         capture: bool,
-        spec: Any,  # SDL_AudioSpec*
+        spec: Any,  # SDL_AudioSpec*  # noqa: ANN401
     ) -> None:
         assert device_id >= 0
         assert ffi.typeof(spec) is ffi.typeof("SDL_AudioSpec*")
@@ -284,7 +284,7 @@ class AudioDevice:
         if isinstance(samples_, np.ndarray):
             samples_ = self._verify_array_format(samples_)
         samples: NDArray[Any] = np.asarray(samples_, dtype=self.format)
-        if len(samples.shape) < 2:
+        if len(samples.shape) < 2:  # noqa: PLR2004
             samples = samples[:, np.newaxis]
         return np.ascontiguousarray(np.broadcast_to(samples, (samples.shape[0], self.channels)), dtype=self.format)
 
@@ -605,7 +605,7 @@ class AllowedChanges(enum.IntFlag):
     """"""
 
 
-def open(
+def open(  # noqa: PLR0913
     name: str | None = None,
     capture: bool = False,
     *,

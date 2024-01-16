@@ -518,7 +518,7 @@ def test_color() -> None:
     color_a["b"] = color_a["b"]
     assert list(color_a) == [0, 3, 2]
 
-    assert color_a == color_a
+    assert color_a == color_a  # noqa: PLR0124
 
     color_b = libtcodpy.Color(255, 255, 255)
     assert color_a != color_b
@@ -532,7 +532,7 @@ def test_color() -> None:
 def test_color_repr() -> None:
     Color = libtcodpy.Color
     col = Color(0, 1, 2)
-    assert eval(repr(col)) == col
+    assert eval(repr(col)) == col  # noqa: S307
 
 
 @pytest.mark.filterwarnings("ignore")
