@@ -15,7 +15,7 @@ from cffi import FFI
 
 sys.path.append(str(Path(__file__).parent))  # Allow importing local modules.
 
-import build_sdl  # noqa: E402
+import build_sdl
 
 Py_LIMITED_API = 0x03060000
 
