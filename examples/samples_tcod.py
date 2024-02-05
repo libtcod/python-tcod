@@ -768,12 +768,11 @@ class PathfindingSample(Sample):
                     libtcodpy.console_put_char(sample_console, self.px, self.py, " ", libtcodpy.BKGND_NONE)
                     self.px, self.py = libtcodpy.path_walk(self.path, True)  # type: ignore
                     libtcodpy.console_put_char(sample_console, self.px, self.py, "@", libtcodpy.BKGND_NONE)
-            else:
-                if not libtcodpy.dijkstra_is_empty(self.dijkstra):
-                    libtcodpy.console_put_char(sample_console, self.px, self.py, " ", libtcodpy.BKGND_NONE)
-                    self.px, self.py = libtcodpy.dijkstra_path_walk(self.dijkstra)  # type: ignore
-                    libtcodpy.console_put_char(sample_console, self.px, self.py, "@", libtcodpy.BKGND_NONE)
-                    self.recalculate = True
+            elif not libtcodpy.dijkstra_is_empty(self.dijkstra):
+                libtcodpy.console_put_char(sample_console, self.px, self.py, " ", libtcodpy.BKGND_NONE)
+                self.px, self.py = libtcodpy.dijkstra_path_walk(self.dijkstra)  # type: ignore
+                libtcodpy.console_put_char(sample_console, self.px, self.py, "@", libtcodpy.BKGND_NONE)
+                self.recalculate = True
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym == tcod.event.KeySym.i and self.dy > 0:
