@@ -25,6 +25,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path("..").resolve(strict=True)))
 
+THIS_DIR = Path(__file__).parent
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -378,8 +380,8 @@ napoleon_use_ivar = False
 napoleon_use_param = True
 napoleon_use_rtype = True
 
-rst_prolog = Path("prolog.rst").read_text(encoding="utf-8")  # Added to the beginning of every source file.
-rst_epilog = Path("epilog.rst").read_text(encoding="utf-8")  # Added to the end of every source file.
+rst_prolog = (THIS_DIR / "prolog.rst").read_text(encoding="utf-8")  # Added to the beginning of every source file.
+rst_epilog = (THIS_DIR / "epilog.rst").read_text(encoding="utf-8")  # Added to the end of every source file.
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
