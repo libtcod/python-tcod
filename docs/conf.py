@@ -103,7 +103,7 @@ language = "en"
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "/epilog.rst"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "epilog.rst", "prolog.rst"]
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -378,13 +378,14 @@ napoleon_use_ivar = False
 napoleon_use_param = True
 napoleon_use_rtype = True
 
-rst_prolog = ".. include:: /prolog.rst"  # Added to the beginning of every source file.
-rst_epilog = ".. include:: /epilog.rst"  # Added to the end of every source file.
+rst_prolog = Path("prolog.rst").read_text(encoding="utf-8")  # Added to the beginning of every source file.
+rst_epilog = Path("epilog.rst").read_text(encoding="utf-8")  # Added to the end of every source file.
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
+    "tcod-ecs": ("https://python-tcod-ecs.readthedocs.io/en/latest/", None),
 }
 
 os.environ["READTHEDOCS"] = "True"
