@@ -23,7 +23,7 @@ def test_sdl_window(uses_window: None) -> None:
     assert window.title == sys.argv[0]
     window.title = "Title"
     assert window.title == "Title"
-    assert window.opacity == 1.0  # noqa: PLR2004
+    assert window.opacity == 1.0
     window.position = window.position
     window.fullscreen = window.fullscreen
     window.resizable = window.resizable
