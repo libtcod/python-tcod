@@ -5,7 +5,7 @@ Part 2 - Entities
 
 .. include:: notice.rst
 
-In part 2 entities will be added and the state system will be refactored to be more generic.
+In part 2 entities will be added and a new state will be created to handle them.
 This part will also begin to split logic into multiple Python modules using a namespace called ``game``.
 
 Entities will be handled with an ECS implementation, in this case: `tcod-ecs`_.
@@ -24,46 +24,6 @@ Create a new folder called ``game`` and inside the folder create a new python fi
 
 This package will be used to organize new modules.
 
-State protocol
-==============================================================================
-
-To have more states than ``ExampleState`` one must use an abstract type which can be used to refer to any state.
-In this case a `Protocol`_ will be used, called ``State``.
-
-Create a new module: ``game/state.py``.
-In this module add the class :python:`class State(Protocol):`.
-``Protocol`` is from Python's ``typing`` module.
-``State`` should have the ``on_event`` and ``on_draw`` methods from ``ExampleState`` but these methods will be empty other than the docstrings describing what they are for.
-These methods refer to types from ``tcod`` and those types will need to be imported.
-``State`` should also have :python:`__slots__ = ()` [#slots]_ in case the class is used for a subclass.
-
-``game/state.py`` should look like this:
-
-.. code-block:: python
-
-    """Base classes for states."""
-    from __future__ import annotations
-
-    from typing import Protocol
-
-    import tcod.console
-    import tcod.event
-
-
-    class State(Protocol):
-        """An abstract game state."""
-
-        __slots__ = ()
-
-        def on_event(self, event: tcod.event.Event) -> None:
-            """Called on events."""
-
-        def on_draw(self, console: tcod.console.Console) -> None:
-            """Called when the state is being drawn."""
-
-The ``ExampleState`` class does not need to be updated since it is already a structural subtype of ``State``.
-Note that subclasses of ``State`` will never be in same module as ``State``, this will be the same for all abstract classes.
-
 Organizing globals
 ==============================================================================
 
@@ -73,14 +33,15 @@ Any global variables which might be assigned from other modules will need to a t
 Create a new module: ``g.py`` [#g]_.
 This module is exceptional and will be placed at the top-level instead of in the ``game`` folder.
 
-``console`` and ``context`` from ``main.py`` will now be annotated in ``g.py``.
-These will not be assigned here, only annotated with a type-hint.
+In ``g.py`` import ``tcod.context`` and ``tcod.ecs``.
 
-A new global will be added: :python:`states: list[game.state.State] = []`.
-States are implemented as a list/stack to support `pushdown automata <https://gameprogrammingpatterns.com/state.html#pushdown-automata>`_.
-Representing states as a stack makes it easier to implement popup windows, menus, and other "history aware" states.
+``context`` from ``main.py`` will now be annotated in ``g.py`` by adding the line :python:`context: tcod.context.Context` by itself.
+Notice that is this only a type-hinted name and nothing is assigned to it.
+This means that type-checking will assume the variable always exists but using it before it is assigned will crash at run-time.
 
-Finally :python:`world: tcod.ecs.Registry` will be added to hold the ECS scope.
+``main.py`` should add :python:`import g` and replace the variables named ``context`` with ``g.context``.
+
+Then add the :python:`world: tcod.ecs.Registry` global to hold the ECS scope.
 
 It is important to document all variables placed in this module with docstrings.
 
@@ -89,107 +50,17 @@ It is important to document all variables placed in this module with docstrings.
     """This module stores globally mutable variables used by this program."""
     from __future__ import annotations
 
-    import tcod.console
     import tcod.context
     import tcod.ecs
-
-    import game.state
-
-    console: tcod.console.Console
-    """The main console."""
 
     context: tcod.context.Context
     """The window managed by tcod."""
 
-    states: list[game.state.State] = []
-    """A stack of states with the last item being the active state."""
-
     world: tcod.ecs.Registry
     """The active ECS registry and current session."""
 
-Now other modules can :python:`import g` to access global variables.
-
 Ideally you should not overuse this module for too many things.
-When a variables can either be taken as a function parameter or accessed as a global then passing as a parameter is always preferable.
-
-State functions
-==============================================================================
-
-Create a new module: ``game/state_tools.py``.
-This module will handle events and rendering of the global state.
-
-In this module add the function :python:`def main_draw() -> None:`.
-This will hold the "clear, draw, present" logic from the ``main`` function which will be moved to this function.
-Render the active state with :python:`g.states[-1].on_draw(g.console)`.
-If ``g.states`` is empty then this function should immediately :python:`return` instead of doing anything.
-Empty containers in Python are :python:`False` when checked for truthiness.
-
-Next the function :python:`def main_loop() -> None:` is created.
-The :python:`while` loop from ``main`` will be moved to this function.
-The while loop will be replaced by :python:`while g.states:` so that this function will exit if no state exists.
-Drawing will be replaced by a call to ``main_draw``.
-Events in the for-loop will be passed to the active state :python:`g.states[-1].on_event(event)`.
-Any states ``on_event`` method could potentially change the state so ``g.states`` must be checked to be non-empty for every handled event.
-
-.. code-block:: python
-
-    """State handling functions."""
-    from __future__ import annotations
-
-    import tcod.console
-
-    import g
-
-
-    def main_draw() -> None:
-        """Render and present the active state."""
-        if not g.states:
-            return
-        g.console.clear()
-        g.states[-1].on_draw(g.console)
-        g.context.present(g.console)
-
-
-    def main_loop() -> None:
-        """Run the active state forever."""
-        while g.states:
-            main_draw()
-            for event in tcod.event.wait():
-                if g.states:
-                    g.states[-1].on_event(event)
-
-Now ``main.py`` can be edited to use the global variables and the new game loop.
-
-Add :python:`import g` and :python:`import game.state_tools`.
-Replace references to ``console`` with ``g.console``.
-Replace references to ``context`` with ``g.context``.
-
-States are initialed by assigning a list with the initial state to ``g.states``.
-The previous game loop is replaced by a call to :python:`game.state_tools.main_loop()`.
-
-.. code-block:: python
-    :emphasize-lines: 3-4,12-15
-
-    ...
-
-    import g
-    import game.state_tools
-
-    def main() -> None:
-        """Entry point function."""
-        tileset = tcod.tileset.load_tilesheet(
-            "data/Alloy_curses_12x12.png", columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437
-        )
-        tcod.tileset.procedural_block_elements(tileset=tileset)
-        g.console = tcod.console.Console(80, 50)
-        g.states = [ExampleState(player_x=console.width // 2, player_y=console.height // 2)]
-        with tcod.context.new(console=g.console, tileset=tileset) as g.context:
-            game.state_tools.main_loop()
-    ...
-
-After this you can test the game.
-There should be no visible differences from before.
-
+When a variable can either be taken as a function parameter or accessed as a global then passing as a parameter is always preferable.
 
 ECS tags
 ==============================================================================
@@ -435,7 +306,7 @@ Make sure :python:`return` has the correct indentation and is not part of the fo
 
         return world
 
-New in-game state
+New InGame state
 ==============================================================================
 
 Now there is a new ECS world but the example state does not know how to render it.
@@ -485,7 +356,6 @@ Then add the following:
 
 Create a new :python:`class InGame:` decorated with :python:`@attrs.define(eq=False)`.
 States will always use ``g.world`` to access the ECS registry.
-States prefer ``console`` as a parameter over the global ``g.console`` so always use ``console`` when it exists.
 
 .. code-block:: python
 
@@ -494,8 +364,8 @@ States prefer ``console`` as a parameter over the global ``g.console`` so always
         """Primary in-game state."""
         ...
 
-Create an ``on_event`` method matching the ``State`` protocol.
-Copying these methods from ``State`` or ``ExampleState`` should be enough.
+Create an ``on_event`` and ``on_draw`` method matching the ``ExampleState`` class.
+Copying ``ExampleState`` and modifying it should be enough since this wil replace ``ExampleState``.
 
 Now to do an tcod-ecs query to fetch the player entity.
 In tcod-ecs queries most often start with :python:`g.world.Q.all_of(components=[], tags=[])`.
@@ -520,9 +390,13 @@ The query to see if the player has stepped on gold is to check for whichever ent
 The query for this is :python:`g.world.Q.all_of(components=[Gold], tags=[player.components[Position], IsItem]):`.
 
 We will iterate over whatever matches this query using a :python:`for gold in ...:` loop.
-Add the entities ``Gold`` component to the player.
+Add the entities ``Gold`` component to the players similar component.
 Keep in mind that ``Gold`` is treated like an ``int`` so its usage is predictable.
-Now print the current amount of gold using :python:`print(f"Picked up {gold.components[Gold]}g, total: {player.components[Gold]}g")`.
+
+Format the added and total of gold using a Python f-string_: :python:`text = f"Picked up {gold.components[Gold]}g, total: {player.components[Gold]}g"`.
+Store ``text`` globally in the ECS registry with :python:`g.world[None].components[("Text", str)] = text`.
+This is done as two lines to avoid creating a line with an excessive length.
+
 Then use :python:`gold.clear()` at the end to remove all components and tags from the gold entity which will effectively delete it.
 
 .. code-block:: python
@@ -539,7 +413,8 @@ Then use :python:`gold.clear()` at the end to remove all components and tags fro
                     # Auto pickup gold
                     for gold in g.world.Q.all_of(components=[Gold], tags=[player.components[Position], IsItem]):
                         player.components[Gold] += gold.components[Gold]
-                        print(f"Picked up {gold.components[Gold]}g, total: {player.components[Gold]}g")
+                        text = f"Picked up {gold.components[Gold]}g, total: {player.components[Gold]}g"
+                        g.world[None].components[str] = text
                         gold.clear()
         ...
 
@@ -556,6 +431,17 @@ Draw the graphic by assigning it to the consoles Numpy array directly with :pyth
 ``console.rgb`` is a ``ch,fg,bg`` array and :python:`[["ch", "fg"]]` narrows it down to only ``ch,fg``.
 The array is in C row-major memory order so you access it with yx (or ij) ordering.
 
+That ends the entity rendering loop.
+Next is to print the ``("Text", str)`` component if it exists.
+A normal access will raise ``KeyError`` if the component is accessed before being assigned.
+This case will be handled by the ``.get`` method of the ``Entity.components`` attribute.
+:python:`g.world[None].components.get(("Text", str))` will return :python:`None` instead of raising ``KeyError``.
+Assigning this result to ``text`` and then checking :python:`if text:` will ensure that ``text`` within the branch is not None and that the string is not empty.
+We will not use ``text`` outside of the branch, so an assignment expression can be used here to check and assign the name at the same time with :python:`if text := g.world[None].components.get(("Text", str)):`.
+
+In this branch you will print ``text`` to the bottom of the console with a white foreground and black background.
+The call to do this is :python:`console.print(x=0, y=console.height - 1, string=text, fg=(255, 255, 255), bg=(0, 0, 0))`.
+
 .. code-block:: python
 
         ...
@@ -567,6 +453,12 @@ The array is in C row-major memory order so you access it with yx (or ij) orderi
                     continue
                 graphic = entity.components[Graphic]
                 console.rgb[["ch", "fg"]][pos.y, pos.x] = graphic.ch, graphic.fg
+
+            if text := g.world[None].components.get(("Text", str)):
+                console.print(x=0, y=console.height - 1, string=text, fg=(255, 255, 255), bg=(0, 0, 0))
+
+Verify the indentation of the ``if`` branch is correct.
+It should be at the same level as the ``for`` loop and not inside of it.
 
 ``game/states.py`` should now look like this:
 
@@ -633,7 +525,8 @@ The array is in C row-major memory order so you access it with yx (or ij) orderi
                     # Auto pickup gold
                     for gold in g.world.Q.all_of(components=[Gold], tags=[player.components[Position], IsItem]):
                         player.components[Gold] += gold.components[Gold]
-                        print(f"Picked up ${gold.components[Gold]}, total: ${player.components[Gold]}")
+                        text = f"Picked up {gold.components[Gold]}g, total: {player.components[Gold]}g"
+                        g.world[None].components[("Text", str)] = text
                         gold.clear()
 
         def on_draw(self, console: tcod.console.Console) -> None:
@@ -645,16 +538,26 @@ The array is in C row-major memory order so you access it with yx (or ij) orderi
                 graphic = entity.components[Graphic]
                 console.rgb[["ch", "fg"]][pos.y, pos.x] = graphic.ch, graphic.fg
 
+            if text := g.world[None].components.get(("Text", str)):
+                console.print(x=0, y=console.height - 1, string=text, fg=(255, 255, 255), bg=(0, 0, 0))
+
+Main script update
+==============================================================================
+
 Back to ``main.py``.
-At this point you should know which imports to add and which are no longed needed.
-``ExampleState`` should be removed.
-``g.state`` will be initialized with :python:`[game.states.InGame()]` instead.
-Add :python:`g.world = game.world_tools.new_world()`.
+At this point you should know to import the modules needed.
+
+The ``ExampleState`` class is obsolete and will be removed.
+``state`` will be created with :python:`game.states.InGame()` instead.
+
+If you have not replaced ``context`` with ``g.context`` yet then do it now.
+
+Add :python:`g.world = game.world_tools.new_world()` before the main loop.
 
 ``main.py`` will look like this:
 
 .. code-block:: python
-    :emphasize-lines: 5-12,22-23
+    :emphasize-lines: 10-12,22-24,28
 
     #!/usr/bin/env python3
     """Main entry-point module. This script is used to start the program."""
@@ -662,10 +565,10 @@ Add :python:`g.world = game.world_tools.new_world()`.
 
     import tcod.console
     import tcod.context
+    import tcod.event
     import tcod.tileset
 
     import g
-    import game.state_tools
     import game.states
     import game.world_tools
 
@@ -676,11 +579,17 @@ Add :python:`g.world = game.world_tools.new_world()`.
             "data/Alloy_curses_12x12.png", columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437
         )
         tcod.tileset.procedural_block_elements(tileset=tileset)
-        g.console = tcod.console.Console(80, 50)
-        g.states = [game.states.InGame()]
+        console = tcod.console.Console(80, 50)
+        state = game.states.InGame()
         g.world = game.world_tools.new_world()
-        with tcod.context.new(console=g.console, tileset=tileset) as g.context:
-            game.state_tools.main_loop()
+        with tcod.context.new(console=console, tileset=tileset) as g.context:
+            while True:  # Main loop
+                console.clear()  # Clear the console before any drawing
+                state.on_draw(console)  # Draw the current state
+                g.context.present(console)  # Render the console to the window and show it
+                for event in tcod.event.wait():  # Event loop, blocks until pending events exist
+                    print(event)
+                    state.on_event(event)  # Dispatch events to the state
 
 
     if __name__ == "__main__":
@@ -692,10 +601,7 @@ You can review the part-2 source code `here <https://github.com/HexDecimal/pytho
 
 .. rubric:: Footnotes
 
-.. [#slots] This is done to prevent subclasses from requiring a ``__dict__`` attribute.
-                If you are still wondering what ``__slots__`` is then `the Python docs have a detailed explanation <https://docs.python.org/3/reference/datamodel.html#slots>`_.
-
 .. [#g] ``global``, ``globals``, and ``glob`` were already taken by keywords, built-ins, and the standard library.
         The alternatives are to either put this in the ``game`` namespace or to add an underscore such as ``globals_.py``.
 
-.. _Protocol: https://mypy.readthedocs.io/en/stable/protocols.html
+.. _f-string: https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals
