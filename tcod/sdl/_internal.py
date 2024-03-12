@@ -1,4 +1,5 @@
 """tcod.sdl private functions."""
+
 from __future__ import annotations
 
 import logging

@@ -13,6 +13,7 @@ This script tests the viability of running python-tcod tasks in parallel.
 Typically the field-of-view tasks run good but not great, and the path-finding
 tasks run poorly.
 """
+
 import concurrent.futures
 import multiprocessing
 import platform

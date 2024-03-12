@@ -6,6 +6,7 @@ You can also set the cursor icon to an OS-defined or custom icon.
 
 .. versionadded:: 13.5
 """
+
 from __future__ import annotations
 
 import enum

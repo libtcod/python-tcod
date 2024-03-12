@@ -31,6 +31,7 @@ Example::
            [ 76,  54,  85, 144, 164],
            [ 63,  94, 159, 209, 203]], dtype=uint8)
 """
+
 from __future__ import annotations
 
 import enum

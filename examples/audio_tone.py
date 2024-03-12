@@ -3,6 +3,7 @@
 
 Opens an audio device using SDL and plays a square wave for 1 second.
 """
+
 import math
 import time
 from typing import Any

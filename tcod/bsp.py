@@ -24,6 +24,7 @@ Example::
         else:
             print('Dig a room for %s.' % node)
 """
+
 from __future__ import annotations
 
 from typing import Any, Iterator

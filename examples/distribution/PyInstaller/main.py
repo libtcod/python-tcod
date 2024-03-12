@@ -4,6 +4,7 @@
 # example script.  This work is published from: United States.
 # https://creativecommons.org/publicdomain/zero/1.0/
 """PyInstaller main script example."""
+
 import sys
 from pathlib import Path
 

@@ -1,4 +1,5 @@
 """Tests for newer tcod API."""
+
 import copy
 import pickle
 from typing import Any, NoReturn

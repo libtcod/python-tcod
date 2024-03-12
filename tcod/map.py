@@ -1,4 +1,5 @@
 """libtcod map attributes and field-of-view functions."""
+
 from __future__ import annotations
 
 import warnings

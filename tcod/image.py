@@ -8,6 +8,7 @@ To load images you should typically use `Pillow <https://pillow.readthedocs.io/e
 The best it can do with consoles is convert an image into semigraphics which can be shown on non-emulated terminals.
 For true pixel-based rendering you'll want to access the SDL rendering port at :any:`tcod.sdl.render`.
 """
+
 from __future__ import annotations
 
 from os import PathLike

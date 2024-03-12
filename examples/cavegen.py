@@ -6,6 +6,7 @@ http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generatin
 This will print the result to the console, so be sure to run this from the
 command line.
 """
+
 from typing import Any
 
 import numpy as np

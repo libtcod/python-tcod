@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Print the description used for GitHub Releases."""
+
 from __future__ import annotations
 
 import re

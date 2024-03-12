@@ -1,4 +1,5 @@
 """Tests for the tcod.noise module."""
+
 import copy
 import pickle
 

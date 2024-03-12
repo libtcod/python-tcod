@@ -1,4 +1,5 @@
 """This module handles loading of the libtcod cffi API."""
+
 from __future__ import annotations
 
 import logging

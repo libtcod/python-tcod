@@ -6,6 +6,7 @@ or you can use :any:`Context.sdl_window` to get the window being controlled by t
 
 .. versionadded:: 13.4
 """
+
 from __future__ import annotations
 
 import enum

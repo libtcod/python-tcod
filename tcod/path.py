@@ -15,6 +15,7 @@ the root node.  You can then get a path towards or away from the root with
     All path-finding functions now respect the NumPy array shape (if a NumPy
     array is used.)
 """
+
 from __future__ import annotations
 
 import functools

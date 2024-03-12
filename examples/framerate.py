@@ -4,6 +4,7 @@
 # published from: United States.
 # https://creativecommons.org/publicdomain/zero/1.0/
 """A system to control time since the original libtcod tools are deprecated."""
+
 import statistics
 import time
 from collections import deque

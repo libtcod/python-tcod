@@ -1,4 +1,5 @@
 """Deprecated module alias for tcod.libtcodpy, use 'import tcod as libtcodpy' instead."""
+
 import warnings
 
 from tcod.libtcodpy import *  # noqa: F403

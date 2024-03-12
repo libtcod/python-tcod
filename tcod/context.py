@@ -22,6 +22,7 @@ to setup the size of the console.  You should use
 
 .. versionadded:: 11.12
 """
+
 from __future__ import annotations
 
 import copy

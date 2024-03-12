@@ -79,6 +79,7 @@ Example::
 
 .. versionadded:: 8.4
 """
+
 from __future__ import annotations
 
 import enum
@@ -444,12 +445,7 @@ class MouseState(Event):
         self._tile = Point(*xy)
 
     def __repr__(self) -> str:
-        return ("tcod.event.{}(position={!r}, tile={!r}, state={})").format(
-            self.__class__.__name__,
-            tuple(self.position),
-            tuple(self.tile),
-            MouseButtonMask(self.state),
-        )
+        return f"tcod.event.{self.__class__.__name__}(position={tuple(self.position)!r}, tile={tuple(self.tile)!r}, state={MouseButtonMask(self.state)})"
 
     def __str__(self) -> str:
         return ("<%s, position=(x=%i, y=%i), tile=(x=%i, y=%i), state=%s>") % (
@@ -554,14 +550,7 @@ class MouseMotion(MouseState):
         return self
 
     def __repr__(self) -> str:
-        return ("tcod.event.{}(position={!r}, motion={!r}, tile={!r}, tile_motion={!r}, state={!r})").format(
-            self.__class__.__name__,
-            tuple(self.position),
-            tuple(self.motion),
-            tuple(self.tile),
-            tuple(self.tile_motion),
-            MouseButtonMask(self.state),
-        )
+        return f"tcod.event.{self.__class__.__name__}(position={tuple(self.position)!r}, motion={tuple(self.motion)!r}, tile={tuple(self.tile)!r}, tile_motion={tuple(self.tile_motion)!r}, state={MouseButtonMask(self.state)!r})"
 
     def __str__(self) -> str:
         return ("<%s, motion=(x=%i, y=%i), tile_motion=(x=%i, y=%i)>") % (
@@ -621,12 +610,7 @@ class MouseButtonEvent(MouseState):
         return self
 
     def __repr__(self) -> str:
-        return "tcod.event.{}(position={!r}, tile={!r}, button={!r})".format(
-            self.__class__.__name__,
-            tuple(self.position),
-            tuple(self.tile),
-            MouseButton(self.button),
-        )
+        return f"tcod.event.{self.__class__.__name__}(position={tuple(self.position)!r}, tile={tuple(self.tile)!r}, button={MouseButton(self.button)!r})"
 
     def __str__(self) -> str:
         return "<type=%r, position=(x=%i, y=%i), tile=(x=%i, y=%i), button=%r)" % (
