@@ -6,6 +6,7 @@ Bring any issues or feature requests to GitHub: https://github.com/libtcod/pytho
 
 Read the documentation online: https://python-tcod.readthedocs.io/en/latest/
 """
+
 from __future__ import annotations
 
 import warnings

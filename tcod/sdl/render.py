@@ -2,6 +2,7 @@
 
 .. versionadded:: 13.4
 """
+
 from __future__ import annotations
 
 import enum

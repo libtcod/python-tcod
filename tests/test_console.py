@@ -1,4 +1,5 @@
 """Tests for tcod.console."""
+
 import pickle
 from pathlib import Path
 

@@ -1,4 +1,5 @@
 """Test SDL specific features."""
+
 import sys
 
 import numpy as np

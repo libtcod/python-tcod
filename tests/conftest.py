@@ -1,4 +1,5 @@
 """Test directory configuration."""
+
 import random
 import warnings
 from typing import Callable, Iterator, Union

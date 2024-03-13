@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Python-tcod setup script."""
+
 from __future__ import annotations
 
 import platform

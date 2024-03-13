@@ -4,6 +4,7 @@ Libtcod consoles are a strictly tile-based representation of colored glyphs/tile
 To render a console you need a tileset and a window to render to.
 See :ref:`getting-started` for info on how to set those up.
 """
+
 from __future__ import annotations
 
 import warnings

@@ -4,6 +4,7 @@
 # published from: United States.
 # https://creativecommons.org/publicdomain/zero/1.0/
 """An demonstration of event handling using the tcod.event module."""
+
 from typing import List, Set
 
 import tcod.context

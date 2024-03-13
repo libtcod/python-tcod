@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Automate tagged releases of this project."""
+
 from __future__ import annotations
 
 import argparse

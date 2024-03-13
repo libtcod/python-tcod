@@ -1,4 +1,5 @@
 """Test tcod.sdl.audio module."""
+
 import contextlib
 import sys
 import time

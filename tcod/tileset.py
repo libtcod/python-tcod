@@ -10,6 +10,7 @@ useful to use `an alternative library for graphics rendering
 <https://wiki.python.org/moin/PythonGameLibraries>`_ while continuing to use
 python-tcod's pathfinding and field-of-view algorithms.
 """
+
 from __future__ import annotations
 
 import itertools

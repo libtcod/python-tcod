@@ -41,6 +41,7 @@ Example::
 
 .. versionadded:: 13.5
 """
+
 from __future__ import annotations
 
 import enum

@@ -1,4 +1,5 @@
 """This module handles backward compatibility with the ctypes libtcodpy module."""
+
 from __future__ import annotations
 
 import atexit
@@ -325,13 +326,7 @@ class Dice(_CDataWrapper):
         )
 
     def __repr__(self) -> str:
-        return "{}(nb_dices={!r},nb_faces={!r},multiplier={!r},addsub={!r})".format(
-            self.__class__.__name__,
-            self.nb_dices,
-            self.nb_faces,
-            self.multiplier,
-            self.addsub,
-        )
+        return f"{self.__class__.__name__}(nb_dices={self.nb_dices!r},nb_faces={self.nb_faces!r},multiplier={self.multiplier!r},addsub={self.addsub!r})"
 
 
 # reverse lookup table for KEY_X attributes, used by Key.__repr__

@@ -5,6 +5,7 @@ You will need to get this external library from PyPI:
 
     pip install freetype-py
 """
+
 # To the extent possible under law, the libtcod maintainers have waived all
 # copyright and related or neighboring rights to this example script.
 # https://creativecommons.org/publicdomain/zero/1.0/

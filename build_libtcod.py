@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Parse and compile libtcod and SDL sources for CFFI."""
+
 from __future__ import annotations
 
 import contextlib

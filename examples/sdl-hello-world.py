@@ -1,4 +1,5 @@
 """Hello world using tcod's SDL API and using Pillow for the TTF rendering."""
+
 from pathlib import Path
 
 import numpy as np

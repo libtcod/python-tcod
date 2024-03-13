@@ -1,4 +1,5 @@
 """Old libtcod color management."""
+
 from __future__ import annotations
 
 import warnings

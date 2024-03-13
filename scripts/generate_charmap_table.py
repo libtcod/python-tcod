@@ -3,6 +3,7 @@
 
 Uses the tabulate module from PyPI.
 """
+
 from __future__ import annotations
 
 import argparse

@@ -1,4 +1,5 @@
 """Test old libtcodpy parser."""
+
 from pathlib import Path
 from typing import Any
 

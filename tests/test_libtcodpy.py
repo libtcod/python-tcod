@@ -1,4 +1,5 @@
 """Tests for the libtcodpy API."""
+
 from pathlib import Path
 from typing import Any, Callable, Iterator, List, Optional, Tuple, Union
 
