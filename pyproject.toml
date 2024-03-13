@@ -146,7 +146,10 @@ module = "tcod._libtcod"
 ignore_missing_imports = true
 
 [tool.ruff]
-# https://beta.ruff.rs/docs/rules/
+extend-exclude = ["libtcod"] # Ignore submodule
+line-length = 120
+
+[tool.ruff.lint] # https://docs.astral.sh/ruff/rules/
 select = [
     "C90", # mccabe
     "E",   # pycodestyle
@@ -190,9 +193,6 @@ ignore = [
     "D206",   # indent-with-spaces
     "W191",   # tab-indentation
 ]
-extend-exclude = ["libtcod"] # Ignore submodule
-line-length = 120
 
-[tool.ruff.pydocstyle]
-# Use Google-style docstrings.
+[tool.ruff.lint.pydocstyle] # https://docs.astral.sh/ruff/settings/#lintpydocstyle
 convention = "google"
