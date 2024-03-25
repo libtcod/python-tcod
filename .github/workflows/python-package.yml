@@ -273,7 +273,7 @@ jobs:
         # Downloads SDL2 for the later step.
         run: python3 build_sdl.py
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.12.3
+        uses: pypa/cibuildwheel@v2.17.0
         env:
           CIBW_BUILD: ${{ matrix.python }}
           CIBW_ARCHS_MACOS: x86_64 arm64 universal2
@@ -281,6 +281,7 @@ jobs:
           CIBW_BEFORE_TEST: pip install numpy
           CIBW_TEST_COMMAND: python -c "import tcod.context"
           CIBW_TEST_SKIP: "pp* *-macosx_arm64 *-macosx_universal2:arm64"
+          MACOSX_DEPLOYMENT_TARGET: "10.11"
       - name: Archive wheel
         uses: actions/upload-artifact@v3
         with:
