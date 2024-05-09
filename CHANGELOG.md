@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed access violation when events are polled before SDL is initialized.
+
 ## [16.2.2] - 2024-01-16
 
 ### Fixed

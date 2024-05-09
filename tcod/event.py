@@ -92,6 +92,7 @@ from typing_extensions import Literal
 
 import tcod.event_constants
 import tcod.sdl.joystick
+import tcod.sdl.sys
 from tcod.cffi import ffi, lib
 from tcod.event_constants import *  # noqa: F403
 from tcod.event_constants import KMOD_ALT, KMOD_CTRL, KMOD_GUI, KMOD_SHIFT
@@ -1196,6 +1197,13 @@ def get() -> Iterator[Any]:
     It is also safe to call this function inside of a loop that is already handling events
     (the event iterator is reentrant.)
     """
+    if not lib.SDL_WasInit(tcod.sdl.sys.Subsystem.EVENTS):
+        warnings.warn(
+            "Events polled before SDL was initialized.",
+            RuntimeWarning,
+            stacklevel=1,
+        )
+        return
     sdl_event = ffi.new("SDL_Event*")
     while lib.SDL_PollEvent(sdl_event):
         if sdl_event.type in _SDL_TO_CLASS_TABLE:
