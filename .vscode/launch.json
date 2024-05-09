@@ -6,24 +6,24 @@
     "configurations": [
         {
             "name": "Python: Current File",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${file}",
-            "console": "internalConsole",
+            "console": "integratedTerminal",
         },
         {
             // Run the Python samples.
             // tcod will be built and installed in editalbe mode.
             "name": "Python: Python samples",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/examples/samples_tcod.py",
             "cwd": "${workspaceFolder}/examples",
-            "console": "internalConsole",
+            "console": "integratedTerminal",
         },
         {
             "name": "Python: Run tests",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "module": "pytest",
             "preLaunchTask": "develop python-tcod",
@@ -31,7 +31,7 @@
         {
             "name": "Documentation: Launch Chrome",
             "request": "launch",
-            "type": "pwa-chrome",
+            "type": "chrome",
             "url": "file://${workspaceFolder}/docs/_build/html/index.html",
             "webRoot": "${workspaceFolder}",
             "preLaunchTask": "build documentation",
@@ -39,7 +39,7 @@
         {
             "name": "Documentation: Launch Edge",
             "request": "launch",
-            "type": "pwa-msedge",
+            "type": "msedge",
             "url": "file://${workspaceFolder}/docs/_build/html/index.html",
             "webRoot": "${workspaceFolder}",
             "preLaunchTask": "build documentation",

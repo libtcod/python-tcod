@@ -8,16 +8,10 @@
         "source.fixAll": "always",
         "source.organizeImports": "never"
     },
+    "cmake.configureOnOpen": false,
     "files.trimFinalNewlines": true,
     "files.insertFinalNewline": true,
     "files.trimTrailingWhitespace": true,
-    "python.linting.enabled": true,
-    "python.linting.flake8Enabled": false,
-    "python.linting.mypyEnabled": true,
-    "python.linting.mypyArgs": [
-        "--follow-imports=silent",
-        "--show-column-numbers"
-    ],
     "files.associations": {
         "*.spec": "python",
     },
