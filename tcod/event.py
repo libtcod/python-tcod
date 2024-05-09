@@ -174,16 +174,11 @@ def _verify_tile_coordinates(xy: Point | None) -> Point:
     return Point(0, 0)
 
 
-_is_sdl_video_initialized = False
-
-
 def _init_sdl_video() -> None:
     """Keyboard layout stuff needs SDL to be initialized first."""
-    global _is_sdl_video_initialized
-    if _is_sdl_video_initialized:
+    if lib.SDL_WasInit(lib.SDL_INIT_VIDEO):
         return
     lib.SDL_InitSubSystem(lib.SDL_INIT_VIDEO)
-    _is_sdl_video_initialized = True
 
 
 class Modifier(enum.IntFlag):
@@ -744,7 +739,7 @@ class WindowEvent(Event):
     def __repr__(self) -> str:
         return f"tcod.event.{self.__class__.__name__}(type={self.type!r})"
 
-    __WINDOW_TYPES = {
+    __WINDOW_TYPES: Final = {
         lib.SDL_WINDOWEVENT_SHOWN: "WindowShown",
         lib.SDL_WINDOWEVENT_HIDDEN: "WindowHidden",
         lib.SDL_WINDOWEVENT_EXPOSED: "WindowExposed",
@@ -1592,7 +1587,9 @@ def add_watch(callback: _EventCallback) -> _EventCallback:
     .. versionadded:: 13.4
     """
     if callback in _event_watch_handles:
-        warnings.warn(f"{callback} is already an active event watcher, nothing was added.", RuntimeWarning)
+        warnings.warn(
+            f"{callback} is already an active event watcher, nothing was added.", RuntimeWarning, stacklevel=2
+        )
         return callback
     handle = _event_watch_handles[callback] = ffi.new_handle(callback)
     lib.SDL_AddEventWatch(lib._sdl_event_watcher, handle)
@@ -1609,7 +1606,7 @@ def remove_watch(callback: Callable[[Event], None]) -> None:
     .. versionadded:: 13.4
     """
     if callback not in _event_watch_handles:
-        warnings.warn(f"{callback} is not an active event watcher, nothing was removed.", RuntimeWarning)
+        warnings.warn(f"{callback} is not an active event watcher, nothing was removed.", RuntimeWarning, stacklevel=2)
         return
     handle = _event_watch_handles[callback]
     lib.SDL_DelEventWatch(lib._sdl_event_watcher, handle)
@@ -2813,7 +2810,7 @@ def __getattr__(name: str) -> int:
     return value
 
 
-__all__ = [
+__all__ = [  # noqa: F405
     "Modifier",
     "Point",
     "BUTTON_LEFT",

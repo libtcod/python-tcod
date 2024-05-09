@@ -4285,7 +4285,7 @@ def __getattr__(name: str) -> Color:
     raise AttributeError(msg) from None
 
 
-__all__ = [
+__all__ = [  # noqa: F405
     "Color",
     "Bsp",
     "NB_FOV_ALGORITHMS",
