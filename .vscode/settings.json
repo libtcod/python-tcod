@@ -163,6 +163,7 @@
         "GAMECONTROLLER",
         "gamepad",
         "genindex",
+        "getbbox",
         "GFORCE",
         "GLES",
         "globaltoc",

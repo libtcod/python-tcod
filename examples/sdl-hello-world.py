@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont  # type: ignore  # pip install Pillow
+from PIL import Image, ImageDraw, ImageFont  # pip install Pillow
 
 import tcod.event
 import tcod.sdl.render
@@ -15,8 +15,9 @@ font = ImageFont.truetype(bytes(CURRENT_DIR / "DejaVuSerif.ttf"), size=18)  # Pr
 
 def render_text(renderer: tcod.sdl.render.Renderer, text: str) -> tcod.sdl.render.Texture:
     """Render text, upload it to VRAM, then return it as an SDL Texture."""
-    # Use Pillow normally to render the font.  This code is standard.
-    width, height = font.getsize(text)
+    # Use Pillow to render the font.
+    _left, _top, right, bottom = font.getbbox(text)
+    width, height = right, bottom
     image = Image.new("RGBA", (width, height))
     draw = ImageDraw.Draw(image)
     draw.text((0, 0), text, font=font)
