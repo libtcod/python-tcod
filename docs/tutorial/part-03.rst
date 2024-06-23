@@ -29,6 +29,7 @@ These methods refer to types from ``tcod`` and those types will need to be impor
 .. code-block:: python
 
     """Base classes for states."""
+
     from __future__ import annotations
 
     from typing import Protocol
@@ -80,6 +81,7 @@ Any states ``on_event`` method could potentially change the state so ``g.states`
 .. code-block:: python
 
     """State handling functions."""
+
     from __future__ import annotations
 
     import tcod.console

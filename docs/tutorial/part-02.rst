@@ -48,6 +48,7 @@ It is important to document all variables placed in this module with docstrings.
 .. code-block:: python
 
     """This module stores globally mutable variables used by this program."""
+
     from __future__ import annotations
 
     import tcod.context
@@ -80,6 +81,7 @@ The ``game/tags.py`` module should look like this:
 .. code-block:: python
 
     """Collection of common tags."""
+
     from __future__ import annotations
 
     from typing import Final
@@ -184,6 +186,7 @@ The ``game/components.py`` module should look like this:
 .. code-block:: python
 
     """Collection of common components."""
+
     from __future__ import annotations
 
     from typing import Final, Self
@@ -275,6 +278,7 @@ Make sure :python:`return` has the correct indentation and is not part of the fo
 .. code-block:: python
 
     """Functions for working with worlds."""
+
     from __future__ import annotations
 
     from random import Random
@@ -465,6 +469,7 @@ It should be at the same level as the ``for`` loop and not inside of it.
 .. code-block:: python
 
     """A collection of game states."""
+
     from __future__ import annotations
 
     from typing import Final
@@ -561,6 +566,7 @@ Add :python:`g.world = game.world_tools.new_world()` before the main loop.
 
     #!/usr/bin/env python3
     """Main entry-point module. This script is used to start the program."""
+
     from __future__ import annotations
 
     import tcod.console
