@@ -61,7 +61,7 @@ class Map:
                [ True,  True,  True],
                [False,  True,  True],
                [False, False,  True]]...)
-        >>> m.fov[3,1]
+        >>> m.fov.item(3, 1)
         False
 
     .. deprecated:: 11.13

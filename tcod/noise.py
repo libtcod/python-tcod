@@ -236,7 +236,7 @@ class Noise:
             raise IndexError(
                 "This noise generator has %i dimensions, but was indexed with %i." % (self.dimensions, len(indexes))
             )
-        indexes = np.broadcast_arrays(*indexes)
+        indexes = list(np.broadcast_arrays(*indexes))
         c_input = [ffi.NULL, ffi.NULL, ffi.NULL, ffi.NULL]
         for i, index in enumerate(indexes):
             if index.dtype.type == np.object_:

@@ -313,8 +313,8 @@ class Console:
             ...     (*WHITE, 255),
             ...     (*BLACK, 255),
             ... )
-            >>> con.rgba[0, 0]
-            (88, [255, 255, 255, 255], [  0,   0,   0, 255])
+            >>> print(f"{con.rgba[0, 0]=}")
+            con.rgba[0, 0]=...(88, [255, 255, 255, 255], [  0,   0,   0, 255])...
 
         .. versionadded:: 12.3
         """
@@ -334,11 +334,11 @@ class Console:
             >>> con = tcod.console.Console(10, 2)
             >>> BLUE, YELLOW, BLACK = (0, 0, 255), (255, 255, 0), (0, 0, 0)
             >>> con.rgb[0, 0] = ord("@"), YELLOW, BLACK
-            >>> con.rgb[0, 0]
-            (64, [255, 255,   0], [0, 0, 0])
+            >>> print(f"{con.rgb[0, 0]=}")
+            con.rgb[0, 0]=...(64, [255, 255,   0], [0, 0, 0])...
             >>> con.rgb["bg"] = BLUE
-            >>> con.rgb[0, 0]
-            (64, [255, 255,   0], [  0,   0, 255])
+            >>> print(f"{con.rgb[0, 0]=}")
+            con.rgb[0, 0]=...(64, [255, 255,   0], [  0,   0, 255])...
 
         .. versionadded:: 12.3
         """

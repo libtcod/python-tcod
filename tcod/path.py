@@ -1141,7 +1141,7 @@ class Pathfinder:
             >>> i, j = (3, 3)  # Starting index.
             >>> path = [(i, j)]  # List of nodes from the start to the root.
             >>> while not (pf.traversal[i, j] == (i, j)).all():
-            ...     i, j = pf.traversal[i, j]
+            ...     i, j = pf.traversal[i, j].tolist()
             ...     path.append((i, j))
             >>> path  # Slower.
             [(3, 3), (2, 2), (1, 1), (0, 0)]
