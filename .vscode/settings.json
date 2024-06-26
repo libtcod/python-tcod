@@ -186,6 +186,7 @@
         "imageio",
         "INCOL",
         "INROW",
+        "interactable",
         "intersphinx",
         "isinstance",
         "isort",

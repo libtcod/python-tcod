@@ -140,7 +140,7 @@ The next step is to change state based on user input.
 Like ``tcod`` you'll need to install ``attrs`` with Pip, such as with :shell:`pip install attrs`.
 
 Start by adding an ``attrs`` class called ``ExampleState``.
-This a normal class with the :python:`@attrs.define(eq=False)` decorator added.
+This a normal class with the :python:`@attrs.define()` decorator added.
 
 This class should hold coordinates for the player.
 It should also have a ``on_draw`` method which takes :any:`tcod.console.Console` as a parameter and marks the player position on it.
@@ -162,7 +162,7 @@ Call this method using the players current coordinates and the :python:`"@"` cha
     import tcod.tileset
 
 
-    @attrs.define(eq=False)
+    @attrs.define()
     class ExampleState:
         """Example state with a hard-coded player position."""
 
@@ -242,7 +242,7 @@ The full script so far is:
     import tcod.tileset
 
 
-    @attrs.define(eq=False)
+    @attrs.define()
     class ExampleState:
         """Example state with a hard-coded player position."""
 

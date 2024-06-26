@@ -358,12 +358,12 @@ Then add the following:
         KeySym.n: (1, 1),
     }
 
-Create a new :python:`class InGame:` decorated with :python:`@attrs.define(eq=False)`.
+Create a new :python:`class InGame:` decorated with :python:`@attrs.define()`.
 States will always use ``g.world`` to access the ECS registry.
 
 .. code-block:: python
 
-    @attrs.define(eq=False)
+    @attrs.define()
     class InGame:
         """Primary in-game state."""
         ...
@@ -515,7 +515,7 @@ It should be at the same level as the ``for`` loop and not inside of it.
     }
 
 
-    @attrs.define(eq=False)
+    @attrs.define()
     class InGame:
         """Primary in-game state."""
 
