@@ -316,16 +316,20 @@ New InGame state
 Now there is a new ECS world but the example state does not know how to render it.
 A new state needs to be made which is aware of the new entities.
 
-Create a new script called ``game/states.py``.
-``states`` is for derived classes, ``state`` is for the abstract class.
-New states will be created in this module and this module will be allowed to import many first party modules without issues.
-
 Before adding a new state it is time to add a more complete set of directional keys.
-These will be added as a dictionary and can be reused anytime we want to know how a key translates to a direction.
+Create a new module called ``game/constants.py``.
+Keys will be mapped to direction using a dictionary which can be reused anytime we want to know how a key translates to a direction.
 Use :python:`from tcod.event import KeySym` to make ``KeySym`` enums easier to write.
-Then add the following:
+
+``game/constants.py`` should look like this:
 
 .. code-block:: python
+
+    """Global constants are stored here."""
+
+    from typing import Final
+
+    from tcod.event import KeySym
 
     DIRECTION_KEYS: Final = {
         # Arrow keys
@@ -357,6 +361,10 @@ Then add the following:
         KeySym.u: (1, -1),
         KeySym.n: (1, 1),
     }
+
+Create a new module called ``game/states.py``.
+``states`` is for derived classes, ``state`` is for the abstract class.
+New states will be created in this module and this module will be allowed to import many first party modules without issues.
 
 Create a new :python:`class InGame:` decorated with :python:`@attrs.define()`.
 States will always use ``g.world`` to access the ECS registry.
@@ -472,47 +480,14 @@ It should be at the same level as the ``for`` loop and not inside of it.
 
     from __future__ import annotations
 
-    from typing import Final
-
     import attrs
     import tcod.console
     import tcod.event
-    from tcod.event import KeySym
 
     import g
     from game.components import Gold, Graphic, Position
+    from game.constants import DIRECTION_KEYS
     from game.tags import IsItem, IsPlayer
-
-    DIRECTION_KEYS: Final = {
-        # Arrow keys
-        KeySym.LEFT: (-1, 0),
-        KeySym.RIGHT: (1, 0),
-        KeySym.UP: (0, -1),
-        KeySym.DOWN: (0, 1),
-        # Arrow key diagonals
-        KeySym.HOME: (-1, -1),
-        KeySym.END: (-1, 1),
-        KeySym.PAGEUP: (1, -1),
-        KeySym.PAGEDOWN: (1, 1),
-        # Keypad
-        KeySym.KP_4: (-1, 0),
-        KeySym.KP_6: (1, 0),
-        KeySym.KP_8: (0, -1),
-        KeySym.KP_2: (0, 1),
-        KeySym.KP_7: (-1, -1),
-        KeySym.KP_1: (-1, 1),
-        KeySym.KP_9: (1, -1),
-        KeySym.KP_3: (1, 1),
-        # VI keys
-        KeySym.h: (-1, 0),
-        KeySym.l: (1, 0),
-        KeySym.k: (0, -1),
-        KeySym.j: (0, 1),
-        KeySym.y: (-1, -1),
-        KeySym.b: (-1, 1),
-        KeySym.u: (1, -1),
-        KeySym.n: (1, 1),
-    }
 
 
     @attrs.define()
