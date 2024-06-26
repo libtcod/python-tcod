@@ -19,7 +19,7 @@ jobs:
   ruff:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Ruff
         run: pip install ruff
       - name: Ruff Check
@@ -30,13 +30,13 @@ jobs:
   mypy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
       - name: Install typing dependencies
         run: pip install mypy pytest -r requirements.txt
       - name: Mypy
-        uses: liskin/gh-problem-matcher-wrap@v2
+        uses: liskin/gh-problem-matcher-wrap@v3
         with:
           linters: mypy
           run: mypy --show-column-numbers
@@ -48,7 +48,7 @@ jobs:
         run: sudo apt-get update
       - name: Install APT dependencies
         run: sudo apt-get install libsdl2-dev
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
@@ -57,11 +57,12 @@ jobs:
         run: pip install build
       - name: Build source distribution
         run: python -m build --sdist
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: sdist
           path: dist/tcod-*.tar.gz
           retention-days: 7
+          compression-level: 0
 
   # This makes sure that the latest versions of the SDL headers parse correctly.
   parse_sdl:
@@ -73,12 +74,12 @@ jobs:
         sdl-version: ["2.0.14", "2.0.16"]
       fail-fast: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
       - name: Install build dependencies
@@ -94,7 +95,7 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-latest", "windows-latest"]
-        python-version: ["3.8", "3.9", "pypy-3.8"]
+        python-version: ["3.8", "pypy-3.8"]
         architecture: ["x64"]
         include:
           - os: "windows-latest"
@@ -106,14 +107,14 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: |
           git submodule update --init --recursive --depth 1
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.architecture }}
@@ -144,13 +145,16 @@ jobs:
       - name: Xvfb logs
         if: runner.os != 'Windows'
         run: cat /tmp/xvfb.log
-      - uses: codecov/codecov-action@v3
-      - uses: actions/upload-artifact@v3
+      - uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - uses: actions/upload-artifact@v4
         if: runner.os == 'Windows'
         with:
-          name: wheels-windows
+          name: wheels-windows-${{ matrix.architecture }}-${{ matrix.python-version }}
           path: dist/*.whl
           retention-days: 7
+          compression-level: 0
 
   test-docs:
     needs: [ruff, mypy]
@@ -160,7 +164,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install libsdl2-dev
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
@@ -184,13 +188,13 @@ jobs:
       matrix:
         os: ["ubuntu-latest", "windows-latest"]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --depth 1
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.x"
       - name: Install Python dependencies
@@ -212,18 +216,20 @@ jobs:
       matrix:
         arch: ["x86_64", "aarch64"]
         build: ["cp38-manylinux*", "pp38-manylinux*"]
+    env:
+      BUILD_DESC:
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ env.git-depth }}
       - name: Set up QEMU
         if: ${{ matrix.arch == 'aarch64' }}
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Checkout submodules
         run: |
           git submodule update --init --recursive --depth 1
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.x"
       - name: Install Python dependencies
@@ -247,33 +253,44 @@ jobs:
           CIBW_TEST_COMMAND: python -c "import tcod.context"
           # Skip test on emulated architectures
           CIBW_TEST_SKIP: "*_aarch64"
+      - name: Remove asterisk from label
+        run: |
+          BUILD_DESC=${{ matrix.build }}
+          BUILD_DESC=${BUILD_DESC//\*}
+          echo BUILD_DESC=${BUILD_DESC} >> $GITHUB_ENV
       - name: Archive wheel
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels-linux
+          name: wheels-linux-${{ matrix.arch }}-${{ env.BUILD_DESC }}
           path: wheelhouse/*.whl
           retention-days: 7
+          compression-level: 0
 
   build-macos:
     needs: [ruff, mypy]
-    runs-on: "macos-11"
+    runs-on: "macos-14"
     strategy:
       fail-fast: true
       matrix:
-        python: ["cp38-*_universal2", "cp38-*_x86_64", "cp38-*_arm64", "pp38-*"]
+        python: ["cp38-*_universal2", "cp38-*_x86_64", "pp38-*"]
+    env:
+      PYTHON_DESC:
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
       - name: Install Python dependencies
-        run: pip3 install -r requirements.txt
+        run: pip install -r requirements.txt
       - name: Prepare package
         # Downloads SDL2 for the later step.
-        run: python3 build_sdl.py
+        run: python build_sdl.py
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.17.0
+        uses: pypa/cibuildwheel@v2.19.1
         env:
           CIBW_BUILD: ${{ matrix.python }}
           CIBW_ARCHS_MACOS: x86_64 arm64 universal2
@@ -282,12 +299,18 @@ jobs:
           CIBW_TEST_COMMAND: python -c "import tcod.context"
           CIBW_TEST_SKIP: "pp* *-macosx_arm64 *-macosx_universal2:arm64"
           MACOSX_DEPLOYMENT_TARGET: "10.11"
+      - name: Remove asterisk from label
+        run: |
+          PYTHON_DESC=${{ matrix.python }}
+          PYTHON_DESC=${PYTHON_DESC//\*/X}
+          echo PYTHON_DESC=${PYTHON_DESC} >> $GITHUB_ENV
       - name: Archive wheel
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels-macos
+          name: wheels-macos-${{ env.PYTHON_DESC }}
           path: wheelhouse/*.whl
           retention-days: 7
+          compression-level: 0
 
   publish:
     needs: [sdist, build, build-macos, linux-wheels]
@@ -295,26 +318,19 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     environment:
       name: release
-      url: https://pypi.org/p/tcod
+      url: https://pypi.org/project/tcod/
     permissions:
       id-token: write
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: sdist
           path: dist/
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: wheels-windows
+          pattern: wheels-*
           path: dist/
-      - uses: actions/download-artifact@v3
-        with:
-          name: wheels-macos
-          path: dist/
-      - uses: actions/download-artifact@v3
-        with:
-          name: wheels-linux
-          path: dist/
+          merge-multiple: true
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           skip-existing: true
