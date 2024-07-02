@@ -72,7 +72,7 @@ author = "Kyle Benesch"
 #
 # The full version, including alpha/beta/rc tags.
 git_describe = subprocess.run(
-    ["git", "describe", "--abbrev=0"],  # noqa: S603, S607
+    ["git", "describe", "--abbrev=0"],  # noqa: S607
     stdout=subprocess.PIPE,
     text=True,
     check=True,
