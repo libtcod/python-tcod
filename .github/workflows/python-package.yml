@@ -272,7 +272,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python: ["cp38-*_universal2", "cp38-*_x86_64", "pp38-*"]
+        python: ["cp38-*_universal2", "pp38-*"]
     env:
       PYTHON_DESC:
     steps:
