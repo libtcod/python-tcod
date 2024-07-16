@@ -94,7 +94,7 @@ Use the code :python:`for event in tcod.event.wait():` to begin handing events.
 
 In the event loop start with the line :python:`print(event)` so that all events can be viewed from the program output.
 Then test if an event is for closing the window with :python:`if isinstance(event, tcod.event.Quit):`.
-If this is True then you should exit the function with :python:`raise SystemExit()`. [#why_raise]_
+If this is True then you should exit the function with :python:`raise SystemExit`. [#why_raise]_
 
 .. code-block:: python
     :emphasize-lines: 3,5,15-23
@@ -121,7 +121,7 @@ If this is True then you should exit the function with :python:`raise SystemExit
                 for event in tcod.event.wait():  # Event loop, blocks until pending events exist
                     print(event)
                     if isinstance(event, tcod.event.Quit):
-                        raise SystemExit()
+                        raise SystemExit
 
 
     if __name__ == "__main__":
@@ -205,7 +205,7 @@ Modify the drawing routine so that the console is cleared, then passed to :pytho
                 for event in tcod.event.wait():
                     print(event)
                     if isinstance(event, tcod.event.Quit):
-                        raise SystemExit()
+                        raise SystemExit
 
 
     if __name__ == "__main__":
@@ -259,7 +259,7 @@ The full script so far is:
             """Move the player on events and handle exiting. Movement is hard-coded."""
             match event:
                 case tcod.event.Quit():
-                    raise SystemExit()
+                    raise SystemExit
                 case tcod.event.KeyDown(sym=tcod.event.KeySym.LEFT):
                     self.player_x -= 1
                 case tcod.event.KeyDown(sym=tcod.event.KeySym.RIGHT):
@@ -308,5 +308,5 @@ You can review the part-1 source code `here <https://github.com/HexDecimal/pytho
 .. [#init_context] This tutorial follows the setup for a fixed-size console.
                    The alternatives shown in :ref:`getting-started` are outside the scope of this tutorial.
 
-.. [#why_raise] You could use :python:`return` here to exit the ``main`` function and end the program, but :python:`raise SystemExit()` is used because it will close the program from anywhere.
-                :python:`raise SystemExit()` is also more useful to teach than :any:`sys.exit`.
+.. [#why_raise] You could use :python:`return` here to exit the ``main`` function and end the program, but :python:`raise SystemExit` is used because it will close the program from anywhere.
+                :python:`raise SystemExit` is also more useful to teach than :any:`sys.exit`.

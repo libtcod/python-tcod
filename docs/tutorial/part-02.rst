@@ -327,6 +327,8 @@ Use :python:`from tcod.event import KeySym` to make ``KeySym`` enums easier to w
 
     """Global constants are stored here."""
 
+    from __future__ import annotations
+
     from typing import Final
 
     from tcod.event import KeySym
@@ -386,7 +388,7 @@ The query to fetch player entities is :python:`g.world.Q.all_of(tags=[IsPlayer])
 We expect only one player so the result will be unpacked into a single name: :python:`(player,) = g.world.Q.all_of(tags=[IsPlayer])`.
 
 Next is to handle the event.
-Handling :python:`case tcod.event.Quit():` is the same as before: :python:`raise SystemExit()`.
+Handling :python:`case tcod.event.Quit():` is the same as before: :python:`raise SystemExit`.
 
 The case for direction keys will now be done in a single case: :python:`case tcod.event.KeyDown(sym=sym) if sym in DIRECTION_KEYS:`.
 ``sym=sym`` assigns from the event attribute to a local name.
@@ -419,7 +421,7 @@ Then use :python:`gold.clear()` at the end to remove all components and tags fro
             (player,) = g.world.Q.all_of(tags=[IsPlayer])
             match event:
                 case tcod.event.Quit():
-                    raise SystemExit()
+                    raise SystemExit
                 case tcod.event.KeyDown(sym=sym) if sym in DIRECTION_KEYS:
                     player.components[Position] += DIRECTION_KEYS[sym]
                     # Auto pickup gold
@@ -499,7 +501,7 @@ It should be at the same level as the ``for`` loop and not inside of it.
             (player,) = g.world.Q.all_of(tags=[IsPlayer])
             match event:
                 case tcod.event.Quit():
-                    raise SystemExit()
+                    raise SystemExit
                 case tcod.event.KeyDown(sym=sym) if sym in DIRECTION_KEYS:
                     player.components[Position] += DIRECTION_KEYS[sym]
                     # Auto pickup gold
