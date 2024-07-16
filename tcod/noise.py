@@ -133,6 +133,7 @@ class Noise:
         octaves: float = 4,
         seed: int | tcod.random.Random | None = None,
     ) -> None:
+        """Initialize and seed the noise object."""
         if not 0 < dimensions <= 4:  # noqa: PLR2004
             msg = f"dimensions must be in range 0 < n <= 4, got {dimensions}"
             raise ValueError(msg)

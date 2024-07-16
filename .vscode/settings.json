@@ -15,6 +15,7 @@
     "files.associations": {
         "*.spec": "python",
     },
+    "mypy-type-checker.importStrategy": "fromEnvironment",
     "cSpell.words": [
         "aarch",
         "ADDA",

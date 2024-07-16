@@ -671,9 +671,7 @@ def map_() -> Iterator[tcod.map.Map]:
 @pytest.fixture()
 def path_callback(map_: tcod.map.Map) -> Callable[[int, int, int, int, None], bool]:
     def callback(ox: int, oy: int, dx: int, dy: int, user_data: None) -> bool:
-        if map_.walkable[dy, dx]:
-            return True
-        return False
+        return bool(map_.walkable[dy, dx])
 
     return callback
 

@@ -42,6 +42,7 @@ class SDLTilesetAtlas:
     """Prepares a tileset for rendering using SDL."""
 
     def __init__(self, renderer: tcod.sdl.render.Renderer, tileset: tcod.tileset.Tileset) -> None:
+        """Initialize the tileset atlas."""
         self._renderer = renderer
         self.tileset: Final[tcod.tileset.Tileset] = tileset
         """The tileset used to create this SDLTilesetAtlas."""
@@ -64,6 +65,7 @@ class SDLConsoleRender:
     """Holds an internal cache console and texture which are used to optimized console rendering."""
 
     def __init__(self, atlas: SDLTilesetAtlas) -> None:
+        """Initialize the console renderer."""
         self.atlas: Final[SDLTilesetAtlas] = atlas
         """The SDLTilesetAtlas used to create this SDLConsoleRender.
 

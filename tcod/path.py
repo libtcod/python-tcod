@@ -591,7 +591,7 @@ def _world_array(shape: tuple[int, ...], dtype: DTypeLike = np.int32) -> NDArray
     )
 
 
-def _as_hashable(obj: np.ndarray[Any, Any] | None) -> Any | None:
+def _as_hashable(obj: np.ndarray[Any, Any] | None) -> object | None:
     """Return NumPy arrays as a more hashable form."""
     if obj is None:
         return obj
@@ -661,6 +661,7 @@ class CustomGraph:
     """
 
     def __init__(self, shape: tuple[int, ...], *, order: str = "C") -> None:
+        """Initialize the custom graph."""
         self._shape = self._shape_c = tuple(shape)
         self._ndim = len(self._shape)
         self._order = order
@@ -894,8 +895,7 @@ class CustomGraph:
         edge_array = np.transpose(edge_nz)
         edge_array -= edge_center
         for edge, edge_cost in zip(edge_array, edge_costs):
-            edge = tuple(edge)
-            self.add_edge(edge, edge_cost, cost=cost, condition=condition)
+            self.add_edge(tuple(edge), edge_cost, cost=cost, condition=condition)
 
     def set_heuristic(self, *, cardinal: int = 0, diagonal: int = 0, z: int = 0, w: int = 0) -> None:
         """Set a pathfinder heuristic so that pathfinding can done with A*.
@@ -1028,6 +1028,7 @@ class SimpleGraph:
     """
 
     def __init__(self, *, cost: ArrayLike, cardinal: int, diagonal: int, greed: int = 1) -> None:
+        """Initialize the graph."""
         cost = np.asarray(cost)
         if cost.ndim != 2:  # noqa: PLR2004
             msg = f"The cost array must e 2 dimensional, array of shape {cost.shape!r} given."
@@ -1087,6 +1088,7 @@ class Pathfinder:
     """
 
     def __init__(self, graph: CustomGraph | SimpleGraph) -> None:
+        """Initialize the pathfinder from a graph."""
         self._graph = graph
         self._order = graph._order
         self._frontier_p = ffi.gc(lib.TCOD_frontier_new(self._graph._ndim), lib.TCOD_frontier_delete)
@@ -1273,7 +1275,7 @@ class Pathfinder:
             if self._order == "F":
                 # Goal is now ij indexed for the rest of this function.
                 goal = goal[::-1]
-            if self._distance[goal] != np.iinfo(self._distance.dtype).max:
+            if self._distance[goal] != np.iinfo(self._distance.dtype).max:  # noqa: SIM102
                 if not lib.frontier_has_index(self._frontier_p, goal):
                     return
         self._update_heuristic(goal)

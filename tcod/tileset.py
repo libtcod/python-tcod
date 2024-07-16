@@ -22,7 +22,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 import tcod.console
-from tcod._internal import _check, _console, _path_encode, _raise_tcod_error, deprecate
+from tcod._internal import _check, _check_p, _console, _path_encode, _raise_tcod_error, deprecate
 from tcod.cffi import ffi, lib
 
 
@@ -33,9 +33,12 @@ class Tileset:
     """
 
     def __init__(self, tile_width: int, tile_height: int) -> None:
-        self._tileset_p = ffi.gc(
-            lib.TCOD_tileset_new(tile_width, tile_height),
-            lib.TCOD_tileset_delete,
+        """Initialize the tileset."""
+        self._tileset_p = _check_p(
+            ffi.gc(
+                lib.TCOD_tileset_new(tile_width, tile_height),
+                lib.TCOD_tileset_delete,
+            )
         )
 
     @classmethod

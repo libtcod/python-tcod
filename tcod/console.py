@@ -120,6 +120,7 @@ class Console:
         order: Literal["C", "F"] = "C",
         buffer: NDArray[Any] | None = None,
     ) -> None:
+        """Initialize the console."""
         self._key_color: tuple[int, int, int] | None = None
         self._order = tcod._internal.verify_order(order)
         if buffer is not None:
@@ -930,7 +931,7 @@ class Console:
 
     def __str__(self) -> str:
         """Return a simplified representation of this consoles contents."""
-        return "<%s>" % "\n ".join("".join(chr(c) for c in line) for line in self._tiles["ch"])
+        return "<{}>".format("\n ".join("".join(chr(c) for c in line) for line in self._tiles["ch"]))
 
     def print(  # noqa: PLR0913
         self,

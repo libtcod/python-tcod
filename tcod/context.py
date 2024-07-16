@@ -344,7 +344,8 @@ class Context:
                         scale = max(1, scale + event.y)
         """
         if magnification < 0:
-            raise ValueError("Magnification must be greater than zero. (Got %f)" % magnification)
+            msg = f"Magnification must be greater than zero. (Got {magnification:f})"
+            raise ValueError(msg)
         size = ffi.new("int[2]")
         _check(lib.TCOD_context_recommended_console_size(self._p, magnification, size, size + 1))
         width, height = max(min_columns, size[0]), max(min_rows, size[1])

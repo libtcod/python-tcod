@@ -76,6 +76,7 @@ class Map:
         height: int,
         order: Literal["C", "F"] = "C",
     ) -> None:
+        """Initialize the map."""
         warnings.warn(
             "This class may perform poorly and is no longer needed.",
             DeprecationWarning,
@@ -234,7 +235,8 @@ def compute_fov(
     """
     transparency = np.asarray(transparency)
     if len(transparency.shape) != 2:  # noqa: PLR2004
-        raise TypeError("transparency must be an array of 2 dimensions" " (shape is %r)" % transparency.shape)
+        msg = f"transparency must be an array of 2 dimensions (shape is {transparency.shape!r})"
+        raise TypeError(msg)
     if isinstance(pov, int):
         msg = "The tcod.map.compute_fov function has changed.  The `x` and `y` parameters should now be given as a single tuple."
         raise TypeError(msg)

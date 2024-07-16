@@ -317,7 +317,7 @@ class Dice(_CDataWrapper):
         self.nb_rolls = value
 
     def __str__(self) -> str:
-        add = "+(%s)" % self.addsub if self.addsub != 0 else ""
+        add = f"+({self.addsub})" if self.addsub != 0 else ""
         return "%id%ix%s%s" % (
             self.nb_dices,
             self.nb_faces,
@@ -330,7 +330,7 @@ class Dice(_CDataWrapper):
 
 
 # reverse lookup table for KEY_X attributes, used by Key.__repr__
-_LOOKUP_VK = {value: "KEY_%s" % key[6:] for key, value in lib.__dict__.items() if key.startswith("TCODK")}
+_LOOKUP_VK = {value: f"KEY_{key[6:]}" for key, value in lib.__dict__.items() if key.startswith("TCODK")}
 
 
 class Key(_CDataWrapper):
@@ -418,9 +418,9 @@ class Key(_CDataWrapper):
         params = []
         params.append(f"pressed={self.pressed!r}, vk=tcod.{_LOOKUP_VK[self.vk]}")
         if self.c:
-            params.append("c=ord(%r)" % chr(self.c))
+            params.append(f"c=ord({chr(self.c)!r})")
         if self.text:
-            params.append("text=%r" % self.text)
+            params.append(f"text={self.text!r}")
         for attr in [
             "shift",
             "lalt",
@@ -432,7 +432,7 @@ class Key(_CDataWrapper):
         ]:
             if getattr(self, attr):
                 params.append(f"{attr}={getattr(self, attr)!r}")
-        return "tcod.Key(%s)" % ", ".join(params)
+        return "tcod.Key({})".format(", ".join(params))
 
     @property
     def key_p(self) -> Any:
@@ -510,7 +510,7 @@ class Mouse(_CDataWrapper):
         ]:
             if getattr(self, attr):
                 params.append(f"{attr}={getattr(self, attr)!r}")
-        return "tcod.Mouse(%s)" % ", ".join(params)
+        return "tcod.Mouse({})".format(", ".join(params))
 
     @property
     def mouse_p(self) -> Any:
@@ -2361,7 +2361,8 @@ def _heightmap_cdata(array: NDArray[np.float32]) -> ffi.CData:
         msg = "array must be a contiguous segment."
         raise ValueError(msg)
     if array.dtype != np.float32:
-        raise ValueError("array dtype must be float32, not %r" % array.dtype)
+        msg = f"array dtype must be float32, not {array.dtype!r}"
+        raise ValueError(msg)
     height, width = array.shape
     pointer = ffi.from_buffer("float *", array)
     return ffi.new("TCOD_heightmap_t *", (width, height, pointer))
