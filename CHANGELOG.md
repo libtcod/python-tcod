@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 ### Fixed
 
 - Fixed access violation when events are polled before SDL is initialized.
+- Fixed access violation when libtcod images fail to load.
+- Verify input files exist when calling `libtcodpy.parser_run`, `libtcodpy.namegen_parse`, `tcod.image.load`.
 
 ## [16.2.2] - 2024-01-16
 

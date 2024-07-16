@@ -39,10 +39,16 @@ class Image:
         """Initialize a blank image."""
         self.width, self.height = width, height
         self.image_c = ffi.gc(lib.TCOD_image_new(width, height), lib.TCOD_image_delete)
+        if self.image_c == ffi.NULL:
+            msg = "Failed to allocate image."
+            raise MemoryError(msg)
 
     @classmethod
     def _from_cdata(cls, cdata: Any) -> Image:  # noqa: ANN401
         self: Image = object.__new__(cls)
+        if cdata == ffi.NULL:
+            msg = "Pointer must not be NULL."
+            raise RuntimeError(msg)
         self.image_c = cdata
         self.width, self.height = self._get_size()
         return self
@@ -365,7 +371,8 @@ def load(filename: str | PathLike[str]) -> NDArray[np.uint8]:
 
     .. versionadded:: 11.4
     """
-    image = Image._from_cdata(ffi.gc(lib.TCOD_image_load(_path_encode(Path(filename))), lib.TCOD_image_delete))
+    filename = Path(filename).resolve(strict=True)
+    image = Image._from_cdata(ffi.gc(lib.TCOD_image_load(_path_encode(filename)), lib.TCOD_image_delete))
     array: NDArray[np.uint8] = np.asarray(image, dtype=np.uint8)
     height, width, depth = array.shape
     if depth == 3:  # noqa: PLR2004

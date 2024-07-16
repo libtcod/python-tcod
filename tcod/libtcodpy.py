@@ -3434,7 +3434,7 @@ def mouse_get_status() -> Mouse:
 
 @pending_deprecate()
 def namegen_parse(filename: str | PathLike[str], random: tcod.random.Random | None = None) -> None:
-    lib.TCOD_namegen_parse(_path_encode(Path(filename)), random or ffi.NULL)
+    lib.TCOD_namegen_parse(_path_encode(Path(filename).resolve(strict=True)), random or ffi.NULL)
 
 
 @pending_deprecate()
@@ -3636,8 +3636,9 @@ def _pycall_parser_error(msg: Any) -> None:
 @deprecate("Parser functions have been deprecated.")
 def parser_run(parser: Any, filename: str | PathLike[str], listener: Any = None) -> None:
     global _parser_listener  # noqa: PLW0603
+    filename = Path(filename).resolve(strict=True)
     if not listener:
-        lib.TCOD_parser_run(parser, _path_encode(Path(filename)), ffi.NULL)
+        lib.TCOD_parser_run(parser, _path_encode(filename), ffi.NULL)
         return
 
     propagate_manager = _PropagateException()
@@ -3656,7 +3657,7 @@ def parser_run(parser: Any, filename: str | PathLike[str], listener: Any = None)
     with _parser_callback_lock:
         _parser_listener = listener
         with propagate_manager:
-            lib.TCOD_parser_run(parser, _path_encode(Path(filename)), c_listener)
+            lib.TCOD_parser_run(parser, _path_encode(filename), c_listener)
 
 
 @deprecate("libtcod objects are deleted automatically.")
