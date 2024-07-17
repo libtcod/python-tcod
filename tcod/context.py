@@ -32,7 +32,7 @@ import warnings
 from pathlib import Path
 from typing import Any, Iterable, NoReturn, TypeVar
 
-from typing_extensions import Literal
+from typing_extensions import Literal, deprecated
 
 import tcod.console
 import tcod.event
@@ -40,7 +40,7 @@ import tcod.render
 import tcod.sdl.render
 import tcod.sdl.video
 import tcod.tileset
-from tcod._internal import _check, _check_warn, pending_deprecate
+from tcod._internal import _check, _check_warn
 from tcod.cffi import ffi, lib
 
 __all__ = (
@@ -574,7 +574,7 @@ def new(  # noqa: PLR0913
     return Context._claim(context_pp[0])
 
 
-@pending_deprecate("Call tcod.context.new with width and height as keyword parameters.")
+@deprecated("Call tcod.context.new with width and height as keyword parameters.")
 def new_window(  # noqa: PLR0913
     width: int,
     height: int,
@@ -601,7 +601,7 @@ def new_window(  # noqa: PLR0913
     )
 
 
-@pending_deprecate("Call tcod.context.new with columns and rows as keyword parameters.")
+@deprecated("Call tcod.context.new with columns and rows as keyword parameters.")
 def new_terminal(  # noqa: PLR0913
     columns: int,
     rows: int,

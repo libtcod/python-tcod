@@ -29,8 +29,9 @@ from __future__ import annotations
 
 from typing import Any, Iterator
 
+from typing_extensions import deprecated
+
 import tcod.random
-from tcod._internal import deprecate
 from tcod.cffi import ffi, lib
 
 
@@ -72,7 +73,7 @@ class BSP:
         self.children: tuple[()] | tuple[BSP, BSP] = ()
 
     @property
-    @deprecate("This attribute has been renamed to `width`.", FutureWarning)
+    @deprecated("This attribute has been renamed to `width`.", category=FutureWarning)
     def w(self) -> int:  # noqa: D102
         return self.width
 
@@ -81,7 +82,7 @@ class BSP:
         self.width = value
 
     @property
-    @deprecate("This attribute has been renamed to `height`.", FutureWarning)
+    @deprecated("This attribute has been renamed to `height`.", category=FutureWarning)
     def h(self) -> int:  # noqa: D102
         return self.height
 
@@ -177,7 +178,7 @@ class BSP:
         )
         self._unpack_bsp_tree(cdata)
 
-    @deprecate("Use pre_order method instead of walk.")
+    @deprecated("Use pre_order method instead of walk.")
     def walk(self) -> Iterator[BSP]:
         """Iterate over this BSP's hierarchy in pre order.
 

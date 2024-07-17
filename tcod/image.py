@@ -17,9 +17,10 @@ from typing import Any
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
+from typing_extensions import deprecated
 
 import tcod.console
-from tcod._internal import _console, _path_encode, deprecate
+from tcod._internal import _console, _path_encode
 from tcod.cffi import ffi, lib
 
 
@@ -357,10 +358,9 @@ def _get_format_name(format: int) -> str:
     return str(format)
 
 
-@deprecate(
+@deprecated(
     "This function may be removed in the future."
     "  It's recommended to load images with a more complete image library such as python-Pillow or python-imageio.",
-    category=PendingDeprecationWarning,
 )
 def load(filename: str | PathLike[str]) -> NDArray[np.uint8]:
     """Load a PNG file as an RGBA array.

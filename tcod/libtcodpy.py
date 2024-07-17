@@ -12,7 +12,7 @@ from typing import Any, Callable, Hashable, Iterable, Iterator, Sequence
 
 import numpy as np
 from numpy.typing import NDArray
-from typing_extensions import Literal
+from typing_extensions import Literal, deprecated
 
 import tcod.bsp
 import tcod.console
@@ -77,6 +77,7 @@ def BKGND_ADDALPHA(a: int) -> int:
     return BKGND_ADDA | (int(a * 255) << 8)
 
 
+@deprecated("Console array attributes perform better than this class.")
 class ConsoleBuffer:
     """Simple console that allows direct (fast) access to cells. Simplifies use of the "fill" functions.
 
@@ -111,11 +112,6 @@ class ConsoleBuffer:
 
         Values to fill the buffer are optional, defaults to black with no characters.
         """
-        warnings.warn(
-            "Console array attributes perform better than this class.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
         self.width = width
         self.height = height
         self.clear(back_r, back_g, back_b, fore_r, fore_g, fore_b, char)
@@ -271,6 +267,7 @@ class ConsoleBuffer:
             dest.ch.ravel()[:] = self.char
 
 
+@deprecated("Using this class is not recommended.")
 class Dice(_CDataWrapper):
     """A libtcod dice object.
 
@@ -286,11 +283,6 @@ class Dice(_CDataWrapper):
     """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        warnings.warn(
-            "Using this class is not recommended.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
         super().__init__(*args, **kwargs)
         if self.cdata == ffi.NULL:
             self._init(*args, **kwargs)

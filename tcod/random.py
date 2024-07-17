@@ -14,8 +14,9 @@ import random
 import warnings
 from typing import Any, Hashable
 
+from typing_extensions import deprecated
+
 import tcod.constants
-from tcod._internal import deprecate
 from tcod.cffi import ffi, lib
 
 MERSENNE_TWISTER = tcod.constants.RNG_MT
@@ -127,7 +128,7 @@ class Random:
         """
         return float(lib.TCOD_random_get_gaussian_double(self.random_c, mu, sigma))
 
-    @deprecate("This is a typo, rename this to 'gauss'", category=FutureWarning)
+    @deprecated("This is a typo, rename this to 'gauss'", category=FutureWarning)
     def guass(self, mu: float, sigma: float) -> float:  # noqa: D102
         return self.gauss(mu, sigma)
 
@@ -146,7 +147,7 @@ class Random:
         """
         return float(lib.TCOD_random_get_gaussian_double_inv(self.random_c, mu, sigma))
 
-    @deprecate("This is a typo, rename this to 'inverse_gauss'", category=FutureWarning)
+    @deprecated("This is a typo, rename this to 'inverse_gauss'", category=FutureWarning)
     def inverse_guass(self, mu: float, sigma: float) -> float:  # noqa: D102
         return self.inverse_gauss(mu, sigma)
 

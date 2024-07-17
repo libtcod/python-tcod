@@ -14,11 +14,11 @@ from typing import Any, Iterable
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
-from typing_extensions import Literal
+from typing_extensions import Literal, deprecated
 
 import tcod._internal
 import tcod.constants
-from tcod._internal import _check, _path_encode, deprecate
+from tcod._internal import _check, _path_encode
 from tcod.cffi import ffi, lib
 
 
@@ -248,7 +248,7 @@ class Console:
         return self._tiles["ch"].T if self._order == "F" else self._tiles["ch"]
 
     @property
-    @deprecate("This attribute has been renamed to `rgba`.", category=FutureWarning)
+    @deprecated("This attribute has been renamed to `rgba`.", category=FutureWarning)
     def tiles(self) -> NDArray[Any]:
         """An array of this consoles raw tile data.
 
@@ -264,7 +264,7 @@ class Console:
         return self.rgba
 
     @property
-    @deprecate("This attribute has been renamed to `rgba`.", category=FutureWarning)
+    @deprecated("This attribute has been renamed to `rgba`.", category=FutureWarning)
     def buffer(self) -> NDArray[Any]:
         """An array of this consoles raw tile data.
 
@@ -276,7 +276,7 @@ class Console:
         return self.rgba
 
     @property
-    @deprecate("This attribute has been renamed to `rgb`.", category=FutureWarning)
+    @deprecated("This attribute has been renamed to `rgb`.", category=FutureWarning)
     def tiles_rgb(self) -> NDArray[Any]:
         """An array of this consoles data without the alpha channel.
 
@@ -288,7 +288,7 @@ class Console:
         return self.rgb
 
     @property
-    @deprecate("This attribute has been renamed to `rgb`.", category=FutureWarning)
+    @deprecated("This attribute has been renamed to `rgb`.", category=FutureWarning)
     def tiles2(self) -> NDArray[Any]:
         """This name is deprecated in favour of :any:`rgb`.
 
@@ -352,7 +352,7 @@ class Console:
         return color.r, color.g, color.b
 
     @default_bg.setter
-    @deprecate("Console defaults have been deprecated.", category=FutureWarning)
+    @deprecated("Console defaults have been deprecated.", category=FutureWarning)
     def default_bg(self, color: tuple[int, int, int]) -> None:
         self._console_data.back = color
 
@@ -363,7 +363,7 @@ class Console:
         return color.r, color.g, color.b
 
     @default_fg.setter
-    @deprecate("Console defaults have been deprecated.", category=FutureWarning)
+    @deprecated("Console defaults have been deprecated.", category=FutureWarning)
     def default_fg(self, color: tuple[int, int, int]) -> None:
         self._console_data.fore = color
 
@@ -373,7 +373,7 @@ class Console:
         return self._console_data.bkgnd_flag  # type: ignore
 
     @default_bg_blend.setter
-    @deprecate("Console defaults have been deprecated.", category=FutureWarning)
+    @deprecated("Console defaults have been deprecated.", category=FutureWarning)
     def default_bg_blend(self, value: int) -> None:
         self._console_data.bkgnd_flag = value
 
@@ -383,7 +383,7 @@ class Console:
         return self._console_data.alignment  # type: ignore
 
     @default_alignment.setter
-    @deprecate("Console defaults have been deprecated.", category=FutureWarning)
+    @deprecated("Console defaults have been deprecated.", category=FutureWarning)
     def default_alignment(self, value: int) -> None:
         self._console_data.alignment = value
 
@@ -830,7 +830,7 @@ class Console:
                 bg_alpha,
             )
 
-    @deprecate("Pass the key color to Console.blit instead of calling this function.")
+    @deprecated("Pass the key color to Console.blit instead of calling this function.")
     def set_key_color(self, color: tuple[int, int, int] | None) -> None:
         """Set a consoles blit transparent color.
 
@@ -1234,7 +1234,7 @@ def get_height_rect(width: int, string: str) -> int:
     return int(lib.TCOD_console_get_height_rect_wn(width, len(string_), string_))
 
 
-@deprecate("This function does not support contexts.", category=FutureWarning)
+@deprecated("This function does not support contexts.", category=FutureWarning)
 def recommended_size() -> tuple[int, int]:
     """Return the recommended size of a console for the current active window.
 

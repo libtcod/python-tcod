@@ -20,9 +20,10 @@ from typing import Any, Iterable
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
+from typing_extensions import deprecated
 
 import tcod.console
-from tcod._internal import _check, _check_p, _console, _path_encode, _raise_tcod_error, deprecate
+from tcod._internal import _check, _check_p, _console, _path_encode, _raise_tcod_error
 from tcod.cffi import ffi, lib
 
 
@@ -235,7 +236,7 @@ class Tileset:
         )
 
 
-@deprecate("Using the default tileset is deprecated.")
+@deprecated("Using the default tileset is deprecated.")
 def get_default() -> Tileset:
     """Return a reference to the default Tileset.
 
@@ -248,7 +249,7 @@ def get_default() -> Tileset:
     return Tileset._claim(lib.TCOD_get_default_tileset())
 
 
-@deprecate("Using the default tileset is deprecated.")
+@deprecated("Using the default tileset is deprecated.")
 def set_default(tileset: Tileset) -> None:
     """Set the default tileset.
 
@@ -278,7 +279,7 @@ def load_truetype_font(path: str | PathLike[str], tile_width: int, tile_height: 
     return Tileset._claim(cdata)
 
 
-@deprecate("Accessing the default tileset is deprecated.")
+@deprecated("Accessing the default tileset is deprecated.")
 def set_truetype_font(path: str | PathLike[str], tile_width: int, tile_height: int) -> None:
     """Set the default tileset from a `.ttf` or `.otf` file.
 
