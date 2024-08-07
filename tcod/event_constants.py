@@ -540,23 +540,6 @@ _REVERSE_WHEEL_TABLE = {
 }
 
 __all__ = [
-    "KMOD_NONE",
-    "KMOD_LSHIFT",
-    "KMOD_RSHIFT",
-    "KMOD_SHIFT",
-    "KMOD_LCTRL",
-    "KMOD_RCTRL",
-    "KMOD_CTRL",
-    "KMOD_LALT",
-    "KMOD_RALT",
-    "KMOD_ALT",
-    "KMOD_LGUI",
-    "KMOD_RGUI",
-    "KMOD_GUI",
-    "KMOD_NUM",
-    "KMOD_CAPS",
-    "KMOD_MODE",
-    "KMOD_SCROLL",
     "MOUSEWHEEL_NORMAL",
     "MOUSEWHEEL_FLIPPED",
     "MOUSEWHEEL",

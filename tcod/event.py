@@ -95,7 +95,6 @@ import tcod.sdl.joystick
 import tcod.sdl.sys
 from tcod.cffi import ffi, lib
 from tcod.event_constants import *  # noqa: F403
-from tcod.event_constants import KMOD_ALT, KMOD_CTRL, KMOD_GUI, KMOD_SHIFT
 from tcod.sdl.joystick import _HAT_DIRECTIONS
 
 T = TypeVar("T")
@@ -2807,6 +2806,14 @@ def __getattr__(name: str) -> int:
             FutureWarning,
             stacklevel=2,
         )
+    elif name.startswith("KMOD_"):
+        modifier = name[5:]
+        warnings.warn(
+            "Key modifiers have been replaced with the Modifier IntFlag.\n"
+            f"`tcod.event.{modifier}` should be replaced with `tcod.event.Modifier.{modifier}`",
+            FutureWarning,
+            stacklevel=2,
+        )
     return value
 
 
@@ -2859,23 +2866,6 @@ __all__ = [  # noqa: F405
     "Scancode",
     "KeySym",
     # --- From event_constants.py ---
-    "KMOD_NONE",
-    "KMOD_LSHIFT",
-    "KMOD_RSHIFT",
-    "KMOD_SHIFT",
-    "KMOD_LCTRL",
-    "KMOD_RCTRL",
-    "KMOD_CTRL",
-    "KMOD_LALT",
-    "KMOD_RALT",
-    "KMOD_ALT",
-    "KMOD_LGUI",
-    "KMOD_RGUI",
-    "KMOD_GUI",
-    "KMOD_NUM",
-    "KMOD_CAPS",
-    "KMOD_MODE",
-    "KMOD_RESERVED",
     "MOUSEWHEEL_NORMAL",
     "MOUSEWHEEL_FLIPPED",
     "MOUSEWHEEL",

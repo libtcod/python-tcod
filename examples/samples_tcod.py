@@ -27,6 +27,7 @@ import tcod.render
 import tcod.sdl.mouse
 import tcod.sdl.render
 from tcod import libtcodpy
+from tcod.sdl.video import WindowFlags
 
 # ruff: noqa: S311
 
@@ -82,11 +83,13 @@ class Sample(tcod.event.EventDispatch[None]):
             cur_sample = (cur_sample - 1) % len(SAMPLES)
             SAMPLES[cur_sample].on_enter()
             draw_samples_menu()
-        elif event.sym == tcod.event.KeySym.RETURN and event.mod & tcod.event.KMOD_LALT:
-            libtcodpy.console_set_fullscreen(not libtcodpy.console_is_fullscreen())
-        elif event.sym == tcod.event.KeySym.PRINTSCREEN or event.sym == tcod.event.KeySym.p:
+        elif event.sym == tcod.event.KeySym.RETURN and event.mod & tcod.event.Modifier.ALT:
+            sdl_window = context.sdl_window
+            if sdl_window:
+                sdl_window.fullscreen = False if sdl_window.fullscreen else WindowFlags.FULLSCREEN_DESKTOP
+        elif event.sym in (tcod.event.KeySym.PRINTSCREEN, tcod.event.KeySym.p):
             print("screenshot")
-            if event.mod & tcod.event.KMOD_LALT:
+            if event.mod & tcod.event.Modifier.ALT:
                 libtcodpy.console_save_apf(root_console, "samples.apf")
                 print("apf")
             else:

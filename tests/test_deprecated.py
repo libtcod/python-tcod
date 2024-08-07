@@ -51,6 +51,13 @@ def test_deprecate_mouse_constants() -> None:
         _ = tcod.event.BUTTON_LMASK
 
 
+def test_deprecate_kmod_constants() -> None:
+    with pytest.warns(FutureWarning, match=r"Modifier.LSHIFT"):
+        _ = tcod.event.KMOD_LSHIFT
+    with pytest.warns(FutureWarning, match=r"Modifier.GUI"):
+        _ = tcod.event.KMOD_GUI
+
+
 def test_line_where() -> None:
     with pytest.warns():
         where = tcod.libtcodpy.line_where(1, 0, 3, 4)
