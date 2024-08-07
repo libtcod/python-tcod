@@ -181,7 +181,7 @@ class Context:
         """Automatically close on the context on exit."""
         self.close()
 
-    def present(  # noqa: PLR0913
+    def present(
         self,
         console: tcod.console.Console,
         *,

@@ -115,7 +115,7 @@ class Map:
         buffer: np.ndarray[Any, np.dtype[np.bool_]] = self.__buffer[:, :, 2]
         return buffer.T if self._order == "F" else buffer
 
-    def compute_fov(  # noqa: PLR0913
+    def compute_fov(
         self,
         x: int,
         y: int,

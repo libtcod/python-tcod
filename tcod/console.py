@@ -519,7 +519,7 @@ class Console:
             stacklevel=3,
         )
 
-    def print_(  # noqa: PLR0913
+    def print_(
         self,
         x: int,
         y: int,
@@ -596,7 +596,7 @@ class Console:
             )
         )
 
-    def get_height_rect(self, x: int, y: int, width: int, height: int, string: str) -> int:  # noqa: PLR0913
+    def get_height_rect(self, x: int, y: int, width: int, height: int, string: str) -> int:
         """Return the height of this text word-wrapped into this rectangle.
 
         Args:

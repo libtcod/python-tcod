@@ -655,7 +655,7 @@ class Renderer:
             raise TypeError(msg)
 
     @_required_version((2, 0, 18))
-    def geometry(  # noqa: PLR0913
+    def geometry(
         self,
         texture: Texture | None,
         xy: NDArray[np.float32],
