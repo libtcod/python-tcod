@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Changed
+
+- `EventDispatch`'s on event methods are now defined as positional parameters, so renaming the `event` parameter is now valid in subclasses.
+
 ### Deprecated
 
 - Keyboard bitmask modifiers `tcod.event.KMOD_*` have been replaced by `tcod.event.Modifier`.

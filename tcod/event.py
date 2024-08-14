@@ -90,6 +90,7 @@ import numpy as np
 from numpy.typing import NDArray
 from typing_extensions import Literal
 
+import tcod.event
 import tcod.event_constants
 import tcod.sdl.joystick
 import tcod.sdl.sys
@@ -1377,160 +1378,160 @@ class EventDispatch(Generic[T]):
         wait(timeout)
         self.event_get()
 
-    def ev_quit(self, event: tcod.event.Quit) -> T | None:
+    def ev_quit(self, event: tcod.event.Quit, /) -> T | None:
         """Called when the termination of the program is requested."""
 
-    def ev_keydown(self, event: tcod.event.KeyDown) -> T | None:
+    def ev_keydown(self, event: tcod.event.KeyDown, /) -> T | None:
         """Called when a keyboard key is pressed or repeated."""
 
-    def ev_keyup(self, event: tcod.event.KeyUp) -> T | None:
+    def ev_keyup(self, event: tcod.event.KeyUp, /) -> T | None:
         """Called when a keyboard key is released."""
 
-    def ev_mousemotion(self, event: tcod.event.MouseMotion) -> T | None:
+    def ev_mousemotion(self, event: tcod.event.MouseMotion, /) -> T | None:
         """Called when the mouse is moved."""
 
-    def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> T | None:
+    def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown, /) -> T | None:
         """Called when a mouse button is pressed."""
 
-    def ev_mousebuttonup(self, event: tcod.event.MouseButtonUp) -> T | None:
+    def ev_mousebuttonup(self, event: tcod.event.MouseButtonUp, /) -> T | None:
         """Called when a mouse button is released."""
 
-    def ev_mousewheel(self, event: tcod.event.MouseWheel) -> T | None:
+    def ev_mousewheel(self, event: tcod.event.MouseWheel, /) -> T | None:
         """Called when the mouse wheel is scrolled."""
 
-    def ev_textinput(self, event: tcod.event.TextInput) -> T | None:
+    def ev_textinput(self, event: tcod.event.TextInput, /) -> T | None:
         """Called to handle Unicode input."""
 
-    def ev_windowshown(self, event: tcod.event.WindowEvent) -> T | None:
+    def ev_windowshown(self, event: tcod.event.WindowEvent, /) -> T | None:
         """Called when the window is shown."""
 
-    def ev_windowhidden(self, event: tcod.event.WindowEvent) -> T | None:
+    def ev_windowhidden(self, event: tcod.event.WindowEvent, /) -> T | None:
         """Called when the window is hidden."""
 
-    def ev_windowexposed(self, event: tcod.event.WindowEvent) -> T | None:
+    def ev_windowexposed(self, event: tcod.event.WindowEvent, /) -> T | None:
         """Called when a window is exposed, and needs to be refreshed.
 
         This usually means a call to :any:`libtcodpy.console_flush` is necessary.
         """
 
-    def ev_windowmoved(self, event: tcod.event.WindowMoved) -> T | None:
+    def ev_windowmoved(self, event: tcod.event.WindowMoved, /) -> T | None:
         """Called when the window is moved."""
 
-    def ev_windowresized(self, event: tcod.event.WindowResized) -> T | None:
+    def ev_windowresized(self, event: tcod.event.WindowResized, /) -> T | None:
         """Called when the window is resized."""
 
-    def ev_windowsizechanged(self, event: tcod.event.WindowResized) -> T | None:
+    def ev_windowsizechanged(self, event: tcod.event.WindowResized, /) -> T | None:
         """Called when the system or user changes the size of the window."""
 
-    def ev_windowminimized(self, event: tcod.event.WindowEvent) -> T | None:
+    def ev_windowminimized(self, event: tcod.event.WindowEvent, /) -> T | None:
         """Called when the window is minimized."""
 
-    def ev_windowmaximized(self, event: tcod.event.WindowEvent) -> T | None:
+    def ev_windowmaximized(self, event: tcod.event.WindowEvent, /) -> T | None:
         """Called when the window is maximized."""
 
-    def ev_windowrestored(self, event: tcod.event.WindowEvent) -> T | None:
+    def ev_windowrestored(self, event: tcod.event.WindowEvent, /) -> T | None:
         """Called when the window is restored."""
 
-    def ev_windowenter(self, event: tcod.event.WindowEvent) -> T | None:
+    def ev_windowenter(self, event: tcod.event.WindowEvent, /) -> T | None:
         """Called when the window gains mouse focus."""
 
-    def ev_windowleave(self, event: tcod.event.WindowEvent) -> T | None:
+    def ev_windowleave(self, event: tcod.event.WindowEvent, /) -> T | None:
         """Called when the window loses mouse focus."""
 
-    def ev_windowfocusgained(self, event: tcod.event.WindowEvent) -> T | None:
+    def ev_windowfocusgained(self, event: tcod.event.WindowEvent, /) -> T | None:
         """Called when the window gains keyboard focus."""
 
-    def ev_windowfocuslost(self, event: tcod.event.WindowEvent) -> T | None:
+    def ev_windowfocuslost(self, event: tcod.event.WindowEvent, /) -> T | None:
         """Called when the window loses keyboard focus."""
 
-    def ev_windowclose(self, event: tcod.event.WindowEvent) -> T | None:
+    def ev_windowclose(self, event: tcod.event.WindowEvent, /) -> T | None:
         """Called when the window manager requests the window to be closed."""
 
-    def ev_windowtakefocus(self, event: tcod.event.WindowEvent) -> T | None:
+    def ev_windowtakefocus(self, event: tcod.event.WindowEvent, /) -> T | None:
         pass
 
-    def ev_windowhittest(self, event: tcod.event.WindowEvent) -> T | None:
+    def ev_windowhittest(self, event: tcod.event.WindowEvent, /) -> T | None:
         pass
 
-    def ev_joyaxismotion(self, event: tcod.event.JoystickAxis) -> T | None:
+    def ev_joyaxismotion(self, event: tcod.event.JoystickAxis, /) -> T | None:
         """Called when a joystick analog is moved.
 
         .. versionadded:: 13.8
         """
 
-    def ev_joyballmotion(self, event: tcod.event.JoystickBall) -> T | None:
+    def ev_joyballmotion(self, event: tcod.event.JoystickBall, /) -> T | None:
         """Called when a joystick ball is moved.
 
         .. versionadded:: 13.8
         """
 
-    def ev_joyhatmotion(self, event: tcod.event.JoystickHat) -> T | None:
+    def ev_joyhatmotion(self, event: tcod.event.JoystickHat, /) -> T | None:
         """Called when a joystick hat is moved.
 
         .. versionadded:: 13.8
         """
 
-    def ev_joybuttondown(self, event: tcod.event.JoystickButton) -> T | None:
+    def ev_joybuttondown(self, event: tcod.event.JoystickButton, /) -> T | None:
         """Called when a joystick button is pressed.
 
         .. versionadded:: 13.8
         """
 
-    def ev_joybuttonup(self, event: tcod.event.JoystickButton) -> T | None:
+    def ev_joybuttonup(self, event: tcod.event.JoystickButton, /) -> T | None:
         """Called when a joystick button is released.
 
         .. versionadded:: 13.8
         """
 
-    def ev_joydeviceadded(self, event: tcod.event.JoystickDevice) -> T | None:
+    def ev_joydeviceadded(self, event: tcod.event.JoystickDevice, /) -> T | None:
         """Called when a joystick is added.
 
         .. versionadded:: 13.8
         """
 
-    def ev_joydeviceremoved(self, event: tcod.event.JoystickDevice) -> T | None:
+    def ev_joydeviceremoved(self, event: tcod.event.JoystickDevice, /) -> T | None:
         """Called when a joystick is removed.
 
         .. versionadded:: 13.8
         """
 
-    def ev_controlleraxismotion(self, event: tcod.event.ControllerAxis) -> T | None:
+    def ev_controlleraxismotion(self, event: tcod.event.ControllerAxis, /) -> T | None:
         """Called when a controller analog is moved.
 
         .. versionadded:: 13.8
         """
 
-    def ev_controllerbuttondown(self, event: tcod.event.ControllerButton) -> T | None:
+    def ev_controllerbuttondown(self, event: tcod.event.ControllerButton, /) -> T | None:
         """Called when a controller button is pressed.
 
         .. versionadded:: 13.8
         """
 
-    def ev_controllerbuttonup(self, event: tcod.event.ControllerButton) -> T | None:
+    def ev_controllerbuttonup(self, event: tcod.event.ControllerButton, /) -> T | None:
         """Called when a controller button is released.
 
         .. versionadded:: 13.8
         """
 
-    def ev_controllerdeviceadded(self, event: tcod.event.ControllerDevice) -> T | None:
+    def ev_controllerdeviceadded(self, event: tcod.event.ControllerDevice, /) -> T | None:
         """Called when a standard controller is added.
 
         .. versionadded:: 13.8
         """
 
-    def ev_controllerdeviceremoved(self, event: tcod.event.ControllerDevice) -> T | None:
+    def ev_controllerdeviceremoved(self, event: tcod.event.ControllerDevice, /) -> T | None:
         """Called when a standard controller is removed.
 
         .. versionadded:: 13.8
         """
 
-    def ev_controllerdeviceremapped(self, event: tcod.event.ControllerDevice) -> T | None:
+    def ev_controllerdeviceremapped(self, event: tcod.event.ControllerDevice, /) -> T | None:
         """Called when a standard controller is remapped.
 
         .. versionadded:: 13.8
         """
 
-    def ev_(self, event: Any) -> T | None:
+    def ev_(self, event: Any, /) -> T | None:
         pass
 
 
