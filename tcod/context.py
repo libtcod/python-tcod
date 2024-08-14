@@ -265,7 +265,7 @@ class Context:
                 event.position[0] - event.motion[0],
                 event.position[1] - event.motion[1],
             )
-            event_copy.motion = event.tile_motion = tcod.event.Point(
+            event_copy.motion = event._tile_motion = tcod.event.Point(
                 event._tile[0] - prev_tile[0], event._tile[1] - prev_tile[1]
             )
         return event_copy

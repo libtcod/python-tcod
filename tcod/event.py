@@ -486,7 +486,7 @@ class MouseMotion(MouseState):
     ) -> None:
         super().__init__(position, tile, state)
         self.motion = Point(*motion)
-        self.__tile_motion = Point(*tile_motion) if tile_motion is not None else None
+        self._tile_motion = Point(*tile_motion) if tile_motion is not None else None
 
     @property
     def pixel_motion(self) -> Point:
@@ -514,7 +514,7 @@ class MouseMotion(MouseState):
             DeprecationWarning,
             stacklevel=2,
         )
-        return _verify_tile_coordinates(self.__tile_motion)
+        return _verify_tile_coordinates(self._tile_motion)
 
     @tile_motion.setter
     def tile_motion(self, xy: tuple[int, int]) -> None:
@@ -524,7 +524,7 @@ class MouseMotion(MouseState):
             DeprecationWarning,
             stacklevel=2,
         )
-        self.__tile_motion = Point(*xy)
+        self._tile_motion = Point(*xy)
 
     @classmethod
     def from_sdl_event(cls, sdl_event: Any) -> MouseMotion:

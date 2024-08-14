@@ -14,6 +14,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 - Keyboard bitmask modifiers `tcod.event.KMOD_*` have been replaced by `tcod.event.Modifier`.
 
+### Fixed
+
+- Suppressed internal `mouse.tile_motion` deprecation warning.
+
 ## [16.2.3] - 2024-07-16
 
 ### Fixed
