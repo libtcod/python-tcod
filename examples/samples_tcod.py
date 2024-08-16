@@ -726,8 +726,7 @@ class PathfindingSample(Sample):
                 for y in range(SAMPLE_SCREEN_HEIGHT):
                     for x in range(SAMPLE_SCREEN_WIDTH):
                         d = libtcodpy.dijkstra_get_distance(self.dijkstra, x, y)
-                        if d > self.dijkstra_dist:
-                            self.dijkstra_dist = d
+                        self.dijkstra_dist = max(d, self.dijkstra_dist)
                 # compute path from px,py to dx,dy
                 libtcodpy.dijkstra_path_set(self.dijkstra, self.dx, self.dy)
             self.recalculate = False

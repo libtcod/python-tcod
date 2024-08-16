@@ -15,7 +15,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--no-window", action="store_true", help="Skip tests which need a rendering context.")
 
 
-@pytest.fixture()
+@pytest.fixture
 def uses_window(request: pytest.FixtureRequest) -> Iterator[None]:
     """Marks tests which require a rendering context."""
     if request.config.getoption("--no-window"):
@@ -40,7 +40,7 @@ def session_console(request: pytest.FixtureRequest) -> Iterator[tcod.console.Con
         yield con
 
 
-@pytest.fixture()
+@pytest.fixture
 def console(session_console: tcod.console.Console) -> tcod.console.Console:
     console = session_console
     tcod.console_flush()
@@ -54,18 +54,18 @@ def console(session_console: tcod.console.Console) -> tcod.console.Console:
     return console
 
 
-@pytest.fixture()
+@pytest.fixture
 def offscreen(console: tcod.console.Console) -> tcod.console.Console:
     """Return an off-screen console with the same size as the root console."""
     return tcod.console.Console(console.width, console.height)
 
 
-@pytest.fixture()
+@pytest.fixture
 def fg() -> tcod.Color:
     return tcod.Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
 
-@pytest.fixture()
+@pytest.fixture
 def bg() -> tcod.Color:
     return tcod.Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 

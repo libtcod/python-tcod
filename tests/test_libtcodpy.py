@@ -660,7 +660,7 @@ POINTS_AB = POINT_A + POINT_B  # valid path
 POINTS_AC = POINT_A + POINT_C  # invalid path
 
 
-@pytest.fixture()
+@pytest.fixture
 def map_() -> Iterator[tcod.map.Map]:
     map_ = tcod.map.Map(MAP_WIDTH, MAP_HEIGHT)
     map_.walkable[...] = map_.transparent[...] = MAP[...] == " "
@@ -668,7 +668,7 @@ def map_() -> Iterator[tcod.map.Map]:
     libtcodpy.map_delete(map_)
 
 
-@pytest.fixture()
+@pytest.fixture
 def path_callback(map_: tcod.map.Map) -> Callable[[int, int, int, int, None], bool]:
     def callback(ox: int, oy: int, dx: int, dy: int, user_data: None) -> bool:
         return bool(map_.walkable[dy, dx])
