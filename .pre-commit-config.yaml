@@ -4,7 +4,7 @@ ci:
   autoupdate_schedule: quarterly
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -17,7 +17,7 @@ repos:
       - id: fix-byte-order-marker
       - id: detect-private-key
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.0
+    rev: v0.7.0
     hooks:
       - id: ruff
         args: [--fix-only, --exit-non-zero-on-fix]
