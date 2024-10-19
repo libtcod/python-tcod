@@ -131,7 +131,7 @@ class NodeCostArray(np.ndarray):  # type: ignore
 
     def __new__(cls, array: ArrayLike) -> NodeCostArray:
         """Validate a numpy array and setup a C callback."""
-        return np.asarray(array).view(cls)
+        return np.asarray(array).view(cls)  # type: ignore[no-any-return]
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({repr(self.view(np.ndarray))!r})"

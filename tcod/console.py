@@ -122,7 +122,7 @@ class Console:
     ) -> None:
         """Initialize the console."""
         self._key_color: tuple[int, int, int] | None = None
-        self._order = tcod._internal.verify_order(order)
+        self._order: Literal["C", "F"] = tcod._internal.verify_order(order)
         if buffer is not None:
             if self._order == "F":
                 buffer = buffer.transpose()
@@ -345,45 +345,82 @@ class Console:
         """
         return self.rgba.view(self._DTYPE_RGB)
 
+    _DEPRECATE_CONSOLE_DEFAULTS_MSG = """Console defaults have been deprecated.
+Consider one of the following:
+
+    # Set parameters once then pass them as kwargs
+    DEFAULT_COLOR = {"bg": (0, 0, 127), "fg": (127, 127, 255)}
+    console.print(x, y, string, **DEFAULT_COLOR)
+
+    # Clear the console to a color and then skip setting colors on printing/drawing
+    console.clear(fg=(127, 127, 255), bg=(0, 0, 127))
+    console.print(x, y, string, fg=None)
+"""
+
     @property
+    @deprecated(_DEPRECATE_CONSOLE_DEFAULTS_MSG, category=FutureWarning)
     def default_bg(self) -> tuple[int, int, int]:
-        """Tuple[int, int, int]: The default background color."""
+        """Tuple[int, int, int]: The default background color.
+
+        .. deprecated:: 8.5
+            These should not be used. Prefer passing defaults as kwargs.
+
+            .. code-block::
+
+                DEFAULT_COLOR = {"bg": (0, 0, 127), "fg": (127, 127, 255)}
+                console.print(x, y, string, **DEFAULT_COLOR)
+        """
         color = self._console_data.back
         return color.r, color.g, color.b
 
     @default_bg.setter
-    @deprecated("Console defaults have been deprecated.", category=FutureWarning)
+    @deprecated(_DEPRECATE_CONSOLE_DEFAULTS_MSG, category=FutureWarning)
     def default_bg(self, color: tuple[int, int, int]) -> None:
         self._console_data.back = color
 
     @property
+    @deprecated(_DEPRECATE_CONSOLE_DEFAULTS_MSG, category=FutureWarning)
     def default_fg(self) -> tuple[int, int, int]:
-        """Tuple[int, int, int]: The default foreground color."""
+        """Tuple[int, int, int]: The default foreground color.
+
+        .. deprecated:: 8.5
+            These should not be used. Prefer passing defaults as kwargs.
+        """
         color = self._console_data.fore
         return color.r, color.g, color.b
 
     @default_fg.setter
-    @deprecated("Console defaults have been deprecated.", category=FutureWarning)
+    @deprecated(_DEPRECATE_CONSOLE_DEFAULTS_MSG, category=FutureWarning)
     def default_fg(self, color: tuple[int, int, int]) -> None:
         self._console_data.fore = color
 
     @property
+    @deprecated(_DEPRECATE_CONSOLE_DEFAULTS_MSG, category=FutureWarning)
     def default_bg_blend(self) -> int:
-        """int: The default blending mode."""
+        """int: The default blending mode.
+
+        .. deprecated:: 8.5
+            These should not be used. Prefer passing defaults as kwargs.
+        """
         return self._console_data.bkgnd_flag  # type: ignore
 
     @default_bg_blend.setter
-    @deprecated("Console defaults have been deprecated.", category=FutureWarning)
+    @deprecated(_DEPRECATE_CONSOLE_DEFAULTS_MSG, category=FutureWarning)
     def default_bg_blend(self, value: int) -> None:
         self._console_data.bkgnd_flag = value
 
     @property
+    @deprecated(_DEPRECATE_CONSOLE_DEFAULTS_MSG, category=FutureWarning)
     def default_alignment(self) -> int:
-        """int: The default text alignment."""
+        """int: The default text alignment.
+
+        .. deprecated:: 8.5
+            These should not be used. Prefer passing defaults as kwargs.
+        """
         return self._console_data.alignment  # type: ignore
 
     @default_alignment.setter
-    @deprecated("Console defaults have been deprecated.", category=FutureWarning)
+    @deprecated(_DEPRECATE_CONSOLE_DEFAULTS_MSG, category=FutureWarning)
     def default_alignment(self, value: int) -> None:
         self._console_data.alignment = value
 
@@ -391,7 +428,7 @@ class Console:
         """Raise a warning for bad default values during calls to clear."""
         warnings.warn(
             f"Clearing with the console default values is deprecated.\nAdd {name}={value!r} to this call.",
-            DeprecationWarning,
+            FutureWarning,
             stacklevel=3,
         )
 
@@ -737,8 +774,8 @@ class Console:
             explicit.
         """
         self.__deprecate_defaults("draw_frame", bg_blend)
-        string = _fmt(string) if string else ffi.NULL
-        _check(lib.TCOD_console_printf_frame(self.console_c, x, y, width, height, clear, bg_blend, string))
+        string_: Any = _fmt(string) if string else ffi.NULL
+        _check(lib.TCOD_console_printf_frame(self.console_c, x, y, width, height, clear, bg_blend, string_))
 
     def blit(  # noqa: PLR0913
         self,

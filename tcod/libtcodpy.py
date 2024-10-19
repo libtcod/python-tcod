@@ -347,6 +347,8 @@ class Key(_CDataWrapper):
         Use events from the :any:`tcod.event` module instead.
     """
 
+    cdata: Any
+
     _BOOL_ATTRIBUTES = (
         "lalt",
         "lctrl",
@@ -509,7 +511,7 @@ class Mouse(_CDataWrapper):
         return self.cdata
 
 
-@deprecate("Call tcod.bsp.BSP(x, y, width, height) instead.", FutureWarning)
+@deprecate("Call tcod.bsp.BSP(x, y, width, height) instead.", category=FutureWarning)
 def bsp_new_with_size(x: int, y: int, w: int, h: int) -> tcod.bsp.BSP:
     """Create a new BSP instance with the given rectangle.
 
@@ -528,7 +530,7 @@ def bsp_new_with_size(x: int, y: int, w: int, h: int) -> tcod.bsp.BSP:
     return Bsp(x, y, w, h)
 
 
-@deprecate("Call node.split_once instead.", FutureWarning)
+@deprecate("Call node.split_once instead.", category=FutureWarning)
 def bsp_split_once(node: tcod.bsp.BSP, horizontal: bool, position: int) -> None:
     """Deprecated function.
 
@@ -538,7 +540,7 @@ def bsp_split_once(node: tcod.bsp.BSP, horizontal: bool, position: int) -> None:
     node.split_once(horizontal, position)
 
 
-@deprecate("Call node.split_recursive instead.", FutureWarning)
+@deprecate("Call node.split_recursive instead.", category=FutureWarning)
 def bsp_split_recursive(
     node: tcod.bsp.BSP,
     randomizer: tcod.random.Random | None,
@@ -556,7 +558,7 @@ def bsp_split_recursive(
     node.split_recursive(nb, minHSize, minVSize, maxHRatio, maxVRatio, randomizer)
 
 
-@deprecate("Assign values via attribute instead.", FutureWarning)
+@deprecate("Assign values via attribute instead.", category=FutureWarning)
 def bsp_resize(node: tcod.bsp.BSP, x: int, y: int, w: int, h: int) -> None:
     """Deprecated function.
 
@@ -589,7 +591,7 @@ def bsp_right(node: tcod.bsp.BSP) -> tcod.bsp.BSP | None:
     return None if not node.children else node.children[1]
 
 
-@deprecate("Get the parent with 'node.parent' instead.", FutureWarning)
+@deprecate("Get the parent with 'node.parent' instead.", category=FutureWarning)
 def bsp_father(node: tcod.bsp.BSP) -> tcod.bsp.BSP | None:
     """Deprecated function.
 
@@ -599,7 +601,7 @@ def bsp_father(node: tcod.bsp.BSP) -> tcod.bsp.BSP | None:
     return node.parent
 
 
-@deprecate("Check for children with 'bool(node.children)' instead.", FutureWarning)
+@deprecate("Check for children with 'bool(node.children)' instead.", category=FutureWarning)
 def bsp_is_leaf(node: tcod.bsp.BSP) -> bool:
     """Deprecated function.
 
@@ -609,7 +611,7 @@ def bsp_is_leaf(node: tcod.bsp.BSP) -> bool:
     return not node.children
 
 
-@deprecate("Use 'node.contains' instead.", FutureWarning)
+@deprecate("Use 'node.contains' instead.", category=FutureWarning)
 def bsp_contains(node: tcod.bsp.BSP, cx: int, cy: int) -> bool:
     """Deprecated function.
 
@@ -619,7 +621,7 @@ def bsp_contains(node: tcod.bsp.BSP, cx: int, cy: int) -> bool:
     return node.contains(cx, cy)
 
 
-@deprecate("Use 'node.find_node' instead.", FutureWarning)
+@deprecate("Use 'node.find_node' instead.", category=FutureWarning)
 def bsp_find_node(node: tcod.bsp.BSP, cx: int, cy: int) -> tcod.bsp.BSP | None:
     """Deprecated function.
 
@@ -723,7 +725,7 @@ def bsp_remove_sons(node: tcod.bsp.BSP) -> None:
     node.children = ()
 
 
-@deprecate("libtcod objects are deleted automatically.", FutureWarning)
+@deprecate("libtcod objects are deleted automatically.", category=FutureWarning)
 def bsp_delete(node: tcod.bsp.BSP) -> None:
     """Exists for backward compatibility.  Does nothing.
 
@@ -1609,8 +1611,8 @@ def console_print_frame(
     .. deprecated:: 8.5
         Use :any:`Console.print_frame` instead.
     """
-    fmt = _fmt(fmt) if fmt else ffi.NULL
-    _check(lib.TCOD_console_printf_frame(_console(con), x, y, w, h, clear, flag, fmt))
+    fmt_: Any = _fmt(fmt) if fmt else ffi.NULL
+    _check(lib.TCOD_console_printf_frame(_console(con), x, y, w, h, clear, flag, fmt_))
 
 
 @pending_deprecate()
@@ -1680,7 +1682,7 @@ def console_get_char(con: tcod.console.Console, x: int, y: int) -> int:
     return lib.TCOD_console_get_char(_console(con), x, y)  # type: ignore
 
 
-@deprecate("This function is not supported if contexts are being used.", FutureWarning)
+@deprecate("This function is not supported if contexts are being used.", category=FutureWarning)
 def console_set_fade(fade: int, fadingColor: tuple[int, int, int]) -> None:
     """Deprecated function.
 
@@ -1690,7 +1692,7 @@ def console_set_fade(fade: int, fadingColor: tuple[int, int, int]) -> None:
     lib.TCOD_console_set_fade(fade, fadingColor)
 
 
-@deprecate("This function is not supported if contexts are being used.", FutureWarning)
+@deprecate("This function is not supported if contexts are being used.", category=FutureWarning)
 def console_get_fade() -> int:
     """Deprecated function.
 
@@ -1700,7 +1702,7 @@ def console_get_fade() -> int:
     return int(lib.TCOD_console_get_fade())
 
 
-@deprecate("This function is not supported if contexts are being used.", FutureWarning)
+@deprecate("This function is not supported if contexts are being used.", category=FutureWarning)
 def console_get_fading_color() -> Color:
     """Deprecated function.
 
@@ -1753,7 +1755,7 @@ def console_check_for_keypress(flags: int = KEY_RELEASED) -> Key:
     return key
 
 
-@deprecate("Use tcod.event.get_keyboard_state to see if a key is held.", FutureWarning)
+@deprecate("Use tcod.event.get_keyboard_state to see if a key is held.", category=FutureWarning)
 def console_is_key_pressed(key: int) -> bool:
     """Return True if a key is held.
 
@@ -2972,52 +2974,52 @@ def heightmap_delete(hm: Any) -> None:
     """
 
 
-@deprecate("Use `tcod.image.Image(width, height)` instead.", FutureWarning)
+@deprecate("Use `tcod.image.Image(width, height)` instead.", category=FutureWarning)
 def image_new(width: int, height: int) -> tcod.image.Image:
     return tcod.image.Image(width, height)
 
 
-@deprecate("Use the `image.clear()` method instead.", FutureWarning)
+@deprecate("Use the `image.clear()` method instead.", category=FutureWarning)
 def image_clear(image: tcod.image.Image, col: tuple[int, int, int]) -> None:
     image.clear(col)
 
 
-@deprecate("Use the `image.invert()` method instead.", FutureWarning)
+@deprecate("Use the `image.invert()` method instead.", category=FutureWarning)
 def image_invert(image: tcod.image.Image) -> None:
     image.invert()
 
 
-@deprecate("Use the `image.hflip()` method instead.", FutureWarning)
+@deprecate("Use the `image.hflip()` method instead.", category=FutureWarning)
 def image_hflip(image: tcod.image.Image) -> None:
     image.hflip()
 
 
-@deprecate("Use the `image.rotate90(n)` method instead.", FutureWarning)
+@deprecate("Use the `image.rotate90(n)` method instead.", category=FutureWarning)
 def image_rotate90(image: tcod.image.Image, num: int = 1) -> None:
     image.rotate90(num)
 
 
-@deprecate("Use the `image.vflip()` method instead.", FutureWarning)
+@deprecate("Use the `image.vflip()` method instead.", category=FutureWarning)
 def image_vflip(image: tcod.image.Image) -> None:
     image.vflip()
 
 
-@deprecate("Use the `image.scale(new_width, new_height)` method instead.", FutureWarning)
+@deprecate("Use the `image.scale(new_width, new_height)` method instead.", category=FutureWarning)
 def image_scale(image: tcod.image.Image, neww: int, newh: int) -> None:
     image.scale(neww, newh)
 
 
-@deprecate("Use the `image.image_set_key_color(rgb)` method instead.", FutureWarning)
+@deprecate("Use the `image.image_set_key_color(rgb)` method instead.", category=FutureWarning)
 def image_set_key_color(image: tcod.image.Image, col: tuple[int, int, int]) -> None:
     image.set_key_color(col)
 
 
-@deprecate("Use `np.asarray(image)[y, x, 3]` instead.", FutureWarning)
+@deprecate("Use `np.asarray(image)[y, x, 3]` instead.", category=FutureWarning)
 def image_get_alpha(image: tcod.image.Image, x: int, y: int) -> int:
     return image.get_alpha(x, y)
 
 
-@deprecate("Use the Numpy array interface to check alpha or color keys.", FutureWarning)
+@deprecate("Use the Numpy array interface to check alpha or color keys.", category=FutureWarning)
 def image_is_pixel_transparent(image: tcod.image.Image, x: int, y: int) -> bool:
     return bool(lib.TCOD_image_is_pixel_transparent(image.image_c, x, y))
 
@@ -3025,7 +3027,7 @@ def image_is_pixel_transparent(image: tcod.image.Image, x: int, y: int) -> bool:
 @deprecate(
     "Call the classmethod `tcod.image.Image.from_file` instead to load images."
     "\nIt's recommended to load images with a more complete image library such as python-Pillow or python-imageio.",
-    FutureWarning,
+    category=FutureWarning,
 )
 def image_load(filename: str | PathLike[str]) -> tcod.image.Image:
     """Load an image file into an Image instance and return it.
@@ -3042,7 +3044,7 @@ def image_load(filename: str | PathLike[str]) -> tcod.image.Image:
     return tcod.image.Image.from_file(filename)
 
 
-@deprecate("Use `Tileset.render` instead of this function.", FutureWarning)
+@deprecate("Use `Tileset.render` instead of this function.", category=FutureWarning)
 def image_from_console(console: tcod.console.Console) -> tcod.image.Image:
     """Return an Image with a Consoles pixel data.
 
@@ -3062,7 +3064,7 @@ def image_from_console(console: tcod.console.Console) -> tcod.image.Image:
     )
 
 
-@deprecate("Use `Tileset.render` instead of this function.", FutureWarning)
+@deprecate("Use `Tileset.render` instead of this function.", category=FutureWarning)
 def image_refresh_console(image: tcod.image.Image, console: tcod.console.Console) -> None:
     """Update an image made with :any:`image_from_console`.
 
@@ -3072,27 +3074,27 @@ def image_refresh_console(image: tcod.image.Image, console: tcod.console.Console
     image.refresh_console(console)
 
 
-@deprecate("Access an images size with `image.width` or `image.height`.", FutureWarning)
+@deprecate("Access an images size with `image.width` or `image.height`.", category=FutureWarning)
 def image_get_size(image: tcod.image.Image) -> tuple[int, int]:
     return image.width, image.height
 
 
-@deprecate("Use `np.asarray(image)[y, x, :3]` instead.", FutureWarning)
+@deprecate("Use `np.asarray(image)[y, x, :3]` instead.", category=FutureWarning)
 def image_get_pixel(image: tcod.image.Image, x: int, y: int) -> tuple[int, int, int]:
     return image.get_pixel(x, y)
 
 
-@deprecate("Use the `image.get_mipmap_pixel(...)` method instead.", FutureWarning)
+@deprecate("Use the `image.get_mipmap_pixel(...)` method instead.", category=FutureWarning)
 def image_get_mipmap_pixel(image: tcod.image.Image, x0: float, y0: float, x1: float, y1: float) -> tuple[int, int, int]:
     return image.get_mipmap_pixel(x0, y0, x1, y1)
 
 
-@deprecate("Use `np.asarray(image)[y, x, :3] = rgb` instead.", FutureWarning)
+@deprecate("Use `np.asarray(image)[y, x, :3] = rgb` instead.", category=FutureWarning)
 def image_put_pixel(image: tcod.image.Image, x: int, y: int, col: tuple[int, int, int]) -> None:
     image.put_pixel(x, y, col)
 
 
-@deprecate("Use the `image.blit(...)` method instead.", FutureWarning)
+@deprecate("Use the `image.blit(...)` method instead.", category=FutureWarning)
 def image_blit(
     image: tcod.image.Image,
     console: tcod.console.Console,
@@ -3106,7 +3108,7 @@ def image_blit(
     image.blit(console, x, y, bkgnd_flag, scalex, scaley, angle)
 
 
-@deprecate("Use the `image.blit_rect(...)` method instead.", FutureWarning)
+@deprecate("Use the `image.blit_rect(...)` method instead.", category=FutureWarning)
 def image_blit_rect(
     image: tcod.image.Image,
     console: tcod.console.Console,
@@ -3119,7 +3121,7 @@ def image_blit_rect(
     image.blit_rect(console, x, y, w, h, bkgnd_flag)
 
 
-@deprecate("Use `Console.draw_semigraphics(image, ...)` instead.", FutureWarning)
+@deprecate("Use `Console.draw_semigraphics(image, ...)` instead.", category=FutureWarning)
 def image_blit_2x(
     image: tcod.image.Image,
     console: tcod.console.Console,
@@ -3133,12 +3135,12 @@ def image_blit_2x(
     image.blit_2x(console, dx, dy, sx, sy, w, h)
 
 
-@deprecate("Use the `image.save_as` method instead.", FutureWarning)
+@deprecate("Use the `image.save_as` method instead.", category=FutureWarning)
 def image_save(image: tcod.image.Image, filename: str | PathLike[str]) -> None:
     image.save_as(filename)
 
 
-@deprecate("libtcod objects are deleted automatically.", FutureWarning)
+@deprecate("libtcod objects are deleted automatically.", category=FutureWarning)
 def image_delete(image: tcod.image.Image) -> None:
     """Does nothing. libtcod objects are managed by Python's garbage collector.
 
@@ -3146,7 +3148,7 @@ def image_delete(image: tcod.image.Image) -> None:
     """
 
 
-@deprecate("Use tcod.los.bresenham instead.", FutureWarning)
+@deprecate("Use tcod.los.bresenham instead.", category=FutureWarning)
 def line_init(xo: int, yo: int, xd: int, yd: int) -> None:
     """Initialize a line whose points will be returned by `line_step`.
 
@@ -3166,7 +3168,7 @@ def line_init(xo: int, yo: int, xd: int, yd: int) -> None:
     lib.TCOD_line_init(xo, yo, xd, yd)
 
 
-@deprecate("Use tcod.los.bresenham instead.", FutureWarning)
+@deprecate("Use tcod.los.bresenham instead.", category=FutureWarning)
 def line_step() -> tuple[int, int] | tuple[None, None]:
     """After calling line_init returns (x, y) points of the line.
 
@@ -3188,7 +3190,7 @@ def line_step() -> tuple[int, int] | tuple[None, None]:
     return None, None
 
 
-@deprecate("Use tcod.los.bresenham instead.", FutureWarning)
+@deprecate("Use tcod.los.bresenham instead.", category=FutureWarning)
 def line(xo: int, yo: int, xd: int, yd: int, py_callback: Callable[[int, int], bool]) -> bool:
     """Iterate over a line using a callback function.
 
@@ -3220,7 +3222,7 @@ def line(xo: int, yo: int, xd: int, yd: int, py_callback: Callable[[int, int], b
     return False
 
 
-@deprecate("This function has been replaced by tcod.los.bresenham.", FutureWarning)
+@deprecate("This function has been replaced by tcod.los.bresenham.", category=FutureWarning)
 def line_iter(xo: int, yo: int, xd: int, yd: int) -> Iterator[tuple[int, int]]:
     """Returns an Iterable over a Bresenham line.
 
@@ -3247,7 +3249,7 @@ def line_iter(xo: int, yo: int, xd: int, yd: int) -> Iterator[tuple[int, int]]:
         yield (x[0], y[0])
 
 
-@deprecate("This function has been replaced by tcod.los.bresenham.", FutureWarning)
+@deprecate("This function has been replaced by tcod.los.bresenham.", category=FutureWarning)
 def line_where(x1: int, y1: int, x2: int, y2: int, inclusive: bool = True) -> tuple[NDArray[np.intc], NDArray[np.intc]]:
     """Return a NumPy index array following a Bresenham line.
 
@@ -3265,7 +3267,7 @@ def line_where(x1: int, y1: int, x2: int, y2: int, inclusive: bool = True) -> tu
     return i, j
 
 
-@deprecate("Call tcod.map.Map(width, height) instead.", FutureWarning)
+@deprecate("Call tcod.map.Map(width, height) instead.", category=FutureWarning)
 def map_new(w: int, h: int) -> tcod.map.Map:
     """Return a :any:`tcod.map.Map` with a width and height.
 
@@ -3276,7 +3278,7 @@ def map_new(w: int, h: int) -> tcod.map.Map:
     return tcod.map.Map(w, h)
 
 
-@deprecate("Use Python's standard copy module instead.", FutureWarning)
+@deprecate("Use Python's standard copy module instead.", category=FutureWarning)
 def map_copy(source: tcod.map.Map, dest: tcod.map.Map) -> None:
     """Copy map data from `source` to `dest`.
 
@@ -3289,7 +3291,7 @@ def map_copy(source: tcod.map.Map, dest: tcod.map.Map) -> None:
     dest._Map__buffer[:] = source._Map__buffer[:]  # type: ignore
 
 
-@deprecate("Set properties using the m.transparent and m.walkable arrays.", FutureWarning)
+@deprecate("Set properties using the m.transparent and m.walkable arrays.", category=FutureWarning)
 def map_set_properties(m: tcod.map.Map, x: int, y: int, isTrans: bool, isWalk: bool) -> None:
     """Set the properties of a single cell.
 
@@ -3302,7 +3304,7 @@ def map_set_properties(m: tcod.map.Map, x: int, y: int, isTrans: bool, isWalk: b
     lib.TCOD_map_set_properties(m.map_c, x, y, isTrans, isWalk)
 
 
-@deprecate("Clear maps using NumPy broadcast rules instead.", FutureWarning)
+@deprecate("Clear maps using NumPy broadcast rules instead.", category=FutureWarning)
 def map_clear(m: tcod.map.Map, transparent: bool = False, walkable: bool = False) -> None:
     """Change all map cells to a specific value.
 
@@ -3314,7 +3316,7 @@ def map_clear(m: tcod.map.Map, transparent: bool = False, walkable: bool = False
     m.walkable[:] = walkable
 
 
-@deprecate("Call the map.compute_fov method instead.", FutureWarning)
+@deprecate("Call the map.compute_fov method instead.", category=FutureWarning)
 def map_compute_fov(
     m: tcod.map.Map,
     x: int,
@@ -3331,7 +3333,7 @@ def map_compute_fov(
     m.compute_fov(x, y, radius, light_walls, algo)
 
 
-@deprecate("Use map.fov to check for this property.", FutureWarning)
+@deprecate("Use map.fov to check for this property.", category=FutureWarning)
 def map_is_in_fov(m: tcod.map.Map, x: int, y: int) -> bool:
     """Return True if the cell at x,y is lit by the last field-of-view algorithm.
 
@@ -3343,7 +3345,7 @@ def map_is_in_fov(m: tcod.map.Map, x: int, y: int) -> bool:
     return bool(lib.TCOD_map_is_in_fov(m.map_c, x, y))
 
 
-@deprecate("Use map.transparent to check for this property.", FutureWarning)
+@deprecate("Use map.transparent to check for this property.", category=FutureWarning)
 def map_is_transparent(m: tcod.map.Map, x: int, y: int) -> bool:
     """Return True is a map cell is transparent.
 
@@ -3355,7 +3357,7 @@ def map_is_transparent(m: tcod.map.Map, x: int, y: int) -> bool:
     return bool(lib.TCOD_map_is_transparent(m.map_c, x, y))
 
 
-@deprecate("Use map.walkable to check for this property.", FutureWarning)
+@deprecate("Use map.walkable to check for this property.", category=FutureWarning)
 def map_is_walkable(m: tcod.map.Map, x: int, y: int) -> bool:
     """Return True is a map cell is walkable.
 
@@ -3367,7 +3369,7 @@ def map_is_walkable(m: tcod.map.Map, x: int, y: int) -> bool:
     return bool(lib.TCOD_map_is_walkable(m.map_c, x, y))
 
 
-@deprecate("libtcod objects are deleted automatically.", FutureWarning)
+@deprecate("libtcod objects are deleted automatically.", category=FutureWarning)
 def map_delete(m: tcod.map.Map) -> None:
     """Does nothing. libtcod objects are managed by Python's garbage collector.
 
@@ -3375,7 +3377,7 @@ def map_delete(m: tcod.map.Map) -> None:
     """
 
 
-@deprecate("Check the map.width attribute instead.", FutureWarning)
+@deprecate("Check the map.width attribute instead.", category=FutureWarning)
 def map_get_width(map: tcod.map.Map) -> int:
     """Return the width of a map.
 
@@ -3385,7 +3387,7 @@ def map_get_width(map: tcod.map.Map) -> int:
     return map.width
 
 
-@deprecate("Check the map.height attribute instead.", FutureWarning)
+@deprecate("Check the map.height attribute instead.", category=FutureWarning)
 def map_get_height(map: tcod.map.Map) -> int:
     """Return the height of a map.
 
@@ -3395,7 +3397,7 @@ def map_get_height(map: tcod.map.Map) -> int:
     return map.height
 
 
-@deprecate("Use `tcod.sdl.mouse.show(visible)` instead.", FutureWarning)
+@deprecate("Use `tcod.sdl.mouse.show(visible)` instead.", category=FutureWarning)
 def mouse_show_cursor(visible: bool) -> None:
     """Change the visibility of the mouse cursor.
 
@@ -3405,7 +3407,7 @@ def mouse_show_cursor(visible: bool) -> None:
     lib.TCOD_mouse_show_cursor(visible)
 
 
-@deprecate("Use `is_visible = tcod.sdl.mouse.show()` instead.", FutureWarning)
+@deprecate("Use `is_visible = tcod.sdl.mouse.show()` instead.", category=FutureWarning)
 def mouse_is_cursor_visible() -> bool:
     """Return True if the mouse cursor is visible.
 
@@ -3415,12 +3417,12 @@ def mouse_is_cursor_visible() -> bool:
     return bool(lib.TCOD_mouse_is_cursor_visible())
 
 
-@deprecate("Use `tcod.sdl.mouse.warp_in_window` instead.", FutureWarning)
+@deprecate("Use `tcod.sdl.mouse.warp_in_window` instead.", category=FutureWarning)
 def mouse_move(x: int, y: int) -> None:
     lib.TCOD_mouse_move(x, y)
 
 
-@deprecate("Use tcod.event.get_mouse_state() instead.", FutureWarning)
+@deprecate("Use tcod.event.get_mouse_state() instead.", category=FutureWarning)
 def mouse_get_status() -> Mouse:
     return Mouse(lib.TCOD_mouse_get_status())
 
@@ -3457,7 +3459,7 @@ def namegen_destroy() -> None:
     lib.TCOD_namegen_destroy()
 
 
-@deprecate("Use `tcod.noise.Noise(dimensions, hurst=, lacunarity=)` instead.", FutureWarning)
+@deprecate("Use `tcod.noise.Noise(dimensions, hurst=, lacunarity=)` instead.", category=FutureWarning)
 def noise_new(
     dim: int,
     h: float = NOISE_DEFAULT_HURST,
@@ -3478,7 +3480,7 @@ def noise_new(
     return tcod.noise.Noise(dim, hurst=h, lacunarity=l, seed=random)
 
 
-@deprecate("Use `noise.algorithm = x` instead.", FutureWarning)
+@deprecate("Use `noise.algorithm = x` instead.", category=FutureWarning)
 def noise_set_type(n: tcod.noise.Noise, typ: int) -> None:
     """Set a Noise objects default noise algorithm.
 
@@ -3489,7 +3491,7 @@ def noise_set_type(n: tcod.noise.Noise, typ: int) -> None:
     n.algorithm = typ
 
 
-@deprecate("Use `value = noise[x]` instead.", FutureWarning)
+@deprecate("Use `value = noise[x]` instead.", category=FutureWarning)
 def noise_get(n: tcod.noise.Noise, f: Sequence[float], typ: int = NOISE_DEFAULT) -> float:
     """Return the noise value sampled from the ``f`` coordinate.
 
@@ -3509,7 +3511,7 @@ def noise_get(n: tcod.noise.Noise, f: Sequence[float], typ: int = NOISE_DEFAULT)
     return float(lib.TCOD_noise_get_ex(n.noise_c, ffi.new("float[4]", f), typ))
 
 
-@deprecate("Configure a Noise instance for FBM and then sample it like normal.", FutureWarning)
+@deprecate("Configure a Noise instance for FBM and then sample it like normal.", category=FutureWarning)
 def noise_get_fbm(
     n: tcod.noise.Noise,
     f: Sequence[float],
@@ -3530,7 +3532,7 @@ def noise_get_fbm(
     return float(lib.TCOD_noise_get_fbm_ex(n.noise_c, ffi.new("float[4]", f), oc, typ))
 
 
-@deprecate("Configure a Noise instance for FBM and then sample it like normal.", FutureWarning)
+@deprecate("Configure a Noise instance for FBM and then sample it like normal.", category=FutureWarning)
 def noise_get_turbulence(
     n: tcod.noise.Noise,
     f: Sequence[float],
@@ -3551,7 +3553,7 @@ def noise_get_turbulence(
     return float(lib.TCOD_noise_get_turbulence_ex(n.noise_c, ffi.new("float[4]", f), oc, typ))
 
 
-@deprecate("libtcod objects are deleted automatically.", FutureWarning)
+@deprecate("libtcod objects are deleted automatically.", category=FutureWarning)
 def noise_delete(n: tcod.noise.Noise) -> None:
     # type (Any) -> None
     """Does nothing. libtcod objects are managed by Python's garbage collector.

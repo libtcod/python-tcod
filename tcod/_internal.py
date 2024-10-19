@@ -2,17 +2,16 @@
 
 from __future__ import annotations
 
-import functools
 import locale
 import sys
 import warnings
 from pathlib import Path
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, AnyStr, Callable, NoReturn, SupportsInt, TypeVar, cast
+from typing import TYPE_CHECKING, Any, AnyStr, Callable, NoReturn, SupportsInt, TypeVar
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
-from typing_extensions import Literal
+from typing_extensions import Literal, LiteralString, deprecated
 
 from tcod.cffi import ffi, lib
 
@@ -24,31 +23,28 @@ F = TypeVar("F", bound=FuncType)
 T = TypeVar("T")
 
 
-def deprecate(message: str, category: type[Warning] = DeprecationWarning, stacklevel: int = 0) -> Callable[[F], F]:
-    """Return a decorator which adds a warning to functions."""
+def _deprecate_passthrough(
+    message: str, /, *, category: type[Warning] = DeprecationWarning, stacklevel: int = 0
+) -> Callable[[F], F]:
+    """Return a decorator which skips wrapping a warning onto functions. This is used for non-debug runs."""
 
     def decorator(func: F) -> F:
-        if not __debug__:
-            return func
-
-        @functools.wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
-            warnings.warn(message, category, stacklevel=stacklevel + 2)
-            return func(*args, **kwargs)
-
-        return cast(F, wrapper)
+        return func
 
     return decorator
 
 
+deprecate = deprecated if __debug__ or TYPE_CHECKING else _deprecate_passthrough
+
+
 def pending_deprecate(
-    message: str = "This function may be deprecated in the future."
+    message: LiteralString = "This function may be deprecated in the future."
     " Consider raising an issue on GitHub if you need this feature.",
     category: type[Warning] = PendingDeprecationWarning,
     stacklevel: int = 0,
 ) -> Callable[[F], F]:
     """Like deprecate, but the default parameters are filled out for a generic pending deprecation warning."""
-    return deprecate(message, category, stacklevel)
+    return deprecate(message, category=category, stacklevel=stacklevel)
 
 
 def verify_order(order: Literal["C", "F"]) -> Literal["C", "F"]:
@@ -119,7 +115,7 @@ def _unicode(string: AnyStr, stacklevel: int = 2) -> str:
             stacklevel=stacklevel + 1,
         )
         return string.decode("latin-1")
-    return string
+    return str(string)
 
 
 def _fmt(string: str, stacklevel: int = 2) -> bytes:
@@ -271,5 +267,5 @@ class TempImage:
 def _as_image(image: ArrayLike | tcod.image.Image) -> TempImage | tcod.image.Image:
     """Convert this input into an Image-like object."""
     if hasattr(image, "image_c"):
-        return image  # type: ignore
+        return image
     return TempImage(image)

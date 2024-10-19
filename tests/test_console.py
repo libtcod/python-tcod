@@ -65,7 +65,7 @@ def test_console_defaults() -> None:
 
 
 @pytest.mark.filterwarnings("ignore:Parameter names have been moved around,")
-@pytest.mark.filterwarnings("ignore:Pass the key color to Console.blit instea")
+@pytest.mark.filterwarnings("ignore:Pass the key color to Console.blit instead")
 @pytest.mark.filterwarnings("ignore:.*default values have been deprecated")
 def test_console_methods() -> None:
     console = tcod.console.Console(width=12, height=10)
@@ -150,7 +150,7 @@ def test_rexpaint(tmp_path: Path) -> None:
     assert consoles[0].rgb.shape == loaded[0].rgb.shape
     assert consoles[1].rgb.shape == loaded[1].rgb.shape
     with pytest.raises(FileNotFoundError):
-        tcod.console.load_xp(tmp_path / "non_existant")
+        tcod.console.load_xp(tmp_path / "non_existent")
 
 
 def test_draw_frame() -> None:

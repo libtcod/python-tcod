@@ -31,7 +31,7 @@ class Color(List[int]):
         return int(self[0])
 
     @r.setter
-    @deprecate("Setting color attributes has been deprecated.", FutureWarning)
+    @deprecate("Setting color attributes has been deprecated.", category=FutureWarning)
     def r(self, value: int) -> None:
         self[0] = value & 0xFF
 
@@ -45,7 +45,7 @@ class Color(List[int]):
         return int(self[1])
 
     @g.setter
-    @deprecate("Setting color attributes has been deprecated.", FutureWarning)
+    @deprecate("Setting color attributes has been deprecated.", category=FutureWarning)
     def g(self, value: int) -> None:
         self[1] = value & 0xFF
 
@@ -59,7 +59,7 @@ class Color(List[int]):
         return int(self[2])
 
     @b.setter
-    @deprecate("Setting color attributes has been deprecated.", FutureWarning)
+    @deprecate("Setting color attributes has been deprecated.", category=FutureWarning)
     def b(self, value: int) -> None:
         self[2] = value & 0xFF
 
@@ -82,7 +82,7 @@ class Color(List[int]):
             return super().__getitem__("rgb".index(index))
         return super().__getitem__(index)
 
-    @deprecate("This class will not be mutable in the future.", FutureWarning)
+    @deprecate("This class will not be mutable in the future.", category=FutureWarning)
     def __setitem__(self, index: Any, value: Any) -> None:  # noqa: ANN401, D105
         if isinstance(index, str):
             super().__setitem__("rgb".index(index), value)
@@ -99,7 +99,7 @@ class Color(List[int]):
         except TypeError:
             return False
 
-    @deprecate("Use NumPy instead for color math operations.", FutureWarning)
+    @deprecate("Use NumPy instead for color math operations.", category=FutureWarning)
     def __add__(self, other: object) -> Color:  # type: ignore[override]
         """Add two colors together.
 
@@ -108,7 +108,7 @@ class Color(List[int]):
         """
         return Color._new_from_cdata(lib.TCOD_color_add(self, other))
 
-    @deprecate("Use NumPy instead for color math operations.", FutureWarning)
+    @deprecate("Use NumPy instead for color math operations.", category=FutureWarning)
     def __sub__(self, other: object) -> Color:
         """Subtract one color from another.
 
@@ -117,7 +117,7 @@ class Color(List[int]):
         """
         return Color._new_from_cdata(lib.TCOD_color_subtract(self, other))
 
-    @deprecate("Use NumPy instead for color math operations.", FutureWarning)
+    @deprecate("Use NumPy instead for color math operations.", category=FutureWarning)
     def __mul__(self, other: object) -> Color:
         """Multiply with a scaler or another color.
 

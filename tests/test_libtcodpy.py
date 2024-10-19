@@ -260,9 +260,9 @@ def test_console_fill_numpy(console: tcod.console.Console) -> None:
     for y in range(height):
         fill[y, :] = y % 256
 
-    libtcodpy.console_fill_background(console, fill, fill, fill)  # type: ignore
-    libtcodpy.console_fill_foreground(console, fill, fill, fill)  # type: ignore
-    libtcodpy.console_fill_char(console, fill)  # type: ignore
+    libtcodpy.console_fill_background(console, fill, fill, fill)
+    libtcodpy.console_fill_foreground(console, fill, fill, fill)
+    libtcodpy.console_fill_char(console, fill)
 
     # verify fill
     bg: NDArray[np.intc] = np.zeros((height, width), dtype=np.intc)

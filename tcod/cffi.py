@@ -59,7 +59,7 @@ if sys.platform == "win32":
 
 
 verify_dependencies()
-from tcod._libtcod import ffi, lib  # noqa
+from tcod._libtcod import ffi, lib  # noqa: E402
 
 __sdl_version__ = get_sdl_version()
 
