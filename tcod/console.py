@@ -357,8 +357,7 @@ Consider one of the following:
     console.print(x, y, string, fg=None)
 """
 
-    @property
-    @deprecated(_DEPRECATE_CONSOLE_DEFAULTS_MSG, category=FutureWarning)
+    @property  # Getters used internally, so only deprecate the setters.
     def default_bg(self) -> tuple[int, int, int]:
         """Tuple[int, int, int]: The default background color.
 
@@ -379,7 +378,6 @@ Consider one of the following:
         self._console_data.back = color
 
     @property
-    @deprecated(_DEPRECATE_CONSOLE_DEFAULTS_MSG, category=FutureWarning)
     def default_fg(self) -> tuple[int, int, int]:
         """Tuple[int, int, int]: The default foreground color.
 
@@ -395,7 +393,6 @@ Consider one of the following:
         self._console_data.fore = color
 
     @property
-    @deprecated(_DEPRECATE_CONSOLE_DEFAULTS_MSG, category=FutureWarning)
     def default_bg_blend(self) -> int:
         """int: The default blending mode.
 
@@ -410,7 +407,6 @@ Consider one of the following:
         self._console_data.bkgnd_flag = value
 
     @property
-    @deprecated(_DEPRECATE_CONSOLE_DEFAULTS_MSG, category=FutureWarning)
     def default_alignment(self) -> int:
         """int: The default text alignment.
 
