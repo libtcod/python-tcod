@@ -5,7 +5,6 @@
 # https://creativecommons.org/publicdomain/zero/1.0/
 """PyInstaller main script example."""
 
-import sys
 from pathlib import Path
 
 import tcod.console
@@ -15,8 +14,8 @@ import tcod.tileset
 
 WIDTH, HEIGHT = 80, 60
 
-# The base directory, this is sys._MEIPASS when in one-file mode.
-BASE_DIR = Path(getattr(sys, "_MEIPASS", "."))
+BASE_DIR = Path(__file__).parent
+"""The directory of this script."""
 
 FONT_PATH = BASE_DIR / "data/terminal8x8_gs_ro.png"
 

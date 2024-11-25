@@ -1,5 +1,7 @@
 """Tileset and font related functions.
 
+If you want to load a tileset from a common tileset image then you only need :any:`tcod.tileset.load_tilesheet`.
+
 Tilesets can be loaded as a whole from tile-sheets or True-Type fonts, or they
 can be put together from multiple tile images by loading them separately
 using :any:`Tileset.set_tile`.
@@ -341,6 +343,24 @@ def load_tilesheet(path: str | PathLike[str], columns: int, rows: int, charmap: 
     tiles onto proper Unicode.
     If `None` is used then no tiles will be mapped, you will need to use
     :any:`Tileset.remap` to assign codepoints to this Tileset.
+
+    Image alpha and key colors are handled automatically.
+    For example any tileset from the `Dwarf Fortress tileset repository <https://dwarffortresswiki.org/index.php/DF2014:Tileset_repository>`_
+    will load correctly with the following example:
+
+    Example::
+
+        from pathlib import Path
+
+        import tcod.tileset
+
+        THIS_DIR = Path(__file__, "..")  # Directory of this script file
+        FONT = THIS_DIR / "assets/tileset.png"  # Replace with any tileset from the DF tileset repository
+
+        # Will raise FileNotFoundError if the font is missing!
+        tileset = tcod.tileset.load_tilesheet(FONT, 16, 16, tcod.tileset.CHARMAP_CP437)
+
+    The tileset return value is usually passed to the `tileset` parameter of :any:`tcod.context.new`.
 
     .. versionadded:: 11.12
     """
