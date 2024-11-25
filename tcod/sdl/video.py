@@ -20,11 +20,11 @@ from tcod.cffi import ffi, lib
 from tcod.sdl._internal import _check, _check_p, _required_version, _version_at_least
 
 __all__ = (
-    "WindowFlags",
     "FlashOperation",
     "Window",
-    "new_window",
+    "WindowFlags",
     "get_grabbed_window",
+    "new_window",
     "screen_saver_allowed",
 )
 

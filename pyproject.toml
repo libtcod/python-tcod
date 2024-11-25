@@ -178,20 +178,18 @@ select = [
     "D",   # pydocstyle
 ]
 ignore = [
-    "E501",   # line-too-long
-    "S101",   # assert
-    "S301",   # suspicious-pickle-usage
-    "S311",   # suspicious-non-cryptographic-random-usage
-    "ANN101", # missing-type-self
-    "ANN102", # missing-type-cls
-    "D203",   # one-blank-line-before-class
-    "D204",   # one-blank-line-after-class
-    "D213",   # multi-line-summary-second-line
-    "D407",   # dashed-underline-after-section
-    "D408",   # section-underline-after-name
-    "D409",   # section-underline-matches-section-length
-    "D206",   # indent-with-spaces
-    "W191",   # tab-indentation
+    "E501", # line-too-long
+    "S101", # assert
+    "S301", # suspicious-pickle-usage
+    "S311", # suspicious-non-cryptographic-random-usage
+    "D203", # one-blank-line-before-class
+    "D204", # one-blank-line-after-class
+    "D213", # multi-line-summary-second-line
+    "D407", # dashed-underline-after-section
+    "D408", # section-underline-after-name
+    "D409", # section-underline-matches-section-length
+    "D206", # indent-with-spaces
+    "W191", # tab-indentation
 ]
 
 [tool.ruff.lint.pydocstyle] # https://docs.astral.sh/ruff/settings/#lintpydocstyle

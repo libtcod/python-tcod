@@ -19,22 +19,22 @@ from tcod.tcod import __getattr__  # noqa: F401
 from tcod.version import __version__
 
 __all__ = [
-    "__version__",
+    "Console",
     "__sdl_version__",
-    "lib",
-    "ffi",
+    "__version__",
     "bsp",
     "color",
     "console",
     "context",
     "event",
-    "tileset",
+    "ffi",
     "image",
+    "lib",
     "los",
     "map",
     "noise",
     "path",
     "random",
     "tileset",
-    "Console",
+    "tileset",
 ]

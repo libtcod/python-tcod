@@ -44,24 +44,24 @@ from tcod._internal import _check, _check_warn
 from tcod.cffi import ffi, lib
 
 __all__ = (
-    "Context",
-    "new",
-    "new_window",
-    "new_terminal",
-    "SDL_WINDOW_FULLSCREEN",
-    "SDL_WINDOW_FULLSCREEN_DESKTOP",
-    "SDL_WINDOW_HIDDEN",
-    "SDL_WINDOW_BORDERLESS",
-    "SDL_WINDOW_RESIZABLE",
-    "SDL_WINDOW_MINIMIZED",
-    "SDL_WINDOW_MAXIMIZED",
-    "SDL_WINDOW_INPUT_GRABBED",
-    "SDL_WINDOW_ALLOW_HIGHDPI",
     "RENDERER_OPENGL",
     "RENDERER_OPENGL2",
     "RENDERER_SDL",
     "RENDERER_SDL2",
     "RENDERER_XTERM",
+    "SDL_WINDOW_ALLOW_HIGHDPI",
+    "SDL_WINDOW_BORDERLESS",
+    "SDL_WINDOW_FULLSCREEN",
+    "SDL_WINDOW_FULLSCREEN_DESKTOP",
+    "SDL_WINDOW_HIDDEN",
+    "SDL_WINDOW_INPUT_GRABBED",
+    "SDL_WINDOW_MAXIMIZED",
+    "SDL_WINDOW_MINIMIZED",
+    "SDL_WINDOW_RESIZABLE",
+    "Context",
+    "new",
+    "new_terminal",
+    "new_window",
 )
 
 _Event = TypeVar("_Event", bound=tcod.event.Event)

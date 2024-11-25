@@ -503,7 +503,7 @@ violet = Color(127, 0, 255)
 white = Color(255, 255, 255)
 yellow = Color(255, 255, 0)
 
-__all__ = [
+__all__ = [  # noqa: RUF022
     "FOV_BASIC",
     "FOV_DIAMOND",
     "FOV_PERMISSIVE_0",

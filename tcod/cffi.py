@@ -76,4 +76,4 @@ def _libtcod_log_watcher(message: Any, userdata: None) -> None:  # noqa: ANN401
 lib.TCOD_set_log_callback(lib._libtcod_log_watcher, ffi.NULL)
 lib.TCOD_set_log_level(0)
 
-__all__ = ["ffi", "lib", "__sdl_version__"]
+__all__ = ["__sdl_version__", "ffi", "lib"]

@@ -79,12 +79,12 @@ __all__ = [
     "console",
     "context",
     "event",
-    "tileset",
     "image",
     "los",
     "map",
     "noise",
     "path",
     "random",
+    "tileset",
     "tileset",
 ]

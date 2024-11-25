@@ -539,7 +539,7 @@ _REVERSE_WHEEL_TABLE = {
     1027: "MOUSEWHEEL",
 }
 
-__all__ = [
+__all__ = [  # noqa: RUF022
     "MOUSEWHEEL_NORMAL",
     "MOUSEWHEEL_FLIPPED",
     "MOUSEWHEEL",

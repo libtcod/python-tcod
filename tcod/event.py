@@ -2818,7 +2818,7 @@ def __getattr__(name: str) -> int:
     return value
 
 
-__all__ = [  # noqa: F405
+__all__ = [  # noqa: F405 RUF022
     "Modifier",
     "Point",
     "BUTTON_LEFT",
