@@ -675,29 +675,33 @@ class Renderer:
     def geometry(
         self,
         texture: Texture | None,
-        xy: NDArray[np.float32],
-        color: NDArray[np.uint8],
-        uv: NDArray[np.float32],
+        xy: NDArray[np.float32] | Sequence[tuple[float, float]],
+        color: NDArray[np.uint8] | Sequence[tuple[int, int, int, int]],
+        uv: NDArray[np.float32] | Sequence[tuple[float, float]],
         indices: NDArray[np.uint8 | np.uint16 | np.uint32] | None = None,
     ) -> None:
         """Render triangles from texture and vertex data.
 
+        Args:
+            texture: The SDL texture to render from.
+            xy: A sequence of (x, y) points to buffer.
+            color: A sequence of (r, g, b, a) colors to buffer.
+            uv: A sequence of (x, y) coordinates to buffer.
+            indices: A sequence of indexes referring to the buffered data, every 3 indexes is a triangle to render.
+
         .. versionadded:: 13.5
         """
-        assert xy.dtype == np.float32
+        xy = np.ascontiguousarray(xy, np.float32)
         assert len(xy.shape) == 2  # noqa: PLR2004
         assert xy.shape[1] == 2  # noqa: PLR2004
-        assert xy[0].flags.c_contiguous
 
-        assert color.dtype == np.uint8
+        color = np.ascontiguousarray(color, np.uint8)
         assert len(color.shape) == 2  # noqa: PLR2004
         assert color.shape[1] == 4  # noqa: PLR2004
-        assert color[0].flags.c_contiguous
 
-        assert uv.dtype == np.float32
+        uv = np.ascontiguousarray(uv, np.float32)
         assert len(uv.shape) == 2  # noqa: PLR2004
         assert uv.shape[1] == 2  # noqa: PLR2004
-        assert uv[0].flags.c_contiguous
         if indices is not None:
             assert indices.dtype.type in (np.uint8, np.uint16, np.uint32, np.int8, np.int16, np.int32)
             indices = np.ascontiguousarray(indices)
@@ -709,7 +713,7 @@ class Renderer:
                 texture.p if texture else ffi.NULL,
                 ffi.cast("float*", xy.ctypes.data),
                 xy.strides[0],
-                ffi.cast("uint8_t*", color.ctypes.data),
+                ffi.cast("SDL_Color*", color.ctypes.data),
                 color.strides[0],
                 ffi.cast("float*", uv.ctypes.data),
                 uv.strides[0],

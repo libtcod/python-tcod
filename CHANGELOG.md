@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 ### Fixed
 
 - `tcod.sdl.Renderer.draw_lines` type hint was too narrow.
+- Fixed crash in `tcod.sdl.Renderer.geometry`.
 
 ## [17.0.0] - 2025-03-28
 

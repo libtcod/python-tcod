@@ -99,6 +99,14 @@ def test_sdl_render(uses_window: None) -> None:
     with pytest.raises(TypeError, match=r"must have 2 axes"):
         render.draw_points(np.ones((3,), dtype=dtype))
 
+    render.geometry(
+        None,
+        np.zeros((1, 2), np.float32),
+        np.zeros((1, 4), np.uint8),
+        np.zeros((1, 2), np.float32),
+        np.zeros((3,), np.uint8),
+    )
+
 
 def test_sdl_render_bad_types() -> None:
     with pytest.raises(TypeError):
