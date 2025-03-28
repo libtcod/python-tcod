@@ -76,6 +76,23 @@ def test_sdl_render(uses_window: None) -> None:
     assert (render.read_pixels(format="RGB") == (0, 0, 0)).all()
     assert render.read_pixels(rect=(1, 2, 3, 4)).shape == (4, 3, 4)
 
+    render.clear()
+
+    render.draw_point((0, 0))
+    render.draw_points(np.ones((3, 2), dtype=np.float32))
+    render.draw_points(np.ones((3, 2), dtype=np.intc))
+    render.draw_points(np.ones((3, 2), dtype=np.float16))
+    render.draw_points(np.ones((3, 2), dtype=np.int8))
+    render.draw_line((0, 0), (1, 1))
+    render.draw_lines(np.ones((3, 2), dtype=np.float32))
+    render.draw_lines(np.ones((3, 2), dtype=np.intc))
+    render.draw_rect((0, 0, 1, 1))
+    render.draw_rects(np.ones((3, 4), dtype=np.float32))
+    render.draw_rects(np.ones((3, 4), dtype=np.intc))
+    render.fill_rect((0, 0, 1, 1))
+    render.fill_rects(np.ones((3, 4), dtype=np.float32))
+    render.fill_rects(np.ones((3, 4), dtype=np.intc))
+
 
 def test_sdl_render_bad_types() -> None:
     with pytest.raises(TypeError):

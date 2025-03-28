@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 ### Fixed
 
 - Suppressed internal `mouse.tile_motion` deprecation warning.
+- Fixed SDL renderer primitive drawing methods. #159
 
 ## [16.2.3] - 2024-07-16
 
