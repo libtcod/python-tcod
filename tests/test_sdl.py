@@ -58,7 +58,9 @@ def test_sdl_screen_saver(uses_window: None) -> None:
 def test_sdl_render(uses_window: None) -> None:
     window = tcod.sdl.video.new_window(1, 1)
     render = tcod.sdl.render.new_renderer(window, software=True, vsync=False, target_textures=True)
+    render.clear()
     render.present()
+    render.clear()
     rgb = render.upload_texture(np.zeros((8, 8, 3), np.uint8))
     assert (rgb.width, rgb.height) == (8, 8)
     assert rgb.access == tcod.sdl.render.TextureAccess.STATIC
@@ -75,8 +77,6 @@ def test_sdl_render(uses_window: None) -> None:
     assert (render.read_pixels() == (0, 0, 0, 255)).all()
     assert (render.read_pixels(format="RGB") == (0, 0, 0)).all()
     assert render.read_pixels(rect=(1, 2, 3, 4)).shape == (4, 3, 4)
-
-    render.clear()
 
     render.draw_point((0, 0))
     render.draw_points(np.ones((3, 2), dtype=np.float32))
