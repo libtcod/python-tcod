@@ -33,7 +33,7 @@ SDL2_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "2.28.1")
 # Used to remove excessive newlines in debug outputs.
 RE_NEWLINES = re.compile(r"\n\n+")
 # Functions using va_list need to be culled.
-RE_VAFUNC = re.compile(r"^.*?\([^()]*va_list[^()]*\);$", re.MULTILINE)
+RE_VAFUNC = re.compile(r"^.*?\([^()]*va_list[^()]*\)\s*;\s*$", re.MULTILINE)
 # Static inline functions need to be culled.
 RE_INLINE = re.compile(r"^static inline.*?^}$", re.MULTILINE | re.DOTALL)
 # Most SDL_PIXELFORMAT names need their values scrubbed.

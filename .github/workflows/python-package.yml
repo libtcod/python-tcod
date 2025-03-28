@@ -71,7 +71,7 @@ jobs:
     strategy:
       matrix:
         os: ["windows-latest", "macos-latest"]
-        sdl-version: ["2.0.14", "2.0.16"]
+        sdl-version: ["2.0.14", "2.0.16", "2.30.0"]
       fail-fast: true
     steps:
       - uses: actions/checkout@v4
