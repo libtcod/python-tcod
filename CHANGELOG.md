@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [17.0.0] - 2025-03-28
+
 ### Changed
 
 - `EventDispatch`'s on event methods are now defined as positional parameters, so renaming the `event` parameter is now valid in subclasses.
