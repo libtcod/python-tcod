@@ -60,6 +60,9 @@ IGNORE_DEFINES = frozenset(
         "SDL_INLINE",
         "SDL_FORCE_INLINE",
         "SDL_FALLTHROUGH",
+        "SDL_HAS_FALLTHROUGH",
+        "SDL_NO_THREAD_SAFETY_ANALYSIS",
+        "SDL_SCOPED_CAPABILITY",
         # Might show up in parsing and not in source.
         "SDL_ANDROID_EXTERNAL_STORAGE_READ",
         "SDL_ANDROID_EXTERNAL_STORAGE_WRITE",
