@@ -697,7 +697,7 @@ def bsp_traverse_level_order(
     _bsp_traverse(node.level_order(), callback, userData)
 
 
-@deprecate("Iterate over nodes using " "'for n in node.inverted_level_order():' instead.")
+@deprecate("Iterate over nodes using 'for n in node.inverted_level_order():' instead.")
 def bsp_traverse_inverted_level_order(
     node: tcod.bsp.BSP,
     callback: Callable[[tcod.bsp.BSP, Any], None],
@@ -1863,7 +1863,7 @@ def console_delete(con: tcod.console.Console) -> None:
         )
     else:
         warnings.warn(
-            "You no longer need to make this call, " "Console's are deleted when they go out of scope.",
+            "You no longer need to make this call, Console's are deleted when they go out of scope.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -2398,7 +2398,7 @@ def heightmap_set_value(hm: NDArray[np.float32], x: int, y: int, value: float) -
     """
     if hm.flags["C_CONTIGUOUS"]:
         warnings.warn(
-            "Assign to this heightmap with hm[i,j] = value\n" "consider using order='F'",
+            "Assign to this heightmap with hm[i,j] = value\nconsider using order='F'",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -2847,7 +2847,7 @@ def heightmap_get_value(hm: NDArray[np.float32], x: int, y: int) -> float:
     """
     if hm.flags["C_CONTIGUOUS"]:
         warnings.warn(
-            "Get a value from this heightmap with hm[i,j]\n" "consider using order='F'",
+            "Get a value from this heightmap with hm[i,j]\nconsider using order='F'",
             DeprecationWarning,
             stacklevel=2,
         )

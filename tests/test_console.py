@@ -112,7 +112,7 @@ def test_console_str() -> None:
     console.ch[:] = ord(".")
     with pytest.warns():
         console.print_(0, 0, "Test")
-    assert str(console) == ("<Test......\n" " ..........>")
+    assert str(console) == ("<Test......\n ..........>")
 
 
 def test_console_fortran_buffer() -> None:

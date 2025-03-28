@@ -77,7 +77,7 @@ def run_test(
     for i in range(1, THREADS + 1):
         executor = concurrent.futures.ThreadPoolExecutor(i)
         multi_time = min(timeit.repeat(lambda: multi_func(executor, maps), number=1, repeat=REPEAT))
-        print(f"{i} threads: {multi_time * 1000:.2f}ms, " f"{single_time / (multi_time * i) * 100:.2f}% efficiency")
+        print(f"{i} threads: {multi_time * 1000:.2f}ms, {single_time / (multi_time * i) * 100:.2f}% efficiency")
 
 
 def main() -> None:
@@ -89,13 +89,10 @@ def main() -> None:
 
     print(f"Python {sys.version}\n{platform.platform()}\n{platform.processor()}")
 
-    print(f"\nComputing field-of-view for " f"{len(maps)} empty {MAP_WIDTH}x{MAP_HEIGHT} maps.")
+    print(f"\nComputing field-of-view for {len(maps)} empty {MAP_WIDTH}x{MAP_HEIGHT} maps.")
     run_test(maps, test_fov_single, test_fov_threads)
 
-    print(
-        f"\nComputing AStar from corner to corner {len(maps)} times "
-        f"on separate empty {MAP_WIDTH}x{MAP_HEIGHT} maps."
-    )
+    print(f"\nComputing AStar from corner to corner {len(maps)} times on separate empty {MAP_WIDTH}x{MAP_HEIGHT} maps.")
     run_test(maps, test_astar_single, test_astar_threads)
 
 

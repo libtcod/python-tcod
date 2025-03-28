@@ -831,7 +831,7 @@ class JoystickEvent(Event):
         return tcod.sdl.joystick.Joystick._from_instance_id(self.which)
 
     def __repr__(self) -> str:
-        return f"tcod.event.{self.__class__.__name__}" f"(type={self.type!r}, which={self.which})"
+        return f"tcod.event.{self.__class__.__name__}(type={self.type!r}, which={self.which})"
 
     def __str__(self) -> str:
         prefix = super().__str__().strip("<>")
@@ -934,9 +934,7 @@ class JoystickHat(JoystickEvent):
         return cls("JOYHATMOTION", sdl_event.jhat.which, *_HAT_DIRECTIONS[sdl_event.jhat.hat])
 
     def __repr__(self) -> str:
-        return (
-            f"tcod.event.{self.__class__.__name__}" f"(type={self.type!r}, which={self.which}, x={self.x}, y={self.y})"
-        )
+        return f"tcod.event.{self.__class__.__name__}(type={self.type!r}, which={self.which}, x={self.x}, y={self.y})"
 
     def __str__(self) -> str:
         prefix = super().__str__().strip("<>")
@@ -977,7 +975,7 @@ class JoystickButton(JoystickEvent):
         return cls(type, sdl_event.jbutton.which, sdl_event.jbutton.button)
 
     def __repr__(self) -> str:
-        return f"tcod.event.{self.__class__.__name__}" f"(type={self.type!r}, which={self.which}, button={self.button})"
+        return f"tcod.event.{self.__class__.__name__}(type={self.type!r}, which={self.which}, button={self.button})"
 
     def __str__(self) -> str:
         prefix = super().__str__().strip("<>")
@@ -1032,7 +1030,7 @@ class ControllerEvent(Event):
         return tcod.sdl.joystick.GameController._from_instance_id(self.which)
 
     def __repr__(self) -> str:
-        return f"tcod.event.{self.__class__.__name__}" f"(type={self.type!r}, which={self.which})"
+        return f"tcod.event.{self.__class__.__name__}(type={self.type!r}, which={self.which})"
 
     def __str__(self) -> str:
         prefix = super().__str__().strip("<>")

@@ -29,7 +29,7 @@ def _fmt(string: str) -> bytes:
 
 _root_console = None
 
-rgba_graphic = np.dtype([("ch", np.intc), ("fg", "4B"), ("bg", "4B")])
+rgba_graphic: np.dtype[Any] = np.dtype([("ch", np.intc), ("fg", "4B"), ("bg", "4B")])
 """A NumPy :any:`dtype` compatible with :any:`Console.rgba`.
 
 This dtype is: ``np.dtype([("ch", np.intc), ("fg", "4B"), ("bg", "4B")])``
@@ -37,7 +37,7 @@ This dtype is: ``np.dtype([("ch", np.intc), ("fg", "4B"), ("bg", "4B")])``
 .. versionadded:: 12.3
 """
 
-rgb_graphic = np.dtype([("ch", np.intc), ("fg", "3B"), ("bg", "3B")])
+rgb_graphic: np.dtype[Any] = np.dtype([("ch", np.intc), ("fg", "3B"), ("bg", "3B")])
 """A NumPy :any:`dtype` compatible with :any:`Console.rgb`.
 
 This dtype is: ``np.dtype([("ch", np.intc), ("fg", "3B"), ("bg", "3B")])``
@@ -104,7 +104,7 @@ class Console:
     DTYPE = rgba_graphic
 
     # A structured array type with the added "fg_rgb" and "bg_rgb" fields.
-    _DTYPE_RGB = np.dtype(
+    _DTYPE_RGB: np.dtype[Any] = np.dtype(
         {
             "names": ["ch", "fg", "bg"],
             "formats": [np.int32, "3u1", "3u1"],
@@ -955,7 +955,7 @@ Consider one of the following:
 
     def __repr__(self) -> str:
         """Return a string representation of this console."""
-        return "tcod.console.Console(width=%i, height=%i, " "order=%r,buffer=\n%r)" % (
+        return "tcod.console.Console(width=%i, height=%i, order=%r,buffer=\n%r)" % (
             self.width,
             self.height,
             self._order,

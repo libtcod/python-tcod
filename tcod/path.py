@@ -171,7 +171,7 @@ class _PathFinder:
 
         if not hasattr(self.cost, "get_tcod_path_ffi"):
             assert not callable(self.cost), (
-                "Any callback alone is missing shape information. " "Wrap your callback in tcod.path.EdgeCostCallback"
+                "Any callback alone is missing shape information. Wrap your callback in tcod.path.EdgeCostCallback"
             )
             self.cost = NodeCostArray(self.cost)
 

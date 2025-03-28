@@ -220,7 +220,7 @@ def render_colors(first, key, mouse):
         SAMPLE_SCREEN_HEIGHT - 1,
         libtcod.BKGND_MULTIPLY,
         libtcod.CENTER,
-        "The Doryen library uses 24 bits " "colors, for both background and " "foreground.",
+        "The Doryen library uses 24 bits colors, for both background and foreground.",
     )
 
     if key.c == ord("f"):
@@ -270,10 +270,7 @@ def render_offscreen(first, key, mouse):
             SAMPLE_SCREEN_HEIGHT // 2,
             libtcod.BKGND_NONE,
             libtcod.CENTER,
-            b"You can render to an offscreen "
-            b"console and blit in on another "
-            b"one, simulating alpha "
-            b"transparency.",
+            b"You can render to an offscreen console and blit in on another one, simulating alpha transparency.",
         )
     if first:
         libtcod.sys_set_fps(30)

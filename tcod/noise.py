@@ -91,7 +91,7 @@ class Implementation(enum.IntEnum):
 def __getattr__(name: str) -> Implementation:
     if name in Implementation.__members__:
         warnings.warn(
-            f"'tcod.noise.{name}' is deprecated," f" use 'tcod.noise.Implementation.{name}' instead.",
+            f"'tcod.noise.{name}' is deprecated, use 'tcod.noise.Implementation.{name}' instead.",
             FutureWarning,
             stacklevel=2,
         )
