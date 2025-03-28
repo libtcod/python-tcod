@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 import enum
-from typing import Any, Final
+from typing import Any, Final, Sequence
 
 import numpy as np
 from numpy.typing import NDArray
@@ -594,59 +594,78 @@ class Renderer:
         _check(lib.SDL_RenderDrawLineF(self.p, x1, y1, x2, y2))
 
     @staticmethod
-    def _convert_array(array: NDArray[np.number]) -> NDArray[np.intc] | NDArray[np.float32]:
-        """Convert ndarray for a SDL function expecting a C contiguous array of either intc or float32."""
-        if array.dtype in (np.intc, np.int8, np.int16, np.int32, np.uint8, np.uint16):
-            return np.ascontiguousarray(array, np.intc)
-        return np.ascontiguousarray(array, np.float32)
+    def _convert_array(
+        array: NDArray[np.number] | Sequence[Sequence[float]], item_length: int
+    ) -> NDArray[np.intc] | NDArray[np.float32]:
+        """Convert ndarray for a SDL function expecting a C contiguous array of either intc or float32.
 
-    def fill_rects(self, rects: NDArray[np.number]) -> None:
+        Array shape is enforced to be (n, item_length)
+        """
+        if getattr(array, "dtype", None) in (np.intc, np.int8, np.int16, np.int32, np.uint8, np.uint16):
+            out = np.ascontiguousarray(array, np.intc)
+        else:
+            out = np.ascontiguousarray(array, np.float32)
+        if len(out.shape) != 2:  # noqa: PLR2004
+            msg = f"Array must have 2 axes, but shape is {out.shape!r}"
+            raise TypeError(msg)
+        if out.shape[1] != item_length:
+            msg = f"Array shape[1] must be {item_length}, but shape is {out.shape!r}"
+            raise TypeError(msg)
+        return out
+
+    def fill_rects(self, rects: NDArray[np.number] | Sequence[tuple[float, float, float, float]]) -> None:
         """Fill multiple rectangles from an array.
+
+        Args:
+            rects: A sequence or array of (x, y, width, height) rectangles.
 
         .. versionadded:: 13.5
         """
-        assert len(rects.shape) == 2  # noqa: PLR2004
-        assert rects.shape[1] == 4  # noqa: PLR2004
-        rects = self._convert_array(rects)
+        rects = self._convert_array(rects, item_length=4)
         if rects.dtype == np.intc:
             _check(lib.SDL_RenderFillRects(self.p, tcod.ffi.from_buffer("SDL_Rect*", rects), rects.shape[0]))
             return
         _check(lib.SDL_RenderFillRectsF(self.p, tcod.ffi.from_buffer("SDL_FRect*", rects), rects.shape[0]))
 
-    def draw_rects(self, rects: NDArray[np.number]) -> None:
+    def draw_rects(self, rects: NDArray[np.number] | Sequence[tuple[float, float, float, float]]) -> None:
         """Draw multiple outlined rectangles from an array.
+
+        Args:
+            rects: A sequence or array of (x, y, width, height) rectangles.
 
         .. versionadded:: 13.5
         """
+        rects = self._convert_array(rects, item_length=4)
         assert len(rects.shape) == 2  # noqa: PLR2004
         assert rects.shape[1] == 4  # noqa: PLR2004
-        rects = self._convert_array(rects)
         if rects.dtype == np.intc:
             _check(lib.SDL_RenderDrawRects(self.p, tcod.ffi.from_buffer("SDL_Rect*", rects), rects.shape[0]))
             return
         _check(lib.SDL_RenderDrawRectsF(self.p, tcod.ffi.from_buffer("SDL_FRect*", rects), rects.shape[0]))
 
-    def draw_points(self, points: NDArray[np.number]) -> None:
+    def draw_points(self, points: NDArray[np.number] | Sequence[tuple[float, float]]) -> None:
         """Draw an array of points.
+
+        Args:
+            points: A sequence or array of (x, y) points.
 
         .. versionadded:: 13.5
         """
-        assert len(points.shape) == 2  # noqa: PLR2004
-        assert points.shape[1] == 2  # noqa: PLR2004
-        points = self._convert_array(points)
+        points = self._convert_array(points, item_length=2)
         if points.dtype == np.intc:
             _check(lib.SDL_RenderDrawPoints(self.p, tcod.ffi.from_buffer("SDL_Point*", points), points.shape[0]))
             return
         _check(lib.SDL_RenderDrawPointsF(self.p, tcod.ffi.from_buffer("SDL_FPoint*", points), points.shape[0]))
 
-    def draw_lines(self, points: NDArray[np.intc | np.float32]) -> None:
+    def draw_lines(self, points: NDArray[np.number] | Sequence[tuple[float, float]]) -> None:
         """Draw a connected series of lines from an array.
+
+        Args:
+            points: A sequence or array of (x, y) points.
 
         .. versionadded:: 13.5
         """
-        assert len(points.shape) == 2  # noqa: PLR2004
-        assert points.shape[1] == 2  # noqa: PLR2004
-        points = self._convert_array(points)
+        points = self._convert_array(points, item_length=2)
         if points.dtype == np.intc:
             _check(lib.SDL_RenderDrawLines(self.p, tcod.ffi.from_buffer("SDL_Point*", points), points.shape[0] - 1))
             return

@@ -79,19 +79,25 @@ def test_sdl_render(uses_window: None) -> None:
     assert render.read_pixels(rect=(1, 2, 3, 4)).shape == (4, 3, 4)
 
     render.draw_point((0, 0))
-    render.draw_points(np.ones((3, 2), dtype=np.float32))
-    render.draw_points(np.ones((3, 2), dtype=np.intc))
-    render.draw_points(np.ones((3, 2), dtype=np.float16))
-    render.draw_points(np.ones((3, 2), dtype=np.int8))
     render.draw_line((0, 0), (1, 1))
-    render.draw_lines(np.ones((3, 2), dtype=np.float32))
-    render.draw_lines(np.ones((3, 2), dtype=np.intc))
     render.draw_rect((0, 0, 1, 1))
-    render.draw_rects(np.ones((3, 4), dtype=np.float32))
-    render.draw_rects(np.ones((3, 4), dtype=np.intc))
     render.fill_rect((0, 0, 1, 1))
-    render.fill_rects(np.ones((3, 4), dtype=np.float32))
-    render.fill_rects(np.ones((3, 4), dtype=np.intc))
+
+    render.draw_points([(0, 0)])
+    render.draw_lines([(0, 0), (1, 1)])
+    render.draw_rects([(0, 0, 1, 1)])
+    render.fill_rects([(0, 0, 1, 1)])
+
+    for dtype in (np.intc, np.int8, np.uint8, np.float32, np.float16):
+        render.draw_points(np.ones((3, 2), dtype=dtype))
+        render.draw_lines(np.ones((3, 2), dtype=dtype))
+        render.draw_rects(np.ones((3, 4), dtype=dtype))
+        render.fill_rects(np.ones((3, 4), dtype=dtype))
+
+    with pytest.raises(TypeError, match=r"shape\[1\] must be 2"):
+        render.draw_points(np.ones((3, 1), dtype=dtype))
+    with pytest.raises(TypeError, match=r"must have 2 axes"):
+        render.draw_points(np.ones((3,), dtype=dtype))
 
 
 def test_sdl_render_bad_types() -> None:

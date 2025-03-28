@@ -6,6 +6,14 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Added
+
+- SDL renderer primitive drawing methods now support sequences of tuples.
+
+### Fixed
+
+- `tcod.sdl.Renderer.draw_lines` type hint was too narrow.
+
 ## [17.0.0] - 2025-03-28
 
 ### Changed
