@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [17.1.0] - 2025-03-29
+
 ### Added
 
 - SDL renderer primitive drawing methods now support sequences of tuples.
