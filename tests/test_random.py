@@ -4,6 +4,8 @@ import copy
 import pickle
 from pathlib import Path
 
+import pytest
+
 import tcod.random
 
 # ruff: noqa: D103
@@ -15,8 +17,10 @@ def test_tcod_random() -> None:
     rand = tcod.random.Random(tcod.random.COMPLEMENTARY_MULTIPLY_WITH_CARRY)
     assert 0 <= rand.randint(0, 100) <= 100  # noqa: PLR2004
     assert 0 <= rand.uniform(0, 100) <= 100  # noqa: PLR2004
-    rand.guass(0, 1)
-    rand.inverse_guass(0, 1)
+    with pytest.warns(FutureWarning, match=r"typo"):
+        rand.guass(0, 1)
+    with pytest.warns(FutureWarning, match=r"typo"):
+        rand.inverse_guass(0, 1)
 
 
 def test_tcod_random_copy() -> None:

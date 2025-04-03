@@ -10,6 +10,7 @@ from numpy.typing import DTypeLike, NDArray
 
 import tcod
 import tcod.console
+from tcod import libtcodpy
 
 # ruff: noqa: D103
 
@@ -35,7 +36,7 @@ def test_tcod_bsp() -> None:
     assert not bsp.children
 
     with pytest.raises(RuntimeError):
-        tcod.bsp_traverse_pre_order(bsp, raise_Exception)
+        libtcodpy.bsp_traverse_pre_order(bsp, raise_Exception)
 
     bsp.split_recursive(3, 4, 4, 1, 1)
     for node in bsp.walk():
@@ -66,11 +67,11 @@ def test_tcod_map_set_bits() -> None:
     assert not map_.fov[:].any()
 
     map_.transparent[1, 0] = True
-    assert tcod.map_is_transparent(map_, 0, 1)
+    assert libtcodpy.map_is_transparent(map_, 0, 1)
     map_.walkable[1, 0] = True
-    assert tcod.map_is_walkable(map_, 0, 1)
+    assert libtcodpy.map_is_walkable(map_, 0, 1)
     map_.fov[1, 0] = True
-    assert tcod.map_is_in_fov(map_, 0, 1)
+    assert libtcodpy.map_is_in_fov(map_, 0, 1)
 
 
 @pytest.mark.filterwarnings("ignore:This class may perform poorly")
@@ -115,7 +116,7 @@ def test_color_class() -> None:
     assert tcod.white - tcod.white == tcod.black
     assert tcod.black + (2, 2, 2) - (1, 1, 1) == (1, 1, 1)  # noqa: RUF005
 
-    color = tcod.Color()
+    color = libtcodpy.Color()
     color.r = 1
     color.g = 2
     color.b = 3
@@ -156,7 +157,7 @@ def test_path_callback() -> None:
 
 
 def test_key_repr() -> None:
-    Key = tcod.Key
+    Key = libtcodpy.Key
     key = Key(vk=1, c=2, shift=True)
     assert key.vk == 1
     assert key.c == 2  # noqa: PLR2004
@@ -168,7 +169,7 @@ def test_key_repr() -> None:
 
 
 def test_mouse_repr() -> None:
-    Mouse = tcod.Mouse
+    Mouse = libtcodpy.Mouse
     mouse = Mouse(x=1, lbutton=True)
     mouse_copy = eval(repr(mouse))  # noqa: S307
     assert mouse.x == mouse_copy.x
@@ -188,10 +189,10 @@ def test_recommended_size(console: tcod.console.Console) -> None:
 
 @pytest.mark.filterwarnings("ignore")
 def test_context(uses_window: None) -> None:
-    with tcod.context.new_window(32, 32, renderer=tcod.RENDERER_SDL2):
+    with tcod.context.new_window(32, 32, renderer=libtcodpy.RENDERER_SDL2):
         pass
     WIDTH, HEIGHT = 16, 4
-    with tcod.context.new_terminal(columns=WIDTH, rows=HEIGHT, renderer=tcod.RENDERER_SDL2) as context:
+    with tcod.context.new_terminal(columns=WIDTH, rows=HEIGHT, renderer=libtcodpy.RENDERER_SDL2) as context:
         console = tcod.console.Console(*context.recommended_console_size())
         context.present(console)
         assert context.sdl_window_p is not None

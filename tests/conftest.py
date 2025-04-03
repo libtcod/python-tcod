@@ -1,5 +1,7 @@
 """Test directory configuration."""
 
+from __future__ import annotations
+
 import random
 import warnings
 from typing import Callable, Iterator, Union
@@ -7,6 +9,7 @@ from typing import Callable, Iterator, Union
 import pytest
 
 import tcod
+from tcod import libtcodpy
 
 # ruff: noqa: D103
 
@@ -33,23 +36,23 @@ def session_console(request: pytest.FixtureRequest) -> Iterator[tcod.console.Con
     HEIGHT = 10
     TITLE = "libtcod-cffi tests"
     FULLSCREEN = False
-    RENDERER = getattr(tcod, "RENDERER_" + request.param)
+    RENDERER = getattr(libtcodpy, "RENDERER_" + request.param)
 
-    tcod.console_set_custom_font(FONT_FILE)
-    with tcod.console_init_root(WIDTH, HEIGHT, TITLE, FULLSCREEN, RENDERER, vsync=False) as con:
+    libtcodpy.console_set_custom_font(FONT_FILE)
+    with libtcodpy.console_init_root(WIDTH, HEIGHT, TITLE, FULLSCREEN, RENDERER, vsync=False) as con:
         yield con
 
 
 @pytest.fixture
 def console(session_console: tcod.console.Console) -> tcod.console.Console:
     console = session_console
-    tcod.console_flush()
+    libtcodpy.console_flush()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         console.default_fg = (255, 255, 255)
         console.default_bg = (0, 0, 0)
-        console.default_bg_blend = tcod.BKGND_SET
-        console.default_alignment = tcod.LEFT
+        console.default_bg_blend = libtcodpy.BKGND_SET
+        console.default_alignment = libtcodpy.LEFT
     console.clear()
     return console
 
@@ -61,13 +64,13 @@ def offscreen(console: tcod.console.Console) -> tcod.console.Console:
 
 
 @pytest.fixture
-def fg() -> tcod.Color:
-    return tcod.Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+def fg() -> libtcodpy.Color:
+    return libtcodpy.Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
 
 @pytest.fixture
-def bg() -> tcod.Color:
-    return tcod.Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+def bg() -> libtcodpy.Color:
+    return libtcodpy.Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
 
 def ch_ascii_int() -> int:
@@ -96,4 +99,4 @@ def ch_latin1_str() -> str:
 )
 def ch(request: pytest.FixtureRequest) -> Callable[[], Union[int, str]]:
     """Test with multiple types of ascii/latin1 characters."""
-    return globals()["ch_%s" % request.param]()  # type: ignore
+    return globals()[f"ch_{request.param}"]()  # type: ignore

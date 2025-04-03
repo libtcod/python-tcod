@@ -73,13 +73,17 @@ def test_console_methods() -> None:
     console.print_(0, 0, "Test")
     console.print_rect(0, 0, 2, 8, "a b c d e f")
     console.get_height_rect(0, 0, 2, 8, "a b c d e f")
-    console.rect(0, 0, 2, 2, True)
-    console.hline(0, 1, 10)
-    console.vline(1, 0, 10)
+    with pytest.deprecated_call():
+        console.rect(0, 0, 2, 2, True)
+    with pytest.deprecated_call():
+        console.hline(0, 1, 10)
+    with pytest.deprecated_call():
+        console.vline(1, 0, 10)
     console.print_frame(0, 0, 8, 8, "Frame")
     console.blit(0, 0, 0, 0, console, 0, 0)  # type: ignore
     console.blit(0, 0, 0, 0, console, 0, 0, key_color=(0, 0, 0))  # type: ignore
-    console.set_key_color((254, 0, 254))
+    with pytest.deprecated_call():
+        console.set_key_color((254, 0, 254))
 
 
 def test_console_pickle() -> None:

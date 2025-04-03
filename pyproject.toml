@@ -99,8 +99,7 @@ addopts = [
 log_file_level = "DEBUG"
 faulthandler_timeout = 5
 filterwarnings = [
-    "ignore::DeprecationWarning:tcod.libtcodpy",
-    "ignore::PendingDeprecationWarning:tcod.libtcodpy",
+    "ignore:This function may be deprecated in the future:PendingDeprecationWarning",
     "ignore:This class may perform poorly and is no longer needed.::tcod.map",
     "ignore:'import tcod as libtcodpy' is preferred.",
 ]

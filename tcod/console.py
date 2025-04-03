@@ -645,6 +645,7 @@ Consider one of the following:
         string_ = string.encode("utf-8")
         return int(lib.TCOD_console_get_height_rect_n(self.console_c, x, y, width, height, len(string_), string_))
 
+    @deprecated("""Replace with 'console.draw_rect(x, y, width, height, ch=..., fg=..., bg=..., bg_blend=...)'""")
     def rect(  # noqa: PLR0913
         self,
         x: int,
@@ -677,6 +678,9 @@ Consider one of the following:
         self.__deprecate_defaults("draw_rect", bg_blend, clear=bool(clear))
         lib.TCOD_console_rect(self.console_c, x, y, width, height, clear, bg_blend)
 
+    @deprecated(
+        """Replace with 'console.draw_rect(x, y, width=width, height=1, ch=ord("─"), fg=..., bg=..., bg_blend=...)'"""
+    )
     def hline(
         self,
         x: int,
@@ -686,7 +690,7 @@ Consider one of the following:
     ) -> None:
         """Draw a horizontal line on the console.
 
-        This always uses ord('─'), the horizontal line character.
+        This always uses ord("─"), the horizontal line character.
 
         Args:
             x (int): The x coordinate from the left.
@@ -704,6 +708,9 @@ Consider one of the following:
         self.__deprecate_defaults("draw_rect", bg_blend)
         lib.TCOD_console_hline(self.console_c, x, y, width, bg_blend)
 
+    @deprecated(
+        """Replace with 'console.draw_rect(x, y, width=1, height=height, ch=ord("│"), fg=..., bg=..., bg_blend=...)'"""
+    )
     def vline(
         self,
         x: int,
@@ -713,7 +720,7 @@ Consider one of the following:
     ) -> None:
         """Draw a vertical line on the console.
 
-        This always uses ord('│'), the vertical line character.
+        This always uses ord("│"), the vertical line character.
 
         Args:
             x (int): The x coordinate from the left.
@@ -1130,15 +1137,16 @@ Consider one of the following:
 
         Example::
 
+            >>> from tcod import libtcodpy
             >>> console = tcod.console.Console(12, 6)
             >>> console.draw_frame(x=0, y=0, width=3, height=3)
             >>> console.draw_frame(x=3, y=0, width=3, height=3, decoration="╔═╗║ ║╚═╝")
             >>> console.draw_frame(x=6, y=0, width=3, height=3, decoration="123456789")
             >>> console.draw_frame(x=9, y=0, width=3, height=3, decoration="/-\\| |\\-/")
             >>> console.draw_frame(x=0, y=3, width=12, height=3)
-            >>> console.print_box(x=0, y=3, width=12, height=1, string=" Title ", alignment=tcod.CENTER)
+            >>> console.print_box(x=0, y=3, width=12, height=1, string=" Title ", alignment=libtcodpy.CENTER)
             1
-            >>> console.print_box(x=0, y=5, width=12, height=1, string="┤Lower├", alignment=tcod.CENTER)
+            >>> console.print_box(x=0, y=5, width=12, height=1, string="┤Lower├", alignment=libtcodpy.CENTER)
             1
             >>> print(console)
             <┌─┐╔═╗123/-\

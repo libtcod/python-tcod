@@ -410,7 +410,7 @@ class Key(_CDataWrapper):
     def __repr__(self) -> str:
         """Return a representation of this Key object."""
         params = []
-        params.append(f"pressed={self.pressed!r}, vk=tcod.{_LOOKUP_VK[self.vk]}")
+        params.append(f"pressed={self.pressed!r}, vk=libtcodpy.{_LOOKUP_VK[self.vk]}")
         if self.c:
             params.append(f"c=ord({chr(self.c)!r})")
         if self.text:
@@ -426,7 +426,7 @@ class Key(_CDataWrapper):
         ]:
             if getattr(self, attr):
                 params.append(f"{attr}={getattr(self, attr)!r}")
-        return "tcod.Key({})".format(", ".join(params))
+        return "libtcodpy.Key({})".format(", ".join(params))
 
     @property
     def key_p(self) -> Any:
@@ -504,7 +504,7 @@ class Mouse(_CDataWrapper):
         ]:
             if getattr(self, attr):
                 params.append(f"{attr}={getattr(self, attr)!r}")
-        return "tcod.Mouse({})".format(", ".join(params))
+        return "libtcodpy.Mouse({})".format(", ".join(params))
 
     @property
     def mouse_p(self) -> Any:
@@ -828,7 +828,8 @@ def color_gen_map(colors: Iterable[tuple[int, int, int]], indexes: Iterable[int]
         List[Color]: A list of Color instances.
 
     Example:
-        >>> tcod.color_gen_map([(0, 0, 0), (255, 128, 0)], [0, 5])
+        >>> from tcod import libtcodpy
+        >>> libtcodpy.color_gen_map([(0, 0, 0), (255, 128, 0)], [0, 5])
         [Color(0, 0, 0), Color(51, 25, 0), Color(102, 51, 0), \
 Color(153, 76, 0), Color(204, 102, 0), Color(255, 128, 0)]
     """
@@ -2667,13 +2668,13 @@ def heightmap_kernel_transform(
 
     Example:
         >>> import numpy as np
+        >>> from tcod import libtcodpy
         >>> heightmap = np.zeros((3, 3), dtype=np.float32)
         >>> heightmap[:,1] = 1
         >>> dx = [-1, 1, 0]
         >>> dy = [0, 0, 0]
         >>> weight = [0.33, 0.33, 0.33]
-        >>> tcod.heightmap_kernel_transform(heightmap, 3, dx, dy, weight,
-        ...                                 0.0, 1.0)
+        >>> libtcodpy.heightmap_kernel_transform(heightmap, 3, dx, dy, weight, 0.0, 1.0)
     """
     c_dx = ffi.new("int[]", dx)
     c_dy = ffi.new("int[]", dy)
