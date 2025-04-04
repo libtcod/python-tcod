@@ -10,7 +10,7 @@ from __future__ import annotations
 import warnings
 from os import PathLike
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, overload
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -552,6 +552,7 @@ Consider one of the following:
             stacklevel=3,
         )
 
+    @deprecated("Switch to using keywords and then replace with 'console.print(...)'")
     def print_(
         self,
         x: int,
@@ -579,6 +580,7 @@ Consider one of the following:
         alignment = self.default_alignment if alignment is None else alignment
         lib.TCOD_console_printf_ex(self.console_c, x, y, bg_blend, alignment, _fmt(string))
 
+    @deprecated("Switch to using keywords and then replace with 'console.print(...)'")
     def print_rect(  # noqa: PLR0913
         self,
         x: int,
@@ -973,55 +975,159 @@ Consider one of the following:
         """Return a simplified representation of this consoles contents."""
         return "<{}>".format("\n ".join("".join(chr(c) for c in line) for line in self._tiles["ch"]))
 
-    def print(  # noqa: PLR0913
+    @overload
+    @deprecated(
+        "Switch all parameters to keywords such as 'console.print(x=..., y=..., text=..., width=..., height=..., fg=..., bg=..., bg_blend=..., alignment=...)'"
+        "\n'string' keyword should be renamed to `text`"
+    )
+    def print(
         self,
         x: int,
         y: int,
-        string: str,
+        text: str,
         fg: tuple[int, int, int] | None = None,
         bg: tuple[int, int, int] | None = None,
         bg_blend: int = tcod.constants.BKGND_SET,
         alignment: int = tcod.constants.LEFT,
-    ) -> None:
-        r"""Print a string on a console with manual line breaks.
+        *,
+        string: str = "",
+    ) -> int: ...
 
-        `x` and `y` are the starting tile, with ``0,0`` as the upper-left
-        corner of the console.
+    @overload
+    def print(
+        self,
+        x: int,
+        y: int,
+        text: str,
+        *,
+        width: int | None = None,
+        height: int | None = None,
+        fg: tuple[int, int, int] | None = None,
+        bg: tuple[int, int, int] | None = None,
+        bg_blend: int = tcod.constants.BKGND_SET,
+        alignment: int = tcod.constants.LEFT,
+    ) -> int: ...
 
-        `string` is a Unicode string which may include color control
-        characters.  Strings which are too long will be truncated until the
-        next newline character ``"\n"``.
+    def print(  # noqa: PLR0913
+        self,
+        x: int,
+        y: int,
+        text: str = "",
+        fg: tuple[int, int, int] | None = None,
+        bg: tuple[int, int, int] | None = None,
+        bg_blend: int = tcod.constants.BKGND_SET,
+        alignment: int = tcod.constants.LEFT,
+        *,
+        width: int | None = None,
+        height: int | None = None,
+        string: str = "",
+    ) -> int:
+        r"""Print a string of Unicode text on this console.
 
-        `fg` and `bg` are the foreground text color and background tile color
-        respectfully.  This is a 3-item tuple with (r, g, b) color values from
-        0 to 255.  These parameters can also be set to `None` to leave the
-        colors unchanged.
+        Prefer using keywords for this method call to avoid ambiguous parameters.
 
-        `bg_blend` is the blend type used by libtcod.
+        Args:
+            x: Starting X coordinate, with the left-most tile as zero.
+            y: Starting Y coordinate, with the top-most tile as zero.
+            text: A Unicode string which may include color control characters.
+            width: Width in tiles to constrain the printing region.
+                If a `width` is given then `text` will have automatic word wrapping applied to it.
+                A `width` of `None` means `text` will only have manual line breaks.
+            height: Height in tiles to constrain the printing region.
+            fg: RGB tuple to use as the foreground color, or `None` to leave the foreground unchanged.
+                Tuple values should be 0-255.
+            bg: RGB tuple to use as the background color, or `None` to leave the foreground unchanged.
+                Tuple values should be 0-255.
+            bg_blend: Background blend type used by libtcod.
+                Typically starts with `libtcodpy.BKGND_*`.
+            alignment: One of `libtcodpy.LEFT`, `libtcodpy.CENTER`, or `libtcodpy.RIGHT`
+            string: Older deprecated name of the `text` parameter.
 
-        `alignment` can be `tcod.LEFT`, `tcod.CENTER`, or `tcod.RIGHT`.
+        Returns:
+            The height of `text` in lines via word wrapping and line breaks.
+
+        Example::
+
+            >>> from tcod import libtcodpy
+            >>> console = tcod.console.Console(20, 1)
+            >>> console.clear(ch=ord('·'))
+            >>> console.print(x=0, y=0, text="left")
+            1
+            >>> console.print(x=console.width, y=0, text="right", alignment=libtcodpy.RIGHT)
+            1
+            >>> console.print(x=10, y=0, text="center", alignment=libtcodpy.CENTER)
+            1
+            >>> print(console)
+            <left···center··right>
+
+            >>> console = tcod.console.Console(20, 4)
+            >>> console.clear(ch=ord('·'))
+            >>> console.print(x=1, y=1, text="words within bounds", width=8)
+            3
+            >>> print(console)
+            <····················
+             ·words··············
+             ·within·············
+             ·bounds·············>
+            >>> WHITE = (255, 255, 255)
+            >>> BLACK = (0, 0, 0)
+            >>> console.print(x=0, y=0, text="Black text on white background", fg=BLACK, bg=WHITE)
+            1
 
         .. versionadded:: 8.5
 
         .. versionchanged:: 9.0
+
             `fg` and `bg` now default to `None` instead of white-on-black.
 
         .. versionchanged:: 13.0
+
             `x` and `y` are now always used as an absolute position for negative values.
+
+        .. versionchanged:: Unreleased
+
+            Added `text` parameter to replace `string`.
+
+            Added `width` and `height` keyword parameters to bind text to a rectangle and replace other print functions.
+            Right-aligned text with `width=None` now treats the `x` coordinate as a past-the-end index, this will shift
+            the text of older calls to the left by 1 tile.
+
+            Now returns the number of lines printed via word wrapping.
         """
-        string_ = string.encode("utf-8")
-        lib.TCOD_console_printn(
-            self.console_c,
-            x,
-            y,
-            len(string_),
-            string_,
-            (fg,) if fg is not None else ffi.NULL,
-            (bg,) if bg is not None else ffi.NULL,
-            bg_blend,
-            alignment,
+        if width is not None and width <= 0:
+            return 0
+        if width is None and alignment == tcod.constants.LEFT:  # Fix alignment
+            width = 0x100000
+        if width is None and alignment == tcod.constants.CENTER:  # Fix center alignment
+            x -= 0x100000
+            width = 0x200000
+        if width is None and alignment == tcod.constants.RIGHT:  # Fix right alignment
+            x -= 0x100000
+            width = 0x100000
+        rgb_fg = ffi.new("TCOD_ColorRGB*", fg) if fg is not None else ffi.NULL
+        rgb_bg = ffi.new("TCOD_ColorRGB*", bg) if bg is not None else ffi.NULL
+        utf8 = (string or text).encode("utf-8")
+        return _check(
+            int(
+                lib.TCOD_printn_rgb(
+                    self.console_c,
+                    {
+                        "x": x,
+                        "y": y,
+                        "width": width or 0,
+                        "height": height or 0,
+                        "fg": rgb_fg,
+                        "bg": rgb_bg,
+                        "flag": bg_blend,
+                        "alignment": alignment,
+                    },
+                    len(utf8),
+                    utf8,
+                )
+            )
         )
 
+    @deprecated("Switch to using keywords and then replace with 'console.print(...)'")
     def print_box(  # noqa: PLR0913
         self,
         x: int,
@@ -1144,9 +1250,9 @@ Consider one of the following:
             >>> console.draw_frame(x=6, y=0, width=3, height=3, decoration="123456789")
             >>> console.draw_frame(x=9, y=0, width=3, height=3, decoration="/-\\| |\\-/")
             >>> console.draw_frame(x=0, y=3, width=12, height=3)
-            >>> console.print_box(x=0, y=3, width=12, height=1, string=" Title ", alignment=libtcodpy.CENTER)
+            >>> console.print(x=0, y=3, width=12, height=1, string=" Title ", alignment=libtcodpy.CENTER)
             1
-            >>> console.print_box(x=0, y=5, width=12, height=1, string="┤Lower├", alignment=libtcodpy.CENTER)
+            >>> console.print(x=0, y=5, width=12, height=1, string="┤Lower├", alignment=libtcodpy.CENTER)
             1
             >>> print(console)
             <┌─┐╔═╗123/-\

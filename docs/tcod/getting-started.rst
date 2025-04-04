@@ -19,7 +19,7 @@ console will be stretched to fit the window.  You can add arguments to
 :any:`Context.present` to fix the aspect ratio or only scale the console by
 integer increments.
 
-Example::
+.. code-block:: python
 
     #!/usr/bin/env python
     # Make sure 'dejavu10x10_gs_tc.png' is in the same directory as this script.
@@ -38,14 +38,14 @@ Example::
             "dejavu10x10_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD,
         )
         # Create the main console.
-        console = tcod.console.Console(WIDTH, HEIGHT, order="F")
+        console = tcod.console.Console(WIDTH, HEIGHT)
         # Create a window based on this console and tileset.
         with tcod.context.new(  # New window for a console of size columns×rows.
             columns=console.width, rows=console.height, tileset=tileset,
         ) as context:
             while True:  # Main loop, runs until SystemExit is raised.
                 console.clear()
-                console.print(x=0, y=0, string="Hello World!")
+                console.print(x=0, y=0, text="Hello World!")
                 context.present(console)  # Show the console.
 
                 # This event loop will wait until at least one event is processed before exiting.
@@ -53,8 +53,9 @@ Example::
                 for event in tcod.event.wait():
                     context.convert_event(event)  # Sets tile coordinates for mouse events.
                     print(event)  # Print event names and attributes.
-                    if isinstance(event, tcod.event.Quit):
-                        raise SystemExit()
+                    match event:
+                        case tcod.event.Quit():
+                            raise SystemExit()
             # The window will be closed after the above with-block exits.
 
 
@@ -87,7 +88,7 @@ You can call :any:`Context.new_console` every frame or only when the window
 is resized.  This example creates a new console every frame instead of
 clearing the console every frame and replacing it only on resizing the window.
 
-Example::
+.. code-block:: python
 
     #!/usr/bin/env python
     import tcod.context
@@ -103,17 +104,18 @@ Example::
             width=WIDTH, height=HEIGHT, sdl_window_flags=FLAGS
         ) as context:
             while True:
-                console = context.new_console(order="F")  # Console size based on window resolution and tile size.
+                console = context.new_console()  # Console size based on window resolution and tile size.
                 console.print(0, 0, "Hello World")
                 context.present(console, integer_scaling=True)
 
                 for event in tcod.event.wait():
-                    context.convert_event(event)  # Sets tile coordinates for mouse events.
+                    event = context.convert_event(event)  # Sets tile coordinates for mouse events.
                     print(event)  # Print event names and attributes.
-                    if isinstance(event, tcod.event.Quit):
-                        raise SystemExit()
-                    elif isinstance(event, tcod.event.WindowResized) and event.type == "WindowSizeChanged":
-                        pass  # The next call to context.new_console may return a different size.
+                    match event:
+                        case tcod.event.Quit():
+                            raise SystemExit()
+                        case tcod.event.WindowResized(type="WindowSizeChanged"):
+                            pass  # The next call to context.new_console may return a different size.
 
 
     if __name__ == "__main__":

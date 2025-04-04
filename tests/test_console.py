@@ -70,8 +70,10 @@ def test_console_defaults() -> None:
 def test_console_methods() -> None:
     console = tcod.console.Console(width=12, height=10)
     console.put_char(0, 0, ord("@"))
-    console.print_(0, 0, "Test")
-    console.print_rect(0, 0, 2, 8, "a b c d e f")
+    with pytest.deprecated_call():
+        console.print_(0, 0, "Test")
+    with pytest.deprecated_call():
+        console.print_rect(0, 0, 2, 8, "a b c d e f")
     console.get_height_rect(0, 0, 2, 8, "a b c d e f")
     with pytest.deprecated_call():
         console.rect(0, 0, 2, 2, True)

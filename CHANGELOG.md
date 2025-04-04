@@ -6,6 +6,17 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Changed
+
+- `Console.print` now accepts `height` and `width` keywords and has renamed `string` to `text`.
+- Text printed with `Console.print` using right-alignment has been shifted to the left by 1-tile.
+
+### Deprecated
+
+- Using `Console.print` without keywords for only the `x`, `y`, and `text` parameters has been deprecated.
+  The `string` parameter has been renamed to `text`.
+- `Console.print_box` has been replaced by `Console.print`.
+
 ## [17.1.0] - 2025-03-29
 
 ### Added
