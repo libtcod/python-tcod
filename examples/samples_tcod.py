@@ -190,7 +190,7 @@ class OffscreenConsoleSample(Sample):
             sample_console.width // 2,
             sample_console.height // 2,
             "Offscreen console",
-            False,
+            clear=False,
             fg=WHITE,
             bg=BLACK,
         )
@@ -239,7 +239,7 @@ class OffscreenConsoleSample(Sample):
 
 
 class LineDrawingSample(Sample):
-    FLAG_NAMES = [
+    FLAG_NAMES = (
         "BKGND_NONE",
         "BKGND_SET",
         "BKGND_MULTIPLY",
@@ -253,7 +253,7 @@ class LineDrawingSample(Sample):
         "BKGND_BURN",
         "BKGND_OVERLAY",
         "BKGND_ALPHA",
-    ]
+    )
 
     def __init__(self) -> None:
         self.name = "Line drawing"
@@ -316,7 +316,7 @@ class LineDrawingSample(Sample):
 
 
 class NoiseSample(Sample):
-    NOISE_OPTIONS = [  # (name, algorithm, implementation)
+    NOISE_OPTIONS = (  # (name, algorithm, implementation)
         (
             "perlin noise",
             tcod.noise.Algorithm.PERLIN,
@@ -362,7 +362,7 @@ class NoiseSample(Sample):
             tcod.noise.Algorithm.WAVELET,
             tcod.noise.Implementation.TURBULENCE,
         ),
-    ]
+    )
 
     def __init__(self) -> None:
         self.name = "Noise"
@@ -428,7 +428,7 @@ class NoiseSample(Sample):
         )
 
         for cur_func in range(len(self.NOISE_OPTIONS)):
-            text = "%i : %s" % (cur_func + 1, self.NOISE_OPTIONS[cur_func][0])
+            text = f"{cur_func + 1} : {self.NOISE_OPTIONS[cur_func][0]}"
             if cur_func == self.func:
                 sample_console.print(2, 2 + cur_func, text, fg=WHITE, bg=LIGHT_BLUE)
             else:
@@ -495,7 +495,7 @@ LIGHT_WALL = (130, 110, 50)
 DARK_GROUND = (50, 50, 150)
 LIGHT_GROUND = (200, 180, 50)
 
-SAMPLE_MAP_ = [
+SAMPLE_MAP_ = (
     "##############################################",
     "#######################      #################",
     "#####################    #     ###############",
@@ -516,11 +516,11 @@ SAMPLE_MAP_ = [
     "########       #     #### #####          #####",
     "########       #####      ####################",
     "##############################################",
-]
+)
 
 SAMPLE_MAP: NDArray[Any] = np.array([list(line) for line in SAMPLE_MAP_]).transpose()
 
-FOV_ALGO_NAMES = [
+FOV_ALGO_NAMES = (
     "BASIC      ",
     "DIAMOND    ",
     "SHADOW     ",
@@ -535,7 +535,7 @@ FOV_ALGO_NAMES = [
     "PERMISSIVE8",
     "RESTRICTIVE",
     "SYMMETRIC_SHADOWCAST",
-]
+)
 
 TORCH_RADIUS = 10
 SQUARED_TORCH_RADIUS = TORCH_RADIUS * TORCH_RADIUS
@@ -635,13 +635,13 @@ class FOVSample(Sample):
             sample_console.bg[...] = np.where(fov[:, :, np.newaxis], self.light_map_bg, self.dark_map_bg)
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        MOVE_KEYS = {
+        MOVE_KEYS = {  # noqa: N806
             tcod.event.KeySym.i: (0, -1),
             tcod.event.KeySym.j: (-1, 0),
             tcod.event.KeySym.k: (0, 1),
             tcod.event.KeySym.l: (1, 0),
         }
-        FOV_SELECT_KEYS = {
+        FOV_SELECT_KEYS = {  # noqa: N806
             tcod.event.KeySym.MINUS: -1,
             tcod.event.KeySym.EQUALS: 1,
             tcod.event.KeySym.KP_MINUS: -1,
@@ -753,7 +753,7 @@ class PathfindingSample(Sample):
                             sample_console,
                             x,
                             y,
-                            libtcodpy.color_lerp(  # type: ignore
+                            libtcodpy.color_lerp(  # type: ignore[arg-type]
                                 LIGHT_GROUND,
                                 DARK_GROUND,
                                 0.9 * libtcodpy.dijkstra_get_distance(self.dijkstra, x, y) / self.dijkstra_dist,
@@ -771,11 +771,11 @@ class PathfindingSample(Sample):
             if self.using_astar:
                 if not libtcodpy.path_is_empty(self.path):
                     libtcodpy.console_put_char(sample_console, self.px, self.py, " ", libtcodpy.BKGND_NONE)
-                    self.px, self.py = libtcodpy.path_walk(self.path, True)  # type: ignore
+                    self.px, self.py = libtcodpy.path_walk(self.path, True)  # type: ignore[assignment]
                     libtcodpy.console_put_char(sample_console, self.px, self.py, "@", libtcodpy.BKGND_NONE)
             elif not libtcodpy.dijkstra_is_empty(self.dijkstra):
                 libtcodpy.console_put_char(sample_console, self.px, self.py, " ", libtcodpy.BKGND_NONE)
-                self.px, self.py = libtcodpy.dijkstra_path_walk(self.dijkstra)  # type: ignore
+                self.px, self.py = libtcodpy.dijkstra_path_walk(self.dijkstra)  # type: ignore[assignment]
                 libtcodpy.console_put_char(sample_console, self.px, self.py, "@", libtcodpy.BKGND_NONE)
                 self.recalculate = True
 
@@ -983,9 +983,9 @@ class BSPSample(Sample):
             1,
             "ENTER : rebuild bsp\n"
             "SPACE : rebuild dungeon\n"
-            "+-: bsp depth %d\n"
-            "*/: room size %d\n"
-            "1 : random room size %s" % (bsp_depth, bsp_min_room_size, rooms),
+            f"+-: bsp depth {bsp_depth}\n"
+            f"*/: room size {bsp_min_room_size}\n"
+            f"1 : random room size {rooms}",
             fg=WHITE,
             bg=None,
         )
@@ -1102,23 +1102,12 @@ class MouseSample(Sample):
         sample_console.print(
             1,
             1,
-            "Pixel position : %4dx%4d\n"
-            "Tile position  : %4dx%4d\n"
-            "Tile movement  : %4dx%4d\n"
-            "Left button    : %s\n"
-            "Right button   : %s\n"
-            "Middle button  : %s\n"
-            % (
-                self.motion.position.x,
-                self.motion.position.y,
-                self.motion.tile.x,
-                self.motion.tile.y,
-                self.motion.tile_motion.x,
-                self.motion.tile_motion.y,
-                ("OFF", "ON")[self.mouse_left],
-                ("OFF", "ON")[self.mouse_right],
-                ("OFF", "ON")[self.mouse_middle],
-            ),
+            f"Pixel position : {self.motion.position.x:4d}x{self.motion.position.y:4d}\n"
+            f"Tile position  : {self.motion.tile.x:4d}x{self.motion.tile.y:4d}\n"
+            f"Tile movement  : {self.motion.tile_motion.x:4d}x{self.motion.tile_motion.y:4d}\n"
+            f"Left button    : {'ON' if self.mouse_left else 'OFF'}\n"
+            f"Right button   : {'ON' if self.mouse_right else 'OFF'}\n"
+            f"Middle button  : {'ON' if self.mouse_middle else 'OFF'}\n",
             fg=LIGHT_YELLOW,
             bg=None,
         )
@@ -1318,9 +1307,9 @@ class FastRenderSample(Sample):
         brightness = texture[uu.astype(int), vv.astype(int)] / 4.0 + 0.5
 
         # use the brightness map to compose the final color of the tunnel
-        R = brightness * self.tex_r
-        G = brightness * self.tex_g
-        B = brightness * self.tex_b
+        rr = brightness * self.tex_r
+        gg = brightness * self.tex_g
+        bb = brightness * self.tex_b
 
         # create new light source
         if random.random() <= time_delta * LIGHTS_CHANCE and len(self.lights) < MAX_LIGHTS:
@@ -1350,17 +1339,17 @@ class FastRenderSample(Sample):
             brightness = light_brightness / ((xc - xl) ** 2 + (yc - yl) ** 2)
 
             # make all pixels shine around this light
-            R += brightness * light.r
-            G += brightness * light.g
-            B += brightness * light.b
+            rr += brightness * light.r
+            gg += brightness * light.g
+            bb += brightness * light.b
 
         # truncate values
-        R = R.clip(0, 255)
-        G = G.clip(0, 255)
-        B = B.clip(0, 255)
+        rr = rr.clip(0, 255)
+        gg = gg.clip(0, 255)
+        bb = bb.clip(0, 255)
 
         # fill the screen with these background colors
-        sample_console.bg.transpose(2, 1, 0)[...] = (R, G, B)
+        sample_console.bg.transpose(2, 1, 0)[...] = (rr, gg, bb)
 
 
 #############################################
@@ -1406,10 +1395,8 @@ def init_context(renderer: int) -> None:
     global context, console_render, sample_minimap
     if "context" in globals():
         context.close()
-    libtcod_version = "%i.%i.%i" % (
-        tcod.cffi.lib.TCOD_MAJOR_VERSION,
-        tcod.cffi.lib.TCOD_MINOR_VERSION,
-        tcod.cffi.lib.TCOD_PATCHLEVEL,
+    libtcod_version = (
+        f"{tcod.cffi.lib.TCOD_MAJOR_VERSION}.{tcod.cffi.lib.TCOD_MINOR_VERSION}.{tcod.cffi.lib.TCOD_PATCHLEVEL}"
     )
     context = tcod.context.new(
         columns=root_console.width,
@@ -1535,14 +1522,14 @@ def draw_stats() -> None:
     root_console.print(
         root_console.width,
         46,
-        "last frame :%5.1f ms (%4d fps)" % (frame_length[-1] * 1000.0, fps),
+        f"last frame :{frame_length[-1] * 1000.0:5.1f} ms ({int(fps):4d} fps)",
         fg=GREY,
         alignment=libtcodpy.RIGHT,
     )
     root_console.print(
         root_console.width,
         47,
-        "elapsed : %8d ms %5.2fs" % (time.perf_counter() * 1000, time.perf_counter()),
+        f"elapsed : {int(time.perf_counter() * 1000):8d} ms {time.perf_counter():5.2f}s",
         fg=GREY,
         alignment=libtcodpy.RIGHT,
     )
