@@ -1169,7 +1169,7 @@ class NameGeneratorSample(Sample):
         )
         for i in range(len(self.names)):
             sample_console.print(
-                SAMPLE_SCREEN_WIDTH - 2,
+                SAMPLE_SCREEN_WIDTH - 1,
                 2 + i,
                 self.names[i],
                 fg=WHITE,
@@ -1533,14 +1533,14 @@ def draw_stats() -> None:
     except ZeroDivisionError:
         fps = 0
     root_console.print(
-        79,
+        root_console.width,
         46,
         "last frame :%5.1f ms (%4d fps)" % (frame_length[-1] * 1000.0, fps),
         fg=GREY,
         alignment=libtcodpy.RIGHT,
     )
     root_console.print(
-        79,
+        root_console.width,
         47,
         "elapsed : %8d ms %5.2fs" % (time.perf_counter() * 1000, time.perf_counter()),
         fg=GREY,
