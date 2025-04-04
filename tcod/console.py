@@ -193,7 +193,7 @@ class Console:
         else:
             self._console_data = ffi.cast("struct TCOD_Console*", self.console_c)
 
-        self._tiles: NDArray[Any] = np.frombuffer(  # type: ignore
+        self._tiles = np.frombuffer(
             ffi.buffer(self._console_data.tiles[0 : self.width * self.height]),
             dtype=self.DTYPE,
         ).reshape((self.height, self.width))
@@ -203,12 +203,12 @@ class Console:
     @property
     def width(self) -> int:
         """The width of this Console."""
-        return lib.TCOD_console_get_width(self.console_c)  # type: ignore
+        return int(lib.TCOD_console_get_width(self.console_c))
 
     @property
     def height(self) -> int:
         """The height of this Console."""
-        return lib.TCOD_console_get_height(self.console_c)  # type: ignore
+        return int(lib.TCOD_console_get_height(self.console_c))
 
     @property
     def bg(self) -> NDArray[np.uint8]:
@@ -402,7 +402,7 @@ Consider one of the following:
         .. deprecated:: 8.5
             These should not be used. Prefer passing defaults as kwargs.
         """
-        return self._console_data.bkgnd_flag  # type: ignore
+        return int(self._console_data.bkgnd_flag)
 
     @default_bg_blend.setter
     @deprecated(_DEPRECATE_CONSOLE_DEFAULTS_MSG, category=FutureWarning)
@@ -416,7 +416,7 @@ Consider one of the following:
         .. deprecated:: 8.5
             These should not be used. Prefer passing defaults as kwargs.
         """
-        return self._console_data.alignment  # type: ignore
+        return int(self._console_data.alignment)
 
     @default_alignment.setter
     @deprecated(_DEPRECATE_CONSOLE_DEFAULTS_MSG, category=FutureWarning)
@@ -434,8 +434,8 @@ Consider one of the following:
     def clear(
         self,
         ch: int = 0x20,
-        fg: tuple[int, int, int] = ...,  # type: ignore
-        bg: tuple[int, int, int] = ...,  # type: ignore
+        fg: tuple[int, int, int] = ...,  # type: ignore[assignment]
+        bg: tuple[int, int, int] = ...,  # type: ignore[assignment]
     ) -> None:
         """Reset all values in this console to a single value.
 
@@ -454,11 +454,11 @@ Consider one of the following:
             Added the `ch`, `fg`, and `bg` parameters.
             Non-white-on-black default values are deprecated.
         """
-        if fg is ...:  # type: ignore
+        if fg is ...:  # type: ignore[comparison-overlap]
             fg = self.default_fg
             if fg != (255, 255, 255):
                 self.__clear_warning("fg", fg)
-        if bg is ...:  # type: ignore
+        if bg is ...:  # type: ignore[comparison-overlap]
             bg = self.default_bg
             if bg != (0, 0, 0):
                 self.__clear_warning("bg", bg)
@@ -657,7 +657,7 @@ Consider one of the following:
         y: int,
         width: int,
         height: int,
-        clear: bool,
+        clear: bool,  # noqa: FBT001
         bg_blend: int = tcod.constants.BKGND_DEFAULT,
     ) -> None:
         """Draw a the background color on a rect optionally clearing the text.
@@ -750,7 +750,7 @@ Consider one of the following:
         width: int,
         height: int,
         string: str = "",
-        clear: bool = True,
+        clear: bool = True,  # noqa: FBT001, FBT002
         bg_blend: int = tcod.constants.BKGND_DEFAULT,
     ) -> None:
         """Draw a framed rectangle with optional text.
@@ -831,11 +831,11 @@ Consider one of the following:
         # The old syntax is easy to detect and correct.
         if hasattr(src_y, "console_c"):
             (src_x, src_y, width, height, dest, dest_x, dest_y) = (
-                dest,  # type: ignore
+                dest,  # type: ignore[assignment]
                 dest_x,
                 dest_y,
                 src_x,
-                src_y,  # type: ignore
+                src_y,  # type: ignore[assignment]
                 width,
                 height,
             )
@@ -933,6 +933,7 @@ Consider one of the following:
         return bool(self.console_c != ffi.NULL)
 
     def __getstate__(self) -> dict[str, Any]:
+        """Support serialization via :mod:`pickle`."""
         state = self.__dict__.copy()
         del state["console_c"]
         state["_console_data"] = {
@@ -948,6 +949,7 @@ Consider one of the following:
         return state
 
     def __setstate__(self, state: dict[str, Any]) -> None:
+        """Support serialization via :mod:`pickle`."""
         self._key_color = None
         if "_tiles" not in state:
             tiles: NDArray[Any] = np.ndarray((self.height, self.width), dtype=self.DTYPE)
@@ -967,12 +969,7 @@ Consider one of the following:
 
     def __repr__(self) -> str:
         """Return a string representation of this console."""
-        return "tcod.console.Console(width=%i, height=%i, order=%r,buffer=\n%r)" % (
-            self.width,
-            self.height,
-            self._order,
-            self.rgba,
-        )
+        return f"tcod.console.Console(width={self.width}, height={self.height}, order={self._order!r},buffer=\n{self.rgba!r})"
 
     def __str__(self) -> str:
         """Return a simplified representation of this consoles contents."""
@@ -1197,7 +1194,7 @@ Consider one of the following:
         width: int,
         height: int,
         title: str = "",
-        clear: bool = True,
+        clear: bool = True,  # noqa: FBT001, FBT002
         fg: tuple[int, int, int] | None = None,
         bg: tuple[int, int, int] | None = None,
         bg_blend: int = tcod.constants.BKGND_SET,
