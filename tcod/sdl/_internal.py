@@ -5,10 +5,12 @@ from __future__ import annotations
 import logging
 import sys as _sys
 from dataclasses import dataclass
-from types import TracebackType
-from typing import Any, Callable, NoReturn, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, NoReturn, TypeVar
 
 from tcod.cffi import ffi, lib
+
+if TYPE_CHECKING:
+    from types import TracebackType
 
 T = TypeVar("T")
 

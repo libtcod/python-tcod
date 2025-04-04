@@ -11,13 +11,15 @@ from __future__ import annotations
 
 import enum
 import sys
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 
 from tcod.cffi import ffi, lib
 from tcod.sdl._internal import _check, _check_p, _required_version, _version_at_least
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike, NDArray
 
 __all__ = (
     "FlashOperation",
@@ -134,7 +136,9 @@ class Window:
             raise TypeError(msg)
         self.p = sdl_window_p
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Window):
+            return NotImplemented
         return bool(self.p == other.p)
 
     def set_icon(self, pixels: ArrayLike) -> None:

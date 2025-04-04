@@ -36,15 +36,17 @@ from __future__ import annotations
 
 import enum
 import warnings
-from typing import Any, Sequence
+from typing import TYPE_CHECKING, Any, Sequence
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 from typing_extensions import Literal
 
 import tcod.constants
 import tcod.random
 from tcod.cffi import ffi, lib
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike, NDArray
 
 
 class Algorithm(enum.IntEnum):
@@ -274,7 +276,8 @@ class Noise:
                 ffi.from_buffer("float*", out),
             )
         else:
-            raise TypeError("Unexpected %r" % self.implementation)
+            msg = f"Unexpected {self.implementation!r}"
+            raise TypeError(msg)
 
         return out
 

@@ -42,7 +42,7 @@ def parse_changelog(args: argparse.Namespace) -> tuple[str, str]:
         print("--- Tagged section:")
         print(tagged)
 
-    return "".join((header, tagged, tail)), changes
+    return f"{header}{tagged}{tail}", changes
 
 
 def replace_unreleased_tags(tag: str, dry_run: bool) -> None:

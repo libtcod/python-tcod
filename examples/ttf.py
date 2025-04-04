@@ -9,16 +9,18 @@ You will need to get this external library from PyPI:
 # To the extent possible under law, the libtcod maintainers have waived all
 # copyright and related or neighboring rights to this example script.
 # https://creativecommons.org/publicdomain/zero/1.0/
-from typing import Tuple
+from typing import TYPE_CHECKING, Tuple
 
 import freetype  # type: ignore  # pip install freetype-py
 import numpy as np
-from numpy.typing import NDArray
 
 import tcod.console
 import tcod.context
 import tcod.event
 import tcod.tileset
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 FONT = "VeraMono.ttf"
 
@@ -81,7 +83,7 @@ def main() -> None:
             context.present(console, integer_scaling=True)
             for event in tcod.event.wait():
                 if isinstance(event, tcod.event.Quit):
-                    raise SystemExit()
+                    raise SystemExit
                 if isinstance(event, tcod.event.WindowResized) and event.type == "WindowSizeChanged":
                     # Resize the Tileset to match the new screen size.
                     context.change_tileset(

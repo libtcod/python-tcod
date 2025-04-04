@@ -3,6 +3,8 @@ from __future__ import annotations
 import enum
 import warnings
 
+from typing_extensions import Self
+
 from tcod.cffi import ffi, lib
 from tcod.sdl._internal import _check, _get_error
 
@@ -40,7 +42,7 @@ class _ScopeInit:
     def __del__(self) -> None:
         self.close()
 
-    def __enter__(self) -> _ScopeInit:
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self, *_: object) -> None:

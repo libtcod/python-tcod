@@ -30,7 +30,7 @@ def main() -> None:
             context.present(console)
             for event in tcod.event.wait():
                 if isinstance(event, tcod.event.Quit):
-                    raise SystemExit()
+                    raise SystemExit
 
 
 if __name__ == "__main__":

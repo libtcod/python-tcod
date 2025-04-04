@@ -14,10 +14,9 @@ import sys
 import time
 import warnings
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import NDArray
 
 import tcod.cffi
 import tcod.context
@@ -28,6 +27,9 @@ import tcod.sdl.mouse
 import tcod.sdl.render
 from tcod import libtcodpy
 from tcod.sdl.video import WindowFlags
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 # ruff: noqa: S311
 
@@ -96,13 +98,13 @@ class Sample(tcod.event.EventDispatch[None]):
                 libtcodpy.sys_save_screenshot()
                 print("png")
         elif event.sym == tcod.event.KeySym.ESCAPE:
-            raise SystemExit()
+            raise SystemExit
         elif event.sym in RENDERER_KEYS:
             # Swap the active context for one with a different renderer.
             init_context(RENDERER_KEYS[event.sym])
 
     def ev_quit(self, event: tcod.event.Quit) -> None:
-        raise SystemExit()
+        raise SystemExit
 
 
 class TrueColorSample(Sample):
@@ -307,7 +309,7 @@ class LineDrawingSample(Sample):
         sample_console.print(
             2,
             2,
-            "%s (ENTER to change)" % self.FLAG_NAMES[self.bk_flag & 0xFF],
+            f"{self.FLAG_NAMES[self.bk_flag & 0xFF]} (ENTER to change)",
             fg=WHITE,
             bg=None,
         )
@@ -431,26 +433,26 @@ class NoiseSample(Sample):
                 sample_console.print(2, 2 + cur_func, text, fg=WHITE, bg=LIGHT_BLUE)
             else:
                 sample_console.print(2, 2 + cur_func, text, fg=GREY, bg=None)
-        sample_console.print(2, 11, "Y/H : zoom (%2.1f)" % self.zoom, fg=WHITE, bg=None)
+        sample_console.print(2, 11, f"Y/H : zoom ({self.zoom:2.1f})", fg=WHITE, bg=None)
         if self.implementation != tcod.noise.Implementation.SIMPLE:
             sample_console.print(
                 2,
                 12,
-                "E/D : hurst (%2.1f)" % self.hurst,
+                f"E/D : hurst ({self.hurst:2.1f})",
                 fg=WHITE,
                 bg=None,
             )
             sample_console.print(
                 2,
                 13,
-                "R/F : lacunarity (%2.1f)" % self.lacunarity,
+                f"R/F : lacunarity ({self.lacunarity:2.1f})",
                 fg=WHITE,
                 bg=None,
             )
             sample_console.print(
                 2,
                 14,
-                "T/G : octaves (%2.1f)" % self.octaves,
+                f"T/G : octaves ({self.octaves:2.1f})",
                 fg=WHITE,
                 bg=None,
             )
@@ -991,7 +993,7 @@ class BSPSample(Sample):
             walls = "OFF"
             if bsp_room_walls:
                 walls = "ON"
-            sample_console.print(1, 6, "2 : room walls %s" % walls, fg=WHITE, bg=None)
+            sample_console.print(1, 6, f"2 : room walls {walls}", fg=WHITE, bg=None)
         # render the level
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
@@ -1161,7 +1163,7 @@ class NameGeneratorSample(Sample):
         sample_console.print(
             1,
             1,
-            "%s\n\n+ : next generator\n- : prev generator" % self.sets[self.current_set],
+            f"{self.sets[self.current_set]}\n\n+ : next generator\n- : prev generator",
             fg=WHITE,
             bg=None,
         )
@@ -1214,8 +1216,8 @@ AMBIENT_LIGHT = 0.8  # brightness of tunnel texture
 
 # the coordinates of all tiles in the screen, as numpy arrays.
 # example: (4x3 pixels screen)
-# xc = [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]
-# yc = [[1, 1, 1, 1], [2, 2, 2, 2], [3, 3, 3, 3]]
+# xc = [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]  # noqa: ERA001
+# yc = [[1, 1, 1, 1], [2, 2, 2, 2], [3, 3, 3, 3]]  # noqa: ERA001
 if numpy_available:
     (xc, yc) = np.meshgrid(range(SCREEN_W), range(SCREEN_H))
     # translate coordinates of all pixels to center
@@ -1504,7 +1506,7 @@ def handle_events() -> None:
 
         SAMPLES[cur_sample].dispatch(event)
         if isinstance(event, tcod.event.Quit):
-            raise SystemExit()
+            raise SystemExit
 
 
 def draw_samples_menu() -> None:
@@ -1518,7 +1520,7 @@ def draw_samples_menu() -> None:
         root_console.print(
             2,
             46 - (len(SAMPLES) - i),
-            "  %s" % sample.name.ljust(19),
+            f"  {sample.name.ljust(19)}",
             fg,
             bg,
             alignment=libtcodpy.LEFT,

@@ -14,6 +14,8 @@ from typing import Any, ClassVar, Iterable, Iterator
 
 from cffi import FFI
 
+# ruff: noqa: T201
+
 sys.path.append(str(Path(__file__).parent))  # Allow importing local modules.
 
 import build_sdl
@@ -50,14 +52,14 @@ class ParsedHeader:
 
     def __init__(self, path: Path) -> None:
         """Initialize and organize a header file."""
-        self.path = path = path.resolve(True)
+        self.path = path = path.resolve(strict=True)
         directory = path.parent
         depends = set()
         header = self.path.read_text(encoding="utf-8")
         header = RE_COMMENT.sub("", header)
         header = RE_CPLUSPLUS.sub("", header)
         for dependency in RE_INCLUDE.findall(header):
-            depends.add((directory / str(dependency)).resolve(True))
+            depends.add((directory / str(dependency)).resolve(strict=True))
         header = RE_PREPROCESSOR.sub("", header)
         header = RE_TAGS.sub("", header)
         header = RE_VAFUNC.sub("", header)
@@ -91,7 +93,7 @@ def walk_includes(directory: str) -> Iterator[ParsedHeader]:
             if file in HEADER_PARSE_EXCLUDES:
                 continue
             if file.endswith(".h"):
-                yield ParsedHeader(Path(path, file).resolve(True))
+                yield ParsedHeader(Path(path, file).resolve(strict=True))
 
 
 def resolve_dependencies(

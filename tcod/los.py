@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import NDArray
 
 from tcod.cffi import ffi, lib
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 def bresenham(start: tuple[int, int], end: tuple[int, int]) -> NDArray[np.intc]:

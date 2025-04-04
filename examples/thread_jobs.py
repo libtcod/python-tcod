@@ -32,32 +32,32 @@ MAP_NUMBER = 500
 REPEAT = 10  # Number to times to run a test. Only the fastest result is shown.
 
 
-def test_fov(map_: tcod.map.Map) -> tcod.map.Map:  # noqa: D103
+def test_fov(map_: tcod.map.Map) -> tcod.map.Map:
     map_.compute_fov(MAP_WIDTH // 2, MAP_HEIGHT // 2)
     return map_
 
 
-def test_fov_single(maps: List[tcod.map.Map]) -> None:  # noqa: D103
+def test_fov_single(maps: List[tcod.map.Map]) -> None:
     for map_ in maps:
         test_fov(map_)
 
 
-def test_fov_threads(executor: concurrent.futures.Executor, maps: List[tcod.map.Map]) -> None:  # noqa: D103
+def test_fov_threads(executor: concurrent.futures.Executor, maps: List[tcod.map.Map]) -> None:
     for _result in executor.map(test_fov, maps):
         pass
 
 
-def test_astar(map_: tcod.map.Map) -> List[Tuple[int, int]]:  # noqa: D103
+def test_astar(map_: tcod.map.Map) -> List[Tuple[int, int]]:
     astar = tcod.path.AStar(map_)
     return astar.get_path(0, 0, MAP_WIDTH - 1, MAP_HEIGHT - 1)
 
 
-def test_astar_single(maps: List[tcod.map.Map]) -> None:  # noqa: D103
+def test_astar_single(maps: List[tcod.map.Map]) -> None:
     for map_ in maps:
         test_astar(map_)
 
 
-def test_astar_threads(executor: concurrent.futures.Executor, maps: List[tcod.map.Map]) -> None:  # noqa: D103
+def test_astar_threads(executor: concurrent.futures.Executor, maps: List[tcod.map.Map]) -> None:
     for _result in executor.map(test_astar, maps):
         pass
 

@@ -8,18 +8,21 @@ See :ref:`getting-started` for info on how to set those up.
 from __future__ import annotations
 
 import warnings
-from os import PathLike
 from pathlib import Path
-from typing import Any, Iterable, overload
+from typing import TYPE_CHECKING, Any, Iterable, overload
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
-from typing_extensions import Literal, deprecated
+from typing_extensions import Literal, Self, deprecated
 
 import tcod._internal
 import tcod.constants
 from tcod._internal import _check, _path_encode
 from tcod.cffi import ffi, lib
+
+if TYPE_CHECKING:
+    from os import PathLike
+
+    from numpy.typing import ArrayLike, NDArray
 
 
 def _fmt(string: str) -> bytes:
@@ -884,7 +887,7 @@ Consider one of the following:
         """
         self._key_color = color
 
-    def __enter__(self) -> Console:
+    def __enter__(self) -> Self:
         """Return this console in a managed context.
 
         When the root console is used as a context, the graphical window will

@@ -433,7 +433,6 @@ def test_line_iter() -> None:
 
 @pytest.mark.filterwarnings("ignore")
 def test_bsp() -> None:
-    """Commented out statements work in libtcod-cffi."""
     bsp = libtcodpy.bsp_new_with_size(0, 0, 64, 64)
     repr(bsp)  # test __repr__ on leaf
     libtcodpy.bsp_resize(bsp, 0, 0, 32, 32)
@@ -449,15 +448,15 @@ def test_bsp() -> None:
     bsp.level = bsp.level
 
     # cover functions on leaf
-    # self.assertFalse(libtcodpy.bsp_left(bsp))
-    # self.assertFalse(libtcodpy.bsp_right(bsp))
-    # self.assertFalse(libtcodpy.bsp_father(bsp))
+    assert not libtcodpy.bsp_left(bsp)
+    assert not libtcodpy.bsp_right(bsp)
+    assert not libtcodpy.bsp_father(bsp)
     assert libtcodpy.bsp_is_leaf(bsp)
 
     assert libtcodpy.bsp_contains(bsp, 1, 1)
-    # self.assertFalse(libtcodpy.bsp_contains(bsp, -1, -1))
-    # self.assertEqual(libtcodpy.bsp_find_node(bsp, 1, 1), bsp)
-    # self.assertFalse(libtcodpy.bsp_find_node(bsp, -1, -1))
+    assert not libtcodpy.bsp_contains(bsp, -1, -1)
+    assert libtcodpy.bsp_find_node(bsp, 1, 1) == bsp
+    assert not libtcodpy.bsp_find_node(bsp, -1, -1)
 
     libtcodpy.bsp_split_once(bsp, False, 4)
     repr(bsp)  # test __repr__ with parent
@@ -467,10 +466,10 @@ def test_bsp() -> None:
     # cover functions on parent
     assert libtcodpy.bsp_left(bsp)
     assert libtcodpy.bsp_right(bsp)
-    # self.assertFalse(libtcodpy.bsp_father(bsp))
+    assert not libtcodpy.bsp_father(bsp)
     assert not libtcodpy.bsp_is_leaf(bsp)
-    # self.assertEqual(libtcodpy.bsp_father(libtcodpy.bsp_left(bsp)), bsp)
-    # self.assertEqual(libtcodpy.bsp_father(libtcodpy.bsp_right(bsp)), bsp)
+    assert libtcodpy.bsp_father(libtcodpy.bsp_left(bsp)) == bsp  # type: ignore[arg-type]
+    assert libtcodpy.bsp_father(libtcodpy.bsp_right(bsp)) == bsp  # type: ignore[arg-type]
 
     libtcodpy.bsp_split_recursive(bsp, None, 4, 2, 2, 1.0, 1.0)
 

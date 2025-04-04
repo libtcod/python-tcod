@@ -84,10 +84,9 @@ from __future__ import annotations
 
 import enum
 import warnings
-from typing import Any, Callable, Final, Generic, Iterator, Mapping, NamedTuple, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Final, Generic, Iterator, Mapping, NamedTuple, TypeVar
 
 import numpy as np
-from numpy.typing import NDArray
 from typing_extensions import Literal
 
 import tcod.event
@@ -97,6 +96,9 @@ import tcod.sdl.sys
 from tcod.cffi import ffi, lib
 from tcod.event_constants import *  # noqa: F403
 from tcod.sdl.joystick import _HAT_DIRECTIONS
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 T = TypeVar("T")
 
@@ -299,7 +301,7 @@ class Event:
     @classmethod
     def from_sdl_event(cls, sdl_event: Any) -> Event:
         """Return a class instance from a python-cffi 'SDL_Event*' pointer."""
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def __str__(self) -> str:
         return f"<type={self.type!r}>"
@@ -2189,7 +2191,7 @@ class Scancode(enum.IntEnum):
         result._value_ = value
         return result
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, KeySym):
             msg = "Scancode and KeySym enums can not be compared directly. Convert one or the other to the same type."
             raise TypeError(msg)
@@ -2743,7 +2745,7 @@ class KeySym(enum.IntEnum):
         result._value_ = value
         return result
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, Scancode):
             msg = "Scancode and KeySym enums can not be compared directly. Convert one or the other to the same type."
             raise TypeError(msg)

@@ -27,12 +27,14 @@ Example::
 
 from __future__ import annotations
 
-from typing import Any, Iterator
+from typing import TYPE_CHECKING, Any, Iterator
 
 from typing_extensions import deprecated
 
-import tcod.random
 from tcod.cffi import ffi, lib
+
+if TYPE_CHECKING:
+    import tcod.random
 
 
 class BSP:
@@ -236,13 +238,13 @@ class BSP:
         .. versionadded:: 8.3
         """
         levels: list[list[BSP]] = []
-        next = [self]
-        while next:
-            levels.append(next)
-            level = next
-            next = []
+        next_: list[BSP] = [self]
+        while next_:
+            levels.append(next_)
+            level = next_
+            next_ = []
             for node in level:
-                next.extend(node.children)
+                next_.extend(node.children)
         while levels:
             yield from levels.pop()
 

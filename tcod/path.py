@@ -21,14 +21,16 @@ from __future__ import annotations
 import functools
 import itertools
 import warnings
-from typing import Any, Callable, Final
+from typing import TYPE_CHECKING, Any, Callable, Final
 
 import numpy as np
-from numpy.typing import ArrayLike, DTypeLike, NDArray
-from typing_extensions import Literal
+from typing_extensions import Literal, Self
 
 from tcod._internal import _check
 from tcod.cffi import ffi, lib
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike, DTypeLike, NDArray
 
 
 @ffi.def_extern()  # type: ignore
@@ -129,7 +131,7 @@ class NodeCostArray(np.ndarray):  # type: ignore
         np.uint32: ("uint32_t*", _get_path_cost_func("PathCostArrayUInt32")),
     }
 
-    def __new__(cls, array: ArrayLike) -> NodeCostArray:
+    def __new__(cls, array: ArrayLike) -> Self:
         """Validate a numpy array and setup a C callback."""
         return np.asarray(array).view(cls)  # type: ignore[no-any-return]
 

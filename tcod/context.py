@@ -32,7 +32,7 @@ import warnings
 from pathlib import Path
 from typing import Any, Iterable, NoReturn, TypeVar
 
-from typing_extensions import Literal, deprecated
+from typing_extensions import Literal, Self, deprecated
 
 import tcod.console
 import tcod.event
@@ -164,7 +164,7 @@ class Context:
             msg = "This context has been closed can no longer be used."
             raise RuntimeError(msg) from None
 
-    def __enter__(self) -> Context:
+    def __enter__(self) -> Self:
         """Enter this context which will close on exiting."""
         return self
 

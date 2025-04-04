@@ -10,6 +10,8 @@ from pathlib import Path
 
 from setuptools import setup
 
+# ruff: noqa: T201
+
 SDL_VERSION_NEEDED = (2, 0, 5)
 
 SETUP_DIR = Path(__file__).parent  # setup.py current directory
@@ -17,7 +19,7 @@ SETUP_DIR = Path(__file__).parent  # setup.py current directory
 
 def get_package_data() -> list[str]:
     """Get data files which will be included in the main tcod/ directory."""
-    BIT_SIZE, _ = platform.architecture()
+    bit_size, _ = platform.architecture()
     files = [
         "py.typed",
         "lib/LIBTCOD-CREDITS.txt",
@@ -25,7 +27,7 @@ def get_package_data() -> list[str]:
         "lib/README-SDL.txt",
     ]
     if "win32" in sys.platform:
-        if BIT_SIZE == "32bit":
+        if bit_size == "32bit":
             files += ["x86/SDL2.dll"]
         else:
             files += ["x64/SDL2.dll"]

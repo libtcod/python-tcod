@@ -48,16 +48,19 @@ import enum
 import sys
 import threading
 import time
-from types import TracebackType
-from typing import Any, Callable, Final, Hashable, Iterator
+from typing import TYPE_CHECKING, Any, Callable, Final, Hashable, Iterator
 
 import numpy as np
-from numpy.typing import ArrayLike, DTypeLike, NDArray
 from typing_extensions import Literal, Self
 
 import tcod.sdl.sys
 from tcod.cffi import ffi, lib
 from tcod.sdl._internal import _check, _get_error, _ProtectedContext
+
+if TYPE_CHECKING:
+    from types import TracebackType
+
+    from numpy.typing import ArrayLike, DTypeLike, NDArray
 
 
 def _get_format(format: DTypeLike) -> int:

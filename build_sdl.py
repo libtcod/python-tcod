@@ -14,11 +14,11 @@ import zipfile
 from pathlib import Path
 from typing import Any
 
-import pcpp  # type: ignore
+import pcpp  # type: ignore[import-untyped]
 import requests
 
 # This script calls a lot of programs.
-# ruff: noqa: S603, S607
+# ruff: noqa: S603, S607, T201
 
 BIT_SIZE, LINKAGE = platform.architecture()
 
@@ -141,7 +141,7 @@ def unpack_sdl2(version: str) -> Path:
     return sdl2_path
 
 
-class SDLParser(pcpp.Preprocessor):  # type: ignore
+class SDLParser(pcpp.Preprocessor):  # type: ignore[misc]
     """A modified preprocessor to output code in a format for CFFI."""
 
     def __init__(self) -> None:
@@ -159,7 +159,7 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore
                 buffer.write(f"#define {name} ...\n")
             return buffer.getvalue()
 
-    def on_include_not_found(self, is_malformed: bool, is_system_include: bool, curdir: str, includepath: str) -> None:
+    def on_include_not_found(self, is_malformed: bool, is_system_include: bool, curdir: str, includepath: str) -> None:  # noqa: ARG002, FBT001
         """Remove bad includes such as stddef.h and stdarg.h."""
         raise pcpp.OutputDirective(pcpp.Action.IgnoreAndRemove)
 
@@ -190,7 +190,7 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore
         self,
         directive: Any,  # noqa: ANN401
         tokens: list[Any],
-        if_passthru: bool,
+        if_passthru: bool,  # noqa: FBT001
         preceding_tokens: list[Any],
     ) -> Any:  # noqa: ANN401
         """Catch and store definitions."""
@@ -204,7 +204,7 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore
 
 check_sdl_version()
 
-if sys.platform in ["win32", "darwin"]:
+if sys.platform == "win32" or sys.platform == "darwin":
     SDL2_PARSE_PATH = unpack_sdl2(SDL2_PARSE_VERSION)
     SDL2_BUNDLE_PATH = unpack_sdl2(SDL2_BUNDLE_VERSION)
 

@@ -17,7 +17,7 @@ def render_text(renderer: tcod.sdl.render.Renderer, text: str) -> tcod.sdl.rende
     """Render text, upload it to VRAM, then return it as an SDL Texture."""
     # Use Pillow to render the font.
     _left, _top, right, bottom = font.getbbox(text)
-    width, height = right, bottom
+    width, height = int(right), int(bottom)
     image = Image.new("RGBA", (width, height))
     draw = ImageDraw.Draw(image)
     draw.text((0, 0), text, font=font)
@@ -43,7 +43,7 @@ def main() -> None:
         renderer.present()
         for event in tcod.event.get():
             if isinstance(event, tcod.event.Quit):
-                raise SystemExit()
+                raise SystemExit
 
 
 if __name__ == "__main__":

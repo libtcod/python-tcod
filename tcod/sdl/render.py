@@ -6,15 +6,17 @@
 from __future__ import annotations
 
 import enum
-from typing import Any, Final, Sequence
+from typing import TYPE_CHECKING, Any, Final, Sequence
 
 import numpy as np
-from numpy.typing import NDArray
 from typing_extensions import Literal
 
 import tcod.sdl.video
 from tcod.cffi import ffi, lib
 from tcod.sdl._internal import _check, _check_p, _required_version
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 class TextureAccess(enum.IntEnum):

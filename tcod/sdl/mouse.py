@@ -10,15 +10,17 @@ You can also set the cursor icon to an OS-defined or custom icon.
 from __future__ import annotations
 
 import enum
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 
 import tcod.event
 import tcod.sdl.video
 from tcod.cffi import ffi, lib
 from tcod.sdl._internal import _check, _check_p
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike, NDArray
 
 
 class Cursor:
@@ -33,7 +35,7 @@ class Cursor:
             raise TypeError(msg)
         self.p = sdl_cursor_p
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         return bool(self.p == getattr(other, "p", None))
 
     @classmethod

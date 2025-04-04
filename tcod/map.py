@@ -3,15 +3,17 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 from typing_extensions import Literal
 
 import tcod._internal
 import tcod.constants
 from tcod.cffi import ffi, lib
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike, NDArray
 
 
 class Map:

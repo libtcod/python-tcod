@@ -55,7 +55,7 @@ integer increments.
                     print(event)  # Print event names and attributes.
                     match event:
                         case tcod.event.Quit():
-                            raise SystemExit()
+                            raise SystemExit
             # The window will be closed after the above with-block exits.
 
 
@@ -113,7 +113,7 @@ clearing the console every frame and replacing it only on resizing the window.
                     print(event)  # Print event names and attributes.
                     match event:
                         case tcod.event.Quit():
-                            raise SystemExit()
+                            raise SystemExit
                         case tcod.event.WindowResized(type="WindowSizeChanged"):
                             pass  # The next call to context.new_console may return a different size.
 

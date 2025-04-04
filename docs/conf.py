@@ -27,6 +27,8 @@ sys.path.insert(0, str(Path("..").resolve(strict=True)))
 
 THIS_DIR = Path(__file__).parent
 
+# ruff: noqa: ERA001
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -79,7 +81,7 @@ git_describe = subprocess.run(
 )
 release = git_describe.stdout.strip()
 assert release
-print("release version: %r" % release)
+print(f"release version: {release!r}")
 
 # The short X.Y version.
 match_version = re.match(r"([0-9]+\.[0-9]+).*?", release)

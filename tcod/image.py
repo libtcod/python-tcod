@@ -11,17 +11,21 @@ For true pixel-based rendering you'll want to access the SDL rendering port at :
 
 from __future__ import annotations
 
-from os import PathLike
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 from typing_extensions import deprecated
 
-import tcod.console
 from tcod._internal import _console, _path_encode
 from tcod.cffi import ffi, lib
+
+if TYPE_CHECKING:
+    from os import PathLike
+
+    from numpy.typing import ArrayLike, NDArray
+
+    import tcod.console
 
 
 class Image:

@@ -62,7 +62,7 @@ def test_parser() -> None:
             type_names = ["NONE", "BOOL", "CHAR", "INT", "FLOAT", "STRING", "COLOR", "DICE"]
             type_name = type_names[typ & 0xFF]
             if typ & libtcod.TYPE_LIST:
-                type_name = "LIST<%s>" % type_name
+                type_name = f"LIST<{type_name}>"
             print("new property named ", name, " type ", type_name, " value ", value)
             return True
 

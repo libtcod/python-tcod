@@ -6,12 +6,10 @@ import atexit
 import sys
 import threading
 import warnings
-from os import PathLike
 from pathlib import Path
-from typing import Any, Callable, Hashable, Iterable, Iterator, Sequence
+from typing import TYPE_CHECKING, Any, Callable, Hashable, Iterable, Iterator, Sequence
 
 import numpy as np
-from numpy.typing import NDArray
 from typing_extensions import Literal, deprecated
 
 import tcod.bsp
@@ -53,6 +51,11 @@ from tcod.constants import (
     KEY_RELEASED,
     NOISE_DEFAULT,
 )
+
+if TYPE_CHECKING:
+    from os import PathLike
+
+    from numpy.typing import NDArray
 
 # Functions are too deprecated to make changes.
 # ruff: noqa: ANN401 PLR0913 D102 D103 D105 D107

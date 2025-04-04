@@ -41,7 +41,7 @@ def main() -> None:
                 context.convert_event(event)  # Set tile coordinates for event.
                 print(repr(event))
                 if isinstance(event, tcod.event.Quit):
-                    raise SystemExit()
+                    raise SystemExit
                 if isinstance(event, tcod.event.WindowResized) and event.type == "WindowSizeChanged":
                     console = context.new_console()
                 if isinstance(event, tcod.event.ControllerDevice):

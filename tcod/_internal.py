@@ -5,17 +5,19 @@ from __future__ import annotations
 import locale
 import sys
 import warnings
-from pathlib import Path
-from types import TracebackType
 from typing import TYPE_CHECKING, Any, AnyStr, Callable, NoReturn, SupportsInt, TypeVar
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 from typing_extensions import Literal, LiteralString, deprecated
 
 from tcod.cffi import ffi, lib
 
 if TYPE_CHECKING:
+    from pathlib import Path
+    from types import TracebackType
+
+    from numpy.typing import ArrayLike, NDArray
+
     import tcod.image
 
 FuncType = Callable[..., Any]

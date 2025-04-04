@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import random
 import warnings
-from typing import Callable, Iterator, Union
+from typing import Callable, Iterator
 
 import pytest
 
@@ -97,6 +97,6 @@ def ch_latin1_str() -> str:
         "latin1_str",
     ]
 )
-def ch(request: pytest.FixtureRequest) -> Callable[[], Union[int, str]]:
+def ch(request: pytest.FixtureRequest) -> Callable[[], int | str]:
     """Test with multiple types of ascii/latin1 characters."""
-    return globals()[f"ch_{request.param}"]()  # type: ignore
+    return globals()[f"ch_{request.param}"]()  # type: ignore[no-any-return]
