@@ -81,9 +81,10 @@ def test_console_methods() -> None:
         console.hline(0, 1, 10)
     with pytest.deprecated_call():
         console.vline(1, 0, 10)
-    console.print_frame(0, 0, 8, 8, "Frame")
-    console.blit(0, 0, 0, 0, console, 0, 0)  # type: ignore
-    console.blit(0, 0, 0, 0, console, 0, 0, key_color=(0, 0, 0))  # type: ignore
+    with pytest.deprecated_call():
+        console.print_frame(0, 0, 8, 8, "Frame")
+    console.blit(0, 0, 0, 0, console, 0, 0)  # type: ignore[arg-type]
+    console.blit(0, 0, 0, 0, console, 0, 0, key_color=(0, 0, 0))  # type: ignore[arg-type]
     with pytest.deprecated_call():
         console.set_key_color((254, 0, 254))
 

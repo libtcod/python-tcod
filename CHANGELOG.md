@@ -13,9 +13,12 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ### Deprecated
 
-- Using `Console.print` without keywords for only the `x`, `y`, and `text` parameters has been deprecated.
+- In general the `fg`, `bg`, and `bg_blend` keywords are too hard to keep track of as positional arguments so they must be replaced with keyword arguments instead.
+- `Console.print`: deprecated `string`, `fg`, `bg`, and `bg_blend` being given as positional arguments.
   The `string` parameter has been renamed to `text`.
 - `Console.print_box` has been replaced by `Console.print`.
+- `Console.draw_frame`: deprecated `clear`, `fg`, `bg`, and `bg_blend` being given as positional arguments.
+- `Console.draw_rect`: deprecated `fg`, `bg`, and `bg_blend` being given as positional arguments.
 
 ## [17.1.0] - 2025-03-29
 

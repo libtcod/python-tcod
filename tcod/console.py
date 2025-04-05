@@ -743,6 +743,7 @@ Consider one of the following:
         self.__deprecate_defaults("draw_rect", bg_blend)
         lib.TCOD_console_vline(self.console_c, x, y, height, bg_blend)
 
+    @deprecated("Replace with 'console.draw_frame(...)', use a separate print call for frame titles")
     def print_frame(  # noqa: PLR0913
         self,
         x: int,
@@ -976,8 +977,23 @@ Consider one of the following:
         return "<{}>".format("\n ".join("".join(chr(c) for c in line) for line in self._tiles["ch"]))
 
     @overload
+    def print(
+        self,
+        x: int,
+        y: int,
+        text: str,
+        *,
+        width: int | None = None,
+        height: int | None = None,
+        fg: tuple[int, int, int] | None = None,
+        bg: tuple[int, int, int] | None = None,
+        bg_blend: int = tcod.constants.BKGND_SET,
+        alignment: int = tcod.constants.LEFT,
+    ) -> int: ...
+
+    @overload
     @deprecated(
-        "Switch all parameters to keywords such as 'console.print(x=..., y=..., text=..., width=..., height=..., fg=..., bg=..., bg_blend=..., alignment=...)'"
+        "Replace text, fg, bg, bg_blend, and alignment with keyword arguments."
         "\n'string' keyword should be renamed to `text`"
     )
     def print(
@@ -991,21 +1007,6 @@ Consider one of the following:
         alignment: int = tcod.constants.LEFT,
         *,
         string: str = "",
-    ) -> int: ...
-
-    @overload
-    def print(
-        self,
-        x: int,
-        y: int,
-        text: str,
-        *,
-        width: int | None = None,
-        height: int | None = None,
-        fg: tuple[int, int, int] | None = None,
-        bg: tuple[int, int, int] | None = None,
-        bg_blend: int = tcod.constants.BKGND_SET,
-        alignment: int = tcod.constants.LEFT,
     ) -> int: ...
 
     def print(  # noqa: PLR0913
@@ -1036,11 +1037,15 @@ Consider one of the following:
             height: Height in tiles to constrain the printing region.
             fg: RGB tuple to use as the foreground color, or `None` to leave the foreground unchanged.
                 Tuple values should be 0-255.
+                Must be given as a keyword argument.
             bg: RGB tuple to use as the background color, or `None` to leave the foreground unchanged.
                 Tuple values should be 0-255.
+                Must be given as a keyword argument.
             bg_blend: Background blend type used by libtcod.
                 Typically starts with `libtcodpy.BKGND_*`.
+                Must be given as a keyword argument.
             alignment: One of `libtcodpy.LEFT`, `libtcodpy.CENTER`, or `libtcodpy.RIGHT`
+                Must be given as a keyword argument.
             string: Older deprecated name of the `text` parameter.
 
         Returns:
@@ -1086,13 +1091,16 @@ Consider one of the following:
 
         .. versionchanged:: Unreleased
 
+            Deprecated giving `string`, `fg`, `bg`, and `bg_blend` as positional arguments.
+
             Added `text` parameter to replace `string`.
 
             Added `width` and `height` keyword parameters to bind text to a rectangle and replace other print functions.
             Right-aligned text with `width=None` now treats the `x` coordinate as a past-the-end index, this will shift
             the text of older calls to the left by 1 tile.
 
-            Now returns the number of lines printed via word wrapping.
+            Now returns the number of lines printed via word wrapping,
+            same as previous print functions bound to rectangles.
         """
         if width is not None and width <= 0:
             return 0
@@ -1187,6 +1195,38 @@ Consider one of the following:
             )
         )
 
+    @overload
+    def draw_frame(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        *,
+        clear: bool = True,
+        fg: tuple[int, int, int] | None = None,
+        bg: tuple[int, int, int] | None = None,
+        bg_blend: int = tcod.constants.BKGND_SET,
+        decoration: str | tuple[int, int, int, int, int, int, int, int, int] = "┌─┐│ │└─┘",
+    ) -> None: ...
+
+    @overload
+    @deprecated("Parameters clear, fg, bg, bg_blend should be keyword arguments. Remove title parameter")
+    def draw_frame(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        title: str = "",
+        clear: bool = True,  # noqa: FBT001, FBT002
+        fg: tuple[int, int, int] | None = None,
+        bg: tuple[int, int, int] | None = None,
+        bg_blend: int = tcod.constants.BKGND_SET,
+        *,
+        decoration: str | tuple[int, int, int, int, int, int, int, int, int] = "┌─┐│ │└─┘",
+    ) -> None: ...
+
     def draw_frame(  # noqa: PLR0913
         self,
         x: int,
@@ -1215,13 +1255,16 @@ Consider one of the following:
         border with :any:`Console.print_box` using your own style.
 
         If `clear` is True than the region inside of the frame will be cleared.
+        Must be given as a keyword argument.
 
         `fg` and `bg` are the foreground and background colors for the frame
         border.  This is a 3-item tuple with (r, g, b) color values from
         0 to 255.  These parameters can also be set to `None` to leave the
         colors unchanged.
+        Must be given as a keyword argument.
 
         `bg_blend` is the blend type used by libtcod.
+        Must be given as a keyword argument.
 
         `decoration` is a sequence of glyphs to use for rendering the borders.
         This a str or tuple of int's with 9 items with the items arranged in
@@ -1240,6 +1283,10 @@ Consider one of the following:
 
         .. versionchanged:: 13.0
             `x` and `y` are now always used as an absolute position for negative values.
+
+        .. versionchanged:: Unreleased
+            Deprecated `clear`, `fg`, `bg`, and `bg_blend` being given as positional arguments.
+            These should be keyword arguments only.
 
         Example::
 
@@ -1305,6 +1352,34 @@ Consider one of the following:
             )
         )
 
+    @overload
+    def draw_rect(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        *,
+        ch: int,
+        fg: tuple[int, int, int] | None = None,
+        bg: tuple[int, int, int] | None = None,
+        bg_blend: int = tcod.constants.BKGND_SET,
+    ) -> None: ...
+
+    @overload
+    @deprecated("Parameters cg, fg, bg, bg_blend should be keyword arguments")
+    def draw_rect(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        ch: int,
+        fg: tuple[int, int, int] | None = None,
+        bg: tuple[int, int, int] | None = None,
+        bg_blend: int = tcod.constants.BKGND_SET,
+    ) -> None: ...
+
     def draw_rect(  # noqa: PLR0913
         self,
         x: int,
@@ -1323,15 +1398,16 @@ Consider one of the following:
 
         `width` and `height` determine the size of the rectangle.
 
-        `ch` is a Unicode integer.  You can use 0 to leave the current
-        characters unchanged.
+        `ch` is a Unicode integer.  You can use 0 to leave the current characters unchanged.
+        Must be given as a keyword argument.
 
-        `fg` and `bg` are the foreground text color and background tile color
-        respectfully.  This is a 3-item tuple with (r, g, b) color values from
-        0 to 255.  These parameters can also be set to `None` to leave the
-        colors unchanged.
+        `fg` and `bg` are the foreground text color and background tile color respectfully.
+        This is a 3-item tuple with (r, g, b) color values from 0 to 255.
+        These parameters can also be set to `None` to leave the colors unchanged.
+        Must be given as a keyword argument.
 
         `bg_blend` is the blend type used by libtcod.
+        Must be given as a keyword argument.
 
         .. versionadded:: 8.5
 
@@ -1340,6 +1416,10 @@ Consider one of the following:
 
         .. versionchanged:: 13.0
             `x` and `y` are now always used as an absolute position for negative values.
+
+        .. versionchanged:: Unreleased
+            Deprecated `ch`, `fg`, `bg`, and `bg_blend` being given as positional arguments.
+            These should be keyword arguments only.
         """
         lib.TCOD_console_draw_rect_rgb(
             self.console_c,
