@@ -63,6 +63,12 @@ sample_console = tcod.console.Console(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT,
 cur_sample = 0  # Current selected sample.
 frame_times = [time.perf_counter()]
 frame_length = [0.0]
+START_TIME = time.perf_counter()
+
+
+def _get_elapsed_time() -> float:
+    """Return time passed since the start of the program."""
+    return time.perf_counter() - START_TIME
 
 
 class Sample(tcod.event.EventDispatch[None]):
@@ -207,13 +213,13 @@ class OffscreenConsoleSample(Sample):
         )
 
     def on_enter(self) -> None:
-        self.counter = time.perf_counter()
+        self.counter = _get_elapsed_time()
         # get a "screenshot" of the current sample screen
         sample_console.blit(dest=self.screenshot)
 
     def on_draw(self) -> None:
-        if time.perf_counter() - self.counter >= 1:
-            self.counter = time.perf_counter()
+        if _get_elapsed_time() - self.counter >= 1:
+            self.counter = _get_elapsed_time()
             self.x += self.x_dir
             self.y += self.y_dir
             if self.x == sample_console.width / 2 + 5:
@@ -396,8 +402,8 @@ class NoiseSample(Sample):
         )
 
     def on_draw(self) -> None:
-        self.dx = time.perf_counter() * 0.25
-        self.dy = time.perf_counter() * 0.25
+        self.dx = _get_elapsed_time() * 0.25
+        self.dy = _get_elapsed_time() * 0.25
         for y in range(2 * sample_console.height):
             for x in range(2 * sample_console.width):
                 f = [
@@ -518,7 +524,7 @@ SAMPLE_MAP_ = (
     "##############################################",
 )
 
-SAMPLE_MAP: NDArray[Any] = np.array([list(line) for line in SAMPLE_MAP_]).transpose()
+SAMPLE_MAP: NDArray[Any] = np.array([[ord(c) for c in line] for line in SAMPLE_MAP_]).transpose()
 
 FOV_ALGO_NAMES = (
     "BASIC      ",
@@ -555,17 +561,17 @@ class FOVSample(Sample):
         map_shape = (SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
 
         self.walkable: NDArray[np.bool_] = np.zeros(map_shape, dtype=bool, order="F")
-        self.walkable[:] = SAMPLE_MAP[:] == " "
+        self.walkable[:] = SAMPLE_MAP[:] == ord(" ")
 
         self.transparent: NDArray[np.bool_] = np.zeros(map_shape, dtype=bool, order="F")
-        self.transparent[:] = self.walkable[:] | (SAMPLE_MAP == "=")
+        self.transparent[:] = self.walkable[:] | (SAMPLE_MAP[:] == ord("="))
 
         # Lit background colors for the map.
         self.light_map_bg: NDArray[np.uint8] = np.full(SAMPLE_MAP.shape, LIGHT_GROUND, dtype="3B")
-        self.light_map_bg[SAMPLE_MAP[:] == "#"] = LIGHT_WALL
+        self.light_map_bg[SAMPLE_MAP[:] == ord("#")] = LIGHT_WALL
         # Dark background colors for the map.
         self.dark_map_bg: NDArray[np.uint8] = np.full(SAMPLE_MAP.shape, DARK_GROUND, dtype="3B")
-        self.dark_map_bg[SAMPLE_MAP[:] == "#"] = DARK_WALL
+        self.dark_map_bg[SAMPLE_MAP[:] == ord("#")] = DARK_WALL
 
     def draw_ui(self) -> None:
         sample_console.print(
@@ -586,8 +592,8 @@ class FOVSample(Sample):
         self.draw_ui()
         sample_console.print(self.player_x, self.player_y, "@")
         # Draw windows.
-        sample_console.rgb["ch"][SAMPLE_MAP == "="] = 0x2550  # BOX DRAWINGS DOUBLE HORIZONTAL
-        sample_console.rgb["fg"][SAMPLE_MAP == "="] = BLACK
+        sample_console.rgb["ch"][SAMPLE_MAP[:] == ord("=")] = 0x2550  # BOX DRAWINGS DOUBLE HORIZONTAL
+        sample_console.rgb["fg"][SAMPLE_MAP[:] == ord("=")] = BLACK
 
         # Get a 2D boolean array of visible cells.
         fov = tcod.map.compute_fov(
@@ -600,7 +606,7 @@ class FOVSample(Sample):
 
         if self.torch:
             # Derive the touch from noise based on the current time.
-            torch_t = time.perf_counter() * 5
+            torch_t = _get_elapsed_time() * 5
             # Randomize the light position between -1.5 and 1.5
             torch_x = self.player_x + self.noise.get_point(torch_t) * 1.5
             torch_y = self.player_y + self.noise.get_point(torch_t + 11) * 1.5
@@ -632,7 +638,11 @@ class FOVSample(Sample):
             # Linear interpolation between colors.
             sample_console.rgb["bg"] = dark_bg + (light_bg - dark_bg) * light[..., np.newaxis]
         else:
-            sample_console.bg[...] = np.where(fov[:, :, np.newaxis], self.light_map_bg, self.dark_map_bg)
+            sample_console.bg[...] = np.select(
+                condlist=[fov[:, :, np.newaxis]],
+                choicelist=[self.light_map_bg],
+                default=self.dark_map_bg,
+            )
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         MOVE_KEYS = {  # noqa: N806
@@ -665,174 +675,89 @@ class FOVSample(Sample):
 
 class PathfindingSample(Sample):
     def __init__(self) -> None:
+        """Initialize this sample."""
         self.name = "Path finding"
 
-        self.px = 20
-        self.py = 10
-        self.dx = 24
-        self.dy = 1
-        self.dijkstra_dist = 0.0
+        self.player_x = 20
+        self.player_y = 10
+        self.dest_x = 24
+        self.dest_y = 1
         self.using_astar = True
-        self.recalculate = False
         self.busy = 0.0
-        self.old_char = " "
+        self.cost = SAMPLE_MAP.T[:] == ord(" ")
+        self.graph = tcod.path.SimpleGraph(cost=self.cost, cardinal=70, diagonal=99)
+        self.pathfinder = tcod.path.Pathfinder(graph=self.graph)
 
-        self.map = tcod.map.Map(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
-        for y in range(SAMPLE_SCREEN_HEIGHT):
-            for x in range(SAMPLE_SCREEN_WIDTH):
-                if SAMPLE_MAP[x, y] == " ":
-                    # ground
-                    self.map.walkable[y, x] = True
-                    self.map.transparent[y, x] = True
-                elif SAMPLE_MAP[x, y] == "=":
-                    # window
-                    self.map.walkable[y, x] = False
-                    self.map.transparent[y, x] = True
-        self.path = tcod.path.AStar(self.map)
-        self.dijkstra = tcod.path.Dijkstra(self.map)
+        self.background_console = tcod.console.Console(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
+
+        # draw the dungeon
+        self.background_console.rgb["fg"] = BLACK
+        self.background_console.rgb["bg"] = DARK_GROUND
+        self.background_console.rgb["bg"][SAMPLE_MAP.T[:] == ord("#")] = DARK_WALL
+        self.background_console.rgb["ch"][SAMPLE_MAP.T[:] == ord("=")] = ord("═")
 
     def on_enter(self) -> None:
-        # we draw the foreground only the first time.
-        #  during the player movement, only the @ is redrawn.
-        #  the rest impacts only the background color
-        # draw the help text & player @
-        sample_console.clear()
-        sample_console.ch[self.dx, self.dy] = ord("+")
-        sample_console.fg[self.dx, self.dy] = WHITE
-        sample_console.ch[self.px, self.py] = ord("@")
-        sample_console.fg[self.px, self.py] = WHITE
-        sample_console.print(
-            1,
-            1,
-            "IJKL / mouse :\nmove destination\nTAB : A*/dijkstra",
-            fg=WHITE,
-            bg=None,
-        )
-        sample_console.print(1, 4, "Using : A*", fg=WHITE, bg=None)
-        # draw windows
-        for y in range(SAMPLE_SCREEN_HEIGHT):
-            for x in range(SAMPLE_SCREEN_WIDTH):
-                if SAMPLE_MAP[x, y] == "=":
-                    libtcodpy.console_put_char(sample_console, x, y, libtcodpy.CHAR_DHLINE, libtcodpy.BKGND_NONE)
-        self.recalculate = True
+        """Do nothing."""
 
     def on_draw(self) -> None:
-        if self.recalculate:
-            if self.using_astar:
-                libtcodpy.path_compute(self.path, self.px, self.py, self.dx, self.dy)
-            else:
-                self.dijkstra_dist = 0.0
-                # compute dijkstra grid (distance from px,py)
-                libtcodpy.dijkstra_compute(self.dijkstra, self.px, self.py)
-                # get the maximum distance (needed for rendering)
-                for y in range(SAMPLE_SCREEN_HEIGHT):
-                    for x in range(SAMPLE_SCREEN_WIDTH):
-                        d = libtcodpy.dijkstra_get_distance(self.dijkstra, x, y)
-                        self.dijkstra_dist = max(d, self.dijkstra_dist)
-                # compute path from px,py to dx,dy
-                libtcodpy.dijkstra_path_set(self.dijkstra, self.dx, self.dy)
-            self.recalculate = False
-            self.busy = 0.2
+        """Recompute and render pathfinding."""
+        self.pathfinder = tcod.path.Pathfinder(graph=self.graph)
+        # self.pathfinder.clear() # Known issues, needs fixing  # noqa: ERA001
+        self.pathfinder.add_root((self.player_y, self.player_x))
+
         # draw the dungeon
-        for y in range(SAMPLE_SCREEN_HEIGHT):
-            for x in range(SAMPLE_SCREEN_WIDTH):
-                if SAMPLE_MAP[x, y] == "#":
-                    libtcodpy.console_set_char_background(sample_console, x, y, DARK_WALL, libtcodpy.BKGND_SET)
-                else:
-                    libtcodpy.console_set_char_background(sample_console, x, y, DARK_GROUND, libtcodpy.BKGND_SET)
+        self.background_console.blit(dest=sample_console)
+
+        sample_console.print(self.dest_x, self.dest_y, "+", fg=WHITE)
+        sample_console.print(self.player_x, self.player_y, "@", fg=WHITE)
+        sample_console.print(1, 1, "IJKL / mouse :\nmove destination\nTAB : A*/dijkstra", fg=WHITE, bg=None)
+        sample_console.print(1, 4, "Using : A*", fg=WHITE, bg=None)
+
+        if not self.using_astar:
+            self.pathfinder.resolve(goal=None)
+            reachable = self.pathfinder.distance != np.iinfo(self.pathfinder.distance.dtype).max
+
+            # draw distance from player
+            dijkstra_max_dist = float(self.pathfinder.distance[reachable].max())
+            np.array(self.pathfinder.distance, copy=True, dtype=np.float32)
+            interpolate = self.pathfinder.distance[reachable] * 0.9 / dijkstra_max_dist
+            color_delta = (np.array(DARK_GROUND) - np.array(LIGHT_GROUND)).astype(np.float32)
+            sample_console.rgb.T["bg"][reachable] = np.array(LIGHT_GROUND) + interpolate[:, np.newaxis] * color_delta
+
         # draw the path
-        if self.using_astar:
-            for i in range(libtcodpy.path_size(self.path)):
-                x, y = libtcodpy.path_get(self.path, i)
-                libtcodpy.console_set_char_background(sample_console, x, y, LIGHT_GROUND, libtcodpy.BKGND_SET)
-        else:
-            for y in range(SAMPLE_SCREEN_HEIGHT):
-                for x in range(SAMPLE_SCREEN_WIDTH):
-                    if SAMPLE_MAP[x, y] != "#":
-                        libtcodpy.console_set_char_background(
-                            sample_console,
-                            x,
-                            y,
-                            libtcodpy.color_lerp(  # type: ignore[arg-type]
-                                LIGHT_GROUND,
-                                DARK_GROUND,
-                                0.9 * libtcodpy.dijkstra_get_distance(self.dijkstra, x, y) / self.dijkstra_dist,
-                            ),
-                            libtcodpy.BKGND_SET,
-                        )
-            for i in range(libtcodpy.dijkstra_size(self.dijkstra)):
-                x, y = libtcodpy.dijkstra_get(self.dijkstra, i)
-                libtcodpy.console_set_char_background(sample_console, x, y, LIGHT_GROUND, libtcodpy.BKGND_SET)
+        path = self.pathfinder.path_to((self.dest_y, self.dest_x))[1:, ::-1]
+        sample_console.rgb["bg"][tuple(path.T)] = LIGHT_GROUND
 
         # move the creature
         self.busy -= frame_length[-1]
         if self.busy <= 0.0:
             self.busy = 0.2
-            if self.using_astar:
-                if not libtcodpy.path_is_empty(self.path):
-                    libtcodpy.console_put_char(sample_console, self.px, self.py, " ", libtcodpy.BKGND_NONE)
-                    self.px, self.py = libtcodpy.path_walk(self.path, True)  # type: ignore[assignment]
-                    libtcodpy.console_put_char(sample_console, self.px, self.py, "@", libtcodpy.BKGND_NONE)
-            elif not libtcodpy.dijkstra_is_empty(self.dijkstra):
-                libtcodpy.console_put_char(sample_console, self.px, self.py, " ", libtcodpy.BKGND_NONE)
-                self.px, self.py = libtcodpy.dijkstra_path_walk(self.dijkstra)  # type: ignore[assignment]
-                libtcodpy.console_put_char(sample_console, self.px, self.py, "@", libtcodpy.BKGND_NONE)
-                self.recalculate = True
+            if len(path):
+                self.player_x = int(path.item(0, 0))
+                self.player_y = int(path.item(0, 1))
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        if event.sym == tcod.event.KeySym.i and self.dy > 0:
-            # destination move north
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.old_char, libtcodpy.BKGND_NONE)
-            self.dy -= 1
-            self.old_char = sample_console.ch[self.dx, self.dy]
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", libtcodpy.BKGND_NONE)
-            if SAMPLE_MAP[self.dx, self.dy] == " ":
-                self.recalculate = True
-        elif event.sym == tcod.event.KeySym.k and self.dy < SAMPLE_SCREEN_HEIGHT - 1:
-            # destination move south
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.old_char, libtcodpy.BKGND_NONE)
-            self.dy += 1
-            self.old_char = sample_console.ch[self.dx, self.dy]
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", libtcodpy.BKGND_NONE)
-            if SAMPLE_MAP[self.dx, self.dy] == " ":
-                self.recalculate = True
-        elif event.sym == tcod.event.KeySym.j and self.dx > 0:
-            # destination move west
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.old_char, libtcodpy.BKGND_NONE)
-            self.dx -= 1
-            self.old_char = sample_console.ch[self.dx, self.dy]
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", libtcodpy.BKGND_NONE)
-            if SAMPLE_MAP[self.dx, self.dy] == " ":
-                self.recalculate = True
-        elif event.sym == tcod.event.KeySym.l and self.dx < SAMPLE_SCREEN_WIDTH - 1:
-            # destination move east
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.old_char, libtcodpy.BKGND_NONE)
-            self.dx += 1
-            self.old_char = sample_console.ch[self.dx, self.dy]
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", libtcodpy.BKGND_NONE)
-            if SAMPLE_MAP[self.dx, self.dy] == " ":
-                self.recalculate = True
+        """Handle movement and UI."""
+        if event.sym == tcod.event.KeySym.i and self.dest_y > 0:  # destination move north
+            self.dest_y -= 1
+        elif event.sym == tcod.event.KeySym.k and self.dest_y < SAMPLE_SCREEN_HEIGHT - 1:  # destination move south
+            self.dest_y += 1
+        elif event.sym == tcod.event.KeySym.j and self.dest_x > 0:  # destination move west
+            self.dest_x -= 1
+        elif event.sym == tcod.event.KeySym.l and self.dest_x < SAMPLE_SCREEN_WIDTH - 1:  # destination move east
+            self.dest_x += 1
         elif event.sym == tcod.event.KeySym.TAB:
             self.using_astar = not self.using_astar
-            if self.using_astar:
-                libtcodpy.console_print(sample_console, 1, 4, "Using : A*      ")
-            else:
-                libtcodpy.console_print(sample_console, 1, 4, "Using : Dijkstra")
-            self.recalculate = True
         else:
             super().ev_keydown(event)
 
     def ev_mousemotion(self, event: tcod.event.MouseMotion) -> None:
+        """Move destination via mouseover."""
         mx = event.tile.x - SAMPLE_SCREEN_X
         my = event.tile.y - SAMPLE_SCREEN_Y
-        if 0 <= mx < SAMPLE_SCREEN_WIDTH and 0 <= my < SAMPLE_SCREEN_HEIGHT and (self.dx != mx or self.dy != my):
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, self.old_char, libtcodpy.BKGND_NONE)
-            self.dx = mx
-            self.dy = my
-            self.old_char = sample_console.ch[self.dx, self.dy]
-            libtcodpy.console_put_char(sample_console, self.dx, self.dy, "+", libtcodpy.BKGND_NONE)
-            if SAMPLE_MAP[self.dx, self.dy] == " ":
-                self.recalculate = True
+        if 0 <= mx < SAMPLE_SCREEN_WIDTH and 0 <= my < SAMPLE_SCREEN_HEIGHT:
+            self.dest_x = mx
+            self.dest_y = my
 
 
 #############################################
@@ -1044,7 +969,7 @@ class ImageSample(Sample):
         y = sample_console.height / 2
         scalex = 0.2 + 1.8 * (1.0 + math.cos(time.time() / 2)) / 2.0
         scaley = scalex
-        angle = time.perf_counter()
+        angle = _get_elapsed_time()
         if int(time.time()) % 2:
             # split the color channels of circle.png
             # the red channel
@@ -1529,7 +1454,7 @@ def draw_stats() -> None:
     root_console.print(
         root_console.width,
         47,
-        f"elapsed : {int(time.perf_counter() * 1000):8d} ms {time.perf_counter():5.2f}s",
+        f"elapsed : {int(_get_elapsed_time() * 1000):8d} ms {_get_elapsed_time():5.2f}s",
         fg=GREY,
         alignment=libtcodpy.RIGHT,
     )
