@@ -104,20 +104,9 @@ class BSP:
         """Provide a useful readout when printed."""
         status = "leaf"
         if self.children:
-            status = "split at position=%i,horizontal=%r" % (
-                self.position,
-                self.horizontal,
-            )
+            status = f"split at position={self.position},horizontal={self.horizontal!r}"
 
-        return "<%s(x=%i,y=%i,width=%i,height=%i) level=%i %s>" % (
-            self.__class__.__name__,
-            self.x,
-            self.y,
-            self.width,
-            self.height,
-            self.level,
-            status,
-        )
+        return f"<{self.__class__.__name__}(x={self.x},y={self.y},width={self.width},height={self.height}) level={self.level} {status}>"
 
     def _unpack_bsp_tree(self, cdata: Any) -> None:  # noqa: ANN401
         self.x = cdata.x

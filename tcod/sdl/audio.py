@@ -564,7 +564,7 @@ class _AudioCallbackUserdata:
     device: AudioDevice
 
 
-@ffi.def_extern()  # type: ignore
+@ffi.def_extern()  # type: ignore[misc]
 def _sdl_audio_callback(userdata: Any, stream: Any, length: int) -> None:  # noqa: ANN401
     """Handle audio device callbacks."""
     data: _AudioCallbackUserdata = ffi.from_handle(userdata)

@@ -16,6 +16,7 @@ from typing_extensions import Literal, Self, deprecated
 
 import tcod._internal
 import tcod.constants
+import tcod.image
 from tcod._internal import _check, _path_encode
 from tcod.cffi import ffi, lib
 
@@ -1444,7 +1445,7 @@ Consider one of the following:
 
         .. versionadded:: 11.4
         """
-        image = tcod._internal._as_image(pixels)
+        image = tcod.image._as_image(pixels)
         lib.TCOD_image_blit_2x(image.image_c, self.console_c, x, y, 0, 0, -1, -1)
 
 

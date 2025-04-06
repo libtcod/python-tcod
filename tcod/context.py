@@ -447,7 +447,7 @@ class Context:
         raise pickle.PicklingError(msg)
 
 
-@ffi.def_extern()  # type: ignore
+@ffi.def_extern()  # type: ignore[misc]
 def _pycall_cli_output(catch_reference: Any, output: Any) -> None:  # noqa: ANN401
     """Callback for the libtcod context CLI.
 

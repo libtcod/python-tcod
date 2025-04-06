@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING, Any, Callable, Final
 import numpy as np
 from typing_extensions import Literal, Self
 
+import tcod.map
 from tcod._internal import _check
 from tcod.cffi import ffi, lib
 
@@ -33,29 +34,29 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike, DTypeLike, NDArray
 
 
-@ffi.def_extern()  # type: ignore
+@ffi.def_extern()  # type: ignore[misc]
 def _pycall_path_old(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:  # noqa: ANN401
-    """Libtcodpy style callback, needs to preserve the old userData issue."""
-    func, userData = ffi.from_handle(handle)
-    return func(x1, y1, x2, y2, userData)  # type: ignore
+    """Libtcodpy style callback, needs to preserve the old userdata issue."""
+    func, userdata = ffi.from_handle(handle)
+    return func(x1, y1, x2, y2, userdata)  # type: ignore[no-any-return]
 
 
-@ffi.def_extern()  # type: ignore
+@ffi.def_extern()  # type: ignore[misc]
 def _pycall_path_simple(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:  # noqa: ANN401
     """Does less and should run faster, just calls the handle function."""
-    return ffi.from_handle(handle)(x1, y1, x2, y2)  # type: ignore
+    return ffi.from_handle(handle)(x1, y1, x2, y2)  # type: ignore[no-any-return]
 
 
-@ffi.def_extern()  # type: ignore
+@ffi.def_extern()  # type: ignore[misc]
 def _pycall_path_swap_src_dest(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:  # noqa: ANN401
     """A TDL function dest comes first to match up with a dest only call."""
-    return ffi.from_handle(handle)(x2, y2, x1, y1)  # type: ignore
+    return ffi.from_handle(handle)(x2, y2, x1, y1)  # type: ignore[no-any-return]
 
 
-@ffi.def_extern()  # type: ignore
-def _pycall_path_dest_only(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:  # noqa: ANN401
+@ffi.def_extern()  # type: ignore[misc]
+def _pycall_path_dest_only(_x1: int, _y1: int, x2: int, y2: int, handle: Any) -> float:  # noqa: ANN401
     """A TDL function which samples the dest coordinate only."""
-    return ffi.from_handle(handle)(x2, y2)  # type: ignore
+    return ffi.from_handle(handle)(x2, y2)  # type: ignore[no-any-return]
 
 
 def _get_path_cost_func(
@@ -63,8 +64,8 @@ def _get_path_cost_func(
 ) -> Callable[[int, int, int, int, Any], float]:
     """Return a properly cast PathCostArray callback."""
     if not ffi:
-        return lambda x1, y1, x2, y2, _: 0
-    return ffi.cast("TCOD_path_func_t", ffi.addressof(lib, name))  # type: ignore
+        return lambda _x1, _y1, _x2, _y2, _: 0
+    return ffi.cast("TCOD_path_func_t", ffi.addressof(lib, name))  # type: ignore[no-any-return]
 
 
 class _EdgeCostFunc:
@@ -113,7 +114,7 @@ class EdgeCostCallback(_EdgeCostFunc):
         super().__init__(callback, shape)
 
 
-class NodeCostArray(np.ndarray):  # type: ignore
+class NodeCostArray(np.ndarray):  # type: ignore[type-arg]
     """Calculate cost from a numpy array of nodes.
 
     `array` is a NumPy array holding the path-cost of each node.
@@ -157,13 +158,13 @@ class NodeCostArray(np.ndarray):  # type: ignore
 class _PathFinder:
     """A class sharing methods used by AStar and Dijkstra."""
 
-    def __init__(self, cost: Any, diagonal: float = 1.41) -> None:
+    def __init__(self, cost: tcod.map.Map | ArrayLike | _EdgeCostFunc, diagonal: float = 1.41) -> None:
         self.cost = cost
         self.diagonal = diagonal
         self._path_c: Any = None
         self._callback = self._userdata = None
 
-        if hasattr(self.cost, "map_c"):
+        if isinstance(self.cost, tcod.map.Map):
             self.shape = self.cost.width, self.cost.height
             self._path_c = ffi.gc(
                 self._path_new_using_map(self.cost.map_c, diagonal),
@@ -171,7 +172,7 @@ class _PathFinder:
             )
             return
 
-        if not hasattr(self.cost, "get_tcod_path_ffi"):
+        if not isinstance(self.cost, _EdgeCostFunc):
             assert not callable(self.cost), (
                 "Any callback alone is missing shape information. Wrap your callback in tcod.path.EdgeCostCallback"
             )
@@ -206,7 +207,7 @@ class _PathFinder:
 
     def __setstate__(self, state: dict[str, Any]) -> None:
         self.__dict__.update(state)
-        self.__init__(self.cost, self.diagonal)  # type: ignore
+        _PathFinder.__init__(self, self.cost, self.diagonal)
 
     _path_new_using_map = lib.TCOD_path_new_using_map
     _path_new_using_function = lib.TCOD_path_new_using_function
@@ -239,7 +240,7 @@ class AStar(_PathFinder):
         path = []
         x = ffi.new("int[2]")
         y = x + 1
-        while lib.TCOD_path_walk(self._path_c, x, y, False):
+        while lib.TCOD_path_walk(self._path_c, x, y, False):  # noqa: FBT003
             path.append((x[0], y[0]))
         return path
 
@@ -323,7 +324,7 @@ def _export_dict(array: NDArray[Any]) -> dict[str, Any]:
     }
 
 
-def _export(array: NDArray[Any]) -> Any:  # noqa: ANN401
+def _export(array: NDArray[np.number]) -> Any:  # noqa: ANN401
     """Convert a NumPy array into a cffi object."""
     return ffi.new("struct NArray*", _export_dict(array))
 
@@ -332,7 +333,8 @@ def _compile_cost_edges(edge_map: ArrayLike) -> tuple[NDArray[np.intc], int]:
     """Return an edge_cost array using an integer map."""
     edge_map = np.array(edge_map, copy=True)
     if edge_map.ndim != 2:  # noqa: PLR2004
-        raise ValueError("edge_map must be 2 dimensional. (Got %i)" % edge_map.ndim)
+        msg = f"edge_map must be 2 dimensional. (Got {edge_map.ndim})"
+        raise ValueError(msg)
     edge_center = edge_map.shape[0] // 2, edge_map.shape[1] // 2
     edge_map[edge_center] = 0
     edge_map[edge_map < 0] = 0
@@ -353,7 +355,7 @@ def dijkstra2d(  # noqa: PLR0913
     diagonal: int | None = None,
     *,
     edge_map: ArrayLike | None = None,
-    out: np.ndarray | None = ...,  # type: ignore
+    out: NDArray[np.number] | None = ...,  # type: ignore[assignment, unused-ignore]
 ) -> NDArray[Any]:
     """Return the computed distance of all nodes on a 2D Dijkstra grid.
 
@@ -750,7 +752,8 @@ class CustomGraph:
         edge_dir = tuple(edge_dir)
         cost = np.asarray(cost)
         if len(edge_dir) != self._ndim:
-            raise TypeError("edge_dir must have exactly %i items, got %r" % (self._ndim, edge_dir))
+            msg = f"edge_dir must have exactly {self._ndim} items, got {edge_dir!r}"
+            raise TypeError(msg)
         if edge_cost <= 0:
             msg = f"edge_cost must be greater than zero, got {edge_cost!r}"
             raise ValueError(msg)
@@ -884,7 +887,8 @@ class CustomGraph:
         if edge_map.ndim < self._ndim:
             edge_map = np.asarray(edge_map[(np.newaxis,) * (self._ndim - edge_map.ndim)])
         if edge_map.ndim != self._ndim:
-            raise TypeError("edge_map must must match graph dimensions (%i). (Got %i)" % (self.ndim, edge_map.ndim))
+            msg = f"edge_map must must match graph dimensions ({self.ndim}). (Got {edge_map.ndim})"
+            raise TypeError(msg)
         if self._order == "F":
             # edge_map needs to be converted into C.
             # The other parameters are converted by the add_edge method.
@@ -1186,7 +1190,8 @@ class Pathfinder:
         if self._order == "F":  # Convert to ij indexing order.
             index = index[::-1]
         if len(index) != self._distance.ndim:
-            raise TypeError("Index must be %i items, got %r" % (self._distance.ndim, index))
+            msg = f"Index must be {self._distance.ndim} items, got {index!r}"
+            raise TypeError(msg)
         self._distance[index] = value
         self._update_heuristic(None)
         lib.TCOD_frontier_push(self._frontier_p, index, value, value)
@@ -1273,7 +1278,8 @@ class Pathfinder:
         if goal is not None:
             goal = tuple(goal)  # Check for bad input.
             if len(goal) != self._distance.ndim:
-                raise TypeError("Goal must be %i items, got %r" % (self._distance.ndim, goal))
+                msg = f"Goal must be {self._distance.ndim} items, got {goal!r}"
+                raise TypeError(msg)
             if self._order == "F":
                 # Goal is now ij indexed for the rest of this function.
                 goal = goal[::-1]
@@ -1320,7 +1326,8 @@ class Pathfinder:
         """
         index = tuple(index)  # Check for bad input.
         if len(index) != self._graph._ndim:
-            raise TypeError("Index must be %i items, got %r" % (self._distance.ndim, index))
+            msg = f"Index must be {self._distance.ndim} items, got {index!r}"
+            raise TypeError(msg)
         self.resolve(index)
         if self._order == "F":  # Convert to ij indexing order.
             index = index[::-1]

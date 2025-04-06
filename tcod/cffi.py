@@ -64,8 +64,8 @@ from tcod._libtcod import ffi, lib  # noqa: E402
 __sdl_version__ = get_sdl_version()
 
 
-@ffi.def_extern()  # type: ignore
-def _libtcod_log_watcher(message: Any, userdata: None) -> None:  # noqa: ANN401
+@ffi.def_extern()  # type: ignore[misc]
+def _libtcod_log_watcher(message: Any, _userdata: None) -> None:  # noqa: ANN401
     text = str(ffi.string(message.message), encoding="utf-8")
     source = str(ffi.string(message.source), encoding="utf-8")
     level = int(message.level)

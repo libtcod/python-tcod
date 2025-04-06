@@ -64,7 +64,7 @@ class _ProtectedContext:
         return True
 
 
-@ffi.def_extern()  # type: ignore
+@ffi.def_extern()  # type: ignore[misc]
 def _sdl_log_output_function(_userdata: None, category: int, priority: int, message_p: Any) -> None:  # noqa: ANN401
     """Pass logs sent by SDL to Python's logging system."""
     message = str(ffi.string(message_p), encoding="utf-8")
@@ -118,7 +118,7 @@ def _required_version(required: tuple[int, int, int]) -> Callable[[T], T]:
         msg = f"This feature requires SDL version {required}, but tcod was compiled with version {_compiled_version()}"
         raise RuntimeError(msg)
 
-    return lambda x: replacement  # type: ignore[return-value]
+    return lambda _: replacement  # type: ignore[return-value]
 
 
 lib.SDL_LogSetOutputFunction(lib._sdl_log_output_function, ffi.NULL)

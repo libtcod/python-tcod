@@ -7,7 +7,6 @@ import sys
 import warnings
 from typing import TYPE_CHECKING, Any, AnyStr, Callable, NoReturn, SupportsInt, TypeVar
 
-import numpy as np
 from typing_extensions import Literal, LiteralString, deprecated
 
 from tcod.cffi import ffi, lib
@@ -16,9 +15,6 @@ if TYPE_CHECKING:
     from pathlib import Path
     from types import TracebackType
 
-    from numpy.typing import ArrayLike, NDArray
-
-    import tcod.image
 
 FuncType = Callable[..., Any]
 F = TypeVar("F", bound=FuncType)
@@ -26,7 +22,11 @@ T = TypeVar("T")
 
 
 def _deprecate_passthrough(
-    message: str, /, *, category: type[Warning] = DeprecationWarning, stacklevel: int = 0
+    message: str,  # noqa: ARG001
+    /,
+    *,
+    category: type[Warning] = DeprecationWarning,  # noqa: ARG001
+    stacklevel: int = 0,  # noqa: ARG001
 ) -> Callable[[F], F]:
     """Return a decorator which skips wrapping a warning onto functions. This is used for non-debug runs."""
 
@@ -51,7 +51,7 @@ def pending_deprecate(
 
 def verify_order(order: Literal["C", "F"]) -> Literal["C", "F"]:
     """Verify and return a Numpy order string."""
-    order = order.upper()  # type: ignore
+    order = order.upper()  # type: ignore[assignment]
     if order not in ("C", "F"):
         msg = f"order must be 'C' or 'F', not {order!r}"
         raise TypeError(msg)
@@ -91,7 +91,7 @@ def _check_warn(error: int, stacklevel: int = 2) -> int:
 def _unpack_char_p(char_p: Any) -> str:  # noqa: ANN401
     if char_p == ffi.NULL:
         return ""
-    return ffi.string(char_p).decode()  # type: ignore
+    return str(ffi.string(char_p), encoding="utf-8")
 
 
 def _int(int_or_str: SupportsInt | str | bytes) -> int:
@@ -171,7 +171,7 @@ class _PropagateException:
         return self.propagate
 
     def __exit__(
-        self, type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None
+        self, _type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None
     ) -> None:
         """If we're holding on to an exception, raise it now.
 
@@ -232,42 +232,3 @@ def _console(console: Any) -> Any:  # noqa: ANN401
             stacklevel=3,
         )
         return ffi.NULL
-
-
-class TempImage:
-    """An Image-like container for NumPy arrays."""
-
-    def __init__(self, array: ArrayLike) -> None:
-        """Initialize an image from the given array.  May copy or reference the array."""
-        self._array: NDArray[np.uint8] = np.ascontiguousarray(array, dtype=np.uint8)
-        height, width, depth = self._array.shape
-        if depth != 3:  # noqa: PLR2004
-            msg = f"Array must have RGB channels.  Shape is: {self._array.shape!r}"
-            raise TypeError(msg)
-        self._buffer = ffi.from_buffer("TCOD_color_t[]", self._array)
-        self._mipmaps = ffi.new(
-            "struct TCOD_mipmap_*",
-            {
-                "width": width,
-                "height": height,
-                "fwidth": width,
-                "fheight": height,
-                "buf": self._buffer,
-                "dirty": True,
-            },
-        )
-        self.image_c = ffi.new(
-            "TCOD_Image*",
-            {
-                "nb_mipmaps": 1,
-                "mipmaps": self._mipmaps,
-                "has_key_color": False,
-            },
-        )
-
-
-def _as_image(image: ArrayLike | tcod.image.Image) -> TempImage | tcod.image.Image:
-    """Convert this input into an Image-like object."""
-    if hasattr(image, "image_c"):
-        return image
-    return TempImage(image)

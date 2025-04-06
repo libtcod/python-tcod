@@ -1548,7 +1548,7 @@ def get_mouse_state() -> MouseState:
     return MouseState((xy[0], xy[1]), (int(tile[0]), int(tile[1])), buttons)
 
 
-@ffi.def_extern()  # type: ignore
+@ffi.def_extern()  # type: ignore[misc]
 def _sdl_event_watcher(userdata: Any, sdl_event: Any) -> int:
     callback: Callable[[Event], None] = ffi.from_handle(userdata)
     callback(_parse_event(sdl_event))

@@ -145,7 +145,7 @@ class Image:
             int: The alpha value of the pixel.
             With 0 being fully transparent and 255 being fully opaque.
         """
-        return lib.TCOD_image_get_alpha(self.image_c, x, y)  # type: ignore
+        return int(lib.TCOD_image_get_alpha(self.image_c, x, y))
 
     def refresh_console(self, console: tcod.console.Console) -> None:
         """Update an Image created with :any:`libtcodpy.image_from_console`.
@@ -351,17 +351,6 @@ class Image:
         }
 
 
-def _get_format_name(format: int) -> str:
-    """Return the SDL_PIXELFORMAT_X name for this format, if possible."""
-    for attr in dir(lib):
-        if not attr.startswith("SDL_PIXELFORMAT"):
-            continue
-        if getattr(lib, attr) != format:
-            continue
-        return attr
-    return str(format)
-
-
 @deprecated(
     "This function may be removed in the future."
     "  It's recommended to load images with a more complete image library such as python-Pillow or python-imageio.",
@@ -388,3 +377,42 @@ def load(filename: str | PathLike[str]) -> NDArray[np.uint8]:
             axis=2,
         )
     return array
+
+
+class _TempImage:
+    """An Image-like container for NumPy arrays."""
+
+    def __init__(self, array: ArrayLike) -> None:
+        """Initialize an image from the given array.  May copy or reference the array."""
+        self._array: NDArray[np.uint8] = np.ascontiguousarray(array, dtype=np.uint8)
+        height, width, depth = self._array.shape
+        if depth != 3:  # noqa: PLR2004
+            msg = f"Array must have RGB channels.  Shape is: {self._array.shape!r}"
+            raise TypeError(msg)
+        self._buffer = ffi.from_buffer("TCOD_color_t[]", self._array)
+        self._mipmaps = ffi.new(
+            "struct TCOD_mipmap_*",
+            {
+                "width": width,
+                "height": height,
+                "fwidth": width,
+                "fheight": height,
+                "buf": self._buffer,
+                "dirty": True,
+            },
+        )
+        self.image_c = ffi.new(
+            "TCOD_Image*",
+            {
+                "nb_mipmaps": 1,
+                "mipmaps": self._mipmaps,
+                "has_key_color": False,
+            },
+        )
+
+
+def _as_image(image: ArrayLike | Image | _TempImage) -> _TempImage | Image:
+    """Convert this input into an Image-like object."""
+    if isinstance(image, (Image, _TempImage)):
+        return image
+    return _TempImage(image)

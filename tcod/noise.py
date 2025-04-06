@@ -236,9 +236,8 @@ class Noise:
         if not isinstance(indexes, tuple):
             indexes = (indexes,)
         if len(indexes) > self.dimensions:
-            raise IndexError(
-                "This noise generator has %i dimensions, but was indexed with %i." % (self.dimensions, len(indexes))
-            )
+            msg = f"This noise generator has {self.dimensions} dimensions, but was indexed with {len(indexes)}."
+            raise IndexError(msg)
         indexes = list(np.broadcast_arrays(*indexes))
         c_input = [ffi.NULL, ffi.NULL, ffi.NULL, ffi.NULL]
         for i, index in enumerate(indexes):

@@ -22,7 +22,7 @@ from tcod import (
     image,
     libtcodpy,
     los,
-    map,
+    map,  # noqa: A004
     noise,
     path,
     random,

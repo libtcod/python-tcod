@@ -238,8 +238,8 @@ class ConsoleBuffer:
     def blit(
         self,
         dest: tcod.console.Console,
-        fill_fore: bool = True,
-        fill_back: bool = True,
+        fill_fore: bool = True,  # noqa: FBT001, FBT002
+        fill_back: bool = True,  # noqa: FBT001, FBT002
     ) -> None:
         """Use libtcod's "fill" functions to write the buffer to a console.
 
@@ -313,12 +313,7 @@ class Dice(_CDataWrapper):
 
     def __str__(self) -> str:
         add = f"+({self.addsub})" if self.addsub != 0 else ""
-        return "%id%ix%s%s" % (
-            self.nb_dices,
-            self.nb_faces,
-            self.multiplier,
-            add,
-        )
+        return f"{self.nb_dices}d{self.nb_faces}x{self.multiplier}{add}"
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(nb_dices={self.nb_dices!r},nb_faces={self.nb_faces!r},multiplier={self.multiplier!r},addsub={self.addsub!r})"
@@ -3584,7 +3579,8 @@ def _unpack_union(type_: int, union: Any) -> Any:  # noqa: PLR0911
         return Dice(union.dice)
     if type_ & lib.TCOD_TYPE_LIST:
         return _convert_TCODList(union.list, type_ & 0xFF)
-    raise RuntimeError("Unknown libtcod type: %i" % type_)
+    msg = f"Unknown libtcod type: {type_}"
+    raise RuntimeError(msg)
 
 
 def _convert_TCODList(c_list: Any, type_: int) -> Any:
@@ -3607,27 +3603,27 @@ _parser_callback_lock = threading.Lock()
 _parser_listener: Any = None
 
 
-@ffi.def_extern()  # type: ignore
+@ffi.def_extern()  # type: ignore[misc]
 def _pycall_parser_new_struct(struct: Any, name: str) -> Any:
     return _parser_listener.new_struct(struct, _unpack_char_p(name))
 
 
-@ffi.def_extern()  # type: ignore
+@ffi.def_extern()  # type: ignore[misc]
 def _pycall_parser_new_flag(name: str) -> Any:
     return _parser_listener.new_flag(_unpack_char_p(name))
 
 
-@ffi.def_extern()  # type: ignore
+@ffi.def_extern()  # type: ignore[misc]
 def _pycall_parser_new_property(propname: Any, type: Any, value: Any) -> Any:
     return _parser_listener.new_property(_unpack_char_p(propname), type, _unpack_union(type, value))
 
 
-@ffi.def_extern()  # type: ignore
+@ffi.def_extern()  # type: ignore[misc]
 def _pycall_parser_end_struct(struct: Any, name: Any) -> Any:
     return _parser_listener.end_struct(struct, _unpack_char_p(name))
 
 
-@ffi.def_extern()  # type: ignore
+@ffi.def_extern()  # type: ignore[misc]
 def _pycall_parser_error(msg: Any) -> None:
     _parser_listener.error(_unpack_char_p(msg))
 

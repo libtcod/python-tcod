@@ -229,10 +229,11 @@ class Tileset:
         """
         tile_i = x + y * self._tileset_p.virtual_columns
         if not (0 <= tile_i < self._tileset_p.tiles_count):
-            raise IndexError(
-                "Tile %i is non-existent and can't be assigned."
-                " (Tileset has %i tiles.)" % (tile_i, self._tileset_p.tiles_count)
+            msg = (
+                f"Tile {tile_i} is non-existent and can't be assigned."
+                f" (Tileset has {self._tileset_p.tiles_count} tiles.)"
             )
+            raise IndexError(msg)
         _check(
             lib.TCOD_tileset_assign_tile(
                 self._tileset_p,
