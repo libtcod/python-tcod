@@ -19,6 +19,9 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 - `Console.print_box` has been replaced by `Console.print`.
 - `Console.draw_frame`: deprecated `clear`, `fg`, `bg`, and `bg_blend` being given as positional arguments.
 - `Console.draw_rect`: deprecated `fg`, `bg`, and `bg_blend` being given as positional arguments.
+- The `EventDispatch` class is now deprecated.
+  This class was made before Python supported protocols and structural pattern matching,
+  now the class serves little purpose and its usage can create a minor technical burden.
 
 ## [17.1.0] - 2025-03-29
 

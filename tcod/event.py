@@ -87,7 +87,7 @@ import warnings
 from typing import TYPE_CHECKING, Any, Callable, Final, Generic, Iterator, Mapping, NamedTuple, TypeVar
 
 import numpy as np
-from typing_extensions import Literal
+from typing_extensions import Literal, deprecated
 
 import tcod.event
 import tcod.event_constants
@@ -1238,6 +1238,10 @@ def wait(timeout: float | None = None) -> Iterator[Any]:
     return get()
 
 
+@deprecated(
+    "Event dispatch should be handled via a single custom method in a Protocol instead of this class.",
+    category=DeprecationWarning,
+)
 class EventDispatch(Generic[T]):
     '''Dispatches events to methods depending on the events type attribute.
 
@@ -1247,6 +1251,10 @@ class EventDispatch(Generic[T]):
     .. versionchanged:: 11.12
         This is now a generic class.
         The type hints at the return value of :any:`dispatch` and the `ev_*` methods.
+
+    .. deprecated:: Unreleased
+        Event dispatch should be handled via a single custom method in a Protocol instead of this class.
+        Note that events can and should be handled using Python's `match` statement.
 
     Example::
 
