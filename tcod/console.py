@@ -1090,7 +1090,7 @@ Consider one of the following:
 
             `x` and `y` are now always used as an absolute position for negative values.
 
-        .. versionchanged:: Unreleased
+        .. versionchanged:: 18.0
 
             Deprecated giving `string`, `fg`, `bg`, and `bg_blend` as positional arguments.
 
@@ -1285,7 +1285,7 @@ Consider one of the following:
         .. versionchanged:: 13.0
             `x` and `y` are now always used as an absolute position for negative values.
 
-        .. versionchanged:: Unreleased
+        .. versionchanged:: 18.0
             Deprecated `clear`, `fg`, `bg`, and `bg_blend` being given as positional arguments.
             These should be keyword arguments only.
 
@@ -1418,7 +1418,7 @@ Consider one of the following:
         .. versionchanged:: 13.0
             `x` and `y` are now always used as an absolute position for negative values.
 
-        .. versionchanged:: Unreleased
+        .. versionchanged:: 18.0
             Deprecated `ch`, `fg`, `bg`, and `bg_blend` being given as positional arguments.
             These should be keyword arguments only.
         """

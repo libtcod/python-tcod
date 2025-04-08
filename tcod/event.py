@@ -1252,7 +1252,7 @@ class EventDispatch(Generic[T]):
         This is now a generic class.
         The type hints at the return value of :any:`dispatch` and the `ev_*` methods.
 
-    .. deprecated:: Unreleased
+    .. deprecated:: 18.0
         Event dispatch should be handled via a single custom method in a Protocol instead of this class.
         Note that events can and should be handled using Python's `match` statement.
 

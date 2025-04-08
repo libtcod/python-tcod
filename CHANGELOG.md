@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [18.0.0] - 2025-04-08
+
 ### Changed
 
 - `Console.print` now accepts `height` and `width` keywords and has renamed `string` to `text`.
