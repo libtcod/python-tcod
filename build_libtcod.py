@@ -208,11 +208,11 @@ ffi.cdef(build_sdl.get_cdef())
 for include in includes:
     try:
         ffi.cdef(include.header)
-    except Exception:
+    except Exception:  # noqa: PERF203
         # Print the source, for debugging.
         print(f"Error with: {include.path}")
         for i, line in enumerate(include.header.split("\n"), 1):
-            print("%03i %s" % (i, line))
+            print(f"{i:03i} {line}")
         raise
 ffi.cdef(
     """
@@ -221,7 +221,10 @@ ffi.cdef(
 )
 ffi.set_source(
     module_name,
-    "#include <tcod/cffi.h>\n#include <SDL.h>",
+    """\
+#include <tcod/cffi.h>
+#define SDL_oldnames_h_
+#include <SDL3/SDL.h>""",
     include_dirs=include_dirs,
     library_dirs=library_dirs,
     sources=sources,
