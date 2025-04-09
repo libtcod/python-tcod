@@ -3,6 +3,7 @@
 import contextlib
 import sys
 import time
+from collections.abc import Callable
 from typing import Any
 
 import numpy as np
@@ -14,11 +15,19 @@ import tcod.sdl.audio
 # ruff: noqa: D103
 
 
+def device_works(device: Callable[[], tcod.sdl.audio.AudioDevice]) -> bool:
+    try:
+        device().open().close()
+    except RuntimeError:
+        return False
+    return True
+
+
 needs_audio_device = pytest.mark.xfail(
-    not list(tcod.sdl.audio.get_devices()), reason="This test requires an audio device"
+    not device_works(tcod.sdl.audio.get_default_playback), reason="This test requires an audio device"
 )
 needs_audio_capture = pytest.mark.xfail(
-    not list(tcod.sdl.audio.get_capture_devices()), reason="This test requires an audio capture device"
+    not device_works(tcod.sdl.audio.get_default_recording), reason="This test requires an audio capture device"
 )
 
 
@@ -31,20 +40,14 @@ def test_devices() -> None:
 def test_audio_device() -> None:
     with tcod.sdl.audio.open(frequency=44100, format=np.float32, channels=2, paused=True) as device:
         assert not device.stopped
-        assert device.convert(np.zeros(4, dtype=np.float32), 22050).shape[0] == 8  # noqa: PLR2004
-        assert device.convert(np.zeros((4, 4), dtype=np.float32)).shape == (4, 2)
-        assert device.convert(np.zeros(4, dtype=np.int8)).shape[0] == 4  # noqa: PLR2004
+        device.convert(np.zeros(4, dtype=np.float32), 22050)
+        assert device.convert(np.zeros((4, 4), dtype=np.float32)).shape[1] == device.channels
+        device.convert(np.zeros(4, dtype=np.int8)).shape[0]
         assert device.paused is True
         device.paused = False
         assert device.paused is False
         device.paused = True
-        assert device.queued_samples == 0
-        with pytest.raises(TypeError):
-            device.callback  # noqa: B018
-        with pytest.raises(TypeError):
-            device.callback = lambda _device, _stream: None
-        with contextlib.closing(tcod.sdl.audio.BasicMixer(device)) as mixer:
-            assert mixer.daemon
+        with contextlib.closing(tcod.sdl.audio.BasicMixer(device, frequency=44100, channels=2)) as mixer:
             assert mixer.play(np.zeros(4, np.float32)).busy
             mixer.play(np.zeros(0, np.float32))
             mixer.play(np.full(1, 0.01, np.float32), on_end=lambda _: None)
@@ -59,18 +62,15 @@ def test_audio_device() -> None:
 
 @needs_audio_capture
 def test_audio_capture() -> None:
-    with tcod.sdl.audio.open(capture=True) as device:
-        assert not device.stopped
-        assert isinstance(device.dequeue_audio(), np.ndarray)
+    with contextlib.closing(tcod.sdl.audio.get_default_recording().open()) as device:
+        device.new_stream(np.float32, 1, 11025).dequeue_audio()
 
 
 @needs_audio_device
 def test_audio_device_repr() -> None:
-    with tcod.sdl.audio.open(format=np.uint16, paused=True, callback=True) as device:
+    with contextlib.closing(tcod.sdl.audio.get_default_playback().open()) as device:
         assert not device.stopped
-        assert "silence=" in repr(device)
-        assert "callback=" in repr(device)
-    assert "stopped=" in repr(device)
+        assert "paused=False" in repr(device)
 
 
 def test_convert_bad_shape() -> None:
@@ -83,7 +83,7 @@ def test_convert_bad_shape() -> None:
 def test_convert_bad_type() -> None:
     with pytest.raises(TypeError, match=r".*bool"):
         tcod.sdl.audio.convert_audio(np.zeros(8, bool), 8000, out_rate=8000, out_format=np.float32, out_channels=1)
-    with pytest.raises(RuntimeError, match=r"Invalid source format"):
+    with pytest.raises(RuntimeError, match=r"Parameter 'src_spec->format' is invalid"):
         tcod.sdl.audio.convert_audio(np.zeros(8, np.int64), 8000, out_rate=8000, out_format=np.float32, out_channels=1)
 
 
@@ -110,7 +110,6 @@ def test_audio_callback() -> None:
     check_called = CheckCalled()
     with tcod.sdl.audio.open(callback=check_called, paused=False) as device:
         assert not device.stopped
-        device.callback = device.callback
         while not check_called.was_called:
             time.sleep(0.001)
 

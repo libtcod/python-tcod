@@ -315,8 +315,8 @@ int compute_heuristic(const struct PathfinderHeuristic* __restrict heuristic, in
     default:
       return 0;
   }
-  int diagonal = heuristic->diagonal != 0 ? MIN(x, y) : 0;
-  int straight = MAX(x, y) - diagonal;
+  int diagonal = heuristic->diagonal != 0 ? TCOD_MIN(x, y) : 0;
+  int straight = TCOD_MAX(x, y) - diagonal;
   return (straight * heuristic->cardinal + diagonal * heuristic->diagonal + w * heuristic->w + z * heuristic->z);
 }
 void path_compute_add_edge(

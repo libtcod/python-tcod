@@ -18,14 +18,16 @@ class Subsystem(enum.IntFlag):
     GAMECONTROLLER = 0x00002000
     EVENTS = 0x00004000
     SENSOR = 0x00008000
-    EVERYTHING = int(lib.SDL_INIT_EVERYTHING)
 
 
-def init(flags: int = Subsystem.EVERYTHING) -> None:
+def init(flags: int) -> None:
     _check(lib.SDL_InitSubSystem(flags))
 
 
-def quit(flags: int = Subsystem.EVERYTHING) -> None:
+def quit(flags: int | None = None) -> None:
+    if flags is None:
+        lib.SDL_Quit()
+        return
     lib.SDL_QuitSubSystem(flags)
 
 

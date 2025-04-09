@@ -68,14 +68,9 @@ __all__ = (
 _Event = TypeVar("_Event", bound=tcod.event.Event)
 
 SDL_WINDOW_FULLSCREEN = lib.SDL_WINDOW_FULLSCREEN
-"""Exclusive fullscreen mode.
-
-It's generally not recommended to use this flag unless you know what you're
-doing.
-`SDL_WINDOW_FULLSCREEN_DESKTOP` should be used instead whenever possible.
-"""
-SDL_WINDOW_FULLSCREEN_DESKTOP = lib.SDL_WINDOW_FULLSCREEN_DESKTOP
-"""A borderless fullscreen window at the desktop resolution."""
+"""Fullscreen mode."""
+# SDL_WINDOW_FULLSCREEN_DESKTOP = lib.SDL_WINDOW_FULLSCREEN_DESKTOP
+# """A borderless fullscreen window at the desktop resolution."""
 SDL_WINDOW_HIDDEN = lib.SDL_WINDOW_HIDDEN
 """Window is hidden."""
 SDL_WINDOW_BORDERLESS = lib.SDL_WINDOW_BORDERLESS
@@ -86,9 +81,9 @@ SDL_WINDOW_MINIMIZED = lib.SDL_WINDOW_MINIMIZED
 """Window is minimized."""
 SDL_WINDOW_MAXIMIZED = lib.SDL_WINDOW_MAXIMIZED
 """Window is maximized."""
-SDL_WINDOW_INPUT_GRABBED = lib.SDL_WINDOW_INPUT_GRABBED
+SDL_WINDOW_INPUT_GRABBED = lib.SDL_WINDOW_MOUSE_GRABBED
 """Window has grabbed the input."""
-SDL_WINDOW_ALLOW_HIGHDPI = lib.SDL_WINDOW_ALLOW_HIGHDPI
+SDL_WINDOW_ALLOW_HIGHDPI = lib.SDL_WINDOW_HIGH_PIXEL_DENSITY
 """High DPI mode, see the SDL documentation."""
 
 RENDERER_OPENGL = lib.TCOD_RENDERER_OPENGL
@@ -225,13 +220,14 @@ class Context:
         )
         _check(lib.TCOD_context_present(self._p, console.console_c, viewport_args))
 
-    def pixel_to_tile(self, x: int, y: int) -> tuple[int, int]:
+    def pixel_to_tile(self, x: float, y: float) -> tuple[float, float]:
         """Convert window pixel coordinates to tile coordinates."""
-        with ffi.new("int[2]", (x, y)) as xy:
-            _check(lib.TCOD_context_screen_pixel_to_tile_i(self._p, xy, xy + 1))
+        with ffi.new("double[2]", (x, y)) as xy:
+            _check(lib.TCOD_context_screen_pixel_to_tile_d(self._p, xy, xy + 1))
             return xy[0], xy[1]
 
-    def pixel_to_subtile(self, x: int, y: int) -> tuple[float, float]:
+    @deprecated("Use pixel_to_tile method instead.")
+    def pixel_to_subtile(self, x: float, y: float) -> tuple[float, float]:
         """Convert window pixel coordinates to sub-tile coordinates."""
         with ffi.new("double[2]", (x, y)) as xy:
             _check(lib.TCOD_context_screen_pixel_to_tile_d(self._p, xy, xy + 1))
@@ -267,7 +263,7 @@ class Context:
                 event.position[1] - event.motion[1],
             )
             event_copy.motion = event._tile_motion = tcod.event.Point(
-                event._tile[0] - prev_tile[0], event._tile[1] - prev_tile[1]
+                int(event._tile[0]) - int(prev_tile[0]), int(event._tile[1]) - int(prev_tile[1])
             )
         return event_copy
 

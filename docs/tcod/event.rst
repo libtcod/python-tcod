@@ -1,4 +1,4 @@
-SDL2 Event Handling ``tcod.event``
+SDL Event Handling ``tcod.event``
 ==================================
 
 .. automodule:: tcod.event

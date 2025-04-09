@@ -13,6 +13,7 @@ import enum
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
+from typing_extensions import deprecated
 
 import tcod.event
 import tcod.sdl.video
@@ -41,7 +42,7 @@ class Cursor:
     @classmethod
     def _claim(cls, sdl_cursor_p: Any) -> Cursor:
         """Verify and wrap this pointer in a garbage collector before returning a Cursor."""
-        return cls(ffi.gc(_check_p(sdl_cursor_p), lib.SDL_FreeCursor))
+        return cls(ffi.gc(_check_p(sdl_cursor_p), lib.SDL_DestroyCursor))
 
 
 class SystemCursor(enum.IntEnum):
@@ -174,19 +175,28 @@ def capture(enable: bool) -> None:
     _check(lib.SDL_CaptureMouse(enable))
 
 
+@deprecated("Set 'Window.relative_mouse_mode = value' instead.")
 def set_relative_mode(enable: bool) -> None:
     """Enable or disable relative mouse mode which will lock and hide the mouse and only report mouse motion.
 
     .. seealso::
         :any:`tcod.sdl.mouse.capture`
-        https://wiki.libsdl.org/SDL_SetRelativeMouseMode
+        https://wiki.libsdl.org/SDL_SetWindowRelativeMouseMode
+
+    .. deprecated:: Unreleased
+        Replaced with :any:`tcod.sdl.video.Window.relative_mouse_mode`
     """
-    _check(lib.SDL_SetRelativeMouseMode(enable))
+    _check(lib.SDL_SetWindowRelativeMouseMode(lib.SDL_GetMouseFocus(), enable))
 
 
+@deprecated("Check 'Window.relative_mouse_mode' instead.")
 def get_relative_mode() -> bool:
-    """Return True if relative mouse mode is enabled."""
-    return bool(lib.SDL_GetRelativeMouseMode())
+    """Return True if relative mouse mode is enabled.
+
+    .. deprecated:: Unreleased
+        Replaced with :any:`tcod.sdl.video.Window.relative_mouse_mode`
+    """
+    return bool(lib.SDL_GetWindowRelativeMouseMode(lib.SDL_GetMouseFocus()))
 
 
 def get_global_state() -> tcod.event.MouseState:
@@ -249,5 +259,8 @@ def show(visible: bool | None = None) -> bool:
 
     .. versionadded:: 16.0
     """
-    _OPTIONS = {None: lib.SDL_QUERY, False: lib.SDL_DISABLE, True: lib.SDL_ENABLE}
-    return _check(lib.SDL_ShowCursor(_OPTIONS[visible])) == int(lib.SDL_ENABLE)
+    if visible is True:
+        lib.SDL_ShowCursor()
+    elif visible is False:
+        lib.SDL_HideCursor()
+    return lib.SDL_CursorVisible()

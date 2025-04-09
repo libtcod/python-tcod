@@ -33,7 +33,6 @@ import tcod.sdl.mouse
 import tcod.sdl.render
 import tcod.tileset
 from tcod import libtcodpy
-from tcod.sdl.video import WindowFlags
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -101,8 +100,8 @@ class Sample(tcod.event.EventDispatch[None]):
         elif event.sym == tcod.event.KeySym.RETURN and event.mod & tcod.event.Modifier.ALT:
             sdl_window = context.sdl_window
             if sdl_window:
-                sdl_window.fullscreen = False if sdl_window.fullscreen else WindowFlags.FULLSCREEN_DESKTOP
-        elif event.sym in (tcod.event.KeySym.PRINTSCREEN, tcod.event.KeySym.p):
+                sdl_window.fullscreen = not sdl_window.fullscreen
+        elif event.sym in (tcod.event.KeySym.PRINTSCREEN, tcod.event.KeySym.P):
             print("screenshot")
             if event.mod & tcod.event.Modifier.ALT:
                 libtcodpy.console_save_apf(root_console, "samples.apf")
@@ -469,27 +468,27 @@ class NoiseSample(Sample):
         if tcod.event.KeySym.N9 >= event.sym >= tcod.event.KeySym.N1:
             self.func = event.sym - tcod.event.KeySym.N1
             self.noise = self.get_noise()
-        elif event.sym == tcod.event.KeySym.e:
+        elif event.sym == tcod.event.KeySym.E:
             self.hurst += 0.1
             self.noise = self.get_noise()
-        elif event.sym == tcod.event.KeySym.d:
+        elif event.sym == tcod.event.KeySym.D:
             self.hurst -= 0.1
             self.noise = self.get_noise()
-        elif event.sym == tcod.event.KeySym.r:
+        elif event.sym == tcod.event.KeySym.R:
             self.lacunarity += 0.5
             self.noise = self.get_noise()
-        elif event.sym == tcod.event.KeySym.f:
+        elif event.sym == tcod.event.KeySym.F:
             self.lacunarity -= 0.5
             self.noise = self.get_noise()
-        elif event.sym == tcod.event.KeySym.t:
+        elif event.sym == tcod.event.KeySym.T:
             self.octaves += 0.5
             self.noise.octaves = self.octaves
-        elif event.sym == tcod.event.KeySym.g:
+        elif event.sym == tcod.event.KeySym.G:
             self.octaves -= 0.5
             self.noise.octaves = self.octaves
-        elif event.sym == tcod.event.KeySym.y:
+        elif event.sym == tcod.event.KeySym.Y:
             self.zoom += 0.2
-        elif event.sym == tcod.event.KeySym.h:
+        elif event.sym == tcod.event.KeySym.H:
             self.zoom -= 0.2
         else:
             super().ev_keydown(event)
@@ -648,10 +647,10 @@ class FOVSample(Sample):
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         MOVE_KEYS = {  # noqa: N806
-            tcod.event.KeySym.i: (0, -1),
-            tcod.event.KeySym.j: (-1, 0),
-            tcod.event.KeySym.k: (0, 1),
-            tcod.event.KeySym.l: (1, 0),
+            tcod.event.KeySym.I: (0, -1),
+            tcod.event.KeySym.J: (-1, 0),
+            tcod.event.KeySym.K: (0, 1),
+            tcod.event.KeySym.L: (1, 0),
         }
         FOV_SELECT_KEYS = {  # noqa: N806
             tcod.event.KeySym.MINUS: -1,
@@ -664,9 +663,9 @@ class FOVSample(Sample):
             if self.walkable[self.player_x + x, self.player_y + y]:
                 self.player_x += x
                 self.player_y += y
-        elif event.sym == tcod.event.KeySym.t:
+        elif event.sym == tcod.event.KeySym.T:
             self.torch = not self.torch
-        elif event.sym == tcod.event.KeySym.w:
+        elif event.sym == tcod.event.KeySym.W:
             self.light_walls = not self.light_walls
         elif event.sym in FOV_SELECT_KEYS:
             self.algo_num += FOV_SELECT_KEYS[event.sym]
@@ -740,13 +739,13 @@ class PathfindingSample(Sample):
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         """Handle movement and UI."""
-        if event.sym == tcod.event.KeySym.i and self.dest_y > 0:  # destination move north
+        if event.sym == tcod.event.KeySym.I and self.dest_y > 0:  # destination move north
             self.dest_y -= 1
-        elif event.sym == tcod.event.KeySym.k and self.dest_y < SAMPLE_SCREEN_HEIGHT - 1:  # destination move south
+        elif event.sym == tcod.event.KeySym.K and self.dest_y < SAMPLE_SCREEN_HEIGHT - 1:  # destination move south
             self.dest_y += 1
-        elif event.sym == tcod.event.KeySym.j and self.dest_x > 0:  # destination move west
+        elif event.sym == tcod.event.KeySym.J and self.dest_x > 0:  # destination move west
             self.dest_x -= 1
-        elif event.sym == tcod.event.KeySym.l and self.dest_x < SAMPLE_SCREEN_WIDTH - 1:  # destination move east
+        elif event.sym == tcod.event.KeySym.L and self.dest_x < SAMPLE_SCREEN_WIDTH - 1:  # destination move east
             self.dest_x += 1
         elif event.sym == tcod.event.KeySym.TAB:
             self.using_astar = not self.using_astar
@@ -758,8 +757,8 @@ class PathfindingSample(Sample):
         mx = event.tile.x - SAMPLE_SCREEN_X
         my = event.tile.y - SAMPLE_SCREEN_Y
         if 0 <= mx < SAMPLE_SCREEN_WIDTH and 0 <= my < SAMPLE_SCREEN_HEIGHT:
-            self.dest_x = mx
-            self.dest_y = my
+            self.dest_x = int(mx)
+            self.dest_y = int(my)
 
 
 #############################################
@@ -1029,9 +1028,9 @@ class MouseSample(Sample):
         sample_console.print(
             1,
             1,
-            f"Pixel position : {self.motion.position.x:4d}x{self.motion.position.y:4d}\n"
-            f"Tile position  : {self.motion.tile.x:4d}x{self.motion.tile.y:4d}\n"
-            f"Tile movement  : {self.motion.tile_motion.x:4d}x{self.motion.tile_motion.y:4d}\n"
+            f"Pixel position : {self.motion.position.x:4.0f}x{self.motion.position.y:4.0f}\n"
+            f"Tile position  : {self.motion.tile.x:4.0f}x{self.motion.tile.y:4.0f}\n"
+            f"Tile movement  : {self.motion.tile_motion.x:4.0f}x{self.motion.tile_motion.y:4.0f}\n"
             f"Left button    : {'ON' if self.mouse_left else 'OFF'}\n"
             f"Right button   : {'ON' if self.mouse_right else 'OFF'}\n"
             f"Middle button  : {'ON' if self.mouse_middle else 'OFF'}\n",
@@ -1209,7 +1208,7 @@ class FastRenderSample(Sample):
             # new pixels are based on absolute elapsed time
             int_abs_t = int(self.abs_t)
 
-            texture = np.roll(texture, -int_t, 1)  # type: ignore[assignment]
+            texture = np.roll(texture, -int_t, 1)
             # replace new stretch of texture with new values
             for v in range(RES_V - int_t, RES_V):
                 for u in range(RES_U):
@@ -1334,9 +1333,9 @@ def init_context(renderer: int) -> None:
     )
     if context.sdl_renderer:  # If this context supports SDL rendering.
         # Start by setting the logical size so that window resizing doesn't break anything.
-        context.sdl_renderer.logical_size = (
-            tileset.tile_width * root_console.width,
-            tileset.tile_height * root_console.height,
+        context.sdl_renderer.set_logical_presentation(
+            resolution=(tileset.tile_width * root_console.width, tileset.tile_height * root_console.height),
+            mode=tcod.sdl.render.LogicalPresentation.STRETCH,
         )
         assert context.sdl_atlas
         # Generate the console renderer and minimap.

@@ -10,10 +10,12 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, Final, Literal
 
 import numpy as np
+from typing_extensions import deprecated
 
+import tcod.sdl.constants
 import tcod.sdl.video
 from tcod.cffi import ffi, lib
-from tcod.sdl._internal import _check, _check_p, _required_version
+from tcod.sdl._internal import Properties, _check, _check_p
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -39,6 +41,26 @@ class RendererFlip(enum.IntFlag):
     """Flip the image horizontally."""
     VERTICAL = 2
     """Flip the image vertically."""
+
+
+class LogicalPresentation(enum.IntEnum):
+    """SDL logical presentation modes.
+
+    See https://wiki.libsdl.org/SDL3/SDL_RendererLogicalPresentation
+
+    .. versionadded:: Unreleased
+    """
+
+    DISABLED = 0
+    """"""
+    STRETCH = 1
+    """"""
+    LETTERBOX = 2
+    """"""
+    OVERSCAN = 3
+    """"""
+    INTEGER_SCALE = 4
+    """"""
 
 
 class BlendFactor(enum.IntEnum):
@@ -155,18 +177,21 @@ class Texture:
         """Encapsulate an SDL_Texture pointer. This function is private."""
         self.p = sdl_texture_p
         self._sdl_renderer_p = sdl_renderer_p  # Keep alive.
-        query = self._query()
-        self.format: Final[int] = query[0]
+
+        props = Properties(lib.SDL_GetTextureProperties(self.p))
+        self.format: Final[int] = props[(tcod.sdl.constants.SDL_PROP_TEXTURE_FORMAT_NUMBER, int)]
         """Texture format, read only."""
-        self.access: Final[TextureAccess] = TextureAccess(query[1])
+        self.access: Final[TextureAccess] = TextureAccess(
+            props[(tcod.sdl.constants.SDL_PROP_TEXTURE_ACCESS_NUMBER, int)]
+        )
         """Texture access mode, read only.
 
         .. versionchanged:: 13.5
             Attribute is now a :any:`TextureAccess` value.
         """
-        self.width: Final[int] = query[2]
+        self.width: Final[int] = props[(tcod.sdl.constants.SDL_PROP_TEXTURE_WIDTH_NUMBER, int)]
         """Texture pixel width, read only."""
-        self.height: Final[int] = query[3]
+        self.height: Final[int] = props[(tcod.sdl.constants.SDL_PROP_TEXTURE_HEIGHT_NUMBER, int)]
         """Texture pixel height, read only."""
 
     def __eq__(self, other: object) -> bool:
@@ -174,13 +199,6 @@ class Texture:
         if isinstance(other, Texture):
             return bool(self.p == other.p)
         return NotImplemented
-
-    def _query(self) -> tuple[int, int, int, int]:
-        """Return (format, access, width, height)."""
-        format = ffi.new("uint32_t*")
-        buffer = ffi.new("int[3]")
-        lib.SDL_QueryTexture(self.p, format, buffer, buffer + 1, buffer + 2)
-        return int(format[0]), int(buffer[0]), int(buffer[1]), int(buffer[2])
 
     def update(self, pixels: NDArray[Any], rect: tuple[int, int, int, int] | None = None) -> None:
         """Update the pixel data of this texture.
@@ -289,7 +307,7 @@ class Renderer:
             Added the `angle`, `center`, and `flip` parameters.
         """
         _check(
-            lib.SDL_RenderCopyExF(
+            lib.SDL_RenderTextureRotated(
                 self.p,
                 texture.p,
                 (source,) if source is not None else ffi.NULL,
@@ -393,7 +411,7 @@ class Renderer:
         .. versionadded:: 13.5
         """
         out = ffi.new("int[2]")
-        _check(lib.SDL_GetRendererOutputSize(self.p, out, out + 1))
+        _check(lib.SDL_GetCurrentRenderOutputSize(self.p, out, out + 1))
         return out[0], out[1]
 
     @property
@@ -404,50 +422,51 @@ class Renderer:
 
         .. versionadded:: 13.5
         """
-        if not lib.SDL_RenderIsClipEnabled(self.p):
+        if not lib.SDL_RenderClipEnabled(self.p):
             return None
         rect = ffi.new("SDL_Rect*")
-        lib.SDL_RenderGetClipRect(self.p, rect)
+        lib.SDL_GetRenderClipRect(self.p, rect)
         return rect.x, rect.y, rect.w, rect.h
 
     @clip_rect.setter
     def clip_rect(self, rect: tuple[int, int, int, int] | None) -> None:
         rect_p = ffi.NULL if rect is None else ffi.new("SDL_Rect*", rect)
-        _check(lib.SDL_RenderSetClipRect(self.p, rect_p))
+        _check(lib.SDL_SetRenderClipRect(self.p, rect_p))
 
-    @property
-    def integer_scaling(self) -> bool:
-        """Get or set if this renderer enforces integer scaling.
+    def set_logical_presentation(self, resolution: tuple[int, int], mode: LogicalPresentation) -> None:
+        """Set this renderers device independent resolution.
 
         .. seealso::
-            https://wiki.libsdl.org/SDL_RenderSetIntegerScale
+            https://wiki.libsdl.org/SDL3/SDL_SetRenderLogicalPresentation
 
-        .. versionadded:: 13.5
+        .. versionadded:: Unreleased
         """
-        return bool(lib.SDL_RenderGetIntegerScale(self.p))
-
-    @integer_scaling.setter
-    def integer_scaling(self, enable: bool) -> None:
-        _check(lib.SDL_RenderSetIntegerScale(self.p, enable))
+        width, height = resolution
+        _check(lib.SDL_SetRenderLogicalPresentation(self.p, width, height, mode))
 
     @property
     def logical_size(self) -> tuple[int, int]:
-        """Get or set a device independent (width, height) resolution.
+        """Get current independent (width, height) resolution.
 
         Might be (0, 0) if a resolution was never assigned.
 
         .. seealso::
-            https://wiki.libsdl.org/SDL_RenderSetLogicalSize
+            https://wiki.libsdl.org/SDL3/SDL_GetRenderLogicalPresentation
 
         .. versionadded:: 13.5
+
+        .. versionchanged:: Unreleased
+            Setter is deprecated, use :any:`set_logical_presentation` instead.
         """
         out = ffi.new("int[2]")
-        lib.SDL_RenderGetLogicalSize(self.p, out, out + 1)
+        lib.SDL_GetRenderLogicalPresentation(self.p, out, out + 1, ffi.NULL)
         return out[0], out[1]
 
     @logical_size.setter
+    @deprecated("Use set_logical_presentation method to correctly setup logical size.")
     def logical_size(self, size: tuple[int, int]) -> None:
-        _check(lib.SDL_RenderSetLogicalSize(self.p, *size))
+        width, height = size
+        _check(lib.SDL_SetRenderLogicalPresentation(self.p, width, height, lib.SDL_LOGICAL_PRESENTATION_STRETCH))
 
     @property
     def scale(self) -> tuple[float, float]:
@@ -459,12 +478,12 @@ class Renderer:
         .. versionadded:: 13.5
         """
         out = ffi.new("float[2]")
-        lib.SDL_RenderGetScale(self.p, out, out + 1)
+        lib.SDL_GetRenderScale(self.p, out, out + 1)
         return out[0], out[1]
 
     @scale.setter
     def scale(self, scale: tuple[float, float]) -> None:
-        _check(lib.SDL_RenderSetScale(self.p, *scale))
+        _check(lib.SDL_SetRenderScale(self.p, *scale))
 
     @property
     def viewport(self) -> tuple[int, int, int, int] | None:
@@ -476,26 +495,25 @@ class Renderer:
         .. versionadded:: 13.5
         """
         rect = ffi.new("SDL_Rect*")
-        lib.SDL_RenderGetViewport(self.p, rect)
+        lib.SDL_GetRenderViewport(self.p, rect)
         return rect.x, rect.y, rect.w, rect.h
 
     @viewport.setter
     def viewport(self, rect: tuple[int, int, int, int] | None) -> None:
-        _check(lib.SDL_RenderSetViewport(self.p, (rect,)))
+        _check(lib.SDL_SetRenderViewport(self.p, (rect,)))
 
-    @_required_version((2, 0, 18))
     def set_vsync(self, enable: bool) -> None:
         """Enable or disable VSync for this renderer.
 
         .. versionadded:: 13.5
         """
-        _check(lib.SDL_RenderSetVSync(self.p, enable))
+        _check(lib.SDL_SetRenderVSync(self.p, enable))
 
     def read_pixels(
         self,
         *,
         rect: tuple[int, int, int, int] | None = None,
-        format: int | Literal["RGB", "RGBA"] = "RGBA",
+        format: Literal["RGB", "RGBA"] = "RGBA",  # noqa: A002
         out: NDArray[np.uint8] | None = None,
     ) -> NDArray[np.uint8]:
         """Fetch the pixel contents of the current rendering target to an array.
@@ -512,49 +530,37 @@ class Renderer:
 
         This operation is slow due to coping from VRAM to RAM.
         When reading the main rendering target this should be called after rendering and before :any:`present`.
-        See https://wiki.libsdl.org/SDL2/SDL_RenderReadPixels
+        See https://wiki.libsdl.org/SDL3/SDL_RenderReadPixels
 
         Returns:
             The output uint8 array of shape: ``(height, width, channels)`` with the fetched pixels.
 
         .. versionadded:: 15.0
+
+        .. versionchanged:: Unreleased
+            `format` no longer accepts `int` values.
         """
-        FORMATS: Final = {"RGB": lib.SDL_PIXELFORMAT_RGB24, "RGBA": lib.SDL_PIXELFORMAT_RGBA32}
-        sdl_format = FORMATS.get(format) if isinstance(format, str) else format
-        if rect is None:
-            texture_p = lib.SDL_GetRenderTarget(self.p)
-            if texture_p:
-                texture = Texture(texture_p)
-                rect = (0, 0, texture.width, texture.height)
-            else:
-                rect = (0, 0, *self.output_size)
-        width, height = rect[2:4]
+        surface = _check_p(
+            ffi.gc(lib.SDL_RenderReadPixels(self.p, (rect,) if rect is not None else ffi.NULL), lib.SDL_DestroySurface)
+        )
+        width, height = rect[2:4] if rect is not None else (int(surface.w), int(surface.h))
+        depth = {"RGB": 3, "RGBA": 4}.get(format)
+        if depth is None:
+            msg = f"Pixel format {format!r} not supported by tcod."
+            raise TypeError(msg)
+        expected_shape = height, width, depth
         if out is None:
-            if sdl_format == lib.SDL_PIXELFORMAT_RGBA32:
-                out = np.empty((height, width, 4), dtype=np.uint8)
-            elif sdl_format == lib.SDL_PIXELFORMAT_RGB24:
-                out = np.empty((height, width, 3), dtype=np.uint8)
-            else:
-                msg = f"Pixel format {format!r} not supported by tcod."
-                raise TypeError(msg)
+            out = np.empty(expected_shape, dtype=np.uint8)
         if out.dtype != np.uint8:
             msg = "`out` must be a uint8 array."
             raise TypeError(msg)
-        expected_shape = (height, width, {lib.SDL_PIXELFORMAT_RGB24: 3, lib.SDL_PIXELFORMAT_RGBA32: 4}[sdl_format])
         if out.shape != expected_shape:
             msg = f"Expected `out` to be an array of shape {expected_shape}, got {out.shape} instead."
             raise TypeError(msg)
         if not out[0].flags.c_contiguous:
             msg = "`out` array must be C contiguous."
-        _check(
-            lib.SDL_RenderReadPixels(
-                self.p,
-                (rect,),
-                sdl_format,
-                ffi.cast("void*", out.ctypes.data),
-                out.strides[0],
-            )
-        )
+        out_surface = tcod.sdl.video._TempSurface(out)
+        _check(lib.SDL_BlitSurface(surface, ffi.NULL, out_surface.p, ffi.NULL))
         return out
 
     def clear(self) -> None:
@@ -569,14 +575,14 @@ class Renderer:
 
         .. versionadded:: 13.5
         """
-        _check(lib.SDL_RenderFillRectF(self.p, (rect,)))
+        _check(lib.SDL_RenderFillRect(self.p, (rect,)))
 
     def draw_rect(self, rect: tuple[float, float, float, float]) -> None:
         """Draw a rectangle outline.
 
         .. versionadded:: 13.5
         """
-        _check(lib.SDL_RenderDrawRectF(self.p, (rect,)))
+        _check(lib.SDL_RenderFillRects(self.p, (rect,), 1))
 
     def draw_point(self, xy: tuple[float, float]) -> None:
         """Draw a point.
@@ -584,7 +590,7 @@ class Renderer:
         .. versionadded:: 13.5
         """
         x, y = xy
-        _check(lib.SDL_RenderDrawPointF(self.p, x, y))
+        _check(lib.SDL_RenderPoint(self.p, x, y))
 
     def draw_line(self, start: tuple[float, float], end: tuple[float, float]) -> None:
         """Draw a single line.
@@ -593,20 +599,15 @@ class Renderer:
         """
         x1, y1 = start
         x2, y2 = end
-        _check(lib.SDL_RenderDrawLineF(self.p, x1, y1, x2, y2))
+        _check(lib.SDL_RenderLine(self.p, x1, y1, x2, y2))
 
     @staticmethod
-    def _convert_array(
-        array: NDArray[np.number] | Sequence[Sequence[float]], item_length: int
-    ) -> NDArray[np.intc] | NDArray[np.float32]:
+    def _convert_array(array: NDArray[np.number] | Sequence[Sequence[float]], item_length: int) -> NDArray[np.float32]:
         """Convert ndarray for a SDL function expecting a C contiguous array of either intc or float32.
 
         Array shape is enforced to be (n, item_length)
         """
-        if getattr(array, "dtype", None) in (np.intc, np.int8, np.int16, np.int32, np.uint8, np.uint16):
-            out = np.ascontiguousarray(array, np.intc)
-        else:
-            out = np.ascontiguousarray(array, np.float32)
+        out = np.ascontiguousarray(array, np.float32)
         if len(out.shape) != 2:  # noqa: PLR2004
             msg = f"Array must have 2 axes, but shape is {out.shape!r}"
             raise TypeError(msg)
@@ -624,10 +625,7 @@ class Renderer:
         .. versionadded:: 13.5
         """
         rects = self._convert_array(rects, item_length=4)
-        if rects.dtype == np.intc:
-            _check(lib.SDL_RenderFillRects(self.p, tcod.ffi.from_buffer("SDL_Rect*", rects), rects.shape[0]))
-            return
-        _check(lib.SDL_RenderFillRectsF(self.p, tcod.ffi.from_buffer("SDL_FRect*", rects), rects.shape[0]))
+        _check(lib.SDL_RenderFillRects(self.p, tcod.ffi.from_buffer("SDL_FRect*", rects), rects.shape[0]))
 
     def draw_rects(self, rects: NDArray[np.number] | Sequence[tuple[float, float, float, float]]) -> None:
         """Draw multiple outlined rectangles from an array.
@@ -640,10 +638,7 @@ class Renderer:
         rects = self._convert_array(rects, item_length=4)
         assert len(rects.shape) == 2  # noqa: PLR2004
         assert rects.shape[1] == 4  # noqa: PLR2004
-        if rects.dtype == np.intc:
-            _check(lib.SDL_RenderDrawRects(self.p, tcod.ffi.from_buffer("SDL_Rect*", rects), rects.shape[0]))
-            return
-        _check(lib.SDL_RenderDrawRectsF(self.p, tcod.ffi.from_buffer("SDL_FRect*", rects), rects.shape[0]))
+        _check(lib.SDL_RenderRects(self.p, tcod.ffi.from_buffer("SDL_FRect*", rects), rects.shape[0]))
 
     def draw_points(self, points: NDArray[np.number] | Sequence[tuple[float, float]]) -> None:
         """Draw an array of points.
@@ -654,10 +649,7 @@ class Renderer:
         .. versionadded:: 13.5
         """
         points = self._convert_array(points, item_length=2)
-        if points.dtype == np.intc:
-            _check(lib.SDL_RenderDrawPoints(self.p, tcod.ffi.from_buffer("SDL_Point*", points), points.shape[0]))
-            return
-        _check(lib.SDL_RenderDrawPointsF(self.p, tcod.ffi.from_buffer("SDL_FPoint*", points), points.shape[0]))
+        _check(lib.SDL_RenderPoints(self.p, tcod.ffi.from_buffer("SDL_FPoint*", points), points.shape[0]))
 
     def draw_lines(self, points: NDArray[np.number] | Sequence[tuple[float, float]]) -> None:
         """Draw a connected series of lines from an array.
@@ -668,17 +660,13 @@ class Renderer:
         .. versionadded:: 13.5
         """
         points = self._convert_array(points, item_length=2)
-        if points.dtype == np.intc:
-            _check(lib.SDL_RenderDrawLines(self.p, tcod.ffi.from_buffer("SDL_Point*", points), points.shape[0] - 1))
-            return
-        _check(lib.SDL_RenderDrawLinesF(self.p, tcod.ffi.from_buffer("SDL_FPoint*", points), points.shape[0] - 1))
+        _check(lib.SDL_RenderLines(self.p, tcod.ffi.from_buffer("SDL_FPoint*", points), points.shape[0]))
 
-    @_required_version((2, 0, 18))
     def geometry(
         self,
         texture: Texture | None,
         xy: NDArray[np.float32] | Sequence[tuple[float, float]],
-        color: NDArray[np.uint8] | Sequence[tuple[int, int, int, int]],
+        color: NDArray[np.float32] | Sequence[tuple[float, float, float, float]],
         uv: NDArray[np.float32] | Sequence[tuple[float, float]],
         indices: NDArray[np.uint8 | np.uint16 | np.uint32] | None = None,
     ) -> None:
@@ -692,12 +680,15 @@ class Renderer:
             indices: A sequence of indexes referring to the buffered data, every 3 indexes is a triangle to render.
 
         .. versionadded:: 13.5
+
+        .. versionchanged:: Unreleased
+            `color` now takes float values instead of 8-bit integers.
         """
         xy = np.ascontiguousarray(xy, np.float32)
         assert len(xy.shape) == 2  # noqa: PLR2004
         assert xy.shape[1] == 2  # noqa: PLR2004
 
-        color = np.ascontiguousarray(color, np.uint8)
+        color = np.ascontiguousarray(color, np.float32)
         assert len(color.shape) == 2  # noqa: PLR2004
         assert color.shape[1] == 4  # noqa: PLR2004
 
@@ -715,7 +706,7 @@ class Renderer:
                 texture.p if texture else ffi.NULL,
                 ffi.cast("float*", xy.ctypes.data),
                 xy.strides[0],
-                ffi.cast("SDL_Color*", color.ctypes.data),
+                ffi.cast("SDL_FColor*", color.ctypes.data),
                 color.strides[0],
                 ffi.cast("float*", uv.ctypes.data),
                 uv.strides[0],
@@ -730,36 +721,35 @@ class Renderer:
 def new_renderer(
     window: tcod.sdl.video.Window,
     *,
-    driver: int | None = None,
-    software: bool = False,
-    vsync: bool = True,
-    target_textures: bool = False,
+    driver: str | None = None,
+    vsync: int = True,
 ) -> Renderer:
     """Initialize and return a new SDL Renderer.
 
     Args:
         window: The window that this renderer will be attached to.
         driver: Force SDL to use a specific video driver.
-        software: If True then a software renderer will be forced.  By default a hardware renderer is used.
         vsync: If True then Vsync will be enabled.
-        target_textures: If True then target textures can be used by the renderer.
 
     Example::
 
         # Start by creating a window.
         sdl_window = tcod.sdl.video.new_window(640, 480)
         # Create a renderer with target texture support.
-        sdl_renderer = tcod.sdl.render.new_renderer(sdl_window, target_textures=True)
+        sdl_renderer = tcod.sdl.render.new_renderer(sdl_window)
 
     .. seealso::
         :func:`tcod.sdl.video.new_window`
+
+    .. versionchanged:: Unreleased
+        Removed `software` and `target_textures` parameters.
+        `vsync` now takes an integer.
+        `driver` now take a string.
     """
-    driver = driver if driver is not None else -1
-    flags = 0
-    if vsync:
-        flags |= int(lib.SDL_RENDERER_PRESENTVSYNC)
-    if target_textures:
-        flags |= int(lib.SDL_RENDERER_TARGETTEXTURE)
-    flags |= int(lib.SDL_RENDERER_SOFTWARE) if software else int(lib.SDL_RENDERER_ACCELERATED)
-    renderer_p = _check_p(ffi.gc(lib.SDL_CreateRenderer(window.p, driver, flags), lib.SDL_DestroyRenderer))
+    props = Properties()
+    props[(tcod.sdl.constants.SDL_PROP_RENDERER_CREATE_PRESENT_VSYNC_NUMBER, int)] = vsync
+    props[(tcod.sdl.constants.SDL_PROP_RENDERER_CREATE_WINDOW_POINTER, tcod.sdl.video.Window)] = window
+    if driver is not None:
+        props[(tcod.sdl.constants.SDL_PROP_RENDERER_CREATE_NAME_STRING, str)] = driver
+    renderer_p = _check_p(ffi.gc(lib.SDL_CreateRendererWithProperties(props.p), lib.SDL_DestroyRenderer))
     return Renderer(renderer_p)

@@ -179,7 +179,6 @@ def test_mouse_repr() -> None:
 def test_cffi_structs() -> None:
     # Make sure cffi structures are the correct size.
     tcod.ffi.new("SDL_Event*")
-    tcod.ffi.new("SDL_AudioCVT*")
 
 
 @pytest.mark.filterwarnings("ignore")

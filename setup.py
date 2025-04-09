@@ -12,7 +12,7 @@ from setuptools import setup
 
 # ruff: noqa: T201
 
-SDL_VERSION_NEEDED = (2, 0, 5)
+SDL_VERSION_NEEDED = (3, 2, 0)
 
 SETUP_DIR = Path(__file__).parent  # setup.py current directory
 
@@ -28,11 +28,11 @@ def get_package_data() -> list[str]:
     ]
     if "win32" in sys.platform:
         if bit_size == "32bit":
-            files += ["x86/SDL2.dll"]
+            files += ["x86/SDL3.dll"]
         else:
-            files += ["x64/SDL2.dll"]
+            files += ["x64/SDL3.dll"]
     if sys.platform == "darwin":
-        files += ["SDL2.framework/Versions/A/SDL2"]
+        files += ["SDL3.framework/Versions/A/SDL3"]
     return files
 
 
@@ -42,13 +42,19 @@ def check_sdl_version() -> None:
         return
     needed_version = "{}.{}.{}".format(*SDL_VERSION_NEEDED)
     try:
-        sdl_version_str = subprocess.check_output(["sdl2-config", "--version"], universal_newlines=True).strip()  # noqa: S603, S607
-    except FileNotFoundError as exc:
-        msg = (
-            f"libsdl2-dev or equivalent must be installed on your system and must be at least version {needed_version}."
-            "\nsdl2-config must be on PATH."
-        )
-        raise RuntimeError(msg) from exc
+        sdl_version_str = subprocess.check_output(
+            ["pkg-config", "sdl3", "--modversion"],  # noqa: S607
+            universal_newlines=True,
+        ).strip()
+    except FileNotFoundError:
+        try:
+            sdl_version_str = subprocess.check_output(["sdl3-config", "--version"], universal_newlines=True).strip()  # noqa: S603, S607
+        except FileNotFoundError as exc:
+            msg = (
+                f"libsdl3-dev or equivalent must be installed on your system and must be at least version {needed_version}."
+                "\nsdl3-config must be on PATH."
+            )
+            raise RuntimeError(msg) from exc
     print(f"Found SDL {sdl_version_str}.")
     sdl_version = tuple(int(s) for s in sdl_version_str.split("."))
     if sdl_version < SDL_VERSION_NEEDED:

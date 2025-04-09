@@ -115,7 +115,7 @@ class EdgeCostCallback(_EdgeCostFunc):
         super().__init__(callback, shape)
 
 
-class NodeCostArray(np.ndarray):  # type: ignore[type-arg]
+class NodeCostArray(np.ndarray):
     """Calculate cost from a numpy array of nodes.
 
     `array` is a NumPy array holding the path-cost of each node.
@@ -574,7 +574,7 @@ def hillclimb2d(
         c_edges, n_edges = _compile_bool_edges(edge_map)
         func = functools.partial(lib.hillclimb2d, c_dist, x, y, n_edges, c_edges)
     else:
-        func = functools.partial(lib.hillclimb2d_basic, c_dist, x, y, cardinal, diagonal)
+        func = functools.partial(lib.hillclimb2d_basic, c_dist, x, y, bool(cardinal), bool(diagonal))
     length = _check(func(ffi.NULL))
     path: np.ndarray[Any, np.dtype[np.intc]] = np.ndarray((length, 2), dtype=np.intc)
     c_path = ffi.from_buffer("int*", path)
@@ -596,7 +596,7 @@ def _world_array(shape: tuple[int, ...], dtype: DTypeLike = np.int32) -> NDArray
     )
 
 
-def _as_hashable(obj: np.ndarray[Any, Any] | None) -> object | None:
+def _as_hashable(obj: NDArray[Any] | None) -> object | None:
     """Return NumPy arrays as a more hashable form."""
     if obj is None:
         return obj
@@ -772,7 +772,7 @@ class CustomGraph:
             cost = cost.T
             if condition is not None:
                 condition = condition.T
-        key = (_as_hashable(cost), _as_hashable(condition))
+        key = (_as_hashable(cost), _as_hashable(condition))  # type: ignore[arg-type]
         try:
             rule = self._graph[key]
         except KeyError:
@@ -789,7 +789,7 @@ class CustomGraph:
     def add_edges(
         self,
         *,
-        edge_map: ArrayLike,
+        edge_map: ArrayLike | NDArray[np.integer],
         cost: NDArray[Any],
         condition: ArrayLike | None = None,
     ) -> None:
@@ -894,16 +894,20 @@ class CustomGraph:
             # edge_map needs to be converted into C.
             # The other parameters are converted by the add_edge method.
             edge_map = edge_map.T
-        edge_center = tuple(i // 2 for i in edge_map.shape)
-        edge_map[edge_center] = 0
-        edge_map[edge_map < 0] = 0
-        edge_nz = edge_map.nonzero()
-        edge_costs = edge_map[edge_nz]
+        edge_center = tuple(i // 2 for i in edge_map.shape)  # type: ignore[union-attr]
+        edge_map[edge_center] = 0  # type: ignore[index]
+        edge_map[edge_map < 0] = 0  # type: ignore[index, operator]
+        edge_nz = edge_map.nonzero()  # type: ignore[union-attr]
+        edge_costs = edge_map[edge_nz]  # type: ignore[index]
         edge_array = np.transpose(edge_nz)
         edge_array -= edge_center
-        for edge, edge_cost in zip(edge_array, edge_costs, strict=True):
+        for edge, edge_cost in zip(
+            edge_array,
+            edge_costs,  # type: ignore[arg-type]
+            strict=True,
+        ):
             self.add_edge(
-                tuple(edge.tolist()),  # type: ignore[arg-type]
+                tuple(edge.tolist()),
                 edge_cost,
                 cost=cost,
                 condition=condition,
@@ -1170,7 +1174,7 @@ class Pathfinder:
         """
         if self._order == "F":
             axes = range(self._travel.ndim)
-            return self._travel.transpose((*axes[-2::-1], axes[-1]))[..., ::-1]
+            return self._travel.transpose((*axes[-2::-1], axes[-1]))[..., ::-1]  # type: ignore[no-any-return]
         return self._travel
 
     def clear(self) -> None:

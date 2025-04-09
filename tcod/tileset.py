@@ -192,15 +192,14 @@ class Tileset:
         out: NDArray[np.uint8] = np.empty((height, width, 4), np.uint8)
         out[:] = 9
         surface_p = ffi.gc(
-            lib.SDL_CreateRGBSurfaceWithFormatFrom(
-                ffi.from_buffer("void*", out),
+            lib.SDL_CreateSurfaceFrom(
                 width,
                 height,
-                32,
-                out.strides[0],
                 lib.SDL_PIXELFORMAT_RGBA32,
+                ffi.from_buffer("void*", out),
+                out.strides[0],
             ),
-            lib.SDL_FreeSurface,
+            lib.SDL_DestroySurface,
         )
         with surface_p, ffi.new("SDL_Surface**", surface_p) as surface_p_p:
             _check(

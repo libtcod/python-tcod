@@ -6,9 +6,45 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Changed
+
+- Switched to SDL3.
+  This will cause several breaking changes such as the names of keyboard constants and other SDL enums.
+- `tcod.sdl.video.Window.grab` has been split into `.mouse_grab` and `.keyboard_grab` attributes.
+- `tcod.event.KeySym` single letter symbols are now all uppercase.
+- Relative mouse mode is set via `tcod.sdl.video.Window.relative_mouse_mode` instead of `tcod.sdl.mouse.set_relative_mode`.
+- `tcod.sdl.render.new_renderer`: Removed `software` and `target_textures` parameters, `vsync` takes `int`, `driver` takes `str` instead of `int`.
+- SDL renderer logical
+- `tcod.sdl.render.Renderer`: `integer_scaling` and `logical_size` are now set with `set_logical_presentation` method.
+- `tcod.sdl.render.Renderer.geometry` now takes float values for `color` instead of 8-bit integers.
+- `tcod.event.Point` and other mouse/tile coordinate types now use `float` instead of `int`.
+  SDL3 has decided that mouse events have subpixel precision.
+  If you see any usual `float` types in your code then this is why.
+- `tcod.sdl.audio` has been affected by major changes to SDL3.
+  - `tcod.sdl.audio.open` has new behavior due to SDL3 and should be avoided.
+  - Callbacks which were assigned to `AudioDevice`'s must now be applied to `AudioStream`'s instead.
+  - `AudioDevice`'s are now opened using references to existing devices.
+  - Sound queueing methods were moved from `AudioDevice` to a new `AudioStream` class.
+  - `BasicMixer` may require manually specifying `frequency` and `channels` to replicate old behavior.
+  - `get_devices` and `get_capture_devices` now return `dict[str, AudioDevice]`.
+
+### Deprecated
+
+- `tcod.sdl.audio.open` was replaced with a newer API, get a default device with `tcod.sdl.audio.get_default_playback().open()`.
+- `tcod.sdl.audio.BasicMixer` should be replaced with `AudioStream`'s.
+- Should no longer use `tcod.sdl.audio.AudioDevice` in a context, use `contextlib.closing` for the old behavior.
+
 ### Removed
 
 - Support dropped for Python 3.8 and 3.9.
+- Removed `Joystick.get_current_power` due to SDL3 changes.
+- `WindowFlags.FULLSCREEN_DESKTOP` is now just `WindowFlags.FULLSCREEN`
+- `tcod.sdl.render.Renderer.integer_scaling` removed.
+- Removed `callback`, `spec`, `queued_samples`, `queue_audio`, and `dequeue_audio` attributes from `tcod.sdl.audio.AudioDevice`.
+
+### Fixed
+
+- `Joystick.get_ball` was broken.
 
 ## [18.1.0] - 2025-05-05
 

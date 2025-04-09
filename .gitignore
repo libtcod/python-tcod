@@ -69,10 +69,10 @@ Release/
 tcod/_*.c
 tcod/_*.pyd
 .benchmarks
-dependencies/SDL2*
+dependencies/SDL*
 tcod/x86
 tcod/x64
-tcod/SDL2.framework
+tcod/SDL?.framework
 deb_dist/
 *.tar.gz
 tcod/version.py

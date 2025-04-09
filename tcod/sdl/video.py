@@ -14,9 +14,11 @@ import sys
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
+from typing_extensions import Self, deprecated
 
+import tcod.sdl.constants
 from tcod.cffi import ffi, lib
-from tcod.sdl._internal import _check, _check_p, _required_version, _version_at_least
+from tcod.sdl._internal import Properties, _check, _check_p, _required_version
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
@@ -40,11 +42,7 @@ class WindowFlags(enum.IntFlag):
 
     FULLSCREEN = int(lib.SDL_WINDOW_FULLSCREEN)
     """"""
-    FULLSCREEN_DESKTOP = int(lib.SDL_WINDOW_FULLSCREEN_DESKTOP)
-    """"""
     OPENGL = int(lib.SDL_WINDOW_OPENGL)
-    """"""
-    SHOWN = int(lib.SDL_WINDOW_SHOWN)
     """"""
     HIDDEN = int(lib.SDL_WINDOW_HIDDEN)
     """"""
@@ -56,21 +54,17 @@ class WindowFlags(enum.IntFlag):
     """"""
     MAXIMIZED = int(lib.SDL_WINDOW_MAXIMIZED)
     """"""
-    MOUSE_GRABBED = int(lib.SDL_WINDOW_INPUT_GRABBED)
+    MOUSE_GRABBED = int(lib.SDL_WINDOW_MOUSE_GRABBED)
     """"""
     INPUT_FOCUS = int(lib.SDL_WINDOW_INPUT_FOCUS)
     """"""
     MOUSE_FOCUS = int(lib.SDL_WINDOW_MOUSE_FOCUS)
     """"""
-    FOREIGN = int(lib.SDL_WINDOW_FOREIGN)
-    """"""
-    ALLOW_HIGHDPI = int(lib.SDL_WINDOW_ALLOW_HIGHDPI)
+    ALLOW_HIGHDPI = int(lib.SDL_WINDOW_HIGH_PIXEL_DENSITY)
     """"""
     MOUSE_CAPTURE = int(lib.SDL_WINDOW_MOUSE_CAPTURE)
     """"""
     ALWAYS_ON_TOP = int(lib.SDL_WINDOW_ALWAYS_ON_TOP)
-    """"""
-    SKIP_TASKBAR = int(lib.SDL_WINDOW_SKIP_TASKBAR)
     """"""
     UTILITY = int(lib.SDL_WINDOW_UTILITY)
     """"""
@@ -107,18 +101,16 @@ class _TempSurface:
             msg = f"NumPy array must have RGB or RGBA channels. (got {self._array.shape})"
             raise TypeError(msg)
         self.p = ffi.gc(
-            lib.SDL_CreateRGBSurfaceFrom(
-                ffi.from_buffer("void*", self._array),
-                self._array.shape[1],  # Width.
-                self._array.shape[0],  # Height.
-                self._array.shape[2] * 8,  # Bit depth.
-                self._array.strides[1],  # Pitch.
-                0x000000FF,
-                0x0000FF00,
-                0x00FF0000,
-                0xFF000000 if self._array.shape[2] == 4 else 0,  # noqa: PLR2004
+            _check_p(
+                lib.SDL_CreateSurfaceFrom(
+                    self._array.shape[1],
+                    self._array.shape[0],
+                    lib.SDL_PIXELFORMAT_RGBA32 if self._array.shape[2] == 4 else lib.SDL_PIXELFORMAT_RGB24,
+                    ffi.from_buffer("void*", self._array),
+                    self._array.strides[0],
+                )
             ),
-            lib.SDL_FreeSurface,
+            lib.SDL_DestroySurface,
         )
 
 
@@ -140,6 +132,13 @@ class Window:
         if not isinstance(other, Window):
             return NotImplemented
         return bool(self.p == other.p)
+
+    def _as_property_pointer(self) -> Any:  # noqa: ANN401
+        return self.p
+
+    @classmethod
+    def _from_property_pointer(cls, raw_cffi_pointer: Any, /) -> Self:  # noqa: ANN401
+        return cls(raw_cffi_pointer)
 
     def set_icon(self, pixels: ArrayLike) -> None:
         """Set the window icon from an image.
@@ -222,24 +221,19 @@ class Window:
         return WindowFlags(lib.SDL_GetWindowFlags(self.p))
 
     @property
-    def fullscreen(self) -> int:
+    def fullscreen(self) -> bool:
         """Get or set the fullscreen status of this window.
-
-        Can be set to the :any:`WindowFlags.FULLSCREEN` or :any:`WindowFlags.FULLSCREEN_DESKTOP` flags.
 
         Example::
 
             # Toggle fullscreen.
             window: tcod.sdl.video.Window
-            if window.fullscreen:
-                window.fullscreen = False  # Set windowed mode.
-            else:
-                window.fullscreen = tcod.sdl.video.WindowFlags.FULLSCREEN_DESKTOP
+            window.fullscreen = not window.fullscreen
         """
-        return self.flags & (WindowFlags.FULLSCREEN | WindowFlags.FULLSCREEN_DESKTOP)
+        return bool(self.flags & WindowFlags.FULLSCREEN)
 
     @fullscreen.setter
-    def fullscreen(self, value: int) -> None:
+    def fullscreen(self, value: bool) -> None:
         _check(lib.SDL_SetWindowFullscreen(self.p, value))
 
     @property
@@ -271,26 +265,51 @@ class Window:
 
         Will error if you try to set this and opacity isn't supported.
         """
-        out = ffi.new("float*")
-        _check(lib.SDL_GetWindowOpacity(self.p, out))
-        return float(out[0])
+        return float(lib.SDL_GetWindowOpacity(self.p))
 
     @opacity.setter
     def opacity(self, value: float) -> None:
         _check(lib.SDL_SetWindowOpacity(self.p, value))
 
     @property
+    @deprecated("This attribute as been split into mouse_grab and keyboard_grab")
     def grab(self) -> bool:
         """Get or set this windows input grab mode.
 
-        .. seealso::
-            https://wiki.libsdl.org/SDL_SetWindowGrab
+        .. deprecated:: Unreleased
+            This attribute as been split into :any:`mouse_grab` and :any:`keyboard_grab`.
         """
-        return bool(lib.SDL_GetWindowGrab(self.p))
+        return self.mouse_grab
 
     @grab.setter
     def grab(self, value: bool) -> None:
-        lib.SDL_SetWindowGrab(self.p, value)
+        self.mouse_grab = value
+
+    @property
+    def mouse_grab(self) -> bool:
+        """Get or set this windows mouse input grab mode.
+
+        .. versionadded:: Unreleased
+        """
+        return bool(lib.SDL_GetWindowMouseGrab(self.p))
+
+    @mouse_grab.setter
+    def mouse_grab(self, value: bool, /) -> None:
+        lib.SDL_SetWindowMouseGrab(self.p, value)
+
+    @property
+    def keyboard_grab(self) -> bool:
+        """Get or set this windows keyboard input grab mode.
+
+        https://wiki.libsdl.org/SDL3/SDL_SetWindowKeyboardGrab
+
+        .. versionadded:: Unreleased
+        """
+        return bool(lib.SDL_GetWindowKeyboardGrab(self.p))
+
+    @keyboard_grab.setter
+    def keyboard_grab(self, value: bool, /) -> None:
+        lib.SDL_SetWindowKeyboardGrab(self.p, value)
 
     @property
     def mouse_rect(self) -> tuple[int, int, int, int] | None:
@@ -300,13 +319,11 @@ class Window:
 
         .. versionadded:: 13.5
         """
-        _version_at_least((2, 0, 18))
         rect = lib.SDL_GetWindowMouseRect(self.p)
         return (rect.x, rect.y, rect.w, rect.h) if rect else None
 
     @mouse_rect.setter
     def mouse_rect(self, rect: tuple[int, int, int, int] | None) -> None:
-        _version_at_least((2, 0, 18))
         _check(lib.SDL_SetWindowMouseRect(self.p, (rect,) if rect else ffi.NULL))
 
     @_required_version((2, 0, 16))
@@ -338,6 +355,20 @@ class Window:
         """Hide this window."""
         lib.SDL_HideWindow(self.p)
 
+    @property
+    def relative_mouse_mode(self) -> bool:
+        """Enable or disable relative mouse mode which will lock and hide the mouse and only report mouse motion.
+
+        .. seealso::
+            :any:`tcod.sdl.mouse.capture`
+            https://wiki.libsdl.org/SDL_SetWindowRelativeMouseMode
+        """
+        return bool(lib.SDL_GetWindowRelativeMouseMode(self.p))
+
+    @relative_mouse_mode.setter
+    def relative_mouse_mode(self, enable: bool, /) -> None:
+        _check(lib.SDL_SetWindowRelativeMouseMode(self.p, enable))
+
 
 def new_window(  # noqa: PLR0913
     width: int,
@@ -368,11 +399,18 @@ def new_window(  # noqa: PLR0913
     .. seealso::
         :func:`tcod.sdl.render.new_renderer`
     """
-    x = x if x is not None else int(lib.SDL_WINDOWPOS_UNDEFINED)
-    y = y if y is not None else int(lib.SDL_WINDOWPOS_UNDEFINED)
     if title is None:
         title = sys.argv[0]
-    window_p = ffi.gc(lib.SDL_CreateWindow(title.encode("utf-8"), x, y, width, height, flags), lib.SDL_DestroyWindow)
+    window_props = Properties()
+    window_props[(tcod.sdl.constants.SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, int)] = flags
+    window_props[(tcod.sdl.constants.SDL_PROP_WINDOW_CREATE_TITLE_STRING, str)] = title
+    if x is not None:
+        window_props[(tcod.sdl.constants.SDL_PROP_WINDOW_CREATE_X_NUMBER, int)] = x
+    if y is not None:
+        window_props[(tcod.sdl.constants.SDL_PROP_WINDOW_CREATE_Y_NUMBER, int)] = y
+    window_props[(tcod.sdl.constants.SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, int)] = width
+    window_props[(tcod.sdl.constants.SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, int)] = height
+    window_p = ffi.gc(lib.SDL_CreateWindowWithProperties(window_props.p), lib.SDL_DestroyWindow)
     return Window(_check_p(window_p))
 
 
@@ -406,4 +444,4 @@ def screen_saver_allowed(allow: bool | None = None) -> bool:
         lib.SDL_EnableScreenSaver()
     else:
         lib.SDL_DisableScreenSaver()
-    return bool(lib.SDL_IsScreenSaverEnabled())
+    return bool(lib.SDL_ScreenSaverEnabled())

@@ -44,10 +44,11 @@ jobs:
   sdist:
     runs-on: ubuntu-latest
     steps:
-      - name: APT update
-        run: sudo apt-get update
-      - name: Install APT dependencies
-        run: sudo apt-get install libsdl2-dev
+      - uses: libsdl-org/setup-sdl@6574e20ac65ce362cd12f9c26b3a5e4d3cd31dee
+        with:
+          install-linux-dependencies: true
+          build-type: "Debug"
+          version: "3.2.14"
       - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ env.git-depth }}
@@ -71,7 +72,7 @@ jobs:
     strategy:
       matrix:
         os: ["windows-latest", "macos-latest"]
-        sdl-version: ["2.0.14", "2.0.16", "2.30.0"]
+        sdl-version: ["3.2.10"]
       fail-fast: true
     steps:
       - uses: actions/checkout@v4
@@ -90,7 +91,7 @@ jobs:
           SDL_VERSION: ${{ matrix.sdl-version }}
 
   build:
-    needs: [ruff, mypy]
+    needs: [ruff, mypy, sdist]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -122,7 +123,13 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install libsdl2-dev xvfb
+          sudo apt-get install xvfb
+      - uses: libsdl-org/setup-sdl@6574e20ac65ce362cd12f9c26b3a5e4d3cd31dee
+        if: runner.os == 'Linux'
+        with:
+          install-linux-dependencies: true
+          build-type: "Release"
+          version: "3.2.14"
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
@@ -157,13 +164,15 @@ jobs:
           compression-level: 0
 
   test-docs:
-    needs: [ruff, mypy]
+    needs: [ruff, mypy, sdist]
     runs-on: ubuntu-latest
     steps:
-      - name: Install APT dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install libsdl2-dev
+      - uses: libsdl-org/setup-sdl@6574e20ac65ce362cd12f9c26b3a5e4d3cd31dee
+        if: runner.os == 'Linux'
+        with:
+          install-linux-dependencies: true
+          build-type: "Debug"
+          version: "3.2.14"
       - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ env.git-depth }}
@@ -182,11 +191,11 @@ jobs:
         run: python -m sphinx -T -E -W --keep-going . _build/html
 
   tox:
-    needs: [ruff]
+    needs: [ruff, sdist]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["ubuntu-latest", "windows-latest"]
+        os: ["ubuntu-latest"] # "windows-latest" disabled due to free-threaded build issues
     steps:
       - uses: actions/checkout@v4
         with:
@@ -200,17 +209,18 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip tox
-      - name: Install APT dependencies
+      - uses: libsdl-org/setup-sdl@6574e20ac65ce362cd12f9c26b3a5e4d3cd31dee
         if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install libsdl2-dev
+        with:
+          install-linux-dependencies: true
+          build-type: "Debug"
+          version: "3.2.14"
       - name: Run tox
         run: |
           tox -vv
 
   linux-wheels:
-    needs: [ruff, mypy]
+    needs: [ruff, mypy, sdist]
     runs-on: ${{ matrix.arch == 'aarch64' && 'ubuntu-24.04-arm' || 'ubuntu-latest'}}
     strategy:
       matrix:
@@ -248,7 +258,18 @@ jobs:
           CIBW_BEFORE_ALL_LINUX: >
             yum install -y epel-release &&
             yum-config-manager --enable epel &&
-            yum install -y SDL2-devel
+            yum install -y gcc git-core make cmake \
+                alsa-lib-devel pulseaudio-libs-devel \
+                libX11-devel libXext-devel libXrandr-devel libXcursor-devel libXfixes-devel \
+                libXi-devel libXScrnSaver-devel dbus-devel ibus-devel \
+                systemd-devel mesa-libGL-devel libxkbcommon-devel mesa-libGLES-devel \
+                mesa-libEGL-devel vulkan-devel wayland-devel wayland-protocols-devel \
+                libdrm-devel mesa-libgbm-devel libusb-devel
+            git clone --depth 1 --branch release-3.2.10 https://github.com/libsdl-org/SDL.git sdl_repo &&
+            cmake -S sdl_repo -B sdl_build &&
+            cmake --build sdl_build --config Release &&
+            cmake --install sdl_build --config Release --prefix /usr/local &&
+            cp --verbose /usr/local/lib64/pkgconfig/sdl3.pc /lib64/pkgconfig/sdl3.pc
           CIBW_BEFORE_TEST: pip install numpy
           CIBW_TEST_COMMAND: python -c "import tcod.context"
           # Skip test on emulated architectures
@@ -267,7 +288,7 @@ jobs:
           compression-level: 0
 
   build-macos:
-    needs: [ruff, mypy]
+    needs: [ruff, mypy, sdist]
     runs-on: "macos-14"
     strategy:
       fail-fast: true
@@ -287,7 +308,7 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
       - name: Prepare package
-        # Downloads SDL2 for the later step.
+        # Downloads SDL for the later step.
         run: python build_sdl.py
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.23.3
@@ -298,7 +319,7 @@ jobs:
           CIBW_BEFORE_TEST: pip install numpy
           CIBW_TEST_COMMAND: python -c "import tcod.context"
           CIBW_TEST_SKIP: "pp* *-macosx_arm64 *-macosx_universal2:arm64"
-          MACOSX_DEPLOYMENT_TARGET: "10.11"
+          MACOSX_DEPLOYMENT_TARGET: "10.13"
       - name: Remove asterisk from label
         run: |
           PYTHON_DESC=${{ matrix.python }}

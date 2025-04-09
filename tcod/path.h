@@ -13,7 +13,7 @@ extern "C" {
 /**
  *  Common NumPy data types.
  */
-enum NP_Type {
+typedef enum NP_Type {
   np_undefined = 0,
   np_int8,
   np_int16,
@@ -26,23 +26,23 @@ enum NP_Type {
   np_float16,
   np_float32,
   np_float64,
-};
+} NP_Type;
 /**
  *  A simple 4D NumPy array ctype.
  */
-struct NArray {
-  enum NP_Type type;
+typedef struct NArray {
+  NP_Type type;
   int8_t ndim;
   char* __restrict data;
   ptrdiff_t shape[5];    // TCOD_PATHFINDER_MAX_DIMENSIONS + 1
   ptrdiff_t strides[5];  // TCOD_PATHFINDER_MAX_DIMENSIONS + 1
-};
+} NArray;
 
 struct PathfinderRule {
   /** Rule condition, could be uninitialized zeros. */
-  struct NArray condition;
+  NArray condition;
   /** Edge cost map, required. */
-  struct NArray cost;
+  NArray cost;
   /** Number of edge rules in `edge_array`. */
   int edge_count;
   /** Example of 2D edges: [i, j, cost, i_2, j_2, cost_2, ...] */
@@ -131,7 +131,7 @@ int path_compute(
     parameters.
  */
 ptrdiff_t get_travel_path(
-    int8_t ndim, const struct NArray* __restrict travel_map, const int* __restrict start, int* __restrict out);
+    int8_t ndim, const NArray* __restrict travel_map, const int* __restrict start, int* __restrict out);
 /**
     Update the priority of nodes on the frontier and sort them.
  */
@@ -142,7 +142,7 @@ int update_frontier_heuristic(
 
     Assumes no heuristic is active.
  */
-int rebuild_frontier_from_distance(struct TCOD_Frontier* __restrict frontier, const struct NArray* __restrict dist_map);
+int rebuild_frontier_from_distance(struct TCOD_Frontier* __restrict frontier, const NArray* __restrict dist_map);
 /**
     Return true if `index[frontier->ndim]` is a node in `frontier`.
  */

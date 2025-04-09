@@ -154,9 +154,9 @@ class Point(NamedTuple):
         :any:`MouseMotion` :any:`MouseButtonDown` :any:`MouseButtonUp`
     """
 
-    x: int
+    x: float
     """A pixel or tile coordinate starting with zero as the left-most position."""
-    y: int
+    y: float
     """A pixel or tile coordinate starting with zero as the top-most position."""
 
 
@@ -357,8 +357,8 @@ class KeyboardEvent(Event):
 
     @classmethod
     def from_sdl_event(cls, sdl_event: Any) -> Any:
-        keysym = sdl_event.key.keysym
-        self = cls(keysym.scancode, keysym.sym, keysym.mod, bool(sdl_event.key.repeat))
+        keysym = sdl_event.key
+        self = cls(keysym.scancode, keysym.key, keysym.mod, bool(sdl_event.key.repeat))
         self.sdl_event = sdl_event
         return self
 
@@ -408,8 +408,8 @@ class MouseState(Event):
 
     def __init__(
         self,
-        position: tuple[int, int] = (0, 0),
-        tile: tuple[int, int] | None = (0, 0),
+        position: tuple[float, float] = (0, 0),
+        tile: tuple[float, float] | None = (0, 0),
         state: int = 0,
     ) -> None:
         super().__init__()
@@ -440,7 +440,7 @@ class MouseState(Event):
         return _verify_tile_coordinates(self._tile)
 
     @tile.setter
-    def tile(self, xy: tuple[int, int]) -> None:
+    def tile(self, xy: tuple[float, float]) -> None:
         self._tile = Point(*xy)
 
     def __repr__(self) -> str:
@@ -481,10 +481,10 @@ class MouseMotion(MouseState):
 
     def __init__(
         self,
-        position: tuple[int, int] = (0, 0),
-        motion: tuple[int, int] = (0, 0),
-        tile: tuple[int, int] | None = (0, 0),
-        tile_motion: tuple[int, int] | None = (0, 0),
+        position: tuple[float, float] = (0, 0),
+        motion: tuple[float, float] = (0, 0),
+        tile: tuple[float, float] | None = (0, 0),
+        tile_motion: tuple[float, float] | None = (0, 0),
         state: int = 0,
     ) -> None:
         super().__init__(position, tile, state)
@@ -520,7 +520,7 @@ class MouseMotion(MouseState):
         return _verify_tile_coordinates(self._tile_motion)
 
     @tile_motion.setter
-    def tile_motion(self, xy: tuple[int, int]) -> None:
+    def tile_motion(self, xy: tuple[float, float]) -> None:
         warnings.warn(
             "The mouse.tile_motion attribute is deprecated."
             "  Use mouse.motion of the event returned by context.convert_event instead.",
@@ -581,8 +581,8 @@ class MouseButtonEvent(MouseState):
 
     def __init__(
         self,
-        pixel: tuple[int, int] = (0, 0),
-        tile: tuple[int, int] | None = (0, 0),
+        pixel: tuple[float, float] = (0, 0),
+        tile: tuple[float, float] | None = (0, 0),
         button: int = 0,
     ) -> None:
         super().__init__(pixel, tile, button)
@@ -601,9 +601,9 @@ class MouseButtonEvent(MouseState):
         pixel = button.x, button.y
         subtile = _pixel_to_tile(*pixel)
         if subtile is None:
-            tile: tuple[int, int] | None = None
+            tile: tuple[float, float] | None = None
         else:
-            tile = int(subtile[0]), int(subtile[1])
+            tile = float(subtile[0]), float(subtile[1])
         self = cls(pixel, tile, button.button)
         self.sdl_event = sdl_event
         return self
@@ -727,11 +727,11 @@ class WindowEvent(Event):
             return Undefined.from_sdl_event(sdl_event)
         event_type: Final = cls.__WINDOW_TYPES[sdl_event.window.event]
         self: WindowEvent
-        if sdl_event.window.event == lib.SDL_WINDOWEVENT_MOVED:
+        if sdl_event.window.event == lib.SDL_EVENT_WINDOW_MOVED:
             self = WindowMoved(sdl_event.window.data1, sdl_event.window.data2)
         elif sdl_event.window.event in (
-            lib.SDL_WINDOWEVENT_RESIZED,
-            lib.SDL_WINDOWEVENT_SIZE_CHANGED,
+            lib.SDL_EVENT_WINDOW_RESIZED,
+            lib.SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED,
         ):
             self = WindowResized(event_type, sdl_event.window.data1, sdl_event.window.data2)
         else:
@@ -743,22 +743,20 @@ class WindowEvent(Event):
         return f"tcod.event.{self.__class__.__name__}(type={self.type!r})"
 
     __WINDOW_TYPES: Final = {
-        lib.SDL_WINDOWEVENT_SHOWN: "WindowShown",
-        lib.SDL_WINDOWEVENT_HIDDEN: "WindowHidden",
-        lib.SDL_WINDOWEVENT_EXPOSED: "WindowExposed",
-        lib.SDL_WINDOWEVENT_MOVED: "WindowMoved",
-        lib.SDL_WINDOWEVENT_RESIZED: "WindowResized",
-        lib.SDL_WINDOWEVENT_SIZE_CHANGED: "WindowSizeChanged",
-        lib.SDL_WINDOWEVENT_MINIMIZED: "WindowMinimized",
-        lib.SDL_WINDOWEVENT_MAXIMIZED: "WindowMaximized",
-        lib.SDL_WINDOWEVENT_RESTORED: "WindowRestored",
-        lib.SDL_WINDOWEVENT_ENTER: "WindowEnter",
-        lib.SDL_WINDOWEVENT_LEAVE: "WindowLeave",
-        lib.SDL_WINDOWEVENT_FOCUS_GAINED: "WindowFocusGained",
-        lib.SDL_WINDOWEVENT_FOCUS_LOST: "WindowFocusLost",
-        lib.SDL_WINDOWEVENT_CLOSE: "WindowClose",
-        lib.SDL_WINDOWEVENT_TAKE_FOCUS: "WindowTakeFocus",
-        lib.SDL_WINDOWEVENT_HIT_TEST: "WindowHitTest",
+        lib.SDL_EVENT_WINDOW_SHOWN: "WindowShown",
+        lib.SDL_EVENT_WINDOW_HIDDEN: "WindowHidden",
+        lib.SDL_EVENT_WINDOW_EXPOSED: "WindowExposed",
+        lib.SDL_EVENT_WINDOW_MOVED: "WindowMoved",
+        lib.SDL_EVENT_WINDOW_RESIZED: "WindowResized",
+        lib.SDL_EVENT_WINDOW_MINIMIZED: "WindowMinimized",
+        lib.SDL_EVENT_WINDOW_MAXIMIZED: "WindowMaximized",
+        lib.SDL_EVENT_WINDOW_RESTORED: "WindowRestored",
+        lib.SDL_EVENT_WINDOW_MOUSE_ENTER: "WindowEnter",
+        lib.SDL_EVENT_WINDOW_MOUSE_LEAVE: "WindowLeave",
+        lib.SDL_EVENT_WINDOW_FOCUS_GAINED: "WindowFocusGained",
+        lib.SDL_EVENT_WINDOW_FOCUS_LOST: "WindowFocusLost",
+        lib.SDL_EVENT_WINDOW_CLOSE_REQUESTED: "WindowClose",
+        lib.SDL_EVENT_WINDOW_HIT_TEST: "WindowHitTest",
     }
 
 
@@ -974,7 +972,10 @@ class JoystickButton(JoystickEvent):
 
     @classmethod
     def from_sdl_event(cls, sdl_event: Any) -> JoystickButton:
-        type = {lib.SDL_JOYBUTTONDOWN: "JOYBUTTONDOWN", lib.SDL_JOYBUTTONUP: "JOYBUTTONUP"}[sdl_event.type]
+        type = {
+            lib.SDL_EVENT_JOYSTICK_BUTTON_DOWN: "JOYBUTTONDOWN",
+            lib.SDL_EVENT_JOYSTICK_BUTTON_UP: "JOYBUTTONUP",
+        }[sdl_event.type]
         return cls(type, sdl_event.jbutton.which, sdl_event.jbutton.button)
 
     def __repr__(self) -> str:
@@ -1010,7 +1011,10 @@ class JoystickDevice(JoystickEvent):
 
     @classmethod
     def from_sdl_event(cls, sdl_event: Any) -> JoystickDevice:
-        type = {lib.SDL_JOYDEVICEADDED: "JOYDEVICEADDED", lib.SDL_JOYDEVICEREMOVED: "JOYDEVICEREMOVED"}[sdl_event.type]
+        type = {
+            lib.SDL_EVENT_JOYSTICK_ADDED: "JOYDEVICEADDED",
+            lib.SDL_EVENT_JOYSTICK_REMOVED: "JOYDEVICEREMOVED",
+        }[sdl_event.type]
         return cls(type, sdl_event.jdevice.which)
 
 
@@ -1095,14 +1099,14 @@ class ControllerButton(ControllerEvent):
     @classmethod
     def from_sdl_event(cls, sdl_event: Any) -> ControllerButton:
         type = {
-            lib.SDL_CONTROLLERBUTTONDOWN: "CONTROLLERBUTTONDOWN",
-            lib.SDL_CONTROLLERBUTTONUP: "CONTROLLERBUTTONUP",
+            lib.SDL_EVENT_GAMEPAD_BUTTON_DOWN: "CONTROLLERBUTTONDOWN",
+            lib.SDL_EVENT_GAMEPAD_BUTTON_UP: "CONTROLLERBUTTONUP",
         }[sdl_event.type]
         return cls(
             type,
             sdl_event.cbutton.which,
             tcod.sdl.joystick.ControllerButton(sdl_event.cbutton.button),
-            sdl_event.cbutton.state == lib.SDL_PRESSED,
+            bool(sdl_event.cbutton.down),
         )
 
     def __repr__(self) -> str:
@@ -1127,9 +1131,9 @@ class ControllerDevice(ControllerEvent):
     @classmethod
     def from_sdl_event(cls, sdl_event: Any) -> ControllerDevice:
         type = {
-            lib.SDL_CONTROLLERDEVICEADDED: "CONTROLLERDEVICEADDED",
-            lib.SDL_CONTROLLERDEVICEREMOVED: "CONTROLLERDEVICEREMOVED",
-            lib.SDL_CONTROLLERDEVICEREMAPPED: "CONTROLLERDEVICEREMAPPED",
+            lib.SDL_EVENT_GAMEPAD_ADDED: "CONTROLLERDEVICEADDED",
+            lib.SDL_EVENT_GAMEPAD_REMOVED: "CONTROLLERDEVICEREMOVED",
+            lib.SDL_EVENT_GAMEPAD_REMAPPED: "CONTROLLERDEVICEREMAPPED",
         }[sdl_event.type]
         return cls(type, sdl_event.cdevice.which)
 
@@ -1153,28 +1157,28 @@ class Undefined(Event):
 
 
 _SDL_TO_CLASS_TABLE: dict[int, type[Event]] = {
-    lib.SDL_QUIT: Quit,
-    lib.SDL_KEYDOWN: KeyDown,
-    lib.SDL_KEYUP: KeyUp,
-    lib.SDL_MOUSEMOTION: MouseMotion,
-    lib.SDL_MOUSEBUTTONDOWN: MouseButtonDown,
-    lib.SDL_MOUSEBUTTONUP: MouseButtonUp,
-    lib.SDL_MOUSEWHEEL: MouseWheel,
-    lib.SDL_TEXTINPUT: TextInput,
-    lib.SDL_WINDOWEVENT: WindowEvent,
-    lib.SDL_JOYAXISMOTION: JoystickAxis,
-    lib.SDL_JOYBALLMOTION: JoystickBall,
-    lib.SDL_JOYHATMOTION: JoystickHat,
-    lib.SDL_JOYBUTTONDOWN: JoystickButton,
-    lib.SDL_JOYBUTTONUP: JoystickButton,
-    lib.SDL_JOYDEVICEADDED: JoystickDevice,
-    lib.SDL_JOYDEVICEREMOVED: JoystickDevice,
-    lib.SDL_CONTROLLERAXISMOTION: ControllerAxis,
-    lib.SDL_CONTROLLERBUTTONDOWN: ControllerButton,
-    lib.SDL_CONTROLLERBUTTONUP: ControllerButton,
-    lib.SDL_CONTROLLERDEVICEADDED: ControllerDevice,
-    lib.SDL_CONTROLLERDEVICEREMOVED: ControllerDevice,
-    lib.SDL_CONTROLLERDEVICEREMAPPED: ControllerDevice,
+    lib.SDL_EVENT_QUIT: Quit,
+    lib.SDL_EVENT_KEY_DOWN: KeyDown,
+    lib.SDL_EVENT_KEY_UP: KeyUp,
+    lib.SDL_EVENT_MOUSE_MOTION: MouseMotion,
+    lib.SDL_EVENT_MOUSE_BUTTON_DOWN: MouseButtonDown,
+    lib.SDL_EVENT_MOUSE_BUTTON_UP: MouseButtonUp,
+    lib.SDL_EVENT_MOUSE_WHEEL: MouseWheel,
+    lib.SDL_EVENT_TEXT_INPUT: TextInput,
+    # lib.SDL_EVENT_WINDOW_EVENT: WindowEvent,
+    lib.SDL_EVENT_JOYSTICK_AXIS_MOTION: JoystickAxis,
+    lib.SDL_EVENT_JOYSTICK_BALL_MOTION: JoystickBall,
+    lib.SDL_EVENT_JOYSTICK_HAT_MOTION: JoystickHat,
+    lib.SDL_EVENT_JOYSTICK_BUTTON_DOWN: JoystickButton,
+    lib.SDL_EVENT_JOYSTICK_BUTTON_UP: JoystickButton,
+    lib.SDL_EVENT_JOYSTICK_ADDED: JoystickDevice,
+    lib.SDL_EVENT_JOYSTICK_REMOVED: JoystickDevice,
+    lib.SDL_EVENT_GAMEPAD_AXIS_MOTION: ControllerAxis,
+    lib.SDL_EVENT_GAMEPAD_BUTTON_DOWN: ControllerButton,
+    lib.SDL_EVENT_GAMEPAD_BUTTON_UP: ControllerButton,
+    lib.SDL_EVENT_GAMEPAD_ADDED: ControllerDevice,
+    lib.SDL_EVENT_GAMEPAD_REMOVED: ControllerDevice,
+    lib.SDL_EVENT_GAMEPAD_REMAPPED: ControllerDevice,
 }
 
 
@@ -1618,7 +1622,7 @@ def remove_watch(callback: Callable[[Event], None]) -> None:
         warnings.warn(f"{callback} is not an active event watcher, nothing was removed.", RuntimeWarning, stacklevel=2)
         return
     handle = _event_watch_handles[callback]
-    lib.SDL_DelEventWatch(lib._sdl_event_watcher, handle)
+    lib.SDL_RemoveEventWatch(lib._sdl_event_watcher, handle)
     del _event_watch_handles[callback]
 
 
@@ -2129,35 +2133,41 @@ class Scancode(enum.IntEnum):
     RALT = 230
     RGUI = 231
     MODE = 257
-    AUDIONEXT = 258
-    AUDIOPREV = 259
-    AUDIOSTOP = 260
-    AUDIOPLAY = 261
-    AUDIOMUTE = 262
-    MEDIASELECT = 263
-    WWW = 264
-    MAIL = 265
-    CALCULATOR = 266
-    COMPUTER = 267
-    AC_SEARCH = 268
-    AC_HOME = 269
-    AC_BACK = 270
-    AC_FORWARD = 271
-    AC_STOP = 272
-    AC_REFRESH = 273
-    AC_BOOKMARKS = 274
-    BRIGHTNESSDOWN = 275
-    BRIGHTNESSUP = 276
-    DISPLAYSWITCH = 277
-    KBDILLUMTOGGLE = 278
-    KBDILLUMDOWN = 279
-    KBDILLUMUP = 280
-    EJECT = 281
-    SLEEP = 282
-    APP1 = 283
-    APP2 = 284
-    AUDIOREWIND = 285
-    AUDIOFASTFORWARD = 286
+    SLEEP = 258
+    WAKE = 259
+    CHANNEL_INCREMENT = 260
+    CHANNEL_DECREMENT = 261
+    MEDIA_PLAY = 262
+    MEDIA_PAUSE = 263
+    MEDIA_RECORD = 264
+    MEDIA_FAST_FORWARD = 265
+    MEDIA_REWIND = 266
+    MEDIA_NEXT_TRACK = 267
+    MEDIA_PREVIOUS_TRACK = 268
+    MEDIA_STOP = 269
+    MEDIA_EJECT = 270
+    MEDIA_PLAY_PAUSE = 271
+    MEDIA_SELECT = 272
+    AC_NEW = 273
+    AC_OPEN = 274
+    AC_CLOSE = 275
+    AC_EXIT = 276
+    AC_SAVE = 277
+    AC_PRINT = 278
+    AC_PROPERTIES = 279
+    AC_SEARCH = 280
+    AC_HOME = 281
+    AC_BACK = 282
+    AC_FORWARD = 283
+    AC_STOP = 284
+    AC_REFRESH = 285
+    AC_BOOKMARKS = 286
+    SOFTLEFT = 287
+    SOFTRIGHT = 288
+    CALL = 289
+    ENDCALL = 290
+    RESERVED = 400
+    COUNT = 512
     # --- end ---
 
     @property
@@ -2179,7 +2189,7 @@ class Scancode(enum.IntEnum):
         Based on the current keyboard layout.
         """
         _init_sdl_video()
-        return KeySym(lib.SDL_GetKeyFromScancode(self.value))
+        return KeySym(lib.SDL_GetKeyFromScancode(self.value, 0, False))  # noqa: FBT003
 
     @property
     def scancode(self) -> Scancode:
@@ -2472,12 +2482,12 @@ class KeySym(enum.IntEnum):
     ESCAPE = 27
     SPACE = 32
     EXCLAIM = 33
-    QUOTEDBL = 34
+    DBLAPOSTROPHE = 34
     HASH = 35
     DOLLAR = 36
     PERCENT = 37
     AMPERSAND = 38
-    QUOTE = 39
+    APOSTROPHE = 39
     LEFTPAREN = 40
     RIGHTPAREN = 41
     ASTERISK = 42
@@ -2508,34 +2518,47 @@ class KeySym(enum.IntEnum):
     RIGHTBRACKET = 93
     CARET = 94
     UNDERSCORE = 95
-    BACKQUOTE = 96
-    a = 97
-    b = 98
-    c = 99
-    d = 100
-    e = 101
-    f = 102
-    g = 103
-    h = 104
-    i = 105
-    j = 106
-    k = 107
-    l = 108  # noqa: E741
-    m = 109
-    n = 110
-    o = 111
-    p = 112
-    q = 113
-    r = 114
-    s = 115
-    t = 116
-    u = 117
-    v = 118
-    w = 119
-    x = 120
-    y = 121
-    z = 122
+    GRAVE = 96
+    A = 97
+    B = 98
+    C = 99
+    D = 100
+    E = 101
+    F = 102
+    G = 103
+    H = 104
+    I = 105  # noqa: E741
+    J = 106
+    K = 107
+    L = 108
+    M = 109
+    N = 110
+    O = 111  # noqa: E741
+    P = 112
+    Q = 113
+    R = 114
+    S = 115
+    T = 116
+    U = 117
+    V = 118
+    W = 119
+    X = 120
+    Y = 121
+    Z = 122
+    LEFTBRACE = 123
+    PIPE = 124
+    RIGHTBRACE = 125
+    TILDE = 126
     DELETE = 127
+    PLUSMINUS = 177
+    EXTENDED_MASK = 536870912
+    LEFT_TAB = 536870913
+    LEVEL5_SHIFT = 536870914
+    MULTI_KEY_COMPOSE = 536870915
+    LMETA = 536870916
+    RMETA = 536870917
+    LHYPER = 536870918
+    RHYPER = 536870919
     SCANCODE_MASK = 1073741824
     CAPSLOCK = 1073741881
     F1 = 1073741882
@@ -2677,35 +2700,39 @@ class KeySym(enum.IntEnum):
     RALT = 1073742054
     RGUI = 1073742055
     MODE = 1073742081
-    AUDIONEXT = 1073742082
-    AUDIOPREV = 1073742083
-    AUDIOSTOP = 1073742084
-    AUDIOPLAY = 1073742085
-    AUDIOMUTE = 1073742086
-    MEDIASELECT = 1073742087
-    WWW = 1073742088
-    MAIL = 1073742089
-    CALCULATOR = 1073742090
-    COMPUTER = 1073742091
-    AC_SEARCH = 1073742092
-    AC_HOME = 1073742093
-    AC_BACK = 1073742094
-    AC_FORWARD = 1073742095
-    AC_STOP = 1073742096
-    AC_REFRESH = 1073742097
-    AC_BOOKMARKS = 1073742098
-    BRIGHTNESSDOWN = 1073742099
-    BRIGHTNESSUP = 1073742100
-    DISPLAYSWITCH = 1073742101
-    KBDILLUMTOGGLE = 1073742102
-    KBDILLUMDOWN = 1073742103
-    KBDILLUMUP = 1073742104
-    EJECT = 1073742105
-    SLEEP = 1073742106
-    APP1 = 1073742107
-    APP2 = 1073742108
-    AUDIOREWIND = 1073742109
-    AUDIOFASTFORWARD = 1073742110
+    SLEEP = 1073742082
+    WAKE = 1073742083
+    CHANNEL_INCREMENT = 1073742084
+    CHANNEL_DECREMENT = 1073742085
+    MEDIA_PLAY = 1073742086
+    MEDIA_PAUSE = 1073742087
+    MEDIA_RECORD = 1073742088
+    MEDIA_FAST_FORWARD = 1073742089
+    MEDIA_REWIND = 1073742090
+    MEDIA_NEXT_TRACK = 1073742091
+    MEDIA_PREVIOUS_TRACK = 1073742092
+    MEDIA_STOP = 1073742093
+    MEDIA_EJECT = 1073742094
+    MEDIA_PLAY_PAUSE = 1073742095
+    MEDIA_SELECT = 1073742096
+    AC_NEW = 1073742097
+    AC_OPEN = 1073742098
+    AC_CLOSE = 1073742099
+    AC_EXIT = 1073742100
+    AC_SAVE = 1073742101
+    AC_PRINT = 1073742102
+    AC_PROPERTIES = 1073742103
+    AC_SEARCH = 1073742104
+    AC_HOME = 1073742105
+    AC_BACK = 1073742106
+    AC_FORWARD = 1073742107
+    AC_STOP = 1073742108
+    AC_REFRESH = 1073742109
+    AC_BOOKMARKS = 1073742110
+    SOFTLEFT = 1073742111
+    SOFTRIGHT = 1073742112
+    CALL = 1073742113
+    ENDCALL = 1073742114
     # --- end ---
 
     @property
@@ -2744,7 +2771,7 @@ class KeySym(enum.IntEnum):
         Based on the current keyboard layout.
         """
         _init_sdl_video()
-        return Scancode(lib.SDL_GetScancodeFromKey(self.value))
+        return Scancode(lib.SDL_GetScancodeFromKey(self.value, ffi.NULL))
 
     @classmethod
     def _missing_(cls, value: object) -> KeySym | None:

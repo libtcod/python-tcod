@@ -49,15 +49,15 @@ def test_sdl_window_bad_types() -> None:
 
 
 def test_sdl_screen_saver(uses_window: None) -> None:
-    tcod.sdl.sys.init()
+    tcod.sdl.sys.init(tcod.sdl.sys.Subsystem.VIDEO)
     assert tcod.sdl.video.screen_saver_allowed(False) is False
     assert tcod.sdl.video.screen_saver_allowed(True) is True
     assert tcod.sdl.video.screen_saver_allowed() is True
 
 
 def test_sdl_render(uses_window: None) -> None:
-    window = tcod.sdl.video.new_window(1, 1)
-    render = tcod.sdl.render.new_renderer(window, software=True, vsync=False, target_textures=True)
+    window = tcod.sdl.video.new_window(4, 4)
+    render = tcod.sdl.render.new_renderer(window, driver="software", vsync=False)
     render.clear()
     render.present()
     render.clear()
@@ -74,9 +74,9 @@ def test_sdl_render(uses_window: None) -> None:
     with pytest.raises(TypeError):
         render.upload_texture(np.zeros((8, 8, 5), np.uint8))
 
-    assert (render.read_pixels() == (0, 0, 0, 255)).all()
+    assert render.read_pixels(rect=(0, 0, 3, 4)).shape == (4, 3, 4)
     assert (render.read_pixels(format="RGB") == (0, 0, 0)).all()
-    assert render.read_pixels(rect=(1, 2, 3, 4)).shape == (4, 3, 4)
+    assert (render.read_pixels() == (0, 0, 0, 255)).all()
 
     render.draw_point((0, 0))
     render.draw_line((0, 0), (1, 1))
@@ -102,7 +102,7 @@ def test_sdl_render(uses_window: None) -> None:
     render.geometry(
         None,
         np.zeros((1, 2), np.float32),
-        np.zeros((1, 4), np.uint8),
+        np.zeros((1, 4), np.float32),
         np.zeros((1, 2), np.float32),
         np.zeros((3,), np.uint8),
     )

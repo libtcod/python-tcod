@@ -3,16 +3,22 @@
 
 from __future__ import annotations
 
+import ast
 import contextlib
 import glob
 import os
 import platform
 import re
+import subprocess
 import sys
 from collections.abc import Iterable, Iterator
 from pathlib import Path
 from typing import Any, ClassVar
 
+import attrs
+import pycparser  # type: ignore[import-untyped]
+import pycparser.c_ast  # type: ignore[import-untyped]
+import pycparser.c_generator  # type: ignore[import-untyped]
 from cffi import FFI
 
 # ruff: noqa: T201
@@ -204,15 +210,16 @@ else:
     extra_link_args.extend(GCC_CFLAGS[tdl_build])
 
 ffi = FFI()
-ffi.cdef(build_sdl.get_cdef())
+sdl_cdef, sdl_strings = build_sdl.get_cdef()
+ffi.cdef(sdl_cdef)
 for include in includes:
     try:
         ffi.cdef(include.header)
-    except Exception:
+    except Exception:  # noqa: PERF203
         # Print the source, for debugging.
         print(f"Error with: {include.path}")
         for i, line in enumerate(include.header.split("\n"), 1):
-            print("%03i %s" % (i, line))
+            print(f"{i:03i} {line}")
         raise
 ffi.cdef(
     """
@@ -221,7 +228,10 @@ ffi.cdef(
 )
 ffi.set_source(
     module_name,
-    "#include <tcod/cffi.h>\n#include <SDL.h>",
+    """\
+#include <tcod/cffi.h>
+#define SDL_oldnames_h_
+#include <SDL3/SDL.h>""",
     include_dirs=include_dirs,
     library_dirs=library_dirs,
     sources=sources,
@@ -380,10 +390,10 @@ def write_library_constants() -> None:
         f.write(f"""{parse_sdl_attrs("SDL_SCANCODE", None)[0]}\n""")
 
         f.write("\n# --- SDL keyboard symbols ---\n")
-        f.write(f"""{parse_sdl_attrs("SDLK", None)[0]}\n""")
+        f.write(f"""{parse_sdl_attrs("SDLK_", None)[0]}\n""")
 
         f.write("\n# --- SDL keyboard modifiers ---\n")
-        f.write("{}\n_REVERSE_MOD_TABLE = {}\n".format(*parse_sdl_attrs("KMOD", None)))
+        f.write("{}\n_REVERSE_MOD_TABLE = {}\n".format(*parse_sdl_attrs("SDL_KMOD", None)))
 
         f.write("\n# --- SDL wheel ---\n")
         f.write("{}\n_REVERSE_WHEEL_TABLE = {}\n".format(*parse_sdl_attrs("SDL_MOUSEWHEEL", all_names)))
@@ -407,6 +417,237 @@ def write_library_constants() -> None:
 
     Path("tcod/event.py").write_text(event_py, encoding="utf-8")
 
+    with Path("tcod/sdl/constants.py").open("w", encoding="utf-8") as f:
+        f.write('"""SDL private constants."""\n\n')
+        for name, value in sdl_strings.items():
+            f.write(f"{name} = {ast.literal_eval(value)!r}\n")
+
+    subprocess.run(["ruff", "format", "--silent", Path("tcod/sdl/constants.py")], check=True)  # noqa: S603, S607
+
+
+def _fix_reserved_name(name: str) -> str:
+    """Add underscores to reserved Python keywords."""
+    assert isinstance(name, str)
+    if name in ("def", "in"):
+        return name + "_"
+    return name
+
+
+@attrs.define(frozen=True)
+class ConvertedParam:
+    name: str = attrs.field(converter=_fix_reserved_name)
+    hint: str
+    original: str
+
+
+def _type_from_names(names: list[str]) -> str:
+    if not names:
+        return ""
+    if names[-1] == "void":
+        return "None"
+    if names in (["unsigned", "char"], ["bool"]):
+        return "bool"
+    if names[-1] in ("size_t", "int", "ptrdiff_t"):
+        return "int"
+    if names[-1] in ("float", "double"):
+        return "float"
+    return "Any"
+
+
+def _param_as_hint(node: pycparser.c_ast.Node, default_name: str) -> ConvertedParam:
+    original = pycparser.c_generator.CGenerator().visit(node)
+    name: str
+    names: list[str]
+    match node:
+        case pycparser.c_ast.Typename(type=pycparser.c_ast.TypeDecl(type=pycparser.c_ast.IdentifierType(names=names))):
+            # Unnamed type
+            return ConvertedParam(default_name, _type_from_names(names), original)
+        case pycparser.c_ast.Decl(
+            name=name, type=pycparser.c_ast.TypeDecl(type=pycparser.c_ast.IdentifierType(names=names))
+        ):
+            # Named type
+            return ConvertedParam(name, _type_from_names(names), original)
+        case pycparser.c_ast.Decl(
+            name=name,
+            type=pycparser.c_ast.ArrayDecl(
+                type=pycparser.c_ast.TypeDecl(type=pycparser.c_ast.IdentifierType(names=names))
+            ),
+        ):
+            # Named array
+            return ConvertedParam(name, "Any", original)
+        case pycparser.c_ast.Decl(name=name, type=pycparser.c_ast.PtrDecl()):
+            # Named pointer
+            return ConvertedParam(name, "Any", original)
+        case pycparser.c_ast.Typename(name=name, type=pycparser.c_ast.PtrDecl()):
+            # Forwarded struct
+            return ConvertedParam(name or default_name, "Any", original)
+        case pycparser.c_ast.TypeDecl(type=pycparser.c_ast.IdentifierType(names=names)):
+            # Return type
+            return ConvertedParam(default_name, _type_from_names(names), original)
+        case pycparser.c_ast.PtrDecl():
+            # Return pointer
+            return ConvertedParam(default_name, "Any", original)
+        case pycparser.c_ast.EllipsisParam():
+            # C variable args
+            return ConvertedParam("*__args", "Any", original)
+        case _:
+            raise AssertionError
+
+
+class DefinitionCollector(pycparser.c_ast.NodeVisitor):  # type: ignore[misc]
+    """Gathers functions and names from C headers."""
+
+    def __init__(self) -> None:
+        """Initialize the object with empty values."""
+        self.functions: list[str] = []
+        """Indented Python function definitions."""
+        self.variables: set[str] = set()
+        """Python variable definitions."""
+
+    def parse_defines(self, string: str, /) -> None:
+        """Parse C define directives into hinted names."""
+        for match in re.finditer(r"#define\s+(\S+)\s+(\S+)\s*", string):
+            name, value = match.groups()
+            if value == "...":
+                self.variables.add(f"{name}: Final[int]")
+            else:
+                self.variables.add(f"{name}: Final[Literal[{value}]] = {value}")
+
+    def visit_Decl(self, node: pycparser.c_ast.Decl) -> None:  # noqa: N802
+        """Parse C FFI functions into type hinted Python functions."""
+        match node:
+            case pycparser.c_ast.Decl(
+                type=pycparser.c_ast.FuncDecl(),
+            ):
+                assert isinstance(node.type.args, pycparser.c_ast.ParamList), type(node.type.args)
+                arg_hints = [_param_as_hint(param, f"arg{i}") for i, param in enumerate(node.type.args.params)]
+                return_hint = _param_as_hint(node.type.type, "")
+                if len(arg_hints) == 1 and arg_hints[0].hint == "None":  # Remove void parameter
+                    arg_hints = []
+
+                python_params = [f"{p.name}: {p.hint}" for p in arg_hints]
+                if python_params:
+                    if arg_hints[-1].name.startswith("*"):
+                        python_params.insert(-1, "/")
+                    else:
+                        python_params.append("/")
+                c_def = pycparser.c_generator.CGenerator().visit(node)
+                python_def = f"""def {node.name}({", ".join(python_params)}) -> {return_hint.hint}:"""
+                self.functions.append(f'''    {python_def}\n        """{c_def}"""''')
+
+    def visit_Enumerator(self, node: pycparser.c_ast.Enumerator) -> None:  # noqa: N802
+        """Parse C enums into hinted names."""
+        name: str | None
+        value: str | int
+        match node:
+            case pycparser.c_ast.Enumerator(name=name, value=None):
+                self.variables.add(f"{name}: Final[int]")
+            case pycparser.c_ast.Enumerator(name=name, value=pycparser.c_ast.ID()):
+                self.variables.add(f"{name}: Final[int]")
+            case pycparser.c_ast.Enumerator(name=name, value=pycparser.c_ast.Constant(value=value)):
+                value = int(str(value).removesuffix("u"), base=0)
+                self.variables.add(f"{name}: Final[Literal[{value}]] = {value}")
+            case pycparser.c_ast.Enumerator(
+                name=name, value=pycparser.c_ast.UnaryOp(op="-", expr=pycparser.c_ast.Constant(value=value))
+            ):
+                value = -int(str(value).removesuffix("u"), base=0)
+                self.variables.add(f"{name}: Final[Literal[{value}]] = {value}")
+            case pycparser.c_ast.Enumerator(name=name):
+                self.variables.add(f"{name}: Final[int]")
+            case _:
+                raise AssertionError
+
+
+def write_hints() -> None:
+    """Write a custom _libtcod.pyi file from C definitions."""
+    function_collector = DefinitionCollector()
+    c = pycparser.CParser()
+
+    # Parse SDL headers
+    cdef = sdl_cdef
+    cdef = cdef.replace("int...", "int")
+    cdef = (
+        """
+typedef int bool;
+typedef int int8_t;
+typedef int uint8_t;
+typedef int int16_t;
+typedef int uint16_t;
+typedef int int32_t;
+typedef int uint32_t;
+typedef int int64_t;
+typedef int uint64_t;
+typedef int wchar_t;
+typedef int intptr_t;
+"""
+        + cdef
+    )
+    for match in re.finditer(r"SDL_PIXELFORMAT_\w+", cdef):
+        function_collector.variables.add(f"{match.group()}: int")
+    cdef = re.sub(r"(typedef enum SDL_PixelFormat).*(SDL_PixelFormat;)", r"\1 \2", cdef, flags=re.DOTALL)
+    cdef = cdef.replace("padding[...]", "padding[]")
+    cdef = cdef.replace("...;} SDL_TouchFingerEvent;", "} SDL_TouchFingerEvent;")
+    function_collector.parse_defines(cdef)
+    cdef = re.sub(r"\n#define .*", "", cdef)
+    cdef = re.sub(r"""extern "Python" \{(.*?)\}""", r"\1", cdef, flags=re.DOTALL)
+    cdef = re.sub(r"//.*", "", cdef)
+    cdef = cdef.replace("...;", ";")
+    ast = c.parse(cdef)
+    function_collector.visit(ast)
+
+    # Parse libtcod headers
+    cdef = "\n".join(include.header for include in includes)
+    function_collector.parse_defines(cdef)
+    cdef = re.sub(r"\n?#define .*", "", cdef)
+    cdef = re.sub(r"//.*", "", cdef)
+    cdef = (
+        """
+typedef int int8_t;
+typedef int uint8_t;
+typedef int int16_t;
+typedef int uint16_t;
+typedef int int32_t;
+typedef int uint32_t;
+typedef int int64_t;
+typedef int uint64_t;
+typedef int wchar_t;
+typedef int intptr_t;
+typedef int ptrdiff_t;
+typedef int size_t;
+typedef unsigned char bool;
+typedef void* SDL_PropertiesID;
+"""
+        + cdef
+    )
+    cdef = re.sub(r"""extern "Python" \{(.*?)\}""", r"\1", cdef, flags=re.DOTALL)
+    function_collector.visit(c.parse(cdef))
+    function_collector.variables.add("TCOD_ctx: Any")
+    function_collector.variables.add("TCOD_COMPILEDVERSION: Final[int]")
+
+    # Write PYI file
+    out_functions = """\n\n    @staticmethod\n""".join(sorted(function_collector.functions))
+    out_variables = "\n    ".join(sorted(function_collector.variables))
+
+    pyi = f"""\
+# Autogenerated with build_libtcod.py
+from typing import Any, Final, Literal
+
+# pyi files for CFFI ports are not standard
+# ruff: noqa: A002, ANN401, D402, D403, D415, N801, N802, N803, N815, PLW0211, PYI021
+
+class _lib:
+    @staticmethod
+{out_functions}
+
+    {out_variables}
+
+lib: _lib
+ffi: Any
+"""
+    Path("tcod/_libtcod.pyi").write_text(pyi)
+    subprocess.run(["ruff", "format", "--silent", Path("tcod/_libtcod.pyi")], check=True)  # noqa: S603, S607
+
 
 if __name__ == "__main__":
+    write_hints()
     write_library_constants()

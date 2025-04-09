@@ -1516,9 +1516,9 @@ def recommended_size() -> tuple[int, int]:
     renderer = lib.TCOD_sys_get_sdl_renderer()
     with ffi.new("int[2]") as xy:
         if renderer:
-            lib.SDL_GetRendererOutputSize(renderer, xy, xy + 1)
+            lib.SDL_GetCurrentRenderOutputSize(renderer, xy, xy + 1)
         else:  # Assume OpenGL if a renderer does not exist.
-            lib.SDL_GL_GetDrawableSize(window, xy, xy + 1)
+            lib.SDL_GetWindowSizeInPixels(window, xy, xy + 1)
         w = max(1, xy[0] // lib.TCOD_ctx.tileset.tile_width)
         h = max(1, xy[1] // lib.TCOD_ctx.tileset.tile_height)
     return w, h

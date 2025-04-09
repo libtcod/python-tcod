@@ -31,7 +31,7 @@ def main() -> None:
     """Show hello world until the window is closed."""
     # Open an SDL window and renderer.
     window = tcod.sdl.video.new_window(720, 480, flags=tcod.sdl.video.WindowFlags.RESIZABLE)
-    renderer = tcod.sdl.render.new_renderer(window, target_textures=True)
+    renderer = tcod.sdl.render.new_renderer(window)
     # Render the text once, then reuse the texture.
     hello_world = render_text(renderer, "Hello World")
     hello_world.color_mod = (64, 255, 64)  # Set the color when copied.

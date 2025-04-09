@@ -10,6 +10,7 @@ requires = [
     "pycparser>=2.14",
     "pcpp==1.30",
     "requests>=2.28.1",
+    "attrs",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -116,6 +117,8 @@ warn_unused_ignores = true
 warn_return_any = true
 implicit_reexport = false
 strict_equality = true
+strict_bytes = true
+extra_checks = true
 exclude = [
     "build/",
     "venv/",

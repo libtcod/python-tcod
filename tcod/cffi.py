@@ -15,17 +15,12 @@ logger = logging.getLogger("tcod")
 
 __sdl_version__ = ""
 
+REQUIRED_SDL_VERSION = (3, 2, 0)
+
 ffi_check = cffi.FFI()
 ffi_check.cdef(
     """
-typedef struct SDL_version
-{
-    uint8_t major;
-    uint8_t minor;
-    uint8_t patch;
-} SDL_version;
-
-void SDL_GetVersion(SDL_version * ver);
+int SDL_GetVersion(void);
 """
 )
 
@@ -33,11 +28,13 @@ void SDL_GetVersion(SDL_version * ver);
 def verify_dependencies() -> None:
     """Try to make sure dependencies exist on this system."""
     if sys.platform == "win32":
-        lib_test: Any = ffi_check.dlopen("SDL2.dll")  # Make sure SDL2.dll is here.
-        version: Any = ffi_check.new("struct SDL_version*")
-        lib_test.SDL_GetVersion(version)  # Need to check this version.
-        version_tuple = version.major, version.minor, version.patch
-        if version_tuple < (2, 0, 5):
+        lib_test: Any = ffi_check.dlopen("SDL3.dll")  # Make sure SDL3.dll is here.
+        int_version = lib_test.SDL_GetVersion()  # Need to check this version.
+        major = int_version // 1000000
+        minor = (int_version // 1000) % 1000
+        patch = int_version % 1000
+        version_tuple = major, minor, patch
+        if version_tuple < REQUIRED_SDL_VERSION:
             msg = f"Tried to load an old version of SDL {version_tuple!r}"
             raise RuntimeError(msg)
 
@@ -48,9 +45,8 @@ def get_architecture() -> str:
 
 
 def get_sdl_version() -> str:
-    sdl_version = ffi.new("SDL_version*")
-    lib.SDL_GetVersion(sdl_version)
-    return f"{sdl_version.major}.{sdl_version.minor}.{sdl_version.patch}"
+    int_version = lib.SDL_GetVersion()
+    return f"{int_version // 1000000}.{(int_version // 1000) % 1000}.{int_version % 1000}"
 
 
 if sys.platform == "win32":
