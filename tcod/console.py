@@ -1368,7 +1368,7 @@ Consider one of the following:
     ) -> None: ...
 
     @overload
-    @deprecated("Parameters cg, fg, bg, bg_blend should be keyword arguments")
+    @deprecated("Parameters ch, fg, bg, bg_blend should be keyword arguments")
     def draw_rect(
         self,
         x: int,
