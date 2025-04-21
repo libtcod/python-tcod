@@ -336,6 +336,33 @@ class Console:
         with this attribute that are independent of a :any:`Console`.
 
         Example:
+            >>> tile_graphics = np.array(  # Tile graphics lookup table
+            ...     [  # (Unicode, foreground, background)
+            ...         (ord("."), (255, 255, 255), (0, 0, 0)),  # Tile 0
+            ...         (ord("#"), (255, 255, 255), (0, 0, 0)),  # Tile 1
+            ...         (ord("^"), (255, 255, 255), (0, 0, 0)),  # Tile 2
+            ...         (ord("~"), (255, 255, 255), (0, 0, 0)),  # Tile 3
+            ...     ],
+            ...     dtype=tcod.console.rgb_graphic,
+            ... )
+            >>> console = tcod.console.Console(6, 5)
+            >>> console.rgb[:] = tile_graphics[  # Convert 2D array of indexes to tile graphics
+            ...     [
+            ...         [1, 1, 1, 1, 1, 1],
+            ...         [1, 0, 2, 0, 0, 1],
+            ...         [1, 0, 0, 3, 3, 1],
+            ...         [1, 0, 0, 3, 3, 1],
+            ...         [1, 1, 1, 1, 1, 1],
+            ...     ],
+            ... ]
+            >>> print(console)
+            <######
+             #.^..#
+             #..~~#
+             #..~~#
+             ######>
+
+        Example:
             >>> con = tcod.console.Console(10, 2)
             >>> BLUE, YELLOW, BLACK = (0, 0, 255), (255, 255, 0), (0, 0, 0)
             >>> con.rgb[0, 0] = ord("@"), YELLOW, BLACK
