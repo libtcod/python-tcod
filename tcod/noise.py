@@ -411,7 +411,7 @@ def grid(
     scale: tuple[float, ...] | float,
     origin: tuple[int, ...] | None = None,
     indexing: Literal["ij", "xy"] = "xy",
-) -> tuple[NDArray[Any], ...]:
+) -> tuple[NDArray[np.number], ...]:
     """Generate a mesh-grid of sample points to use with noise sampling.
 
     Args:
@@ -449,7 +449,7 @@ def grid(
 
     .. versionadded:: 12.2
     """
-    if isinstance(scale, float):
+    if isinstance(scale, (int, float)):
         scale = (scale,) * len(shape)
     if origin is None:
         origin = (0,) * len(shape)

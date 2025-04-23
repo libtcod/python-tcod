@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Fixed
+
+- `tcod.noise.grid` would raise `TypeError` when given a plain integer for scale.
+
 ## [18.0.0] - 2025-04-08
 
 ### Changed

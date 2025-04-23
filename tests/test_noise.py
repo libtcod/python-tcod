@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 import tcod.noise
+import tcod.random
 
 # ruff: noqa: D103
 
@@ -100,3 +101,7 @@ def test_noise_copy() -> None:
     assert repr(noise3) == repr(pickle.loads(pickle.dumps(noise3)))
     noise4 = tcod.noise.Noise(2, seed=42)
     assert repr(noise4) == repr(pickle.loads(pickle.dumps(noise4)))
+
+
+def test_noise_grid() -> None:
+    tcod.noise.grid((2, 2), scale=2)  # Check int scale
