@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Added
+
+- `tcod.path.path2d` computes a path for the most basic cases.
+
 ### Fixed
 
 - `tcod.noise.grid` would raise `TypeError` when given a plain integer for scale.

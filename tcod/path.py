@@ -21,7 +21,7 @@ from __future__ import annotations
 import functools
 import itertools
 import warnings
-from typing import TYPE_CHECKING, Any, Callable, Final
+from typing import TYPE_CHECKING, Any, Callable, Final, Sequence
 
 import numpy as np
 from typing_extensions import Literal, Self
@@ -324,7 +324,7 @@ def _export_dict(array: NDArray[Any]) -> dict[str, Any]:
     }
 
 
-def _export(array: NDArray[np.number]) -> Any:  # noqa: ANN401
+def _export(array: NDArray[np.integer]) -> Any:  # noqa: ANN401
     """Convert a NumPy array into a cffi object."""
     return ffi.new("struct NArray*", _export_dict(array))
 
@@ -355,8 +355,8 @@ def dijkstra2d(  # noqa: PLR0913
     diagonal: int | None = None,
     *,
     edge_map: ArrayLike | None = None,
-    out: NDArray[np.number] | None = ...,  # type: ignore[assignment, unused-ignore]
-) -> NDArray[Any]:
+    out: NDArray[np.integer] | None = ...,  # type: ignore[assignment, unused-ignore]
+) -> NDArray[np.integer]:
     """Return the computed distance of all nodes on a 2D Dijkstra grid.
 
     `distance` is an input array of node distances.  Is this often an
@@ -528,7 +528,7 @@ def hillclimb2d(
     diagonal: bool | None = None,
     *,
     edge_map: ArrayLike | None = None,
-) -> NDArray[Any]:
+) -> NDArray[np.intc]:
     """Return a path on a grid from `start` to the lowest point.
 
     `distance` should be a fully computed distance array.  This kind of array
@@ -1289,7 +1289,7 @@ class Pathfinder:
         self._update_heuristic(goal)
         self._graph._resolve(self)
 
-    def path_from(self, index: tuple[int, ...]) -> NDArray[Any]:
+    def path_from(self, index: tuple[int, ...]) -> NDArray[np.intc]:
         """Return the shortest path from `index` to the nearest root.
 
         The returned array is of shape `(length, ndim)` where `length` is the
@@ -1343,7 +1343,7 @@ class Pathfinder:
         )
         return path[:, ::-1] if self._order == "F" else path
 
-    def path_to(self, index: tuple[int, ...]) -> NDArray[Any]:
+    def path_to(self, index: tuple[int, ...]) -> NDArray[np.intc]:
         """Return the shortest path from the nearest root to `index`.
 
         See :any:`path_from`.
@@ -1370,3 +1370,146 @@ class Pathfinder:
             []
         """
         return self.path_from(index)[::-1]
+
+
+def path2d(  # noqa: C901, PLR0912, PLR0913
+    cost: ArrayLike,
+    *,
+    start_points: Sequence[tuple[int, int]],
+    end_points: Sequence[tuple[int, int]],
+    cardinal: int,
+    diagonal: int | None = None,
+    check_bounds: bool = True,
+) -> NDArray[np.intc]:
+    """Return a path between `start_points` and `end_points`.
+
+    If `start_points` or `end_points` has only one item then this is equivalent to A*.
+    Otherwise it is equivalent to Dijkstra.
+
+    If multiple `start_points` or `end_points` are given then the single shortest path between them is returned.
+
+    Points placed on nodes with a cost of 0 are treated as always reachable from adjacent nodes.
+
+    Args:
+        cost: A 2D array of integers with the cost of each node.
+        start_points: A sequence of one or more starting points indexing `cost`.
+        end_points: A sequence of one or more ending points indexing `cost`.
+        cardinal: The relative cost to move a cardinal direction.
+        diagonal: The relative cost to move a diagonal direction.
+            `None` or `0` will disable diagonal movement.
+        check_bounds: If `False` then out-of-bounds points are silently ignored.
+            If `True` (default) then out-of-bounds points raise :any:`IndexError`.
+
+    Returns:
+        A `(length, 2)` array of indexes of the path including the start and end points.
+        If there is no path then an array with zero items will be returned.
+
+    Example::
+
+        # Note: coordinates in this example are (i, j), or (y, x)
+        >>> cost = np.array([
+        ...     [1, 0, 1, 1, 1, 0, 1],
+        ...     [1, 0, 1, 1, 1, 0, 1],
+        ...     [1, 0, 1, 0, 1, 0, 1],
+        ...     [1, 1, 1, 1, 1, 0, 1],
+        ... ])
+
+        # Endpoints are reachable even when endpoints are on blocked nodes
+        >>> tcod.path.path2d(cost, start_points=[(0, 0)], end_points=[(2, 3)], cardinal=70, diagonal=99)
+        array([[0, 0],
+               [1, 0],
+               [2, 0],
+               [3, 1],
+               [2, 2],
+               [2, 3]], dtype=int...)
+
+        # Unreachable endpoints return a zero length array
+        >>> tcod.path.path2d(cost, start_points=[(0, 0)], end_points=[(3, 6)], cardinal=70, diagonal=99)
+        array([], shape=(0, 2), dtype=int...)
+        >>> tcod.path.path2d(cost, start_points=[(0, 0), (3, 0)], end_points=[(0, 6), (3, 6)], cardinal=70, diagonal=99)
+        array([], shape=(0, 2), dtype=int...)
+        >>> tcod.path.path2d(cost, start_points=[], end_points=[], cardinal=70, diagonal=99)
+        array([], shape=(0, 2), dtype=int...)
+
+        # Overlapping endpoints return a single step
+        >>> tcod.path.path2d(cost, start_points=[(0, 0)], end_points=[(0, 0)], cardinal=70, diagonal=99)
+        array([[0, 0]], dtype=int32)
+
+        # Multiple endpoints return the shortest path
+        >>> tcod.path.path2d(
+        ...     cost, start_points=[(0, 0)], end_points=[(1, 3), (3, 3), (2, 2), (2, 4)], cardinal=70, diagonal=99)
+        array([[0, 0],
+               [1, 0],
+               [2, 0],
+               [3, 1],
+               [2, 2]], dtype=int...)
+        >>> tcod.path.path2d(
+        ...     cost, start_points=[(0, 0), (0, 2)], end_points=[(1, 3), (3, 3), (2, 2), (2, 4)], cardinal=70, diagonal=99)
+        array([[0, 2],
+               [1, 3]], dtype=int...)
+        >>> tcod.path.path2d(cost, start_points=[(0, 0), (0, 2)], end_points=[(3, 2)], cardinal=1)
+        array([[0, 2],
+               [1, 2],
+               [2, 2],
+               [3, 2]], dtype=int...)
+
+        # Checking for out-of-bounds points may be toggled
+        >>> tcod.path.path2d(cost, start_points=[(0, 0)], end_points=[(-1, -1), (3, 1)], cardinal=1)
+        Traceback (most recent call last):
+        ...
+        IndexError: End point (-1, -1) is out-of-bounds of cost shape (4, 7)
+        >>> tcod.path.path2d(cost, start_points=[(0, 0)], end_points=[(-1, -1), (3, 1)], cardinal=1, check_bounds=False)
+        array([[0, 0],
+               [1, 0],
+               [2, 0],
+               [3, 0],
+               [3, 1]], dtype=int...)
+
+    .. versionadded:: Unreleased
+    """
+    cost = np.copy(cost)  # Copy array to later modify nodes to be always reachable
+
+    # Check bounds of endpoints
+    if check_bounds:
+        for points, name in [(start_points, "start"), (end_points, "end")]:
+            for i, j in points:
+                if not (0 <= i < cost.shape[0] and 0 <= j < cost.shape[1]):
+                    msg = f"{name.capitalize()} point {(i, j)!r} is out-of-bounds of cost shape {cost.shape!r}"
+                    raise IndexError(msg)
+    else:
+        start_points = [(i, j) for i, j in start_points if 0 <= i < cost.shape[0] and 0 <= j < cost.shape[1]]
+        end_points = [(i, j) for i, j in end_points if 0 <= i < cost.shape[0] and 0 <= j < cost.shape[1]]
+
+    if not start_points or not end_points:
+        return np.zeros((0, 2), dtype=np.intc)  # Missing endpoints
+
+    # Check if endpoints can be manipulated to use A* for a one-to-many computation
+    reversed_path = False
+    if len(end_points) == 1 and len(start_points) > 1:
+        # Swap endpoints to ensure single start point as the A* goal
+        reversed_path = True
+        start_points, end_points = end_points, start_points
+
+    for ij in start_points:
+        cost[ij] = 1  # Enforce reachability of endpoint
+
+    graph = SimpleGraph(cost=cost, cardinal=cardinal, diagonal=diagonal or 0)
+    pf = Pathfinder(graph)
+    for ij in end_points:
+        pf.add_root(ij)
+
+    if len(start_points) == 1:  # Compute A* from possibly multiple roots to one goal
+        out = pf.path_from(start_points[0])
+        if pf.distance[start_points[0]] == np.iinfo(pf.distance.dtype).max:
+            return np.zeros((0, 2), dtype=np.intc)  # Unreachable endpoint
+        if reversed_path:
+            out = out[::-1]
+        return out
+
+    # Crude Dijkstra implementation until issues with Pathfinder are fixed
+    pf.resolve(None)
+    best_distance, best_ij = min((pf.distance[ij], ij) for ij in start_points)
+    if best_distance == np.iinfo(pf.distance.dtype).max:
+        return np.zeros((0, 2), dtype=np.intc)  # All endpoints unreachable
+
+    return hillclimb2d(pf.distance, best_ij, cardinal=bool(cardinal), diagonal=bool(diagonal))
