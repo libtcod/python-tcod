@@ -6,9 +6,11 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [18.1.0] - 2025-05-05
+
 ### Added
 
-- `tcod.path.path2d` computes a path for the most basic cases.
+- `tcod.path.path2d` to compute paths for the most basic cases.
 
 ### Fixed
 

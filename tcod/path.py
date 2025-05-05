@@ -1465,7 +1465,7 @@ def path2d(  # noqa: C901, PLR0912, PLR0913
                [3, 0],
                [3, 1]], dtype=int...)
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 18.1
     """
     cost = np.copy(cost)  # Copy array to later modify nodes to be always reachable
 
