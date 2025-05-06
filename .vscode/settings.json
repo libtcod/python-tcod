@@ -189,6 +189,7 @@
         "iinfo",
         "IJKL",
         "imageio",
+        "imread",
         "INCOL",
         "INROW",
         "interactable",

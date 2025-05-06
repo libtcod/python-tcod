@@ -126,20 +126,20 @@ class Tileset:
             # Normal usage when a tile already has its own alpha channel.
             # The loaded tile must be the correct shape for the tileset you assign it to.
             # The tile is assigned to a private use area and will not conflict with any exiting codepoint.
-            tileset.set_tile(0x100000, imageio.load("rgba_tile.png"))
+            tileset.set_tile(0x100000, imageio.imread("rgba_tile.png"))
 
             # Load a greyscale tile.
-            tileset.set_tile(0x100001, imageio.load("greyscale_tile.png"), pilmode="L")
+            tileset.set_tile(0x100001, imageio.imread("greyscale_tile.png"), mode="L")
             # If you are stuck with an RGB array then you can use the red channel as the input: `rgb[:, :, 0]`
 
             # Loads an RGB sprite without a background.
-            tileset.set_tile(0x100002, imageio.load("rgb_no_background.png", pilmode="RGBA"))
+            tileset.set_tile(0x100002, imageio.imread("rgb_no_background.png", mode="RGBA"))
             # If you're stuck with an RGB array then you can pad the channel axis with an alpha of 255:
             #   rgba = np.pad(rgb, pad_width=((0, 0), (0, 0), (0, 1)), constant_values=255)
 
             # Loads an RGB sprite with a key color background.
             KEY_COLOR = np.asarray((255, 0, 255), dtype=np.uint8)
-            sprite_rgb = imageio.load("rgb_tile.png")
+            sprite_rgb = imageio.imread("rgb_tile.png")
             # Compare the RGB colors to KEY_COLOR, compress full matches to a 2D mask.
             sprite_mask = (sprite_rgb != KEY_COLOR).all(axis=2)
             # Generate the alpha array, with 255 as the foreground and 0 as the background.
