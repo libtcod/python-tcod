@@ -1364,6 +1364,8 @@ def main() -> None:
             sample_console.blit(root_console, SAMPLE_SCREEN_X, SAMPLE_SCREEN_Y)
             draw_stats()
             if context.sdl_renderer:
+                # Clear the renderer on each frame
+                context.sdl_renderer.clear()
                 # SDL renderer support, upload the sample console background to a minimap texture.
                 sample_minimap.update(sample_console.rgb.T["bg"])
                 # Render the root_console normally, this is the drawing step of context.present without presenting.
