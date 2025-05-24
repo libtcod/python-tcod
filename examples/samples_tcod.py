@@ -18,13 +18,20 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+import tcod.bsp
 import tcod.cffi
+import tcod.console
 import tcod.context
 import tcod.event
+import tcod.image
+import tcod.los
+import tcod.map
 import tcod.noise
+import tcod.path
 import tcod.render
 import tcod.sdl.mouse
 import tcod.sdl.render
+import tcod.tileset
 from tcod import libtcodpy
 from tcod.sdl.video import WindowFlags
 
@@ -103,14 +110,9 @@ class Sample(tcod.event.EventDispatch[None]):
             else:
                 libtcodpy.sys_save_screenshot()
                 print("png")
-        elif event.sym == tcod.event.KeySym.ESCAPE:
-            raise SystemExit
         elif event.sym in RENDERER_KEYS:
             # Swap the active context for one with a different renderer.
             init_context(RENDERER_KEYS[event.sym])
-
-    def ev_quit(self, event: tcod.event.Quit) -> None:
-        raise SystemExit
 
 
 class TrueColorSample(Sample):
@@ -1364,6 +1366,9 @@ def main() -> None:
             sample_console.blit(root_console, SAMPLE_SCREEN_X, SAMPLE_SCREEN_Y)
             draw_stats()
             if context.sdl_renderer:
+                # Clear the screen to ensure no garbage data outside of the logical area is displayed
+                context.sdl_renderer.draw_color = (0, 0, 0, 255)
+                context.sdl_renderer.clear()
                 # SDL renderer support, upload the sample console background to a minimap texture.
                 sample_minimap.update(sample_console.rgb.T["bg"])
                 # Render the root_console normally, this is the drawing step of context.present without presenting.
@@ -1418,6 +1423,8 @@ def handle_events() -> None:
 
         SAMPLES[cur_sample].dispatch(event)
         if isinstance(event, tcod.event.Quit):
+            raise SystemExit
+        if isinstance(event, tcod.event.KeyDown) and event.sym == tcod.event.KeySym.ESCAPE:
             raise SystemExit
 
 
