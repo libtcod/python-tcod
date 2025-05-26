@@ -8,11 +8,12 @@ See :ref:`getting-started` for info on how to set those up.
 from __future__ import annotations
 
 import warnings
+from collections.abc import Iterable
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterable, overload
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
-from typing_extensions import Literal, Self, deprecated
+from typing_extensions import Self, deprecated
 
 import tcod._internal
 import tcod.constants

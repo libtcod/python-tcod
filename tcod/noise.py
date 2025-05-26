@@ -36,10 +36,10 @@ from __future__ import annotations
 
 import enum
 import warnings
-from typing import TYPE_CHECKING, Any, Sequence
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
-from typing_extensions import Literal
 
 import tcod.constants
 import tcod.random
@@ -459,5 +459,7 @@ def grid(
     if len(shape) != len(origin):
         msg = "shape must have the same length as origin"
         raise TypeError(msg)
-    indexes = (np.arange(i_shape) * i_scale + i_origin for i_shape, i_scale, i_origin in zip(shape, scale, origin))
+    indexes = (
+        np.arange(i_shape) * i_scale + i_origin for i_shape, i_scale, i_origin in zip(shape, scale, origin, strict=True)
+    )
     return tuple(np.meshgrid(*indexes, copy=False, sparse=True, indexing=indexing))

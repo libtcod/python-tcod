@@ -9,8 +9,9 @@ import os
 import platform
 import re
 import sys
+from collections.abc import Iterable, Iterator
 from pathlib import Path
-from typing import Any, ClassVar, Iterable, Iterator
+from typing import Any, ClassVar
 
 from cffi import FFI
 
@@ -20,7 +21,7 @@ sys.path.append(str(Path(__file__).parent))  # Allow importing local modules.
 
 import build_sdl
 
-Py_LIMITED_API = 0x03060000
+Py_LIMITED_API = 0x03100000
 
 HEADER_PARSE_PATHS = ("tcod/", "libtcod/src/libtcod/")
 HEADER_PARSE_EXCLUDES = ("gl2_ext_.h", "renderer_gl_internal.h", "event.h")

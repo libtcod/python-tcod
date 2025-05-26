@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, List
+from typing import Any
 
 from tcod._internal import deprecate
 from tcod.cffi import lib
 
 
-class Color(List[int]):
+class Color(list[int]):
     """Old-style libtcodpy color class.
 
     Args:

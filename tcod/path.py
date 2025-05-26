@@ -21,10 +21,11 @@ from __future__ import annotations
 import functools
 import itertools
 import warnings
-from typing import TYPE_CHECKING, Any, Callable, Final, Sequence
+from collections.abc import Callable, Sequence
+from typing import TYPE_CHECKING, Any, Final, Literal
 
 import numpy as np
-from typing_extensions import Literal, Self
+from typing_extensions import Self
 
 import tcod.map
 from tcod._internal import _check
@@ -134,7 +135,7 @@ class NodeCostArray(np.ndarray):  # type: ignore[type-arg]
 
     def __new__(cls, array: ArrayLike) -> Self:
         """Validate a numpy array and setup a C callback."""
-        return np.asarray(array).view(cls)  # type: ignore[no-any-return]
+        return np.asarray(array).view(cls)
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({repr(self.view(np.ndarray))!r})"
@@ -182,11 +183,11 @@ class _PathFinder:
             self._callback,
             self._userdata,
             self.shape,
-        ) = self.cost.get_tcod_path_ffi()
+        ) = self.cost.get_tcod_path_ffi()  # type: ignore[union-attr]
         self._path_c = ffi.gc(
             self._path_new_using_function(
-                self.cost.shape[0],
-                self.cost.shape[1],
+                self.cost.shape[0],  # type: ignore[union-attr]
+                self.cost.shape[1],  # type: ignore[union-attr]
                 self._callback,
                 self._userdata,
                 diagonal,
@@ -900,8 +901,13 @@ class CustomGraph:
         edge_costs = edge_map[edge_nz]
         edge_array = np.transpose(edge_nz)
         edge_array -= edge_center
-        for edge, edge_cost in zip(edge_array, edge_costs):
-            self.add_edge(tuple(edge), edge_cost, cost=cost, condition=condition)
+        for edge, edge_cost in zip(edge_array, edge_costs, strict=True):
+            self.add_edge(
+                tuple(edge.tolist()),  # type: ignore[arg-type]
+                edge_cost,
+                cost=cost,
+                condition=condition,
+            )
 
     def set_heuristic(self, *, cardinal: int = 0, diagonal: int = 0, z: int = 0, w: int = 0) -> None:
         """Set a pathfinder heuristic so that pathfinding can done with A*.

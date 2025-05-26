@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import random
 import warnings
-from typing import Callable, Iterator
+from collections.abc import Callable, Iterator
 
 import pytest
 

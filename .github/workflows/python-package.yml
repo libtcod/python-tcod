@@ -95,14 +95,14 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-latest", "windows-latest"]
-        python-version: ["3.8", "pypy-3.8"]
+        python-version: ["3.10", "pypy-3.10"]
         architecture: ["x64"]
         include:
           - os: "windows-latest"
-            python-version: "3.8"
+            python-version: "3.10"
             architecture: "x86"
           - os: "windows-latest"
-            python-version: "pypy-3.8"
+            python-version: "pypy-3.10"
             architecture: "x86"
       fail-fast: false
 
@@ -215,9 +215,9 @@ jobs:
     strategy:
       matrix:
         arch: ["x86_64", "aarch64"]
-        build: ["cp38-manylinux*", "pp38-manylinux*"]
+        build: ["cp310-manylinux*", "pp310-manylinux*"]
     env:
-      BUILD_DESC:
+      BUILD_DESC: ""
     steps:
       - uses: actions/checkout@v4
         with:
@@ -272,9 +272,9 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python: ["cp38-*_universal2", "pp38-*"]
+        python: ["cp310-*_universal2", "pp310-*"]
     env:
-      PYTHON_DESC:
+      PYTHON_DESC: ""
     steps:
       - uses: actions/checkout@v4
         with:

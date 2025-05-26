@@ -5,9 +5,10 @@ from __future__ import annotations
 import locale
 import sys
 import warnings
-from typing import TYPE_CHECKING, Any, AnyStr, Callable, NoReturn, SupportsInt, TypeVar
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any, AnyStr, Literal, NoReturn, SupportsInt, TypeVar
 
-from typing_extensions import Literal, LiteralString, deprecated
+from typing_extensions import LiteralString, deprecated
 
 from tcod.cffi import ffi, lib
 

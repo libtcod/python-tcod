@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
-from typing_extensions import Literal
 
 import tcod._internal
 import tcod.constants
@@ -262,6 +261,6 @@ def compute_fov(
             ffi.from_buffer("struct TCOD_MapCell*", map_buffer),
         ),
     )
-    map_buffer["transparent"] = transparency
+    map_buffer["transparent"] = transparency  # type: ignore[call-overload]
     lib.TCOD_map_compute_fov(map_cdata, pov[1], pov[0], radius, light_walls, algorithm)
-    return map_buffer["fov"]
+    return map_buffer["fov"]  # type: ignore[no-any-return,call-overload]

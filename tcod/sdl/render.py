@@ -6,10 +6,10 @@
 from __future__ import annotations
 
 import enum
-from typing import TYPE_CHECKING, Any, Final, Sequence
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any, Final, Literal
 
 import numpy as np
-from typing_extensions import Literal
 
 import tcod.sdl.video
 from tcod.cffi import ffi, lib

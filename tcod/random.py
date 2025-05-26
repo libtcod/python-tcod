@@ -12,7 +12,8 @@ from __future__ import annotations
 import os
 import random
 import warnings
-from typing import Any, Hashable
+from collections.abc import Hashable
+from typing import Any
 
 from typing_extensions import deprecated
 

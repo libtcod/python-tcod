@@ -16,8 +16,9 @@ python-tcod's pathfinding and field-of-view algorithms.
 from __future__ import annotations
 
 import itertools
+from collections.abc import Iterable
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterable
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from typing_extensions import deprecated

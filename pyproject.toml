@@ -18,7 +18,7 @@ dynamic = ["version"]
 description = "The official Python port of libtcod."
 authors = [{ name = "Kyle Benesch", email = "4b796c65+tcod@gmail.com" }]
 readme = "README.rst"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 license = { text = "Simplified BSD License" }
 dependencies = [
     "cffi>=1.15",
@@ -45,11 +45,10 @@ classifiers = [
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
     "Topic :: Games/Entertainment",
@@ -70,20 +69,10 @@ Tracker = "https://github.com/libtcod/python-tcod/issues"
 Forum = "https://github.com/libtcod/python-tcod/discussions"
 
 [tool.distutils.bdist_wheel]
-py-limited-api = "cp38"
+py-limited-api = "cp310"
 
 [tool.setuptools_scm]
 write_to = "tcod/version.py"
-
-[tool.black]
-line-length = 120
-target-version = ["py38"]
-
-[tool.isort]
-profile = "black"
-py_version = "38"
-skip_gitignore = true
-line_length = 120
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -106,7 +95,7 @@ filterwarnings = [
 
 [tool.mypy]
 files = ["."]
-python_version = "3.9"
+python_version = "3.10"
 warn_unused_configs = true
 show_error_codes = true
 disallow_subclassing_any = true

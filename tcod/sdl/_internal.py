@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import logging
 import sys as _sys
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable, NoReturn, TypeVar
+from typing import TYPE_CHECKING, Any, NoReturn, TypeVar
 
 from tcod.cffi import ffi, lib
 

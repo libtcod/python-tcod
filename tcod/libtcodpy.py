@@ -6,11 +6,12 @@ import atexit
 import sys
 import threading
 import warnings
+from collections.abc import Callable, Hashable, Iterable, Iterator, Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Hashable, Iterable, Iterator, Sequence
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
-from typing_extensions import Literal, deprecated
+from typing_extensions import deprecated
 
 import tcod.bsp
 import tcod.console

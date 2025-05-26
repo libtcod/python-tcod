@@ -8,7 +8,6 @@
 import statistics
 import time
 from collections import deque
-from typing import Deque, Optional
 
 import tcod
 
@@ -25,11 +24,11 @@ class Clock:
     def __init__(self) -> None:
         """Initialize this object with empty data."""
         self.last_time = time.perf_counter()  # Last time this was synced.
-        self.time_samples: Deque[float] = deque()  # Delta time samples.
+        self.time_samples: deque[float] = deque()  # Delta time samples.
         self.max_samples = 64  # Number of fps samples to log.  Can be changed.
         self.drift_time = 0.0  # Tracks how much the last frame was overshot.
 
-    def sync(self, fps: Optional[float] = None) -> float:
+    def sync(self, fps: float | None = None) -> float:
         """Sync to a given framerate and return the delta time.
 
         `fps` is the desired framerate in frames-per-second.  If None is given

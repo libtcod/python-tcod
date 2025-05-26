@@ -48,10 +48,11 @@ import enum
 import sys
 import threading
 import time
-from typing import TYPE_CHECKING, Any, Callable, Final, Hashable, Iterator
+from collections.abc import Callable, Hashable, Iterator
+from typing import TYPE_CHECKING, Any, Final, Literal
 
 import numpy as np
-from typing_extensions import Literal, Self
+from typing_extensions import Self
 
 import tcod.sdl.sys
 from tcod.cffi import ffi, lib

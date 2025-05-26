@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import argparse
 import unicodedata
-from typing import Iterable, Iterator
+from collections.abc import Iterable, Iterator
 
 from tabulate import tabulate
 

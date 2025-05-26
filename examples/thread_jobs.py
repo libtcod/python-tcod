@@ -19,7 +19,7 @@ import multiprocessing
 import platform
 import sys
 import timeit
-from typing import Callable, List, Tuple
+from collections.abc import Callable
 
 import tcod.map
 
@@ -37,35 +37,35 @@ def test_fov(map_: tcod.map.Map) -> tcod.map.Map:
     return map_
 
 
-def test_fov_single(maps: List[tcod.map.Map]) -> None:
+def test_fov_single(maps: list[tcod.map.Map]) -> None:
     for map_ in maps:
         test_fov(map_)
 
 
-def test_fov_threads(executor: concurrent.futures.Executor, maps: List[tcod.map.Map]) -> None:
+def test_fov_threads(executor: concurrent.futures.Executor, maps: list[tcod.map.Map]) -> None:
     for _result in executor.map(test_fov, maps):
         pass
 
 
-def test_astar(map_: tcod.map.Map) -> List[Tuple[int, int]]:
+def test_astar(map_: tcod.map.Map) -> list[tuple[int, int]]:
     astar = tcod.path.AStar(map_)
     return astar.get_path(0, 0, MAP_WIDTH - 1, MAP_HEIGHT - 1)
 
 
-def test_astar_single(maps: List[tcod.map.Map]) -> None:
+def test_astar_single(maps: list[tcod.map.Map]) -> None:
     for map_ in maps:
         test_astar(map_)
 
 
-def test_astar_threads(executor: concurrent.futures.Executor, maps: List[tcod.map.Map]) -> None:
+def test_astar_threads(executor: concurrent.futures.Executor, maps: list[tcod.map.Map]) -> None:
     for _result in executor.map(test_astar, maps):
         pass
 
 
 def run_test(
-    maps: List[tcod.map.Map],
-    single_func: Callable[[List[tcod.map.Map]], None],
-    multi_func: Callable[[concurrent.futures.Executor, List[tcod.map.Map]], None],
+    maps: list[tcod.map.Map],
+    single_func: Callable[[list[tcod.map.Map]], None],
+    multi_func: Callable[[concurrent.futures.Executor, list[tcod.map.Map]], None],
 ) -> None:
     """Run a function designed for a single thread and compare it to a threaded version.
 

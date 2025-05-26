@@ -1209,7 +1209,7 @@ class FastRenderSample(Sample):
             # new pixels are based on absolute elapsed time
             int_abs_t = int(self.abs_t)
 
-            texture = np.roll(texture, -int_t, 1)
+            texture = np.roll(texture, -int_t, 1)  # type: ignore[assignment]
             # replace new stretch of texture with new values
             for v in range(RES_V - int_t, RES_V):
                 for u in range(RES_U):

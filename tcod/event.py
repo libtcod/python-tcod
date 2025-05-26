@@ -84,10 +84,11 @@ from __future__ import annotations
 
 import enum
 import warnings
-from typing import TYPE_CHECKING, Any, Callable, Final, Generic, Iterator, Mapping, NamedTuple, TypeVar
+from collections.abc import Callable, Iterator, Mapping
+from typing import TYPE_CHECKING, Any, Final, Generic, Literal, NamedTuple, TypeVar
 
 import numpy as np
-from typing_extensions import Literal, deprecated
+from typing_extensions import deprecated
 
 import tcod.event
 import tcod.event_constants

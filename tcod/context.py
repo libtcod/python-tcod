@@ -29,10 +29,11 @@ import copy
 import pickle
 import sys
 import warnings
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable, NoReturn, TypeVar
+from typing import Any, Literal, NoReturn, TypeVar
 
-from typing_extensions import Literal, Self, deprecated
+from typing_extensions import Self, deprecated
 
 import tcod.console
 import tcod.event

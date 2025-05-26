@@ -1,7 +1,8 @@
 """Tests for the libtcodpy API."""
 
+from collections.abc import Callable, Iterator
 from pathlib import Path
-from typing import Any, Callable, Iterator, List, Optional, Tuple, Union
+from typing import Any
 
 import numpy as np
 import pytest
@@ -37,9 +38,9 @@ def assert_char(  # noqa: PLR0913
     console: tcod.console.Console,
     x: int,
     y: int,
-    ch: Optional[Union[str, int]] = None,
-    fg: Optional[Tuple[int, int, int]] = None,
-    bg: Optional[Tuple[int, int, int]] = None,
+    ch: str | int | None = None,
+    fg: tuple[int, int, int] | None = None,
+    bg: tuple[int, int, int] | None = None,
 ) -> None:
     if ch is not None:
         if isinstance(ch, str):
@@ -52,7 +53,7 @@ def assert_char(  # noqa: PLR0913
 
 
 @pytest.mark.filterwarnings("ignore")
-def test_console_defaults(console: tcod.console.Console, fg: Tuple[int, int, int], bg: Tuple[int, int, int]) -> None:
+def test_console_defaults(console: tcod.console.Console, fg: tuple[int, int, int], bg: tuple[int, int, int]) -> None:
     libtcodpy.console_set_default_foreground(console, fg)
     libtcodpy.console_set_default_background(console, bg)
     libtcodpy.console_clear(console)
@@ -60,13 +61,13 @@ def test_console_defaults(console: tcod.console.Console, fg: Tuple[int, int, int
 
 
 @pytest.mark.filterwarnings("ignore")
-def test_console_set_char_background(console: tcod.console.Console, bg: Tuple[int, int, int]) -> None:
+def test_console_set_char_background(console: tcod.console.Console, bg: tuple[int, int, int]) -> None:
     libtcodpy.console_set_char_background(console, 0, 0, bg, libtcodpy.BKGND_SET)
     assert_char(console, 0, 0, bg=bg)
 
 
 @pytest.mark.filterwarnings("ignore")
-def test_console_set_char_foreground(console: tcod.console.Console, fg: Tuple[int, int, int]) -> None:
+def test_console_set_char_foreground(console: tcod.console.Console, fg: tuple[int, int, int]) -> None:
     libtcodpy.console_set_char_foreground(console, 0, 0, fg)
     assert_char(console, 0, 0, fg=fg)
 
@@ -85,14 +86,14 @@ def test_console_put_char(console: tcod.console.Console, ch: int) -> None:
 
 @pytest.mark.filterwarnings("ignore")
 def console_put_char_ex(
-    console: tcod.console.Console, ch: int, fg: Tuple[int, int, int], bg: Tuple[int, int, int]
+    console: tcod.console.Console, ch: int, fg: tuple[int, int, int], bg: tuple[int, int, int]
 ) -> None:
     libtcodpy.console_put_char_ex(console, 0, 0, ch, fg, bg)
     assert_char(console, 0, 0, ch=ch, fg=fg, bg=bg)
 
 
 @pytest.mark.filterwarnings("ignore")
-def test_console_printing(console: tcod.console.Console, fg: Tuple[int, int, int], bg: Tuple[int, int, int]) -> None:
+def test_console_printing(console: tcod.console.Console, fg: tuple[int, int, int], bg: tuple[int, int, int]) -> None:
     libtcodpy.console_set_background_flag(console, libtcodpy.BKGND_SET)
     assert libtcodpy.console_get_background_flag(console) == libtcodpy.BKGND_SET
 
@@ -182,8 +183,8 @@ def test_console_rexpaint_save_load(
     console: tcod.console.Console,
     tmp_path: Path,
     ch: int,
-    fg: Tuple[int, int, int],
-    bg: Tuple[int, int, int],
+    fg: tuple[int, int, int],
+    bg: tuple[int, int, int],
 ) -> None:
     libtcodpy.console_print(console, 0, 0, "test")
     libtcodpy.console_put_char_ex(console, 1, 1, ch, fg, bg)
@@ -206,7 +207,7 @@ def test_console_rexpaint_list_save_load(console: tcod.console.Console, tmp_path
     assert libtcodpy.console_list_save_xp([con1, con2], xp_file, 1)
     loaded_consoles = libtcodpy.console_list_load_xp(xp_file)
     assert loaded_consoles
-    for a, b in zip([con1, con2], loaded_consoles):
+    for a, b in zip([con1, con2], loaded_consoles, strict=True):
         assertConsolesEqual(a, b)
         libtcodpy.console_delete(a)
         libtcodpy.console_delete(b)
@@ -260,9 +261,9 @@ def test_console_fill_numpy(console: tcod.console.Console) -> None:
     for y in range(height):
         fill[y, :] = y % 256
 
-    libtcodpy.console_fill_background(console, fill, fill, fill)
-    libtcodpy.console_fill_foreground(console, fill, fill, fill)
-    libtcodpy.console_fill_char(console, fill)
+    libtcodpy.console_fill_background(console, fill, fill, fill)  # type: ignore[arg-type]
+    libtcodpy.console_fill_foreground(console, fill, fill, fill)  # type: ignore[arg-type]
+    libtcodpy.console_fill_char(console, fill)  # type: ignore[arg-type]
 
     # verify fill
     bg: NDArray[np.intc] = np.zeros((height, width), dtype=np.intc)
@@ -273,10 +274,10 @@ def test_console_fill_numpy(console: tcod.console.Console) -> None:
             bg[y, x] = libtcodpy.console_get_char_background(console, x, y)[0]
             fg[y, x] = libtcodpy.console_get_char_foreground(console, x, y)[0]
             ch[y, x] = libtcodpy.console_get_char(console, x, y)
-    fill = fill.tolist()
-    assert fill == bg.tolist()
-    assert fill == fg.tolist()
-    assert fill == ch.tolist()
+    fill_ = fill.tolist()
+    assert fill_ == bg.tolist()
+    assert fill_ == fg.tolist()
+    assert fill_ == ch.tolist()
 
 
 @pytest.mark.filterwarnings("ignore")
@@ -405,7 +406,7 @@ def test_line_step() -> None:
 def test_line() -> None:
     """Tests normal use, lazy evaluation, and error propagation."""
     # test normal results
-    test_result: List[Tuple[int, int]] = []
+    test_result: list[tuple[int, int]] = []
 
     def line_test(x: int, y: int) -> bool:
         test_result.append((x, y))
@@ -697,8 +698,8 @@ def test_astar(map_: tcod.map.Map) -> None:
     assert libtcodpy.path_size(astar) > 0
     assert not libtcodpy.path_is_empty(astar)
 
-    x: Optional[int]
-    y: Optional[int]
+    x: int | None
+    y: int | None
 
     for i in range(libtcodpy.path_size(astar)):
         x, y = libtcodpy.path_get(astar, i)
@@ -735,8 +736,8 @@ def test_dijkstra(map_: tcod.map.Map) -> None:
 
     libtcodpy.dijkstra_reverse(path)
 
-    x: Optional[int]
-    y: Optional[int]
+    x: int | None
+    y: int | None
 
     for i in range(libtcodpy.dijkstra_size(path)):
         x, y = libtcodpy.dijkstra_get(path, i)

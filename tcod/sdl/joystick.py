@@ -6,10 +6,8 @@
 from __future__ import annotations
 
 import enum
-from typing import Any, ClassVar, Final
+from typing import Any, ClassVar, Final, Literal
 from weakref import WeakValueDictionary
-
-from typing_extensions import Literal
 
 import tcod.sdl.sys
 from tcod.cffi import ffi, lib

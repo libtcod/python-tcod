@@ -9,7 +9,7 @@ You will need to get this external library from PyPI:
 # To the extent possible under law, the libtcod maintainers have waived all
 # copyright and related or neighboring rights to this example script.
 # https://creativecommons.org/publicdomain/zero/1.0/
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING
 
 import freetype  # type: ignore  # pip install freetype-py
 import numpy as np
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 FONT = "VeraMono.ttf"
 
 
-def load_ttf(path: str, size: Tuple[int, int]) -> tcod.tileset.Tileset:
+def load_ttf(path: str, size: tuple[int, int]) -> tcod.tileset.Tileset:
     """Load a TTF file and return a tcod Tileset.
 
     `path` is the file path to the font, this can be any font supported by the

@@ -5,8 +5,6 @@
 # https://creativecommons.org/publicdomain/zero/1.0/
 """An demonstration of event handling using the tcod.event module."""
 
-from typing import List, Set
-
 import tcod.context
 import tcod.event
 import tcod.sdl.joystick
@@ -17,11 +15,11 @@ WIDTH, HEIGHT = 720, 480
 
 def main() -> None:
     """Example program for tcod.event."""
-    event_log: List[str] = []
+    event_log: list[str] = []
     motion_desc = ""
     tcod.sdl.joystick.init()
-    controllers: Set[tcod.sdl.joystick.GameController] = set()
-    joysticks: Set[tcod.sdl.joystick.Joystick] = set()
+    controllers: set[tcod.sdl.joystick.GameController] = set()
+    joysticks: set[tcod.sdl.joystick.Joystick] = set()
 
     with tcod.context.new(width=WIDTH, height=HEIGHT) as context:
         console = context.new_console()
