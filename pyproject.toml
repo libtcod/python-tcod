@@ -2,8 +2,9 @@
 requires = [
     # setuptools >=64.0.0 might break editable installs
     # https://github.com/pypa/setuptools/issues/3548
-    "setuptools >=61.0.0",
+    "setuptools >=77.0.3",
     "setuptools_scm[toml]>=6.2",
+    "packaging>=24.2",
     "wheel>=0.37.1",
     "cffi>=1.15",
     "pycparser>=2.14",
@@ -19,7 +20,12 @@ description = "The official Python port of libtcod."
 authors = [{ name = "Kyle Benesch", email = "4b796c65+tcod@gmail.com" }]
 readme = "README.rst"
 requires-python = ">=3.10"
-license = { text = "Simplified BSD License" }
+license = "BSD-2-Clause"
+license-files = [
+    "LICENSE.txt",
+    "libtcod/LICENSE.txt",
+    "libtcod/LIBTCOD-CREDITS.txt",
+]
 dependencies = [
     "cffi>=1.15",
     'numpy>=1.21.4; implementation_name != "pypy"',
@@ -39,7 +45,6 @@ classifiers = [
     "Environment :: MacOS X",
     "Environment :: X11 Applications",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: BSD License",
     "Natural Language :: English",
     "Operating System :: POSIX",
     "Operating System :: MacOS :: MacOS X",
