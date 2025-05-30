@@ -40,11 +40,7 @@ class WindowFlags(enum.IntFlag):
 
     FULLSCREEN = int(lib.SDL_WINDOW_FULLSCREEN)
     """"""
-    FULLSCREEN_DESKTOP = int(lib.SDL_WINDOW_FULLSCREEN_DESKTOP)
-    """"""
     OPENGL = int(lib.SDL_WINDOW_OPENGL)
-    """"""
-    SHOWN = int(lib.SDL_WINDOW_SHOWN)
     """"""
     HIDDEN = int(lib.SDL_WINDOW_HIDDEN)
     """"""
@@ -56,21 +52,17 @@ class WindowFlags(enum.IntFlag):
     """"""
     MAXIMIZED = int(lib.SDL_WINDOW_MAXIMIZED)
     """"""
-    MOUSE_GRABBED = int(lib.SDL_WINDOW_INPUT_GRABBED)
+    MOUSE_GRABBED = int(lib.SDL_WINDOW_MOUSE_GRABBED)
     """"""
     INPUT_FOCUS = int(lib.SDL_WINDOW_INPUT_FOCUS)
     """"""
     MOUSE_FOCUS = int(lib.SDL_WINDOW_MOUSE_FOCUS)
     """"""
-    FOREIGN = int(lib.SDL_WINDOW_FOREIGN)
-    """"""
-    ALLOW_HIGHDPI = int(lib.SDL_WINDOW_ALLOW_HIGHDPI)
+    ALLOW_HIGHDPI = int(lib.SDL_WINDOW_HIGH_PIXEL_DENSITY)
     """"""
     MOUSE_CAPTURE = int(lib.SDL_WINDOW_MOUSE_CAPTURE)
     """"""
     ALWAYS_ON_TOP = int(lib.SDL_WINDOW_ALWAYS_ON_TOP)
-    """"""
-    SKIP_TASKBAR = int(lib.SDL_WINDOW_SKIP_TASKBAR)
     """"""
     UTILITY = int(lib.SDL_WINDOW_UTILITY)
     """"""

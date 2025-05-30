@@ -6,9 +6,20 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Changed
+
+- Switched to SDL3.
+  This will cause several breaking changes such as the names of keyboard constants and other SDL enums.
+
 ### Removed
 
 - Support dropped for Python 3.8 and 3.9.
+- Removed `Joystick.get_current_power` due to SDL3 changes.
+- `WindowFlags.FULLSCREEN_DESKTOP` is now just `WindowFlags.FULLSCREEN`
+
+### Fixed
+
+- `Joystick.get_ball` was broken.
 
 ## [18.1.0] - 2025-05-05
 

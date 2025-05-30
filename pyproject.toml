@@ -10,6 +10,7 @@ requires = [
     "pycparser>=2.14",
     "pcpp==1.30",
     "requests>=2.28.1",
+    "attrs",
 ]
 build-backend = "setuptools.build_meta"
 
