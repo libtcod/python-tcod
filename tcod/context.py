@@ -68,14 +68,9 @@ __all__ = (
 _Event = TypeVar("_Event", bound=tcod.event.Event)
 
 SDL_WINDOW_FULLSCREEN = lib.SDL_WINDOW_FULLSCREEN
-"""Exclusive fullscreen mode.
-
-It's generally not recommended to use this flag unless you know what you're
-doing.
-`SDL_WINDOW_FULLSCREEN_DESKTOP` should be used instead whenever possible.
-"""
-SDL_WINDOW_FULLSCREEN_DESKTOP = lib.SDL_WINDOW_FULLSCREEN_DESKTOP
-"""A borderless fullscreen window at the desktop resolution."""
+"""Fullscreen mode."""
+# SDL_WINDOW_FULLSCREEN_DESKTOP = lib.SDL_WINDOW_FULLSCREEN_DESKTOP
+# """A borderless fullscreen window at the desktop resolution."""
 SDL_WINDOW_HIDDEN = lib.SDL_WINDOW_HIDDEN
 """Window is hidden."""
 SDL_WINDOW_BORDERLESS = lib.SDL_WINDOW_BORDERLESS
@@ -86,9 +81,9 @@ SDL_WINDOW_MINIMIZED = lib.SDL_WINDOW_MINIMIZED
 """Window is minimized."""
 SDL_WINDOW_MAXIMIZED = lib.SDL_WINDOW_MAXIMIZED
 """Window is maximized."""
-SDL_WINDOW_INPUT_GRABBED = lib.SDL_WINDOW_INPUT_GRABBED
+SDL_WINDOW_INPUT_GRABBED = lib.SDL_WINDOW_MOUSE_GRABBED
 """Window has grabbed the input."""
-SDL_WINDOW_ALLOW_HIGHDPI = lib.SDL_WINDOW_ALLOW_HIGHDPI
+SDL_WINDOW_ALLOW_HIGHDPI = lib.SDL_WINDOW_HIGH_PIXEL_DENSITY
 """High DPI mode, see the SDL documentation."""
 
 RENDERER_OPENGL = lib.TCOD_RENDERER_OPENGL

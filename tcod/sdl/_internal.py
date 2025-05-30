@@ -92,7 +92,7 @@ def _check_p(result: Any) -> Any:  # noqa: ANN401
 
 
 def _compiled_version() -> tuple[int, int, int]:
-    return int(lib.SDL_MAJOR_VERSION), int(lib.SDL_MINOR_VERSION), int(lib.SDL_PATCHLEVEL)
+    return int(lib.SDL_MAJOR_VERSION), int(lib.SDL_MINOR_VERSION), int(lib.SDL_MICRO_VERSION)
 
 
 def _linked_version() -> tuple[int, int, int]:
@@ -122,6 +122,6 @@ def _required_version(required: tuple[int, int, int]) -> Callable[[T], T]:
     return lambda _: replacement  # type: ignore[return-value]
 
 
-lib.SDL_LogSetOutputFunction(lib._sdl_log_output_function, ffi.NULL)
+lib.SDL_SetLogOutputFunction(lib._sdl_log_output_function, ffi.NULL)
 if __debug__:
-    lib.SDL_LogSetAllPriority(lib.SDL_LOG_PRIORITY_VERBOSE)
+    lib.SDL_SetLogPriorities(lib.SDL_LOG_PRIORITY_VERBOSE)

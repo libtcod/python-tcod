@@ -188,7 +188,7 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore[misc]
             return False  # Data type for printing, which is not needed.
         if tokens[0].value.startswith("SDL_PLATFORM_"):
             return False  # Ignore platform definitions
-        return bool(tokens[0].value.startswith("SDL_"))
+        return bool(str(tokens[0].value).startswith(("SDL_", "SDLK_")))
 
     def on_directive_handle(
         self,
