@@ -211,7 +211,7 @@ jobs:
 
   linux-wheels:
     needs: [ruff, mypy]
-    runs-on: "ubuntu-latest"
+    runs-on: ${{ matrix.arch == 'aarch64' && 'ubuntu-24.04-arm' || 'ubuntu-latest'}}
     strategy:
       matrix:
         arch: ["x86_64", "aarch64"]
