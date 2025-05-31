@@ -183,11 +183,11 @@ class _PathFinder:
             self._callback,
             self._userdata,
             self.shape,
-        ) = self.cost.get_tcod_path_ffi()  # type: ignore[union-attr]
+        ) = self.cost.get_tcod_path_ffi()
         self._path_c = ffi.gc(
             self._path_new_using_function(
-                self.cost.shape[0],  # type: ignore[union-attr]
-                self.cost.shape[1],  # type: ignore[union-attr]
+                self.cost.shape[0],
+                self.cost.shape[1],
                 self._callback,
                 self._userdata,
                 diagonal,
