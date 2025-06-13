@@ -14,6 +14,7 @@ defaults:
 
 env:
   git-depth: 0 # Depth to search for tags.
+  sdl-version: "3.2.16" # SDL version to bundle
 
 jobs:
   ruff:
@@ -48,7 +49,7 @@ jobs:
         with:
           install-linux-dependencies: true
           build-type: "Debug"
-          version: "3.2.14"
+          version: ${{ env.sdl-version }}
       - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ env.git-depth }}
@@ -72,7 +73,7 @@ jobs:
     strategy:
       matrix:
         os: ["windows-latest", "macos-latest"]
-        sdl-version: ["3.2.10"]
+        sdl-version: ["3.2.16"]
       fail-fast: true
     steps:
       - uses: actions/checkout@v4
@@ -129,7 +130,7 @@ jobs:
         with:
           install-linux-dependencies: true
           build-type: "Release"
-          version: "3.2.14"
+          version: ${{ env.sdl-version }}
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
@@ -172,7 +173,7 @@ jobs:
         with:
           install-linux-dependencies: true
           build-type: "Debug"
-          version: "3.2.14"
+          version: ${{ env.sdl-version }}
       - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ env.git-depth }}
@@ -214,7 +215,7 @@ jobs:
         with:
           install-linux-dependencies: true
           build-type: "Debug"
-          version: "3.2.14"
+          version: ${{ env.sdl-version }}
       - name: Run tox
         run: |
           tox -vv
@@ -265,7 +266,7 @@ jobs:
                 systemd-devel mesa-libGL-devel libxkbcommon-devel mesa-libGLES-devel \
                 mesa-libEGL-devel vulkan-devel wayland-devel wayland-protocols-devel \
                 libdrm-devel mesa-libgbm-devel libusb-devel
-            git clone --depth 1 --branch release-3.2.10 https://github.com/libsdl-org/SDL.git sdl_repo &&
+            git clone --depth 1 --branch release-${{env.sdl-version}} https://github.com/libsdl-org/SDL.git sdl_repo &&
             cmake -S sdl_repo -B sdl_build &&
             cmake --build sdl_build --config Release &&
             cmake --install sdl_build --config Release --prefix /usr/local &&

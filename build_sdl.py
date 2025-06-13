@@ -33,9 +33,9 @@ BIT_SIZE, LINKAGE = platform.architecture()
 # Reject versions of SDL older than this, update the requirements in the readme if you change this.
 SDL_MIN_VERSION = (3, 2, 0)
 # The SDL version to parse and export symbols from.
-SDL_PARSE_VERSION = os.environ.get("SDL_VERSION", "3.2.10")
+SDL_PARSE_VERSION = os.environ.get("SDL_VERSION", "3.2.16")
 # The SDL version to include in binary distributions.
-SDL_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "3.2.10")
+SDL_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "3.2.16")
 
 
 # Used to remove excessive newlines in debug outputs.

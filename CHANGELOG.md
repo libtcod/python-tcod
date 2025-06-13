@@ -8,7 +8,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ### Changed
 
-- Switched to SDL3.
+- Updated libtcod to 2.1.1
+- Updated SDL to 3.2.16
   This will cause several breaking changes such as the names of keyboard constants and other SDL enums.
 - `tcod.sdl.video.Window.grab` has been split into `.mouse_grab` and `.keyboard_grab` attributes.
 - `tcod.event.KeySym` single letter symbols are now all uppercase.
