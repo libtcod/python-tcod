@@ -20,7 +20,6 @@ Be sure to run [Mypy](https://mypy.readthedocs.io/en/stable/getting_started.html
 - `tcod.event.KeySym` single letter symbols are now all uppercase.
 - Relative mouse mode is set via `tcod.sdl.video.Window.relative_mouse_mode` instead of `tcod.sdl.mouse.set_relative_mode`.
 - `tcod.sdl.render.new_renderer`: Removed `software` and `target_textures` parameters, `vsync` takes `int`, `driver` takes `str` instead of `int`.
-- SDL renderer logical
 - `tcod.sdl.render.Renderer`: `integer_scaling` and `logical_size` are now set with `set_logical_presentation` method.
 - `tcod.sdl.render.Renderer.geometry` now takes float values for `color` instead of 8-bit integers.
 - `tcod.event.Point` and other mouse/tile coordinate types now use `float` instead of `int`.
