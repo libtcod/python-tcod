@@ -276,7 +276,7 @@ class Window:
     def grab(self) -> bool:
         """Get or set this windows input grab mode.
 
-        .. deprecated:: Unreleased
+        .. deprecated:: 19.0
             This attribute as been split into :any:`mouse_grab` and :any:`keyboard_grab`.
         """
         return self.mouse_grab
@@ -289,7 +289,7 @@ class Window:
     def mouse_grab(self) -> bool:
         """Get or set this windows mouse input grab mode.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 19.0
         """
         return bool(lib.SDL_GetWindowMouseGrab(self.p))
 
@@ -303,7 +303,7 @@ class Window:
 
         https://wiki.libsdl.org/SDL3/SDL_SetWindowKeyboardGrab
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 19.0
         """
         return bool(lib.SDL_GetWindowKeyboardGrab(self.p))
 

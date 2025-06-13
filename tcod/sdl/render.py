@@ -48,7 +48,7 @@ class LogicalPresentation(enum.IntEnum):
 
     See https://wiki.libsdl.org/SDL3/SDL_RendererLogicalPresentation
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 19.0
     """
 
     DISABLED = 0
@@ -439,7 +439,7 @@ class Renderer:
         .. seealso::
             https://wiki.libsdl.org/SDL3/SDL_SetRenderLogicalPresentation
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 19.0
         """
         width, height = resolution
         _check(lib.SDL_SetRenderLogicalPresentation(self.p, width, height, mode))
@@ -455,7 +455,7 @@ class Renderer:
 
         .. versionadded:: 13.5
 
-        .. versionchanged:: Unreleased
+        .. versionchanged:: 19.0
             Setter is deprecated, use :any:`set_logical_presentation` instead.
         """
         out = ffi.new("int[2]")
@@ -537,7 +537,7 @@ class Renderer:
 
         .. versionadded:: 15.0
 
-        .. versionchanged:: Unreleased
+        .. versionchanged:: 19.0
             `format` no longer accepts `int` values.
         """
         surface = _check_p(
@@ -681,7 +681,7 @@ class Renderer:
 
         .. versionadded:: 13.5
 
-        .. versionchanged:: Unreleased
+        .. versionchanged:: 19.0
             `color` now takes float values instead of 8-bit integers.
         """
         xy = np.ascontiguousarray(xy, np.float32)
@@ -741,7 +741,7 @@ def new_renderer(
     .. seealso::
         :func:`tcod.sdl.video.new_window`
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 19.0
         Removed `software` and `target_textures` parameters.
         `vsync` now takes an integer.
         `driver` now take a string.

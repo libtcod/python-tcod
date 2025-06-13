@@ -217,7 +217,7 @@ class AudioDevice:
     .. versionchanged:: 16.0
         Can now be used as a context which will close the device on exit.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 19.0
         Removed `spec` and `callback` attribute.
 
         `queued_samples`, `queue_audio`, and `dequeue_audio` moved to :any:`AudioStream` class.
@@ -269,7 +269,7 @@ class AudioDevice:
         self.is_physical: Final[bool] = bool(lib.SDL_IsAudioDevicePhysical(device_id))
         """True of this is a physical device, or False if this is a logical device.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 19.0
         """
 
     def __repr__(self) -> str:
@@ -294,7 +294,7 @@ class AudioDevice:
     def name(self) -> str:
         """Name of the device.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 19.0
         """
         return str(ffi.string(_check_p(lib.SDL_GetAudioDeviceName(self.device_id))), encoding="utf-8")
 
@@ -304,7 +304,7 @@ class AudioDevice:
 
         Default is 1.0 but can be set higher or zero.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 19.0
         """
         return _check_float(lib.SDL_GetAudioDeviceGain(self.device_id), failure=-1.0)
 
@@ -320,7 +320,7 @@ class AudioDevice:
     ) -> Self:
         """Open a new logical audio device for this device.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 19.0
 
         .. seealso::
             https://wiki.libsdl.org/SDL3/SDL_OpenAudioDevice
@@ -349,7 +349,7 @@ class AudioDevice:
     def stopped(self) -> bool:
         """Is True if the device has failed or was closed.
 
-        .. deprecated:: Unreleased
+        .. deprecated:: 19.0
             No longer used by the SDL3 API.
         """
         return bool(not hasattr(self, "device_id"))
@@ -417,7 +417,7 @@ class AudioDevice:
     def __enter__(self) -> Self:
         """Return self and enter a managed context.
 
-        .. deprecated:: Unreleased
+        .. deprecated:: 19.0
             Use :func:`contextlib.closing` if you want to close this device after a context.
         """
         return self
@@ -443,7 +443,7 @@ class AudioDevice:
     ) -> AudioStream:
         """Create, bind, and return a new :any:`AudioStream` for this device.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 19.0
         """
         new_stream = AudioStream.new(format=format, channels=channels, frequency=frequency)
         self.bind((new_stream,))
@@ -463,7 +463,7 @@ class AudioDevice:
 class AudioStreamCallbackData:
     """Data provided to AudioStream callbacks.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 19.0
     """
 
     additional_bytes: int
@@ -487,7 +487,7 @@ class AudioStream:
 
     This class is commonly created with :any:`AudioDevice.new_stream` which creates a new stream bound to the device.
 
-    ..versionadded:: Unreleased
+    ..versionadded:: 19.0
     """
 
     __slots__ = ("__weakref__", "_stream_p")
@@ -819,10 +819,10 @@ class BasicMixer:
 
     .. versionadded:: 13.6
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 19.0
         Added `frequency` and `channels` parameters.
 
-    .. deprecated:: Unreleased
+    .. deprecated:: 19.0
         Changes in the SDL3 API have made this classes usefulness questionable.
         This class should be replaced with custom streams.
     """
@@ -927,7 +927,7 @@ def _sdl_audio_stream_callback(userdata: Any, stream_p: Any, additional_amount: 
 def get_devices() -> dict[str, AudioDevice]:
     """Iterate over the available audio output devices.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 19.0
         Now returns a dictionary of :any:`AudioDevice`.
     """
     tcod.sdl.sys.init(tcod.sdl.sys.Subsystem.AUDIO)
@@ -942,7 +942,7 @@ def get_devices() -> dict[str, AudioDevice]:
 def get_capture_devices() -> dict[str, AudioDevice]:
     """Iterate over the available audio capture devices.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 19.0
         Now returns a dictionary of :any:`AudioDevice`.
     """
     tcod.sdl.sys.init(tcod.sdl.sys.Subsystem.AUDIO)
@@ -960,7 +960,7 @@ def get_default_playback() -> AudioDevice:
     Example:
         playback_device = tcod.sdl.audio.get_default_playback().open()
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 19.0
     """
     tcod.sdl.sys.init(tcod.sdl.sys.Subsystem.AUDIO)
     return AudioDevice(ffi.cast("SDL_AudioDeviceID", lib.SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK))
@@ -972,7 +972,7 @@ def get_default_recording() -> AudioDevice:
     Example:
         recording_device = tcod.sdl.audio.get_default_recording().open()
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 19.0
     """
     tcod.sdl.sys.init(tcod.sdl.sys.Subsystem.AUDIO)
     return AudioDevice(ffi.cast("SDL_AudioDeviceID", lib.SDL_AUDIO_DEVICE_DEFAULT_RECORDING))
@@ -982,7 +982,7 @@ def get_default_recording() -> AudioDevice:
 class AllowedChanges(enum.IntFlag):
     """Which parameters are allowed to be changed when the values given are not supported.
 
-    .. deprecated:: Unreleased
+    .. deprecated:: 19.0
         This is no longer used.
     """
 
@@ -1033,12 +1033,12 @@ def open(  # noqa: A001, PLR0913
     If a callback is given then it will be called with the `AudioDevice` and a Numpy buffer of the data stream.
     This callback will be run on a separate thread.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 19.0
         SDL3 returns audio devices differently, exact formatting is set with :any:`AudioDevice.new_stream` instead.
 
         `samples` and `allowed_changes` are ignored.
 
-    .. deprecated:: Unreleased
+    .. deprecated:: 19.0
         This is an outdated method.
         Use :any:`AudioDevice.open` instead, for example:
         ``tcod.sdl.audio.get_default_playback().open()``

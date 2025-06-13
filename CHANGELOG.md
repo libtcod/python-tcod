@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [19.0.0] - 2025-06-13
+
+Finished port to SDL3, this has caused several breaking changes from SDL such as lowercase key constants now being uppercase and mouse events returning `float` instead of `int`.
+Be sure to run [Mypy](https://mypy.readthedocs.io/en/stable/getting_started.html) on your projects to catch any issues from this update.
+
 ### Changed
 
 - Updated libtcod to 2.1.1

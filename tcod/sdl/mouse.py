@@ -183,7 +183,7 @@ def set_relative_mode(enable: bool) -> None:
         :any:`tcod.sdl.mouse.capture`
         https://wiki.libsdl.org/SDL_SetWindowRelativeMouseMode
 
-    .. deprecated:: Unreleased
+    .. deprecated:: 19.0
         Replaced with :any:`tcod.sdl.video.Window.relative_mouse_mode`
     """
     _check(lib.SDL_SetWindowRelativeMouseMode(lib.SDL_GetMouseFocus(), enable))
@@ -193,7 +193,7 @@ def set_relative_mode(enable: bool) -> None:
 def get_relative_mode() -> bool:
     """Return True if relative mouse mode is enabled.
 
-    .. deprecated:: Unreleased
+    .. deprecated:: 19.0
         Replaced with :any:`tcod.sdl.video.Window.relative_mouse_mode`
     """
     return bool(lib.SDL_GetWindowRelativeMouseMode(lib.SDL_GetMouseFocus()))
