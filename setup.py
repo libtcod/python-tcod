@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 import platform
 import subprocess
 import sys
@@ -55,6 +56,10 @@ def check_sdl_version() -> None:
                 "\nsdl3-config must be on PATH."
             )
             raise RuntimeError(msg) from exc
+    except subprocess.CalledProcessError as exc:
+        if sys.version_info >= (3, 11):
+            exc.add_note(f"Note: {os.environ.get('PKG_CONFIG_PATH')=}")
+        raise
     print(f"Found SDL {sdl_version_str}.")
     sdl_version = tuple(int(s) for s in sdl_version_str.split("."))
     if sdl_version < SDL_VERSION_NEEDED:

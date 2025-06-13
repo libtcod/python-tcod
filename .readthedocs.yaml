@@ -9,7 +9,17 @@ build:
   tools:
     python: "3.11"
   apt_packages:
-    - libsdl3-dev
+    - build-essential
+    - make
+    - pkg-config
+    - cmake
+    - ninja-build
+  jobs:
+    pre_install:
+      - git clone --depth 1 --branch release-3.2.16 https://github.com/libsdl-org/SDL.git sdl_repo
+      - cmake -S sdl_repo -B sdl_build -D CMAKE_INSTALL_PREFIX=~/.local
+      - cmake --build sdl_build --config Debug
+      - cmake --install sdl_build
 
 submodules:
   include: all
