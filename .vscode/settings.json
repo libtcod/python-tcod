@@ -350,6 +350,7 @@
         "pycall",
         "pycparser",
         "pyinstaller",
+        "pyodide",
         "pypa",
         "PYPI",
         "pypiwin",

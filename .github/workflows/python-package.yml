@@ -321,8 +321,33 @@ jobs:
           retention-days: 7
           compression-level: 0
 
+  pyodide:
+    needs: [ruff, mypy, sdist]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: ${{ env.git-depth }}
+      - name: Checkout submodules
+        run: git submodule update --init --recursive --depth 1
+      - uses: libsdl-org/setup-sdl@6574e20ac65ce362cd12f9c26b3a5e4d3cd31dee
+        with:
+          install-linux-dependencies: true
+          build-type: "Debug"
+          version: ${{ env.sdl-version }}
+      - uses: pypa/cibuildwheel@v3.0.0
+        env:
+          CIBW_PLATFORM: pyodide
+      - name: Archive wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-pyodide
+          path: wheelhouse/*.whl
+          retention-days: 30
+          compression-level: 0
+
   publish:
-    needs: [sdist, build, build-macos, linux-wheels]
+    needs: [sdist, build, build-macos, linux-wheels, pyodide]
     runs-on: ubuntu-latest
     if: github.ref_type == 'tag'
     environment:

@@ -350,8 +350,9 @@ extra_link_args: list[str] = []
 libraries: list[str] = []
 library_dirs: list[str] = []
 
-
-if sys.platform == "darwin":
+if "PYODIDE" in os.environ:
+    pass
+elif sys.platform == "darwin":
     extra_link_args += ["-framework", "SDL3"]
 else:
     libraries += ["SDL3"]
@@ -382,6 +383,7 @@ if sys.platform not in ["win32", "darwin"]:
     extra_compile_args += (
         subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True).strip().split()
     )
-    extra_link_args += (
-        subprocess.check_output(["pkg-config", "sdl3", "--libs"], universal_newlines=True).strip().split()
-    )
+    if "PYODIDE" not in os.environ:
+        extra_link_args += (
+            subprocess.check_output(["pkg-config", "sdl3", "--libs"], universal_newlines=True).strip().split()
+        )

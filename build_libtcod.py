@@ -162,7 +162,12 @@ sources: list[str] = []
 
 libraries: list[str] = [*build_sdl.libraries]
 library_dirs: list[str] = [*build_sdl.library_dirs]
-define_macros: list[tuple[str, Any]] = [("Py_LIMITED_API", Py_LIMITED_API)]
+define_macros: list[tuple[str, Any]] = []
+
+if "PYODIDE" not in os.environ:
+    # Unable to apply Py_LIMITED_API to Pyodide in cffi<=1.17.1
+    # https://github.com/python-cffi/cffi/issues/179
+    define_macros.append(("Py_LIMITED_API", Py_LIMITED_API))
 
 sources += walk_sources("tcod/")
 sources += walk_sources("libtcod/src/libtcod/")
