@@ -14,8 +14,6 @@ import tcod.random
 with pytest.warns():
     import libtcodpy
 
-# ruff: noqa: D103
-
 
 def test_deprecate_color() -> None:
     with pytest.warns(FutureWarning, match=r"\(0, 0, 0\)"):

@@ -8,8 +8,6 @@ import pytest
 
 import tcod.random
 
-# ruff: noqa: D103
-
 SCRIPT_DIR = Path(__file__).parent
 
 

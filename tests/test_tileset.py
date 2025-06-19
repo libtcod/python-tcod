@@ -2,8 +2,6 @@
 
 import tcod.tileset
 
-# ruff: noqa: D103
-
 
 def test_proc_block_elements() -> None:
     tileset = tcod.tileset.Tileset(8, 8)

@@ -11,8 +11,6 @@ import pytest
 import tcod
 from tcod import libtcodpy
 
-# ruff: noqa: D103
-
 
 def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--no-window", action="store_true", help="Skip tests which need a rendering context.")

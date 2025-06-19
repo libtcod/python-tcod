@@ -9,8 +9,6 @@ import pytest
 import tcod
 import tcod.console
 
-# ruff: noqa: D103
-
 
 def test_array_read_write() -> None:
     console = tcod.console.Console(width=12, height=10)

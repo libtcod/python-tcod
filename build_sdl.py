@@ -20,7 +20,7 @@ import pcpp  # type: ignore[import-untyped]
 import requests
 
 # This script calls a lot of programs.
-# ruff: noqa: S603, S607, T201
+# ruff: noqa: S603, S607
 
 # Ignore f-strings in logging, these will eventually be replaced with t-strings.
 # ruff: noqa: G004

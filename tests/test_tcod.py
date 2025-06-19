@@ -12,8 +12,6 @@ import tcod
 import tcod.console
 from tcod import libtcodpy
 
-# ruff: noqa: D103
-
 
 def raise_Exception(*_args: object) -> NoReturn:
     raise RuntimeError("testing exception")  # noqa: TRY003, EM101

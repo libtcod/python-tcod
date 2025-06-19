@@ -11,8 +11,6 @@ from numpy.typing import NDArray
 import tcod
 from tcod import libtcodpy
 
-# ruff: noqa: D103
-
 pytestmark = [
     pytest.mark.filterwarnings("ignore::DeprecationWarning"),
     pytest.mark.filterwarnings("ignore::PendingDeprecationWarning"),

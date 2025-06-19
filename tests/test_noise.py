@@ -9,8 +9,6 @@ import pytest
 import tcod.noise
 import tcod.random
 
-# ruff: noqa: D103
-
 
 @pytest.mark.parametrize("implementation", tcod.noise.Implementation)
 @pytest.mark.parametrize("algorithm", tcod.noise.Algorithm)

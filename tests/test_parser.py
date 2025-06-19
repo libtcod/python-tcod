@@ -7,8 +7,6 @@ import pytest
 
 import tcod as libtcod
 
-# ruff: noqa: D103
-
 
 @pytest.mark.filterwarnings("ignore")
 def test_parser() -> None:

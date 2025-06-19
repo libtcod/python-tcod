@@ -37,7 +37,6 @@ from tcod import libtcodpy
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-# ruff: noqa: S311
 
 if not sys.warnoptions:
     warnings.simplefilter("default")  # Show all warnings.

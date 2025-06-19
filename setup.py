@@ -49,7 +49,7 @@ def check_sdl_version() -> None:
         ).strip()
     except FileNotFoundError:
         try:
-            sdl_version_str = subprocess.check_output(["sdl3-config", "--version"], universal_newlines=True).strip()  # noqa: S603, S607
+            sdl_version_str = subprocess.check_output(["sdl3-config", "--version"], universal_newlines=True).strip()  # noqa: S607
         except FileNotFoundError as exc:
             msg = (
                 f"libsdl3-dev or equivalent must be installed on your system and must be at least version {needed_version}."

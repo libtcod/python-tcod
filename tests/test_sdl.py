@@ -9,8 +9,6 @@ import tcod.sdl.render
 import tcod.sdl.sys
 import tcod.sdl.video
 
-# ruff: noqa: D103
-
 
 def test_sdl_window(uses_window: None) -> None:
     assert tcod.sdl.video.get_grabbed_window() is None

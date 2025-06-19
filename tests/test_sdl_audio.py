@@ -12,8 +12,6 @@ from numpy.typing import NDArray
 
 import tcod.sdl.audio
 
-# ruff: noqa: D103
-
 
 def device_works(device: Callable[[], tcod.sdl.audio.AudioDevice]) -> bool:
     try:
