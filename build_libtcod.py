@@ -199,6 +199,7 @@ GCC_CFLAGS = {
         "-fPIC",
         "-Wno-deprecated-declarations",
         "-Wno-discarded-qualifiers",  # Ignore discarded restrict qualifiers.
+        "-Wno-error=implicit-function-declaration",  # From zlib sources
     ],
 }
 

@@ -99,6 +99,9 @@ filterwarnings = [
     "ignore:'import tcod as libtcodpy' is preferred.",
 ]
 
+[tool.cibuildwheel] # https://cibuildwheel.pypa.io/en/stable/options/
+enable = ["pypy"]
+
 [tool.mypy]
 files = ["."]
 python_version = "3.10"
