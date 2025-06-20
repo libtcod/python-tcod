@@ -180,8 +180,8 @@ if sys.platform in ["win32", "darwin"]:
     include_dirs.append("libtcod/src/zlib/")
 
 
-if sys.platform == "darwin":
-    # Fix "implicit declaration of function 'close'" in zlib.
+if sys.platform != "win32":
+    # Fix implicit declaration of multiple functions in zlib.
     define_macros.append(("HAVE_UNISTD_H", 1))
 
 
@@ -199,7 +199,6 @@ GCC_CFLAGS = {
         "-fPIC",
         "-Wno-deprecated-declarations",
         "-Wno-discarded-qualifiers",  # Ignore discarded restrict qualifiers.
-        "-Wno-error=implicit-function-declaration",  # From zlib sources
     ],
 }
 
