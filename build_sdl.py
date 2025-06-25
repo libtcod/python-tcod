@@ -134,12 +134,19 @@ def check_sdl_version() -> None:
         sdl_version_str = subprocess.check_output(
             ["pkg-config", "sdl3", "--modversion"], universal_newlines=True
         ).strip()
-    except FileNotFoundError as exc:
-        msg = (
-            "libsdl3-dev or equivalent must be installed on your system and must be at least version"
-            f" {needed_version}.\nsdl3-config must be on PATH."
-        )
-        raise RuntimeError(msg) from exc
+    except FileNotFoundError:
+        try:
+            sdl_version_str = subprocess.check_output(["sdl3-config", "--version"], universal_newlines=True).strip()
+        except FileNotFoundError as exc:
+            msg = (
+                f"libsdl3-dev or equivalent must be installed on your system and must be at least version {needed_version}."
+                "\nsdl3-config must be on PATH."
+            )
+            raise RuntimeError(msg) from exc
+    except subprocess.CalledProcessError as exc:
+        if sys.version_info >= (3, 11):
+            exc.add_note(f"Note: {os.environ.get('PKG_CONFIG_PATH')=}")
+        raise
     logger.info(f"Found SDL {sdl_version_str}.")
     sdl_version = tuple(int(s) for s in sdl_version_str.split("."))
     if sdl_version < SDL_MIN_VERSION:
