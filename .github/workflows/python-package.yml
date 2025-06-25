@@ -334,9 +334,10 @@ jobs:
         with:
           install-linux-dependencies: true
           build-type: "Debug"
-          version: ${{ env.sdl-version }}
+          version: "3.2.4" # Should be equal or less than the version used by Emscripten
       - uses: pypa/cibuildwheel@v3.0.0
         env:
+          CIBW_BUILD: cp313-pyodide_wasm32
           CIBW_PLATFORM: pyodide
       - name: Archive wheel
         uses: actions/upload-artifact@v4

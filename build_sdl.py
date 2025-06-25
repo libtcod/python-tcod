@@ -249,16 +249,27 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore[misc]
         return super().on_directive_handle(directive, tokens, if_passthru, preceding_tokens)
 
 
+def get_emscripten_include_dir() -> Path:
+    """Find and return the Emscripten include dir."""
+    # None of the EMSDK environment variables exist! Search PATH for Emscripten as a workaround
+    for path in os.environ["PATH"].split(os.pathsep)[::-1]:
+        if Path(path).match("upstream/emscripten"):
+            return Path(path, "system/include").resolve(strict=True)
+    raise AssertionError(os.environ["PATH"])
+
+
 check_sdl_version()
 
-if sys.platform == "win32" or sys.platform == "darwin":
+SDL_PARSE_PATH: Path | None = None
+SDL_BUNDLE_PATH: Path | None = None
+if (sys.platform == "win32" or sys.platform == "darwin") and "PYODIDE" not in os.environ:
     SDL_PARSE_PATH = unpack_sdl(SDL_PARSE_VERSION)
     SDL_BUNDLE_PATH = unpack_sdl(SDL_BUNDLE_VERSION)
 
 SDL_INCLUDE: Path
-if sys.platform == "win32":
+if sys.platform == "win32" and SDL_PARSE_PATH is not None:
     SDL_INCLUDE = SDL_PARSE_PATH / "include"
-elif sys.platform == "darwin":
+elif sys.platform == "darwin" and SDL_PARSE_PATH is not None:
     SDL_INCLUDE = SDL_PARSE_PATH / "Versions/A/Headers"
 else:  # Unix
     matches = re.findall(
@@ -275,6 +286,7 @@ else:  # Unix
         raise AssertionError(matches)
     assert SDL_INCLUDE
 
+logger.info(f"{SDL_INCLUDE=}")
 
 EXTRA_CDEF = """
 #define SDLK_SCANCODE_MASK ...
@@ -358,7 +370,7 @@ else:
     libraries += ["SDL3"]
 
 # Bundle the Windows SDL DLL.
-if sys.platform == "win32":
+if sys.platform == "win32" and SDL_BUNDLE_PATH is not None:
     include_dirs.append(str(SDL_INCLUDE))
     ARCH_MAPPING = {"32bit": "x86", "64bit": "x64"}
     SDL_LIB_DIR = Path(SDL_BUNDLE_PATH, "lib/", ARCH_MAPPING[BIT_SIZE])
@@ -372,18 +384,19 @@ if sys.platform == "win32":
 
 # Link to the SDL framework on MacOS.
 # Delocate will bundle the binaries in a later step.
-if sys.platform == "darwin":
+if sys.platform == "darwin" and SDL_BUNDLE_PATH is not None:
     include_dirs.append(SDL_INCLUDE)
     extra_link_args += [f"-F{SDL_BUNDLE_PATH}/.."]
     extra_link_args += ["-rpath", f"{SDL_BUNDLE_PATH}/.."]
     extra_link_args += ["-rpath", "/usr/local/opt/llvm/lib/"]
 
-# Use sdl-config to link to SDL on Linux.
-if sys.platform not in ["win32", "darwin"]:
+if "PYODIDE" in os.environ:
+    extra_compile_args += ["--use-port=sdl3"]
+elif sys.platform not in ["win32", "darwin"]:
+    # Use sdl-config to link to SDL on Linux.
     extra_compile_args += (
         subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True).strip().split()
     )
-    if "PYODIDE" not in os.environ:
-        extra_link_args += (
-            subprocess.check_output(["pkg-config", "sdl3", "--libs"], universal_newlines=True).strip().split()
-        )
+    extra_link_args += (
+        subprocess.check_output(["pkg-config", "sdl3", "--libs"], universal_newlines=True).strip().split()
+    )

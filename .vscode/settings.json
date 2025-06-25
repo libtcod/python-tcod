@@ -141,6 +141,7 @@
         "dunder",
         "DVLINE",
         "elif",
+        "Emscripten",
         "ENDCALL",
         "endianness",
         "epel",
