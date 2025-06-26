@@ -339,6 +339,7 @@ jobs:
         env:
           CIBW_BUILD: cp313-pyodide_wasm32
           CIBW_PLATFORM: pyodide
+          CIBW_TEST_COMMAND: python -c "import tcod.context"
       - name: Archive wheel
         uses: actions/upload-artifact@v4
         with:

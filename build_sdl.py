@@ -370,7 +370,7 @@ libraries: list[str] = []
 library_dirs: list[str] = []
 
 if "PYODIDE" in os.environ:
-    pass
+    libraries += ["SDL3"]
 elif sys.platform == "darwin":
     extra_link_args += ["-framework", "SDL3"]
 else:
@@ -399,6 +399,7 @@ if sys.platform == "darwin" and SDL_BUNDLE_PATH is not None:
 
 if "PYODIDE" in os.environ:
     extra_compile_args += ["--use-port=sdl3"]
+    extra_link_args += ["--use-port=sdl3"]
 elif sys.platform not in ["win32", "darwin"]:
     # Use sdl-config to link to SDL on Linux.
     extra_compile_args += (
