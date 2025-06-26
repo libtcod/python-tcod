@@ -17,16 +17,15 @@ __sdl_version__ = ""
 
 REQUIRED_SDL_VERSION = (3, 2, 0)
 
-ffi_check = cffi.FFI()
-ffi_check.cdef(
-    """
-int SDL_GetVersion(void);
-"""
-)
-
 
 def verify_dependencies() -> None:
     """Try to make sure dependencies exist on this system."""
+    ffi_check = cffi.FFI()
+    ffi_check.cdef(
+        """
+    int SDL_GetVersion(void);
+    """
+    )
     if sys.platform == "win32":
         lib_test: Any = ffi_check.dlopen("SDL3.dll")  # Make sure SDL3.dll is here.
         int_version = lib_test.SDL_GetVersion()  # Need to check this version.

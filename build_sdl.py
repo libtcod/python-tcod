@@ -37,7 +37,6 @@ SDL_PARSE_VERSION = os.environ.get("SDL_VERSION", "3.2.16")
 # The SDL version to include in binary distributions.
 SDL_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "3.2.16")
 
-
 # Used to remove excessive newlines in debug outputs.
 RE_NEWLINES = re.compile(r"\n\n+")
 # Functions using va_list need to be culled.
@@ -123,6 +122,9 @@ IGNORE_DEFINES = frozenset(
         "SDL_SENSOR_DUMMY",
     )
 )
+
+CMAKE_CMD = ("emcmake", "cmake") if "PYODIDE" in os.environ else ("cmake",)
+CMAKE_FIND_SDL_CMD = (*CMAKE_CMD, "--find-package", "-D", "NAME=SDL3", "-D", "COMPILER_ID=GNU", "-D", "LANGUAGE=C")
 
 
 def check_sdl_version() -> None:
@@ -271,7 +273,21 @@ def get_emscripten_include_dir() -> Path:
     raise AssertionError(os.environ["PATH"])
 
 
-check_sdl_version()
+include_dirs: list[str] = []
+extra_compile_args: list[str] = []
+extra_link_args: list[str] = []
+
+libraries: list[str] = []
+library_dirs: list[str] = []
+
+
+if "PYODIDE" in os.environ:
+    with TemporaryDirectory() as tmp_dir:
+        blank_source = Path(tmp_dir, "blank.c")
+        blank_source.write_text("")
+        subprocess.run(["emcc", "--use-port=sdl3", blank_source], check=True)
+
+# check_sdl_version()
 
 SDL_PARSE_PATH: Path | None = None
 SDL_BUNDLE_PATH: Path | None = None
@@ -285,10 +301,29 @@ if sys.platform == "win32" and SDL_PARSE_PATH is not None:
 elif sys.platform == "darwin" and SDL_PARSE_PATH is not None:
     SDL_INCLUDE = SDL_PARSE_PATH / "Versions/A/Headers"
 else:  # Unix
-    matches = re.findall(
-        r"-I(\S+)",
-        subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True),
-    )
+    matches = []
+    try:
+        out = subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True)
+    except Exception:
+        if "PYODIDE" in os.environ:
+            emcc_stdout = subprocess.check_output(["emcc", "--use-port=sdl3", "--cflags"], text=True)
+            print(f"""EMCC CFLAGS: {emcc_stdout}""")
+            matches = re.findall(r"--sysroot=(\S+)", emcc_stdout)
+            print(f"{matches=}")
+            (sysroot,) = matches
+            matches = [str(Path(sysroot, "include"))]
+            library_dirs.append(str(Path(sysroot, "lib/wasm32-emscripten")))
+            out = ""
+        else:
+            cmake_out = subprocess.run(
+                (*CMAKE_FIND_SDL_CMD, "-D", "MODE=COMPILE"), check=False, text=True, stdout=subprocess.PIPE
+            )
+            print(f"{cmake_out.stdout=}")
+            cmake_out.check_returncode()
+
+            out = subprocess.check_output((*CMAKE_FIND_SDL_CMD, "-D", "MODE=COMPILE"), text=True)
+    if not matches:
+        matches = re.findall(r"-I(\S+)", out)
     if not matches:
         matches = ["/usr/include"]
 
@@ -366,18 +401,16 @@ def get_cdef() -> tuple[str, dict[str, str]]:
     )
     for name in FLEXIBLE_STRUCTS:
         sdl_cdef = sdl_cdef.replace(f"}} {name};", f"...;}} {name};")
+
+    # Remove variable arg functions
+    RE_VA_ARG_FUNC = re.compile(r"^.*?\([^()]*\.\.\.\)\s*;\s*$", re.MULTILINE)
+    sdl_cdef = RE_VA_ARG_FUNC.sub("", sdl_cdef)
+
     return sdl_cdef + EXTRA_CDEF, parser.known_string_defines
 
 
-include_dirs: list[str] = []
-extra_compile_args: list[str] = []
-extra_link_args: list[str] = []
-
-libraries: list[str] = []
-library_dirs: list[str] = []
-
 if "PYODIDE" in os.environ:
-    pass
+    libraries += ["SDL3"]
 elif sys.platform == "darwin":
     extra_link_args += ["-framework", "SDL3"]
 else:
@@ -406,6 +439,13 @@ if sys.platform == "darwin" and SDL_BUNDLE_PATH is not None:
 
 if "PYODIDE" in os.environ:
     extra_compile_args += ["--use-port=sdl3"]
+    extra_link_args += ["--use-port=sdl3"]
+    # extra_compile_args += (
+    #    subprocess.check_output((*CMAKE_FIND_SDL_CMD, "-D", "MODE=COMPILE"), text=True).strip().split()
+    # )
+    # extra_link_args += subprocess.check_output((*CMAKE_FIND_SDL_CMD, "-D", "MODE=LINK"), text=True).strip().split()
+    # print(f"{extra_compile_args=}")
+    # print(f"{extra_link_args=}")
 elif sys.platform not in ["win32", "darwin"]:
     # Use sdl-config to link to SDL on Linux.
     extra_compile_args += (

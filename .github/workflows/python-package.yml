@@ -335,15 +335,16 @@ jobs:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
-      - uses: HexDecimal/my-setup-sdl-action@v1.0.0
-        with:
-          install-linux-dependencies: true
-          build-type: "Debug"
-          version: "3.2.4" # Should be equal or less than the version used by Emscripten
+      #- uses: HexDecimal/my-setup-sdl-action@v1.0.0
+      #  with:
+      #    install-linux-dependencies: true
+      #    build-type: "Debug"
+      #    version: "3.2.4" # Should be equal or less than the version used by Emscripten
       - uses: pypa/cibuildwheel@v3.1.4
         env:
           CIBW_BUILD: cp313-pyodide_wasm32
           CIBW_PLATFORM: pyodide
+          CIBW_TEST_COMMAND: python -c "import tcod.context"
       - name: Archive wheel
         uses: actions/upload-artifact@v4
         with:
