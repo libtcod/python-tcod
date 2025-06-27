@@ -32,6 +32,7 @@ Be sure to run [Mypy](https://mypy.readthedocs.io/en/stable/getting_started.html
   - Sound queueing methods were moved from `AudioDevice` to a new `AudioStream` class.
   - `BasicMixer` may require manually specifying `frequency` and `channels` to replicate old behavior.
   - `get_devices` and `get_capture_devices` now return `dict[str, AudioDevice]`.
+- `TextInput` events are no longer enabled by default.
 
 ### Deprecated
 
