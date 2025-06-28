@@ -271,7 +271,7 @@ if "PYODIDE" in os.environ:
         blank_source.write_text("")
         subprocess.run(["emcc", "--use-port=sdl3", blank_source], check=True)
 
-check_sdl_version()
+# check_sdl_version()
 
 SDL_PARSE_PATH: Path | None = None
 SDL_BUNDLE_PATH: Path | None = None
@@ -404,12 +404,11 @@ if sys.platform == "darwin" and SDL_BUNDLE_PATH is not None:
     extra_link_args += ["-rpath", "/usr/local/opt/llvm/lib/"]
 
 if "PYODIDE" in os.environ:
-    print(f"""EMCC CFLAGS: {subprocess.check_output(["emcc", "--use-port=sdl3", "--cflags"], text=True)!r}""")
     extra_compile_args += ["--use-port=sdl3"]
     extra_link_args += ["--use-port=sdl3"]
     cmake_cmd = ("cmake", "--find-package", "-D", "NAME=SDL3", "-D", "COMPILER_ID=GNU", "-D", "LANGUAGE=C")
-    extra_compile_args += subprocess.check_output((*cmake_cmd, "-DMODE=COMPILE"), text=True).strip().split()
-    extra_link_args += subprocess.check_output((*cmake_cmd, "-DMODE=LINK"), text=True).strip().split()
+    extra_compile_args += subprocess.check_output((*cmake_cmd, "-D", "MODE=COMPILE"), text=True).strip().split()
+    extra_link_args += subprocess.check_output((*cmake_cmd, "-D", "MODE=LINK"), text=True).strip().split()
     print(f"{extra_compile_args=}")
     print(f"{extra_link_args=}")
 elif sys.platform not in ["win32", "darwin"]:
