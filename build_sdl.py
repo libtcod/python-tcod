@@ -123,7 +123,8 @@ IGNORE_DEFINES = frozenset(
     )
 )
 
-CMAKE_FIND_SDL_CMD = ("cmake", "--find-package", "-D", "NAME=SDL3", "-D", "COMPILER_ID=GNU", "-D", "LANGUAGE=C")
+CMAKE_CMD = "emcmake" if "PYODIDE" in os.environ else "cmake"
+CMAKE_FIND_SDL_CMD = (CMAKE_CMD, "--find-package", "-D", "NAME=SDL3", "-D", "COMPILER_ID=GNU", "-D", "LANGUAGE=C")
 
 
 def check_sdl_version() -> None:
