@@ -370,7 +370,7 @@ libraries: list[str] = []
 library_dirs: list[str] = []
 
 if "PYODIDE" in os.environ:
-    libraries += ["SDL2"]
+    pass
 elif sys.platform == "darwin":
     extra_link_args += ["-framework", "SDL3"]
 else:
