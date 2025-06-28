@@ -288,8 +288,9 @@ elif sys.platform == "darwin" and SDL_PARSE_PATH is not None:
 else:  # Unix
     matches = re.findall(
         r"-I(\S+)",
-        # subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True),
-        subprocess.check_output((*CMAKE_FIND_SDL_CMD, "-D", "MODE=COMPILE"), text=True),
+        subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True)
+        if "PYODIDE" not in os.environ
+        else subprocess.check_output((*CMAKE_FIND_SDL_CMD, "-D", "MODE=COMPILE"), text=True),
     )
     assert matches
 
