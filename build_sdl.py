@@ -291,7 +291,7 @@ else:  # Unix
     except Exception:
         out = subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True)
     matches = re.findall(r"-I(\S+)", out)
-    assert matches
+    assert matches, out
 
     for match in matches:
         if Path(match, "SDL3/SDL.h").is_file():
