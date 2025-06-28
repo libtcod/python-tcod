@@ -412,6 +412,8 @@ if "PYODIDE" in os.environ:
     extra_link_args += (
         subprocess.check_output(["pkg-config", "sdl3", "--libs"], universal_newlines=True).strip().split()
     )
+    print(f"{extra_compile_args=}")
+    print(f"{extra_link_args=}")
 elif sys.platform not in ["win32", "darwin"]:
     # Use sdl-config to link to SDL on Linux.
     extra_compile_args += (
