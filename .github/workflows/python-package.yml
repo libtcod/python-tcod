@@ -330,11 +330,11 @@ jobs:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
-      - uses: libsdl-org/setup-sdl@6574e20ac65ce362cd12f9c26b3a5e4d3cd31dee
-        with:
-          install-linux-dependencies: true
-          build-type: "Debug"
-          version: "3.2.4" # Should be equal or less than the version used by Emscripten
+      #- uses: libsdl-org/setup-sdl@6574e20ac65ce362cd12f9c26b3a5e4d3cd31dee
+      #  with:
+      #    install-linux-dependencies: true
+      #    build-type: "Debug"
+      #    version: "3.2.4" # Should be equal or less than the version used by Emscripten
       - uses: pypa/cibuildwheel@v3.0.0
         env:
           CIBW_BUILD: cp313-pyodide_wasm32
