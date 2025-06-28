@@ -401,7 +401,8 @@ if "PYODIDE" in os.environ:
     with TemporaryDirectory() as tmp_dir:
         blank_source = Path(tmp_dir, "blank.c")
         blank_source.write_text("")
-        subprocess.check_output(["emcc", "--use-port=sdl3", blank_source], universal_newlines=True)
+        print(f"""EMCC CFLAGS: {subprocess.check_output(["emcc", "--use-port=sdl3", "--cflags"], text=True)!r}""")
+        subprocess.run(["emcc", "--use-port=sdl3", blank_source], check=True)
 
     extra_compile_args += ["--use-port=sdl3"]
     extra_link_args += ["--use-port=sdl3"]
