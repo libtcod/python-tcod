@@ -37,7 +37,6 @@ SDL_PARSE_VERSION = os.environ.get("SDL_VERSION", "3.2.16")
 # The SDL version to include in binary distributions.
 SDL_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "3.2.16")
 
-
 # Used to remove excessive newlines in debug outputs.
 RE_NEWLINES = re.compile(r"\n\n+")
 # Functions using va_list need to be culled.
@@ -123,6 +122,8 @@ IGNORE_DEFINES = frozenset(
         "SDL_SENSOR_DUMMY",
     )
 )
+
+CMAKE_FIND_SDL_CMD = ("cmake", "--find-package", "-D", "NAME=SDL3", "-D", "COMPILER_ID=GNU", "-D", "LANGUAGE=C")
 
 
 def check_sdl_version() -> None:
@@ -287,7 +288,8 @@ elif sys.platform == "darwin" and SDL_PARSE_PATH is not None:
 else:  # Unix
     matches = re.findall(
         r"-I(\S+)",
-        subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True),
+        # subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True),
+        subprocess.check_output((*CMAKE_FIND_SDL_CMD, "-D", "MODE=COMPILE"), text=True),
     )
     assert matches
 
@@ -406,9 +408,10 @@ if sys.platform == "darwin" and SDL_BUNDLE_PATH is not None:
 if "PYODIDE" in os.environ:
     extra_compile_args += ["--use-port=sdl3"]
     extra_link_args += ["--use-port=sdl3"]
-    cmake_cmd = ("cmake", "--find-package", "-D", "NAME=SDL3", "-D", "COMPILER_ID=GNU", "-D", "LANGUAGE=C")
-    extra_compile_args += subprocess.check_output((*cmake_cmd, "-D", "MODE=COMPILE"), text=True).strip().split()
-    extra_link_args += subprocess.check_output((*cmake_cmd, "-D", "MODE=LINK"), text=True).strip().split()
+    extra_compile_args += (
+        subprocess.check_output((*CMAKE_FIND_SDL_CMD, "-D", "MODE=COMPILE"), text=True).strip().split()
+    )
+    extra_link_args += subprocess.check_output((*CMAKE_FIND_SDL_CMD, "-D", "MODE=LINK"), text=True).strip().split()
     print(f"{extra_compile_args=}")
     print(f"{extra_link_args=}")
 elif sys.platform not in ["win32", "darwin"]:
