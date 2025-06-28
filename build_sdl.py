@@ -287,9 +287,9 @@ elif sys.platform == "darwin" and SDL_PARSE_PATH is not None:
     SDL_INCLUDE = SDL_PARSE_PATH / "Versions/A/Headers"
 else:  # Unix
     try:
-        out = subprocess.check_output((*CMAKE_FIND_SDL_CMD, "-D", "MODE=COMPILE"), text=True)
-    except Exception:
         out = subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True)
+    except Exception:
+        out = subprocess.check_output((*CMAKE_FIND_SDL_CMD, "-D", "MODE=COMPILE"), text=True)
     matches = re.findall(r"-I(\S+)", out)
     assert matches, out
 
