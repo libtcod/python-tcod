@@ -398,8 +398,19 @@ if sys.platform == "darwin" and SDL_BUNDLE_PATH is not None:
     extra_link_args += ["-rpath", "/usr/local/opt/llvm/lib/"]
 
 if "PYODIDE" in os.environ:
+    with TemporaryDirectory() as tmp_dir:
+        blank_source = Path(tmp_dir, "blank.c")
+        blank_source.write_text("")
+        subprocess.check_output(["emcc", "--use-port=sdl3", blank_source], universal_newlines=True)
+
     extra_compile_args += ["--use-port=sdl3"]
     extra_link_args += ["--use-port=sdl3"]
+    extra_compile_args += (
+        subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True).strip().split()
+    )
+    extra_link_args += (
+        subprocess.check_output(["pkg-config", "sdl3", "--libs"], universal_newlines=True).strip().split()
+    )
 elif sys.platform not in ["win32", "darwin"]:
     # Use sdl-config to link to SDL on Linux.
     extra_compile_args += (
