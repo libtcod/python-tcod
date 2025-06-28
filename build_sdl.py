@@ -407,10 +407,10 @@ if "PYODIDE" in os.environ:
     extra_compile_args += ["--use-port=sdl3"]
     extra_link_args += ["--use-port=sdl3"]
     extra_compile_args += (
-        subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True).strip().split()
+        subprocess.check_output(["cmake", "--find-package", "-DNAME=SDL3", "-DMODE=COMPILE"], text=True).strip().split()
     )
     extra_link_args += (
-        subprocess.check_output(["pkg-config", "sdl3", "--libs"], universal_newlines=True).strip().split()
+        subprocess.check_output(["cmake", "--find-package", "-DNAME=SDL3", "-DMODE=LINK"], text=True).strip().split()
     )
     print(f"{extra_compile_args=}")
     print(f"{extra_link_args=}")
