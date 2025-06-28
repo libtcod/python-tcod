@@ -123,7 +123,7 @@ IGNORE_DEFINES = frozenset(
     )
 )
 
-CMAKE_CMD = ("emcmake", "cmake") if "PYODIDE" in os.environ else ("cmake",)
+CMAKE_CMD = ("emcmake", "cmake")
 CMAKE_FIND_SDL_CMD = (*CMAKE_CMD, "--find-package", "-D", "NAME=SDL3", "-D", "COMPILER_ID=GNU", "-D", "LANGUAGE=C")
 
 
