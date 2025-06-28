@@ -265,6 +265,12 @@ def get_emscripten_include_dir() -> Path:
     raise AssertionError(os.environ["PATH"])
 
 
+if "PYODIDE" in os.environ:
+    with TemporaryDirectory() as tmp_dir:
+        blank_source = Path(tmp_dir, "blank.c")
+        blank_source.write_text("")
+        subprocess.run(["emcc", "--use-port=sdl3", blank_source], check=True)
+
 check_sdl_version()
 
 SDL_PARSE_PATH: Path | None = None
@@ -398,12 +404,7 @@ if sys.platform == "darwin" and SDL_BUNDLE_PATH is not None:
     extra_link_args += ["-rpath", "/usr/local/opt/llvm/lib/"]
 
 if "PYODIDE" in os.environ:
-    with TemporaryDirectory() as tmp_dir:
-        blank_source = Path(tmp_dir, "blank.c")
-        blank_source.write_text("")
-        print(f"""EMCC CFLAGS: {subprocess.check_output(["emcc", "--use-port=sdl3", "--cflags"], text=True)!r}""")
-        subprocess.run(["emcc", "--use-port=sdl3", blank_source], check=True)
-
+    print(f"""EMCC CFLAGS: {subprocess.check_output(["emcc", "--use-port=sdl3", "--cflags"], text=True)!r}""")
     extra_compile_args += ["--use-port=sdl3"]
     extra_link_args += ["--use-port=sdl3"]
     cmake_cmd = ("cmake", "--find-package", "-D", "NAME=SDL3", "-D", "COMPILER_ID=GNU", "-D", "LANGUAGE=C")
