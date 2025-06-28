@@ -286,12 +286,11 @@ if sys.platform == "win32" and SDL_PARSE_PATH is not None:
 elif sys.platform == "darwin" and SDL_PARSE_PATH is not None:
     SDL_INCLUDE = SDL_PARSE_PATH / "Versions/A/Headers"
 else:  # Unix
-    matches = re.findall(
-        r"-I(\S+)",
-        subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True)
-        if "PYODIDE" not in os.environ
-        else subprocess.check_output((*CMAKE_FIND_SDL_CMD, "-D", "MODE=COMPILE"), text=True),
-    )
+    try:
+        out = subprocess.check_output((*CMAKE_FIND_SDL_CMD, "-D", "MODE=COMPILE"), text=True)
+    except Exception:
+        out = subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True)
+    matches = re.findall(r"-I(\S+)", out)
     assert matches
 
     for match in matches:
