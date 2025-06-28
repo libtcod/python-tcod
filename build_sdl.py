@@ -406,12 +406,9 @@ if "PYODIDE" in os.environ:
 
     extra_compile_args += ["--use-port=sdl3"]
     extra_link_args += ["--use-port=sdl3"]
-    extra_compile_args += (
-        subprocess.check_output(["cmake", "--find-package", "-DNAME=SDL3", "-DMODE=COMPILE"], text=True).strip().split()
-    )
-    extra_link_args += (
-        subprocess.check_output(["cmake", "--find-package", "-DNAME=SDL3", "-DMODE=LINK"], text=True).strip().split()
-    )
+    cmake_cmd = ("cmake", "--find-package", "-D", "NAME=SDL3", "-D", "COMPILER_ID=GNU", "-D", "LANGUAGE=C")
+    extra_compile_args += subprocess.check_output((*cmake_cmd, "-DMODE=COMPILE"), text=True).strip().split()
+    extra_link_args += subprocess.check_output((*cmake_cmd, "-DMODE=LINK"), text=True).strip().split()
     print(f"{extra_compile_args=}")
     print(f"{extra_link_args=}")
 elif sys.platform not in ["win32", "darwin"]:
