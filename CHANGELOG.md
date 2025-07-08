@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Fixed
+
+- `Console.print` methods using `string` keyword were marked as invalid instead of deprecated.
+
 ## [19.0.0] - 2025-06-13
 
 Finished port to SDL3, this has caused several breaking changes from SDL such as lowercase key constants now being uppercase and mouse events returning `float` instead of `int`.

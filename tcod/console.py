@@ -1038,6 +1038,24 @@ Consider one of the following:
         string: str = "",
     ) -> int: ...
 
+    @overload
+    @deprecated(
+        "Replace text, fg, bg, bg_blend, and alignment with keyword arguments."
+        "\n'string' keyword should be renamed to `text`"
+    )
+    def print(
+        self,
+        x: int,
+        y: int,
+        text: str = "",
+        fg: tuple[int, int, int] | None = None,
+        bg: tuple[int, int, int] | None = None,
+        bg_blend: int = tcod.constants.BKGND_SET,
+        alignment: int = tcod.constants.LEFT,
+        *,
+        string: str,
+    ) -> int: ...
+
     def print(  # noqa: PLR0913
         self,
         x: int,
