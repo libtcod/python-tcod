@@ -8,6 +8,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [19.0.2] - 2025-07-11
 
+Resolve wheel deployment issue.
+
 ## [19.0.1] - 2025-07-11
 
 ### Fixed
