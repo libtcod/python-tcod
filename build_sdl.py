@@ -212,6 +212,12 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore[misc]
                 buffer.write(f"#define {name} ...\n")
             return buffer.getvalue()
 
+    def on_file_open(self, is_system_include: bool, includepath: str) -> Any:  # noqa: ANN401, FBT001
+        """Ignore includes other than SDL headers."""
+        if not Path(includepath).parent.name == "SDL3":
+            raise FileNotFoundError
+        return super().on_file_open(is_system_include, includepath)
+
     def on_include_not_found(self, is_malformed: bool, is_system_include: bool, curdir: str, includepath: str) -> None:  # noqa: ARG002, FBT001
         """Remove bad includes such as stddef.h and stdarg.h."""
         assert "SDL3/SDL" not in includepath, (includepath, curdir)
@@ -283,7 +289,8 @@ else:  # Unix
         r"-I(\S+)",
         subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True),
     )
-    assert matches
+    if not matches:
+        matches = ["/usr/include"]
 
     for match in matches:
         if Path(match, "SDL3/SDL.h").is_file():
