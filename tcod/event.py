@@ -674,6 +674,11 @@ class MouseWheel(Event):
 class TextInput(Event):
     """SDL text input event.
 
+    .. warning::
+        These events are not enabled by default since `19.0`.
+
+        Use :any:`Window.start_text_input` to enable this event.
+
     Attributes:
         type (str): Always "TEXTINPUT".
         text (str): A Unicode string with the input.

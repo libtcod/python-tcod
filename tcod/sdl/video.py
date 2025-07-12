@@ -167,7 +167,12 @@ class _TempSurface:
 
 
 class Window:
-    """An SDL2 Window object."""
+    """An SDL2 Window object.
+
+    Created from :any:`tcod.sdl.video.new_window` when working with SDL directly.
+
+    When using the libtcod :any:`Context` you can access its `Window` via :any:`Context.sdl_window`.
+    """
 
     def __init__(self, sdl_window_p: Any) -> None:  # noqa: ANN401
         if ffi.typeof(sdl_window_p) is not ffi.typeof("struct SDL_Window*"):
@@ -444,9 +449,21 @@ class Window:
             multiline: Allow multiple lines of text.
             android_type: Input type for Android, see SDL docs.
 
+        Example::
+
+            context: tcod.context.Context  # Assuming tcod context is used
+
+            if context.sdl_window:
+                context.sdl_window.start_text_input()
+
+                ... # Handle Unicode input using TextInput events
+
+                context.sdl_window.stop_text_input()  # Close on-screen keyboard when done
+
         .. seealso::
             :any:`stop_text_input`
             :any:`set_text_input_area`
+            :any:`TextInput`
             https://wiki.libsdl.org/SDL3/SDL_StartTextInputWithProperties
 
         .. versionadded:: 19.1
