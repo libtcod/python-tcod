@@ -45,7 +45,7 @@ def parse_changelog(args: argparse.Namespace) -> tuple[str, str]:
     return f"{header}{tagged}{tail}", changes
 
 
-def replace_unreleased_tags(tag: str, dry_run: bool) -> None:
+def replace_unreleased_tags(tag: str, *, dry_run: bool) -> None:
     """Walk though sources and replace pending tags with the new tag."""
     match = re.match(r"\d+\.\d+", tag)
     assert match
@@ -77,7 +77,7 @@ def main() -> None:
         print("--- New changelog:")
         print(new_changelog)
 
-    replace_unreleased_tags(args.tag, args.dry_run)
+    replace_unreleased_tags(args.tag, dry_run=args.dry_run)
 
     if not args.dry_run:
         (PROJECT_DIR / "CHANGELOG.md").write_text(new_changelog, encoding="utf-8")

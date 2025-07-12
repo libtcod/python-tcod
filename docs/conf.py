@@ -1,4 +1,4 @@
-"""Sphinx config file."""
+"""Sphinx config file."""  # noqa: INP001
 # tdl documentation build configuration file, created by
 # sphinx-quickstart on Fri Nov 25 12:49:46 2016.
 #
@@ -65,7 +65,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "python-tcod"
-copyright = "2009-2025, Kyle Benesch"
+copyright = "2009-2025, Kyle Benesch"  # noqa: A001
 author = "Kyle Benesch"
 
 # The version info for the project you're documenting, acts as replacement for
