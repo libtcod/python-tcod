@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [19.1.0] - 2025-07-12
+
 ### Added
 
 - Added text input support to `tcod.sdl.video.Window` which was missing since the SDL3 update.

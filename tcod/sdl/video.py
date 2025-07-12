@@ -98,7 +98,7 @@ class TextInputType(enum.IntEnum):
         :any:`Window.start_text_input`
         https://wiki.libsdl.org/SDL3/SDL_TextInputType
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 19.1
     """
 
     TEXT = lib.SDL_TEXTINPUT_TYPE_TEXT
@@ -128,7 +128,7 @@ class Capitalization(enum.IntEnum):
         :any:`Window.start_text_input`
         https://wiki.libsdl.org/SDL3/SDL_Capitalization
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 19.1
     """
 
     NONE = lib.SDL_CAPITALIZE_NONE
@@ -449,7 +449,7 @@ class Window:
             :any:`set_text_input_area`
             https://wiki.libsdl.org/SDL3/SDL_StartTextInputWithProperties
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 19.1
         """
         props = Properties()
         props[("SDL_PROP_TEXTINPUT_TYPE_NUMBER", int)] = int(type)
@@ -473,7 +473,7 @@ class Window:
             :any:`start_text_input`
             https://wiki.libsdl.org/SDL3/SDL_SetTextInputArea
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 19.1
         """
         _check(lib.SDL_SetTextInputArea(self.p, (rect,), cursor))
 
@@ -483,7 +483,7 @@ class Window:
         .. seealso::
             :any:`start_text_input`
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 19.1
         """
         _check(lib.SDL_StopTextInput(self.p))
 
