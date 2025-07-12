@@ -6,6 +6,12 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Added
+
+- Added text input support to `tcod.sdl.video.Window` which was missing since the SDL3 update.
+  After creating a context use `assert context.sdl_window` or `if context.sdl_window:` to verify that an SDL window exists then use `context.sdl_window.start_text_input` to enable text input events.
+  Keep in mind that this can open an on-screen keyboard.
+
 ## [19.0.2] - 2025-07-11
 
 Resolve wheel deployment issue.

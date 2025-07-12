@@ -38,6 +38,10 @@ def test_sdl_window(uses_window: None) -> None:
     window.opacity = window.opacity
     window.grab = window.grab
 
+    window.start_text_input(capitalization=tcod.sdl.video.Capitalization.NONE, multiline=False)
+    window.set_text_input_area((0, 0, 8, 8), 0)
+    window.stop_text_input()
+
 
 def test_sdl_window_bad_types() -> None:
     with pytest.raises(TypeError):

@@ -24,7 +24,9 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
 __all__ = (
+    "Capitalization",
     "FlashOperation",
+    "TextInputType",
     "Window",
     "WindowFlags",
     "get_grabbed_window",
@@ -89,6 +91,56 @@ class FlashOperation(enum.IntEnum):
     """Flash until focus is gained."""
 
 
+class TextInputType(enum.IntEnum):
+    """SDL input types for text input.
+
+    .. seealso::
+        :any:`Window.start_text_input`
+        https://wiki.libsdl.org/SDL3/SDL_TextInputType
+
+    .. versionadded:: Unreleased
+    """
+
+    TEXT = lib.SDL_TEXTINPUT_TYPE_TEXT
+    """The input is text."""
+    TEXT_NAME = lib.SDL_TEXTINPUT_TYPE_TEXT_NAME
+    """The input is a person's name."""
+    TEXT_EMAIL = lib.SDL_TEXTINPUT_TYPE_TEXT_EMAIL
+    """The input is an e-mail address."""
+    TEXT_USERNAME = lib.SDL_TEXTINPUT_TYPE_TEXT_USERNAME
+    """The input is a username."""
+    TEXT_PASSWORD_HIDDEN = lib.SDL_TEXTINPUT_TYPE_TEXT_PASSWORD_HIDDEN
+    """The input is a secure password that is hidden."""
+    TEXT_PASSWORD_VISIBLE = lib.SDL_TEXTINPUT_TYPE_TEXT_PASSWORD_VISIBLE
+    """The input is a secure password that is visible."""
+    NUMBER = lib.SDL_TEXTINPUT_TYPE_NUMBER
+    """The input is a number."""
+    NUMBER_PASSWORD_HIDDEN = lib.SDL_TEXTINPUT_TYPE_NUMBER_PASSWORD_HIDDEN
+    """The input is a secure PIN that is hidden."""
+    NUMBER_PASSWORD_VISIBLE = lib.SDL_TEXTINPUT_TYPE_NUMBER_PASSWORD_VISIBLE
+    """The input is a secure PIN that is visible."""
+
+
+class Capitalization(enum.IntEnum):
+    """Text capitalization for text input.
+
+    .. seealso::
+        :any:`Window.start_text_input`
+        https://wiki.libsdl.org/SDL3/SDL_Capitalization
+
+    .. versionadded:: Unreleased
+    """
+
+    NONE = lib.SDL_CAPITALIZE_NONE
+    """No auto-capitalization will be done."""
+    SENTENCES = lib.SDL_CAPITALIZE_SENTENCES
+    """The first letter of sentences will be capitalized."""
+    WORDS = lib.SDL_CAPITALIZE_WORDS
+    """The first letter of words will be capitalized."""
+    LETTERS = lib.SDL_CAPITALIZE_LETTERS
+    """All letters will be capitalized."""
+
+
 class _TempSurface:
     """Holds a temporary surface derived from a NumPy array."""
 
@@ -132,6 +184,9 @@ class Window:
         if not isinstance(other, Window):
             return NotImplemented
         return bool(self.p == other.p)
+
+    def __hash__(self) -> int:
+        return hash(self.p)
 
     def _as_property_pointer(self) -> Any:  # noqa: ANN401
         return self.p
@@ -368,6 +423,69 @@ class Window:
     @relative_mouse_mode.setter
     def relative_mouse_mode(self, enable: bool, /) -> None:
         _check(lib.SDL_SetWindowRelativeMouseMode(self.p, enable))
+
+    def start_text_input(
+        self,
+        *,
+        type: TextInputType = TextInputType.TEXT,  # noqa: A002
+        capitalization: Capitalization | None = None,
+        autocorrect: bool = True,
+        multiline: bool | None = None,
+        android_type: int | None = None,
+    ) -> None:
+        """Start receiving text input events supporting Unicode. This may open an on-screen keyboard.
+
+        This method is meant to be paired with :any:`set_text_input_area`.
+
+        Args:
+            type: Type of text being inputted, see :any:`TextInputType`
+            capitalization: Capitalization hint, default is based on `type` given, see :any:`Capitalization`.
+            autocorrect: Enable auto completion and auto correction.
+            multiline: Allow multiple lines of text.
+            android_type: Input type for Android, see SDL docs.
+
+        .. seealso::
+            :any:`stop_text_input`
+            :any:`set_text_input_area`
+            https://wiki.libsdl.org/SDL3/SDL_StartTextInputWithProperties
+
+        .. versionadded:: Unreleased
+        """
+        props = Properties()
+        props[("SDL_PROP_TEXTINPUT_TYPE_NUMBER", int)] = int(type)
+        if capitalization is not None:
+            props[("SDL_PROP_TEXTINPUT_CAPITALIZATION_NUMBER", int)] = int(capitalization)
+        props[("SDL_PROP_TEXTINPUT_AUTOCORRECT_BOOLEAN", bool)] = autocorrect
+        if multiline is not None:
+            props[("SDL_PROP_TEXTINPUT_MULTILINE_BOOLEAN", bool)] = multiline
+        if android_type is not None:
+            props[("SDL_PROP_TEXTINPUT_ANDROID_INPUTTYPE_NUMBER", int)] = int(android_type)
+        _check(lib.SDL_StartTextInputWithProperties(self.p, props.p))
+
+    def set_text_input_area(self, rect: tuple[int, int, int, int], cursor: int) -> None:
+        """Assign the area used for entering Unicode text input.
+
+        Args:
+            rect: `(x, y, width, height)` rectangle used for text input
+            cursor: Cursor X position, relative to `rect[0]`
+
+        .. seealso::
+            :any:`start_text_input`
+            https://wiki.libsdl.org/SDL3/SDL_SetTextInputArea
+
+        .. versionadded:: Unreleased
+        """
+        _check(lib.SDL_SetTextInputArea(self.p, (rect,), cursor))
+
+    def stop_text_input(self) -> None:
+        """Stop receiving text events for this window and close relevant on-screen keyboards.
+
+        .. seealso::
+            :any:`start_text_input`
+
+        .. versionadded:: Unreleased
+        """
+        _check(lib.SDL_StopTextInput(self.p))
 
 
 def new_window(  # noqa: PLR0913

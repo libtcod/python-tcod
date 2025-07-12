@@ -22,6 +22,8 @@ def main() -> None:
     joysticks: set[tcod.sdl.joystick.Joystick] = set()
 
     with tcod.context.new(width=WIDTH, height=HEIGHT) as context:
+        if context.sdl_window:
+            context.sdl_window.start_text_input()
         console = context.new_console()
         while True:
             # Display all event items.
