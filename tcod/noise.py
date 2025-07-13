@@ -12,7 +12,7 @@ Example::
     ...     algorithm=tcod.noise.Algorithm.SIMPLEX,
     ...     seed=42,
     ... )
-    >>> samples = noise[tcod.noise.grid(shape=(5, 4), scale=0.25, origin=(0, 0))]
+    >>> samples = noise[tcod.noise.grid(shape=(5, 4), scale=0.25, offset=(0, 0))]
     >>> samples  # Samples are a grid of floats between -1.0 and 1.0
     array([[ 0.        , -0.55046356, -0.76072866, -0.7088647 , -0.68165785],
            [-0.27523372, -0.7205134 , -0.74057037, -0.43919194, -0.29195625],
@@ -412,8 +412,10 @@ class Noise:
 def grid(
     shape: tuple[int, ...],
     scale: tuple[float, ...] | float,
-    origin: tuple[int, ...] | None = None,
+    origin: tuple[float, ...] | None = None,
     indexing: Literal["ij", "xy"] = "xy",
+    *,
+    offset: tuple[float, ...] | None = None,
 ) -> tuple[NDArray[np.number], ...]:
     """Generate a mesh-grid of sample points to use with noise sampling.
 
@@ -427,6 +429,11 @@ def grid(
             If `None` then the `origin` will be zero on each axis.
             `origin` is not scaled by the `scale` parameter.
         indexing: Passed to :any:`numpy.meshgrid`.
+        offset: The offset into the shape to generate.
+            Similar to `origin` but is scaled by the `scale` parameter.
+            Can be multiples of `shape` to index noise samples by chunk.
+
+            .. versionadded:: Unreleased
 
     Returns:
         A sparse mesh-grid to be passed into a :class:`Noise` instance.
@@ -435,19 +442,36 @@ def grid(
 
         >>> noise = tcod.noise.Noise(dimensions=2, seed=42)
 
-        # Common case for ij-indexed arrays.
+        # Common case for ij-indexed arrays
         >>> noise[tcod.noise.grid(shape=(3, 5), scale=0.25, indexing="ij")]
         array([[ 0.        , -0.27523372, -0.40398532, -0.50773406, -0.64945626],
                [-0.55046356, -0.7205134 , -0.57662135, -0.2643614 , -0.12529983],
                [-0.76072866, -0.74057037, -0.33160293,  0.24446318,  0.5346834 ]],
               dtype=float32)
 
-        # Transpose an xy-indexed array to get a standard order="F" result.
+        # Transpose an xy-indexed array to get a standard order="F" result
         >>> noise[tcod.noise.grid(shape=(4, 5), scale=(0.5, 0.25), origin=(1.0, 1.0))].T
         array([[ 0.52655405,  0.25038874, -0.03488023, -0.18455243, -0.16333057],
                [-0.5037453 , -0.75348294, -0.73630923, -0.35063767,  0.18149695],
                [-0.81221616, -0.6379566 , -0.12449139,  0.4495706 ,  0.7547447 ],
                [-0.7057655 , -0.5817767 , -0.22774395,  0.02399864, -0.07006818]],
+              dtype=float32)
+
+        # Can sample noise by chunk using the offset keyword
+        >>> noise[tcod.noise.grid(shape=(3, 5), scale=0.25, indexing="ij", offset=(0, 0))]
+        array([[ 0.        , -0.27523372, -0.40398532, -0.50773406, -0.64945626],
+               [-0.55046356, -0.7205134 , -0.57662135, -0.2643614 , -0.12529983],
+               [-0.76072866, -0.74057037, -0.33160293,  0.24446318,  0.5346834 ]],
+              dtype=float32)
+        >>> noise[tcod.noise.grid(shape=(3, 5), scale=0.25, indexing="ij", offset=(3, 0))]
+        array([[-0.7088647 , -0.43919194,  0.12860827,  0.6390255 ,  0.80402255],
+               [-0.68165785, -0.29195625,  0.2864191 ,  0.5922846 ,  0.52655405],
+               [-0.7841389 , -0.46131462,  0.0159424 ,  0.17141782, -0.04198273]],
+              dtype=float32)
+        >>> noise[tcod.noise.grid(shape=(3, 5), scale=0.25, indexing="ij", offset=(6, 0))]
+        array([[-0.779634  , -0.60696834, -0.27446985, -0.23233278, -0.5037453 ],
+               [-0.5474089 , -0.54476213, -0.42235228, -0.49519652, -0.7101793 ],
+               [-0.28291094, -0.4326369 , -0.5227732 , -0.69655263, -0.81221616]],
               dtype=float32)
 
     .. versionadded:: 12.2
@@ -462,6 +486,13 @@ def grid(
     if len(shape) != len(origin):
         msg = "shape must have the same length as origin"
         raise TypeError(msg)
+    if offset is not None:
+        if len(shape) != len(offset):
+            msg = "shape must have the same length as offset"
+            raise TypeError(msg)
+        origin = tuple(
+            i_origin + i_scale * i_offset for i_scale, i_offset, i_origin in zip(scale, offset, origin, strict=True)
+        )
     indexes = (
         np.arange(i_shape) * i_scale + i_origin for i_shape, i_scale, i_origin in zip(shape, scale, origin, strict=True)
     )

@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Added
+
+- `tcod.noise.grid` now has the `offset` parameter for easier sampling of noise chunks.
+
 ## [19.1.0] - 2025-07-12
 
 ### Added
