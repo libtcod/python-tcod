@@ -433,7 +433,7 @@ def grid(
             Similar to `origin` but is scaled by the `scale` parameter.
             Can be multiples of `shape` to index noise samples by chunk.
 
-            .. versionadded:: Unreleased
+            .. versionadded:: 19.2
 
     Returns:
         A sparse mesh-grid to be passed into a :class:`Noise` instance.
