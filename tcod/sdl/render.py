@@ -6,7 +6,6 @@
 from __future__ import annotations
 
 import enum
-from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, Final, Literal
 
 import numpy as np
@@ -18,6 +17,8 @@ from tcod.cffi import ffi, lib
 from tcod.sdl._internal import Properties, _check, _check_p
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from numpy.typing import NDArray
 
 
@@ -173,7 +174,7 @@ class Texture:
     Create a new texture using :any:`Renderer.new_texture` or :any:`Renderer.upload_texture`.
     """
 
-    def __init__(self, sdl_texture_p: Any, sdl_renderer_p: Any = None) -> None:
+    def __init__(self, sdl_texture_p: Any, sdl_renderer_p: Any = None) -> None:  # noqa: ANN401
         """Encapsulate an SDL_Texture pointer. This function is private."""
         self.p = sdl_texture_p
         self._sdl_renderer_p = sdl_renderer_p  # Keep alive.
@@ -199,6 +200,10 @@ class Texture:
         if isinstance(other, Texture):
             return bool(self.p == other.p)
         return NotImplemented
+
+    def __hash__(self) -> int:
+        """Return hash for the owned pointer."""
+        return hash(self.p)
 
     def update(self, pixels: NDArray[Any], rect: tuple[int, int, int, int] | None = None) -> None:
         """Update the pixel data of this texture.
@@ -267,7 +272,7 @@ class _RestoreTargetContext:
 class Renderer:
     """SDL Renderer."""
 
-    def __init__(self, sdl_renderer_p: Any) -> None:
+    def __init__(self, sdl_renderer_p: Any) -> None:  # noqa: ANN401
         """Encapsulate an SDL_Renderer pointer. This function is private."""
         if ffi.typeof(sdl_renderer_p) is not ffi.typeof("struct SDL_Renderer*"):
             msg = f"Expected a {ffi.typeof('struct SDL_Window*')} type (was {ffi.typeof(sdl_renderer_p)})."
@@ -282,6 +287,10 @@ class Renderer:
         if isinstance(other, Renderer):
             return bool(self.p == other.p)
         return NotImplemented
+
+    def __hash__(self) -> int:
+        """Return hash for the owned pointer."""
+        return hash(self.p)
 
     def copy(  # noqa: PLR0913
         self,
@@ -328,7 +337,7 @@ class Renderer:
         _check(lib.SDL_SetRenderTarget(self.p, texture.p))
         return restore
 
-    def new_texture(self, width: int, height: int, *, format: int | None = None, access: int | None = None) -> Texture:
+    def new_texture(self, width: int, height: int, *, format: int | None = None, access: int | None = None) -> Texture:  # noqa: A002
         """Allocate and return a new Texture for this renderer.
 
         Args:
@@ -339,13 +348,13 @@ class Renderer:
                     See :any:`TextureAccess` for more options.
         """
         if format is None:
-            format = 0
+            format = 0  # noqa: A001
         if access is None:
             access = int(lib.SDL_TEXTUREACCESS_STATIC)
         texture_p = ffi.gc(lib.SDL_CreateTexture(self.p, format, access, width, height), lib.SDL_DestroyTexture)
         return Texture(texture_p, self.p)
 
-    def upload_texture(self, pixels: NDArray[Any], *, format: int | None = None, access: int | None = None) -> Texture:
+    def upload_texture(self, pixels: NDArray[Any], *, format: int | None = None, access: int | None = None) -> Texture:  # noqa: A002
         """Return a new Texture from an array of pixels.
 
         Args:
@@ -358,9 +367,9 @@ class Renderer:
             assert len(pixels.shape) == 3  # noqa: PLR2004
             assert pixels.dtype == np.uint8
             if pixels.shape[2] == 4:  # noqa: PLR2004
-                format = int(lib.SDL_PIXELFORMAT_RGBA32)
+                format = int(lib.SDL_PIXELFORMAT_RGBA32)  # noqa: A001
             elif pixels.shape[2] == 3:  # noqa: PLR2004
-                format = int(lib.SDL_PIXELFORMAT_RGB24)
+                format = int(lib.SDL_PIXELFORMAT_RGB24)  # noqa: A001
             else:
                 msg = f"Can't determine the format required for an array of shape {pixels.shape}."
                 raise TypeError(msg)
@@ -502,7 +511,7 @@ class Renderer:
     def viewport(self, rect: tuple[int, int, int, int] | None) -> None:
         _check(lib.SDL_SetRenderViewport(self.p, (rect,)))
 
-    def set_vsync(self, enable: bool) -> None:
+    def set_vsync(self, enable: bool) -> None:  # noqa: FBT001
         """Enable or disable VSync for this renderer.
 
         .. versionadded:: 13.5
@@ -625,7 +634,7 @@ class Renderer:
         .. versionadded:: 13.5
         """
         rects = self._convert_array(rects, item_length=4)
-        _check(lib.SDL_RenderFillRects(self.p, tcod.ffi.from_buffer("SDL_FRect*", rects), rects.shape[0]))
+        _check(lib.SDL_RenderFillRects(self.p, ffi.from_buffer("SDL_FRect*", rects), rects.shape[0]))
 
     def draw_rects(self, rects: NDArray[np.number] | Sequence[tuple[float, float, float, float]]) -> None:
         """Draw multiple outlined rectangles from an array.
@@ -638,7 +647,7 @@ class Renderer:
         rects = self._convert_array(rects, item_length=4)
         assert len(rects.shape) == 2  # noqa: PLR2004
         assert rects.shape[1] == 4  # noqa: PLR2004
-        _check(lib.SDL_RenderRects(self.p, tcod.ffi.from_buffer("SDL_FRect*", rects), rects.shape[0]))
+        _check(lib.SDL_RenderRects(self.p, ffi.from_buffer("SDL_FRect*", rects), rects.shape[0]))
 
     def draw_points(self, points: NDArray[np.number] | Sequence[tuple[float, float]]) -> None:
         """Draw an array of points.
@@ -649,7 +658,7 @@ class Renderer:
         .. versionadded:: 13.5
         """
         points = self._convert_array(points, item_length=2)
-        _check(lib.SDL_RenderPoints(self.p, tcod.ffi.from_buffer("SDL_FPoint*", points), points.shape[0]))
+        _check(lib.SDL_RenderPoints(self.p, ffi.from_buffer("SDL_FPoint*", points), points.shape[0]))
 
     def draw_lines(self, points: NDArray[np.number] | Sequence[tuple[float, float]]) -> None:
         """Draw a connected series of lines from an array.
@@ -660,7 +669,7 @@ class Renderer:
         .. versionadded:: 13.5
         """
         points = self._convert_array(points, item_length=2)
-        _check(lib.SDL_RenderLines(self.p, tcod.ffi.from_buffer("SDL_FPoint*", points), points.shape[0]))
+        _check(lib.SDL_RenderLines(self.p, ffi.from_buffer("SDL_FPoint*", points), points.shape[0]))
 
     def geometry(
         self,
