@@ -8,11 +8,16 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [19.3.0] - 2025-07-26
 
+Thanks to cr0ne for pointing out missing texture scaling options.
+These options did not exist in SDL2.
+
 ### Added
 
 - `tcod.sdl.render`: Added `ScaleMode` enum and `Texture.scale_mode` attribute.
 
 ## [19.2.0] - 2025-07-20
+
+Thanks to tryddle for demonstrating how bad the current API was with chunked world generation.
 
 ### Added
 
