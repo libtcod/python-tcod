@@ -70,6 +70,7 @@ def test_sdl_render(uses_window: None) -> None:
     rgb.alpha_mod = rgb.alpha_mod
     rgb.blend_mode = rgb.blend_mode
     rgb.color_mod = rgb.color_mod
+    rgb.scale_mode = rgb.scale_mode
     rgba = render.upload_texture(np.zeros((8, 8, 4), np.uint8), access=tcod.sdl.render.TextureAccess.TARGET)
     with render.set_render_target(rgba):
         render.copy(rgb)

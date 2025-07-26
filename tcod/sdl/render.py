@@ -141,6 +141,19 @@ class BlendMode(enum.IntEnum):
     """"""
 
 
+class ScaleMode(enum.IntEnum):
+    """Texture scaling modes.
+
+    .. versionadded:: unreleased
+    """
+
+    NEAREST = lib.SDL_SCALEMODE_NEAREST
+    """Nearing neighbor."""
+    LINEAR = lib.SDL_SCALEMODE_LINEAR
+    """Linier filtering."""
+    # PIXELART = lib.SDL_SCALEMODE_PIXELART  # Needs SDL 3.4 # noqa: ERA001
+
+
 def compose_blend_mode(  # noqa: PLR0913
     source_color_factor: BlendFactor,
     dest_color_factor: BlendFactor,
@@ -253,6 +266,20 @@ class Texture:
     @color_mod.setter
     def color_mod(self, rgb: tuple[int, int, int]) -> None:
         _check(lib.SDL_SetTextureColorMod(self.p, rgb[0], rgb[1], rgb[2]))
+
+    @property
+    def scale_mode(self) -> ScaleMode:
+        """Get or set this textures :any:`ScaleMode`.
+
+        ..versionadded:: unreleased
+        """
+        mode = ffi.new("SDL_ScaleMode*")
+        _check(lib.SDL_GetTextureScaleMode(self.p, mode))
+        return ScaleMode(mode[0])
+
+    @scale_mode.setter
+    def scale_mode(self, value: ScaleMode, /) -> None:
+        _check(lib.SDL_SetTextureScaleMode(self.p, value))
 
 
 class _RestoreTargetContext:
