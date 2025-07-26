@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [19.3.0] - 2025-07-26
+
 ### Added
 
 - `tcod.sdl.render`: Added `ScaleMode` enum and `Texture.scale_mode` attribute.

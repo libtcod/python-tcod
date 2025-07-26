@@ -144,7 +144,7 @@ class BlendMode(enum.IntEnum):
 class ScaleMode(enum.IntEnum):
     """Texture scaling modes.
 
-    .. versionadded:: unreleased
+    .. versionadded:: 19.3
     """
 
     NEAREST = lib.SDL_SCALEMODE_NEAREST
@@ -271,7 +271,7 @@ class Texture:
     def scale_mode(self) -> ScaleMode:
         """Get or set this textures :any:`ScaleMode`.
 
-        ..versionadded:: unreleased
+        ..versionadded:: 19.3
         """
         mode = ffi.new("SDL_ScaleMode*")
         _check(lib.SDL_GetTextureScaleMode(self.p, mode))
