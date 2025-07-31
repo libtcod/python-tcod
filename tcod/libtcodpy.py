@@ -3584,8 +3584,11 @@ def _unpack_union(type_: int, union: Any) -> Any:  # noqa: PLR0911
     raise RuntimeError(msg)
 
 
-def _convert_TCODList(c_list: Any, type_: int) -> Any:
-    return [_unpack_union(type_, lib.TDL_list_get_union(c_list, i)) for i in range(lib.TCOD_list_size(c_list))]
+def _convert_TCODList(c_list: Any, type_: int) -> Any:  # noqa: N802
+    with ffi.new("TCOD_value_t[]", lib.TCOD_list_size(c_list)) as unions:
+        for i, union in enumerate(unions):
+            union.custom = lib.TCOD_list_get(c_list, i)
+        return [_unpack_union(type_, union) for union in unions]
 
 
 @deprecate("Parser functions have been deprecated.")

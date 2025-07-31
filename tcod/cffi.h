@@ -9,4 +9,3 @@
 #include "path.h"
 #include "random.h"
 #include "tcod.h"
-#include "tdl.h"
