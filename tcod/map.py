@@ -6,6 +6,7 @@ import warnings
 from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
+from typing_extensions import deprecated
 
 import tcod._internal
 import tcod.constants
@@ -15,6 +16,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
 
+@deprecated("This class may perform poorly and is no longer needed.")
 class Map:
     """A map containing libtcod attributes.
 
@@ -78,11 +80,6 @@ class Map:
         order: Literal["C", "F"] = "C",
     ) -> None:
         """Initialize the map."""
-        warnings.warn(
-            "This class may perform poorly and is no longer needed.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
         self.width = width
         self.height = height
         self._order = tcod._internal.verify_order(order)
