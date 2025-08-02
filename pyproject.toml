@@ -102,10 +102,6 @@ filterwarnings = [
 [tool.cibuildwheel] # https://cibuildwheel.pypa.io/en/stable/options/
 enable = ["pypy", "pyodide-prerelease"]
 
-[tool.cibuildwheel.pyodide]
-dependency-versions = "latest" # Until pyodide-version is stable on cibuildwheel
-pyodide-version = "0.28.0a3"
-
 [tool.mypy]
 files = ["."]
 python_version = "3.10"
