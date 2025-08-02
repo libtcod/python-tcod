@@ -599,7 +599,7 @@ class MouseButtonEvent(MouseState):
         return f"tcod.event.{self.__class__.__name__}(position={tuple(self.position)!r}, tile={tuple(self.tile)!r}, button={MouseButton(self.button)!r})"
 
     def __str__(self) -> str:
-        return "<type=%r, position=(x=%i, y=%i), tile=(x=%i, y=%i), button=%r)" % (
+        return "<type=%r, position=(x=%i, y=%i), tile=(x=%i, y=%i), button=%r>" % (
             self.type,
             *self.position,
             *self.tile,
@@ -650,7 +650,7 @@ class MouseWheel(Event):
         )
 
     def __str__(self) -> str:
-        return "<%s, x=%i, y=%i, flipped=%r)" % (
+        return "<%s, x=%i, y=%i, flipped=%r>" % (
             super().__str__().strip("<>"),
             self.x,
             self.y,

@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Fixed
+
+- Corrected some inconsistent angle brackets in the `__str__` of Event subclasses. #165
+
 ## [19.3.1] - 2025-08-02
 
 Solved a deprecation warning which was internal to tcod and no doubt annoyed many devs.
