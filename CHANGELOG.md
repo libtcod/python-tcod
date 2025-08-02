@@ -6,9 +6,14 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [19.3.1] - 2025-08-02
+
+Solved a deprecation warning which was internal to tcod and no doubt annoyed many devs.
+Thanks to jmccardle for forcing me to resolve this.
+
 ### Fixed
 
-- Silenced internal deprecation warning within `Context.convert_event`.
+- Silenced internal deprecation warnings within `Context.convert_event`.
 
 ## [19.3.0] - 2025-07-26
 
