@@ -418,12 +418,8 @@ class MouseState(Event):
         self.state = state
 
     @property
+    @deprecated("The mouse.pixel attribute is deprecated.  Use mouse.position instead.")
     def pixel(self) -> Point:
-        warnings.warn(
-            "The mouse.pixel attribute is deprecated.  Use mouse.position instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
         return self.position
 
     @pixel.setter
@@ -431,26 +427,29 @@ class MouseState(Event):
         self.position = value
 
     @property
+    @deprecated(
+        "The mouse.tile attribute is deprecated."
+        "  Use mouse.position of the event returned by context.convert_event instead."
+    )
     def tile(self) -> Point:
-        warnings.warn(
-            "The mouse.tile attribute is deprecated.  Use mouse.position of the event returned by context.convert_event instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
         return _verify_tile_coordinates(self._tile)
 
     @tile.setter
+    @deprecated(
+        "The mouse.tile attribute is deprecated."
+        "  Use mouse.position of the event returned by context.convert_event instead."
+    )
     def tile(self, xy: tuple[float, float]) -> None:
         self._tile = Point(*xy)
 
     def __repr__(self) -> str:
-        return f"tcod.event.{self.__class__.__name__}(position={tuple(self.position)!r}, tile={tuple(self.tile)!r}, state={MouseButtonMask(self.state)})"
+        return f"tcod.event.{self.__class__.__name__}(position={tuple(self.position)!r}, tile={tuple(self._tile or (0, 0))!r}, state={MouseButtonMask(self.state)})"
 
     def __str__(self) -> str:
         return ("<%s, position=(x=%i, y=%i), tile=(x=%i, y=%i), state=%s>") % (
             super().__str__().strip("<>"),
             *self.position,
-            *self.tile,
+            *(self._tile or (0, 0)),
             MouseButtonMask(self.state),
         )
 
@@ -492,41 +491,29 @@ class MouseMotion(MouseState):
         self._tile_motion = Point(*tile_motion) if tile_motion is not None else None
 
     @property
+    @deprecated("The mouse.pixel_motion attribute is deprecated.  Use mouse.motion instead.")
     def pixel_motion(self) -> Point:
-        warnings.warn(
-            "The mouse.pixel_motion attribute is deprecated.  Use mouse.motion instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
         return self.motion
 
     @pixel_motion.setter
+    @deprecated("The mouse.pixel_motion attribute is deprecated.  Use mouse.motion instead.")
     def pixel_motion(self, value: Point) -> None:
-        warnings.warn(
-            "The mouse.pixel_motion attribute is deprecated.  Use mouse.motion instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
         self.motion = value
 
     @property
+    @deprecated(
+        "The mouse.tile_motion attribute is deprecated."
+        "  Use mouse.motion of the event returned by context.convert_event instead."
+    )
     def tile_motion(self) -> Point:
-        warnings.warn(
-            "The mouse.tile_motion attribute is deprecated."
-            "  Use mouse.motion of the event returned by context.convert_event instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
         return _verify_tile_coordinates(self._tile_motion)
 
     @tile_motion.setter
+    @deprecated(
+        "The mouse.tile_motion attribute is deprecated."
+        "  Use mouse.motion of the event returned by context.convert_event instead."
+    )
     def tile_motion(self, xy: tuple[float, float]) -> None:
-        warnings.warn(
-            "The mouse.tile_motion attribute is deprecated."
-            "  Use mouse.motion of the event returned by context.convert_event instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
         self._tile_motion = Point(*xy)
 
     @classmethod

@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Fixed
+
+- Silenced internal deprecation warning within `Context.convert_event`.
+
 ## [19.3.0] - 2025-07-26
 
 Thanks to cr0ne for pointing out missing texture scaling options.
