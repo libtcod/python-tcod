@@ -786,7 +786,7 @@ class WindowResized(WindowEvent):
         width (int): The current width of the window.
         height (int): The current height of the window.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 19.4
         Removed "WindowSizeChanged" type.
     """
 

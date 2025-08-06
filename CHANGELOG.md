@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [19.4.0] - 2025-08-06
+
 ### Changed
 
 - Checking "WindowSizeChanged" was not valid since SDL 3 and was also not valid in previous examples.
@@ -101,6 +103,8 @@ Be sure to run [Mypy](https://mypy.readthedocs.io/en/stable/getting_started.html
 - `WindowFlags.FULLSCREEN_DESKTOP` is now just `WindowFlags.FULLSCREEN`
 - `tcod.sdl.render.Renderer.integer_scaling` removed.
 - Removed `callback`, `spec`, `queued_samples`, `queue_audio`, and `dequeue_audio` attributes from `tcod.sdl.audio.AudioDevice`.
+- `tcod.event.WindowResized`: `type="WindowSizeChanged"` removed and must no longer be checked for.
+  `EventDispatch.ev_windowsizechanged` is no longer called.
 
 ### Fixed
 
