@@ -90,7 +90,6 @@ from typing import TYPE_CHECKING, Any, Final, Generic, Literal, NamedTuple, Type
 import numpy as np
 from typing_extensions import deprecated
 
-import tcod.event
 import tcod.event_constants
 import tcod.sdl.joystick
 import tcod.sdl.sys
@@ -194,6 +193,7 @@ class Modifier(enum.IntFlag):
 
     Example::
 
+        >>> import tcod.event
         >>> mod = tcod.event.Modifier(4098)
         >>> mod & tcod.event.Modifier.SHIFT  # Check if any shift key is held.
         <Modifier.RSHIFT: 2>
@@ -2738,6 +2738,7 @@ class KeySym(enum.IntEnum):
 
         Example::
 
+            >>> import tcod.event
             >>> tcod.event.KeySym.F1.label
             'F1'
             >>> tcod.event.KeySym.BACKSPACE.label
