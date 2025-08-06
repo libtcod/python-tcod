@@ -42,7 +42,7 @@ def main() -> None:
                 print(repr(event))
                 if isinstance(event, tcod.event.Quit):
                     raise SystemExit
-                if isinstance(event, tcod.event.WindowResized) and event.type == "WindowSizeChanged":
+                if isinstance(event, tcod.event.WindowResized) and event.type == "WindowResized":
                     console = context.new_console()
                 if isinstance(event, tcod.event.ControllerDevice):
                     if event.type == "CONTROLLERDEVICEADDED":

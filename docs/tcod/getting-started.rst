@@ -114,7 +114,7 @@ clearing the console every frame and replacing it only on resizing the window.
                     match event:
                         case tcod.event.Quit():
                             raise SystemExit
-                        case tcod.event.WindowResized(type="WindowSizeChanged"):
+                        case tcod.event.WindowResized(width=width, height=height):  # Size in pixels
                             pass  # The next call to context.new_console may return a different size.
 
 

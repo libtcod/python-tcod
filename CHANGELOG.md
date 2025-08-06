@@ -6,9 +6,15 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Changed
+
+- Checking "WindowSizeChanged" was not valid since SDL 3 and was also not valid in previous examples.
+  You must no longer check the type of the `WindowResized` event.
+
 ### Fixed
 
 - Corrected some inconsistent angle brackets in the `__str__` of Event subclasses. #165
+- Fix regression with window events causing them to be `Unknown` and uncheckable.
 
 ## [19.3.1] - 2025-08-02
 

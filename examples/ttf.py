@@ -84,7 +84,7 @@ def main() -> None:
             for event in tcod.event.wait():
                 if isinstance(event, tcod.event.Quit):
                     raise SystemExit
-                if isinstance(event, tcod.event.WindowResized) and event.type == "WindowSizeChanged":
+                if isinstance(event, tcod.event.WindowResized):
                     # Resize the Tileset to match the new screen size.
                     context.change_tileset(
                         load_ttf(

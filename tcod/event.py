@@ -83,6 +83,7 @@ Example::
 from __future__ import annotations
 
 import enum
+import functools
 import warnings
 from collections.abc import Callable, Iterator, Mapping
 from typing import TYPE_CHECKING, Any, Final, Generic, Literal, NamedTuple, TypeVar
@@ -698,7 +699,6 @@ class WindowEvent(Event):
             "WindowExposed",
             "WindowMoved",
             "WindowResized",
-            "WindowSizeChanged",
             "WindowMinimized",
             "WindowMaximized",
             "WindowRestored",
@@ -715,13 +715,13 @@ class WindowEvent(Event):
 
     @classmethod
     def from_sdl_event(cls, sdl_event: Any) -> WindowEvent | Undefined:
-        if sdl_event.window.event not in cls.__WINDOW_TYPES:
+        if sdl_event.type not in cls._WINDOW_TYPES:
             return Undefined.from_sdl_event(sdl_event)
-        event_type: Final = cls.__WINDOW_TYPES[sdl_event.window.event]
+        event_type: Final = cls._WINDOW_TYPES[sdl_event.type]
         self: WindowEvent
-        if sdl_event.window.event == lib.SDL_EVENT_WINDOW_MOVED:
+        if sdl_event.type == lib.SDL_EVENT_WINDOW_MOVED:
             self = WindowMoved(sdl_event.window.data1, sdl_event.window.data2)
-        elif sdl_event.window.event in (
+        elif sdl_event.type in (
             lib.SDL_EVENT_WINDOW_RESIZED,
             lib.SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED,
         ):
@@ -734,7 +734,7 @@ class WindowEvent(Event):
     def __repr__(self) -> str:
         return f"tcod.event.{self.__class__.__name__}(type={self.type!r})"
 
-    __WINDOW_TYPES: Final = {
+    _WINDOW_TYPES: Final = {
         lib.SDL_EVENT_WINDOW_SHOWN: "WindowShown",
         lib.SDL_EVENT_WINDOW_HIDDEN: "WindowHidden",
         lib.SDL_EVENT_WINDOW_EXPOSED: "WindowExposed",
@@ -785,10 +785,13 @@ class WindowResized(WindowEvent):
     Attributes:
         width (int): The current width of the window.
         height (int): The current height of the window.
+
+    .. versionchanged:: Unreleased
+        Removed "WindowSizeChanged" type.
     """
 
-    type: Final[Literal["WindowResized", "WindowSizeChanged"]]  # type: ignore[misc]
-    """WindowResized" or "WindowSizeChanged"""
+    type: Final[Literal["WindowResized"]]  # type: ignore[misc]
+    """Always "WindowResized"."""
 
     def __init__(self, type: str, width: int, height: int) -> None:
         super().__init__(type)
@@ -1130,6 +1133,15 @@ class ControllerDevice(ControllerEvent):
         return cls(type, sdl_event.cdevice.which)
 
 
+@functools.cache
+def _find_event_name(index: int, /) -> str:
+    """Return the SDL event name for this index."""
+    for attr in dir(lib):
+        if attr.startswith("SDL_EVENT_") and getattr(lib, attr) == index:
+            return attr
+    return "???"
+
+
 class Undefined(Event):
     """This class is a place holder for SDL events without their own tcod.event class."""
 
@@ -1144,8 +1156,11 @@ class Undefined(Event):
 
     def __str__(self) -> str:
         if self.sdl_event:
-            return "<Undefined sdl_event.type=%i>" % self.sdl_event.type
+            return f"<Undefined sdl_event.type={self.sdl_event.type} {_find_event_name(self.sdl_event.type)}>"
         return "<Undefined>"
+
+    def __repr__(self) -> str:
+        return self.__str__()
 
 
 _SDL_TO_CLASS_TABLE: dict[int, type[Event]] = {
@@ -1157,7 +1172,6 @@ _SDL_TO_CLASS_TABLE: dict[int, type[Event]] = {
     lib.SDL_EVENT_MOUSE_BUTTON_UP: MouseButtonUp,
     lib.SDL_EVENT_MOUSE_WHEEL: MouseWheel,
     lib.SDL_EVENT_TEXT_INPUT: TextInput,
-    # lib.SDL_EVENT_WINDOW_EVENT: WindowEvent,
     lib.SDL_EVENT_JOYSTICK_AXIS_MOTION: JoystickAxis,
     lib.SDL_EVENT_JOYSTICK_BALL_MOTION: JoystickBall,
     lib.SDL_EVENT_JOYSTICK_HAT_MOTION: JoystickHat,
@@ -1176,9 +1190,11 @@ _SDL_TO_CLASS_TABLE: dict[int, type[Event]] = {
 
 def _parse_event(sdl_event: Any) -> Event:
     """Convert a C SDL_Event* type into a tcod Event sub-class."""
-    if sdl_event.type not in _SDL_TO_CLASS_TABLE:
-        return Undefined.from_sdl_event(sdl_event)
-    return _SDL_TO_CLASS_TABLE[sdl_event.type].from_sdl_event(sdl_event)
+    if sdl_event.type in _SDL_TO_CLASS_TABLE:
+        return _SDL_TO_CLASS_TABLE[sdl_event.type].from_sdl_event(sdl_event)
+    if sdl_event.type in WindowEvent._WINDOW_TYPES:
+        return WindowEvent.from_sdl_event(sdl_event)
+    return Undefined.from_sdl_event(sdl_event)
 
 
 def get() -> Iterator[Any]:
@@ -1198,10 +1214,7 @@ def get() -> Iterator[Any]:
         return
     sdl_event = ffi.new("SDL_Event*")
     while lib.SDL_PollEvent(sdl_event):
-        if sdl_event.type in _SDL_TO_CLASS_TABLE:
-            yield _SDL_TO_CLASS_TABLE[sdl_event.type].from_sdl_event(sdl_event)
-        else:
-            yield Undefined.from_sdl_event(sdl_event)
+        yield _parse_event(sdl_event)
 
 
 def wait(timeout: float | None = None) -> Iterator[Any]:
@@ -1424,9 +1437,6 @@ class EventDispatch(Generic[T]):
 
     def ev_windowresized(self, event: tcod.event.WindowResized, /) -> T | None:
         """Called when the window is resized."""
-
-    def ev_windowsizechanged(self, event: tcod.event.WindowResized, /) -> T | None:
-        """Called when the system or user changes the size of the window."""
 
     def ev_windowminimized(self, event: tcod.event.WindowEvent, /) -> T | None:
         """Called when the window is minimized."""
