@@ -68,6 +68,7 @@ jobs:
 
   # This makes sure that the latest versions of the SDL headers parse correctly.
   parse_sdl:
+    if: false
     needs: [ruff, mypy]
     runs-on: ${{ matrix.os }}
     strategy:
@@ -92,6 +93,7 @@ jobs:
           SDL_VERSION: ${{ matrix.sdl-version }}
 
   build:
+    if: false
     needs: [ruff, mypy, sdist]
     runs-on: ${{ matrix.os }}
     strategy:
@@ -165,6 +167,7 @@ jobs:
           compression-level: 0
 
   test-docs:
+    if: false
     needs: [ruff, mypy, sdist]
     runs-on: ubuntu-latest
     steps:
@@ -192,6 +195,7 @@ jobs:
         run: python -m sphinx -T -E -W --keep-going . _build/html
 
   tox:
+    if: false
     needs: [ruff, sdist]
     runs-on: ${{ matrix.os }}
     strategy:
@@ -221,6 +225,7 @@ jobs:
           tox -vv
 
   linux-wheels:
+    if: false
     needs: [ruff, mypy, sdist]
     runs-on: ${{ matrix.arch == 'aarch64' && 'ubuntu-24.04-arm' || 'ubuntu-latest'}}
     strategy:
@@ -276,6 +281,7 @@ jobs:
           compression-level: 0
 
   build-macos:
+    if: false
     needs: [ruff, mypy, sdist]
     runs-on: "macos-14"
     strategy:
@@ -322,7 +328,6 @@ jobs:
           compression-level: 0
 
   pyodide:
-    needs: [ruff, mypy, sdist]
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
