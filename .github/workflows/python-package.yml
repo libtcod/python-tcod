@@ -103,9 +103,6 @@ jobs:
           - os: "windows-latest"
             python-version: "3.10"
             architecture: "x86"
-          - os: "windows-latest"
-            python-version: "pypy-3.10"
-            architecture: "x86"
       fail-fast: false
 
     steps:
