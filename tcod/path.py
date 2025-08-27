@@ -1002,8 +1002,8 @@ class CustomGraph:
         _check(
             lib.path_compute(
                 pathfinder._frontier_p,
-                pathfinder._distance_p,
-                pathfinder._travel_p,
+                _export(pathfinder._distance),
+                _export(pathfinder._travel),
                 len(rules),
                 rules,
                 pathfinder._heuristic_p,
@@ -1110,8 +1110,6 @@ class Pathfinder:
         self._frontier_p = ffi.gc(lib.TCOD_frontier_new(self._graph._ndim), lib.TCOD_frontier_delete)
         self._distance = maxarray(self._graph._shape_c)
         self._travel = _world_array(self._graph._shape_c)
-        self._distance_p = _export(self._distance)
-        self._travel_p = _export(self._travel)
         self._heuristic: tuple[int, int, int, int, tuple[int, ...]] | None = None
         self._heuristic_p: Any = ffi.NULL
 
@@ -1180,8 +1178,22 @@ class Pathfinder:
     def clear(self) -> None:
         """Reset the pathfinder to its initial state.
 
-        This sets all values on the :any:`distance` array to their maximum
-        value.
+        This sets all values on the :any:`distance` array to their maximum value.
+
+        Example::
+
+            >>> import tcod.path
+            >>> graph = tcod.path.SimpleGraph(
+            ...     cost=np.ones((5, 5), np.int8), cardinal=2, diagonal=3,
+            ... )
+            >>> pf = tcod.path.Pathfinder(graph)
+            >>> pf.add_root((0, 0))
+            >>> pf.path_to((2, 2)).tolist()
+            [[0, 0], [1, 1], [2, 2]]
+            >>> pf.clear()  # Reset Pathfinder to its initial state
+            >>> pf.add_root((0, 2))
+            >>> pf.path_to((2, 2)).tolist()
+            [[0, 2], [1, 2], [2, 2]]
         """
         self._distance[...] = np.iinfo(self._distance.dtype).max
         self._travel = _world_array(self._graph._shape_c)
@@ -1237,7 +1249,7 @@ class Pathfinder:
         """
         lib.TCOD_frontier_clear(self._frontier_p)
         self._update_heuristic(None)
-        _check(lib.rebuild_frontier_from_distance(self._frontier_p, self._distance_p))
+        _check(lib.rebuild_frontier_from_distance(self._frontier_p, _export(self._distance)))
 
     def resolve(self, goal: tuple[int, ...] | None = None) -> None:
         """Manually run the pathfinder algorithm.
@@ -1341,12 +1353,13 @@ class Pathfinder:
         self.resolve(index)
         if self._order == "F":  # Convert to ij indexing order.
             index = index[::-1]
-        length = _check(lib.get_travel_path(self._graph._ndim, self._travel_p, index, ffi.NULL))
+        _travel_p = _export(self._travel)
+        length = _check(lib.get_travel_path(self._graph._ndim, _travel_p, index, ffi.NULL))
         path: np.ndarray[Any, np.dtype[np.intc]] = np.ndarray((length, self._graph._ndim), dtype=np.intc)
         _check(
             lib.get_travel_path(
                 self._graph._ndim,
-                self._travel_p,
+                _travel_p,
                 index,
                 ffi.from_buffer("int*", path),
             )

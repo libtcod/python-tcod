@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed dangling pointer in `Pathfinder.clear` method.
+
 ## [19.4.0] - 2025-08-06
 
 ### Changed
