@@ -1246,6 +1246,20 @@ class Pathfinder:
         After you are finished editing :any:`distance` you must call this
         function before calling :any:`resolve` or any function which calls
         :any:`resolve` implicitly such as :any:`path_from` or :any:`path_to`.
+
+        Example::
+
+            >>> import tcod.path
+            >>> graph = tcod.path.SimpleGraph(
+            ...     cost=np.ones((5, 5), np.int8), cardinal=2, diagonal=3,
+            ... )
+            >>> pf = tcod.path.Pathfinder(graph)
+            >>> pf.distance[:, 0] = 0  # Set roots along entire left edge
+            >>> pf.rebuild_frontier()
+            >>> pf.path_to((0, 2)).tolist()  # Finds best path from [:, 0]
+            [[0, 0], [0, 1], [0, 2]]
+            >>> pf.path_to((4, 2)).tolist()
+            [[4, 0], [4, 1], [4, 2]]
         """
         lib.TCOD_frontier_clear(self._frontier_p)
         self._update_heuristic(None)

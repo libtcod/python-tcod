@@ -454,7 +454,7 @@ static int update_frontier_from_distance_iterator(
     int dist = get_array_int(dist_map, dimension, index);
     return TCOD_frontier_push(frontier, index, dist, dist);
   }
-  for (int i = 0; i < dist_map->shape[dimension];) {
+  for (int i = 0; i < dist_map->shape[dimension]; ++i) {
     index[dimension] = i;
     int err = update_frontier_from_distance_iterator(frontier, dist_map, dimension + 1, index);
     if (err) { return err; }
