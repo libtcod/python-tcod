@@ -43,6 +43,7 @@ RE_TAGS = re.compile(
     r"TCODLIB_C?API|TCOD_PUBLIC|TCOD_NODISCARD|TCOD_DEPRECATED_NOMESSAGE|TCOD_DEPRECATED_ENUM"
     r"|(TCOD_DEPRECATED\(\".*?\"\))"
     r"|(TCOD_DEPRECATED|TCODLIB_FORMAT)\([^)]*\)|__restrict"
+    r"|TCODLIB_(BEGIN|END)_IGNORE_DEPRECATIONS"
 )
 RE_VAFUNC = re.compile(r"^[^;]*\([^;]*va_list.*\);", re.MULTILINE)
 RE_INLINE = re.compile(r"(^.*?inline.*?\(.*?\))\s*\{.*?\}$", re.DOTALL | re.MULTILINE)

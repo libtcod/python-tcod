@@ -6,6 +6,14 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Changed
+
+- Update to libtcod 2.2.1.
+
+### Fixed
+
+- `SDL_RENDER_SCALE_QUALITY` is now respected again since the change to SDL3.
+
 ## [19.4.1] - 2025-08-27
 
 ### Fixed
