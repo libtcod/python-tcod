@@ -6,9 +6,12 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [19.5.0] - 2025-09-13
+
 ### Changed
 
 - Update to libtcod 2.2.1.
+- Scaling defaults to nearest, set `os.environ["SDL_RENDER_SCALE_QUALITY"] = "linear"` if linear scaling was preferred.
 
 ### Fixed
 
