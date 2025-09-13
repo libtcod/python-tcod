@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 ### Fixed
 
 - `SDL_RENDER_SCALE_QUALITY` is now respected again since the change to SDL3.
+- Fixed crash on controller events.
 
 ## [19.4.1] - 2025-08-27
 

@@ -1060,9 +1060,9 @@ class ControllerAxis(ControllerEvent):
     def from_sdl_event(cls, sdl_event: Any) -> ControllerAxis:
         return cls(
             "CONTROLLERAXISMOTION",
-            sdl_event.caxis.which,
-            tcod.sdl.joystick.ControllerAxis(sdl_event.caxis.axis),
-            sdl_event.caxis.value,
+            sdl_event.gaxis.which,
+            tcod.sdl.joystick.ControllerAxis(sdl_event.gaxis.axis),
+            sdl_event.gaxis.value,
         )
 
     def __repr__(self) -> str:
@@ -1099,9 +1099,9 @@ class ControllerButton(ControllerEvent):
         }[sdl_event.type]
         return cls(
             type,
-            sdl_event.cbutton.which,
-            tcod.sdl.joystick.ControllerButton(sdl_event.cbutton.button),
-            bool(sdl_event.cbutton.down),
+            sdl_event.gbutton.which,
+            tcod.sdl.joystick.ControllerButton(sdl_event.gbutton.button),
+            bool(sdl_event.gbutton.down),
         )
 
     def __repr__(self) -> str:
@@ -1130,7 +1130,7 @@ class ControllerDevice(ControllerEvent):
             lib.SDL_EVENT_GAMEPAD_REMOVED: "CONTROLLERDEVICEREMOVED",
             lib.SDL_EVENT_GAMEPAD_REMAPPED: "CONTROLLERDEVICEREMAPPED",
         }[sdl_event.type]
-        return cls(type, sdl_event.cdevice.which)
+        return cls(type, sdl_event.gdevice.which)
 
 
 @functools.cache
