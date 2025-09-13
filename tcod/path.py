@@ -473,7 +473,7 @@ def dijkstra2d(  # noqa: PLR0913
         Added `out` parameter.  Now returns the output array.
     """
     dist: NDArray[Any] = np.asarray(distance)
-    if out is ...:
+    if out is ...:  # type: ignore[comparison-overlap]
         out = dist
         warnings.warn(
             "No `out` parameter was given. "
