@@ -45,7 +45,7 @@ jobs:
   sdist:
     runs-on: ubuntu-latest
     steps:
-      - uses: HexDecimal/my-setup-sdl-action@v1.0.0
+      - uses: libsdl-org/setup-sdl@1894460666e4fe0c6603ea0cce5733f1cca56ba1
         with:
           install-linux-dependencies: true
           build-type: "Debug"
@@ -122,7 +122,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install xvfb
-      - uses: HexDecimal/my-setup-sdl-action@v1.0.0
+      - uses: libsdl-org/setup-sdl@1894460666e4fe0c6603ea0cce5733f1cca56ba1
         if: runner.os == 'Linux'
         with:
           install-linux-dependencies: true
@@ -165,7 +165,7 @@ jobs:
     needs: [ruff, mypy, sdist]
     runs-on: ubuntu-latest
     steps:
-      - uses: HexDecimal/my-setup-sdl-action@v1.0.0
+      - uses: libsdl-org/setup-sdl@1894460666e4fe0c6603ea0cce5733f1cca56ba1
         if: runner.os == 'Linux'
         with:
           install-linux-dependencies: true
@@ -207,7 +207,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip tox
-      - uses: HexDecimal/my-setup-sdl-action@v1.0.0
+      - uses: libsdl-org/setup-sdl@1894460666e4fe0c6603ea0cce5733f1cca56ba1
         if: runner.os == 'Linux'
         with:
           install-linux-dependencies: true
@@ -327,7 +327,7 @@ jobs:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
-      - uses: HexDecimal/my-setup-sdl-action@v1.0.0
+      - uses: libsdl-org/setup-sdl@1894460666e4fe0c6603ea0cce5733f1cca56ba1
         with:
           install-linux-dependencies: true
           build-type: "Debug"
