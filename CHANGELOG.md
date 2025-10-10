@@ -6,6 +6,17 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Added
+
+- Alternative syntax for number symbols with `KeySym`, can now specify `KeySym["3"]`, etc.
+  Only available on Python 3.13 or later.
+
+### Fixed
+
+- Fixed regression with lowercase key symbols with `tcod.event.K_*` and `KeySym.*` constants, these are still deprecated.
+  Event constants are only fixed for `tcod.event.K_*`, not the undocumented `tcod.event_constants` module.
+  Lowercase `KeySym.*` constants are only available on Python 3.13 or later.
+
 ## [19.5.0] - 2025-09-13
 
 ### Changed

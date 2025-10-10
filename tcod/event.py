@@ -84,6 +84,7 @@ from __future__ import annotations
 
 import enum
 import functools
+import sys
 import warnings
 from collections.abc import Callable, Iterator, Mapping
 from typing import TYPE_CHECKING, Any, Final, Generic, Literal, NamedTuple, TypeVar
@@ -2230,10 +2231,18 @@ class Scancode(enum.IntEnum):
 class KeySym(enum.IntEnum):
     """Keyboard constants based on their symbol.
 
-    These names are derived from SDL except for the numbers which are prefixed
-    with ``N`` (since raw numbers can not be a Python name.)
+    These names are derived from SDL except for numbers which are prefixed with ``N`` (since raw numbers can not be a Python name).
+    Alternatively ``KeySym["9"]`` can be used to represent numbers (since Python 3.13).
 
     .. versionadded:: 12.3
+
+    .. versionchanged:: 19.0
+        SDL backend was updated to 3.x, which means some enums have been renamed.
+        Single letters are now uppercase.
+
+    .. versionchanged:: Unreleased
+        Number symbols can now be fetched with ``KeySym["9"]``, etc.
+        With Python 3.13 or later.
 
     ==================  ==========
     UNKNOWN                      0
@@ -2280,32 +2289,32 @@ class KeySym(enum.IntEnum):
     CARET                       94
     UNDERSCORE                  95
     BACKQUOTE                   96
-    a                           97
-    b                           98
-    c                           99
-    d                          100
-    e                          101
-    f                          102
-    g                          103
-    h                          104
-    i                          105
-    j                          106
-    k                          107
-    l                          108
-    m                          109
-    n                          110
-    o                          111
-    p                          112
-    q                          113
-    r                          114
-    s                          115
-    t                          116
-    u                          117
-    v                          118
-    w                          119
-    x                          120
-    y                          121
-    z                          122
+    A                           97
+    B                           98
+    C                           99
+    D                          100
+    E                          101
+    F                          102
+    G                          103
+    H                          104
+    I                          105
+    J                          106
+    K                          107
+    L                          108
+    M                          109
+    N                          110
+    O                          111
+    P                          112
+    Q                          113
+    R                          114
+    S                          115
+    T                          116
+    U                          117
+    V                          118
+    W                          119
+    X                          120
+    Y                          121
+    Z                          122
     DELETE                     127
     SCANCODE_MASK       1073741824
     CAPSLOCK            1073741881
@@ -2799,6 +2808,48 @@ class KeySym(enum.IntEnum):
         return f"tcod.event.{self.__class__.__name__}.{self.name}"
 
 
+if sys.version_info >= (3, 13):
+    # Alias for lower case letters removed from SDL3
+    KeySym.A._add_alias_("a")
+    KeySym.B._add_alias_("b")
+    KeySym.C._add_alias_("c")
+    KeySym.D._add_alias_("d")
+    KeySym.E._add_alias_("e")
+    KeySym.F._add_alias_("f")
+    KeySym.G._add_alias_("g")
+    KeySym.H._add_alias_("h")
+    KeySym.I._add_alias_("i")
+    KeySym.J._add_alias_("j")
+    KeySym.K._add_alias_("k")
+    KeySym.L._add_alias_("l")
+    KeySym.M._add_alias_("m")
+    KeySym.N._add_alias_("n")
+    KeySym.O._add_alias_("o")
+    KeySym.P._add_alias_("p")
+    KeySym.Q._add_alias_("q")
+    KeySym.R._add_alias_("r")
+    KeySym.S._add_alias_("s")
+    KeySym.T._add_alias_("t")
+    KeySym.U._add_alias_("u")
+    KeySym.V._add_alias_("v")
+    KeySym.W._add_alias_("w")
+    KeySym.X._add_alias_("x")
+    KeySym.Y._add_alias_("y")
+    KeySym.Z._add_alias_("z")
+
+    # Alias for numbers, since Python enum names can not be number literals
+    KeySym.N0._add_alias_("0")
+    KeySym.N1._add_alias_("1")
+    KeySym.N2._add_alias_("2")
+    KeySym.N3._add_alias_("3")
+    KeySym.N4._add_alias_("4")
+    KeySym.N5._add_alias_("5")
+    KeySym.N6._add_alias_("6")
+    KeySym.N7._add_alias_("7")
+    KeySym.N8._add_alias_("8")
+    KeySym.N9._add_alias_("9")
+
+
 def __getattr__(name: str) -> int:
     """Migrate deprecated access of event constants."""
     if name.startswith("BUTTON_"):
@@ -2821,6 +2872,9 @@ def __getattr__(name: str) -> int:
             stacklevel=2,
         )
         return replacement
+
+    if name.startswith("K_") and len(name) == 3:  # noqa: PLR2004
+        name = name.upper()  # Silently fix single letter key symbols removed from SDL3, these are still deprecated
 
     value: int | None = getattr(tcod.event_constants, name, None)
     if not value:
