@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [19.6.0] - 2025-10-20
+
 ### Added
 
 - Alternative syntax for number symbols with `KeySym`, can now specify `KeySym["3"]`, etc.

@@ -2240,7 +2240,7 @@ class KeySym(enum.IntEnum):
         SDL backend was updated to 3.x, which means some enums have been renamed.
         Single letters are now uppercase.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 19.6
         Number symbols can now be fetched with ``KeySym["9"]``, etc.
         With Python 3.13 or later.
 
