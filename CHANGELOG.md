@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 - Fixed regression with lowercase key symbols with `tcod.event.K_*` and `KeySym.*` constants, these are still deprecated.
   Event constants are only fixed for `tcod.event.K_*`, not the undocumented `tcod.event_constants` module.
   Lowercase `KeySym.*` constants are only available on Python 3.13 or later.
+- `BSP.split_recursive` did not accept a `Random` class as the seed. #168
 
 ## [19.5.0] - 2025-09-13
 

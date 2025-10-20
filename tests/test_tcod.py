@@ -9,7 +9,12 @@ import pytest
 from numpy.typing import DTypeLike, NDArray
 
 import tcod
+import tcod.bsp
 import tcod.console
+import tcod.context
+import tcod.map
+import tcod.path
+import tcod.random
 from tcod import libtcodpy
 
 
@@ -20,7 +25,7 @@ def raise_Exception(*_args: object) -> NoReturn:
 def test_line_error() -> None:
     """Test exception propagation."""
     with pytest.raises(RuntimeError), pytest.warns():
-        tcod.line(0, 0, 10, 10, py_callback=raise_Exception)
+        libtcodpy.line(0, 0, 10, 10, py_callback=raise_Exception)
 
 
 @pytest.mark.filterwarnings("ignore:Iterate over nodes using")
@@ -44,7 +49,7 @@ def test_tcod_bsp() -> None:
 
     # test that operations on deep BSP nodes preserve depth
     sub_bsp = bsp.children[0]
-    sub_bsp.split_recursive(3, 2, 2, 1, 1)
+    sub_bsp.split_recursive(3, 2, 2, 1, 1, seed=tcod.random.Random(seed=42))
     assert sub_bsp.children[0].level == 2  # noqa: PLR2004
 
     # cover find_node method
