@@ -12,13 +12,15 @@ from __future__ import annotations
 import os
 import random
 import warnings
-from collections.abc import Hashable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from typing_extensions import deprecated
 
 import tcod.constants
 from tcod.cffi import ffi, lib
+
+if TYPE_CHECKING:
+    from collections.abc import Hashable
 
 MERSENNE_TWISTER = tcod.constants.RNG_MT
 COMPLEMENTARY_MULTIPLY_WITH_CARRY = tcod.constants.RNG_CMWC

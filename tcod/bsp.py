@@ -27,7 +27,6 @@ Example::
 
 from __future__ import annotations
 
-from collections.abc import Iterator
 from typing import TYPE_CHECKING, Any
 
 from typing_extensions import deprecated
@@ -35,6 +34,8 @@ from typing_extensions import deprecated
 from tcod.cffi import ffi, lib
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+
     import tcod.random
 
 
@@ -125,7 +126,11 @@ class BSP:
         self.children[1].parent = self
         self.children[1]._unpack_bsp_tree(lib.TCOD_bsp_right(cdata))
 
-    def split_once(self, horizontal: bool, position: int) -> None:
+    def split_once(
+        self,
+        horizontal: bool,  # noqa: FBT001
+        position: int,
+    ) -> None:
         """Split this partition into 2 sub-partitions.
 
         Args:
@@ -211,13 +216,13 @@ class BSP:
 
         .. versionadded:: 8.3
         """
-        next = [self]
-        while next:
-            level = next
-            next = []
+        next_ = [self]
+        while next_:
+            level = next_
+            next_ = []
             yield from level
             for node in level:
-                next.extend(node.children)
+                next_.extend(node.children)
 
     def inverted_level_order(self) -> Iterator[BSP]:
         """Iterate over this BSP's hierarchy in inverse level order.

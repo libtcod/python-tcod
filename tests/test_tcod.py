@@ -18,14 +18,14 @@ import tcod.random
 from tcod import libtcodpy
 
 
-def raise_Exception(*_args: object) -> NoReturn:
+def raise_exception(*_args: object) -> NoReturn:
     raise RuntimeError("testing exception")  # noqa: TRY003, EM101
 
 
 def test_line_error() -> None:
     """Test exception propagation."""
     with pytest.raises(RuntimeError), pytest.warns():
-        libtcodpy.line(0, 0, 10, 10, py_callback=raise_Exception)
+        libtcodpy.line(0, 0, 10, 10, py_callback=raise_exception)
 
 
 @pytest.mark.filterwarnings("ignore:Iterate over nodes using")
@@ -39,7 +39,7 @@ def test_tcod_bsp() -> None:
     assert not bsp.children
 
     with pytest.raises(RuntimeError):
-        libtcodpy.bsp_traverse_pre_order(bsp, raise_Exception)
+        libtcodpy.bsp_traverse_pre_order(bsp, raise_exception)
 
     bsp.split_recursive(3, 4, 4, 1, 1)
     for node in bsp.walk():
@@ -102,7 +102,7 @@ def test_tcod_map_pickle() -> None:
 def test_tcod_map_pickle_fortran() -> None:
     map_ = tcod.map.Map(2, 3, order="F")
     map2: tcod.map.Map = pickle.loads(pickle.dumps(copy.copy(map_)))
-    assert map_._Map__buffer.strides == map2._Map__buffer.strides  # type: ignore
+    assert map_._Map__buffer.strides == map2._Map__buffer.strides  # type: ignore[attr-defined]
     assert map_.transparent.strides == map2.transparent.strides
     assert map_.walkable.strides == map2.walkable.strides
     assert map_.fov.strides == map2.fov.strides
@@ -148,7 +148,7 @@ def test_path_numpy(dtype: DTypeLike) -> None:
         tcod.path.AStar(np.ones((2, 2), dtype=np.float64))
 
 
-def path_cost(this_x: int, this_y: int, dest_x: int, dest_y: int) -> bool:
+def path_cost(_this_x: int, _this_y: int, _dest_x: int, _dest_y: int) -> bool:
     return True
 
 
@@ -160,7 +160,7 @@ def test_path_callback() -> None:
 
 
 def test_key_repr() -> None:
-    Key = libtcodpy.Key
+    Key = libtcodpy.Key  # noqa: N806
     key = Key(vk=1, c=2, shift=True)
     assert key.vk == 1
     assert key.c == 2  # noqa: PLR2004
@@ -172,7 +172,7 @@ def test_key_repr() -> None:
 
 
 def test_mouse_repr() -> None:
-    Mouse = libtcodpy.Mouse
+    Mouse = libtcodpy.Mouse  # noqa: N806
     mouse = Mouse(x=1, lbutton=True)
     mouse_copy = eval(repr(mouse))  # noqa: S307
     assert mouse.x == mouse_copy.x
@@ -185,16 +185,16 @@ def test_cffi_structs() -> None:
 
 
 @pytest.mark.filterwarnings("ignore")
-def test_recommended_size(console: tcod.console.Console) -> None:
+def test_recommended_size(console: tcod.console.Console) -> None:  # noqa: ARG001
     tcod.console.recommended_size()
 
 
 @pytest.mark.filterwarnings("ignore")
-def test_context(uses_window: None) -> None:
+def test_context(uses_window: None) -> None:  # noqa: ARG001
     with tcod.context.new_window(32, 32, renderer=libtcodpy.RENDERER_SDL2):
         pass
-    WIDTH, HEIGHT = 16, 4
-    with tcod.context.new_terminal(columns=WIDTH, rows=HEIGHT, renderer=libtcodpy.RENDERER_SDL2) as context:
+    width, height = 16, 4
+    with tcod.context.new_terminal(columns=width, rows=height, renderer=libtcodpy.RENDERER_SDL2) as context:
         console = tcod.console.Console(*context.recommended_console_size())
         context.present(console)
         assert context.sdl_window_p is not None
@@ -202,5 +202,5 @@ def test_context(uses_window: None) -> None:
         context.change_tileset(tcod.tileset.Tileset(16, 16))
         context.pixel_to_tile(0, 0)
         context.pixel_to_subtile(0, 0)
-    with pytest.raises(RuntimeError, match=".*context has been closed"):
+    with pytest.raises(RuntimeError, match=r".*context has been closed"):
         context.present(console)
