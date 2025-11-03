@@ -20,7 +20,7 @@ jobs:
   ruff:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install Ruff
         run: pip install ruff
       - name: Ruff Check
@@ -31,7 +31,7 @@ jobs:
   mypy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
       - name: Install typing dependencies
@@ -50,7 +50,7 @@ jobs:
           install-linux-dependencies: true
           build-type: "Debug"
           version: ${{ env.sdl-version }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
@@ -59,7 +59,7 @@ jobs:
         run: pip install build
       - name: Build source distribution
         run: python -m build --sdist
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: sdist
           path: dist/tcod-*.tar.gz
@@ -76,12 +76,12 @@ jobs:
         sdl-version: ["3.2.16"]
       fail-fast: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.x"
       - name: Install build dependencies
@@ -106,14 +106,14 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: |
           git submodule update --init --recursive --depth 1
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.architecture }}
@@ -150,10 +150,10 @@ jobs:
       - name: Xvfb logs
         if: runner.os != 'Windows'
         run: cat /tmp/xvfb.log
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: runner.os == 'Windows'
         with:
           name: wheels-windows-${{ matrix.architecture }}-${{ matrix.python-version }}
@@ -171,7 +171,7 @@ jobs:
           install-linux-dependencies: true
           build-type: "Debug"
           version: ${{ env.sdl-version }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
@@ -195,13 +195,13 @@ jobs:
       matrix:
         os: ["ubuntu-latest"] # "windows-latest" disabled due to free-threaded build issues
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --depth 1
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.x"
       - name: Install Python dependencies
@@ -227,7 +227,7 @@ jobs:
     env:
       BUILD_DESC: ""
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
@@ -265,7 +265,7 @@ jobs:
           BUILD_DESC=${BUILD_DESC//\*}
           echo BUILD_DESC=${BUILD_DESC} >> $GITHUB_ENV
       - name: Archive wheel
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: wheels-linux-${{ matrix.arch }}-${{ env.BUILD_DESC }}
           path: wheelhouse/*.whl
@@ -282,12 +282,12 @@ jobs:
     env:
       PYTHON_DESC: ""
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.x"
       - name: Install Python dependencies
@@ -311,7 +311,7 @@ jobs:
           PYTHON_DESC=${PYTHON_DESC//\*/X}
           echo PYTHON_DESC=${PYTHON_DESC} >> $GITHUB_ENV
       - name: Archive wheel
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: wheels-macos-${{ env.PYTHON_DESC }}
           path: wheelhouse/*.whl
@@ -322,7 +322,7 @@ jobs:
     needs: [ruff, mypy, sdist]
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
@@ -337,7 +337,7 @@ jobs:
           CIBW_BUILD: cp313-pyodide_wasm32
           CIBW_PLATFORM: pyodide
       - name: Archive wheel
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: pyodide
           path: wheelhouse/*.whl
@@ -354,11 +354,11 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         with:
           name: sdist
           path: dist/
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         with:
           pattern: wheels-*
           path: dist/
