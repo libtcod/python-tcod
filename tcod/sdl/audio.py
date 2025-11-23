@@ -5,8 +5,8 @@ If you have experience with audio mixing then you might be better off writing yo
 modifying the existing one which was written using Python/Numpy.
 
 This module is designed to integrate with the wider Python ecosystem.
-It leaves the loading to sound samples to other libraries like
-`SoundFile <https://pysoundfile.readthedocs.io/en/latest/>`_.
+It leaves the loading to sound samples to other libraries such as
+`soundfile <https://python-soundfile.readthedocs.io/en/latest/>`_.
 
 Example::
 
