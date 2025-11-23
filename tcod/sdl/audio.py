@@ -489,7 +489,7 @@ class AudioStream:
 
     This class is commonly created with :any:`AudioDevice.new_stream` which creates a new stream bound to the device.
 
-    ..versionadded:: 19.0
+    .. versionadded:: 19.0
     """
 
     __slots__ = ("__weakref__", "_stream_p")
