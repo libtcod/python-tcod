@@ -8,7 +8,8 @@ This module is designed to integrate with the wider Python ecosystem.
 It leaves the loading to sound samples to other libraries like
 `SoundFile <https://pysoundfile.readthedocs.io/en/latest/>`_.
 
-Example:
+Example::
+
     # Synchronous audio example
     import time
 
@@ -211,7 +212,8 @@ def convert_audio(
 class AudioDevice:
     """An SDL audio device.
 
-    Example:
+    Example::
+
         device = tcod.sdl.audio.get_default_playback().open()  # Open a common audio device
 
     .. versionchanged:: 16.0
@@ -957,7 +959,8 @@ def get_capture_devices() -> dict[str, AudioDevice]:
 def get_default_playback() -> AudioDevice:
     """Return the default playback device.
 
-    Example:
+    Example::
+
         playback_device = tcod.sdl.audio.get_default_playback().open()
 
     .. versionadded:: 19.0
@@ -969,7 +972,8 @@ def get_default_playback() -> AudioDevice:
 def get_default_recording() -> AudioDevice:
     """Return the default recording device.
 
-    Example:
+    Example::
+
         recording_device = tcod.sdl.audio.get_default_recording().open()
 
     .. versionadded:: 19.0
