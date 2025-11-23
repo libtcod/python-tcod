@@ -1,4 +1,4 @@
-"""SDL2 audio playback and recording tools.
+"""SDL audio playback and recording tools.
 
 This module includes SDL's low-level audio API and a naive implementation of an SDL mixer.
 If you have experience with audio mixing then you might be better off writing your own mixer or

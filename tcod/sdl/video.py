@@ -1,4 +1,4 @@
-"""SDL2 Window and Display handling.
+"""SDL Window and Display handling.
 
 There are two main ways to access the SDL window.
 Either you can use this module to open a window yourself bypassing libtcod's context,
@@ -167,7 +167,7 @@ class _TempSurface:
 
 
 class Window:
-    """An SDL2 Window object.
+    """An SDL Window object.
 
     Created from :any:`tcod.sdl.video.new_window` when working with SDL directly.
 

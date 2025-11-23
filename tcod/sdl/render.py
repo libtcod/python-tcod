@@ -1,4 +1,4 @@
-"""SDL2 Rendering functionality.
+"""SDL Rendering functionality.
 
 .. versionadded:: 13.4
 """
