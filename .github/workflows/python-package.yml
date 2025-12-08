@@ -8,6 +8,10 @@ on:
   pull_request:
     types: [opened, reopened]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 defaults:
   run:
     shell: bash
@@ -19,6 +23,7 @@ env:
 jobs:
   ruff:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
       - name: Install Ruff
@@ -30,6 +35,7 @@ jobs:
 
   mypy:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
       - name: Checkout submodules
@@ -44,6 +50,7 @@ jobs:
 
   sdist:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: libsdl-org/setup-sdl@1894460666e4fe0c6603ea0cce5733f1cca56ba1
         with:
@@ -70,6 +77,7 @@ jobs:
   parse_sdl:
     needs: [ruff, mypy]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
     strategy:
       matrix:
         os: ["windows-latest", "macos-latest"]
@@ -94,6 +102,7 @@ jobs:
   build:
     needs: [ruff, mypy, sdist]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     strategy:
       matrix:
         os: ["ubuntu-latest", "windows-latest"]
@@ -162,6 +171,7 @@ jobs:
   test-docs:
     needs: [ruff, mypy, sdist]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: libsdl-org/setup-sdl@1894460666e4fe0c6603ea0cce5733f1cca56ba1
         if: runner.os == 'Linux'
@@ -189,6 +199,7 @@ jobs:
   tox:
     needs: [ruff, sdist]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     strategy:
       matrix:
         os: ["ubuntu-latest"] # "windows-latest" disabled due to free-threaded build issues
@@ -218,6 +229,7 @@ jobs:
   linux-wheels:
     needs: [ruff, mypy, sdist]
     runs-on: ${{ matrix.arch == 'aarch64' && 'ubuntu-24.04-arm' || 'ubuntu-latest'}}
+    timeout-minutes: 15
     strategy:
       matrix:
         arch: ["x86_64", "aarch64"]
@@ -273,6 +285,7 @@ jobs:
   build-macos:
     needs: [ruff, mypy, sdist]
     runs-on: "macos-14"
+    timeout-minutes: 15
     strategy:
       fail-fast: true
       matrix:
@@ -319,6 +332,7 @@ jobs:
   pyodide:
     needs: [ruff, mypy, sdist]
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
         with:
@@ -345,6 +359,7 @@ jobs:
   publish:
     needs: [sdist, build, build-macos, linux-wheels, pyodide]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     if: github.ref_type == 'tag'
     environment:
       name: pypi
