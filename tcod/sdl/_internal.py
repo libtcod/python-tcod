@@ -149,7 +149,7 @@ class Properties:
             lib.SDL_SetPointerProperty(self.p, name, value._as_property_pointer())
 
 
-@ffi.def_extern()  # type: ignore[misc]
+@ffi.def_extern()  # type: ignore[untyped-decorator]
 def _sdl_log_output_function(_userdata: None, category: int, priority: int, message_p: Any) -> None:  # noqa: ANN401
     """Pass logs sent by SDL to Python's logging system."""
     message = str(ffi.string(message_p), encoding="utf-8")

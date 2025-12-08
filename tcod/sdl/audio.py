@@ -906,7 +906,7 @@ class BasicMixer:
             audio_stream.queue_audio(stream)
 
 
-@ffi.def_extern()  # type: ignore[misc]
+@ffi.def_extern()  # type: ignore[untyped-decorator]
 def _sdl_audio_stream_callback(userdata: Any, stream_p: Any, additional_amount: int, total_amount: int, /) -> None:  # noqa: ANN401
     """Handle audio device callbacks."""
     stream = AudioStream(stream_p)

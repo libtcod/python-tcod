@@ -35,26 +35,26 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike, DTypeLike, NDArray
 
 
-@ffi.def_extern()  # type: ignore[misc]
+@ffi.def_extern()  # type: ignore[untyped-decorator]
 def _pycall_path_old(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:  # noqa: ANN401
     """Libtcodpy style callback, needs to preserve the old userdata issue."""
     func, userdata = ffi.from_handle(handle)
     return func(x1, y1, x2, y2, userdata)  # type: ignore[no-any-return]
 
 
-@ffi.def_extern()  # type: ignore[misc]
+@ffi.def_extern()  # type: ignore[untyped-decorator]
 def _pycall_path_simple(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:  # noqa: ANN401
     """Does less and should run faster, just calls the handle function."""
     return ffi.from_handle(handle)(x1, y1, x2, y2)  # type: ignore[no-any-return]
 
 
-@ffi.def_extern()  # type: ignore[misc]
+@ffi.def_extern()  # type: ignore[untyped-decorator]
 def _pycall_path_swap_src_dest(x1: int, y1: int, x2: int, y2: int, handle: Any) -> float:  # noqa: ANN401
     """A TDL function dest comes first to match up with a dest only call."""
     return ffi.from_handle(handle)(x2, y2, x1, y1)  # type: ignore[no-any-return]
 
 
-@ffi.def_extern()  # type: ignore[misc]
+@ffi.def_extern()  # type: ignore[untyped-decorator]
 def _pycall_path_dest_only(_x1: int, _y1: int, x2: int, y2: int, handle: Any) -> float:  # noqa: ANN401
     """A TDL function which samples the dest coordinate only."""
     return ffi.from_handle(handle)(x2, y2)  # type: ignore[no-any-return]

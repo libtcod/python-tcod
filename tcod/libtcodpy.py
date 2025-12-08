@@ -3607,27 +3607,27 @@ _parser_callback_lock = threading.Lock()
 _parser_listener: Any = None
 
 
-@ffi.def_extern()  # type: ignore[misc]
+@ffi.def_extern()  # type: ignore[untyped-decorator]
 def _pycall_parser_new_struct(struct: Any, name: str) -> Any:
     return _parser_listener.new_struct(struct, _unpack_char_p(name))
 
 
-@ffi.def_extern()  # type: ignore[misc]
+@ffi.def_extern()  # type: ignore[untyped-decorator]
 def _pycall_parser_new_flag(name: str) -> Any:
     return _parser_listener.new_flag(_unpack_char_p(name))
 
 
-@ffi.def_extern()  # type: ignore[misc]
+@ffi.def_extern()  # type: ignore[untyped-decorator]
 def _pycall_parser_new_property(propname: Any, type: Any, value: Any) -> Any:
     return _parser_listener.new_property(_unpack_char_p(propname), type, _unpack_union(type, value))
 
 
-@ffi.def_extern()  # type: ignore[misc]
+@ffi.def_extern()  # type: ignore[untyped-decorator]
 def _pycall_parser_end_struct(struct: Any, name: Any) -> Any:
     return _parser_listener.end_struct(struct, _unpack_char_p(name))
 
 
-@ffi.def_extern()  # type: ignore[misc]
+@ffi.def_extern()  # type: ignore[untyped-decorator]
 def _pycall_parser_error(msg: Any) -> None:
     _parser_listener.error(_unpack_char_p(msg))
 
