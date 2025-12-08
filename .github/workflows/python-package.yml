@@ -151,8 +151,6 @@ jobs:
         if: runner.os != 'Windows'
         run: cat /tmp/xvfb.log
       - uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v5
         if: runner.os == 'Windows'
         with:
