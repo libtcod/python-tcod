@@ -102,6 +102,7 @@
         "CONTROLLERDEVICEADDED",
         "CONTROLLERDEVICEREMAPPED",
         "CONTROLLERDEVICEREMOVED",
+        "cooldown",
         "cplusplus",
         "CPLUSPLUS",
         "CRSEL",
