@@ -311,7 +311,7 @@ void _sdl_audio_stream_callback(void* userdata, SDL_AudioStream *stream, int add
 // SDL to Python log function.
 void _sdl_log_output_function(void *userdata, int category, SDL_LogPriority priority, const char *message);
 // Generic event watcher callback.
-int _sdl_event_watcher(void* userdata, SDL_Event* event);
+bool _sdl_event_watcher(void* userdata, SDL_Event* event);
 }
 """
 

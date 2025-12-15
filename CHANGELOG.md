@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Fixed
+
+- `tcod.event.add_watch` was crashing due to a cdef type mismatch.
+
 ## [19.6.0] - 2025-10-20
 
 ### Added

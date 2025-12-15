@@ -204,3 +204,16 @@ def test_context(uses_window: None) -> None:  # noqa: ARG001
         context.pixel_to_subtile(0, 0)
     with pytest.raises(RuntimeError, match=r".*context has been closed"):
         context.present(console)
+
+
+def test_event_watch() -> None:
+    def handle_events(_event: tcod.event.Event) -> None:
+        pass
+
+    tcod.event.add_watch(handle_events)
+    with pytest.warns(RuntimeWarning, match=r"nothing was added"):
+        tcod.event.add_watch(handle_events)
+
+    tcod.event.remove_watch(handle_events)
+    with pytest.warns(RuntimeWarning, match=r"nothing was removed"):
+        tcod.event.remove_watch(handle_events)
