@@ -1348,43 +1348,14 @@ def init_context(renderer: int) -> None:
 
 
 def main() -> None:
-    global context, tileset
+    global tileset
     tileset = tcod.tileset.load_tilesheet(FONT, 32, 8, tcod.tileset.CHARMAP_TCOD)
     init_context(libtcodpy.RENDERER_SDL2)
     try:
         SAMPLES[cur_sample].on_enter()
 
         while True:
-            root_console.clear()
-            draw_samples_menu()
-            draw_renderer_menu()
-
-            # render the sample
-            SAMPLES[cur_sample].on_draw()
-            sample_console.blit(root_console, SAMPLE_SCREEN_X, SAMPLE_SCREEN_Y)
-            draw_stats()
-            if context.sdl_renderer:
-                # Clear the screen to ensure no garbage data outside of the logical area is displayed
-                context.sdl_renderer.draw_color = (0, 0, 0, 255)
-                context.sdl_renderer.clear()
-                # SDL renderer support, upload the sample console background to a minimap texture.
-                sample_minimap.update(sample_console.rgb.T["bg"])
-                # Render the root_console normally, this is the drawing step of context.present without presenting.
-                context.sdl_renderer.copy(console_render.render(root_console))
-                # Render the minimap to the screen.
-                context.sdl_renderer.copy(
-                    sample_minimap,
-                    dest=(
-                        tileset.tile_width * 24,
-                        tileset.tile_height * 36,
-                        SAMPLE_SCREEN_WIDTH * 3,
-                        SAMPLE_SCREEN_HEIGHT * 3,
-                    ),
-                )
-                context.sdl_renderer.present()
-            else:  # No SDL renderer, just use plain context rendering.
-                context.present(root_console)
-
+            redraw_display()
             handle_time()
             handle_events()
     finally:
@@ -1392,6 +1363,39 @@ def main() -> None:
         # automatically. but since this context might be switched to one with a
         # different renderer it is closed manually here.
         context.close()
+
+
+def redraw_display() -> None:
+    """Full clear-draw-present of the screen."""
+    root_console.clear()
+    draw_samples_menu()
+    draw_renderer_menu()
+
+    # render the sample
+    SAMPLES[cur_sample].on_draw()
+    sample_console.blit(root_console, SAMPLE_SCREEN_X, SAMPLE_SCREEN_Y)
+    draw_stats()
+    if context.sdl_renderer:
+        # Clear the screen to ensure no garbage data outside of the logical area is displayed
+        context.sdl_renderer.draw_color = (0, 0, 0, 255)
+        context.sdl_renderer.clear()
+        # SDL renderer support, upload the sample console background to a minimap texture.
+        sample_minimap.update(sample_console.rgb.T["bg"])
+        # Render the root_console normally, this is the drawing step of context.present without presenting.
+        context.sdl_renderer.copy(console_render.render(root_console))
+        # Render the minimap to the screen.
+        context.sdl_renderer.copy(
+            sample_minimap,
+            dest=(
+                tileset.tile_width * 24,
+                tileset.tile_height * 36,
+                SAMPLE_SCREEN_WIDTH * 3,
+                SAMPLE_SCREEN_HEIGHT * 3,
+            ),
+        )
+        context.sdl_renderer.present()
+    else:  # No SDL renderer, just use plain context rendering.
+        context.present(root_console)
 
 
 def handle_time() -> None:
@@ -1404,16 +1408,17 @@ def handle_time() -> None:
 
 def handle_events() -> None:
     for event in tcod.event.get():
-        if context.sdl_renderer:
-            # Manual handing of tile coordinates since context.present is skipped.
+        if context.sdl_renderer:  # Manual handing of tile coordinates since context.present is skipped
+            assert context.sdl_window
+            tile_width = context.sdl_window.size[0] / root_console.width
+            tile_height = context.sdl_window.size[1] / root_console.height
+
             if isinstance(event, (tcod.event.MouseState, tcod.event.MouseMotion)):
-                event.tile = tcod.event.Point(
-                    event.position.x // tileset.tile_width, event.position.y // tileset.tile_height
-                )
+                event.tile = tcod.event.Point(event.position.x // tile_width, event.position.y // tile_height)
             if isinstance(event, tcod.event.MouseMotion):
                 prev_tile = (
-                    (event.position[0] - event.motion[0]) // tileset.tile_width,
-                    (event.position[1] - event.motion[1]) // tileset.tile_height,
+                    (event.position[0] - event.motion[0]) // tile_width,
+                    (event.position[1] - event.motion[1]) // tile_height,
                 )
                 event.tile_motion = tcod.event.Point(event.tile[0] - prev_tile[0], event.tile[1] - prev_tile[1])
         else:
@@ -1484,4 +1489,13 @@ def draw_renderer_menu() -> None:
 
 
 if __name__ == "__main__":
+
+    @tcod.event.add_watch
+    def _handle_events(event: tcod.event.Event) -> None:
+        """Keep window responsive during resize events."""
+        match event:
+            case tcod.event.WindowEvent(type="WindowExposed"):
+                redraw_display()
+                handle_time()
+
     main()
