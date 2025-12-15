@@ -77,8 +77,7 @@ def _get_elapsed_time() -> float:
 
 
 class Sample(tcod.event.EventDispatch[None]):
-    def __init__(self, name: str = "") -> None:
-        self.name = name
+    name: str = "???"
 
     def on_enter(self) -> None:
         pass
@@ -114,74 +113,73 @@ class Sample(tcod.event.EventDispatch[None]):
 
 
 class TrueColorSample(Sample):
+    name = "True colors"
+
     def __init__(self) -> None:
-        self.name = "True colors"
-        # corner colors
-        self.colors: NDArray[np.int16] = np.array(
-            [(50, 40, 150), (240, 85, 5), (50, 35, 240), (10, 200, 130)],
-            dtype=np.int16,
-        )
-        # color shift direction
-        self.slide_dir: NDArray[np.int16] = np.array([[1, 1, 1], [-1, -1, 1], [1, -1, 1], [1, 1, -1]], dtype=np.int16)
-        # corner indexes
-        self.corners: NDArray[np.int16] = np.array([0, 1, 2, 3], dtype=np.int16)
+        self.noise = tcod.noise.Noise(2, tcod.noise.Algorithm.SIMPLEX)
+        """Noise for generating color."""
+
+        self.generator = np.random.default_rng()
+        """Numpy generator for random text."""
 
     def on_draw(self) -> None:
-        self.slide_corner_colors()
         self.interpolate_corner_colors()
         self.darken_background_characters()
         self.randomize_sample_console()
-        self.print_banner()
-
-    def slide_corner_colors(self) -> None:
-        # pick random RGB channels for each corner
-        rand_channels = np.random.randint(low=0, high=3, size=4)
-
-        # shift picked color channels in the direction of slide_dir
-        self.colors[self.corners, rand_channels] += self.slide_dir[self.corners, rand_channels] * 5
-
-        # reverse slide_dir values when limits are reached
-        self.slide_dir[self.colors[:] == 255] = -1
-        self.slide_dir[self.colors[:] == 0] = 1
-
-    def interpolate_corner_colors(self) -> None:
-        # interpolate corner colors across the sample console
-        left = np.linspace(self.colors[0], self.colors[2], SAMPLE_SCREEN_HEIGHT)
-        right = np.linspace(self.colors[1], self.colors[3], SAMPLE_SCREEN_HEIGHT)
-        sample_console.bg[:] = np.linspace(left, right, SAMPLE_SCREEN_WIDTH)
-
-    def darken_background_characters(self) -> None:
-        # darken background characters
-        sample_console.fg[:] = sample_console.bg[:]
-        sample_console.fg[:] //= 2
-
-    def randomize_sample_console(self) -> None:
-        # randomize sample console characters
-        sample_console.ch[:] = np.random.randint(
-            low=ord("a"),
-            high=ord("z") + 1,
-            size=sample_console.ch.size,
-            dtype=np.intc,
-        ).reshape(sample_console.ch.shape)
-
-    def print_banner(self) -> None:
-        # print text on top of samples
-        sample_console.print_box(
+        sample_console.print(
             x=1,
             y=5,
             width=sample_console.width - 2,
             height=sample_console.height - 1,
-            string="The Doryen library uses 24 bits colors, for both background and foreground.",
+            text="The Doryen library uses 24 bits colors, for both background and foreground.",
             fg=WHITE,
             bg=GREY,
             bg_blend=libtcodpy.BKGND_MULTIPLY,
             alignment=libtcodpy.CENTER,
         )
 
+    def get_corner_colors(self) -> NDArray[np.uint8]:
+        """Return 4 random 8-bit colors, smoothed over time."""
+        noise_samples_ij = (
+            [  # i coordinates are per color channel per color
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [9, 10, 11],
+            ],
+            time.perf_counter(),  # j coordinate is time broadcast to all samples
+        )
+        colors = self.noise[noise_samples_ij]
+        colors = ((colors + 1.0) * (0.5 * 255.0)).clip(min=0, max=255)  # Convert -1..1 to 0..255
+        return colors.astype(np.uint8)
+
+    def interpolate_corner_colors(self) -> None:
+        """Interpolate corner colors across the sample console."""
+        colors = self.get_corner_colors()
+        left = np.linspace(colors[0], colors[2], SAMPLE_SCREEN_HEIGHT)
+        right = np.linspace(colors[1], colors[3], SAMPLE_SCREEN_HEIGHT)
+        sample_console.bg[:] = np.linspace(left, right, SAMPLE_SCREEN_WIDTH)
+
+    def darken_background_characters(self) -> None:
+        """Darken background characters."""
+        sample_console.fg[:] = sample_console.bg[:]
+        sample_console.fg[:] //= 2
+
+    def randomize_sample_console(self) -> None:
+        """Randomize sample console characters."""
+        sample_console.ch[:] = self.generator.integers(
+            low=ord("a"),
+            high=ord("z"),
+            endpoint=True,
+            size=sample_console.ch.size,
+            dtype=np.intc,
+        ).reshape(sample_console.ch.shape)
+
 
 class OffscreenConsoleSample(Sample):
+    name = "Offscreen console"
+
     def __init__(self) -> None:
-        self.name = "Offscreen console"
         self.secondary = tcod.console.Console(sample_console.width // 2, sample_console.height // 2)
         self.screenshot = tcod.console.Console(sample_console.width, sample_console.height)
         self.counter = 0.0
@@ -245,6 +243,8 @@ class OffscreenConsoleSample(Sample):
 
 
 class LineDrawingSample(Sample):
+    name = "Line drawing"
+
     FLAG_NAMES = (
         "BKGND_NONE",
         "BKGND_SET",
@@ -262,7 +262,6 @@ class LineDrawingSample(Sample):
     )
 
     def __init__(self) -> None:
-        self.name = "Line drawing"
         self.mk_flag = libtcodpy.BKGND_SET
         self.bk_flag = libtcodpy.BKGND_SET
 
@@ -322,6 +321,8 @@ class LineDrawingSample(Sample):
 
 
 class NoiseSample(Sample):
+    name = "Noise"
+
     NOISE_OPTIONS = (  # (name, algorithm, implementation)
         (
             "perlin noise",
@@ -371,7 +372,6 @@ class NoiseSample(Sample):
     )
 
     def __init__(self) -> None:
-        self.name = "Noise"
         self.func = 0
         self.dx = 0.0
         self.dy = 0.0
@@ -548,9 +548,9 @@ SQUARED_TORCH_RADIUS = TORCH_RADIUS * TORCH_RADIUS
 
 
 class FOVSample(Sample):
-    def __init__(self) -> None:
-        self.name = "Field of view"
+    name = "Field of view"
 
+    def __init__(self) -> None:
         self.player_x = 20
         self.player_y = 10
         self.torch = False
@@ -674,10 +674,10 @@ class FOVSample(Sample):
 
 
 class PathfindingSample(Sample):
+    name = "Path finding"
+
     def __init__(self) -> None:
         """Initialize this sample."""
-        self.name = "Path finding"
-
         self.player_x = 20
         self.player_y = 10
         self.dest_x = 24
@@ -873,8 +873,9 @@ def traverse_node(bsp_map: NDArray[np.bool_], node: tcod.bsp.BSP) -> None:
 
 
 class BSPSample(Sample):
+    name = "Bsp toolkit"
+
     def __init__(self) -> None:
-        self.name = "Bsp toolkit"
         self.bsp = tcod.bsp.BSP(1, 1, SAMPLE_SCREEN_WIDTH - 1, SAMPLE_SCREEN_HEIGHT - 1)
         self.bsp_map: NDArray[np.bool_] = np.zeros((SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT), dtype=bool, order="F")
         self.bsp_generate()
@@ -956,9 +957,9 @@ class BSPSample(Sample):
 
 
 class ImageSample(Sample):
-    def __init__(self) -> None:
-        self.name = "Image toolkit"
+    name = "Image toolkit"
 
+    def __init__(self) -> None:
         self.img = tcod.image.Image.from_file(DATA_DIR / "img/skull.png")
         self.img.set_key_color(BLACK)
         self.circle = tcod.image.Image.from_file(DATA_DIR / "img/circle.png")
@@ -990,9 +991,9 @@ class ImageSample(Sample):
 
 
 class MouseSample(Sample):
-    def __init__(self) -> None:
-        self.name = "Mouse support"
+    name = "Mouse support"
 
+    def __init__(self) -> None:
         self.motion = tcod.event.MouseMotion()
         self.mouse_left = self.mouse_middle = self.mouse_right = 0
         self.log: list[str] = []
@@ -1054,9 +1055,9 @@ class MouseSample(Sample):
 
 
 class NameGeneratorSample(Sample):
-    def __init__(self) -> None:
-        self.name = "Name generator"
+    name = "Name generator"
 
+    def __init__(self) -> None:
         self.current_set = 0
         self.delay = 0.0
         self.names: list[str] = []
@@ -1160,8 +1161,7 @@ class Light:
 
 
 class FastRenderSample(Sample):
-    def __init__(self) -> None:
-        self.name = "Python fast render"
+    name = "Python fast render"
 
     def on_enter(self) -> None:
         sample_console.clear()  # render status message

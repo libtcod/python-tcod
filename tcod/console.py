@@ -1182,7 +1182,9 @@ Consider one of the following:
             )
         )
 
-    @deprecated("Switch to using keywords and then replace with 'console.print(...)'")
+    @deprecated(
+        "Switch parameters to keywords, then replace method with 'console.print(...)', then replace 'string=' with 'text='"
+    )
     def print_box(  # noqa: PLR0913
         self,
         x: int,
@@ -1224,6 +1226,9 @@ Consider one of the following:
 
         .. versionchanged:: 13.0
             `x` and `y` are now always used as an absolute position for negative values.
+
+        .. deprecated:: 18.0
+            This method was replaced by more functional :any:`Console.print` method.
         """
         string_ = string.encode("utf-8")
         return int(
