@@ -8,12 +8,11 @@
 import tcod.context
 import tcod.event
 import tcod.sdl.joystick
-import tcod.sdl.sys
 
-WIDTH, HEIGHT = 720, 480
+WIDTH, HEIGHT = 1280, 720
 
 
-def main() -> None:
+def main() -> None:  # noqa: C901, PLR0912
     """Example program for tcod.event."""
     event_log: list[str] = []
     motion_desc = ""
@@ -40,24 +39,23 @@ def main() -> None:
             for event in tcod.event.wait():
                 context.convert_event(event)  # Set tile coordinates for event.
                 print(repr(event))
-                if isinstance(event, tcod.event.Quit):
-                    raise SystemExit
-                if isinstance(event, tcod.event.WindowResized) and event.type == "WindowResized":
-                    console = context.new_console()
-                if isinstance(event, tcod.event.ControllerDevice):
-                    if event.type == "CONTROLLERDEVICEADDED":
-                        controllers.add(event.controller)
-                    elif event.type == "CONTROLLERDEVICEREMOVED":
-                        controllers.remove(event.controller)
-                if isinstance(event, tcod.event.JoystickDevice):
-                    if event.type == "JOYDEVICEADDED":
-                        joysticks.add(event.joystick)
-                    elif event.type == "JOYDEVICEREMOVED":
-                        joysticks.remove(event.joystick)
-                if isinstance(event, tcod.event.MouseMotion):
-                    motion_desc = str(event)
-                else:  # Log all events other than MouseMotion.
-                    event_log.append(str(event))
+                match event:
+                    case tcod.event.Quit():
+                        raise SystemExit
+                    case tcod.event.WindowResized(type="WindowResized"):
+                        console = context.new_console()
+                    case tcod.event.ControllerDevice(type="CONTROLLERDEVICEADDED", controller=controller):
+                        controllers.add(controller)
+                    case tcod.event.ControllerDevice(type="CONTROLLERDEVICEREMOVED", controller=controller):
+                        controllers.remove(controller)
+                    case tcod.event.JoystickDevice(type="JOYDEVICEADDED", joystick=joystick):
+                        joysticks.add(joystick)
+                    case tcod.event.JoystickDevice(type="JOYDEVICEREMOVED", joystick=joystick):
+                        joysticks.remove(joystick)
+                    case tcod.event.MouseMotion():
+                        motion_desc = str(event)
+                    case _:  # Log all events other than MouseMotion.
+                        event_log.append(repr(event))
 
 
 if __name__ == "__main__":
