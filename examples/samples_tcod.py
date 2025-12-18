@@ -63,8 +63,8 @@ context: tcod.context.Context
 tileset: tcod.tileset.Tileset
 console_render: tcod.render.SDLConsoleRender  # Optional SDL renderer.
 sample_minimap: tcod.sdl.render.Texture  # Optional minimap texture.
-root_console = tcod.console.Console(80, 50, order="F")
-sample_console = tcod.console.Console(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT, order="F")
+root_console = tcod.console.Console(80, 50)
+sample_console = tcod.console.Console(SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
 cur_sample = 0  # Current selected sample.
 frame_times = [time.perf_counter()]
 frame_length = [0.0]
@@ -156,9 +156,9 @@ class TrueColorSample(Sample):
     def interpolate_corner_colors(self) -> None:
         """Interpolate corner colors across the sample console."""
         colors = self.get_corner_colors()
-        left = np.linspace(colors[0], colors[2], SAMPLE_SCREEN_HEIGHT)
-        right = np.linspace(colors[1], colors[3], SAMPLE_SCREEN_HEIGHT)
-        sample_console.bg[:] = np.linspace(left, right, SAMPLE_SCREEN_WIDTH)
+        top = np.linspace(colors[0], colors[1], SAMPLE_SCREEN_WIDTH)
+        bottom = np.linspace(colors[2], colors[3], SAMPLE_SCREEN_WIDTH)
+        sample_console.bg[:] = np.linspace(top, bottom, SAMPLE_SCREEN_HEIGHT)
 
     def darken_background_characters(self) -> None:
         """Darken background characters."""
@@ -265,12 +265,12 @@ class LineDrawingSample(Sample):
         self.mk_flag = libtcodpy.BKGND_SET
         self.bk_flag = libtcodpy.BKGND_SET
 
-        self.bk = tcod.console.Console(sample_console.width, sample_console.height, order="F")
+        self.background = tcod.console.Console(sample_console.width, sample_console.height)
         # initialize the colored background
-        self.bk.bg[:, :, 0] = np.linspace(0, 255, self.bk.width)[:, np.newaxis]
-        self.bk.bg[:, :, 2] = np.linspace(0, 255, self.bk.height)
-        self.bk.bg[:, :, 1] = (self.bk.bg[:, :, 0].astype(int) + self.bk.bg[:, :, 2]) / 2
-        self.bk.ch[:] = ord(" ")
+        self.background.bg[:, :, 0] = np.linspace(0, 255, self.background.width)
+        self.background.bg[:, :, 2] = np.linspace(0, 255, self.background.height)[:, np.newaxis]
+        self.background.bg[:, :, 1] = (self.background.bg[:, :, 0].astype(int) + self.background.bg[:, :, 2]) / 2
+        self.background.ch[:] = ord(" ")
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym in (tcod.event.KeySym.RETURN, tcod.event.KeySym.KP_ENTER):
@@ -291,7 +291,7 @@ class LineDrawingSample(Sample):
             alpha = (1.0 + math.cos(time.time() * 2)) / 2.0
             self.bk_flag = libtcodpy.BKGND_ADDALPHA(int(alpha))
 
-        self.bk.blit(sample_console)
+        self.background.blit(sample_console)
         rect_y = int((sample_console.height - 2) * ((1.0 + math.cos(time.time())) / 2.0))
         for x in range(sample_console.width):
             value = x * 255 // sample_console.width
@@ -429,8 +429,8 @@ class NoiseSample(Sample):
             bg=GREY,
             bg_blend=libtcodpy.BKGND_MULTIPLY,
         )
-        sample_console.fg[2 : 2 + rect_w, 2 : 2 + rect_h] = (
-            sample_console.fg[2 : 2 + rect_w, 2 : 2 + rect_h] * GREY / 255
+        sample_console.fg[2 : 2 + rect_h, 2 : 2 + rect_w] = (
+            sample_console.fg[2 : 2 + rect_h, 2 : 2 + rect_w] * GREY / 255
         )
 
         for cur_func in range(len(self.NOISE_OPTIONS)):
@@ -524,7 +524,7 @@ SAMPLE_MAP_ = (
     "##############################################",
 )
 
-SAMPLE_MAP: NDArray[Any] = np.array([[ord(c) for c in line] for line in SAMPLE_MAP_]).transpose()
+SAMPLE_MAP: NDArray[Any] = np.array([[ord(c) for c in line] for line in SAMPLE_MAP_])
 
 FOV_ALGO_NAMES = (
     "BASIC      ",
@@ -558,12 +558,12 @@ class FOVSample(Sample):
         self.algo_num = libtcodpy.FOV_SYMMETRIC_SHADOWCAST
         self.noise = tcod.noise.Noise(1)  # 1D noise for the torch flickering.
 
-        map_shape = (SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT)
+        map_shape = (SAMPLE_SCREEN_HEIGHT, SAMPLE_SCREEN_WIDTH)
 
-        self.walkable: NDArray[np.bool_] = np.zeros(map_shape, dtype=bool, order="F")
+        self.walkable: NDArray[np.bool_] = np.zeros(map_shape, dtype=bool)
         self.walkable[:] = SAMPLE_MAP[:] == ord(" ")
 
-        self.transparent: NDArray[np.bool_] = np.zeros(map_shape, dtype=bool, order="F")
+        self.transparent: NDArray[np.bool_] = np.zeros(map_shape, dtype=bool)
         self.transparent[:] = self.walkable[:] | (SAMPLE_MAP[:] == ord("="))
 
         # Lit background colors for the map.
@@ -598,7 +598,7 @@ class FOVSample(Sample):
         # Get a 2D boolean array of visible cells.
         fov = tcod.map.compute_fov(
             transparency=self.transparent,
-            pov=(self.player_x, self.player_y),
+            pov=(self.player_y, self.player_x),
             radius=TORCH_RADIUS if self.torch else 0,
             light_walls=self.light_walls,
             algorithm=self.algo_num,
@@ -614,7 +614,7 @@ class FOVSample(Sample):
             brightness = 0.2 * self.noise.get_point(torch_t + 17)
 
             # Get the squared distance using a mesh grid.
-            x, y = np.mgrid[:SAMPLE_SCREEN_WIDTH, :SAMPLE_SCREEN_HEIGHT]
+            y, x = np.mgrid[:SAMPLE_SCREEN_HEIGHT, :SAMPLE_SCREEN_WIDTH]
             # Center the mesh grid on the torch position.
             x = x.astype(np.float32) - torch_x
             y = y.astype(np.float32) - torch_y
@@ -659,7 +659,7 @@ class FOVSample(Sample):
         }
         if event.sym in MOVE_KEYS:
             x, y = MOVE_KEYS[event.sym]
-            if self.walkable[self.player_x + x, self.player_y + y]:
+            if self.walkable[self.player_y + y, self.player_x + x]:
                 self.player_x += x
                 self.player_y += y
         elif event.sym == tcod.event.KeySym.T:
@@ -684,7 +684,7 @@ class PathfindingSample(Sample):
         self.dest_y = 1
         self.using_astar = True
         self.busy = 0.0
-        self.cost = SAMPLE_MAP.T[:] == ord(" ")
+        self.cost = SAMPLE_MAP[:] == ord(" ")
         self.graph = tcod.path.SimpleGraph(cost=self.cost, cardinal=70, diagonal=99)
         self.pathfinder = tcod.path.Pathfinder(graph=self.graph)
 
@@ -693,8 +693,8 @@ class PathfindingSample(Sample):
         # draw the dungeon
         self.background_console.rgb["fg"] = BLACK
         self.background_console.rgb["bg"] = DARK_GROUND
-        self.background_console.rgb["bg"][SAMPLE_MAP.T[:] == ord("#")] = DARK_WALL
-        self.background_console.rgb["ch"][SAMPLE_MAP.T[:] == ord("=")] = ord("═")
+        self.background_console.rgb["bg"][SAMPLE_MAP[:] == ord("#")] = DARK_WALL
+        self.background_console.rgb["ch"][SAMPLE_MAP[:] == ord("=")] = ord("═")
 
     def on_enter(self) -> None:
         """Do nothing."""
@@ -722,10 +722,10 @@ class PathfindingSample(Sample):
             np.array(self.pathfinder.distance, copy=True, dtype=np.float32)
             interpolate = self.pathfinder.distance[reachable] * 0.9 / dijkstra_max_dist
             color_delta = (np.array(DARK_GROUND) - np.array(LIGHT_GROUND)).astype(np.float32)
-            sample_console.rgb.T["bg"][reachable] = np.array(LIGHT_GROUND) + interpolate[:, np.newaxis] * color_delta
+            sample_console.rgb["bg"][reachable] = np.array(LIGHT_GROUND) + interpolate[:, np.newaxis] * color_delta
 
         # draw the path
-        path = self.pathfinder.path_to((self.dest_y, self.dest_x))[1:, ::-1]
+        path = self.pathfinder.path_to((self.dest_y, self.dest_x))[1:]
         sample_console.rgb["bg"][tuple(path.T)] = LIGHT_GROUND
 
         # move the creature
@@ -733,8 +733,8 @@ class PathfindingSample(Sample):
         if self.busy <= 0.0:
             self.busy = 0.2
             if len(path):
-                self.player_x = int(path.item(0, 0))
-                self.player_y = int(path.item(0, 1))
+                self.player_y = int(path.item(0, 0))
+                self.player_x = int(path.item(0, 1))
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         """Handle movement and UI."""
@@ -772,46 +772,46 @@ bsp_room_walls = True
 
 
 # draw a vertical line
-def vline(m: NDArray[np.bool_], x: int, y1: int, y2: int) -> None:
+def vline(map_: NDArray[np.bool_], x: int, y1: int, y2: int) -> None:
     if y1 > y2:
         y1, y2 = y2, y1
     for y in range(y1, y2 + 1):
-        m[x, y] = True
+        map_[y, x] = True
 
 
 # draw a vertical line up until we reach an empty space
-def vline_up(m: NDArray[np.bool_], x: int, y: int) -> None:
-    while y >= 0 and not m[x, y]:
-        m[x, y] = True
+def vline_up(map_: NDArray[np.bool_], x: int, y: int) -> None:
+    while y >= 0 and not map_[y, x]:
+        map_[y, x] = True
         y -= 1
 
 
 # draw a vertical line down until we reach an empty space
-def vline_down(m: NDArray[np.bool_], x: int, y: int) -> None:
-    while y < SAMPLE_SCREEN_HEIGHT and not m[x, y]:
-        m[x, y] = True
+def vline_down(map_: NDArray[np.bool_], x: int, y: int) -> None:
+    while y < SAMPLE_SCREEN_HEIGHT and not map_[y, x]:
+        map_[y, x] = True
         y += 1
 
 
 # draw a horizontal line
-def hline(m: NDArray[np.bool_], x1: int, y: int, x2: int) -> None:
+def hline(map_: NDArray[np.bool_], x1: int, y: int, x2: int) -> None:
     if x1 > x2:
         x1, x2 = x2, x1
     for x in range(x1, x2 + 1):
-        m[x, y] = True
+        map_[y, x] = True
 
 
 # draw a horizontal line left until we reach an empty space
-def hline_left(m: NDArray[np.bool_], x: int, y: int) -> None:
-    while x >= 0 and not m[x, y]:
-        m[x, y] = True
+def hline_left(map_: NDArray[np.bool_], x: int, y: int) -> None:
+    while x >= 0 and not map_[y, x]:
+        map_[y, x] = True
         x -= 1
 
 
 # draw a horizontal line right until we reach an empty space
-def hline_right(m: NDArray[np.bool_], x: int, y: int) -> None:
-    while x < SAMPLE_SCREEN_WIDTH and not m[x, y]:
-        m[x, y] = True
+def hline_right(map_: NDArray[np.bool_], x: int, y: int) -> None:
+    while x < SAMPLE_SCREEN_WIDTH and not map_[y, x]:
+        map_[y, x] = True
         x += 1
 
 
@@ -829,7 +829,7 @@ def traverse_node(bsp_map: NDArray[np.bool_], node: tcod.bsp.BSP) -> None:
             node.y += random.randint(0, node.height - new_height)
             node.width, node.height = new_width, new_height
         # dig the room
-        bsp_map[node.x : node.x + node.width, node.y : node.y + node.height] = True
+        bsp_map[node.y : node.y + node.height, node.x : node.x + node.width] = True
     else:
         # resize the node to fit its sons
         left, right = node.children
@@ -877,7 +877,7 @@ class BSPSample(Sample):
 
     def __init__(self) -> None:
         self.bsp = tcod.bsp.BSP(1, 1, SAMPLE_SCREEN_WIDTH - 1, SAMPLE_SCREEN_HEIGHT - 1)
-        self.bsp_map: NDArray[np.bool_] = np.zeros((SAMPLE_SCREEN_WIDTH, SAMPLE_SCREEN_HEIGHT), dtype=bool, order="F")
+        self.bsp_map: NDArray[np.bool_] = np.zeros((SAMPLE_SCREEN_HEIGHT, SAMPLE_SCREEN_WIDTH), dtype=bool)
         self.bsp_generate()
 
     def bsp_generate(self) -> None:
@@ -923,7 +923,7 @@ class BSPSample(Sample):
         # render the level
         for y in range(SAMPLE_SCREEN_HEIGHT):
             for x in range(SAMPLE_SCREEN_WIDTH):
-                color = DARK_GROUND if self.bsp_map[x][y] else DARK_WALL
+                color = DARK_GROUND if self.bsp_map[y, x] else DARK_WALL
                 libtcodpy.console_set_char_background(sample_console, x, y, color, libtcodpy.BKGND_SET)
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
@@ -1274,7 +1274,7 @@ class FastRenderSample(Sample):
         bb = bb.clip(0, 255)
 
         # fill the screen with these background colors
-        sample_console.bg.transpose(2, 1, 0)[...] = (rr, gg, bb)
+        sample_console.bg.transpose(2, 0, 1)[...] = (rr, gg, bb)
 
 
 #############################################
@@ -1380,7 +1380,7 @@ def redraw_display() -> None:
         context.sdl_renderer.draw_color = (0, 0, 0, 255)
         context.sdl_renderer.clear()
         # SDL renderer support, upload the sample console background to a minimap texture.
-        sample_minimap.update(sample_console.rgb.T["bg"])
+        sample_minimap.update(sample_console.rgb["bg"])
         # Render the root_console normally, this is the drawing step of context.present without presenting.
         context.sdl_renderer.copy(console_render.render(root_console))
         # Render the minimap to the screen.
