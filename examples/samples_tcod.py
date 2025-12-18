@@ -13,6 +13,7 @@ import random
 import sys
 import time
 import warnings
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -1111,9 +1112,6 @@ class NameGeneratorSample(Sample):
 #############################################
 # python fast render sample
 #############################################
-numpy_available = True
-
-use_numpy = numpy_available  # default option
 SCREEN_W = SAMPLE_SCREEN_WIDTH
 SCREEN_H = SAMPLE_SCREEN_HEIGHT
 HALF_W = SCREEN_W // 2
@@ -1133,35 +1131,31 @@ AMBIENT_LIGHT = 0.8  # brightness of tunnel texture
 # example: (4x3 pixels screen)
 # xc = [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]  # noqa: ERA001
 # yc = [[1, 1, 1, 1], [2, 2, 2, 2], [3, 3, 3, 3]]  # noqa: ERA001
-if numpy_available:
-    (xc, yc) = np.meshgrid(range(SCREEN_W), range(SCREEN_H))
-    # translate coordinates of all pixels to center
-    xc = xc - HALF_W
-    yc = yc - HALF_H
-
-noise2d = tcod.noise.Noise(2, hurst=0.5, lacunarity=2.0)
-if numpy_available:  # the texture starts empty
-    texture = np.zeros((RES_U, RES_V))
+(xc, yc) = np.meshgrid(range(SCREEN_W), range(SCREEN_H))
+# translate coordinates of all pixels to center
+xc = xc - HALF_W
+yc = yc - HALF_H
 
 
+@dataclass(frozen=False, slots=True)
 class Light:
-    def __init__(
-        self,
-        x: float,
-        y: float,
-        z: float,
-        r: int,
-        g: int,
-        b: int,
-        strength: float,
-    ) -> None:
-        self.x, self.y, self.z = x, y, z  # pos.
-        self.r, self.g, self.b = r, g, b  # color
-        self.strength = strength  # between 0 and 1, defines brightness
+    """Lighting effect entity."""
+
+    x: float  # pos
+    y: float
+    z: float
+    r: int  # color
+    g: int
+    b: int
+    strength: float  # between 0 and 1, defines brightness
 
 
 class FastRenderSample(Sample):
     name = "Python fast render"
+
+    def __init__(self) -> None:
+        self.texture = np.zeros((RES_U, RES_V))
+        self.noise2d = tcod.noise.Noise(2, hurst=0.5, lacunarity=2.0)
 
     def on_enter(self) -> None:
         sample_console.clear()  # render status message
@@ -1178,8 +1172,6 @@ class FastRenderSample(Sample):
         self.tex_b = 0.0
 
     def on_draw(self) -> None:
-        global texture
-
         time_delta = frame_length[-1] * SPEED  # advance time
         self.frac_t += time_delta  # increase fractional (always < 1.0) time
         self.abs_t += time_delta  # increase absolute elapsed time
@@ -1207,14 +1199,14 @@ class FastRenderSample(Sample):
             # new pixels are based on absolute elapsed time
             int_abs_t = int(self.abs_t)
 
-            texture = np.roll(texture, -int_t, 1)
+            self.texture = np.roll(self.texture, -int_t, 1)
             # replace new stretch of texture with new values
             for v in range(RES_V - int_t, RES_V):
                 for u in range(RES_U):
                     tex_v = (v + int_abs_t) / float(RES_V)
-                    texture[u, v] = libtcodpy.noise_get_fbm(
-                        noise2d, [u / float(RES_U), tex_v], 32.0
-                    ) + libtcodpy.noise_get_fbm(noise2d, [1 - u / float(RES_U), tex_v], 32.0)
+                    self.texture[u, v] = libtcodpy.noise_get_fbm(
+                        self.noise2d, [u / float(RES_U), tex_v], 32.0
+                    ) + libtcodpy.noise_get_fbm(self.noise2d, [1 - u / float(RES_U), tex_v], 32.0)
 
         # squared distance from center,
         # clipped to sensible minimum and maximum values
@@ -1229,7 +1221,7 @@ class FastRenderSample(Sample):
         uu = np.mod(RES_U * (np.arctan2(yc, xc) / (2 * np.pi) + 0.5), RES_U)
 
         # retrieve corresponding pixels from texture
-        brightness = texture[uu.astype(int), vv.astype(int)] / 4.0 + 0.5
+        brightness = self.texture[uu.astype(int), vv.astype(int)] / 4.0 + 0.5
 
         # use the brightness map to compose the final color of the tunnel
         rr = brightness * self.tex_r
@@ -1253,7 +1245,7 @@ class FastRenderSample(Sample):
         for light in self.lights:  # render lights
             # move light's Z coordinate with time, then project its XYZ
             # coordinates to screen-space
-            light.z -= float(time_delta) / TEX_STRETCH
+            light.z -= time_delta / TEX_STRETCH
             xl = light.x / light.z * SCREEN_H
             yl = light.y / light.z * SCREEN_H
 
