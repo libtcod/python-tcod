@@ -34,13 +34,11 @@ import tcod.sdl.mouse
 import tcod.sdl.render
 import tcod.tileset
 from tcod import libtcodpy
+from tcod.event import KeySym
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-
-if not sys.warnoptions:
-    warnings.simplefilter("default")  # Show all warnings.
 
 DATA_DIR = Path(__file__).parent / "../libtcod/data"
 """Path of the samples data directory."""
@@ -77,7 +75,7 @@ def _get_elapsed_time() -> float:
     return time.perf_counter() - START_TIME
 
 
-class Sample(tcod.event.EventDispatch[None]):
+class Sample:
     name: str = "???"
 
     def on_enter(self) -> None:
@@ -86,31 +84,33 @@ class Sample(tcod.event.EventDispatch[None]):
     def on_draw(self) -> None:
         pass
 
-    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
+    def on_event(self, event: tcod.event.Event) -> None:
         global cur_sample
-        if event.sym == tcod.event.KeySym.DOWN:
-            cur_sample = (cur_sample + 1) % len(SAMPLES)
-            SAMPLES[cur_sample].on_enter()
-            draw_samples_menu()
-        elif event.sym == tcod.event.KeySym.UP:
-            cur_sample = (cur_sample - 1) % len(SAMPLES)
-            SAMPLES[cur_sample].on_enter()
-            draw_samples_menu()
-        elif event.sym == tcod.event.KeySym.RETURN and event.mod & tcod.event.Modifier.ALT:
-            sdl_window = context.sdl_window
-            if sdl_window:
-                sdl_window.fullscreen = not sdl_window.fullscreen
-        elif event.sym in (tcod.event.KeySym.PRINTSCREEN, tcod.event.KeySym.P):
-            print("screenshot")
-            if event.mod & tcod.event.Modifier.ALT:
-                libtcodpy.console_save_apf(root_console, "samples.apf")
-                print("apf")
-            else:
-                libtcodpy.sys_save_screenshot()
-                print("png")
-        elif event.sym in RENDERER_KEYS:
-            # Swap the active context for one with a different renderer.
-            init_context(RENDERER_KEYS[event.sym])
+        match event:
+            case tcod.event.Quit() | tcod.event.KeyDown(sym=KeySym.ESCAPE):
+                raise SystemExit
+            case tcod.event.KeyDown(sym=KeySym.DOWN):
+                cur_sample = (cur_sample + 1) % len(SAMPLES)
+                SAMPLES[cur_sample].on_enter()
+                draw_samples_menu()
+            case tcod.event.KeyDown(sym=KeySym.UP):
+                cur_sample = (cur_sample - 1) % len(SAMPLES)
+                SAMPLES[cur_sample].on_enter()
+                draw_samples_menu()
+            case tcod.event.KeyDown(sym=KeySym.RETURN, mod=mod) if mod & tcod.event.Modifier.ALT:
+                sdl_window = context.sdl_window
+                if sdl_window:
+                    sdl_window.fullscreen = not sdl_window.fullscreen
+            case tcod.event.KeyDown(sym=tcod.event.KeySym.PRINTSCREEN | tcod.event.KeySym.P):
+                print("screenshot")
+                if event.mod & tcod.event.Modifier.ALT:
+                    libtcodpy.console_save_apf(root_console, "samples.apf")
+                    print("apf")
+                else:
+                    libtcodpy.sys_save_screenshot()
+                    print("png")
+            case tcod.event.KeyDown(sym=sym) if sym in RENDERER_KEYS:
+                init_context(RENDERER_KEYS[sym])  # Swap the active context for one with a different renderer
 
 
 class TrueColorSample(Sample):
@@ -273,13 +273,14 @@ class LineDrawingSample(Sample):
         self.background.bg[:, :, 1] = (self.background.bg[:, :, 0].astype(int) + self.background.bg[:, :, 2]) / 2
         self.background.ch[:] = ord(" ")
 
-    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        if event.sym in (tcod.event.KeySym.RETURN, tcod.event.KeySym.KP_ENTER):
-            self.bk_flag += 1
-            if (self.bk_flag & 0xFF) > libtcodpy.BKGND_ALPH:
-                self.bk_flag = libtcodpy.BKGND_NONE
-        else:
-            super().ev_keydown(event)
+    def on_event(self, event: tcod.event.Event) -> None:
+        match event:
+            case tcod.event.KeyDown(sym=KeySym.RETURN | KeySym.KP_ENTER):
+                self.bk_flag += 1
+                if (self.bk_flag & 0xFF) > libtcodpy.BKGND_ALPH:
+                    self.bk_flag = libtcodpy.BKGND_NONE
+            case _:
+                super().on_event(event)
 
     def on_draw(self) -> None:
         alpha = 0.0
@@ -464,34 +465,35 @@ class NoiseSample(Sample):
                 bg=None,
             )
 
-    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        if tcod.event.KeySym.N9 >= event.sym >= tcod.event.KeySym.N1:
-            self.func = event.sym - tcod.event.KeySym.N1
-            self.noise = self.get_noise()
-        elif event.sym == tcod.event.KeySym.E:
-            self.hurst += 0.1
-            self.noise = self.get_noise()
-        elif event.sym == tcod.event.KeySym.D:
-            self.hurst -= 0.1
-            self.noise = self.get_noise()
-        elif event.sym == tcod.event.KeySym.R:
-            self.lacunarity += 0.5
-            self.noise = self.get_noise()
-        elif event.sym == tcod.event.KeySym.F:
-            self.lacunarity -= 0.5
-            self.noise = self.get_noise()
-        elif event.sym == tcod.event.KeySym.T:
-            self.octaves += 0.5
-            self.noise.octaves = self.octaves
-        elif event.sym == tcod.event.KeySym.G:
-            self.octaves -= 0.5
-            self.noise.octaves = self.octaves
-        elif event.sym == tcod.event.KeySym.Y:
-            self.zoom += 0.2
-        elif event.sym == tcod.event.KeySym.H:
-            self.zoom -= 0.2
-        else:
-            super().ev_keydown(event)
+    def on_event(self, event: tcod.event.Event) -> None:
+        match event:
+            case tcod.event.KeyDown(sym=sym) if KeySym.N9 >= sym >= KeySym.N1:
+                self.func = sym - tcod.event.KeySym.N1
+                self.noise = self.get_noise()
+            case tcod.event.KeyDown(sym=KeySym.E):
+                self.hurst += 0.1
+                self.noise = self.get_noise()
+            case tcod.event.KeyDown(sym=KeySym.D):
+                self.hurst -= 0.1
+                self.noise = self.get_noise()
+            case tcod.event.KeyDown(sym=KeySym.R):
+                self.lacunarity += 0.5
+                self.noise = self.get_noise()
+            case tcod.event.KeyDown(sym=KeySym.F):
+                self.lacunarity -= 0.5
+                self.noise = self.get_noise()
+            case tcod.event.KeyDown(sym=KeySym.T):
+                self.octaves += 0.5
+                self.noise.octaves = self.octaves
+            case tcod.event.KeyDown(sym=KeySym.G):
+                self.octaves -= 0.5
+                self.noise.octaves = self.octaves
+            case tcod.event.KeyDown(sym=KeySym.Y):
+                self.zoom += 0.2
+            case tcod.event.KeyDown(sym=KeySym.H):
+                self.zoom -= 0.2
+            case _:
+                super().on_event(event)
 
 
 #############################################
@@ -645,7 +647,7 @@ class FOVSample(Sample):
                 default=self.dark_map_bg,
             )
 
-    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
+    def on_event(self, event: tcod.event.Event) -> None:
         MOVE_KEYS = {  # noqa: N806
             tcod.event.KeySym.I: (0, -1),
             tcod.event.KeySym.J: (-1, 0),
@@ -658,20 +660,21 @@ class FOVSample(Sample):
             tcod.event.KeySym.KP_MINUS: -1,
             tcod.event.KeySym.KP_PLUS: 1,
         }
-        if event.sym in MOVE_KEYS:
-            x, y = MOVE_KEYS[event.sym]
-            if self.walkable[self.player_y + y, self.player_x + x]:
-                self.player_x += x
-                self.player_y += y
-        elif event.sym == tcod.event.KeySym.T:
-            self.torch = not self.torch
-        elif event.sym == tcod.event.KeySym.W:
-            self.light_walls = not self.light_walls
-        elif event.sym in FOV_SELECT_KEYS:
-            self.algo_num += FOV_SELECT_KEYS[event.sym]
-            self.algo_num %= len(FOV_ALGO_NAMES)
-        else:
-            super().ev_keydown(event)
+        match event:
+            case tcod.event.KeyDown(sym=sym) if sym in MOVE_KEYS:
+                x, y = MOVE_KEYS[sym]
+                if self.walkable[self.player_y + y, self.player_x + x]:
+                    self.player_x += x
+                    self.player_y += y
+            case tcod.event.KeyDown(sym=KeySym.T):
+                self.torch = not self.torch
+            case tcod.event.KeyDown(sym=KeySym.W):
+                self.light_walls = not self.light_walls
+            case tcod.event.KeyDown(sym=sym) if sym in FOV_SELECT_KEYS:
+                self.algo_num += FOV_SELECT_KEYS[sym]
+                self.algo_num %= len(FOV_ALGO_NAMES)
+            case _:
+                super().on_event(event)
 
 
 class PathfindingSample(Sample):
@@ -737,39 +740,32 @@ class PathfindingSample(Sample):
                 self.player_y = int(path.item(0, 0))
                 self.player_x = int(path.item(0, 1))
 
-    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
+    def on_event(self, event: tcod.event.Event) -> None:
         """Handle movement and UI."""
-        if event.sym == tcod.event.KeySym.I and self.dest_y > 0:  # destination move north
-            self.dest_y -= 1
-        elif event.sym == tcod.event.KeySym.K and self.dest_y < SAMPLE_SCREEN_HEIGHT - 1:  # destination move south
-            self.dest_y += 1
-        elif event.sym == tcod.event.KeySym.J and self.dest_x > 0:  # destination move west
-            self.dest_x -= 1
-        elif event.sym == tcod.event.KeySym.L and self.dest_x < SAMPLE_SCREEN_WIDTH - 1:  # destination move east
-            self.dest_x += 1
-        elif event.sym == tcod.event.KeySym.TAB:
-            self.using_astar = not self.using_astar
-        else:
-            super().ev_keydown(event)
-
-    def ev_mousemotion(self, event: tcod.event.MouseMotion) -> None:
-        """Move destination via mouseover."""
-        mx = event.tile.x - SAMPLE_SCREEN_X
-        my = event.tile.y - SAMPLE_SCREEN_Y
-        if 0 <= mx < SAMPLE_SCREEN_WIDTH and 0 <= my < SAMPLE_SCREEN_HEIGHT:
-            self.dest_x = int(mx)
-            self.dest_y = int(my)
+        match event:
+            case tcod.event.KeyDown(sym=KeySym.I) if self.dest_y > 0:  # destination move north
+                self.dest_y -= 1
+            case tcod.event.KeyDown(sym=KeySym.K) if self.dest_y < SAMPLE_SCREEN_HEIGHT - 1:  # destination move south
+                self.dest_y += 1
+            case tcod.event.KeyDown(sym=KeySym.J) if self.dest_x > 0:  # destination move west
+                self.dest_x -= 1
+            case tcod.event.KeyDown(sym=KeySym.L) if self.dest_x < SAMPLE_SCREEN_WIDTH - 1:  # destination move east
+                self.dest_x += 1
+            case tcod.event.KeyDown(sym=KeySym.TAB):
+                self.using_astar = not self.using_astar
+            case tcod.event.MouseMotion():  # Move destination via mouseover
+                mx = event.tile.x - SAMPLE_SCREEN_X
+                my = event.tile.y - SAMPLE_SCREEN_Y
+                if 0 <= mx < SAMPLE_SCREEN_WIDTH and 0 <= my < SAMPLE_SCREEN_HEIGHT:
+                    self.dest_x = int(mx)
+                    self.dest_y = int(my)
+            case _:
+                super().on_event(event)
 
 
 #############################################
 # bsp sample
 #############################################
-bsp_depth = 8
-bsp_min_room_size = 4
-# a room fills a random part of the node or the maximum available space ?
-bsp_random_room = False
-# if true, there is always a wall on north & west side of a room
-bsp_room_walls = True
 
 
 # draw a vertical line
@@ -817,7 +813,14 @@ def hline_right(map_: NDArray[np.bool_], x: int, y: int) -> None:
 
 
 # the class building the dungeon from the bsp nodes
-def traverse_node(bsp_map: NDArray[np.bool_], node: tcod.bsp.BSP) -> None:
+def traverse_node(
+    bsp_map: NDArray[np.bool_],
+    node: tcod.bsp.BSP,
+    *,
+    bsp_min_room_size: int,
+    bsp_random_room: bool,
+    bsp_room_walls: bool,
+) -> None:
     if not node.children:
         # calculate the room size
         if bsp_room_walls:
@@ -879,46 +882,58 @@ class BSPSample(Sample):
     def __init__(self) -> None:
         self.bsp = tcod.bsp.BSP(1, 1, SAMPLE_SCREEN_WIDTH - 1, SAMPLE_SCREEN_HEIGHT - 1)
         self.bsp_map: NDArray[np.bool_] = np.zeros((SAMPLE_SCREEN_HEIGHT, SAMPLE_SCREEN_WIDTH), dtype=bool)
+
+        self.bsp_depth = 8
+        self.bsp_min_room_size = 4
+        self.bsp_random_room = False  # a room fills a random part of the node or the maximum available space ?
+        self.bsp_room_walls = True  # if true, there is always a wall on north & west side of a room
+
         self.bsp_generate()
 
     def bsp_generate(self) -> None:
         self.bsp.children = ()
-        if bsp_room_walls:
+        if self.bsp_room_walls:
             self.bsp.split_recursive(
-                bsp_depth,
-                bsp_min_room_size + 1,
-                bsp_min_room_size + 1,
+                self.bsp_depth,
+                self.bsp_min_room_size + 1,
+                self.bsp_min_room_size + 1,
                 1.5,
                 1.5,
             )
         else:
-            self.bsp.split_recursive(bsp_depth, bsp_min_room_size, bsp_min_room_size, 1.5, 1.5)
+            self.bsp.split_recursive(self.bsp_depth, self.bsp_min_room_size, self.bsp_min_room_size, 1.5, 1.5)
         self.bsp_refresh()
 
     def bsp_refresh(self) -> None:
         self.bsp_map[...] = False
         for node in copy.deepcopy(self.bsp).inverted_level_order():
-            traverse_node(self.bsp_map, node)
+            traverse_node(
+                self.bsp_map,
+                node,
+                bsp_min_room_size=self.bsp_min_room_size,
+                bsp_random_room=self.bsp_random_room,
+                bsp_room_walls=self.bsp_room_walls,
+            )
 
     def on_draw(self) -> None:
         sample_console.clear()
         rooms = "OFF"
-        if bsp_random_room:
+        if self.bsp_random_room:
             rooms = "ON"
         sample_console.print(
             1,
             1,
             "ENTER : rebuild bsp\n"
             "SPACE : rebuild dungeon\n"
-            f"+-: bsp depth {bsp_depth}\n"
-            f"*/: room size {bsp_min_room_size}\n"
+            f"+-: bsp depth {self.bsp_depth}\n"
+            f"*/: room size {self.bsp_min_room_size}\n"
             f"1 : random room size {rooms}",
             fg=WHITE,
             bg=None,
         )
-        if bsp_random_room:
+        if self.bsp_random_room:
             walls = "OFF"
-            if bsp_room_walls:
+            if self.bsp_room_walls:
                 walls = "ON"
             sample_console.print(1, 6, f"2 : room walls {walls}", fg=WHITE, bg=None)
         # render the level
@@ -927,34 +942,34 @@ class BSPSample(Sample):
                 color = DARK_GROUND if self.bsp_map[y, x] else DARK_WALL
                 libtcodpy.console_set_char_background(sample_console, x, y, color, libtcodpy.BKGND_SET)
 
-    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        global bsp_random_room, bsp_room_walls, bsp_depth, bsp_min_room_size
-        if event.sym in (tcod.event.KeySym.RETURN, tcod.event.KeySym.KP_ENTER):
-            self.bsp_generate()
-        elif event.sym == tcod.event.KeySym.SPACE:
-            self.bsp_refresh()
-        elif event.sym in (tcod.event.KeySym.EQUALS, tcod.event.KeySym.KP_PLUS):
-            bsp_depth += 1
-            self.bsp_generate()
-        elif event.sym in (tcod.event.KeySym.MINUS, tcod.event.KeySym.KP_MINUS):
-            bsp_depth = max(1, bsp_depth - 1)
-            self.bsp_generate()
-        elif event.sym in (tcod.event.KeySym.N8, tcod.event.KeySym.KP_MULTIPLY):
-            bsp_min_room_size += 1
-            self.bsp_generate()
-        elif event.sym in (tcod.event.KeySym.SLASH, tcod.event.KeySym.KP_DIVIDE):
-            bsp_min_room_size = max(2, bsp_min_room_size - 1)
-            self.bsp_generate()
-        elif event.sym in (tcod.event.KeySym.N1, tcod.event.KeySym.KP_1):
-            bsp_random_room = not bsp_random_room
-            if not bsp_random_room:
-                bsp_room_walls = True
-            self.bsp_refresh()
-        elif event.sym in (tcod.event.KeySym.N2, tcod.event.KeySym.KP_2):
-            bsp_room_walls = not bsp_room_walls
-            self.bsp_refresh()
-        else:
-            super().ev_keydown(event)
+    def on_event(self, event: tcod.event.Event) -> None:
+        match event:
+            case tcod.event.KeyDown(sym=KeySym.RETURN | KeySym.KP_ENTER):
+                self.bsp_generate()
+            case tcod.event.KeyDown(sym=KeySym.SPACE):
+                self.bsp_refresh()
+            case tcod.event.KeyDown(sym=KeySym.EQUALS | KeySym.KP_PLUS):
+                self.bsp_depth += 1
+                self.bsp_generate()
+            case tcod.event.KeyDown(sym=KeySym.MINUS | KeySym.KP_MINUS):
+                self.bsp_depth = max(1, self.bsp_depth - 1)
+                self.bsp_generate()
+            case tcod.event.KeyDown(sym=KeySym.N8 | KeySym.KP_MULTIPLY):
+                self.bsp_min_room_size += 1
+                self.bsp_generate()
+            case tcod.event.KeyDown(sym=KeySym.SLASH | KeySym.KP_DIVIDE):
+                self.bsp_min_room_size = max(2, self.bsp_min_room_size - 1)
+                self.bsp_generate()
+            case tcod.event.KeyDown(sym=KeySym.N1 | KeySym.KP_1):
+                self.bsp_random_room = not self.bsp_random_room
+                if not self.bsp_random_room:
+                    self.bsp_room_walls = True
+                self.bsp_refresh()
+            case tcod.event.KeyDown(sym=KeySym.N2 | KeySym.KP_2):
+                self.bsp_room_walls = not self.bsp_room_walls
+                self.bsp_refresh()
+            case _:
+                super().on_event(event)
 
 
 class ImageSample(Sample):
@@ -1005,25 +1020,6 @@ class MouseSample(Sample):
             tcod.sdl.mouse.warp_in_window(sdl_window, 320, 200)
         tcod.sdl.mouse.show(True)
 
-    def ev_mousemotion(self, event: tcod.event.MouseMotion) -> None:
-        self.motion = event
-
-    def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> None:
-        if event.button == tcod.event.BUTTON_LEFT:
-            self.mouse_left = True
-        elif event.button == tcod.event.BUTTON_MIDDLE:
-            self.mouse_middle = True
-        elif event.button == tcod.event.BUTTON_RIGHT:
-            self.mouse_right = True
-
-    def ev_mousebuttonup(self, event: tcod.event.MouseButtonUp) -> None:
-        if event.button == tcod.event.BUTTON_LEFT:
-            self.mouse_left = False
-        elif event.button == tcod.event.BUTTON_MIDDLE:
-            self.mouse_middle = False
-        elif event.button == tcod.event.BUTTON_RIGHT:
-            self.mouse_right = False
-
     def on_draw(self) -> None:
         sample_console.clear(bg=GREY)
         sample_console.print(
@@ -1046,13 +1042,28 @@ class MouseSample(Sample):
             bg=None,
         )
 
-    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        if event.sym == tcod.event.KeySym.N1:
-            tcod.sdl.mouse.show(False)
-        elif event.sym == tcod.event.KeySym.N2:
-            tcod.sdl.mouse.show(True)
-        else:
-            super().ev_keydown(event)
+    def on_event(self, event: tcod.event.Event) -> None:
+        match event:
+            case tcod.event.MouseMotion():
+                self.motion = event
+            case tcod.event.MouseButtonDown(button=tcod.event.MouseButton.LEFT):
+                self.mouse_left = True
+            case tcod.event.MouseButtonDown(button=tcod.event.MouseButton.MIDDLE):
+                self.mouse_middle = True
+            case tcod.event.MouseButtonDown(button=tcod.event.MouseButton.RIGHT):
+                self.mouse_right = True
+            case tcod.event.MouseButtonUp(button=tcod.event.MouseButton.LEFT):
+                self.mouse_left = False
+            case tcod.event.MouseButtonUp(button=tcod.event.MouseButton.MIDDLE):
+                self.mouse_middle = False
+            case tcod.event.MouseButtonUp(button=tcod.event.MouseButton.RIGHT):
+                self.mouse_right = False
+            case tcod.event.KeyDown(sym=KeySym.N1):
+                tcod.sdl.mouse.show(visible=False)
+            case tcod.event.KeyDown(sym=KeySym.N2):
+                tcod.sdl.mouse.show(visible=True)
+            case _:
+                super().on_event(event)
 
 
 class NameGeneratorSample(Sample):
@@ -1097,15 +1108,16 @@ class NameGeneratorSample(Sample):
             self.delay -= 0.5
             self.names.append(libtcodpy.namegen_generate(self.sets[self.current_set]))
 
-    def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        if event.sym == tcod.event.KeySym.EQUALS:
-            self.current_set += 1
-            self.names.append("======")
-        elif event.sym == tcod.event.KeySym.MINUS:
-            self.current_set -= 1
-            self.names.append("======")
-        else:
-            super().ev_keydown(event)
+    def on_event(self, event: tcod.event.Event) -> None:
+        match event:
+            case tcod.event.KeyDown(sym=KeySym.EQUALS):
+                self.current_set += 1
+                self.names.append("======")
+            case tcod.event.KeyDown(sym=KeySym.MINUS):
+                self.current_set -= 1
+                self.names.append("======")
+            case _:
+                super().on_event(event)
         self.current_set %= len(self.sets)
 
 
@@ -1416,11 +1428,7 @@ def handle_events() -> None:
         else:
             context.convert_event(event)
 
-        SAMPLES[cur_sample].dispatch(event)
-        if isinstance(event, tcod.event.Quit):
-            raise SystemExit
-        if isinstance(event, tcod.event.KeyDown) and event.sym == tcod.event.KeySym.ESCAPE:
-            raise SystemExit
+        SAMPLES[cur_sample].on_event(event)
 
 
 def draw_samples_menu() -> None:
@@ -1481,6 +1489,8 @@ def draw_renderer_menu() -> None:
 
 
 if __name__ == "__main__":
+    if not sys.warnoptions:
+        warnings.simplefilter("default")  # Show all warnings.
 
     @tcod.event.add_watch
     def _handle_events(event: tcod.event.Event) -> None:
