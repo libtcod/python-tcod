@@ -66,7 +66,7 @@ jobs:
         run: pip install build
       - name: Build source distribution
         run: python -m build --sdist
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: sdist
           path: dist/tcod-*.tar.gz
@@ -160,7 +160,7 @@ jobs:
         if: runner.os != 'Windows'
         run: cat /tmp/xvfb.log
       - uses: codecov/codecov-action@v5
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: runner.os == 'Windows'
         with:
           name: wheels-windows-${{ matrix.architecture }}-${{ matrix.python-version }}
@@ -275,7 +275,7 @@ jobs:
           BUILD_DESC=${BUILD_DESC//\*}
           echo BUILD_DESC=${BUILD_DESC} >> $GITHUB_ENV
       - name: Archive wheel
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: wheels-linux-${{ matrix.arch }}-${{ env.BUILD_DESC }}
           path: wheelhouse/*.whl
@@ -322,7 +322,7 @@ jobs:
           PYTHON_DESC=${PYTHON_DESC//\*/X}
           echo PYTHON_DESC=${PYTHON_DESC} >> $GITHUB_ENV
       - name: Archive wheel
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: wheels-macos-${{ env.PYTHON_DESC }}
           path: wheelhouse/*.whl
@@ -349,7 +349,7 @@ jobs:
           CIBW_BUILD: cp313-pyodide_wasm32
           CIBW_PLATFORM: pyodide
       - name: Archive wheel
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: pyodide
           path: wheelhouse/*.whl
@@ -367,11 +367,11 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: sdist
           path: dist/
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           pattern: wheels-*
           path: dist/
