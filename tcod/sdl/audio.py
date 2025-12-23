@@ -54,6 +54,7 @@ from tcod.cffi import ffi, lib
 from tcod.sdl._internal import _check, _check_float, _check_int, _check_p
 
 if TYPE_CHECKING:
+    import builtins
     from collections.abc import Callable, Hashable, Iterable, Iterator
     from types import TracebackType
 
@@ -426,9 +427,10 @@ class AudioDevice:
 
     def __exit__(
         self,
-        type: type[BaseException] | None,  # noqa: A002
-        value: BaseException | None,
-        traceback: TracebackType | None,
+        _type: builtins.type[BaseException] | None,  # Explicit builtins prefix to disambiguate Sphinx cross-reference
+        _value: BaseException | None,
+        _traceback: TracebackType | None,
+        /,
     ) -> None:
         """Close the device when exiting the context."""
         self.close()
