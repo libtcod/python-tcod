@@ -6,6 +6,14 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Changed
+
+- Update to libtcod 2.2.2
+
+### Fixed
+
+- Mouse coordinate to tile conversions now support SDL renderer logical size and scaling.
+
 ## [19.6.1] - 2025-12-15
 
 ### Fixed
