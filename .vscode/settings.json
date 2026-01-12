@@ -542,7 +542,4 @@
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff"
     },
-    "cSpell.enableFiletypes": [
-        "github-actions-workflow"
-    ]
 }
