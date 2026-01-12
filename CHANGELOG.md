@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [19.6.3] - 2026-01-12
+
+Fix missing deployment
+
 ## [19.6.2] - 2026-01-12
 
 ### Changed
