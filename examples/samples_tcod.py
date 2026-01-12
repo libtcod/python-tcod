@@ -644,7 +644,7 @@ class FOVSample(Sample):
             sample_console.bg[...] = np.select(
                 condlist=[fov[:, :, np.newaxis]],
                 choicelist=[self.light_map_bg],
-                default=self.dark_map_bg,  # type: ignore[call-overload]  # Numpy regression https://github.com/numpy/numpy/issues/30497
+                default=self.dark_map_bg,
             )
 
     def on_event(self, event: tcod.event.Event) -> None:
