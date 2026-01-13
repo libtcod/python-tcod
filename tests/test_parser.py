@@ -13,19 +13,19 @@ def test_parser() -> None:
     print("***** File Parser test *****")
     parser = libtcod.parser_new()
     struct = libtcod.parser_new_struct(parser, "myStruct")
-    libtcod.struct_add_property(struct, "bool_field", libtcod.TYPE_BOOL, True)
-    libtcod.struct_add_property(struct, "char_field", libtcod.TYPE_CHAR, True)
-    libtcod.struct_add_property(struct, "int_field", libtcod.TYPE_INT, True)
-    libtcod.struct_add_property(struct, "float_field", libtcod.TYPE_FLOAT, True)
-    libtcod.struct_add_property(struct, "color_field", libtcod.TYPE_COLOR, True)
-    libtcod.struct_add_property(struct, "dice_field", libtcod.TYPE_DICE, True)
-    libtcod.struct_add_property(struct, "string_field", libtcod.TYPE_STRING, True)
-    libtcod.struct_add_list_property(struct, "bool_list", libtcod.TYPE_BOOL, True)
-    libtcod.struct_add_list_property(struct, "char_list", libtcod.TYPE_CHAR, True)
-    libtcod.struct_add_list_property(struct, "integer_list", libtcod.TYPE_INT, True)
-    libtcod.struct_add_list_property(struct, "float_list", libtcod.TYPE_FLOAT, True)
-    libtcod.struct_add_list_property(struct, "string_list", libtcod.TYPE_STRING, True)
-    libtcod.struct_add_list_property(struct, "color_list", libtcod.TYPE_COLOR, True)
+    libtcod.struct_add_property(struct, "bool_field", libtcod.TYPE_BOOL, True)  # noqa: FBT003
+    libtcod.struct_add_property(struct, "char_field", libtcod.TYPE_CHAR, True)  # noqa: FBT003
+    libtcod.struct_add_property(struct, "int_field", libtcod.TYPE_INT, True)  # noqa: FBT003
+    libtcod.struct_add_property(struct, "float_field", libtcod.TYPE_FLOAT, True)  # noqa: FBT003
+    libtcod.struct_add_property(struct, "color_field", libtcod.TYPE_COLOR, True)  # noqa: FBT003
+    libtcod.struct_add_property(struct, "dice_field", libtcod.TYPE_DICE, True)  # noqa: FBT003
+    libtcod.struct_add_property(struct, "string_field", libtcod.TYPE_STRING, True)  # noqa: FBT003
+    libtcod.struct_add_list_property(struct, "bool_list", libtcod.TYPE_BOOL, True)  # noqa: FBT003
+    libtcod.struct_add_list_property(struct, "char_list", libtcod.TYPE_CHAR, True)  # noqa: FBT003
+    libtcod.struct_add_list_property(struct, "integer_list", libtcod.TYPE_INT, True)  # noqa: FBT003
+    libtcod.struct_add_list_property(struct, "float_list", libtcod.TYPE_FLOAT, True)  # noqa: FBT003
+    libtcod.struct_add_list_property(struct, "string_list", libtcod.TYPE_STRING, True)  # noqa: FBT003
+    libtcod.struct_add_list_property(struct, "color_list", libtcod.TYPE_COLOR, True)  # noqa: FBT003
 
     # default listener
     print("***** Default listener *****")

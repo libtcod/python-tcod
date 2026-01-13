@@ -102,7 +102,7 @@ def test_tcod_map_pickle() -> None:
 def test_tcod_map_pickle_fortran() -> None:
     map_ = tcod.map.Map(2, 3, order="F")
     map2: tcod.map.Map = pickle.loads(pickle.dumps(copy.copy(map_)))
-    assert map_._Map__buffer.strides == map2._Map__buffer.strides  # type: ignore[attr-defined]
+    assert map_._buffer.strides == map2._buffer.strides
     assert map_.transparent.strides == map2.transparent.strides
     assert map_.walkable.strides == map2.walkable.strides
     assert map_.fov.strides == map2.fov.strides

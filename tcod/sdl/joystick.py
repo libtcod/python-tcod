@@ -335,10 +335,10 @@ class GameController:
 
 def init() -> None:
     """Initialize SDL's joystick and game controller subsystems."""
-    CONTROLLER_SYSTEMS = tcod.sdl.sys.Subsystem.JOYSTICK | tcod.sdl.sys.Subsystem.GAMECONTROLLER
-    if tcod.sdl.sys.Subsystem(lib.SDL_WasInit(CONTROLLER_SYSTEMS)) == CONTROLLER_SYSTEMS:
+    controller_systems = tcod.sdl.sys.Subsystem.JOYSTICK | tcod.sdl.sys.Subsystem.GAMECONTROLLER
+    if tcod.sdl.sys.Subsystem(lib.SDL_WasInit(controller_systems)) == controller_systems:
         return  # Already initialized
-    tcod.sdl.sys.init(CONTROLLER_SYSTEMS)
+    tcod.sdl.sys.init(controller_systems)
 
 
 def _get_number() -> int:
@@ -371,7 +371,7 @@ def _get_all() -> list[Joystick | GameController]:
     return [GameController._open(i) if lib.SDL_IsGamepad(i) else Joystick._open(i) for i in range(_get_number())]
 
 
-def joystick_event_state(new_state: bool | None = None) -> bool:
+def joystick_event_state(new_state: bool | None = None) -> bool:  # noqa: FBT001
     """Check or set joystick event polling.
 
     .. seealso::
@@ -384,7 +384,7 @@ def joystick_event_state(new_state: bool | None = None) -> bool:
     return lib.SDL_JoystickEventsEnabled()
 
 
-def controller_event_state(new_state: bool | None = None) -> bool:
+def controller_event_state(new_state: bool | None = None) -> bool:  # noqa: FBT001
     """Check or set game controller event polling.
 
     .. seealso::

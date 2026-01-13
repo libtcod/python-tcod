@@ -71,7 +71,7 @@ class Image:
         .. versionadded:: 11.4
         """
         array = np.asarray(array, dtype=np.uint8)
-        height, width, depth = array.shape
+        height, width, _depth = array.shape
         image = cls(width, height)
         image_array: NDArray[np.uint8] = np.asarray(image)
         image_array[...] = array

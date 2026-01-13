@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import random
 import warnings
-from collections.abc import Callable, Iterator
+from typing import TYPE_CHECKING
 
 import pytest
 
 import tcod
 from tcod import libtcodpy
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -29,15 +32,15 @@ def uses_window(request: pytest.FixtureRequest) -> Iterator[None]:
 def session_console(request: pytest.FixtureRequest) -> Iterator[tcod.console.Console]:
     if request.config.getoption("--no-window"):
         pytest.skip("This test needs a rendering context.")
-    FONT_FILE = "libtcod/terminal.png"
-    WIDTH = 12
-    HEIGHT = 10
-    TITLE = "libtcod-cffi tests"
-    FULLSCREEN = False
-    RENDERER = getattr(libtcodpy, "RENDERER_" + request.param)
+    font_file = "libtcod/terminal.png"
+    width = 12
+    height = 10
+    title = "libtcod-cffi tests"
+    fullscreen = False
+    renderer = getattr(libtcodpy, "RENDERER_" + request.param)
 
-    libtcodpy.console_set_custom_font(FONT_FILE)
-    with libtcodpy.console_init_root(WIDTH, HEIGHT, TITLE, FULLSCREEN, RENDERER, vsync=False) as con:
+    libtcodpy.console_set_custom_font(font_file)
+    with libtcodpy.console_init_root(width, height, title, fullscreen, renderer, vsync=False) as con:
         yield con
 
 

@@ -139,8 +139,8 @@ def check_sdl_version() -> None:
             sdl_version_str = subprocess.check_output(["sdl3-config", "--version"], universal_newlines=True).strip()
         except FileNotFoundError as exc:
             msg = (
-                f"libsdl3-dev or equivalent must be installed on your system and must be at least version {needed_version}."
-                "\nsdl3-config must be on PATH."
+                f"libsdl3-dev or equivalent must be installed on your system and must be at least version {needed_version}.\n"
+                "sdl3-config must be on PATH."
             )
             raise RuntimeError(msg) from exc
     except subprocess.CalledProcessError as exc:
@@ -223,8 +223,8 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore[misc]
         assert "SDL3/SDL" not in includepath, (includepath, curdir)
         raise pcpp.OutputDirective(pcpp.Action.IgnoreAndRemove)
 
-    def _should_track_define(self, tokens: list[Any]) -> bool:
-        if len(tokens) < 3:
+    def _should_track_define(self, tokens: list[Any]) -> bool:  # noqa: PLR0911
+        if len(tokens) < 3:  # noqa: PLR2004
             return False
         if tokens[0].value in IGNORE_DEFINES:
             return False
@@ -236,7 +236,7 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore[misc]
             return False  # Likely calls a private function.
         if tokens[1].type == "CPP_LPAREN":
             return False  # Function-like macro.
-        if len(tokens) >= 4 and tokens[2].type == "CPP_INTEGER" and tokens[3].type == "CPP_DOT":
+        if len(tokens) >= 4 and tokens[2].type == "CPP_INTEGER" and tokens[3].type == "CPP_DOT":  # noqa: PLR2004
             return False  # Value is a floating point number.
         if tokens[0].value.startswith("SDL_PR") and (tokens[0].value.endswith("32") or tokens[0].value.endswith("64")):
             return False  # Data type for printing, which is not needed.

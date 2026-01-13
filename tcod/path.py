@@ -21,7 +21,6 @@ from __future__ import annotations
 import functools
 import itertools
 import warnings
-from collections.abc import Callable, Sequence
 from typing import TYPE_CHECKING, Any, Final, Literal
 
 import numpy as np
@@ -32,6 +31,8 @@ from tcod._internal import _check
 from tcod.cffi import ffi, lib
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+
     from numpy.typing import ArrayLike, DTypeLike, NDArray
 
 
@@ -148,7 +149,7 @@ class NodeCostArray(np.ndarray):
             msg = f"dtype must be one of {self._C_ARRAY_CALLBACKS.keys()!r}, dtype is {self.dtype.type!r}"
             raise ValueError(msg)
 
-        array_type, callback = self._C_ARRAY_CALLBACKS[self.dtype.type]
+        _array_type, callback = self._C_ARRAY_CALLBACKS[self.dtype.type]
         userdata = ffi.new(
             "struct PathCostArray*",
             (ffi.cast("char*", self.ctypes.data), self.strides),
@@ -525,8 +526,8 @@ def _compile_bool_edges(edge_map: ArrayLike) -> tuple[Any, int]:
 def hillclimb2d(
     distance: ArrayLike,
     start: tuple[int, int],
-    cardinal: bool | None = None,
-    diagonal: bool | None = None,
+    cardinal: bool | None = None,  # noqa: FBT001
+    diagonal: bool | None = None,  # noqa: FBT001
     *,
     edge_map: ArrayLike | None = None,
 ) -> NDArray[np.intc]:
@@ -998,7 +999,7 @@ class CustomGraph:
 
     def _resolve(self, pathfinder: Pathfinder) -> None:
         """Run the pathfinding algorithm for this graph."""
-        rules, keep_alive = self._compile_rules()
+        rules, _keep_alive = self._compile_rules()
         _check(
             lib.path_compute(
                 pathfinder._frontier_p,

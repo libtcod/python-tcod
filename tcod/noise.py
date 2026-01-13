@@ -36,7 +36,6 @@ from __future__ import annotations
 
 import enum
 import warnings
-from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
@@ -46,6 +45,8 @@ import tcod.random
 from tcod.cffi import ffi, lib
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from numpy.typing import ArrayLike, NDArray
 
 
@@ -350,9 +351,9 @@ class Noise:
             self.get_point()
             self.algorithm = saved_algo
 
-        waveletTileData = None
+        waveletTileData = None  # noqa: N806
         if self.noise_c.waveletTileData != ffi.NULL:
-            waveletTileData = list(self.noise_c.waveletTileData[0 : 32 * 32 * 32])
+            waveletTileData = list(self.noise_c.waveletTileData[0 : 32 * 32 * 32])  # noqa: N806
             state["_waveletTileData"] = waveletTileData
 
         state["noise_c"] = {

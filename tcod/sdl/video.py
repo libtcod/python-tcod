@@ -157,7 +157,7 @@ class _TempSurface:
                 lib.SDL_CreateSurfaceFrom(
                     self._array.shape[1],
                     self._array.shape[0],
-                    lib.SDL_PIXELFORMAT_RGBA32 if self._array.shape[2] == 4 else lib.SDL_PIXELFORMAT_RGB24,
+                    lib.SDL_PIXELFORMAT_RGBA32 if self._array.shape[2] == 4 else lib.SDL_PIXELFORMAT_RGB24,  # noqa: PLR2004
                     ffi.from_buffer("void*", self._array),
                     self._array.strides[0],
                 )
@@ -555,7 +555,7 @@ def get_grabbed_window() -> Window | None:
     return Window(sdl_window_p) if sdl_window_p else None
 
 
-def screen_saver_allowed(allow: bool | None = None) -> bool:
+def screen_saver_allowed(allow: bool | None = None) -> bool:  # noqa: FBT001
     """Allow or prevent a screen saver from being displayed and return the current allowed status.
 
     If `allow` is `None` then only the current state is returned.

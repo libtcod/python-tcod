@@ -89,6 +89,8 @@ class Color(list[int]):
         else:
             super().__setitem__(index, value)
 
+    __hash__ = None
+
     def __eq__(self, other: object) -> bool:
         """Compare equality between colors.
 

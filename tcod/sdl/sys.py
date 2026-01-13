@@ -24,7 +24,7 @@ def init(flags: int) -> None:
     _check(lib.SDL_InitSubSystem(flags))
 
 
-def quit(flags: int | None = None) -> None:
+def quit(flags: int | None = None) -> None:  # noqa: A001
     if flags is None:
         lib.SDL_Quit()
         return

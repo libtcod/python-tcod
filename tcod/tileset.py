@@ -16,7 +16,6 @@ python-tcod's pathfinding and field-of-view algorithms.
 from __future__ import annotations
 
 import itertools
-from collections.abc import Iterable
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -27,6 +26,7 @@ from tcod._internal import _check, _check_p, _console, _path_encode, _raise_tcod
 from tcod.cffi import ffi, lib
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from os import PathLike
 
     from numpy.typing import ArrayLike, NDArray

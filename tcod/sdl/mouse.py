@@ -39,8 +39,11 @@ class Cursor:
     def __eq__(self, other: object) -> bool:
         return bool(self.p == getattr(other, "p", None))
 
+    def __hash__(self) -> int:
+        return hash(self.p)
+
     @classmethod
-    def _claim(cls, sdl_cursor_p: Any) -> Cursor:
+    def _claim(cls, sdl_cursor_p: Any) -> Cursor:  # noqa: ANN401
         """Verify and wrap this pointer in a garbage collector before returning a Cursor."""
         return cls(ffi.gc(_check_p(sdl_cursor_p), lib.SDL_DestroyCursor))
 
@@ -149,7 +152,7 @@ def get_cursor() -> Cursor | None:
     return Cursor(cursor_p) if cursor_p else None
 
 
-def capture(enable: bool) -> None:
+def capture(enable: bool) -> None:  # noqa: FBT001
     """Enable or disable mouse capture to track the mouse outside of a window.
 
     It is highly recommended to read the related remarks section in the SDL docs before using this.
@@ -176,7 +179,7 @@ def capture(enable: bool) -> None:
 
 
 @deprecated("Set 'Window.relative_mouse_mode = value' instead.")
-def set_relative_mode(enable: bool) -> None:
+def set_relative_mode(enable: bool) -> None:  # noqa: FBT001
     """Enable or disable relative mouse mode which will lock and hide the mouse and only report mouse motion.
 
     .. seealso::
@@ -248,7 +251,7 @@ def warp_in_window(window: tcod.sdl.video.Window, x: int, y: int) -> None:
     lib.SDL_WarpMouseInWindow(window.p, x, y)
 
 
-def show(visible: bool | None = None) -> bool:
+def show(visible: bool | None = None) -> bool:  # noqa: FBT001
     """Optionally show or hide the mouse cursor then return the state of the cursor.
 
     Args:

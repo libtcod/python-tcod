@@ -10,7 +10,7 @@ import tcod.sdl.sys
 import tcod.sdl.video
 
 
-def test_sdl_window(uses_window: None) -> None:
+def test_sdl_window(uses_window: None) -> None:  # noqa: ARG001
     assert tcod.sdl.video.get_grabbed_window() is None
     window = tcod.sdl.video.new_window(1, 1)
     window.raise_window()
@@ -50,14 +50,14 @@ def test_sdl_window_bad_types() -> None:
         tcod.sdl.video.Window(tcod.ffi.new("SDL_Rect*"))
 
 
-def test_sdl_screen_saver(uses_window: None) -> None:
+def test_sdl_screen_saver(uses_window: None) -> None:  # noqa: ARG001
     tcod.sdl.sys.init(tcod.sdl.sys.Subsystem.VIDEO)
-    assert tcod.sdl.video.screen_saver_allowed(False) is False
-    assert tcod.sdl.video.screen_saver_allowed(True) is True
+    assert tcod.sdl.video.screen_saver_allowed(False) is False  # noqa: FBT003
+    assert tcod.sdl.video.screen_saver_allowed(True) is True  # noqa: FBT003
     assert tcod.sdl.video.screen_saver_allowed() is True
 
 
-def test_sdl_render(uses_window: None) -> None:
+def test_sdl_render(uses_window: None) -> None:  # noqa: ARG001
     window = tcod.sdl.video.new_window(4, 4)
     render = tcod.sdl.render.new_renderer(window, driver="software", vsync=False)
     render.clear()

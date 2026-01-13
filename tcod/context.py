@@ -29,9 +29,8 @@ import copy
 import pickle
 import sys
 import warnings
-from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Literal, NoReturn, TypeVar
+from typing import TYPE_CHECKING, Any, Literal, NoReturn, TypeVar
 
 from typing_extensions import Self, deprecated
 
@@ -43,6 +42,9 @@ import tcod.sdl.video
 import tcod.tileset
 from tcod._internal import _check, _check_warn
 from tcod.cffi import ffi, lib
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 __all__ = (
     "RENDERER_OPENGL",

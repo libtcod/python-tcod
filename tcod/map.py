@@ -82,9 +82,9 @@ class Map:
         """Initialize the map."""
         self.width = width
         self.height = height
-        self._order = tcod._internal.verify_order(order)
+        self._order: Literal["C", "F"] = tcod._internal.verify_order(order)
 
-        self.__buffer: NDArray[np.bool_] = np.zeros((height, width, 3), dtype=np.bool_)
+        self._buffer: NDArray[np.bool_] = np.zeros((height, width, 3), dtype=np.bool_)
         self.map_c = self.__as_cdata()
 
     def __as_cdata(self) -> Any:  # noqa: ANN401
@@ -94,23 +94,23 @@ class Map:
                 self.width,
                 self.height,
                 self.width * self.height,
-                ffi.from_buffer("struct TCOD_MapCell*", self.__buffer),
+                ffi.from_buffer("struct TCOD_MapCell*", self._buffer),
             ),
         )
 
     @property
     def transparent(self) -> NDArray[np.bool_]:
-        buffer: np.ndarray[Any, np.dtype[np.bool_]] = self.__buffer[:, :, 0]
+        buffer: np.ndarray[Any, np.dtype[np.bool_]] = self._buffer[:, :, 0]
         return buffer.T if self._order == "F" else buffer
 
     @property
     def walkable(self) -> NDArray[np.bool_]:
-        buffer: np.ndarray[Any, np.dtype[np.bool_]] = self.__buffer[:, :, 1]
+        buffer: np.ndarray[Any, np.dtype[np.bool_]] = self._buffer[:, :, 1]
         return buffer.T if self._order == "F" else buffer
 
     @property
     def fov(self) -> NDArray[np.bool_]:
-        buffer: np.ndarray[Any, np.dtype[np.bool_]] = self.__buffer[:, :, 2]
+        buffer: np.ndarray[Any, np.dtype[np.bool_]] = self._buffer[:, :, 2]
         return buffer.T if self._order == "F" else buffer
 
     def compute_fov(
@@ -118,7 +118,7 @@ class Map:
         x: int,
         y: int,
         radius: int = 0,
-        light_walls: bool = True,
+        light_walls: bool = True,  # noqa: FBT001, FBT002
         algorithm: int = tcod.constants.FOV_RESTRICTIVE,
     ) -> None:
         """Compute a field-of-view on the current instance.
@@ -146,12 +146,13 @@ class Map:
         lib.TCOD_map_compute_fov(self.map_c, x, y, radius, light_walls, algorithm)
 
     def __setstate__(self, state: dict[str, Any]) -> None:
-        if "_Map__buffer" not in state:  # deprecated
-            # remove this check on major version update
-            self.__buffer = np.zeros((state["height"], state["width"], 3), dtype=np.bool_)
-            self.__buffer[:, :, 0] = state["buffer"] & 0x01
-            self.__buffer[:, :, 1] = state["buffer"] & 0x02
-            self.__buffer[:, :, 2] = state["buffer"] & 0x04
+        if "_Map__buffer" in state:  # Deprecated since 19.6
+            state["_buffer"] = state.pop("_Map__buffer")
+        if "buffer" in state:  # Deprecated
+            self._buffer = np.zeros((state["height"], state["width"], 3), dtype=np.bool_)
+            self._buffer[:, :, 0] = state["buffer"] & 0x01
+            self._buffer[:, :, 1] = state["buffer"] & 0x02
+            self._buffer[:, :, 2] = state["buffer"] & 0x04
             del state["buffer"]
             state["_order"] = "F"
         self.__dict__.update(state)
@@ -167,7 +168,7 @@ def compute_fov(
     transparency: ArrayLike,
     pov: tuple[int, int],
     radius: int = 0,
-    light_walls: bool = True,
+    light_walls: bool = True,  # noqa: FBT001, FBT002
     algorithm: int = tcod.constants.FOV_RESTRICTIVE,
 ) -> NDArray[np.bool_]:
     """Return a boolean mask of the area covered by a field-of-view.

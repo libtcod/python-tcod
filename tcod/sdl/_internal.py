@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 import sys
-from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, NoReturn, Protocol, TypeVar, overload, runtime_checkable
 
@@ -13,6 +12,7 @@ from typing_extensions import Self
 from tcod.cffi import ffi, lib
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from types import TracebackType
 
 T = TypeVar("T")
@@ -161,7 +161,7 @@ def _get_error() -> str:
     return str(ffi.string(lib.SDL_GetError()), encoding="utf-8")
 
 
-def _check(result: bool, /) -> bool:
+def _check(result: bool, /) -> bool:  # noqa: FBT001
     """Check if an SDL function returned without errors, and raise an exception if it did."""
     if not result:
         raise RuntimeError(_get_error())

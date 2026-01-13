@@ -12,9 +12,9 @@ import tcod.console
 
 def test_array_read_write() -> None:
     console = tcod.console.Console(width=12, height=10)
-    FG = (255, 254, 253)
-    BG = (1, 2, 3)
-    CH = ord("&")
+    FG = (255, 254, 253)  # noqa: N806
+    BG = (1, 2, 3)  # noqa: N806
+    CH = ord("&")  # noqa: N806
     with pytest.warns():
         tcod.console_put_char_ex(console, 0, 0, CH, FG, BG)
     assert console.ch[0, 0] == CH
@@ -74,7 +74,7 @@ def test_console_methods() -> None:
         console.print_rect(0, 0, 2, 8, "a b c d e f")
     console.get_height_rect(0, 0, 2, 8, "a b c d e f")
     with pytest.deprecated_call():
-        console.rect(0, 0, 2, 2, True)
+        console.rect(0, 0, 2, 2, True)  # noqa: FBT003
     with pytest.deprecated_call():
         console.hline(0, 1, 10)
     with pytest.deprecated_call():
@@ -107,7 +107,7 @@ def test_console_pickle_fortran() -> None:
 
 
 def test_console_repr() -> None:
-    from numpy import array  # noqa: F401  # Used for eval
+    from numpy import array  # Used for eval  # noqa: F401, PLC0415
 
     eval(repr(tcod.console.Console(10, 2)))  # noqa: S307
 

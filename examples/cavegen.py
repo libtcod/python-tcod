@@ -10,7 +10,7 @@ command line.
 from typing import Any
 
 import numpy as np
-import scipy.signal  # type: ignore
+import scipy.signal  # type: ignore[import-untyped]
 from numpy.typing import NDArray
 
 

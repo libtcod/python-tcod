@@ -8,7 +8,6 @@ See :ref:`getting-started` for info on how to set those up.
 from __future__ import annotations
 
 import warnings
-from collections.abc import Iterable
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, overload
 
@@ -22,6 +21,7 @@ from tcod._internal import _check, _path_encode
 from tcod.cffi import ffi, lib
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from os import PathLike
 
     from numpy.typing import ArrayLike, NDArray

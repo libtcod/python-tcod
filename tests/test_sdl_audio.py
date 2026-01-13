@@ -124,9 +124,9 @@ def test_audio_callback_unraisable() -> None:
     class CheckCalled:
         was_called: bool = False
 
-        def __call__(self, device: tcod.sdl.audio.AudioDevice, stream: NDArray[Any]) -> None:
+        def __call__(self, _device: tcod.sdl.audio.AudioDevice, _stream: NDArray[Any]) -> None:
             self.was_called = True
-            raise Exception("Test unraisable error")  # noqa
+            raise Exception("Test unraisable error")  # noqa: EM101, TRY002, TRY003
 
     check_called = CheckCalled()
     with tcod.sdl.audio.open(callback=check_called, paused=False) as device:
