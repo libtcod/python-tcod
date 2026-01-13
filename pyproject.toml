@@ -97,6 +97,10 @@ filterwarnings = [
     "ignore:'import tcod as libtcodpy' is preferred.",
 ]
 
+[tool.coverage.report] # https://coverage.readthedocs.io/en/latest/config.html
+exclude_lines = ['^\s*\.\.\.', "if TYPE_CHECKING:", "# pragma: no cover"]
+omit = ["tcod/__pyinstaller/*"]
+
 [tool.cibuildwheel] # https://cibuildwheel.pypa.io/en/stable/options/
 enable = ["pypy", "pyodide-prerelease"]
 
