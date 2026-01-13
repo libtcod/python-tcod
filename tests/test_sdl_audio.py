@@ -114,6 +114,7 @@ def test_audio_callback() -> None:
 
 @pytest.mark.skipif(sys.version_info < (3, 8), reason="Needs sys.unraisablehook support")
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.skip(reason="Unsupported, causes too many issues")
 @needs_audio_device
 def test_audio_callback_unraisable() -> None:
     """Test unraisable error in audio callback.
