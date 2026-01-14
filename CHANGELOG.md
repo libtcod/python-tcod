@@ -6,6 +6,15 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Added
+
+- Added methods: `Renderer.coordinates_from_window` and `Renderer.coordinates_to_window`
+- Added `tcod.event.convert_coordinates_from_window`.
+
+### Changed
+
+- `Renderer.logical_size` now returns `None` instead of `(0, 0)` when logical size is unset.
+
 ## [19.6.3] - 2026-01-12
 
 Fix missing deployment

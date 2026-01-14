@@ -439,16 +439,16 @@ class Renderer:
 
     @property
     def output_size(self) -> tuple[int, int]:
-        """Get the (width, height) pixel resolution of the rendering context.
+        """Get the (width, height) pixel resolution of the current rendering context.
 
         .. seealso::
-            https://wiki.libsdl.org/SDL_GetRendererOutputSize
+            https://wiki.libsdl.org/SDL3/SDL_GetCurrentRenderOutputSize
 
         .. versionadded:: 13.5
         """
         out = ffi.new("int[2]")
         _check(lib.SDL_GetCurrentRenderOutputSize(self.p, out, out + 1))
-        return out[0], out[1]
+        return tuple(out)
 
     @property
     def clip_rect(self) -> tuple[int, int, int, int] | None:
@@ -481,10 +481,8 @@ class Renderer:
         _check(lib.SDL_SetRenderLogicalPresentation(self.p, width, height, mode))
 
     @property
-    def logical_size(self) -> tuple[int, int]:
-        """Get current independent (width, height) resolution.
-
-        Might be (0, 0) if a resolution was never assigned.
+    def logical_size(self) -> tuple[int, int] | None:
+        """Get current independent (width, height) resolution, or None if logical size is unset.
 
         .. seealso::
             https://wiki.libsdl.org/SDL3/SDL_GetRenderLogicalPresentation
@@ -493,10 +491,14 @@ class Renderer:
 
         .. versionchanged:: 19.0
             Setter is deprecated, use :any:`set_logical_presentation` instead.
+
+        .. versionchanged:: Unreleased
+            Return ``None`` instead of ``(0, 0)`` when logical size is disabled.
         """
         out = ffi.new("int[2]")
         lib.SDL_GetRenderLogicalPresentation(self.p, out, out + 1, ffi.NULL)
-        return out[0], out[1]
+        out_tuple = tuple(out)
+        return None if out_tuple == (0, 0) else out_tuple
 
     @logical_size.setter
     @deprecated("Use set_logical_presentation method to correctly setup logical size.")
@@ -509,7 +511,7 @@ class Renderer:
         """Get or set an (x_scale, y_scale) multiplier for drawing.
 
         .. seealso::
-            https://wiki.libsdl.org/SDL_RenderSetScale
+            https://wiki.libsdl.org/SDL3/SDL_SetRenderScale
 
         .. versionadded:: 13.5
         """
@@ -526,7 +528,7 @@ class Renderer:
         """Get or set the drawing area for the current rendering target.
 
         .. seealso::
-            https://wiki.libsdl.org/SDL_RenderSetViewport
+            https://wiki.libsdl.org/SDL3/SDL_SetRenderViewport
 
         .. versionadded:: 13.5
         """
@@ -752,6 +754,32 @@ class Renderer:
                 indices.itemsize if indices is not None else 0,
             )
         )
+
+    def coordinates_from_window(self, xy: tuple[float, float], /) -> tuple[float, float]:
+        """Return the renderer coordinates from the given windows coordinates.
+
+        .. seealso::
+            https://wiki.libsdl.org/SDL3/SDL_RenderCoordinatesFromWindow
+
+        .. versionadded:: Unreleased
+        """
+        x, y = xy
+        out_xy = ffi.new("float[2]")
+        _check(lib.SDL_RenderCoordinatesFromWindow(self.p, x, y, out_xy, out_xy + 1))
+        return tuple(out_xy)
+
+    def coordinates_to_window(self, xy: tuple[float, float], /) -> tuple[float, float]:
+        """Return the window coordinates from the given render coordinates.
+
+        .. seealso::
+            https://wiki.libsdl.org/SDL3/SDL_RenderCoordinatesToWindow
+
+        .. versionadded:: Unreleased
+        """
+        x, y = xy
+        out_xy = ffi.new("float[2]")
+        _check(lib.SDL_RenderCoordinatesToWindow(self.p, x, y, out_xy, out_xy + 1))
+        return tuple(out_xy)
 
 
 def new_renderer(

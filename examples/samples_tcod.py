@@ -1379,6 +1379,8 @@ def redraw_display() -> None:
     SAMPLES[cur_sample].on_draw()
     sample_console.blit(root_console, SAMPLE_SCREEN_X, SAMPLE_SCREEN_Y)
     draw_stats()
+    if 0 <= mouse_tile_xy[0] < root_console.width and 0 <= mouse_tile_xy[1] < root_console.height:
+        root_console.rgb[["fg", "bg"]].T[mouse_tile_xy] = (0, 0, 0), (255, 255, 255)  # Highlight mouse tile
     if context.sdl_renderer:
         # Clear the screen to ensure no garbage data outside of the logical area is displayed
         context.sdl_renderer.draw_color = (0, 0, 0, 255)
@@ -1410,25 +1412,20 @@ def handle_time() -> None:
     frame_length.append(frame_times[-1] - frame_times[-2])
 
 
+mouse_tile_xy = (-1, -1)
+"""Last known mouse tile position."""
+
+
 def handle_events() -> None:
+    global mouse_tile_xy
     for event in tcod.event.get():
-        if context.sdl_renderer:  # Manual handing of tile coordinates since context.present is skipped
-            assert context.sdl_window
-            tile_width = context.sdl_window.size[0] / root_console.width
-            tile_height = context.sdl_window.size[1] / root_console.height
-
-            if isinstance(event, (tcod.event.MouseState, tcod.event.MouseMotion)):
-                event.tile = tcod.event.Point(event.position.x // tile_width, event.position.y // tile_height)
-            if isinstance(event, tcod.event.MouseMotion):
-                prev_tile = (
-                    (event.position[0] - event.motion[0]) // tile_width,
-                    (event.position[1] - event.motion[1]) // tile_height,
-                )
-                event.tile_motion = tcod.event.Point(event.tile[0] - prev_tile[0], event.tile[1] - prev_tile[1])
-        else:
-            context.convert_event(event)
-
-        SAMPLES[cur_sample].on_event(event)
+        tile_event = tcod.event.convert_coordinates_from_window(event, context, root_console)
+        SAMPLES[cur_sample].on_event(tile_event)
+        match tile_event:
+            case tcod.event.MouseMotion(position=(x, y)):
+                mouse_tile_xy = int(x), int(y)
+            case tcod.event.WindowEvent(type="WindowLeave"):
+                mouse_tile_xy = -1, -1
 
 
 def draw_samples_menu() -> None:

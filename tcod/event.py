@@ -87,13 +87,15 @@ import functools
 import sys
 import warnings
 from collections.abc import Callable, Iterator, Mapping
-from typing import TYPE_CHECKING, Any, Final, Generic, Literal, NamedTuple, TypeVar
+from typing import TYPE_CHECKING, Any, Final, Generic, Literal, NamedTuple, TypeVar, overload
 
 import numpy as np
 from typing_extensions import deprecated
 
+import tcod.context
 import tcod.event_constants
 import tcod.sdl.joystick
+import tcod.sdl.render
 import tcod.sdl.sys
 from tcod.cffi import ffi, lib
 from tcod.event_constants import *  # noqa: F403
@@ -103,6 +105,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 T = TypeVar("T")
+_EventType = TypeVar("_EventType", bound="Event")
 
 
 class _ConstantsWithPrefix(Mapping[int, str]):
@@ -1562,6 +1565,78 @@ def get_mouse_state() -> MouseState:
     if tile is None:
         return MouseState((xy[0], xy[1]), None, buttons)
     return MouseState((xy[0], xy[1]), (int(tile[0]), int(tile[1])), buttons)
+
+
+@overload
+def convert_coordinates_from_window(
+    event: _EventType,
+    /,
+    context: tcod.context.Context | tcod.sdl.render.Renderer,
+    console: tcod.console.Console | tuple[int, int],
+    dest_rect: tuple[int, int, int, int] | None = None,
+) -> _EventType: ...
+@overload
+def convert_coordinates_from_window(
+    xy: tuple[float, float],
+    /,
+    context: tcod.context.Context | tcod.sdl.render.Renderer,
+    console: tcod.console.Console | tuple[int, int],
+    dest_rect: tuple[int, int, int, int] | None = None,
+) -> tuple[float, float]: ...
+def convert_coordinates_from_window(
+    event: _EventType | tuple[float, float],
+    /,
+    context: tcod.context.Context | tcod.sdl.render.Renderer,
+    console: tcod.console.Console | tuple[int, int],
+    dest_rect: tuple[int, int, int, int] | None = None,
+) -> _EventType | tuple[float, float]:
+    """Return an event or position with window mouse coordinates converted into console tile coordinates.
+
+    Args:
+        event: :any:`Event` to convert, or the `(x, y)` coordinates to convert.
+        context: Context or Renderer to fetch the SDL renderer from for reference with conversions.
+        console: A console used as a size reference.
+            Otherwise the `(columns, rows)` can be given directly as a tuple.
+        dest_rect: The consoles rendering destination as `(x, y, width, height)`.
+            If None is given then the whole rendering target is assumed.
+
+    .. versionadded:: Unreleased
+    """
+    if isinstance(context, tcod.context.Context):
+        maybe_renderer: Final = context.sdl_renderer
+        if maybe_renderer is None:
+            return event
+        context = maybe_renderer
+
+    if isinstance(console, tcod.console.Console):
+        console = console.width, console.height
+
+    if dest_rect is None:
+        dest_rect = (0, 0, *(context.logical_size or context.output_size))
+
+    x_scale: Final = console[0] / dest_rect[2]
+    y_scale: Final = console[1] / dest_rect[3]
+    x_offset: Final = dest_rect[0]
+    y_offset: Final = dest_rect[1]
+
+    if not isinstance(event, Event):
+        x, y = context.coordinates_from_window(event)
+        return (x - x_offset) * x_scale, (y - y_offset) * y_scale
+
+    if isinstance(event, MouseMotion):
+        previous_position = convert_coordinates_from_window(
+            ((event.position[0] - event.motion[0]), (event.position[1] - event.motion[1])), context, console, dest_rect
+        )
+        position = convert_coordinates_from_window(event.position, context, console, dest_rect)
+        event.motion = tcod.event.Point(position[0] - previous_position[0], position[1] - previous_position[1])
+        event._tile_motion = tcod.event.Point(
+            int(position[0]) - int(previous_position[0]), int(position[1]) - int(previous_position[1])
+        )
+    if isinstance(event, (MouseState, MouseMotion)):
+        event.position = event._tile = tcod.event.Point(
+            *convert_coordinates_from_window(event.position, context, console, dest_rect)
+        )
+    return event
 
 
 @ffi.def_extern()  # type: ignore[untyped-decorator]
