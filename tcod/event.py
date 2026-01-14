@@ -1198,7 +1198,7 @@ def _parse_event(sdl_event: Any) -> Event:
     return Undefined.from_sdl_event(sdl_event)
 
 
-def get() -> Iterator[Any]:
+def get() -> Iterator[Event]:
     """Return an iterator for all pending events.
 
     Events are processed as the iterator is consumed.
@@ -1218,7 +1218,7 @@ def get() -> Iterator[Any]:
         yield _parse_event(sdl_event)
 
 
-def wait(timeout: float | None = None) -> Iterator[Any]:
+def wait(timeout: float | None = None) -> Iterator[Event]:
     """Block until events exist, then return an event iterator.
 
     `timeout` is the maximum number of seconds to wait as a floating point
