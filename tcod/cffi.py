@@ -7,7 +7,7 @@ import os
 import platform
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import cffi
 
@@ -39,8 +39,10 @@ def verify_dependencies() -> None:
             raise RuntimeError(msg)
 
 
-def get_architecture() -> str:
-    """Return the Windows architecture, one of "x86" or "x64"."""
+def get_architecture() -> Literal["x86", "x64", "arm64"]:
+    """Return the Windows architecture."""
+    if "(ARM64)" in sys.version:
+        return "arm64"
     return "x86" if platform.architecture()[0] == "32bit" else "x64"
 
 

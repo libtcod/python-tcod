@@ -118,6 +118,9 @@ jobs:
           - os: "windows-latest"
             python-version: "3.10"
             architecture: "x86"
+          - os: "windows-11-arm"
+            python-version: "3.11"
+            architecture: "arm64"
       fail-fast: false
 
     steps:
