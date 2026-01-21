@@ -26,6 +26,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Install Ruff
         run: pip install ruff
       - name: Ruff Check
@@ -38,6 +40,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
       - name: Install typing dependencies
@@ -59,6 +63,7 @@ jobs:
           version: ${{ env.sdl-version }}
       - uses: actions/checkout@v6
         with:
+          persist-credentials: false
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
@@ -86,6 +91,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          persist-credentials: false
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
@@ -117,10 +123,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          persist-credentials: false
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
-        run: |
-          git submodule update --init --recursive --depth 1
+        run: git submodule update --init --recursive --depth 1
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
@@ -143,19 +149,15 @@ jobs:
           pip install pytest pytest-cov pytest-benchmark pytest-timeout build
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Initialize package
-        run: |
-          pip install -e .  # Install the package in-place.
+        run: pip install -e . # Install the package in-place.
       - name: Build package
-        run: |
-          python -m build
+        run: python -m build
       - name: Test with pytest
         if: runner.os == 'Windows'
-        run: |
-          pytest --cov-report=xml --timeout=300
+        run: pytest --cov-report=xml --timeout=300
       - name: Test with pytest (Xvfb)
         if: always() && runner.os != 'Windows'
-        run: |
-          xvfb-run -e /tmp/xvfb.log --server-num=$RANDOM --auto-servernum pytest --cov-report=xml --timeout=300
+        run: xvfb-run -e /tmp/xvfb.log --server-num=$RANDOM --auto-servernum pytest --cov-report=xml --timeout=300
       - name: Xvfb logs
         if: runner.os != 'Windows'
         run: cat /tmp/xvfb.log
@@ -181,6 +183,7 @@ jobs:
           version: ${{ env.sdl-version }}
       - uses: actions/checkout@v6
         with:
+          persist-credentials: false
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
@@ -206,6 +209,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          persist-credentials: false
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --depth 1
@@ -239,6 +243,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          persist-credentials: false
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
@@ -270,8 +275,9 @@ jobs:
           # Skip test on emulated architectures
           CIBW_TEST_SKIP: "*_aarch64"
       - name: Remove asterisk from label
+        env:
+          BUILD_DESC: ${{ matrix.build }}
         run: |
-          BUILD_DESC=${{ matrix.build }}
           BUILD_DESC=${BUILD_DESC//\*}
           echo BUILD_DESC=${BUILD_DESC} >> $GITHUB_ENV
       - name: Archive wheel
@@ -295,6 +301,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          persist-credentials: false
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
@@ -317,8 +324,9 @@ jobs:
           CIBW_TEST_SKIP: "pp* *-macosx_arm64 *-macosx_universal2:arm64"
           MACOSX_DEPLOYMENT_TARGET: "10.13"
       - name: Remove asterisk from label
+        env:
+          PYTHON_DESC: ${{ matrix.python }}
         run: |
-          PYTHON_DESC=${{ matrix.python }}
           PYTHON_DESC=${PYTHON_DESC//\*/X}
           echo PYTHON_DESC=${PYTHON_DESC} >> $GITHUB_ENV
       - name: Archive wheel
@@ -336,6 +344,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          persist-credentials: false
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
@@ -365,7 +374,7 @@ jobs:
       name: pypi
       url: https://pypi.org/project/tcod/${{ github.ref_name }}
     permissions:
-      id-token: write
+      id-token: write # Attestation
     steps:
       - uses: actions/download-artifact@v7
         with:

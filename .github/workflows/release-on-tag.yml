@@ -5,19 +5,23 @@ on:
 
 name: Create Release
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     name: Create Release
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
-      contents: write
+      contents: write # Publish GitHub Releases
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Generate body
-        run: |
-          scripts/get_release_description.py | tee release_body.md
+        run: scripts/get_release_description.py | tee release_body.md
       - name: Create Release
         id: create_release
         uses: ncipollo/release-action@v1

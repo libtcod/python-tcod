@@ -1,0 +1,7 @@
+rules:
+  anonymous-definition:
+    disable: true
+  excessive-permissions:
+    disable: true
+  unpinned-uses:
+    disable: true
