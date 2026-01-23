@@ -8,7 +8,7 @@ import warnings
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, AnyStr, Literal, NoReturn, SupportsInt, TypeVar
 
-from typing_extensions import LiteralString, deprecated
+from typing_extensions import deprecated
 
 from tcod.cffi import ffi, lib
 
@@ -38,16 +38,6 @@ def _deprecate_passthrough(
 
 
 deprecate = deprecated if __debug__ or TYPE_CHECKING else _deprecate_passthrough
-
-
-def pending_deprecate(
-    message: LiteralString = "This function may be deprecated in the future."
-    " Consider raising an issue on GitHub if you need this feature.",
-    category: type[Warning] = PendingDeprecationWarning,
-    stacklevel: int = 0,
-) -> Callable[[F], F]:
-    """Like deprecate, but the default parameters are filled out for a generic pending deprecation warning."""
-    return deprecate(message, category=category, stacklevel=stacklevel)
 
 
 def verify_order(order: Literal["C", "F"]) -> Literal["C", "F"]:

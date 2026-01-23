@@ -7,7 +7,7 @@ import sys
 import threading
 import warnings
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Final, Literal
 
 import numpy as np
 from typing_extensions import deprecated
@@ -35,7 +35,6 @@ from tcod._internal import (
     _unicode,
     _unpack_char_p,
     deprecate,
-    pending_deprecate,
 )
 from tcod.cffi import ffi, lib
 from tcod.color import Color
@@ -79,6 +78,11 @@ def BKGND_ALPHA(a: int) -> int:  # noqa: N802
 
 def BKGND_ADDALPHA(a: int) -> int:  # noqa: N802
     return BKGND_ADDA | (int(a * 255) << 8)
+
+
+_PENDING_DEPRECATE_MSG: Final = (
+    "This function may be deprecated in the future. Consider raising an issue on GitHub if you need this feature."
+)
 
 
 @deprecated("Console array attributes perform better than this class.")
@@ -737,7 +741,7 @@ def bsp_delete(node: tcod.bsp.BSP) -> None:
     """
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def color_lerp(c1: tuple[int, int, int], c2: tuple[int, int, int], a: float) -> Color:
     """Return the linear interpolation between two colors.
 
@@ -757,7 +761,7 @@ def color_lerp(c1: tuple[int, int, int], c2: tuple[int, int, int], a: float) -> 
     return Color._new_from_cdata(lib.TCOD_color_lerp(c1, c2, a))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def color_set_hsv(c: Color, h: float, s: float, v: float) -> None:
     """Set a color using: hue, saturation, and value parameters.
 
@@ -774,7 +778,7 @@ def color_set_hsv(c: Color, h: float, s: float, v: float) -> None:
     c[:] = new_color.r, new_color.g, new_color.b
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def color_get_hsv(c: tuple[int, int, int]) -> tuple[float, float, float]:
     """Return the (hue, saturation, value) of a color.
 
@@ -791,7 +795,7 @@ def color_get_hsv(c: tuple[int, int, int]) -> tuple[float, float, float]:
     return hsv[0], hsv[1], hsv[2]
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def color_scale_HSV(c: Color, scoef: float, vcoef: float) -> None:  # noqa: N802
     """Scale a color's saturation and value.
 
@@ -810,7 +814,7 @@ def color_scale_HSV(c: Color, scoef: float, vcoef: float) -> None:  # noqa: N802
     c[:] = color_p.r, color_p.g, color_p.b
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def color_gen_map(colors: Iterable[tuple[int, int, int]], indexes: Iterable[int]) -> list[Color]:
     """Return a smoothly defined scale of colors.
 
@@ -1149,7 +1153,7 @@ def console_set_window_title(title: str) -> None:
     lib.TCOD_console_set_window_title(_bytes(title))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def console_credits() -> None:
     lib.TCOD_console_credits()
 
@@ -1277,7 +1281,7 @@ def console_clear(con: tcod.console.Console) -> None:
     lib.TCOD_console_clear(_console(con))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def console_put_char(
     con: tcod.console.Console,
     x: int,
@@ -1297,7 +1301,7 @@ def console_put_char(
     lib.TCOD_console_put_char(_console(con), x, y, _int(c), flag)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def console_put_char_ex(
     con: tcod.console.Console,
     x: int,
@@ -1321,7 +1325,7 @@ def console_put_char_ex(
     lib.TCOD_console_put_char_ex(_console(con), x, y, _int(c), fore, back)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def console_set_char_background(
     con: tcod.console.Console,
     x: int,
@@ -1615,7 +1619,7 @@ def console_print_frame(
     _check(lib.TCOD_console_printf_frame(_console(con), x, y, w, h, clear, flag, fmt_))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def console_set_color_control(con: int, fore: tuple[int, int, int], back: tuple[int, int, int]) -> None:
     """Configure :term:`color controls`.
 
@@ -2099,7 +2103,7 @@ def console_list_save_xp(
         lib.TCOD_list_delete(tcod_list)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def path_new_using_map(m: tcod.map.Map, dcost: float = 1.41) -> tcod.path.AStar:
     """Return a new AStar using the given Map.
 
@@ -2114,7 +2118,7 @@ def path_new_using_map(m: tcod.map.Map, dcost: float = 1.41) -> tcod.path.AStar:
     return tcod.path.AStar(m, dcost)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def path_new_using_function(
     w: int,
     h: int,
@@ -2138,7 +2142,7 @@ def path_new_using_function(
     return tcod.path.AStar(tcod.path._EdgeCostFunc((func, userData), (w, h)), dcost)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def path_compute(p: tcod.path.AStar, ox: int, oy: int, dx: int, dy: int) -> bool:
     """Find a path from (ox, oy) to (dx, dy).  Return True if path is found.
 
@@ -2155,7 +2159,7 @@ def path_compute(p: tcod.path.AStar, ox: int, oy: int, dx: int, dy: int) -> bool
     return bool(lib.TCOD_path_compute(p._path_c, ox, oy, dx, dy))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def path_get_origin(p: tcod.path.AStar) -> tuple[int, int]:
     """Get the current origin position.
 
@@ -2173,7 +2177,7 @@ def path_get_origin(p: tcod.path.AStar) -> tuple[int, int]:
     return x[0], y[0]
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def path_get_destination(p: tcod.path.AStar) -> tuple[int, int]:
     """Get the current destination position.
 
@@ -2189,7 +2193,7 @@ def path_get_destination(p: tcod.path.AStar) -> tuple[int, int]:
     return x[0], y[0]
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def path_size(p: tcod.path.AStar) -> int:
     """Return the current length of the computed path.
 
@@ -2202,7 +2206,7 @@ def path_size(p: tcod.path.AStar) -> int:
     return int(lib.TCOD_path_size(p._path_c))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def path_reverse(p: tcod.path.AStar) -> None:
     """Reverse the direction of a path.
 
@@ -2214,7 +2218,7 @@ def path_reverse(p: tcod.path.AStar) -> None:
     lib.TCOD_path_reverse(p._path_c)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def path_get(p: tcod.path.AStar, idx: int) -> tuple[int, int]:
     """Get a point on a path.
 
@@ -2228,7 +2232,7 @@ def path_get(p: tcod.path.AStar, idx: int) -> tuple[int, int]:
     return x[0], y[0]
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def path_is_empty(p: tcod.path.AStar) -> bool:
     """Return True if a path is empty.
 
@@ -2241,7 +2245,7 @@ def path_is_empty(p: tcod.path.AStar) -> bool:
     return bool(lib.TCOD_path_is_empty(p._path_c))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def path_walk(p: tcod.path.AStar, recompute: bool) -> tuple[int, int] | tuple[None, None]:  # noqa: FBT001
     """Return the next (x, y) point in a path, or (None, None) if it's empty.
 
@@ -2271,12 +2275,12 @@ def path_delete(p: tcod.path.AStar) -> None:
     """
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def dijkstra_new(m: tcod.map.Map, dcost: float = 1.41) -> tcod.path.Dijkstra:
     return tcod.path.Dijkstra(m, dcost)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def dijkstra_new_using_function(
     w: int,
     h: int,
@@ -2287,32 +2291,32 @@ def dijkstra_new_using_function(
     return tcod.path.Dijkstra(tcod.path._EdgeCostFunc((func, userData), (w, h)), dcost)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def dijkstra_compute(p: tcod.path.Dijkstra, ox: int, oy: int) -> None:
     lib.TCOD_dijkstra_compute(p._path_c, ox, oy)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def dijkstra_path_set(p: tcod.path.Dijkstra, x: int, y: int) -> bool:
     return bool(lib.TCOD_dijkstra_path_set(p._path_c, x, y))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def dijkstra_get_distance(p: tcod.path.Dijkstra, x: int, y: int) -> int:
     return int(lib.TCOD_dijkstra_get_distance(p._path_c, x, y))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def dijkstra_size(p: tcod.path.Dijkstra) -> int:
     return int(lib.TCOD_dijkstra_size(p._path_c))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def dijkstra_reverse(p: tcod.path.Dijkstra) -> None:
     lib.TCOD_dijkstra_reverse(p._path_c)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def dijkstra_get(p: tcod.path.Dijkstra, idx: int) -> tuple[int, int]:
     x = ffi.new("int *")
     y = ffi.new("int *")
@@ -2320,12 +2324,12 @@ def dijkstra_get(p: tcod.path.Dijkstra, idx: int) -> tuple[int, int]:
     return x[0], y[0]
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def dijkstra_is_empty(p: tcod.path.Dijkstra) -> bool:
     return bool(lib.TCOD_dijkstra_is_empty(p._path_c))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def dijkstra_path_walk(
     p: tcod.path.Dijkstra,
 ) -> tuple[int, int] | tuple[None, None]:
@@ -2362,7 +2366,7 @@ def _heightmap_cdata(array: NDArray[np.float32]) -> Any:
     return ffi.new("TCOD_heightmap_t *", (width, height, pointer))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def heightmap_new(w: int, h: int, order: str = "C") -> NDArray[np.float32]:
     """Return a new numpy.ndarray formatted for use with heightmap functions.
 
@@ -2486,7 +2490,7 @@ def heightmap_copy(hm1: NDArray[np.float32], hm2: NDArray[np.float32]) -> None:
     hm2[:] = hm1[:]
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def heightmap_normalize(hm: NDArray[np.float32], mi: float = 0.0, ma: float = 1.0) -> None:
     """Normalize heightmap values between ``mi`` and ``ma``.
 
@@ -2498,7 +2502,7 @@ def heightmap_normalize(hm: NDArray[np.float32], mi: float = 0.0, ma: float = 1.
     lib.TCOD_heightmap_normalize(_heightmap_cdata(hm), mi, ma)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def heightmap_lerp_hm(
     hm1: NDArray[np.float32],
     hm2: NDArray[np.float32],
@@ -2562,7 +2566,7 @@ def heightmap_multiply_hm(
     hm3[:] = hm1[:] * hm2[:]
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def heightmap_add_hill(hm: NDArray[np.float32], x: float, y: float, radius: float, height: float) -> None:
     """Add a hill (a half spheroid) at given position.
 
@@ -2578,7 +2582,7 @@ def heightmap_add_hill(hm: NDArray[np.float32], x: float, y: float, radius: floa
     lib.TCOD_heightmap_add_hill(_heightmap_cdata(hm), x, y, radius, height)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def heightmap_dig_hill(hm: NDArray[np.float32], x: float, y: float, radius: float, height: float) -> None:
     """Dig a hill in a heightmap.
 
@@ -2596,7 +2600,7 @@ def heightmap_dig_hill(hm: NDArray[np.float32], x: float, y: float, radius: floa
     lib.TCOD_heightmap_dig_hill(_heightmap_cdata(hm), x, y, radius, height)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def heightmap_rain_erosion(
     hm: NDArray[np.float32],
     nbDrops: int,  # noqa: N803
@@ -2625,7 +2629,7 @@ def heightmap_rain_erosion(
     )
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def heightmap_kernel_transform(
     hm: NDArray[np.float32],
     kernelsize: int,
@@ -2681,7 +2685,7 @@ def heightmap_kernel_transform(
     lib.TCOD_heightmap_kernel_transform(_heightmap_cdata(hm), kernelsize, c_dx, c_dy, c_weight, minLevel, maxLevel)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def heightmap_add_voronoi(
     hm: NDArray[np.float32],
     nbPoints: Any,  # noqa: N803
@@ -2804,7 +2808,7 @@ def heightmap_scale_fbm(
     )
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def heightmap_dig_bezier(
     hm: NDArray[np.float32],
     px: tuple[int, int, int, int],
@@ -2863,7 +2867,7 @@ def heightmap_get_value(hm: NDArray[np.float32], x: int, y: int) -> float:
     raise ValueError(msg)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def heightmap_get_interpolated_value(hm: NDArray[np.float32], x: float, y: float) -> float:
     """Return the interpolated height at non integer coordinates.
 
@@ -2878,7 +2882,7 @@ def heightmap_get_interpolated_value(hm: NDArray[np.float32], x: float, y: float
     return float(lib.TCOD_heightmap_get_interpolated_value(_heightmap_cdata(hm), x, y))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def heightmap_get_slope(hm: NDArray[np.float32], x: int, y: int) -> float:
     """Return the slope between 0 and (pi / 2) at given coordinates.
 
@@ -2893,7 +2897,7 @@ def heightmap_get_slope(hm: NDArray[np.float32], x: int, y: int) -> float:
     return float(lib.TCOD_heightmap_get_slope(_heightmap_cdata(hm), x, y))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def heightmap_get_normal(hm: NDArray[np.float32], x: float, y: float, waterLevel: float) -> tuple[float, float, float]:  # noqa: N803
     """Return the map normal at given coordinates.
 
@@ -2930,7 +2934,7 @@ def heightmap_count_cells(hm: NDArray[np.float32], mi: float, ma: float) -> int:
     return int(lib.TCOD_heightmap_count_cells(_heightmap_cdata(hm), mi, ma))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def heightmap_has_land_on_border(hm: NDArray[np.float32], waterlevel: float) -> bool:
     """Returns True if the map edges are below ``waterlevel``, otherwise False.
 
@@ -3427,22 +3431,22 @@ def mouse_get_status() -> Mouse:
     return Mouse(lib.TCOD_mouse_get_status())
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def namegen_parse(filename: str | PathLike[str], random: tcod.random.Random | None = None) -> None:
     lib.TCOD_namegen_parse(_path_encode(Path(filename).resolve(strict=True)), random or ffi.NULL)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def namegen_generate(name: str) -> str:
     return _unpack_char_p(lib.TCOD_namegen_generate(_bytes(name), False))  # noqa: FBT003
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def namegen_generate_custom(name: str, rule: str) -> str:
     return _unpack_char_p(lib.TCOD_namegen_generate_custom(_bytes(name), _bytes(rule), False))  # noqa: FBT003
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def namegen_get_sets() -> list[str]:
     sets = lib.TCOD_namegen_get_sets()
     try:
@@ -3454,7 +3458,7 @@ def namegen_get_sets() -> list[str]:
     return lst
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def namegen_destroy() -> None:
     lib.TCOD_namegen_destroy()
 
@@ -3721,7 +3725,7 @@ DISTRIBUTION_GAUSSIAN_INVERSE = 3
 DISTRIBUTION_GAUSSIAN_RANGE_INVERSE = 4
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def random_get_instance() -> tcod.random.Random:
     """Return the default Random instance.
 
@@ -3731,7 +3735,7 @@ def random_get_instance() -> tcod.random.Random:
     return tcod.random.Random._new_from_cdata(lib.TCOD_random_get_instance())
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def random_new(algo: int = RNG_CMWC) -> tcod.random.Random:
     """Return a new Random instance.  Using ``algo``.
 
@@ -3744,7 +3748,7 @@ def random_new(algo: int = RNG_CMWC) -> tcod.random.Random:
     return tcod.random.Random(algo)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def random_new_from_seed(seed: Hashable, algo: int = RNG_CMWC) -> tcod.random.Random:
     """Return a new Random instance.  Using the given ``seed`` and ``algo``.
 
@@ -3759,7 +3763,7 @@ def random_new_from_seed(seed: Hashable, algo: int = RNG_CMWC) -> tcod.random.Ra
     return tcod.random.Random(algo, seed)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def random_set_distribution(rnd: tcod.random.Random | None, dist: int) -> None:
     """Change the distribution mode of a random number generator.
 
@@ -3770,7 +3774,7 @@ def random_set_distribution(rnd: tcod.random.Random | None, dist: int) -> None:
     lib.TCOD_random_set_distribution(rnd.random_c if rnd else ffi.NULL, dist)
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def random_get_int(rnd: tcod.random.Random | None, mi: int, ma: int) -> int:
     """Return a random integer in the range: ``mi`` <= n <= ``ma``.
 
@@ -3787,7 +3791,7 @@ def random_get_int(rnd: tcod.random.Random | None, mi: int, ma: int) -> int:
     return int(lib.TCOD_random_get_int(rnd.random_c if rnd else ffi.NULL, mi, ma))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def random_get_float(rnd: tcod.random.Random | None, mi: float, ma: float) -> float:
     """Return a random float in the range: ``mi`` <= n <= ``ma``.
 
@@ -3816,7 +3820,7 @@ def random_get_double(rnd: tcod.random.Random | None, mi: float, ma: float) -> f
     return float(lib.TCOD_random_get_double(rnd.random_c if rnd else ffi.NULL, mi, ma))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def random_get_int_mean(rnd: tcod.random.Random | None, mi: int, ma: int, mean: int) -> int:
     """Return a random weighted integer in the range: ``mi`` <= n <= ``ma``.
 
@@ -3834,7 +3838,7 @@ def random_get_int_mean(rnd: tcod.random.Random | None, mi: int, ma: int, mean: 
     return int(lib.TCOD_random_get_int_mean(rnd.random_c if rnd else ffi.NULL, mi, ma, mean))
 
 
-@pending_deprecate()
+@deprecate(_PENDING_DEPRECATE_MSG, category=PendingDeprecationWarning)
 def random_get_float_mean(rnd: tcod.random.Random | None, mi: float, ma: float, mean: float) -> float:
     """Return a random weighted float in the range: ``mi`` <= n <= ``ma``.
 
