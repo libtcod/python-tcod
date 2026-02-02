@@ -29,7 +29,7 @@ import build_sdl
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
 
-Py_LIMITED_API = 0x03100000
+Py_LIMITED_API: None | int = 0x03100000
 
 HEADER_PARSE_PATHS = ("tcod/", "libtcod/src/libtcod/")
 HEADER_PARSE_EXCLUDES = ("gl2_ext_.h", "renderer_gl_internal.h", "event.h")
@@ -167,9 +167,14 @@ libraries: list[str] = [*build_sdl.libraries]
 library_dirs: list[str] = [*build_sdl.library_dirs]
 define_macros: list[tuple[str, Any]] = []
 
-if "PYODIDE" not in os.environ:
+if "free-threading build" in sys.version:
+    Py_LIMITED_API = None
+if "PYODIDE" in os.environ:
     # Unable to apply Py_LIMITED_API to Pyodide in cffi<=1.17.1
     # https://github.com/python-cffi/cffi/issues/179
+    Py_LIMITED_API = None
+
+if Py_LIMITED_API:
     define_macros.append(("Py_LIMITED_API", Py_LIMITED_API))
 
 sources += walk_sources("tcod/")

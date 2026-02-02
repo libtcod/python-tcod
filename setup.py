@@ -40,6 +40,13 @@ if not (SETUP_DIR / "libtcod/src").exists():
     print("Did you forget to run 'git submodule update --init'?")
     sys.exit(1)
 
+options = {
+    "bdist_wheel": {
+        "py_limited_api": "cp310",
+    }
+}
+if "free-threading build" in sys.version:
+    del options["bdist_wheel"]["py_limited_api"]
 
 setup(
     py_modules=["libtcodpy"],
@@ -47,4 +54,5 @@ setup(
     package_data={"tcod": get_package_data()},
     cffi_modules=["build_libtcod.py:ffi"],
     platforms=["Windows", "MacOS", "Linux"],
+    options=options,
 )

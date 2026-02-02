@@ -109,17 +109,24 @@ jobs:
     needs: [ruff, mypy, sdist]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
+    continue-on-error: ${{ matrix.python-version == '3.14t' && matrix.os == 'windows-11-arm' }} # Until issues are resolved: https://github.com/actions/setup-python/issues/1267
     strategy:
       matrix:
         os: ["ubuntu-latest", "windows-latest"]
-        python-version: ["3.10", "pypy-3.10"]
+        python-version: ["3.10", "3.14t", "pypy-3.10"]
         architecture: ["x64"]
         include:
           - os: "windows-latest"
             python-version: "3.10"
             architecture: "x86"
+          - os: "windows-latest"
+            python-version: "3.14t"
+            architecture: "x86"
           - os: "windows-11-arm"
             python-version: "3.11"
+            architecture: "arm64"
+          - os: "windows-11-arm"
+            python-version: "3.14t"
             architecture: "arm64"
       fail-fast: false
 
@@ -240,7 +247,7 @@ jobs:
     strategy:
       matrix:
         arch: ["x86_64", "aarch64"]
-        build: ["cp310-manylinux*", "pp310-manylinux*"]
+        build: ["cp310-manylinux*", "pp310-manylinux*", "cp314t-manylinux*"]
     env:
       BUILD_DESC: ""
     steps:
@@ -298,7 +305,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python: ["cp310-*_universal2", "pp310-*"]
+        python: ["cp310-*_universal2", "cp314t-*_universal2", "pp310-*"]
     env:
       PYTHON_DESC: ""
     steps:

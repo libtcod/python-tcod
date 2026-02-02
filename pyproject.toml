@@ -42,7 +42,7 @@ keywords = [
     "field-of-view",
     "pathfinding",
 ]
-classifiers = [
+classifiers = [ # https://pypi.org/classifiers/
     "Development Status :: 5 - Production/Stable",
     "Environment :: Win32 (MS Windows)",
     "Environment :: MacOS X",
@@ -53,6 +53,7 @@ classifiers = [
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: Free Threading :: 2 - Beta",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
     "Topic :: Games/Entertainment",
@@ -71,9 +72,6 @@ Changelog = "https://github.com/libtcod/python-tcod/blob/main/CHANGELOG.md"
 Source = "https://github.com/libtcod/python-tcod"
 Tracker = "https://github.com/libtcod/python-tcod/issues"
 Forum = "https://github.com/libtcod/python-tcod/discussions"
-
-[tool.distutils.bdist_wheel]
-py-limited-api = "cp310"
 
 [tool.setuptools_scm]
 write_to = "tcod/version.py"
