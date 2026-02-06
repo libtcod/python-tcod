@@ -1600,7 +1600,7 @@ def convert_coordinates_from_window(
         dest_rect: The consoles rendering destination as `(x, y, width, height)`.
             If None is given then the whole rendering target is assumed.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 20.0
     """
     if isinstance(context, tcod.context.Context):
         maybe_renderer: Final = context.sdl_renderer

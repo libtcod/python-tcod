@@ -6,8 +6,11 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [20.0.0] - 2026-02-06
+
 ### Added
 
+- Now supports free-threaded Python, deploys with `cp314t` wheels.
 - Added methods: `Renderer.coordinates_from_window` and `Renderer.coordinates_to_window`
 - Added `tcod.event.convert_coordinates_from_window`.
 

@@ -492,7 +492,7 @@ class Renderer:
         .. versionchanged:: 19.0
             Setter is deprecated, use :any:`set_logical_presentation` instead.
 
-        .. versionchanged:: Unreleased
+        .. versionchanged:: 20.0
             Return ``None`` instead of ``(0, 0)`` when logical size is disabled.
         """
         out = ffi.new("int[2]")
@@ -761,7 +761,7 @@ class Renderer:
         .. seealso::
             https://wiki.libsdl.org/SDL3/SDL_RenderCoordinatesFromWindow
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 20.0
         """
         x, y = xy
         out_xy = ffi.new("float[2]")
@@ -774,7 +774,7 @@ class Renderer:
         .. seealso::
             https://wiki.libsdl.org/SDL3/SDL_RenderCoordinatesToWindow
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 20.0
         """
         x, y = xy
         out_xy = ffi.new("float[2]")
