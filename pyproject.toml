@@ -52,6 +52,7 @@ classifiers = [ # https://pypi.org/classifiers/
     "Operating System :: POSIX",
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: Microsoft :: Windows",
+    "Programming Language :: C",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: Free Threading :: 2 - Beta",
     "Programming Language :: Python :: Implementation :: CPython",
