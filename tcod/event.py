@@ -156,6 +156,9 @@ class Point(NamedTuple):
 
     .. seealso::
         :any:`MouseMotion` :any:`MouseButtonDown` :any:`MouseButtonUp`
+
+    .. versionchanged:: 19.0
+        Now uses floating point coordinates due to the port to SDL3.
     """
 
     x: float
@@ -481,6 +484,9 @@ class MouseMotion(MouseState):
     .. versionchanged:: 15.0
         Renamed `pixel` attribute to `position`.
         Renamed `pixel_motion` attribute to `motion`.
+
+    .. versionchanged:: 19.0
+        `position` and `motion` now use floating point coordinates.
     """
 
     def __init__(
@@ -558,7 +564,7 @@ class MouseButtonEvent(MouseState):
         type (str): Will be "MOUSEBUTTONDOWN" or "MOUSEBUTTONUP",
                     depending on the event.
         position (Point): The pixel coordinates of the mouse.
-        tile (Point): The integer tile coordinates of the mouse on the screen.
+        tile (Point): The tile coordinates of the mouse on the screen.
         button (int): Which mouse button.
 
             This will be one of the following names:
@@ -569,6 +575,8 @@ class MouseButtonEvent(MouseState):
             * tcod.event.BUTTON_X1
             * tcod.event.BUTTON_X2
 
+    .. versionchanged:: 19.0
+        `position` and `tile` now use floating point coordinates.
     """
 
     def __init__(
