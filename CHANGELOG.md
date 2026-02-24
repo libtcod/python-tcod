@@ -6,6 +6,19 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Added
+
+- `Tileset` now supports `MutableMapping` semantics.
+  Can get, set, or iterate over tiles as if it were a dictionary containing tile glyph arrays.
+  Also supports `+=` and `|=` with other tilesets or mappings.
+- `tcod.tileset.procedural_block_elements` can take a tile shape and return a tileset.
+
+### Deprecated
+
+- `Tileset.set_tile(codepoint, tile)` was replaced with `tileset[codepoint] = tile` syntax.
+- `Tileset.get_tile(codepoint)` was soft replaced with `tileset[codepoint]` syntax.
+- `tcod.tileset.procedural_block_elements` should be used with dictionary semantics instead of passing in a tileset.
+
 ## [20.0.0] - 2026-02-06
 
 ### Added

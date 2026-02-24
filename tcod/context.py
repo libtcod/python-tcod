@@ -125,7 +125,7 @@ It is not recommended to use this renderer on Windows.
 
 def _handle_tileset(tileset: tcod.tileset.Tileset | None) -> Any:  # noqa: ANN401
     """Get the TCOD_Tileset pointer from a Tileset or return a NULL pointer."""
-    return tileset._tileset_p if tileset else ffi.NULL
+    return tileset._tileset_p if tileset is not None else ffi.NULL
 
 
 def _handle_title(title: str | None) -> Any:  # noqa: ANN401

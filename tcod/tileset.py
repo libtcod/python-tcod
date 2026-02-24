@@ -2,25 +2,25 @@
 
 If you want to load a tileset from a common tileset image then you only need :any:`tcod.tileset.load_tilesheet`.
 
-Tilesets can be loaded as a whole from tile-sheets or True-Type fonts, or they
-can be put together from multiple tile images by loading them separately
-using :any:`Tileset.set_tile`.
+Tilesets can be loaded as a whole from tile-sheets or True-Type fonts,
+or they can be put together from multiple tile images by loading them separately using :any:`Tileset.__setitem__`.
 
-A major restriction with libtcod is that all tiles must be the same size and
-tiles can't overlap when rendered.  For sprite-based rendering it can be
-useful to use `an alternative library for graphics rendering
+A major restriction with libtcod is that all tiles must be the same size and tiles can't overlap when rendered.
+For sprite-based rendering it can be useful to use `an alternative library for graphics rendering
 <https://wiki.python.org/moin/PythonGameLibraries>`_ while continuing to use
 python-tcod's pathfinding and field-of-view algorithms.
 """
 
 from __future__ import annotations
 
+import copy
 import itertools
+from collections.abc import Iterator, Mapping, MutableMapping
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, SupportsInt, overload
 
 import numpy as np
-from typing_extensions import deprecated
+from typing_extensions import Self, deprecated
 
 from tcod._internal import _check, _check_p, _console, _path_encode, _raise_tcod_error
 from tcod.cffi import ffi, lib
@@ -34,10 +34,11 @@ if TYPE_CHECKING:
     import tcod.console
 
 
-class Tileset:
+class Tileset(MutableMapping[int, "NDArray[np.uint8]"]):
     """A collection of graphical tiles.
 
-    This class is provisional, the API may change in the future.
+    .. versionchanged:: Unreleased
+        Is now a :class:`collections.abc.MutableMapping` type.
     """
 
     def __init__(self, tile_width: int, tile_height: int) -> None:
@@ -80,28 +81,105 @@ class Tileset:
         """Shape (height, width) of the tile in pixels."""
         return self.tile_height, self.tile_width
 
-    def __contains__(self, codepoint: int) -> bool:
-        """Test if a tileset has a codepoint with ``n in tileset``."""
-        return bool(lib.TCOD_tileset_get_tile_(self._tileset_p, codepoint, ffi.NULL) == 0)
+    def __copy__(self) -> Self:
+        """Return a clone of this tileset.
 
-    def get_tile(self, codepoint: int) -> NDArray[np.uint8]:
-        """Return a copy of a tile for the given codepoint.
+        This is not an exact copy. :any:`remap` will not work on the clone.
 
-        If the tile does not exist yet then a blank array will be returned.
-
-        The tile will have a shape of (height, width, rgba) and a dtype of
-        uint8.  Note that most grey-scale tiles will only use the alpha
-        channel and will usually have a solid white color channel.
+        .. versionadded:: Unreleased
         """
-        tile: NDArray[np.uint8] = np.zeros((*self.tile_shape, 4), dtype=np.uint8)
-        lib.TCOD_tileset_get_tile_(
-            self._tileset_p,
-            codepoint,
-            ffi.from_buffer("struct TCOD_ColorRGBA*", tile),
-        )
-        return tile
+        clone = self.__class__(self.tile_width, self.tile_height)
+        for codepoint, tile in self.items():
+            clone[codepoint] = tile
+        return clone
 
-    def set_tile(self, codepoint: int, tile: ArrayLike | NDArray[np.uint8]) -> None:
+    @staticmethod
+    def _iter_items(
+        tiles: Iterable[tuple[int, ArrayLike | NDArray[np.uint8]]] | Mapping[int, ArrayLike | NDArray[np.uint8]], /
+    ) -> Iterable[tuple[int, ArrayLike | NDArray[np.uint8]]]:
+        """Convert a potential mapping to an iterator."""
+        if isinstance(tiles, Mapping):
+            return tiles.items()  # pyright: ignore[reportReturnType]
+        return tiles
+
+    def __iadd__(
+        self,
+        other: Iterable[tuple[int, ArrayLike | NDArray[np.uint8]]] | Mapping[int, ArrayLike | NDArray[np.uint8]],
+        /,
+    ) -> Self:
+        """Add tiles to this tileset inplace, prefers replacing tiles.
+
+        .. versionadded:: Unreleased
+        """
+        for codepoint, tile in self._iter_items(other):
+            self[codepoint] = tile
+        return self
+
+    def __add__(
+        self,
+        other: Iterable[tuple[int, ArrayLike | NDArray[np.uint8]]] | Mapping[int, ArrayLike | NDArray[np.uint8]],
+        /,
+    ) -> Self:
+        """Combine tiles with this tileset, prefers replacing tiles.
+
+        .. versionadded:: Unreleased
+        """
+        clone = copy.copy(self)
+        clone += other
+        return clone
+
+    def __ior__(
+        self,
+        other: Iterable[tuple[int, ArrayLike | NDArray[np.uint8]]] | Mapping[int, ArrayLike | NDArray[np.uint8]],
+        /,
+    ) -> Self:
+        """Add tiles to this tileset inplace, keeps existing tiles instead of replacing them.
+
+        .. versionadded:: Unreleased
+        """
+        for codepoint, tile in self._iter_items(other):
+            if codepoint not in self:
+                self[codepoint] = tile
+        return self
+
+    def __or__(
+        self,
+        other: Iterable[tuple[int, ArrayLike | NDArray[np.uint8]]] | Mapping[int, ArrayLike | NDArray[np.uint8]],
+        /,
+    ) -> Self:
+        """Combine tiles with this tileset, prefers keeping existing tiles instead of replacing them.
+
+        .. versionadded:: Unreleased
+        """
+        clone = copy.copy(self)
+        clone |= other
+        return clone
+
+    def __contains__(self, codepoint: object, /) -> bool:
+        """Test if a tileset has a codepoint with ``n in tileset``."""
+        if not isinstance(codepoint, SupportsInt):
+            return False
+        codepoint = int(codepoint)
+        if not 0 <= codepoint < self._tileset_p.character_map_length:
+            return False
+        return bool(self._get_character_map()[int(codepoint)] > 0)
+
+    def __getitem__(self, codepoint: int, /) -> NDArray[np.uint8]:
+        """Return the RGBA tile data for the given codepoint.
+
+        The tile will have a shape of (height, width, rgba) and a dtype of uint8.
+        Note that most grey-scale tilesets will only use the alpha channel with a solid white color channel.
+
+        .. versionadded:: Unreleased
+        """
+        if codepoint not in self:
+            raise KeyError(codepoint)
+        tile_p = lib.TCOD_tileset_get_tile(self._tileset_p, codepoint)
+        return np.frombuffer(ffi.buffer(tile_p[0 : self.tile_shape[0] * self.tile_shape[1]]), dtype=np.uint8).reshape(
+            *self.tile_shape, 4, copy=True
+        )
+
+    def __setitem__(self, codepoint: int, tile: ArrayLike | NDArray[np.uint8], /) -> None:
         """Upload a tile into this array.
 
         Args:
@@ -127,14 +205,14 @@ class Tileset:
             # Normal usage when a tile already has its own alpha channel.
             # The loaded tile must be the correct shape for the tileset you assign it to.
             # The tile is assigned to a private use area and will not conflict with any exiting codepoint.
-            tileset.set_tile(0x100000, imageio.imread("rgba_tile.png"))
+            tileset[0x100000] = imageio.imread("rgba_tile.png")
 
             # Load a greyscale tile.
-            tileset.set_tile(0x100001, imageio.imread("greyscale_tile.png"), mode="L")
+            tileset[0x100001] = imageio.imread("greyscale_tile.png", mode="L")
             # If you are stuck with an RGB array then you can use the red channel as the input: `rgb[:, :, 0]`
 
             # Loads an RGB sprite without a background.
-            tileset.set_tile(0x100002, imageio.imread("rgb_no_background.png", mode="RGBA"))
+            tileset[0x100002] = imageio.imread("rgb_no_background.png", mode="RGBA")
             # If you're stuck with an RGB array then you can pad the channel axis with an alpha of 255:
             #   rgba = np.pad(rgb, pad_width=((0, 0), (0, 0), (0, 1)), constant_values=255)
 
@@ -147,8 +225,9 @@ class Tileset:
             sprite_alpha = sprite_mask.astype(np.uint8) * 255
             # Combine the RGB and alpha arrays into an RGBA array.
             sprite_rgba = np.append(sprite_rgb, sprite_alpha, axis=2)
-            tileset.set_tile(0x100003, sprite_rgba)
+            tileset[0x100003] = sprite_rgba
 
+        .. versionadded:: Unreleased
         """
         tile = np.ascontiguousarray(tile, dtype=np.uint8)
         if tile.shape == self.tile_shape:
@@ -173,11 +252,71 @@ class Tileset:
         )
         return None
 
+    def _get_character_map(self) -> NDArray[np.intc]:
+        """Return the internal character mapping as an array.
+
+        This reference will break if the tileset is modified.
+        """
+        return np.frombuffer(
+            ffi.buffer(self._tileset_p.character_map[0 : self._tileset_p.character_map_length]), dtype=np.intc
+        )
+
+    def __delitem__(self, codepoint: int, /) -> None:
+        """Unmap a `codepoint` from this tileset.
+
+        Tilesets are optimized for set-and-forget, deleting a tile may not free up memory.
+
+        .. versionadded:: Unreleased
+        """
+        if codepoint not in self:
+            raise KeyError(codepoint)
+        self._get_character_map()[codepoint] = 0
+
+    def __len__(self) -> int:
+        """Return the total count of codepoints assigned in this tileset.
+
+        .. versionadded:: Unreleased
+        """
+        return int((self._get_character_map() > 0).sum())
+
+    def __iter__(self) -> Iterator[int]:
+        """Iterate over the assigned codepoints of this tileset.
+
+        .. versionadded:: Unreleased
+        """
+        # tolist makes a copy, otherwise the reference to character_map can dangle during iteration
+        for i, v in enumerate(self._get_character_map().tolist()):
+            if v:
+                yield i
+
+    def get_tile(self, codepoint: int) -> NDArray[np.uint8]:
+        """Return a copy of a tile for the given codepoint.
+
+        If the tile does not exist then a blank zero array will be returned.
+
+        The tile will have a shape of (height, width, rgba) and a dtype of
+        uint8.  Note that most grey-scale tiles will only use the alpha
+        channel and will usually have a solid white color channel.
+        """
+        try:
+            return self[codepoint]
+        except KeyError:
+            return np.zeros((*self.tile_shape, 4), dtype=np.uint8)
+
+    @deprecated("Assign to a tile using 'tileset[codepoint] = tile' instead.")
+    def set_tile(self, codepoint: int, tile: ArrayLike | NDArray[np.uint8]) -> None:
+        """Upload a tile into this array.
+
+        .. deprecated:: Unreleased
+            Was replaced with :any:`Tileset.__setitem__`.
+            Use ``tileset[codepoint] = tile`` syntax instead of this method.
+        """
+        self[codepoint] = tile
+
     def render(self, console: tcod.console.Console) -> NDArray[np.uint8]:
         """Render an RGBA array, using console with this tileset.
 
-        `console` is the Console object to render, this can not be the root
-        console.
+        `console` is the Console object to render, this can not be the root console.
 
         The output array will be a np.uint8 array with the shape of:
         ``(con_height * tile_height, con_width * tile_width, 4)``.
@@ -222,8 +361,8 @@ class Tileset:
         Large values of `x` will wrap to the next row, so using `x` by itself
         is equivalent to `Tile Index` in the :any:`charmap-reference`.
 
-        This is normally used on loaded tilesheets.  Other methods of Tileset
-        creation won't have reliable tile indexes.
+        This is typically used on tilesets loaded with :any:`load_tilesheet`.
+        Other methods of Tileset creation will not have reliable tile indexes.
 
         .. versionadded:: 11.12
         """
@@ -379,11 +518,23 @@ def load_tilesheet(path: str | PathLike[str], columns: int, rows: int, charmap: 
     return Tileset._claim(cdata)
 
 
-def procedural_block_elements(*, tileset: Tileset) -> None:
-    """Overwrite the block element codepoints in `tileset` with procedurally generated glyphs.
+@overload
+@deprecated(
+    "Prefer assigning tiles using dictionary semantics:\n"
+    "'tileset += tcod.tileset.procedural_block_elements(shape=tileset.tile_shape)'"
+)
+def procedural_block_elements(*, tileset: Tileset) -> Tileset: ...
+@overload
+def procedural_block_elements(*, shape: tuple[int, int]) -> Tileset: ...
+
+
+def procedural_block_elements(*, tileset: Tileset | None = None, shape: tuple[int, int] | None = None) -> Tileset:
+    """Generate and return a :any:`Tileset` with procedurally generated block elements.
 
     Args:
-        tileset (Tileset): A :any:`Tileset` with tiles of any shape.
+        tileset: A :any:`Tileset` with tiles of any shape. The codepoints of this tileset will be overwritten.
+                 This parameter is deprecated and only shape `should` be used.
+        shape: The ``(height, width)`` tile size to generate.
 
     This will overwrite all of the codepoints `listed here <https://en.wikipedia.org/wiki/Block_Elements>`_
     except for the shade glyphs.
@@ -393,11 +544,15 @@ def procedural_block_elements(*, tileset: Tileset) -> None:
 
     .. versionadded:: 13.1
 
+    .. versionchanged:: Unreleased
+        Added `shape` parameter, now returns a `Tileset`.
+        `tileset` parameter is deprecated.
+
     Example::
 
         >>> import tcod.tileset
         >>> tileset = tcod.tileset.Tileset(8, 8)
-        >>> tcod.tileset.procedural_block_elements(tileset=tileset)
+        >>> tileset += tcod.tileset.procedural_block_elements(shape=tileset.tile_shape)
         >>> tileset.get_tile(0x259E)[:, :, 3]  # "▞" Quadrant upper right and lower left.
         array([[  0,   0,   0,   0, 255, 255, 255, 255],
                [  0,   0,   0,   0, 255, 255, 255, 255],
@@ -426,6 +581,9 @@ def procedural_block_elements(*, tileset: Tileset) -> None:
               [255, 255, 255,   0,   0,   0,   0,   0],
               [255, 255, 255,   0,   0,   0,   0,   0]], dtype=uint8)
     """
+    if tileset is None:
+        assert shape is not None
+        tileset = Tileset(shape[1], shape[0])
     quadrants: NDArray[np.uint8] = np.zeros(tileset.tile_shape, dtype=np.uint8)
     half_height = tileset.tile_height // 2
     half_width = tileset.tile_width // 2
@@ -453,7 +611,7 @@ def procedural_block_elements(*, tileset: Tileset) -> None:
     ):
         alpha: NDArray[np.uint8] = np.asarray((quadrants & quad_mask) != 0, dtype=np.uint8)
         alpha *= 255
-        tileset.set_tile(codepoint, alpha)
+        tileset[codepoint] = alpha
 
     for codepoint, axis, fraction, negative in (
         (0x2581, 0, 7, True),  # "▁" Lower one eighth block.
@@ -477,7 +635,8 @@ def procedural_block_elements(*, tileset: Tileset) -> None:
         indexes[axis] = slice(divide, None) if negative else slice(None, divide)
         alpha = np.zeros(tileset.tile_shape, dtype=np.uint8)
         alpha[tuple(indexes)] = 255
-        tileset.set_tile(codepoint, alpha)
+        tileset[codepoint] = alpha
+    return tileset
 
 
 CHARMAP_CP437 = [
