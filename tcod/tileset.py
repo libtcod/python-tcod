@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 class Tileset(MutableMapping[int, "NDArray[np.uint8]"]):
     """A collection of graphical tiles.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 20.1
         Is now a :class:`collections.abc.MutableMapping` type.
     """
 
@@ -86,7 +86,7 @@ class Tileset(MutableMapping[int, "NDArray[np.uint8]"]):
 
         This is not an exact copy. :any:`remap` will not work on the clone.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 20.1
         """
         clone = self.__class__(self.tile_width, self.tile_height)
         for codepoint, tile in self.items():
@@ -109,7 +109,7 @@ class Tileset(MutableMapping[int, "NDArray[np.uint8]"]):
     ) -> Self:
         """Add tiles to this tileset inplace, prefers replacing tiles.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 20.1
         """
         for codepoint, tile in self._iter_items(other):
             self[codepoint] = tile
@@ -122,7 +122,7 @@ class Tileset(MutableMapping[int, "NDArray[np.uint8]"]):
     ) -> Self:
         """Combine tiles with this tileset, prefers replacing tiles.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 20.1
         """
         clone = copy.copy(self)
         clone += other
@@ -135,7 +135,7 @@ class Tileset(MutableMapping[int, "NDArray[np.uint8]"]):
     ) -> Self:
         """Add tiles to this tileset inplace, keeps existing tiles instead of replacing them.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 20.1
         """
         for codepoint, tile in self._iter_items(other):
             if codepoint not in self:
@@ -149,7 +149,7 @@ class Tileset(MutableMapping[int, "NDArray[np.uint8]"]):
     ) -> Self:
         """Combine tiles with this tileset, prefers keeping existing tiles instead of replacing them.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 20.1
         """
         clone = copy.copy(self)
         clone |= other
@@ -170,7 +170,7 @@ class Tileset(MutableMapping[int, "NDArray[np.uint8]"]):
         The tile will have a shape of (height, width, rgba) and a dtype of uint8.
         Note that most grey-scale tilesets will only use the alpha channel with a solid white color channel.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 20.1
         """
         if codepoint not in self:
             raise KeyError(codepoint)
@@ -227,7 +227,7 @@ class Tileset(MutableMapping[int, "NDArray[np.uint8]"]):
             sprite_rgba = np.append(sprite_rgb, sprite_alpha, axis=2)
             tileset[0x100003] = sprite_rgba
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 20.1
         """
         tile = np.ascontiguousarray(tile, dtype=np.uint8)
         if tile.shape == self.tile_shape:
@@ -266,7 +266,7 @@ class Tileset(MutableMapping[int, "NDArray[np.uint8]"]):
 
         Tilesets are optimized for set-and-forget, deleting a tile may not free up memory.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 20.1
         """
         if codepoint not in self:
             raise KeyError(codepoint)
@@ -275,14 +275,14 @@ class Tileset(MutableMapping[int, "NDArray[np.uint8]"]):
     def __len__(self) -> int:
         """Return the total count of codepoints assigned in this tileset.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 20.1
         """
         return int((self._get_character_map() > 0).sum())
 
     def __iter__(self) -> Iterator[int]:
         """Iterate over the assigned codepoints of this tileset.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 20.1
         """
         # tolist makes a copy, otherwise the reference to character_map can dangle during iteration
         for i, v in enumerate(self._get_character_map().tolist()):
@@ -307,7 +307,7 @@ class Tileset(MutableMapping[int, "NDArray[np.uint8]"]):
     def set_tile(self, codepoint: int, tile: ArrayLike | NDArray[np.uint8]) -> None:
         """Upload a tile into this array.
 
-        .. deprecated:: Unreleased
+        .. deprecated:: 20.1
             Was replaced with :any:`Tileset.__setitem__`.
             Use ``tileset[codepoint] = tile`` syntax instead of this method.
         """
@@ -544,7 +544,7 @@ def procedural_block_elements(*, tileset: Tileset | None = None, shape: tuple[in
 
     .. versionadded:: 13.1
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 20.1
         Added `shape` parameter, now returns a `Tileset`.
         `tileset` parameter is deprecated.
 

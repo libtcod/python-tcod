@@ -6,11 +6,13 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [20.1.0] - 2026-02-25
+
 ### Added
 
 - `Tileset` now supports `MutableMapping` semantics.
   Can get, set, or iterate over tiles as if it were a dictionary containing tile glyph arrays.
-  Also supports `+=` and `|=` with other tilesets or mappings.
+  Also supports `+`, `|`, `+=`, and `|=` with other tilesets or mappings to merge them into a single Tileset.
 - `tcod.tileset.procedural_block_elements` can take a tile shape and return a tileset.
 
 ### Deprecated
