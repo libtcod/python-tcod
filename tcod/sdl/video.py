@@ -174,7 +174,14 @@ class Window:
     When using the libtcod :any:`Context` you can access its `Window` via :any:`Context.sdl_window`.
     """
 
-    def __init__(self, sdl_window_p: Any) -> None:  # noqa: ANN401
+    def __init__(self, sdl_window_p: Any | int) -> None:  # noqa: ANN401
+        """Wrap a SDL_Window pointer or SDL WindowID.
+
+        .. versionchanged:: Unreleased
+            Now accepts `int` types as an SDL WindowID.
+        """
+        if isinstance(sdl_window_p, int):
+            sdl_window_p = _check_p(lib.SDL_GetWindowFromID(sdl_window_p))
         if ffi.typeof(sdl_window_p) is not ffi.typeof("struct SDL_Window*"):
             msg = "sdl_window_p must be {!r} type (was {!r}).".format(
                 ffi.typeof("struct SDL_Window*"), ffi.typeof(sdl_window_p)
@@ -186,11 +193,13 @@ class Window:
         self.p = sdl_window_p
 
     def __eq__(self, other: object) -> bool:
+        """Return True if `self` and `other` wrap the same window."""
         if not isinstance(other, Window):
             return NotImplemented
         return bool(self.p == other.p)
 
     def __hash__(self) -> int:
+        """Return the hash of this instances SDL window pointer."""
         return hash(self.p)
 
     def _as_property_pointer(self) -> Any:  # noqa: ANN401

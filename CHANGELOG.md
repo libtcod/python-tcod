@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Added
+
+- `tcod.sdl.video.Window` now accepts an SDL WindowID.
+
 ## [20.1.0] - 2026-02-25
 
 ### Added
