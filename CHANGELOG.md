@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 - `tcod.sdl.video.Window` now accepts an SDL WindowID.
 
+### Changed
+
+- Event classes are now more strict with attribute types
+- Event class initializers are keyword-only and no longer take a type parameter, with exceptions.
+  Generally event class initialization is an internal process.
+- `MouseButtonEvent` no longer a subclass of `MouseState`.
+
+### Deprecated
+
+- `Event.type` is deprecated except for special cases such as `ControllerDevice`, `WindowEvent`, etc.
+- `MouseButtonEvent.state` is deprecated, replaced by the existing `.button` attribute.
+
 ## [20.1.0] - 2026-02-25
 
 ### Added

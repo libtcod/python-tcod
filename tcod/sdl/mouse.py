@@ -210,7 +210,7 @@ def get_global_state() -> tcod.event.MouseState:
     """
     xy = ffi.new("int[2]")
     state = lib.SDL_GetGlobalMouseState(xy, xy + 1)
-    return tcod.event.MouseState((xy[0], xy[1]), state=state)
+    return tcod.event.MouseState(position=tcod.event.Point(xy[0], xy[1]), state=state)
 
 
 def get_relative_state() -> tcod.event.MouseState:
@@ -221,7 +221,7 @@ def get_relative_state() -> tcod.event.MouseState:
     """
     xy = ffi.new("int[2]")
     state = lib.SDL_GetRelativeMouseState(xy, xy + 1)
-    return tcod.event.MouseState((xy[0], xy[1]), state=state)
+    return tcod.event.MouseState(position=tcod.event.Point(xy[0], xy[1]), state=state)
 
 
 def get_state() -> tcod.event.MouseState:
@@ -232,7 +232,7 @@ def get_state() -> tcod.event.MouseState:
     """
     xy = ffi.new("int[2]")
     state = lib.SDL_GetMouseState(xy, xy + 1)
-    return tcod.event.MouseState((xy[0], xy[1]), state=state)
+    return tcod.event.MouseState(position=tcod.event.Point(xy[0], xy[1]), state=state)
 
 
 def get_focus() -> tcod.sdl.video.Window | None:

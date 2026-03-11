@@ -87,10 +87,11 @@ import functools
 import sys
 import warnings
 from collections.abc import Callable, Iterator, Mapping
-from typing import TYPE_CHECKING, Any, Final, Generic, Literal, NamedTuple, TypeVar, overload
+from typing import TYPE_CHECKING, Any, Final, Generic, Literal, NamedTuple, TypeAlias, TypeVar, overload
 
+import attrs
 import numpy as np
-from typing_extensions import deprecated
+from typing_extensions import Self, deprecated
 
 import tcod.context
 import tcod.event_constants
@@ -106,6 +107,12 @@ if TYPE_CHECKING:
 
 T = TypeVar("T")
 _EventType = TypeVar("_EventType", bound="Event")
+
+_C_SDL_Event: TypeAlias = Any
+"""A CFFI pointer to an SDL_Event union.
+
+See SDL docs: https://wiki.libsdl.org/SDL3/SDL_Event
+"""
 
 
 class _ConstantsWithPrefix(Mapping[int, str]):
@@ -266,6 +273,7 @@ class MouseButton(enum.IntEnum):
     """Forward mouse button."""
 
     def __repr__(self) -> str:
+        """Return the enum name, excluding the value."""
         return f"{self.__class__.__name__}.{self.name}"
 
 
@@ -287,126 +295,103 @@ class MouseButtonMask(enum.IntFlag):
     """Forward mouse button is held."""
 
     def __repr__(self) -> str:
+        """Return the bitwise OR flag combination of this value."""
         if self.value == 0:
             return f"{self.__class__.__name__}(0)"
         return "|".join(f"{self.__class__.__name__}.{self.__class__(bit).name}" for bit in self.__class__ if bit & self)
 
 
+@attrs.define(slots=True, kw_only=True)
 class Event:
-    """The base event class.
+    """The base event class."""
 
-    Attributes:
-        type (str): This events type.
-        sdl_event: When available, this holds a python-cffi 'SDL_Event*'
-                   pointer.  All sub-classes have this attribute.
-    """
+    sdl_event: _C_SDL_Event = attrs.field(default=None, eq=False, kw_only=True, repr=False)
+    """When available, this holds a python-cffi 'SDL_Event*' pointer. All sub-classes have this attribute."""
 
-    def __init__(self, type: str | None = None) -> None:
-        if type is None:
-            type = self.__class__.__name__.upper()
-        self.type: Final = type
-        self.sdl_event = None
+    @property
+    @deprecated("The Event.type attribute is deprecated, use isinstance instead.")
+    def type(self) -> str:
+        """This events type.
+
+        .. deprecated:: Unreleased
+            Using this attribute is now actively discouraged. Use :func:`isinstance` or :ref:`match`.
+        """
+        type_override: str | None = getattr(self, "_type", None)
+        if type_override is not None:
+            return type_override
+        return self.__class__.__name__.upper()
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> Event:
-        """Return a class instance from a python-cffi 'SDL_Event*' pointer."""
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Event:
+        """Return a class instance from a python-cffi 'SDL_Event*' pointer.
+
+        .. versionchanged:: Unreleased
+            This method was unsuitable for the public API and is now private.
+        """
         raise NotImplementedError
 
-    def __str__(self) -> str:
-        return f"<type={self.type!r}>"
 
-
+@attrs.define(slots=True, kw_only=True)
 class Quit(Event):
     """An application quit request event.
 
     For more info on when this event is triggered see:
     https://wiki.libsdl.org/SDL_EventType#SDL_QUIT
-
-    Attributes:
-        type (str): Always "QUIT".
     """
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> Quit:
-        self = cls()
-        self.sdl_event = sdl_event
-        return self
-
-    def __repr__(self) -> str:
-        return f"tcod.event.{self.__class__.__name__}()"
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
+        return cls(sdl_event=sdl_event)
 
 
+@attrs.define(slots=True, kw_only=True)
 class KeyboardEvent(Event):
     """Base keyboard event.
-
-    Attributes:
-        type (str): Will be "KEYDOWN" or "KEYUP", depending on the event.
-        scancode (Scancode): The keyboard scan-code, this is the physical location
-                        of the key on the keyboard rather than the keys symbol.
-        sym (KeySym): The keyboard symbol.
-        mod (Modifier): A bitmask of the currently held modifier keys.
-
-            For example, if shift is held then
-            ``event.mod & tcod.event.Modifier.SHIFT`` will evaluate to a true
-            value.
-
-        repeat (bool): True if this event exists because of key repeat.
 
     .. versionchanged:: 12.5
         `scancode`, `sym`, and `mod` now use their respective enums.
     """
 
-    def __init__(self, scancode: int, sym: int, mod: int, repeat: bool = False) -> None:
-        super().__init__()
-        self.scancode = Scancode(scancode)
-        self.sym = KeySym(sym)
-        self.mod = Modifier(mod)
-        self.repeat = repeat
+    scancode: Scancode
+    """The keyboard scan-code, this is the physical location
+                        of the key on the keyboard rather than the keys symbol."""
+    sym: KeySym
+    """The keyboard symbol."""
+    mod: Modifier
+    """A bitmask of the currently held modifier keys.
+
+        For example, if shift is held then
+        ``event.mod & tcod.event.Modifier.SHIFT`` will evaluate to a true
+        value.
+    """
+    repeat: bool = False
+    """True if this event exists because of key repeat."""
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> Any:
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
         keysym = sdl_event.key
-        self = cls(keysym.scancode, keysym.key, keysym.mod, bool(sdl_event.key.repeat))
-        self.sdl_event = sdl_event
-        return self
-
-    def __repr__(self) -> str:
-        return "tcod.event.{}(scancode={!r}, sym={!r}, mod={!r}{})".format(
-            self.__class__.__name__,
-            self.scancode,
-            self.sym,
-            self.mod,
-            ", repeat=True" if self.repeat else "",
+        return cls(
+            scancode=Scancode(keysym.scancode),
+            sym=KeySym(keysym.key),
+            mod=Modifier(keysym.mod),
+            repeat=bool(sdl_event.key.repeat),
+            sdl_event=sdl_event,
         )
 
-    def __str__(self) -> str:
-        return self.__repr__().replace("tcod.event.", "")
 
-
+@attrs.define(slots=True, kw_only=True)
 class KeyDown(KeyboardEvent):
     pass
 
 
+@attrs.define(slots=True, kw_only=True)
 class KeyUp(KeyboardEvent):
     pass
 
 
+@attrs.define(slots=True, kw_only=True)
 class MouseState(Event):
     """Mouse state.
-
-    Attributes:
-        type (str): Always "MOUSESTATE".
-        position (Point): The position coordinates of the mouse.
-        tile (Point): The integer tile coordinates of the mouse on the screen.
-        state (int): A bitmask of which mouse buttons are currently held.
-
-            Will be a combination of the following names:
-
-            * tcod.event.BUTTON_LMASK
-            * tcod.event.BUTTON_MMASK
-            * tcod.event.BUTTON_RMASK
-            * tcod.event.BUTTON_X1MASK
-            * tcod.event.BUTTON_X2MASK
 
     .. versionadded:: 9.3
 
@@ -414,16 +399,12 @@ class MouseState(Event):
         Renamed `pixel` attribute to `position`.
     """
 
-    def __init__(
-        self,
-        position: tuple[float, float] = (0, 0),
-        tile: tuple[float, float] | None = (0, 0),
-        state: int = 0,
-    ) -> None:
-        super().__init__()
-        self.position = Point(*position)
-        self._tile = Point(*tile) if tile is not None else None
-        self.state = state
+    position: Point = attrs.field(default=Point(0, 0))
+    """The position coordinates of the mouse."""
+    _tile: Point | None = attrs.field(default=Point(0, 0), alias="tile")
+    """The integer tile coordinates of the mouse on the screen."""
+    state: MouseButtonMask = attrs.field(default=MouseButtonMask(0))
+    """A bitmask of which mouse buttons are currently held."""
 
     @property
     @deprecated("The mouse.pixel attribute is deprecated.  Use mouse.position instead.")
@@ -450,36 +431,10 @@ class MouseState(Event):
     def tile(self, xy: tuple[float, float]) -> None:
         self._tile = Point(*xy)
 
-    def __repr__(self) -> str:
-        return f"tcod.event.{self.__class__.__name__}(position={tuple(self.position)!r}, tile={tuple(self._tile or (0, 0))!r}, state={MouseButtonMask(self.state)})"
 
-    def __str__(self) -> str:
-        return ("<%s, position=(x=%i, y=%i), tile=(x=%i, y=%i), state=%s>") % (
-            super().__str__().strip("<>"),
-            *self.position,
-            *(self._tile or (0, 0)),
-            MouseButtonMask(self.state),
-        )
-
-
+@attrs.define(slots=True, kw_only=True)
 class MouseMotion(MouseState):
     """Mouse motion event.
-
-    Attributes:
-        type (str): Always "MOUSEMOTION".
-        position (Point): The pixel coordinates of the mouse.
-        motion (Point): The pixel delta.
-        tile (Point): The integer tile coordinates of the mouse on the screen.
-        tile_motion (Point): The integer tile delta.
-        state (int): A bitmask of which mouse buttons are currently held.
-
-            Will be a combination of the following names:
-
-            * tcod.event.BUTTON_LMASK
-            * tcod.event.BUTTON_MMASK
-            * tcod.event.BUTTON_RMASK
-            * tcod.event.BUTTON_X1MASK
-            * tcod.event.BUTTON_X2MASK
 
     .. versionchanged:: 15.0
         Renamed `pixel` attribute to `position`.
@@ -489,17 +444,10 @@ class MouseMotion(MouseState):
         `position` and `motion` now use floating point coordinates.
     """
 
-    def __init__(
-        self,
-        position: tuple[float, float] = (0, 0),
-        motion: tuple[float, float] = (0, 0),
-        tile: tuple[float, float] | None = (0, 0),
-        tile_motion: tuple[float, float] | None = (0, 0),
-        state: int = 0,
-    ) -> None:
-        super().__init__(position, tile, state)
-        self.motion = Point(*motion)
-        self._tile_motion = Point(*tile_motion) if tile_motion is not None else None
+    motion: Point = attrs.field(default=Point(0, 0))
+    """The pixel delta."""
+    _tile_motion: Point | None = attrs.field(default=Point(0, 0), alias="tile_motion")
+    """The tile delta."""
 
     @property
     @deprecated("The mouse.pixel_motion attribute is deprecated.  Use mouse.motion instead.")
@@ -528,149 +476,99 @@ class MouseMotion(MouseState):
         self._tile_motion = Point(*xy)
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> MouseMotion:
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
         motion = sdl_event.motion
+        state = MouseButtonMask(motion.state)
 
-        pixel = motion.x, motion.y
-        pixel_motion = motion.xrel, motion.yrel
+        pixel = Point(motion.x, motion.y)
+        pixel_motion = Point(motion.xrel, motion.yrel)
         subtile = _pixel_to_tile(*pixel)
         if subtile is None:
-            self = cls(pixel, pixel_motion, None, None, motion.state)
+            self = cls(position=pixel, motion=pixel_motion, tile=None, tile_motion=None, state=state)
         else:
-            tile = int(subtile[0]), int(subtile[1])
+            tile = Point(int(subtile[0]), int(subtile[1]))
             prev_pixel = pixel[0] - pixel_motion[0], pixel[1] - pixel_motion[1]
             prev_subtile = _pixel_to_tile(*prev_pixel) or (0, 0)
             prev_tile = int(prev_subtile[0]), int(prev_subtile[1])
-            tile_motion = tile[0] - prev_tile[0], tile[1] - prev_tile[1]
-            self = cls(pixel, pixel_motion, tile, tile_motion, motion.state)
+            tile_motion = Point(tile[0] - prev_tile[0], tile[1] - prev_tile[1])
+            self = cls(position=pixel, motion=pixel_motion, tile=tile, tile_motion=tile_motion, state=state)
         self.sdl_event = sdl_event
         return self
 
-    def __repr__(self) -> str:
-        return f"tcod.event.{self.__class__.__name__}(position={tuple(self.position)!r}, motion={tuple(self.motion)!r}, tile={tuple(self.tile)!r}, tile_motion={tuple(self.tile_motion)!r}, state={MouseButtonMask(self.state)!r})"
 
-    def __str__(self) -> str:
-        return ("<%s, motion=(x=%i, y=%i), tile_motion=(x=%i, y=%i)>") % (
-            super().__str__().strip("<>"),
-            *self.motion,
-            *self.tile_motion,
-        )
-
-
-class MouseButtonEvent(MouseState):
+@attrs.define(slots=True, kw_only=True)
+class MouseButtonEvent(Event):
     """Mouse button event.
-
-    Attributes:
-        type (str): Will be "MOUSEBUTTONDOWN" or "MOUSEBUTTONUP",
-                    depending on the event.
-        position (Point): The pixel coordinates of the mouse.
-        tile (Point): The tile coordinates of the mouse on the screen.
-        button (int): Which mouse button.
-
-            This will be one of the following names:
-
-            * tcod.event.BUTTON_LEFT
-            * tcod.event.BUTTON_MIDDLE
-            * tcod.event.BUTTON_RIGHT
-            * tcod.event.BUTTON_X1
-            * tcod.event.BUTTON_X2
 
     .. versionchanged:: 19.0
         `position` and `tile` now use floating point coordinates.
+
+    .. versionchanged:: Unreleased
+        No longer a subclass of :any:`MouseState`.
     """
 
-    def __init__(
-        self,
-        pixel: tuple[float, float] = (0, 0),
-        tile: tuple[float, float] | None = (0, 0),
-        button: int = 0,
-    ) -> None:
-        super().__init__(pixel, tile, button)
+    position: Point = attrs.field(default=Point(0, 0))
+    """The pixel coordinates of the mouse."""
+    _tile: Point | None = attrs.field(default=Point(0, 0), alias="tile")
+    """The tile coordinates of the mouse on the screen."""
+    button: MouseButton
+    """Which mouse button index was pressed or released in this event.
 
-    @property
-    def button(self) -> int:
-        return self.state
-
-    @button.setter
-    def button(self, value: int) -> None:
-        self.state = value
+    .. versionchanged:: Unreleased
+        Is now strictly a :any:`MouseButton` type.
+    """
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> Any:
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
         button = sdl_event.button
-        pixel = button.x, button.y
+        pixel = Point(button.x, button.y)
         subtile = _pixel_to_tile(*pixel)
         if subtile is None:
-            tile: tuple[float, float] | None = None
+            tile: Point | None = None
         else:
-            tile = float(subtile[0]), float(subtile[1])
-        self = cls(pixel, tile, button.button)
+            tile = Point(float(subtile[0]), float(subtile[1]))
+        self = cls(position=pixel, tile=tile, button=MouseButton(button.button))
         self.sdl_event = sdl_event
         return self
 
-    def __repr__(self) -> str:
-        return f"tcod.event.{self.__class__.__name__}(position={tuple(self.position)!r}, tile={tuple(self.tile)!r}, button={MouseButton(self.button)!r})"
-
-    def __str__(self) -> str:
-        return "<type=%r, position=(x=%i, y=%i), tile=(x=%i, y=%i), button=%r>" % (
-            self.type,
-            *self.position,
-            *self.tile,
-            MouseButton(self.button),
-        )
+    @property
+    @deprecated(
+        "This attribute is for mouse state and mouse motion only. Use `event.button` instead.", category=FutureWarning
+    )
+    def state(self) -> int:  # noqa: D102 # Skip docstring for deprecated property
+        return int(self.button)
 
 
+@attrs.define(slots=True, kw_only=True)
 class MouseButtonDown(MouseButtonEvent):
     """Same as MouseButtonEvent but with ``type="MouseButtonDown"``."""
 
 
+@attrs.define(slots=True, kw_only=True)
 class MouseButtonUp(MouseButtonEvent):
     """Same as MouseButtonEvent but with ``type="MouseButtonUp"``."""
 
 
+@attrs.define(slots=True, kw_only=True)
 class MouseWheel(Event):
-    """Mouse wheel event.
+    """Mouse wheel event."""
 
-    Attributes:
-        type (str): Always "MOUSEWHEEL".
-        x (int): Horizontal scrolling. A positive value means scrolling right.
-        y (int): Vertical scrolling. A positive value means scrolling away from
-                 the user.
-        flipped (bool): If True then the values of `x` and `y` are the opposite
-                        of their usual values.  This depends on the settings of
-                        the Operating System.
+    x: int
+    """Horizontal scrolling. A positive value means scrolling right."""
+    y: int
+    """Vertical scrolling. A positive value means scrolling away from the user."""
+    flipped: bool
+    """If True then the values of `x` and `y` are the opposite of their usual values.
+    This depends on the settings of the Operating System.
     """
 
-    def __init__(self, x: int, y: int, flipped: bool = False) -> None:
-        super().__init__()
-        self.x = x
-        self.y = y
-        self.flipped = flipped
-
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> MouseWheel:
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
         wheel = sdl_event.wheel
-        self = cls(wheel.x, wheel.y, bool(wheel.direction))
-        self.sdl_event = sdl_event
-        return self
-
-    def __repr__(self) -> str:
-        return "tcod.event.%s(x=%i, y=%i%s)" % (
-            self.__class__.__name__,
-            self.x,
-            self.y,
-            ", flipped=True" if self.flipped else "",
-        )
-
-    def __str__(self) -> str:
-        return "<%s, x=%i, y=%i, flipped=%r>" % (
-            super().__str__().strip("<>"),
-            self.x,
-            self.y,
-            self.flipped,
-        )
+        return cls(x=int(wheel.x), y=int(wheel.y), flipped=bool(wheel.direction), sdl_event=sdl_event)
 
 
+@attrs.define(slots=True, kw_only=True)
 class TextInput(Event):
     """SDL text input event.
 
@@ -678,33 +576,21 @@ class TextInput(Event):
         These events are not enabled by default since `19.0`.
 
         Use :any:`Window.start_text_input` to enable this event.
-
-    Attributes:
-        type (str): Always "TEXTINPUT".
-        text (str): A Unicode string with the input.
     """
 
-    def __init__(self, text: str) -> None:
-        super().__init__()
-        self.text = text
+    text: str
+    """A Unicode string with the input."""
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> TextInput:
-        self = cls(ffi.string(sdl_event.text.text, 32).decode("utf8"))
-        self.sdl_event = sdl_event
-        return self
-
-    def __repr__(self) -> str:
-        return f"tcod.event.{self.__class__.__name__}(text={self.text!r})"
-
-    def __str__(self) -> str:
-        return "<{}, text={!r})".format(super().__str__().strip("<>"), self.text)
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
+        return cls(text=str(ffi.string(sdl_event.text.text, 32), encoding="utf8"), sdl_event=sdl_event)
 
 
+@attrs.define(slots=True, kw_only=True)
 class WindowEvent(Event):
     """A window event."""
 
-    type: Final[  # type: ignore[misc]  # Narrowing final type.
+    type: Final[  # Narrowing final type.
         Literal[
             "WindowShown",
             "WindowHidden",
@@ -726,44 +612,50 @@ class WindowEvent(Event):
     """The current window event. This can be one of various options."""
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> WindowEvent | Undefined:
-        if sdl_event.type not in cls._WINDOW_TYPES:
-            return Undefined.from_sdl_event(sdl_event)
-        event_type: Final = cls._WINDOW_TYPES[sdl_event.type]
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> WindowEvent | Undefined:
+        if sdl_event.type not in _WINDOW_TYPES_FROM_ENUM:
+            return Undefined._from_sdl_event(sdl_event)
+        event_type: Final = _WINDOW_TYPES_FROM_ENUM[sdl_event.type]
         self: WindowEvent
         if sdl_event.type == lib.SDL_EVENT_WINDOW_MOVED:
-            self = WindowMoved(sdl_event.window.data1, sdl_event.window.data2)
+            self = WindowMoved(x=int(sdl_event.window.data1), y=int(sdl_event.window.data2), sdl_event=sdl_event)
         elif sdl_event.type in (
             lib.SDL_EVENT_WINDOW_RESIZED,
             lib.SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED,
         ):
-            self = WindowResized(event_type, sdl_event.window.data1, sdl_event.window.data2)
+            self = WindowResized(
+                type=event_type,  # type: ignore[arg-type] # Currently NOT validated
+                width=int(sdl_event.window.data1),
+                height=int(sdl_event.window.data2),
+                sdl_event=sdl_event,
+            )
         else:
-            self = cls(event_type)
-        self.sdl_event = sdl_event
+            self = cls(
+                type=event_type,  # type: ignore[arg-type] # Currently NOT validated
+                sdl_event=sdl_event,
+            )
         return self
 
-    def __repr__(self) -> str:
-        return f"tcod.event.{self.__class__.__name__}(type={self.type!r})"
 
-    _WINDOW_TYPES: Final = {
-        lib.SDL_EVENT_WINDOW_SHOWN: "WindowShown",
-        lib.SDL_EVENT_WINDOW_HIDDEN: "WindowHidden",
-        lib.SDL_EVENT_WINDOW_EXPOSED: "WindowExposed",
-        lib.SDL_EVENT_WINDOW_MOVED: "WindowMoved",
-        lib.SDL_EVENT_WINDOW_RESIZED: "WindowResized",
-        lib.SDL_EVENT_WINDOW_MINIMIZED: "WindowMinimized",
-        lib.SDL_EVENT_WINDOW_MAXIMIZED: "WindowMaximized",
-        lib.SDL_EVENT_WINDOW_RESTORED: "WindowRestored",
-        lib.SDL_EVENT_WINDOW_MOUSE_ENTER: "WindowEnter",
-        lib.SDL_EVENT_WINDOW_MOUSE_LEAVE: "WindowLeave",
-        lib.SDL_EVENT_WINDOW_FOCUS_GAINED: "WindowFocusGained",
-        lib.SDL_EVENT_WINDOW_FOCUS_LOST: "WindowFocusLost",
-        lib.SDL_EVENT_WINDOW_CLOSE_REQUESTED: "WindowClose",
-        lib.SDL_EVENT_WINDOW_HIT_TEST: "WindowHitTest",
-    }
+_WINDOW_TYPES_FROM_ENUM: Final = {
+    lib.SDL_EVENT_WINDOW_SHOWN: "WindowShown",
+    lib.SDL_EVENT_WINDOW_HIDDEN: "WindowHidden",
+    lib.SDL_EVENT_WINDOW_EXPOSED: "WindowExposed",
+    lib.SDL_EVENT_WINDOW_MOVED: "WindowMoved",
+    lib.SDL_EVENT_WINDOW_RESIZED: "WindowResized",
+    lib.SDL_EVENT_WINDOW_MINIMIZED: "WindowMinimized",
+    lib.SDL_EVENT_WINDOW_MAXIMIZED: "WindowMaximized",
+    lib.SDL_EVENT_WINDOW_RESTORED: "WindowRestored",
+    lib.SDL_EVENT_WINDOW_MOUSE_ENTER: "WindowEnter",
+    lib.SDL_EVENT_WINDOW_MOUSE_LEAVE: "WindowLeave",
+    lib.SDL_EVENT_WINDOW_FOCUS_GAINED: "WindowFocusGained",
+    lib.SDL_EVENT_WINDOW_FOCUS_LOST: "WindowFocusLost",
+    lib.SDL_EVENT_WINDOW_CLOSE_REQUESTED: "WindowClose",
+    lib.SDL_EVENT_WINDOW_HIT_TEST: "WindowHitTest",
+}
 
 
+@attrs.define(slots=True, kw_only=True)
 class WindowMoved(WindowEvent):
     """Window moved event.
 
@@ -772,25 +664,14 @@ class WindowMoved(WindowEvent):
         y (int): Movement on the y-axis.
     """
 
-    type: Final[Literal["WINDOWMOVED"]]  # type: ignore[assignment,misc]
+    type: Final[Literal["WINDOWMOVED"]] = "WINDOWMOVED"  # type: ignore[assignment,misc]
     """Always "WINDOWMOVED"."""
 
-    def __init__(self, x: int, y: int) -> None:
-        super().__init__(None)
-        self.x = x
-        self.y = y
-
-    def __repr__(self) -> str:
-        return f"tcod.event.{self.__class__.__name__}(type={self.type!r}, x={self.x!r}, y={self.y!r})"
-
-    def __str__(self) -> str:
-        return "<{}, x={!r}, y={!r})".format(
-            super().__str__().strip("<>"),
-            self.x,
-            self.y,
-        )
+    x: int
+    y: int
 
 
+@attrs.define(slots=True, kw_only=True)
 class WindowResized(WindowEvent):
     """Window resized event.
 
@@ -802,50 +683,31 @@ class WindowResized(WindowEvent):
         Removed "WindowSizeChanged" type.
     """
 
-    type: Final[Literal["WindowResized"]]  # type: ignore[misc]
+    type: Final[Literal["WindowResized"]] = "WindowResized"  # type: ignore[misc]
     """Always "WindowResized"."""
 
-    def __init__(self, type: str, width: int, height: int) -> None:
-        super().__init__(type)
-        self.width = width
-        self.height = height
-
-    def __repr__(self) -> str:
-        return f"tcod.event.{self.__class__.__name__}(type={self.type!r}, width={self.width!r}, height={self.height!r})"
-
-    def __str__(self) -> str:
-        return "<{}, width={!r}, height={!r})".format(
-            super().__str__().strip("<>"),
-            self.width,
-            self.height,
-        )
+    width: int
+    height: int
 
 
+@attrs.define(slots=True, kw_only=True)
 class JoystickEvent(Event):
     """A base class for joystick events.
 
     .. versionadded:: 13.8
     """
 
-    def __init__(self, type: str, which: int) -> None:
-        super().__init__(type)
-        self.which = which
-        """The ID of the joystick this event is for."""
+    which: int
+    """The ID of the joystick this event is for."""
 
     @property
     def joystick(self) -> tcod.sdl.joystick.Joystick:
-        if self.type == "JOYDEVICEADDED":
+        if isinstance(self, JoystickDevice) and self.type == "JOYDEVICEADDED":
             return tcod.sdl.joystick.Joystick._open(self.which)
         return tcod.sdl.joystick.Joystick._from_instance_id(self.which)
 
-    def __repr__(self) -> str:
-        return f"tcod.event.{self.__class__.__name__}(type={self.type!r}, which={self.which})"
 
-    def __str__(self) -> str:
-        prefix = super().__str__().strip("<>")
-        return f"<{prefix}, which={self.which}>"
-
-
+@attrs.define(slots=True, kw_only=True)
 class JoystickAxis(JoystickEvent):
     """When a joystick axis changes in value.
 
@@ -855,31 +717,19 @@ class JoystickAxis(JoystickEvent):
         :any:`tcod.sdl.joystick`
     """
 
-    which: int
-    """The ID of the joystick this event is for."""
+    _type: Final[Literal["JOYAXISMOTION"]] = "JOYAXISMOTION"
 
-    def __init__(self, type: str, which: int, axis: int, value: int) -> None:
-        super().__init__(type, which)
-        self.axis = axis
-        """The index of the changed axis."""
-        self.value = value
-        """The raw value of the axis in the range -32768 to 32767."""
+    axis: int
+    """The index of the changed axis."""
+    value: int
+    """The raw value of the axis in the range -32768 to 32767."""
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> JoystickAxis:
-        return cls("JOYAXISMOTION", sdl_event.jaxis.which, sdl_event.jaxis.axis, sdl_event.jaxis.value)
-
-    def __repr__(self) -> str:
-        return (
-            f"tcod.event.{self.__class__.__name__}"
-            f"(type={self.type!r}, which={self.which}, axis={self.axis}, value={self.value})"
-        )
-
-    def __str__(self) -> str:
-        prefix = super().__str__().strip("<>")
-        return f"<{prefix}, axis={self.axis}, value={self.value}>"
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
+        return cls(which=int(sdl_event.jaxis.which), axis=int(sdl_event.jaxis.axis), value=int(sdl_event.jaxis.value))
 
 
+@attrs.define(slots=True, kw_only=True)
 class JoystickBall(JoystickEvent):
     """When a joystick ball is moved.
 
@@ -889,35 +739,26 @@ class JoystickBall(JoystickEvent):
         :any:`tcod.sdl.joystick`
     """
 
-    which: int
-    """The ID of the joystick this event is for."""
+    _type: Final[Literal["JOYBALLMOTION"]] = "JOYBALLMOTION"
 
-    def __init__(self, type: str, which: int, ball: int, dx: int, dy: int) -> None:
-        super().__init__(type, which)
-        self.ball = ball
-        """The index of the moved ball."""
-        self.dx = dx
-        """The X motion of the ball."""
-        self.dy = dy
-        """The Y motion of the ball."""
+    ball: int
+    """The index of the moved ball."""
+    dx: int
+    """The X motion of the ball."""
+    dy: int
+    """The Y motion of the ball."""
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> JoystickBall:
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
         return cls(
-            "JOYBALLMOTION", sdl_event.jball.which, sdl_event.jball.ball, sdl_event.jball.xrel, sdl_event.jball.yrel
+            which=int(sdl_event.jball.which),
+            ball=int(sdl_event.jball.ball),
+            dx=int(sdl_event.jball.xrel),
+            dy=int(sdl_event.jball.yrel),
         )
 
-    def __repr__(self) -> str:
-        return (
-            f"tcod.event.{self.__class__.__name__}"
-            f"(type={self.type!r}, which={self.which}, ball={self.ball}, dx={self.dx}, dy={self.dy})"
-        )
 
-    def __str__(self) -> str:
-        prefix = super().__str__().strip("<>")
-        return f"<{prefix}, ball={self.ball}, dx={self.dx}, dy={self.dy}>"
-
-
+@attrs.define(slots=True, kw_only=True)
 class JoystickHat(JoystickEvent):
     """When a joystick hat changes direction.
 
@@ -927,28 +768,20 @@ class JoystickHat(JoystickEvent):
         :any:`tcod.sdl.joystick`
     """
 
-    which: int
-    """The ID of the joystick this event is for."""
+    _type: Final[Literal["JOYHATMOTION"]] = "JOYHATMOTION"
 
-    def __init__(self, type: str, which: int, x: Literal[-1, 0, 1], y: Literal[-1, 0, 1]) -> None:
-        super().__init__(type, which)
-        self.x = x
-        """The new X direction of the hat."""
-        self.y = y
-        """The new Y direction of the hat."""
+    x: Literal[-1, 0, 1]
+    """The new X direction of the hat."""
+    y: Literal[-1, 0, 1]
+    """The new Y direction of the hat."""
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> JoystickHat:
-        return cls("JOYHATMOTION", sdl_event.jhat.which, *_HAT_DIRECTIONS[sdl_event.jhat.hat])
-
-    def __repr__(self) -> str:
-        return f"tcod.event.{self.__class__.__name__}(type={self.type!r}, which={self.which}, x={self.x}, y={self.y})"
-
-    def __str__(self) -> str:
-        prefix = super().__str__().strip("<>")
-        return f"<{prefix}, x={self.x}, y={self.y}>"
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
+        x, y = _HAT_DIRECTIONS[sdl_event.jhat.hat]
+        return cls(which=int(sdl_event.jhat.which), x=x, y=y)
 
 
+@attrs.define(slots=True, kw_only=True)
 class JoystickButton(JoystickEvent):
     """When a joystick button is pressed or released.
 
@@ -964,35 +797,31 @@ class JoystickButton(JoystickEvent):
                     print(f"Released {button=} on controller {which}.")
     """
 
-    which: int
-    """The ID of the joystick this event is for."""
-
-    def __init__(self, type: str, which: int, button: int) -> None:
-        super().__init__(type, which)
-        self.button = button
-        """The index of the button this event is for."""
+    button: int
+    """The index of the button this event is for."""
+    pressed: bool
+    """True if the button was pressed, False if the button was released."""
 
     @property
-    def pressed(self) -> bool:
-        """True if the joystick button has been pressed, False when the button was released."""
-        return self.type == "JOYBUTTONDOWN"
+    @deprecated("Check 'JoystickButton.pressed' instead of '.type'.")
+    def type(self) -> Literal["JOYBUTTONUP", "JOYBUTTONDOWN"]:
+        """Button state as a string.
+
+        .. deprecated:: Unreleased
+            Use :any:`pressed` instead.
+        """
+        return ("JOYBUTTONUP", "JOYBUTTONDOWN")[self.pressed]
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> JoystickButton:
-        type = {
-            lib.SDL_EVENT_JOYSTICK_BUTTON_DOWN: "JOYBUTTONDOWN",
-            lib.SDL_EVENT_JOYSTICK_BUTTON_UP: "JOYBUTTONUP",
-        }[sdl_event.type]
-        return cls(type, sdl_event.jbutton.which, sdl_event.jbutton.button)
-
-    def __repr__(self) -> str:
-        return f"tcod.event.{self.__class__.__name__}(type={self.type!r}, which={self.which}, button={self.button})"
-
-    def __str__(self) -> str:
-        prefix = super().__str__().strip("<>")
-        return f"<{prefix}, button={self.button}>"
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
+        return cls(
+            which=int(sdl_event.jbutton.which),
+            button=int(sdl_event.jbutton.button),
+            pressed=bool(sdl_event.jbutton.down),
+        )
 
 
+@attrs.define(slots=True, kw_only=True)
 class JoystickDevice(JoystickEvent):
     """An event for when a joystick is added or removed.
 
@@ -1009,7 +838,7 @@ class JoystickDevice(JoystickEvent):
                     joysticks.remove(joystick)
     """
 
-    type: Final[Literal["JOYDEVICEADDED", "JOYDEVICEREMOVED"]]  # type: ignore[misc]
+    type: Final[Literal["JOYDEVICEADDED", "JOYDEVICEREMOVED"]]
 
     which: int
     """When type="JOYDEVICEADDED" this is the device ID.
@@ -1017,132 +846,105 @@ class JoystickDevice(JoystickEvent):
     """
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> JoystickDevice:
-        type = {
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
+        types: Final[dict[int, Literal["JOYDEVICEADDED", "JOYDEVICEREMOVED"]]] = {
             lib.SDL_EVENT_JOYSTICK_ADDED: "JOYDEVICEADDED",
             lib.SDL_EVENT_JOYSTICK_REMOVED: "JOYDEVICEREMOVED",
-        }[sdl_event.type]
-        return cls(type, sdl_event.jdevice.which)
+        }
+        return cls(type=types[sdl_event.type], which=int(sdl_event.jdevice.which))
 
 
+@attrs.define(slots=True, kw_only=True)
 class ControllerEvent(Event):
     """Base class for controller events.
 
     .. versionadded:: 13.8
     """
 
-    def __init__(self, type: str, which: int) -> None:
-        super().__init__(type)
-        self.which = which
-        """The ID of the joystick this event is for."""
+    which: int
+    """The ID of the controller this event is for."""
 
     @property
     def controller(self) -> tcod.sdl.joystick.GameController:
         """The :any:`GameController` for this event."""
-        if self.type == "CONTROLLERDEVICEADDED":
+        if isinstance(self, ControllerDevice) and self.type == "CONTROLLERDEVICEADDED":
             return tcod.sdl.joystick.GameController._open(self.which)
         return tcod.sdl.joystick.GameController._from_instance_id(self.which)
 
-    def __repr__(self) -> str:
-        return f"tcod.event.{self.__class__.__name__}(type={self.type!r}, which={self.which})"
 
-    def __str__(self) -> str:
-        prefix = super().__str__().strip("<>")
-        return f"<{prefix}, which={self.which}>"
-
-
+@attrs.define(slots=True, kw_only=True)
 class ControllerAxis(ControllerEvent):
     """When a controller axis is moved.
 
     .. versionadded:: 13.8
     """
 
-    type: Final[Literal["CONTROLLERAXISMOTION"]]  # type: ignore[misc]
+    _type: Final[Literal["CONTROLLERAXISMOTION"]] = "CONTROLLERAXISMOTION"
 
-    def __init__(self, type: str, which: int, axis: tcod.sdl.joystick.ControllerAxis, value: int) -> None:
-        super().__init__(type, which)
-        self.axis = axis
-        """Which axis is being moved.  One of :any:`ControllerAxis`."""
-        self.value = value
-        """The new value of this events axis.
+    axis: int
+    """Which axis is being moved.  One of :any:`ControllerAxis`."""
+    value: int
+    """The new value of this events axis.
 
-        This will be -32768 to 32767 for all axes except for triggers which are 0 to 32767 instead."""
+    This will be -32768 to 32767 for all axes except for triggers which are 0 to 32767 instead."""
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> ControllerAxis:
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
         return cls(
-            "CONTROLLERAXISMOTION",
-            sdl_event.gaxis.which,
-            tcod.sdl.joystick.ControllerAxis(sdl_event.gaxis.axis),
-            sdl_event.gaxis.value,
+            which=int(sdl_event.gaxis.which),
+            axis=tcod.sdl.joystick.ControllerAxis(sdl_event.gaxis.axis),
+            value=int(sdl_event.gaxis.value),
         )
 
-    def __repr__(self) -> str:
-        return (
-            f"tcod.event.{self.__class__.__name__}"
-            f"(type={self.type!r}, which={self.which}, axis={self.axis}, value={self.value})"
-        )
 
-    def __str__(self) -> str:
-        prefix = super().__str__().strip("<>")
-        return f"<{prefix}, axis={self.axis}, value={self.value}>"
-
-
+@attrs.define(slots=True, kw_only=True)
 class ControllerButton(ControllerEvent):
     """When a controller button is pressed or released.
 
     .. versionadded:: 13.8
     """
 
-    type: Final[Literal["CONTROLLERBUTTONDOWN", "CONTROLLERBUTTONUP"]]  # type: ignore[misc]
+    button: tcod.sdl.joystick.ControllerButton
+    """The button for this event.  One of :any:`ControllerButton`."""
+    pressed: bool
+    """True if the button was pressed, False if it was released."""
 
-    def __init__(self, type: str, which: int, button: tcod.sdl.joystick.ControllerButton, pressed: bool) -> None:
-        super().__init__(type, which)
-        self.button = button
-        """The button for this event.  One of :any:`ControllerButton`."""
-        self.pressed = pressed
-        """True if the button was pressed, False if it was released."""
+    @property
+    @deprecated("Check 'ControllerButton.pressed' instead of '.type'.")
+    def type(self) -> Literal["CONTROLLERBUTTONUP", "CONTROLLERBUTTONDOWN"]:
+        """Button state as a string.
+
+        .. deprecated:: Unreleased
+            Use :any:`pressed` instead.
+        """
+        return ("CONTROLLERBUTTONUP", "CONTROLLERBUTTONDOWN")[self.pressed]
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> ControllerButton:
-        type = {
-            lib.SDL_EVENT_GAMEPAD_BUTTON_DOWN: "CONTROLLERBUTTONDOWN",
-            lib.SDL_EVENT_GAMEPAD_BUTTON_UP: "CONTROLLERBUTTONUP",
-        }[sdl_event.type]
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
         return cls(
-            type,
-            sdl_event.gbutton.which,
-            tcod.sdl.joystick.ControllerButton(sdl_event.gbutton.button),
-            bool(sdl_event.gbutton.down),
+            which=int(sdl_event.gbutton.which),
+            button=tcod.sdl.joystick.ControllerButton(sdl_event.gbutton.button),
+            pressed=bool(sdl_event.gbutton.down),
         )
 
-    def __repr__(self) -> str:
-        return (
-            f"tcod.event.{self.__class__.__name__}"
-            f"(type={self.type!r}, which={self.which}, button={self.button}, pressed={self.pressed})"
-        )
 
-    def __str__(self) -> str:
-        prefix = super().__str__().strip("<>")
-        return f"<{prefix}, button={self.button}, pressed={self.pressed}>"
-
-
+@attrs.define(slots=True, kw_only=True)
 class ControllerDevice(ControllerEvent):
     """When a controller is added, removed, or remapped.
 
     .. versionadded:: 13.8
     """
 
-    type: Final[Literal["CONTROLLERDEVICEADDED", "CONTROLLERDEVICEREMOVED", "CONTROLLERDEVICEREMAPPED"]]  # type: ignore[misc]
+    type: Final[Literal["CONTROLLERDEVICEADDED", "CONTROLLERDEVICEREMOVED", "CONTROLLERDEVICEREMAPPED"]]
 
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> ControllerDevice:
-        type = {
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
+        types: dict[int, Literal["CONTROLLERDEVICEADDED", "CONTROLLERDEVICEREMOVED", "CONTROLLERDEVICEREMAPPED"]] = {
             lib.SDL_EVENT_GAMEPAD_ADDED: "CONTROLLERDEVICEADDED",
             lib.SDL_EVENT_GAMEPAD_REMOVED: "CONTROLLERDEVICEREMOVED",
             lib.SDL_EVENT_GAMEPAD_REMAPPED: "CONTROLLERDEVICEREMAPPED",
-        }[sdl_event.type]
-        return cls(type, sdl_event.gdevice.which)
+        }
+        return cls(type=types[sdl_event.type], which=int(sdl_event.gdevice.which))
 
 
 @functools.cache
@@ -1154,25 +956,17 @@ def _find_event_name(index: int, /) -> str:
     return "???"
 
 
+@attrs.define(slots=True, kw_only=True)
 class Undefined(Event):
     """This class is a place holder for SDL events without their own tcod.event class."""
 
-    def __init__(self) -> None:
-        super().__init__("")
-
     @classmethod
-    def from_sdl_event(cls, sdl_event: Any) -> Undefined:
-        self = cls()
-        self.sdl_event = sdl_event
-        return self
-
-    def __str__(self) -> str:
-        if self.sdl_event:
-            return f"<Undefined sdl_event.type={self.sdl_event.type} {_find_event_name(self.sdl_event.type)}>"
-        return "<Undefined>"
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
+        return cls(sdl_event=sdl_event)
 
     def __repr__(self) -> str:
-        return self.__str__()
+        """Return debug info for this undefined event, including the SDL event name."""
+        return f"<Undefined sdl_event.type={self.sdl_event.type} {_find_event_name(self.sdl_event.type)}>"
 
 
 _SDL_TO_CLASS_TABLE: dict[int, type[Event]] = {
@@ -1200,13 +994,13 @@ _SDL_TO_CLASS_TABLE: dict[int, type[Event]] = {
 }
 
 
-def _parse_event(sdl_event: Any) -> Event:
+def _parse_event(sdl_event: _C_SDL_Event) -> Event:
     """Convert a C SDL_Event* type into a tcod Event sub-class."""
     if sdl_event.type in _SDL_TO_CLASS_TABLE:
-        return _SDL_TO_CLASS_TABLE[sdl_event.type].from_sdl_event(sdl_event)
-    if sdl_event.type in WindowEvent._WINDOW_TYPES:
-        return WindowEvent.from_sdl_event(sdl_event)
-    return Undefined.from_sdl_event(sdl_event)
+        return _SDL_TO_CLASS_TABLE[sdl_event.type]._from_sdl_event(sdl_event)
+    if sdl_event.type in _WINDOW_TYPES_FROM_ENUM:
+        return WindowEvent._from_sdl_event(sdl_event)
+    return Undefined._from_sdl_event(sdl_event)
 
 
 def get() -> Iterator[Event]:
@@ -1261,7 +1055,8 @@ def wait(timeout: float | None = None) -> Iterator[Event]:
 
 
 @deprecated(
-    "Event dispatch should be handled via a single custom method in a Protocol instead of this class.",
+    """EventDispatch is no longer maintained.
+Event dispatching should be handled via a single custom method in a Protocol instead of this class.""",
     category=DeprecationWarning,
 )
 class EventDispatch(Generic[T]):
@@ -1275,8 +1070,8 @@ class EventDispatch(Generic[T]):
         The type hints at the return value of :any:`dispatch` and the `ev_*` methods.
 
     .. deprecated:: 18.0
-        Event dispatch should be handled via a single custom method in a Protocol instead of this class.
-        Note that events can and should be handled using Python's `match` statement.
+        Event dispatch should be handled via a single custom method in a :class:`~typing.Protocol` instead of this class.
+        Note that events can and should be handled using :ref:`match`.
 
     Example::
 
@@ -1374,7 +1169,7 @@ class EventDispatch(Generic[T]):
 
     __slots__ = ()
 
-    def dispatch(self, event: Any) -> T | None:
+    def dispatch(self, event: Any) -> T | None:  # noqa: ANN401
         """Send an event to an `ev_*` method.
 
         `*` will be the `event.type` attribute converted to lower-case.
@@ -1400,11 +1195,11 @@ class EventDispatch(Generic[T]):
             return None
         return func(event)
 
-    def event_get(self) -> None:
+    def event_get(self) -> None:  # noqa: D102
         for event in get():
             self.dispatch(event)
 
-    def event_wait(self, timeout: float | None) -> None:
+    def event_wait(self, timeout: float | None) -> None:  # noqa: D102
         wait(timeout)
         self.event_get()
 
@@ -1474,10 +1269,10 @@ class EventDispatch(Generic[T]):
     def ev_windowclose(self, event: tcod.event.WindowEvent, /) -> T | None:
         """Called when the window manager requests the window to be closed."""
 
-    def ev_windowtakefocus(self, event: tcod.event.WindowEvent, /) -> T | None:
+    def ev_windowtakefocus(self, event: tcod.event.WindowEvent, /) -> T | None:  # noqa: D102
         pass
 
-    def ev_windowhittest(self, event: tcod.event.WindowEvent, /) -> T | None:
+    def ev_windowhittest(self, event: tcod.event.WindowEvent, /) -> T | None:  # noqa: D102
         pass
 
     def ev_joyaxismotion(self, event: tcod.event.JoystickAxis, /) -> T | None:
@@ -1558,7 +1353,7 @@ class EventDispatch(Generic[T]):
         .. versionadded:: 13.8
         """
 
-    def ev_(self, event: Any, /) -> T | None:
+    def ev_(self, event: Any, /) -> T | None:  # noqa: ANN401, D102
         pass
 
 
@@ -1571,8 +1366,8 @@ def get_mouse_state() -> MouseState:
     buttons = lib.SDL_GetMouseState(xy, xy + 1)
     tile = _pixel_to_tile(*xy)
     if tile is None:
-        return MouseState((xy[0], xy[1]), None, buttons)
-    return MouseState((xy[0], xy[1]), (int(tile[0]), int(tile[1])), buttons)
+        return MouseState(position=Point(xy[0], xy[1]), tile=None, state=buttons)
+    return MouseState(position=Point(xy[0], xy[1]), tile=Point(int(tile[0]), int(tile[1])), state=buttons)
 
 
 @overload
@@ -1648,7 +1443,7 @@ def convert_coordinates_from_window(
 
 
 @ffi.def_extern()  # type: ignore[untyped-decorator]
-def _sdl_event_watcher(userdata: Any, sdl_event: Any) -> int:
+def _sdl_event_watcher(userdata: Any, sdl_event: _C_SDL_Event) -> int:  # noqa: ANN401
     callback: Callable[[Event], None] = ffi.from_handle(userdata)
     callback(_parse_event(sdl_event))
     return 0
@@ -2994,24 +2789,17 @@ def __getattr__(name: str) -> int:
     return value
 
 
-__all__ = [  # noqa: F405 RUF022
-    "Modifier",
+__all__ = (  # noqa: F405 RUF022
     "Point",
-    "BUTTON_LEFT",
-    "BUTTON_MIDDLE",
-    "BUTTON_RIGHT",
-    "BUTTON_X1",
-    "BUTTON_X2",
-    "BUTTON_LMASK",
-    "BUTTON_MMASK",
-    "BUTTON_RMASK",
-    "BUTTON_X1MASK",
-    "BUTTON_X2MASK",
+    "Modifier",
+    "MouseButton",
+    "MouseButtonMask",
     "Event",
     "Quit",
     "KeyboardEvent",
     "KeyDown",
     "KeyUp",
+    "MouseState",
     "MouseMotion",
     "MouseButtonEvent",
     "MouseButtonDown",
@@ -3045,5 +2833,4 @@ __all__ = [  # noqa: F405 RUF022
     # --- From event_constants.py ---
     "MOUSEWHEEL_NORMAL",
     "MOUSEWHEEL_FLIPPED",
-    "MOUSEWHEEL",
-]
+)

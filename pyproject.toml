@@ -28,6 +28,7 @@ license-files = [
     "libtcod/LIBTCOD-CREDITS.txt",
 ]
 dependencies = [
+    "attrs>=25.2.0",
     "cffi>=1.15",
     'numpy>=1.21.4; implementation_name != "pypy"',
     "typing_extensions>=4.12.2",

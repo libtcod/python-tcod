@@ -3,6 +3,7 @@ SDL Event Handling ``tcod.event``
 
 .. automodule:: tcod.event
     :members:
+    :inherited-members: object, int, str, tuple, Event
     :member-order: bysource
     :exclude-members:
         KeySym, Scancode, Modifier, get, wait
