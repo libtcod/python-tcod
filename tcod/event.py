@@ -88,7 +88,7 @@ import sys
 import warnings
 from collections.abc import Callable, Iterator, Mapping
 from math import floor
-from typing import TYPE_CHECKING, Any, Final, Generic, Literal, NamedTuple, TypeAlias, TypeVar, overload
+from typing import TYPE_CHECKING, Any, Final, Generic, Literal, NamedTuple, TypeAlias, TypedDict, TypeVar, overload
 
 import attrs
 import numpy as np
@@ -309,11 +309,24 @@ class MouseButtonMask(enum.IntFlag):
         return "|".join(f"{self.__class__.__name__}.{self.__class__(bit).name}" for bit in self.__class__ if bit & self)
 
 
+class _CommonSDLEventAttributes(TypedDict):
+    """Common keywords for Event subclasses."""
+
+    sdl_event: _C_SDL_Event
+
+
+def _unpack_sdl_event(sdl_event: _C_SDL_Event) -> _CommonSDLEventAttributes:
+    """Unpack an SDL_Event union into common attributes, such as timestamp."""
+    return {
+        "sdl_event": sdl_event,
+    }
+
+
 @attrs.define(slots=True, kw_only=True)
 class Event:
     """The base event class."""
 
-    sdl_event: _C_SDL_Event = attrs.field(default=None, eq=False, kw_only=True, repr=False)
+    sdl_event: _C_SDL_Event = attrs.field(default=None, eq=False, repr=False)
     """When available, this holds a python-cffi 'SDL_Event*' pointer. All sub-classes have this attribute."""
 
     @property
@@ -349,7 +362,7 @@ class Quit(Event):
 
     @classmethod
     def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
-        return cls(sdl_event=sdl_event)
+        return cls(**_unpack_sdl_event(sdl_event))
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -383,7 +396,7 @@ class KeyboardEvent(Event):
             sym=KeySym(keysym.key),
             mod=Modifier(keysym.mod),
             repeat=bool(sdl_event.key.repeat),
-            sdl_event=sdl_event,
+            **_unpack_sdl_event(sdl_event),
         )
 
 
@@ -521,14 +534,28 @@ class MouseMotion(MouseState):
         pixel_motion = Point(float(motion.xrel), float(motion.yrel))
         subtile = _pixel_to_tile(pixel)
         if subtile is None:
-            self = cls(position=pixel, motion=pixel_motion, tile=None, tile_motion=None, state=state)
+            self = cls(
+                position=pixel,
+                motion=pixel_motion,
+                tile=None,
+                tile_motion=None,
+                state=state,
+                **_unpack_sdl_event(sdl_event),
+            )
         else:
             tile = Point(floor(subtile[0]), floor(subtile[1]))
             prev_pixel = (pixel[0] - pixel_motion[0], pixel[1] - pixel_motion[1])
             prev_subtile = _pixel_to_tile(prev_pixel) or (0, 0)
             prev_tile = floor(prev_subtile[0]), floor(prev_subtile[1])
             tile_motion = Point(tile[0] - prev_tile[0], tile[1] - prev_tile[1])
-            self = cls(position=pixel, motion=pixel_motion, tile=tile, tile_motion=tile_motion, state=state)
+            self = cls(
+                position=pixel,
+                motion=pixel_motion,
+                tile=tile,
+                tile_motion=tile_motion,
+                state=state,
+                **_unpack_sdl_event(sdl_event),
+            )
         self.sdl_event = sdl_event
         return self
 
@@ -564,7 +591,7 @@ class MouseButtonEvent(Event):
             tile: Point[int] | None = None
         else:
             tile = Point(floor(subtile[0]), floor(subtile[1]))
-        self = cls(position=pixel, tile=tile, button=MouseButton(button.button))
+        self = cls(position=pixel, tile=tile, button=MouseButton(button.button), **_unpack_sdl_event(sdl_event))
         self.sdl_event = sdl_event
         return self
 
@@ -602,7 +629,7 @@ class MouseWheel(Event):
     @classmethod
     def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
         wheel = sdl_event.wheel
-        return cls(x=int(wheel.x), y=int(wheel.y), flipped=bool(wheel.direction), sdl_event=sdl_event)
+        return cls(x=int(wheel.x), y=int(wheel.y), flipped=bool(wheel.direction), **_unpack_sdl_event(sdl_event))
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -620,7 +647,7 @@ class TextInput(Event):
 
     @classmethod
     def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
-        return cls(text=str(ffi.string(sdl_event.text.text, 32), encoding="utf8"), sdl_event=sdl_event)
+        return cls(text=str(ffi.string(sdl_event.text.text, 32), encoding="utf8"), **_unpack_sdl_event(sdl_event))
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -655,7 +682,9 @@ class WindowEvent(Event):
         event_type: Final = _WINDOW_TYPES_FROM_ENUM[sdl_event.type]
         self: WindowEvent
         if sdl_event.type == lib.SDL_EVENT_WINDOW_MOVED:
-            self = WindowMoved(x=int(sdl_event.window.data1), y=int(sdl_event.window.data2), sdl_event=sdl_event)
+            self = WindowMoved(
+                x=int(sdl_event.window.data1), y=int(sdl_event.window.data2), **_unpack_sdl_event(sdl_event)
+            )
         elif sdl_event.type in (
             lib.SDL_EVENT_WINDOW_RESIZED,
             lib.SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED,
@@ -664,12 +693,12 @@ class WindowEvent(Event):
                 type=event_type,  # type: ignore[arg-type] # Currently NOT validated
                 width=int(sdl_event.window.data1),
                 height=int(sdl_event.window.data2),
-                sdl_event=sdl_event,
+                **_unpack_sdl_event(sdl_event),
             )
         else:
             self = cls(
                 type=event_type,  # type: ignore[arg-type] # Currently NOT validated
-                sdl_event=sdl_event,
+                **_unpack_sdl_event(sdl_event),
             )
         return self
 
@@ -764,7 +793,12 @@ class JoystickAxis(JoystickEvent):
 
     @classmethod
     def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
-        return cls(which=int(sdl_event.jaxis.which), axis=int(sdl_event.jaxis.axis), value=int(sdl_event.jaxis.value))
+        return cls(
+            which=int(sdl_event.jaxis.which),
+            axis=int(sdl_event.jaxis.axis),
+            value=int(sdl_event.jaxis.value),
+            **_unpack_sdl_event(sdl_event),
+        )
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -793,6 +827,7 @@ class JoystickBall(JoystickEvent):
             ball=int(sdl_event.jball.ball),
             dx=int(sdl_event.jball.xrel),
             dy=int(sdl_event.jball.yrel),
+            **_unpack_sdl_event(sdl_event),
         )
 
 
@@ -816,7 +851,7 @@ class JoystickHat(JoystickEvent):
     @classmethod
     def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
         x, y = _HAT_DIRECTIONS[sdl_event.jhat.hat]
-        return cls(which=int(sdl_event.jhat.which), x=x, y=y)
+        return cls(which=int(sdl_event.jhat.which), x=x, y=y, **_unpack_sdl_event(sdl_event))
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -856,6 +891,7 @@ class JoystickButton(JoystickEvent):
             which=int(sdl_event.jbutton.which),
             button=int(sdl_event.jbutton.button),
             pressed=bool(sdl_event.jbutton.down),
+            **_unpack_sdl_event(sdl_event),
         )
 
 
@@ -889,7 +925,7 @@ class JoystickDevice(JoystickEvent):
             lib.SDL_EVENT_JOYSTICK_ADDED: "JOYDEVICEADDED",
             lib.SDL_EVENT_JOYSTICK_REMOVED: "JOYDEVICEREMOVED",
         }
-        return cls(type=types[sdl_event.type], which=int(sdl_event.jdevice.which))
+        return cls(type=types[sdl_event.type], which=int(sdl_event.jdevice.which), **_unpack_sdl_event(sdl_event))
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -932,6 +968,7 @@ class ControllerAxis(ControllerEvent):
             which=int(sdl_event.gaxis.which),
             axis=tcod.sdl.joystick.ControllerAxis(sdl_event.gaxis.axis),
             value=int(sdl_event.gaxis.value),
+            **_unpack_sdl_event(sdl_event),
         )
 
 
@@ -963,6 +1000,7 @@ class ControllerButton(ControllerEvent):
             which=int(sdl_event.gbutton.which),
             button=tcod.sdl.joystick.ControllerButton(sdl_event.gbutton.button),
             pressed=bool(sdl_event.gbutton.down),
+            **_unpack_sdl_event(sdl_event),
         )
 
 
@@ -982,7 +1020,7 @@ class ControllerDevice(ControllerEvent):
             lib.SDL_EVENT_GAMEPAD_REMOVED: "CONTROLLERDEVICEREMOVED",
             lib.SDL_EVENT_GAMEPAD_REMAPPED: "CONTROLLERDEVICEREMAPPED",
         }
-        return cls(type=types[sdl_event.type], which=int(sdl_event.gdevice.which))
+        return cls(type=types[sdl_event.type], which=int(sdl_event.gdevice.which), **_unpack_sdl_event(sdl_event))
 
 
 @functools.cache
@@ -1000,7 +1038,7 @@ class Undefined(Event):
 
     @classmethod
     def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
-        return cls(sdl_event=sdl_event)
+        return cls(**_unpack_sdl_event(sdl_event))
 
     def __repr__(self) -> str:
         """Return debug info for this undefined event, including the SDL event name."""
