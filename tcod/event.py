@@ -387,6 +387,21 @@ class KeyboardEvent(Event):
     """
     repeat: bool = False
     """True if this event exists because of key repeat."""
+    which: int = 0
+    """The SDL keyboard instance ID. Zero if unknown or virtual.
+
+    .. versionadded:: Unreleased
+    """
+    window_id: int = 0
+    """The SDL window ID with keyboard focus.
+
+    .. versionadded:: Unreleased
+    """
+    pressed: bool = False
+    """True if the key was pressed, False if the key was released.
+
+    .. versionadded:: Unreleased
+    """
 
     @classmethod
     def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
@@ -395,19 +410,22 @@ class KeyboardEvent(Event):
             scancode=Scancode(keysym.scancode),
             sym=KeySym(keysym.key),
             mod=Modifier(keysym.mod),
-            repeat=bool(sdl_event.key.repeat),
+            repeat=bool(keysym.repeat),
+            pressed=bool(keysym.down),
+            which=int(keysym.which),
+            window_id=int(keysym.windowID),
             **_unpack_sdl_event(sdl_event),
         )
 
 
 @attrs.define(slots=True, kw_only=True)
 class KeyDown(KeyboardEvent):
-    pass
+    """A :any:`KeyboardEvent` where the key was pressed."""
 
 
 @attrs.define(slots=True, kw_only=True)
 class KeyUp(KeyboardEvent):
-    pass
+    """A :any:`KeyboardEvent` where the key was released."""
 
 
 @attrs.define(slots=True, kw_only=True)
