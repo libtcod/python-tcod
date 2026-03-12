@@ -29,6 +29,7 @@ import copy
 import pickle
 import sys
 import warnings
+from math import floor
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, NoReturn, TypeVar
 
@@ -256,7 +257,8 @@ class Context:
         event_copy = copy.copy(event)
         if isinstance(event, (tcod.event.MouseState, tcod.event.MouseMotion)):
             assert isinstance(event_copy, (tcod.event.MouseState, tcod.event.MouseMotion))
-            event_copy.position = event._tile = tcod.event.Point(*self.pixel_to_tile(*event.position))
+            event_copy.position = tcod.event.Point(*self.pixel_to_tile(event.position[0], event.position[1]))
+            event._tile = tcod.event.Point(floor(event_copy.position[0]), floor(event_copy.position[1]))
         if isinstance(event, tcod.event.MouseMotion):
             assert isinstance(event_copy, tcod.event.MouseMotion)
             assert event._tile is not None
@@ -264,8 +266,13 @@ class Context:
                 event.position[0] - event.motion[0],
                 event.position[1] - event.motion[1],
             )
-            event_copy.motion = event._tile_motion = tcod.event.Point(
-                int(event._tile[0]) - int(prev_tile[0]), int(event._tile[1]) - int(prev_tile[1])
+            event_copy.motion = tcod.event.Point(
+                event_copy.position[0] - prev_tile[0],
+                event_copy.position[1] - prev_tile[1],
+            )
+            event._tile_motion = tcod.event.Point(
+                event._tile[0] - floor(prev_tile[0]),
+                event._tile[1] - floor(prev_tile[1]),
             )
         return event_copy
 

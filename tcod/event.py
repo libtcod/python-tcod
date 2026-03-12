@@ -87,6 +87,7 @@ import functools
 import sys
 import warnings
 from collections.abc import Callable, Iterator, Mapping
+from math import floor
 from typing import TYPE_CHECKING, Any, Final, Generic, Literal, NamedTuple, TypeAlias, TypeVar, overload
 
 import attrs
@@ -149,32 +150,39 @@ def _describe_bitmask(bits: int, table: Mapping[int, str], default: str = "0") -
     return "|".join(result)
 
 
-def _pixel_to_tile(x: float, y: float) -> tuple[float, float] | None:
+def _pixel_to_tile(xy: tuple[float, float], /) -> Point[float] | None:
     """Convert pixel coordinates to tile coordinates."""
     if not lib.TCOD_ctx.engine:
         return None
-    xy = ffi.new("double[2]", (x, y))
-    lib.TCOD_sys_pixel_to_tile(xy, xy + 1)
-    return xy[0], xy[1]
+    xy_out = ffi.new("double[2]", xy)
+    lib.TCOD_sys_pixel_to_tile(xy_out, xy_out + 1)
+    return Point(float(xy_out[0]), float(xy_out[1]))
 
 
-class Point(NamedTuple):
-    """A 2D position used for events with mouse coordinates.
+if sys.version_info >= (3, 11) or TYPE_CHECKING:
 
-    .. seealso::
-        :any:`MouseMotion` :any:`MouseButtonDown` :any:`MouseButtonUp`
+    class Point(NamedTuple, Generic[T]):
+        """A 2D position used for events with mouse coordinates.
 
-    .. versionchanged:: 19.0
-        Now uses floating point coordinates due to the port to SDL3.
-    """
+        .. seealso::
+            :any:`MouseMotion` :any:`MouseButtonDown` :any:`MouseButtonUp`
 
-    x: float
-    """A pixel or tile coordinate starting with zero as the left-most position."""
-    y: float
-    """A pixel or tile coordinate starting with zero as the top-most position."""
+        .. versionchanged:: 19.0
+            Now uses floating point coordinates due to the port to SDL3.
+        """
+
+        x: T
+        """A pixel or tile coordinate starting with zero as the left-most position."""
+        y: T
+        """A pixel or tile coordinate starting with zero as the top-most position."""
+else:
+
+    class Point(NamedTuple):  # noqa: D101
+        x: Any
+        y: Any
 
 
-def _verify_tile_coordinates(xy: Point | None) -> Point:
+def _verify_tile_coordinates(xy: Point[int] | None) -> Point[int]:
     """Check if an events tile coordinate is initialized and warn if not.
 
     Always returns a valid Point object for backwards compatibility.
@@ -399,36 +407,50 @@ class MouseState(Event):
         Renamed `pixel` attribute to `position`.
     """
 
-    position: Point = attrs.field(default=Point(0, 0))
+    position: Point[float] = attrs.field(default=Point(0.0, 0.0))
     """The position coordinates of the mouse."""
-    _tile: Point | None = attrs.field(default=Point(0, 0), alias="tile")
-    """The integer tile coordinates of the mouse on the screen."""
+    _tile: Point[int] | None = attrs.field(default=Point(0, 0), alias="tile")
+
     state: MouseButtonMask = attrs.field(default=MouseButtonMask(0))
     """A bitmask of which mouse buttons are currently held."""
 
     @property
+    def integer_position(self) -> Point[int]:
+        """Integer coordinates of this event.
+
+        .. versionadded:: Unreleased
+        """
+        x, y = self.position
+        return Point(floor(x), floor(y))
+
+    @property
     @deprecated("The mouse.pixel attribute is deprecated.  Use mouse.position instead.")
-    def pixel(self) -> Point:
+    def pixel(self) -> Point[float]:
         return self.position
 
     @pixel.setter
-    def pixel(self, value: Point) -> None:
+    def pixel(self, value: Point[float]) -> None:
         self.position = value
 
     @property
     @deprecated(
         "The mouse.tile attribute is deprecated."
-        "  Use mouse.position of the event returned by context.convert_event instead."
+        "  Use mouse.integer_position of the event returned by context.convert_event instead."
     )
-    def tile(self) -> Point:
+    def tile(self) -> Point[int]:
+        """The integer tile coordinates of the mouse on the screen.
+
+        .. deprecated:: Unreleased
+            Use :any:`integer_position` of the event returned by :any:`Context.convert_event` instead.
+        """
         return _verify_tile_coordinates(self._tile)
 
     @tile.setter
     @deprecated(
         "The mouse.tile attribute is deprecated."
-        "  Use mouse.position of the event returned by context.convert_event instead."
+        "  Use mouse.integer_position of the event returned by context.convert_event instead."
     )
-    def tile(self, xy: tuple[float, float]) -> None:
+    def tile(self, xy: tuple[int, int]) -> None:
         self._tile = Point(*xy)
 
 
@@ -444,35 +466,50 @@ class MouseMotion(MouseState):
         `position` and `motion` now use floating point coordinates.
     """
 
-    motion: Point = attrs.field(default=Point(0, 0))
+    motion: Point[float] = attrs.field(default=Point(0.0, 0.0))
     """The pixel delta."""
-    _tile_motion: Point | None = attrs.field(default=Point(0, 0), alias="tile_motion")
-    """The tile delta."""
+    _tile_motion: Point[int] | None = attrs.field(default=Point(0, 0), alias="tile_motion")
+
+    @property
+    def integer_motion(self) -> Point[int]:
+        """Integer motion of this event.
+
+        .. versionadded:: Unreleased
+        """
+        x, y = self.position
+        dx, dy = self.motion
+        prev_x, prev_y = x - dx, y - dy
+        return Point(floor(x) - floor(prev_x), floor(y) - floor(prev_y))
 
     @property
     @deprecated("The mouse.pixel_motion attribute is deprecated.  Use mouse.motion instead.")
-    def pixel_motion(self) -> Point:
+    def pixel_motion(self) -> Point[float]:
         return self.motion
 
     @pixel_motion.setter
     @deprecated("The mouse.pixel_motion attribute is deprecated.  Use mouse.motion instead.")
-    def pixel_motion(self, value: Point) -> None:
+    def pixel_motion(self, value: Point[float]) -> None:
         self.motion = value
 
     @property
     @deprecated(
         "The mouse.tile_motion attribute is deprecated."
-        "  Use mouse.motion of the event returned by context.convert_event instead."
+        "  Use mouse.integer_motion of the event returned by context.convert_event instead."
     )
-    def tile_motion(self) -> Point:
+    def tile_motion(self) -> Point[int]:
+        """The tile delta.
+
+        .. deprecated:: Unreleased
+            Use :any:`integer_motion` of the event returned by :any:`Context.convert_event` instead.
+        """
         return _verify_tile_coordinates(self._tile_motion)
 
     @tile_motion.setter
     @deprecated(
         "The mouse.tile_motion attribute is deprecated."
-        "  Use mouse.motion of the event returned by context.convert_event instead."
+        "  Use mouse.integer_motion of the event returned by context.convert_event instead."
     )
-    def tile_motion(self, xy: tuple[float, float]) -> None:
+    def tile_motion(self, xy: tuple[int, int]) -> None:
         self._tile_motion = Point(*xy)
 
     @classmethod
@@ -480,16 +517,16 @@ class MouseMotion(MouseState):
         motion = sdl_event.motion
         state = MouseButtonMask(motion.state)
 
-        pixel = Point(motion.x, motion.y)
-        pixel_motion = Point(motion.xrel, motion.yrel)
-        subtile = _pixel_to_tile(*pixel)
+        pixel = Point(float(motion.x), float(motion.y))
+        pixel_motion = Point(float(motion.xrel), float(motion.yrel))
+        subtile = _pixel_to_tile(pixel)
         if subtile is None:
             self = cls(position=pixel, motion=pixel_motion, tile=None, tile_motion=None, state=state)
         else:
-            tile = Point(int(subtile[0]), int(subtile[1]))
-            prev_pixel = pixel[0] - pixel_motion[0], pixel[1] - pixel_motion[1]
-            prev_subtile = _pixel_to_tile(*prev_pixel) or (0, 0)
-            prev_tile = int(prev_subtile[0]), int(prev_subtile[1])
+            tile = Point(floor(subtile[0]), floor(subtile[1]))
+            prev_pixel = (pixel[0] - pixel_motion[0], pixel[1] - pixel_motion[1])
+            prev_subtile = _pixel_to_tile(prev_pixel) or (0, 0)
+            prev_tile = floor(prev_subtile[0]), floor(prev_subtile[1])
             tile_motion = Point(tile[0] - prev_tile[0], tile[1] - prev_tile[1])
             self = cls(position=pixel, motion=pixel_motion, tile=tile, tile_motion=tile_motion, state=state)
         self.sdl_event = sdl_event
@@ -507,10 +544,10 @@ class MouseButtonEvent(Event):
         No longer a subclass of :any:`MouseState`.
     """
 
-    position: Point = attrs.field(default=Point(0, 0))
+    position: Point[float] = attrs.field(default=Point(0.0, 0.0))
     """The pixel coordinates of the mouse."""
-    _tile: Point | None = attrs.field(default=Point(0, 0), alias="tile")
-    """The tile coordinates of the mouse on the screen."""
+    _tile: Point[int] | None = attrs.field(default=Point(0, 0), alias="tile")
+    """The tile integer coordinates of the mouse on the screen. Deprecated."""
     button: MouseButton
     """Which mouse button index was pressed or released in this event.
 
@@ -521,12 +558,12 @@ class MouseButtonEvent(Event):
     @classmethod
     def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
         button = sdl_event.button
-        pixel = Point(button.x, button.y)
-        subtile = _pixel_to_tile(*pixel)
+        pixel = Point(float(button.x), float(button.y))
+        subtile = _pixel_to_tile(pixel)
         if subtile is None:
-            tile: Point | None = None
+            tile: Point[int] | None = None
         else:
-            tile = Point(float(subtile[0]), float(subtile[1]))
+            tile = Point(floor(subtile[0]), floor(subtile[1]))
         self = cls(position=pixel, tile=tile, button=MouseButton(button.button))
         self.sdl_event = sdl_event
         return self
@@ -1362,12 +1399,12 @@ def get_mouse_state() -> MouseState:
 
     .. versionadded:: 9.3
     """
-    xy = ffi.new("int[2]")
+    xy = ffi.new("float[2]")
     buttons = lib.SDL_GetMouseState(xy, xy + 1)
-    tile = _pixel_to_tile(*xy)
+    tile = _pixel_to_tile(tuple(xy))
     if tile is None:
         return MouseState(position=Point(xy[0], xy[1]), tile=None, state=buttons)
-    return MouseState(position=Point(xy[0], xy[1]), tile=Point(int(tile[0]), int(tile[1])), state=buttons)
+    return MouseState(position=Point(xy[0], xy[1]), tile=Point(floor(tile[0]), floor(tile[1])), state=buttons)
 
 
 @overload
@@ -1431,14 +1468,13 @@ def convert_coordinates_from_window(
             ((event.position[0] - event.motion[0]), (event.position[1] - event.motion[1])), context, console, dest_rect
         )
         position = convert_coordinates_from_window(event.position, context, console, dest_rect)
-        event.motion = tcod.event.Point(position[0] - previous_position[0], position[1] - previous_position[1])
-        event._tile_motion = tcod.event.Point(
-            int(position[0]) - int(previous_position[0]), int(position[1]) - int(previous_position[1])
+        event.motion = Point(position[0] - previous_position[0], position[1] - previous_position[1])
+        event._tile_motion = Point(
+            floor(position[0]) - floor(previous_position[0]), floor(position[1]) - floor(previous_position[1])
         )
     if isinstance(event, (MouseState, MouseMotion)):
-        event.position = event._tile = tcod.event.Point(
-            *convert_coordinates_from_window(event.position, context, console, dest_rect)
-        )
+        event.position = Point(*convert_coordinates_from_window(event.position, context, console, dest_rect))
+        event._tile = Point(floor(event.position[0]), floor(event.position[1]))
     return event
 
 

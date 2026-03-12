@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 ### Added
 
 - `tcod.sdl.video.Window` now accepts an SDL WindowID.
+- `MouseState.integer_position` and `MouseMotion.integer_motion` to handle cases where integer values are preferred.
 
 ### Changed
 
@@ -16,11 +17,21 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 - Event class initializers are keyword-only and no longer take a type parameter, with exceptions.
   Generally event class initialization is an internal process.
 - `MouseButtonEvent` no longer a subclass of `MouseState`.
+- `tcod.event.Point` is now a generic type containing `int` or `float` values depending on the context.
+- When converting mouse events to tiles:
+  `MouseState.position` and `MouseMotion.motion` refers to sub-tile coordinates.
+  `MouseState.integer_position` and `MouseMotion.integer_motion` refers to integer tile coordinates.
 
 ### Deprecated
 
 - `Event.type` is deprecated except for special cases such as `ControllerDevice`, `WindowEvent`, etc.
 - `MouseButtonEvent.state` is deprecated, replaced by the existing `.button` attribute.
+
+### Fixed
+
+- Fixed incorrect C FFI types inside `tcod.event.get_mouse_state`.
+- Fixed regression in mouse event tile coordinates being `float` instead of `int`.
+  `convert_coordinates_from_window` can be used if sub-tile coordinates were desired.
 
 ## [20.1.0] - 2026-02-25
 

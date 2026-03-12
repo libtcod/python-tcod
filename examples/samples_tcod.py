@@ -1011,7 +1011,6 @@ class MouseSample(Sample):
 
     def __init__(self) -> None:
         self.motion = tcod.event.MouseMotion()
-        self.mouse_left = self.mouse_middle = self.mouse_right = 0
         self.log: list[str] = []
 
     def on_enter(self) -> None:
@@ -1022,15 +1021,18 @@ class MouseSample(Sample):
 
     def on_draw(self) -> None:
         sample_console.clear(bg=GREY)
+        mouse_state = tcod.event.get_mouse_state()
         sample_console.print(
             1,
             1,
-            f"Pixel position : {self.motion.position.x:4.0f}x{self.motion.position.y:4.0f}\n"
-            f"Tile position  : {self.motion.tile.x:4.0f}x{self.motion.tile.y:4.0f}\n"
-            f"Tile movement  : {self.motion.tile_motion.x:4.0f}x{self.motion.tile_motion.y:4.0f}\n"
-            f"Left button    : {'ON' if self.mouse_left else 'OFF'}\n"
-            f"Right button   : {'ON' if self.mouse_right else 'OFF'}\n"
-            f"Middle button  : {'ON' if self.mouse_middle else 'OFF'}\n",
+            f"Pixel position : {mouse_state.position.x:4.0f}x{mouse_state.position.y:4.0f}\n"
+            f"Tile position  : {self.motion.tile.x:4d}x{self.motion.tile.y:4d}\n"
+            f"Tile movement  : {self.motion.tile_motion.x:4d}x{self.motion.tile_motion.y:4d}\n"
+            f"Left button    : {'ON' if mouse_state.state & tcod.event.MouseButtonMask.LEFT else 'OFF'}\n"
+            f"Middle button  : {'ON' if mouse_state.state & tcod.event.MouseButtonMask.MIDDLE else 'OFF'}\n"
+            f"Right button   : {'ON' if mouse_state.state & tcod.event.MouseButtonMask.RIGHT else 'OFF'}\n"
+            f"X1 button      : {'ON' if mouse_state.state & tcod.event.MouseButtonMask.X1 else 'OFF'}\n"
+            f"X2 button      : {'ON' if mouse_state.state & tcod.event.MouseButtonMask.X2 else 'OFF'}\n",
             fg=LIGHT_YELLOW,
             bg=None,
         )
@@ -1046,18 +1048,6 @@ class MouseSample(Sample):
         match event:
             case tcod.event.MouseMotion():
                 self.motion = event
-            case tcod.event.MouseButtonDown(button=tcod.event.MouseButton.LEFT):
-                self.mouse_left = True
-            case tcod.event.MouseButtonDown(button=tcod.event.MouseButton.MIDDLE):
-                self.mouse_middle = True
-            case tcod.event.MouseButtonDown(button=tcod.event.MouseButton.RIGHT):
-                self.mouse_right = True
-            case tcod.event.MouseButtonUp(button=tcod.event.MouseButton.LEFT):
-                self.mouse_left = False
-            case tcod.event.MouseButtonUp(button=tcod.event.MouseButton.MIDDLE):
-                self.mouse_middle = False
-            case tcod.event.MouseButtonUp(button=tcod.event.MouseButton.RIGHT):
-                self.mouse_right = False
             case tcod.event.KeyDown(sym=KeySym.N1):
                 tcod.sdl.mouse.show(visible=False)
             case tcod.event.KeyDown(sym=KeySym.N2):
@@ -1422,8 +1412,8 @@ def handle_events() -> None:
         tile_event = tcod.event.convert_coordinates_from_window(event, context, root_console)
         SAMPLES[cur_sample].on_event(tile_event)
         match tile_event:
-            case tcod.event.MouseMotion(position=(x, y)):
-                mouse_tile_xy = int(x), int(y)
+            case tcod.event.MouseMotion(integer_position=(x, y)):
+                mouse_tile_xy = x, y
             case tcod.event.WindowEvent(type="WindowLeave"):
                 mouse_tile_xy = -1, -1
 
