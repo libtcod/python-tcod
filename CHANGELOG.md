@@ -9,8 +9,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 ### Added
 
 - `tcod.sdl.video.Window` now accepts an SDL WindowID.
-- `MouseState.integer_position` and `MouseMotion.integer_motion` to handle cases where integer values are preferred.
-- `KeyboardEvent.pressed`, `KeyboardEvent.which`, `KeyboardEvent.window_id`
+- `tcod.event`:
+  - `MouseState.integer_position` and `MouseMotion.integer_motion` to handle cases where integer values are preferred.
+  - `ClipboardUpdate` event.
+  - `KeyboardEvent.pressed`, `KeyboardEvent.which`, `KeyboardEvent.window_id` attributes.
 
 ### Changed
 

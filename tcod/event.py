@@ -1041,6 +1041,27 @@ class ControllerDevice(ControllerEvent):
         return cls(type=types[sdl_event.type], which=int(sdl_event.gdevice.which), **_unpack_sdl_event(sdl_event))
 
 
+@attrs.define(slots=True, kw_only=True)
+class ClipboardUpdate(Event):
+    """Announces changed contents of the clipboard.
+
+    .. versionadded:: Unreleased
+    """
+
+    mime_types: tuple[str, ...]
+    """The MIME types of the clipboard."""
+
+    @classmethod
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
+        return cls(
+            mime_types=tuple(
+                str(ffi.string(sdl_event.clipboard.mime_types[i]), encoding="utf8")
+                for i in range(sdl_event.clipboard.num_mime_types)
+            ),
+            **_unpack_sdl_event(sdl_event),
+        )
+
+
 @functools.cache
 def _find_event_name(index: int, /) -> str:
     """Return the SDL event name for this index."""
@@ -1085,6 +1106,7 @@ _SDL_TO_CLASS_TABLE: dict[int, type[Event]] = {
     lib.SDL_EVENT_GAMEPAD_ADDED: ControllerDevice,
     lib.SDL_EVENT_GAMEPAD_REMOVED: ControllerDevice,
     lib.SDL_EVENT_GAMEPAD_REMAPPED: ControllerDevice,
+    lib.SDL_EVENT_CLIPBOARD_UPDATE: ClipboardUpdate,
 }
 
 
