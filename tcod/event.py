@@ -425,7 +425,7 @@ class MouseState(Event):
 
     @property
     @deprecated("The mouse.pixel attribute is deprecated.  Use mouse.position instead.")
-    def pixel(self) -> Point[float]:
+    def pixel(self) -> Point[float]:  # noqa: D102 # Skip docstring for deprecated attribute
         return self.position
 
     @pixel.setter
@@ -483,7 +483,7 @@ class MouseMotion(MouseState):
 
     @property
     @deprecated("The mouse.pixel_motion attribute is deprecated.  Use mouse.motion instead.")
-    def pixel_motion(self) -> Point[float]:
+    def pixel_motion(self) -> Point[float]:  # noqa: D102 # Skip docstring for deprecated attribute
         return self.motion
 
     @pixel_motion.setter
@@ -739,6 +739,7 @@ class JoystickEvent(Event):
 
     @property
     def joystick(self) -> tcod.sdl.joystick.Joystick:
+        """The :any:`Joystick` for this event."""
         if isinstance(self, JoystickDevice) and self.type == "JOYDEVICEADDED":
             return tcod.sdl.joystick.Joystick._open(self.which)
         return tcod.sdl.joystick.Joystick._from_instance_id(self.which)
@@ -2128,14 +2129,18 @@ class Scancode(enum.IntEnum):
         return result
 
     def __eq__(self, other: object) -> bool:
+        """Compare with another Scancode value.
+
+        Comparison between :any:`KeySym` and :any:`Scancode` is not allowed and will raise :any:`TypeError`.
+        """
         if isinstance(other, KeySym):
             msg = "Scancode and KeySym enums can not be compared directly. Convert one or the other to the same type."
             raise TypeError(msg)
         return super().__eq__(other)
 
     def __hash__(self) -> int:
-        # __eq__ was defined, so __hash__ must be defined.
-        return super().__hash__()
+        """Return the hash for this value."""
+        return super().__hash__()  # __eq__ was defined, so __hash__ must be defined
 
     def __repr__(self) -> str:
         """Return the fully qualified name of this enum."""
@@ -2708,14 +2713,18 @@ class KeySym(enum.IntEnum):
         return result
 
     def __eq__(self, other: object) -> bool:
+        """Compare with another KeySym value.
+
+        Comparison between :any:`KeySym` and :any:`Scancode` is not allowed and will raise :any:`TypeError`.
+        """
         if isinstance(other, Scancode):
             msg = "Scancode and KeySym enums can not be compared directly. Convert one or the other to the same type."
             raise TypeError(msg)
         return super().__eq__(other)
 
     def __hash__(self) -> int:
-        # __eq__ was defined, so __hash__ must be defined.
-        return super().__hash__()
+        """Return the hash for this value."""
+        return super().__hash__()  # __eq__ was defined, so __hash__ must be defined
 
     def __repr__(self) -> str:
         """Return the fully qualified name of this enum."""
