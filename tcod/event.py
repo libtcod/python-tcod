@@ -88,6 +88,7 @@ import sys
 import warnings
 from collections.abc import Callable, Iterator, Mapping
 from math import floor
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final, Generic, Literal, NamedTuple, TypeAlias, TypedDict, TypeVar, overload
 
 import attrs
@@ -1062,6 +1063,68 @@ class ClipboardUpdate(Event):
         )
 
 
+@attrs.define(slots=True, kw_only=True)
+class Drop(Event):
+    """Handle dropping text or files on the window.
+
+    Example::
+
+        match event:
+            case tcod.event.Drop(type="BEGIN"):
+                print("Object dragged over the window")
+            case tcod.event.Drop(type="POSITION", position=position):
+                pass
+            case tcod.event.Drop(type="TEXT", position=position, text=text):
+                print(f"Dropped {text=} at {position=}")
+            case tcod.event.Drop(type="FILE", position=position, path=path):
+                print(f"Dropped {path=} at {position=}")
+            case tcod.event.Drop(type="COMPLETE"):
+                print("Drop handling finished")
+
+    .. versionadded:: Unreleased
+    """
+
+    type: Literal["BEGIN", "FILE", "TEXT", "COMPLETE", "POSITION"]
+    """The subtype of this event."""
+    window_id: int
+    """The active window ID for this event."""
+    position: Point[float]
+    """Mouse position relative to the window. Available in all subtypes except for ``type="BEGIN"``."""
+    source: str
+    """The source app for this event, or an empty string if unavailable."""
+    text: str
+    """The dropped data of a ``Drop(type="TEXT")`` or ``Drop(type="FILE")`` event.
+
+    - If ``Drop(type="TEXT")`` then `text` is the dropped string.
+    - If ``Drop(type="FILE")`` then `text` is the str path of the dropped file.
+      Alternatively :any:`path` can be used.
+    - Otherwise `text` is an empty string.
+    """
+
+    @property
+    def path(self) -> Path:
+        """Return the current `text` as a :any:`Path`."""
+        return Path(self.text)
+
+    @classmethod
+    def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
+        types: dict[int, Literal["BEGIN", "FILE", "TEXT", "COMPLETE", "POSITION"]] = {
+            lib.SDL_EVENT_DROP_BEGIN: "BEGIN",
+            lib.SDL_EVENT_DROP_FILE: "FILE",
+            lib.SDL_EVENT_DROP_TEXT: "TEXT",
+            lib.SDL_EVENT_DROP_COMPLETE: "COMPLETE",
+            lib.SDL_EVENT_DROP_POSITION: "POSITION",
+        }
+        return cls(
+            type=types[sdl_event.drop.type],
+            window_id=int(sdl_event.drop.windowID),
+            position=Point(float(sdl_event.drop.x), float(sdl_event.drop.y)),
+            source=str(ffi.string(sdl_event.drop.source), encoding="utf8") if sdl_event.drop.source else "",
+            text=str(ffi.string(sdl_event.drop.data), encoding="utf8") if sdl_event.drop.data else "",
+            **_unpack_sdl_event(sdl_event),
+        )
+
+
 @functools.cache
 def _find_event_name(index: int, /) -> str:
     """Return the SDL event name for this index."""
@@ -1107,6 +1170,11 @@ _SDL_TO_CLASS_TABLE: dict[int, type[Event]] = {
     lib.SDL_EVENT_GAMEPAD_REMOVED: ControllerDevice,
     lib.SDL_EVENT_GAMEPAD_REMAPPED: ControllerDevice,
     lib.SDL_EVENT_CLIPBOARD_UPDATE: ClipboardUpdate,
+    lib.SDL_EVENT_DROP_BEGIN: Drop,
+    lib.SDL_EVENT_DROP_FILE: Drop,
+    lib.SDL_EVENT_DROP_TEXT: Drop,
+    lib.SDL_EVENT_DROP_COMPLETE: Drop,
+    lib.SDL_EVENT_DROP_POSITION: Drop,
 }
 
 

@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 - `tcod.event`:
   - `MouseState.integer_position` and `MouseMotion.integer_motion` to handle cases where integer values are preferred.
   - `ClipboardUpdate` event.
+  - `Drop` event.
   - `KeyboardEvent.pressed`, `KeyboardEvent.which`, `KeyboardEvent.window_id` attributes.
 
 ### Changed
