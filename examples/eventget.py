@@ -54,8 +54,8 @@ def main() -> None:  # noqa: C901, PLR0912
                         joysticks.remove(joystick)
                     case tcod.event.MouseMotion():
                         motion_desc = str(event)
-                    case _:  # Log all events other than MouseMotion.
-                        event_log.append(repr(event))
+                if not isinstance(event, tcod.event.MouseMotion):  # Log all events other than MouseMotion
+                    event_log.append(repr(event))
 
 
 if __name__ == "__main__":
