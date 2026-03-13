@@ -546,7 +546,7 @@ def bsp_split_once(node: tcod.bsp.BSP, horizontal: bool, position: int) -> None:
 @deprecate("Call node.split_recursive instead.", category=FutureWarning)
 def bsp_split_recursive(
     node: tcod.bsp.BSP,
-    randomizer: tcod.random.Random | None,
+    randomizer: Literal[0] | tcod.random.Random | None,
     nb: int,
     minHSize: int,  # noqa: N803
     minVSize: int,  # noqa: N803
@@ -558,6 +558,8 @@ def bsp_split_recursive(
     .. deprecated:: 2.0
        Use :any:`BSP.split_recursive` instead.
     """
+    if randomizer == 0:
+        randomizer = None
     node.split_recursive(nb, minHSize, minVSize, maxHRatio, maxVRatio, randomizer)
 
 

@@ -12,14 +12,7 @@ import os
 import sys
 import warnings
 
-import tcod as libtcod
-
-try:  # Import Psyco if available
-    import psyco
-
-    psyco.full()
-except ImportError:
-    pass
+from tcod import tcod as libtcod
 
 if not sys.warnoptions:
     warnings.simplefilter("ignore")  # Prevent flood of deprecation warnings.
