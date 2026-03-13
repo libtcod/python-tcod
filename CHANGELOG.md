@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
   - `Drop` event.
   - `KeyboardEvent.pressed`, `KeyboardEvent.which`, `KeyboardEvent.window_id` attributes.
   - `WindowEvent.data` and `WindowEvent.window_id` attributes and added missing SDL3 window events.
+  - `which` and `window_id` attributes for mouse events.
 
 ### Changed
 

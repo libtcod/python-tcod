@@ -446,6 +446,18 @@ class MouseState(Event):
     state: MouseButtonMask = attrs.field(default=MouseButtonMask(0))
     """A bitmask of which mouse buttons are currently held."""
 
+    which: int = 0
+    """The mouse device ID for this event.
+
+    .. versionadded:: Unreleased
+    """
+
+    window_id: int = 0
+    """The window ID with mouse focus.
+
+    .. versionadded:: Unreleased
+    """
+
     @property
     def integer_position(self) -> Point[int]:
         """Integer coordinates of this event.
@@ -547,6 +559,7 @@ class MouseMotion(MouseState):
     @classmethod
     def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
         motion = sdl_event.motion
+        common = {"which": int(motion.which), "window_id": int(motion.windowID)}
         state = MouseButtonMask(motion.state)
 
         pixel = Point(float(motion.x), float(motion.y))
@@ -559,6 +572,7 @@ class MouseMotion(MouseState):
                 tile=None,
                 tile_motion=None,
                 state=state,
+                **common,
                 **_unpack_sdl_event(sdl_event),
             )
         else:
@@ -573,6 +587,7 @@ class MouseMotion(MouseState):
                 tile=tile,
                 tile_motion=tile_motion,
                 state=state,
+                **common,
                 **_unpack_sdl_event(sdl_event),
             )
         self.sdl_event = sdl_event
@@ -601,6 +616,18 @@ class MouseButtonEvent(Event):
         Is now strictly a :any:`MouseButton` type.
     """
 
+    which: int = 0
+    """The mouse device ID for this event.
+
+    .. versionadded:: Unreleased
+    """
+
+    window_id: int = 0
+    """The window ID with mouse focus.
+
+    .. versionadded:: Unreleased
+    """
+
     @classmethod
     def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
         button = sdl_event.button
@@ -610,7 +637,14 @@ class MouseButtonEvent(Event):
             tile: Point[int] | None = None
         else:
             tile = Point(floor(subtile[0]), floor(subtile[1]))
-        self = cls(position=pixel, tile=tile, button=MouseButton(button.button), **_unpack_sdl_event(sdl_event))
+        self = cls(
+            position=pixel,
+            tile=tile,
+            button=MouseButton(button.button),
+            which=int(button.which),
+            window_id=int(button.windowID),
+            **_unpack_sdl_event(sdl_event),
+        )
         self.sdl_event = sdl_event
         return self
 
