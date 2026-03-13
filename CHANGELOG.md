@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
   - `ClipboardUpdate` event.
   - `Drop` event.
   - `KeyboardEvent.pressed`, `KeyboardEvent.which`, `KeyboardEvent.window_id` attributes.
+  - `WindowEvent.data` and `WindowEvent.window_id` attributes and added missing SDL3 window events.
 
 ### Changed
 

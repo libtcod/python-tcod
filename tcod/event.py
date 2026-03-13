@@ -669,65 +669,113 @@ class TextInput(Event):
         return cls(text=str(ffi.string(sdl_event.text.text, 32), encoding="utf8"), **_unpack_sdl_event(sdl_event))
 
 
+_WindowTypes = Literal[
+    "WindowShown",
+    "WindowHidden",
+    "WindowExposed",
+    "WindowMoved",
+    "WindowResized",
+    "PixelSizeChanged",
+    "MetalViewResized",
+    "WindowMinimized",
+    "WindowMaximized",
+    "WindowRestored",
+    "WindowEnter",
+    "WindowLeave",
+    "WindowFocusGained",
+    "WindowFocusLost",
+    "WindowClose",
+    "WindowTakeFocus",
+    "WindowHitTest",
+    "ICCProfileChanged",
+    "DisplayChanged",
+    "DisplayScaleChanged",
+    "SafeAreaChanged",
+    "Occluded",
+    "EnterFullscreen",
+    "LeaveFullscreen",
+    "Destroyed",
+    "HDRStateChanged",
+]
+
+
 @attrs.define(slots=True, kw_only=True)
 class WindowEvent(Event):
-    """A window event."""
+    """A window event.
 
-    type: Final[  # Narrowing final type.
-        Literal[
-            "WindowShown",
-            "WindowHidden",
-            "WindowExposed",
-            "WindowMoved",
-            "WindowResized",
-            "WindowMinimized",
-            "WindowMaximized",
-            "WindowRestored",
-            "WindowEnter",
-            "WindowLeave",
-            "WindowFocusGained",
-            "WindowFocusLost",
-            "WindowClose",
-            "WindowTakeFocus",
-            "WindowHitTest",
-        ]
-    ]
+    Example::
+
+        match event:
+            case tcod.event.WindowEvent(type="WindowShown", window_id=window_id):
+                print(f"Window {window_id} was shown")
+            case tcod.event.WindowEvent(type="WindowHidden", window_id=window_id):
+                print(f"Window {window_id} was hidden")
+            case tcod.event.WindowEvent(type="WindowExposed", window_id=window_id):
+                print(f"Window {window_id} was exposed and needs to be redrawn")
+            case tcod.event.WindowEvent(type="WindowMoved", data=(x, y), window_id=window_id):
+                print(f"Window {window_id} was moved to {x=},{y=}")
+            case tcod.event.WindowEvent(type="WindowResized", data=(width, height), window_id=window_id):
+                print(f"Window {window_id} was resized to {width=},{height=}")
+            case tcod.event.WindowEvent(type="WindowMinimized", window_id=window_id):
+                print(f"Window {window_id} was minimized")
+            case tcod.event.WindowEvent(type="WindowMaximized", window_id=window_id):
+                print(f"Window {window_id} was maximized")
+            case tcod.event.WindowEvent(type="WindowRestored", window_id=window_id):
+                print(f"Window {window_id} was restored")
+            case tcod.event.WindowEvent(type="WindowEnter", window_id=window_id):
+                print(f"Mouse cursor has entered window {window_id}")
+            case tcod.event.WindowEvent(type="WindowLeave", window_id=window_id):
+                print(f"Mouse cursor has left window {window_id}")
+            case tcod.event.WindowEvent(type="WindowFocusGained", window_id=window_id):
+                print(f"Window {window_id} has gained keyboard focus")
+            case tcod.event.WindowEvent(type="WindowFocusLost", window_id=window_id):
+                print(f"Window {window_id} has lost keyboard focus")
+            case tcod.event.WindowEvent(type="WindowClose", window_id=window_id):
+                print(f"Window {window_id} has been closed")
+            case tcod.event.WindowEvent(type="DisplayChanged", data=(display_id, _), window_id=window_id):
+                print(f"Window {window_id} has been moved to display {display_id}")
+            case tcod.event.WindowEvent(type=subtype, data=data, window_id=window_id):
+                print(f"Other window event {subtype} on window {window_id} with {data=}")
+
+    .. versionchanged:: Unreleased
+        Added `data` and `window_id` attributes and added missing SDL3 window events.
+    """
+
+    type: Final[_WindowTypes]
     """The current window event. This can be one of various options."""
+
+    window_id: int
+    """The SDL window ID associated with this event."""
+
+    data: tuple[int, int]
+    """The SDL data associated with this event. What these values are for depends on the event sub-type."""
 
     @classmethod
     def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> WindowEvent | Undefined:
         if sdl_event.type not in _WINDOW_TYPES_FROM_ENUM:
             return Undefined._from_sdl_event(sdl_event)
         event_type: Final = _WINDOW_TYPES_FROM_ENUM[sdl_event.type]
-        self: WindowEvent
+        new_cls = cls
         if sdl_event.type == lib.SDL_EVENT_WINDOW_MOVED:
-            self = WindowMoved(
-                x=int(sdl_event.window.data1), y=int(sdl_event.window.data2), **_unpack_sdl_event(sdl_event)
-            )
-        elif sdl_event.type in (
-            lib.SDL_EVENT_WINDOW_RESIZED,
-            lib.SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED,
-        ):
-            self = WindowResized(
-                type=event_type,  # type: ignore[arg-type] # Currently NOT validated
-                width=int(sdl_event.window.data1),
-                height=int(sdl_event.window.data2),
-                **_unpack_sdl_event(sdl_event),
-            )
-        else:
-            self = cls(
-                type=event_type,  # type: ignore[arg-type] # Currently NOT validated
-                **_unpack_sdl_event(sdl_event),
-            )
-        return self
+            new_cls = WindowMoved
+        elif sdl_event.type == lib.SDL_EVENT_WINDOW_RESIZED:
+            new_cls = WindowResized
+        return new_cls(
+            type=event_type,
+            window_id=int(sdl_event.window.windowID),
+            data=(int(sdl_event.window.data1), int(sdl_event.window.data2)),
+            **_unpack_sdl_event(sdl_event),
+        )
 
 
-_WINDOW_TYPES_FROM_ENUM: Final = {
+_WINDOW_TYPES_FROM_ENUM: Final[dict[int, _WindowTypes]] = {
     lib.SDL_EVENT_WINDOW_SHOWN: "WindowShown",
     lib.SDL_EVENT_WINDOW_HIDDEN: "WindowHidden",
     lib.SDL_EVENT_WINDOW_EXPOSED: "WindowExposed",
     lib.SDL_EVENT_WINDOW_MOVED: "WindowMoved",
     lib.SDL_EVENT_WINDOW_RESIZED: "WindowResized",
+    lib.SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED: "PixelSizeChanged",
+    lib.SDL_EVENT_WINDOW_METAL_VIEW_RESIZED: "MetalViewResized",
     lib.SDL_EVENT_WINDOW_MINIMIZED: "WindowMinimized",
     lib.SDL_EVENT_WINDOW_MAXIMIZED: "WindowMaximized",
     lib.SDL_EVENT_WINDOW_RESTORED: "WindowRestored",
@@ -737,42 +785,50 @@ _WINDOW_TYPES_FROM_ENUM: Final = {
     lib.SDL_EVENT_WINDOW_FOCUS_LOST: "WindowFocusLost",
     lib.SDL_EVENT_WINDOW_CLOSE_REQUESTED: "WindowClose",
     lib.SDL_EVENT_WINDOW_HIT_TEST: "WindowHitTest",
+    lib.SDL_EVENT_WINDOW_ICCPROF_CHANGED: "ICCProfileChanged",
+    lib.SDL_EVENT_WINDOW_DISPLAY_CHANGED: "DisplayChanged",
+    lib.SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED: "DisplayScaleChanged",
+    lib.SDL_EVENT_WINDOW_SAFE_AREA_CHANGED: "SafeAreaChanged",
+    lib.SDL_EVENT_WINDOW_OCCLUDED: "Occluded",
+    lib.SDL_EVENT_WINDOW_ENTER_FULLSCREEN: "EnterFullscreen",
+    lib.SDL_EVENT_WINDOW_LEAVE_FULLSCREEN: "LeaveFullscreen",
+    lib.SDL_EVENT_WINDOW_DESTROYED: "Destroyed",
+    lib.SDL_EVENT_WINDOW_HDR_STATE_CHANGED: "HDRStateChanged",
 }
 
 
 @attrs.define(slots=True, kw_only=True)
 class WindowMoved(WindowEvent):
-    """Window moved event.
+    """Window moved event."""
 
-    Attributes:
-        x (int): Movement on the x-axis.
-        y (int): Movement on the y-axis.
-    """
+    @property
+    def x(self) -> int:
+        """Movement on the x-axis."""
+        return self.data[0]
 
-    type: Final[Literal["WINDOWMOVED"]] = "WINDOWMOVED"  # type: ignore[assignment,misc]
-    """Always "WINDOWMOVED"."""
-
-    x: int
-    y: int
+    @property
+    def y(self) -> int:
+        """Movement on the y-axis."""
+        return self.data[1]
 
 
 @attrs.define(slots=True, kw_only=True)
 class WindowResized(WindowEvent):
     """Window resized event.
 
-    Attributes:
-        width (int): The current width of the window.
-        height (int): The current height of the window.
-
     .. versionchanged:: 19.4
         Removed "WindowSizeChanged" type.
     """
 
-    type: Final[Literal["WindowResized"]] = "WindowResized"  # type: ignore[misc]
-    """Always "WindowResized"."""
+    @property
+    def width(self) -> int:
+        """The current width of the window."""
+        return self.data[0]
 
-    width: int
-    height: int
+    @property
+    def height(self) -> int:
+        """The current height of the window."""
+        return self.data[1]
 
 
 @attrs.define(slots=True, kw_only=True)
