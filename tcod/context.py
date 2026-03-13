@@ -68,7 +68,7 @@ __all__ = (
     "new_window",
 )
 
-_Event = TypeVar("_Event", bound=tcod.event.Event)
+_Event = TypeVar("_Event", bound="tcod.event.Event")
 
 SDL_WINDOW_FULLSCREEN = lib.SDL_WINDOW_FULLSCREEN
 """Fullscreen mode."""
