@@ -22,6 +22,7 @@ import numpy as np
 import tcod.bsp
 import tcod.cffi
 import tcod.console
+import tcod.constants
 import tcod.context
 import tcod.event
 import tcod.image
@@ -76,15 +77,18 @@ def _get_elapsed_time() -> float:
 
 
 class Sample:
+    """Samples base class."""
+
     name: str = "???"
 
     def on_enter(self) -> None:
-        pass
+        """Called when entering a sample."""
 
     def on_draw(self) -> None:
-        pass
+        """Called every frame."""
 
     def on_event(self, event: tcod.event.Event) -> None:
+        """Called for each event."""
         global cur_sample
         match event:
             case tcod.event.Quit() | tcod.event.KeyDown(sym=KeySym.ESCAPE):
@@ -114,9 +118,12 @@ class Sample:
 
 
 class TrueColorSample(Sample):
+    """Simple performance benchmark."""
+
     name = "True colors"
 
     def __init__(self) -> None:
+        """Initialize random generators."""
         self.noise = tcod.noise.Noise(2, tcod.noise.Algorithm.SIMPLEX)
         """Noise for generating color."""
 
@@ -124,6 +131,7 @@ class TrueColorSample(Sample):
         """Numpy generator for random text."""
 
     def on_draw(self) -> None:
+        """Draw this sample."""
         self.interpolate_corner_colors()
         self.darken_background_characters()
         self.randomize_sample_console()
@@ -178,9 +186,15 @@ class TrueColorSample(Sample):
 
 
 class OffscreenConsoleSample(Sample):
+    """Console blit example."""
+
     name = "Offscreen console"
 
+    CONSOLE_MOVE_RATE = 1 / 2
+    CONSOLE_MOVE_MARGIN = 5
+
     def __init__(self) -> None:
+        """Initialize the offscreen console."""
         self.secondary = tcod.console.Console(sample_console.width // 2, sample_console.height // 2)
         self.screenshot = tcod.console.Console(sample_console.width, sample_console.height)
         self.counter = 0.0
@@ -189,57 +203,51 @@ class OffscreenConsoleSample(Sample):
         self.x_dir = 1
         self.y_dir = 1
 
-        self.secondary.draw_frame(
+        self.secondary.draw_frame(0, 0, self.secondary.width, self.secondary.height, clear=False, fg=WHITE, bg=BLACK)
+        self.secondary.print(
             0,
             0,
-            sample_console.width // 2,
-            sample_console.height // 2,
-            "Offscreen console",
-            clear=False,
-            fg=WHITE,
-            bg=BLACK,
+            width=self.secondary.width,
+            height=self.secondary.height,
+            text=" Offscreen console ",
+            fg=BLACK,
+            bg=WHITE,
+            alignment=tcod.constants.CENTER,
         )
 
-        self.secondary.print_box(
-            1,
-            2,
-            sample_console.width // 2 - 2,
-            sample_console.height // 2,
-            "You can render to an offscreen console and blit in on another one, simulating alpha transparency.",
+        self.secondary.print(
+            x=1,
+            y=2,
+            width=sample_console.width // 2 - 2,
+            height=sample_console.height // 2,
+            text="You can render to an offscreen console and blit in on another one, simulating alpha transparency.",
             fg=WHITE,
             bg=None,
             alignment=libtcodpy.CENTER,
         )
 
     def on_enter(self) -> None:
+        """Capture the previous sample screen as this samples background."""
         self.counter = _get_elapsed_time()
-        # get a "screenshot" of the current sample screen
-        sample_console.blit(dest=self.screenshot)
+        sample_console.blit(dest=self.screenshot)  # get a "screenshot" of the current sample screen
 
     def on_draw(self) -> None:
-        if _get_elapsed_time() - self.counter >= 1:
+        """Draw and animate the offscreen console."""
+        if _get_elapsed_time() - self.counter >= self.CONSOLE_MOVE_RATE:
             self.counter = _get_elapsed_time()
             self.x += self.x_dir
             self.y += self.y_dir
-            if self.x == sample_console.width / 2 + 5:
+            if self.x == sample_console.width / 2 + self.CONSOLE_MOVE_MARGIN:
                 self.x_dir = -1
-            elif self.x == -5:
+            elif self.x == -self.CONSOLE_MOVE_MARGIN:
                 self.x_dir = 1
-            if self.y == sample_console.height / 2 + 5:
+            if self.y == sample_console.height / 2 + self.CONSOLE_MOVE_MARGIN:
                 self.y_dir = -1
-            elif self.y == -5:
+            elif self.y == -self.CONSOLE_MOVE_MARGIN:
                 self.y_dir = 1
         self.screenshot.blit(sample_console)
         self.secondary.blit(
-            sample_console,
-            self.x,
-            self.y,
-            0,
-            0,
-            sample_console.width // 2,
-            sample_console.height // 2,
-            1.0,
-            0.75,
+            sample_console, self.x, self.y, 0, 0, sample_console.width // 2, sample_console.height // 2, 1.0, 0.75
         )
 
 
@@ -298,9 +306,7 @@ class LineDrawingSample(Sample):
         for x in range(sample_console.width):
             value = x * 255 // sample_console.width
             col = (value, value, value)
-            libtcodpy.console_set_char_background(sample_console, x, rect_y, col, self.bk_flag)
-            libtcodpy.console_set_char_background(sample_console, x, rect_y + 1, col, self.bk_flag)
-            libtcodpy.console_set_char_background(sample_console, x, rect_y + 2, col, self.bk_flag)
+            sample_console.draw_rect(x=x, y=rect_y, width=1, height=3, ch=0, fg=None, bg=col, bg_blend=self.bk_flag)
         angle = time.time() * 2.0
         cos_angle = math.cos(angle)
         sin_angle = math.sin(angle)
@@ -312,14 +318,8 @@ class LineDrawingSample(Sample):
         # in python the easiest way is to use the line iterator
         for x, y in tcod.los.bresenham((xo, yo), (xd, yd)).tolist():
             if 0 <= x < sample_console.width and 0 <= y < sample_console.height:
-                libtcodpy.console_set_char_background(sample_console, x, y, LIGHT_BLUE, self.bk_flag)
-        sample_console.print(
-            2,
-            2,
-            f"{self.FLAG_NAMES[self.bk_flag & 0xFF]} (ENTER to change)",
-            fg=WHITE,
-            bg=None,
-        )
+                sample_console.draw_rect(x, y, width=1, height=1, ch=0, fg=None, bg=LIGHT_BLUE, bg_blend=self.bk_flag)
+        sample_console.print(2, 2, f"{self.FLAG_NAMES[self.bk_flag & 0xFF]} (ENTER to change)", fg=WHITE, bg=None)
 
 
 class NoiseSample(Sample):
