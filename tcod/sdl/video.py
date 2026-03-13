@@ -177,7 +177,7 @@ class Window:
     def __init__(self, sdl_window_p: Any | int) -> None:  # noqa: ANN401
         """Wrap a SDL_Window pointer or SDL WindowID.
 
-        .. versionchanged:: Unreleased
+        .. versionchanged:: 21.0
             Now accepts `int` types as an SDL WindowID.
         """
         if isinstance(sdl_window_p, int):

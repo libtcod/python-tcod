@@ -338,7 +338,7 @@ class Event:
     .. seealso::
         :any:`tcod.event.time_ns`
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 21.0
     """
 
     @property
@@ -348,7 +348,7 @@ class Event:
         .. seealso::
             :any:`tcod.event.time`
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 21.0
         """
         return self.timestamp_ns / 1_000_000_000
 
@@ -357,7 +357,7 @@ class Event:
     def type(self) -> str:
         """This events type.
 
-        .. deprecated:: Unreleased
+        .. deprecated:: 21.0
             Using this attribute is now actively discouraged. Use :func:`isinstance` or :ref:`match`.
 
         :meta private:
@@ -371,7 +371,7 @@ class Event:
     def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Event:
         """Return a class instance from a python-cffi 'SDL_Event*' pointer.
 
-        .. versionchanged:: Unreleased
+        .. versionchanged:: 21.0
             This method was unsuitable for the public API and is now private.
         """
         raise NotImplementedError
@@ -415,17 +415,17 @@ class KeyboardEvent(Event):
     which: int = 0
     """The SDL keyboard instance ID. Zero if unknown or virtual.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 21.0
     """
     window_id: int = 0
     """The SDL window ID with keyboard focus.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 21.0
     """
     pressed: bool = False
     """True if the key was pressed, False if the key was released.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 21.0
     """
 
     @classmethod
@@ -473,20 +473,20 @@ class MouseState(Event):
     which: int = 0
     """The mouse device ID for this event.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 21.0
     """
 
     window_id: int = 0
     """The window ID with mouse focus.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 21.0
     """
 
     @property
     def integer_position(self) -> Point[int]:
         """Integer coordinates of this event.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 21.0
         """
         x, y = self.position
         return Point(floor(x), floor(y))
@@ -508,7 +508,7 @@ class MouseState(Event):
     def tile(self) -> Point[int]:
         """The integer tile coordinates of the mouse on the screen.
 
-        .. deprecated:: Unreleased
+        .. deprecated:: 21.0
             Use :any:`integer_position` of the event returned by :any:`Context.convert_event` instead.
         """
         return _verify_tile_coordinates(self._tile)
@@ -542,7 +542,7 @@ class MouseMotion(MouseState):
     def integer_motion(self) -> Point[int]:
         """Integer motion of this event.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 21.0
         """
         x, y = self.position
         dx, dy = self.motion
@@ -567,7 +567,7 @@ class MouseMotion(MouseState):
     def tile_motion(self) -> Point[int]:
         """The tile delta.
 
-        .. deprecated:: Unreleased
+        .. deprecated:: 21.0
             Use :any:`integer_motion` of the event returned by :any:`Context.convert_event` instead.
         """
         return _verify_tile_coordinates(self._tile_motion)
@@ -625,7 +625,7 @@ class MouseButtonEvent(Event):
     .. versionchanged:: 19.0
         `position` and `tile` now use floating point coordinates.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 21.0
         No longer a subclass of :any:`MouseState`.
     """
 
@@ -636,20 +636,20 @@ class MouseButtonEvent(Event):
     button: MouseButton
     """Which mouse button index was pressed or released in this event.
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 21.0
         Is now strictly a :any:`MouseButton` type.
     """
 
     which: int = 0
     """The mouse device ID for this event.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 21.0
     """
 
     window_id: int = 0
     """The window ID with mouse focus.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 21.0
     """
 
     @classmethod
@@ -795,7 +795,7 @@ class WindowEvent(Event):
             case tcod.event.WindowEvent(type=subtype, data=data, window_id=window_id):
                 print(f"Other window event {subtype} on window {window_id} with {data=}")
 
-    .. versionchanged:: Unreleased
+    .. versionchanged:: 21.0
         Added `data` and `window_id` attributes and added missing SDL3 window events.
     """
 
@@ -1013,7 +1013,7 @@ class JoystickButton(JoystickEvent):
     def type(self) -> Literal["JOYBUTTONUP", "JOYBUTTONDOWN"]:
         """Button state as a string.
 
-        .. deprecated:: Unreleased
+        .. deprecated:: 21.0
             Use :any:`pressed` instead.
         """
         return ("JOYBUTTONUP", "JOYBUTTONDOWN")[self.pressed]
@@ -1122,7 +1122,7 @@ class ControllerButton(ControllerEvent):
     def type(self) -> Literal["CONTROLLERBUTTONUP", "CONTROLLERBUTTONDOWN"]:
         """Button state as a string.
 
-        .. deprecated:: Unreleased
+        .. deprecated:: 21.0
             Use :any:`pressed` instead.
         """
         return ("CONTROLLERBUTTONUP", "CONTROLLERBUTTONDOWN")[self.pressed]
@@ -1160,7 +1160,7 @@ class ControllerDevice(ControllerEvent):
 class ClipboardUpdate(Event):
     """Announces changed contents of the clipboard.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 21.0
     """
 
     mime_types: tuple[str, ...]
@@ -1195,7 +1195,7 @@ class Drop(Event):
             case tcod.event.Drop(type="COMPLETE"):
                 print("Drop handling finished")
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 21.0
     """
 
     type: Literal["BEGIN", "FILE", "TEXT", "COMPLETE", "POSITION"]
@@ -3097,7 +3097,7 @@ def __getattr__(name: str) -> int:
 def time_ns() -> int:
     """Return the nanoseconds elapsed since SDL was initialized.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 21.0
     """
     return int(lib.SDL_GetTicksNS())
 
@@ -3105,7 +3105,7 @@ def time_ns() -> int:
 def time() -> float:
     """Return the seconds elapsed since SDL was initialized.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 21.0
     """
     return time_ns() / 1_000_000_000
 

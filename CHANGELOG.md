@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [21.0.0] - 2026-03-13
+
 ### Added
 
 - `tcod.sdl.video.Window` now accepts an SDL WindowID.
@@ -39,6 +41,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 - Fixed incorrect C FFI types inside `tcod.event.get_mouse_state`.
 - Fixed regression in mouse event tile coordinates being `float` instead of `int`.
   `convert_coordinates_from_window` can be used if sub-tile coordinates were desired.
+- Fixed regression in `libtcodpy.bsp_split_recursive` not accepting `0`.
 
 ## [20.1.0] - 2026-02-25
 
