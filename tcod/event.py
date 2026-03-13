@@ -682,12 +682,12 @@ class MouseButtonEvent(Event):
 
 @attrs.define(slots=True, kw_only=True)
 class MouseButtonDown(MouseButtonEvent):
-    """Same as MouseButtonEvent but with ``type="MouseButtonDown"``."""
+    """Mouse button has been pressed."""
 
 
 @attrs.define(slots=True, kw_only=True)
 class MouseButtonUp(MouseButtonEvent):
-    """Same as MouseButtonEvent but with ``type="MouseButtonUp"``."""
+    """Mouse button has been released."""
 
 
 @attrs.define(slots=True, kw_only=True)
