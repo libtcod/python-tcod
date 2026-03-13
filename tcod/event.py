@@ -314,12 +314,14 @@ class _CommonSDLEventAttributes(TypedDict):
     """Common keywords for Event subclasses."""
 
     sdl_event: _C_SDL_Event
+    timestamp_ns: int
 
 
 def _unpack_sdl_event(sdl_event: _C_SDL_Event) -> _CommonSDLEventAttributes:
     """Unpack an SDL_Event union into common attributes, such as timestamp."""
     return {
         "sdl_event": sdl_event,
+        "timestamp_ns": sdl_event.common.timestamp,
     }
 
 
@@ -328,7 +330,27 @@ class Event:
     """The base event class."""
 
     sdl_event: _C_SDL_Event = attrs.field(default=None, eq=False, repr=False)
-    """When available, this holds a python-cffi 'SDL_Event*' pointer. All sub-classes have this attribute."""
+    """Holds a python-cffi ``SDL_Event*`` pointer for this event when available."""
+
+    timestamp_ns: int = attrs.field(default=0, eq=False)
+    """The time of this event in nanoseconds since SDL has been initialized.
+
+    .. seealso::
+        :any:`tcod.event.time_ns`
+
+    .. versionadded:: Unreleased
+    """
+
+    @property
+    def timestamp(self) -> float:
+        """The time of this event in seconds since SDL has been initialized.
+
+        .. seealso::
+            :any:`tcod.event.time`
+
+        .. versionadded:: Unreleased
+        """
+        return self.timestamp_ns / 1_000_000_000
 
     @property
     @deprecated("The Event.type attribute is deprecated, use isinstance instead.")
@@ -337,6 +359,8 @@ class Event:
 
         .. deprecated:: Unreleased
             Using this attribute is now actively discouraged. Use :func:`isinstance` or :ref:`match`.
+
+        :meta private:
         """
         type_override: str | None = getattr(self, "_type", None)
         if type_override is not None:
@@ -3070,6 +3094,22 @@ def __getattr__(name: str) -> int:
     return value
 
 
+def time_ns() -> int:
+    """Return the nanoseconds elapsed since SDL was initialized.
+
+    .. versionadded:: Unreleased
+    """
+    return int(lib.SDL_GetTicksNS())
+
+
+def time() -> float:
+    """Return the seconds elapsed since SDL was initialized.
+
+    .. versionadded:: Unreleased
+    """
+    return time_ns() / 1_000_000_000
+
+
 __all__ = (  # noqa: F405 RUF022
     "Point",
     "Modifier",
@@ -3111,6 +3151,8 @@ __all__ = (  # noqa: F405 RUF022
     "get_modifier_state",
     "Scancode",
     "KeySym",
+    "time_ns",
+    "time",
     # --- From event_constants.py ---
     "MOUSEWHEEL_NORMAL",
     "MOUSEWHEEL_FLIPPED",
