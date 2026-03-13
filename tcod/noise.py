@@ -66,6 +66,7 @@ class Algorithm(enum.IntEnum):
     """Wavelet noise."""
 
     def __repr__(self) -> str:
+        """Return the string representation for this algorithm."""
         return f"tcod.noise.Algorithm.{self.name}"
 
 
@@ -88,6 +89,7 @@ class Implementation(enum.IntEnum):
     """Turbulence noise implementation."""
 
     def __repr__(self) -> str:
+        """Return the string representation for this implementation."""
         return f"tcod.noise.Implementation.{self.name}"
 
 
@@ -161,16 +163,17 @@ class Noise:
         return seed
 
     def __repr__(self) -> str:
+        """Return the string representation of this noise instance."""
         parameters = [
             f"dimensions={self.dimensions}",
             f"algorithm={self.algorithm!r}",
             f"implementation={Implementation(self.implementation)!r}",
         ]
-        if self.hurst != 0.5:
+        if self.hurst != 0.5:  # noqa: PLR2004 # Default value
             parameters.append(f"hurst={self.hurst}")
-        if self.lacunarity != 2:
+        if self.lacunarity != 2:  # noqa: PLR2004 # Default value
             parameters.append(f"lacunarity={self.lacunarity}")
-        if self.octaves != 4:
+        if self.octaves != 4:  # noqa: PLR2004 # Default value
             parameters.append(f"octaves={self.octaves}")
         if self._seed is not None:
             parameters.append(f"seed={self._seed}")
@@ -178,10 +181,12 @@ class Noise:
 
     @property
     def dimensions(self) -> int:
+        """Number of dimensions supported by this noise generator."""
         return int(self._tdl_noise_c.dimensions)
 
     @property
     def algorithm(self) -> int:
+        """Current selected algorithm. Can be changed."""
         noise_type = self.noise_c.noise_type
         return Algorithm(noise_type) if noise_type else Algorithm.SIMPLEX
 
@@ -191,6 +196,7 @@ class Noise:
 
     @property
     def implementation(self) -> int:
+        """Current selected implementation. Can be changed."""
         return Implementation(self._tdl_noise_c.implementation)
 
     @implementation.setter
@@ -202,14 +208,17 @@ class Noise:
 
     @property
     def hurst(self) -> float:
+        """Noise hurst exponent. Can be changed."""
         return float(self.noise_c.H)
 
     @property
     def lacunarity(self) -> float:
+        """Noise lacunarity. Can be changed."""
         return float(self.noise_c.lacunarity)
 
     @property
     def octaves(self) -> float:
+        """Level of detail on fBm and turbulence implementations. Can be changed."""
         return float(self._tdl_noise_c.octaves)
 
     @octaves.setter
@@ -343,6 +352,7 @@ class Noise:
         return out
 
     def __getstate__(self) -> dict[str, Any]:
+        """Support picking this instance."""
         state = self.__dict__.copy()
         if self.dimensions < 4 and self.noise_c.waveletTileData == ffi.NULL:  # noqa: PLR2004
             # Trigger a side effect of wavelet, so that copies will be synced.
@@ -374,6 +384,7 @@ class Noise:
         return state
 
     def __setstate__(self, state: dict[str, Any]) -> None:
+        """Unpickle this instance."""
         if isinstance(state, tuple):  # deprecated format
             return self._setstate_old(state)
         # unpack wavelet tile data if it exists

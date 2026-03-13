@@ -571,7 +571,7 @@ class Renderer:
         See https://wiki.libsdl.org/SDL3/SDL_RenderReadPixels
 
         Returns:
-            The output uint8 array of shape: ``(height, width, channels)`` with the fetched pixels.
+            The output uint8 array of shape ``(height, width, channels)`` with the fetched pixels.
 
         .. versionadded:: 15.0
 

@@ -103,6 +103,7 @@ class Joystick:
     """Currently opened joysticks."""
 
     def __init__(self, sdl_joystick_p: Any) -> None:  # noqa: ANN401
+        """Wrap an SDL joystick C pointer."""
         self.sdl_joystick_p: Final = sdl_joystick_p
         """The CFFI pointer to an SDL_Joystick struct."""
         self.axes: Final[int] = _check_int(lib.SDL_GetNumJoystickAxes(self.sdl_joystick_p), failure=-1)
@@ -135,11 +136,13 @@ class Joystick:
         return cls._by_instance_id[instance_id]
 
     def __eq__(self, other: object) -> bool:
+        """Return True if `self` and `other` refer to the same joystick."""
         if isinstance(other, Joystick):
             return self.id == other.id
         return NotImplemented
 
     def __hash__(self) -> int:
+        """Return the joystick id as a hash."""
         return hash(self.id)
 
     def _get_guid(self) -> str:
@@ -173,6 +176,7 @@ class GameController:
     """Currently opened controllers."""
 
     def __init__(self, sdl_controller_p: Any) -> None:  # noqa: ANN401
+        """Wrap an SDL controller C pointer."""
         self.sdl_controller_p: Final = sdl_controller_p
         self.joystick: Final = Joystick(lib.SDL_GetGamepadJoystick(self.sdl_controller_p))
         """The :any:`Joystick` associated with this controller."""
@@ -200,11 +204,13 @@ class GameController:
         return int(lib.SDL_GetGamepadAxis(self.sdl_controller_p, axis))
 
     def __eq__(self, other: object) -> bool:
+        """Return True if `self` and `other` are both controllers referring to the same joystick."""
         if isinstance(other, GameController):
             return self.joystick.id == other.joystick.id
         return NotImplemented
 
     def __hash__(self) -> int:
+        """Return the joystick id as a hash."""
         return hash(self.joystick.id)
 
     # These could exist as convenience functions, but the get_X functions are probably better.

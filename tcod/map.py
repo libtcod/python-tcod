@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Final, Literal
 
 import numpy as np
 from typing_extensions import deprecated
@@ -30,13 +30,6 @@ class Map:
         width (int): Width of the new Map.
         height (int): Height of the new Map.
         order (str): Which numpy memory order to use.
-
-    Attributes:
-        width (int): Read only width of this Map.
-        height (int): Read only height of this Map.
-        transparent: A boolean array of transparent cells.
-        walkable: A boolean array of walkable cells.
-        fov: A boolean array of the cells lit by :any:'compute_fov'.
 
     Example::
 
@@ -80,8 +73,10 @@ class Map:
         order: Literal["C", "F"] = "C",
     ) -> None:
         """Initialize the map."""
-        self.width = width
-        self.height = height
+        self.width: Final = width
+        """Read only width of this Map."""
+        self.height: Final = height
+        """Read only height of this Map."""
         self._order: Literal["C", "F"] = tcod._internal.verify_order(order)
 
         self._buffer: NDArray[np.bool_] = np.zeros((height, width, 3), dtype=np.bool_)
@@ -100,16 +95,19 @@ class Map:
 
     @property
     def transparent(self) -> NDArray[np.bool_]:
+        """A boolean array of transparent cells."""
         buffer: np.ndarray[Any, np.dtype[np.bool_]] = self._buffer[:, :, 0]
         return buffer.T if self._order == "F" else buffer
 
     @property
     def walkable(self) -> NDArray[np.bool_]:
+        """A boolean array of walkable cells."""
         buffer: np.ndarray[Any, np.dtype[np.bool_]] = self._buffer[:, :, 1]
         return buffer.T if self._order == "F" else buffer
 
     @property
     def fov(self) -> NDArray[np.bool_]:
+        """A boolean array of the cells lit by :any:'compute_fov'."""
         buffer: np.ndarray[Any, np.dtype[np.bool_]] = self._buffer[:, :, 2]
         return buffer.T if self._order == "F" else buffer
 
@@ -146,6 +144,7 @@ class Map:
         lib.TCOD_map_compute_fov(self.map_c, x, y, radius, light_walls, algorithm)
 
     def __setstate__(self, state: dict[str, Any]) -> None:
+        """Unpickle this instance."""
         if "_Map__buffer" in state:  # Deprecated since 19.6
             state["_buffer"] = state.pop("_Map__buffer")
         if "buffer" in state:  # Deprecated
@@ -159,6 +158,7 @@ class Map:
         self.map_c = self.__as_cdata()
 
     def __getstate__(self) -> dict[str, Any]:
+        """Pickle this instance."""
         state = self.__dict__.copy()
         del state["map_c"]
         return state

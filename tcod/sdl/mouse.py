@@ -28,6 +28,7 @@ class Cursor:
     """A cursor icon for use with :any:`set_cursor`."""
 
     def __init__(self, sdl_cursor_p: Any) -> None:  # noqa: ANN401
+        """Wrap an SDL cursor C pointer."""
         if ffi.typeof(sdl_cursor_p) is not ffi.typeof("struct SDL_Cursor*"):
             msg = f"Expected a {ffi.typeof('struct SDL_Cursor*')} type (was {ffi.typeof(sdl_cursor_p)})."
             raise TypeError(msg)
@@ -37,9 +38,13 @@ class Cursor:
         self.p = sdl_cursor_p
 
     def __eq__(self, other: object) -> bool:
-        return bool(self.p == getattr(other, "p", None))
+        """Return True if `self` is the same cursor as `other`."""
+        if isinstance(other, Cursor):
+            return bool(self.p == getattr(other, "p", None))
+        return NotImplemented
 
     def __hash__(self) -> int:
+        """Returns the hash of this objects C pointer."""
         return hash(self.p)
 
     @classmethod

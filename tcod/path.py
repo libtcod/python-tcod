@@ -112,6 +112,7 @@ class EdgeCostCallback(_EdgeCostFunc):
         callback: Callable[[int, int, int, int], float],
         shape: tuple[int, int],
     ) -> None:
+        """Initialize this callback."""
         self.callback = callback
         super().__init__(callback, shape)
 
@@ -139,6 +140,7 @@ class NodeCostArray(np.ndarray):
         return np.asarray(array).view(cls)
 
     def __repr__(self) -> str:
+        """Return the string representation of this object."""
         return f"{self.__class__.__name__}({repr(self.view(np.ndarray))!r})"
 
     def get_tcod_path_ffi(self) -> tuple[Any, Any, tuple[int, int]]:
@@ -1068,10 +1070,12 @@ class SimpleGraph:
 
     @property
     def ndim(self) -> int:
+        """Number of dimensions."""
         return 2
 
     @property
     def shape(self) -> tuple[int, int]:
+        """Shape of this graph."""
         return self._shape
 
     @property
