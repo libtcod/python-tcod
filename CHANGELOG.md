@@ -6,6 +6,14 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Added
+
+- `MouseButtonEvent.integer_position` property.
+
+## Fixed
+
+- `integer_position` was missing from mouse button events.
+
 ## [21.0.0] - 2026-03-13
 
 ### Added

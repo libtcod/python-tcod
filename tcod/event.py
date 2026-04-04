@@ -652,6 +652,15 @@ class MouseButtonEvent(Event):
     .. versionadded:: 21.0
     """
 
+    @property
+    def integer_position(self) -> Point[int]:
+        """Integer coordinates of this event.
+
+        .. versionadded:: Unreleased
+        """
+        x, y = self.position
+        return Point(floor(x), floor(y))
+
     @classmethod
     def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
         button = sdl_event.button
