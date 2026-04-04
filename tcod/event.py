@@ -27,21 +27,19 @@ Example::
     while True:
         console = context.new_console()
         context.present(console, integer_scaling=True)
-        for event in tcod.event.wait():
-            context.convert_event(event)  # Adds tile coordinates to mouse events.
+        for pixel_event in tcod.event.wait():
+            event = context.convert_event(pixel_event)  # Convert mouse pixel coordinates to tile coordinates
+            print(event)  # Print all events, for learning and debugging
             if isinstance(event, tcod.event.Quit):
-                print(event)
                 raise SystemExit()
             elif isinstance(event, tcod.event.KeyDown):
-                print(event)  # Prints the Scancode and KeySym enums for this event.
+                print(f"{event.sym=}, {event.scancode=}")  # Show Scancode and KeySym enum names
                 if event.sym in KEY_COMMANDS:
                     print(f"Command: {KEY_COMMANDS[event.sym]}")
             elif isinstance(event, tcod.event.MouseButtonDown):
-                print(event)  # Prints the mouse button constant names for this event.
+                print(f"{event.button=}, {event.integer_position=}")  # Show mouse button and tile
             elif isinstance(event, tcod.event.MouseMotion):
-                print(event)  # Prints the mouse button mask bits in a readable format.
-            else:
-                print(event)  # Print any unhandled events.
+                print(f"{event.integer_position=}, {event.integer_motion=}")  # Current mouse tile and tile motion
 
 Python 3.10 introduced `match statements <https://docs.python.org/3/tutorial/controlflow.html#match-statements>`_
 which can be used to dispatch events more gracefully:
@@ -61,8 +59,8 @@ Example::
     while True:
         console = context.new_console()
         context.present(console, integer_scaling=True)
-        for event in tcod.event.wait():
-            context.convert_event(event)  # Adds tile coordinates to mouse events.
+        for pixel_event in tcod.event.wait():
+            event = context.convert_event(pixel_event)  # Converts mouse pixel coordinates to tile coordinates.
             match event:
                 case tcod.event.Quit():
                     raise SystemExit()
@@ -70,12 +68,14 @@ Example::
                     print(f"Command: {KEY_COMMANDS[sym]}")
                 case tcod.event.KeyDown(sym=sym, scancode=scancode, mod=mod, repeat=repeat):
                     print(f"KeyDown: {sym=}, {scancode=}, {mod=}, {repeat=}")
-                case tcod.event.MouseButtonDown(button=button, pixel=pixel, tile=tile):
-                    print(f"MouseButtonDown: {button=}, {pixel=}, {tile=}")
-                case tcod.event.MouseMotion(pixel=pixel, pixel_motion=pixel_motion, tile=tile, tile_motion=tile_motion):
-                    print(f"MouseMotion: {pixel=}, {pixel_motion=}, {tile=}, {tile_motion=}")
+                case tcod.event.MouseButtonDown(button=button, integer_position=tile):
+                    print(f"MouseButtonDown: {button=}, {tile=}")
+                case tcod.event.MouseMotion(integer_position=tile, integer_motion=tile_motion):
+                    assert isinstance(pixel_event, tcod.event.MouseMotion)
+                    pixel_motion = pixel_event.motion
+                    print(f"MouseMotion: {pixel_motion=}, {tile=}, {tile_motion=}")
                 case tcod.event.Event() as event:
-                    print(event)  # Show any unhandled events.
+                    print(event)  # Print unhandled events
 
 .. versionadded:: 8.4
 """
