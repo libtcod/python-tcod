@@ -6,6 +6,14 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Added
+
+- `tcod.event.MouseWheel` now has `which`, `window_id`, `position` and `integer_position` attributes.
+
+## Fixed
+
+- `tcod.event.convert_coordinates_from_window` was not converting all types of mouse events.
+
 ## [21.1.0] - 2026-04-04
 
 ### Added

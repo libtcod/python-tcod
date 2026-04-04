@@ -255,10 +255,11 @@ class Context:
             Now returns a new event with the coordinates converted into tiles.
         """
         event_copy = copy.copy(event)
-        if isinstance(event, (tcod.event.MouseState, tcod.event.MouseMotion, tcod.event.MouseButtonEvent)):
-            assert isinstance(event_copy, (tcod.event.MouseState, tcod.event.MouseMotion, tcod.event.MouseButtonEvent))
+        if isinstance(event, tcod.event._MouseEventWithPosition):
+            assert isinstance(event_copy, tcod.event._MouseEventWithPosition)
             event_copy.position = tcod.event.Point(*self.pixel_to_tile(event.position[0], event.position[1]))
-            event._tile = tcod.event.Point(floor(event_copy.position[0]), floor(event_copy.position[1]))
+            if isinstance(event, tcod.event._MouseEventWithTile):
+                event._tile = tcod.event.Point(floor(event_copy.position[0]), floor(event_copy.position[1]))
         if isinstance(event, tcod.event.MouseMotion):
             assert isinstance(event_copy, tcod.event.MouseMotion)
             assert event._tile is not None

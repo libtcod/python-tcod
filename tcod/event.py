@@ -89,7 +89,20 @@ import warnings
 from collections.abc import Callable, Iterator, Mapping
 from math import floor
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Final, Generic, Literal, NamedTuple, TypeAlias, TypedDict, TypeVar, overload
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Final,
+    Generic,
+    Literal,
+    NamedTuple,
+    Protocol,
+    TypeAlias,
+    TypedDict,
+    TypeVar,
+    overload,
+    runtime_checkable,
+)
 
 import attrs
 import numpy as np
@@ -630,7 +643,7 @@ class MouseButtonEvent(Event):
     """
 
     position: Point[float] = attrs.field(default=Point(0.0, 0.0))
-    """The pixel coordinates of the mouse."""
+    """The coordinates of the mouse."""
     _tile: Point[int] | None = attrs.field(default=Point(0, 0), alias="tile")
     """The tile integer coordinates of the mouse on the screen. Deprecated."""
     button: MouseButton
@@ -709,13 +722,63 @@ class MouseWheel(Event):
     """Vertical scrolling. A positive value means scrolling away from the user."""
     flipped: bool
     """If True then the values of `x` and `y` are the opposite of their usual values.
-    This depends on the settings of the Operating System.
+    This depends on the operating system settings.
     """
+
+    position: Point[float] = attrs.field(default=Point(0.0, 0.0))
+    """Coordinates of the mouse for this event.
+
+    .. versionadded:: Unreleased
+    """
+
+    which: int = 0
+    """Mouse device ID for this event.
+
+    .. versionadded:: Unreleased
+    """
+
+    window_id: int = 0
+    """Window ID with mouse focus.
+
+    .. versionadded:: Unreleased
+    """
+
+    @property
+    def integer_position(self) -> Point[int]:
+        """Integer coordinates of this event.
+
+        .. versionadded:: Unreleased
+        """
+        x, y = self.position
+        return Point(floor(x), floor(y))
 
     @classmethod
     def _from_sdl_event(cls, sdl_event: _C_SDL_Event) -> Self:
         wheel = sdl_event.wheel
-        return cls(x=int(wheel.x), y=int(wheel.y), flipped=bool(wheel.direction), **_unpack_sdl_event(sdl_event))
+        return cls(
+            x=int(wheel.integer_x),
+            y=int(wheel.integer_y),
+            flipped=bool(wheel.direction),
+            position=Point(float(wheel.mouse_x), float(wheel.mouse_y)),
+            which=int(wheel.which),
+            window_id=int(wheel.windowID),
+            **_unpack_sdl_event(sdl_event),
+        )
+
+
+@runtime_checkable
+class _MouseEventWithPosition(Protocol):
+    """Mouse event with position. Used internally to handle conversions."""
+
+    position: Point[float]
+
+
+@runtime_checkable
+class _MouseEventWithTile(Protocol):
+    """Mouse event with position and deprecated tile attribute. Used internally to handle conversions."""
+
+    position: Point[float]
+    _tile: Point[int] | None
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -1742,9 +1805,10 @@ def convert_coordinates_from_window(
         event._tile_motion = Point(
             floor(position[0]) - floor(previous_position[0]), floor(position[1]) - floor(previous_position[1])
         )
-    if isinstance(event, (MouseState, MouseMotion)):
+    elif isinstance(event, _MouseEventWithPosition):
         event.position = Point(*convert_coordinates_from_window(event.position, context, console, dest_rect))
-        event._tile = Point(floor(event.position[0]), floor(event.position[1]))
+        if isinstance(event, _MouseEventWithTile):
+            event._tile = Point(floor(event.position[0]), floor(event.position[1]))
     return event
 
 
