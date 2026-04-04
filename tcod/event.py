@@ -656,7 +656,7 @@ class MouseButtonEvent(Event):
     def integer_position(self) -> Point[int]:
         """Integer coordinates of this event.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 21.1
         """
         x, y = self.position
         return Point(floor(x), floor(y))
