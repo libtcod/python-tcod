@@ -728,26 +728,26 @@ class MouseWheel(Event):
     position: Point[float] = attrs.field(default=Point(0.0, 0.0))
     """Coordinates of the mouse for this event.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 21.2
     """
 
     which: int = 0
     """Mouse device ID for this event.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 21.2
     """
 
     window_id: int = 0
     """Window ID with mouse focus.
 
-    .. versionadded:: Unreleased
+    .. versionadded:: 21.2
     """
 
     @property
     def integer_position(self) -> Point[int]:
         """Integer coordinates of this event.
 
-        .. versionadded:: Unreleased
+        .. versionadded:: 21.2
         """
         x, y = self.position
         return Point(floor(x), floor(y))
