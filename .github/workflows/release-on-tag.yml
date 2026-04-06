@@ -24,7 +24,5 @@ jobs:
         run: scripts/get_release_description.py | tee release_body.md
       - name: Create Release
         id: create_release
-        uses: ncipollo/release-action@v1
-        with:
-          name: ""
-          bodyFile: release_body.md
+        # https://cli.github.com/manual/gh_release_create
+        run: gh release create "${GITHUB_REF_NAME}" --verify-tag --notes-file release_body.md
