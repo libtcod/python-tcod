@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Deployment
+
+- PyPy wheels switched from PyPy 3.10 to PyPy 3.11.
+- Experimental Pyodide wheels are now uploaded to PyPI.
+
 ## [21.2.0] - 2026-04-04
 
 ### Added
