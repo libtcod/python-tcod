@@ -47,10 +47,7 @@ jobs:
       - name: Install typing dependencies
         run: pip install mypy pytest -r requirements.txt
       - name: Mypy
-        uses: liskin/gh-problem-matcher-wrap@v3
-        with:
-          linters: mypy
-          run: mypy --show-column-numbers
+        run: mypy
 
   sdist:
     runs-on: ubuntu-latest
