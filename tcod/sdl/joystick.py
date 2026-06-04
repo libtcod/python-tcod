@@ -357,7 +357,7 @@ def _get_instance_ids() -> list[int]:
     init()
     count = ffi.new("int*")
     joysticks_p = _check_p(ffi.gc(lib.SDL_GetJoysticks(count), lib.SDL_free))  # SDL_JoystickID array
-    return [int(i) for i in joysticks_p[0:count[0]]]
+    return [int(i) for i in joysticks_p[0 : count[0]]]
 
 
 def get_joysticks() -> list[Joystick]:
