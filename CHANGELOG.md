@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [21.2.1] - 2026-06-04
+
 ### Deployment
 
 - PyPy wheels switched from PyPy 3.10 to PyPy 3.11.
