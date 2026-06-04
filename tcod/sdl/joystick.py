@@ -126,9 +126,9 @@ class Joystick:
         self._by_instance_id[self.id] = self
 
     @classmethod
-    def _open(cls, device_index: int) -> Joystick:
+    def _open(cls, instance_id: int) -> Joystick:
         tcod.sdl.sys.init(tcod.sdl.sys.Subsystem.JOYSTICK)
-        p = _check_p(ffi.gc(lib.SDL_OpenJoystick(device_index), lib.SDL_CloseJoystick))
+        p = _check_p(ffi.gc(lib.SDL_OpenJoystick(instance_id), lib.SDL_CloseJoystick))
         return cls(p)
 
     @classmethod
@@ -184,8 +184,8 @@ class GameController:
         self._by_instance_id[self.joystick.id] = self
 
     @classmethod
-    def _open(cls, joystick_index: int) -> GameController:
-        return cls(_check_p(ffi.gc(lib.SDL_OpenGamepad(joystick_index), lib.SDL_CloseGamepad)))
+    def _open(cls, instance_id: int) -> GameController:
+        return cls(_check_p(ffi.gc(lib.SDL_OpenGamepad(instance_id), lib.SDL_CloseGamepad)))
 
     @classmethod
     def _from_instance_id(cls, instance_id: int) -> GameController:
@@ -347,17 +347,22 @@ def init() -> None:
     tcod.sdl.sys.init(controller_systems)
 
 
-def _get_number() -> int:
-    """Return the number of attached joysticks."""
+def _get_instance_ids() -> list[int]:
+    """Return the instance IDs of all attached joysticks.
+
+    SDL3's ``SDL_GetJoysticks`` returns an array of instance IDs, which is what
+    ``SDL_OpenJoystick``/``SDL_OpenGamepad``/``SDL_IsGamepad`` expect.  These are not
+    contiguous device indices, so they must not be replaced with ``range``.
+    """
     init()
     count = ffi.new("int*")
-    lib.SDL_GetJoysticks(count)
-    return int(count[0])
+    joysticks_p = _check_p(ffi.gc(lib.SDL_GetJoysticks(count), lib.SDL_free))  # SDL_JoystickID array
+    return [int(i) for i in joysticks_p[0 : count[0]]]
 
 
 def get_joysticks() -> list[Joystick]:
     """Return a list of all connected joystick devices."""
-    return [Joystick._open(i) for i in range(_get_number())]
+    return [Joystick._open(instance_id) for instance_id in _get_instance_ids()]
 
 
 def get_controllers() -> list[GameController]:
@@ -365,7 +370,7 @@ def get_controllers() -> list[GameController]:
 
     This ignores joysticks without a game controller mapping.
     """
-    return [GameController._open(i) for i in range(_get_number()) if lib.SDL_IsGamepad(i)]
+    return [GameController._open(instance_id) for instance_id in _get_instance_ids() if lib.SDL_IsGamepad(instance_id)]
 
 
 def _get_all() -> list[Joystick | GameController]:
@@ -374,7 +379,10 @@ def _get_all() -> list[Joystick | GameController]:
     If the joystick has a controller mapping then it is returned as a :any:`GameController`.
     Otherwise it is returned as a :any:`Joystick`.
     """
-    return [GameController._open(i) if lib.SDL_IsGamepad(i) else Joystick._open(i) for i in range(_get_number())]
+    return [
+        GameController._open(instance_id) if lib.SDL_IsGamepad(instance_id) else Joystick._open(instance_id)
+        for instance_id in _get_instance_ids()
+    ]
 
 
 def joystick_event_state(new_state: bool | None = None) -> bool:  # noqa: FBT001

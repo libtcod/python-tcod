@@ -11,6 +11,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 - PyPy wheels switched from PyPy 3.10 to PyPy 3.11.
 - Experimental Pyodide wheels are now uploaded to PyPI.
 
+### Fixed
+
+- `tcod.sdl.joystick.get_joysticks`, `get_controllers`, and related enumeration passed device indices to SDL3 functions expecting instance IDs, so enumeration could fail or open the wrong device after a joystick was reconnected.
+
 ## [21.2.0] - 2026-04-04
 
 ### Added
