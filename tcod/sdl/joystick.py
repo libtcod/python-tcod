@@ -375,9 +375,7 @@ def get_controllers() -> list[GameController]:
 
     This ignores joysticks without a game controller mapping.
     """
-    return [
-        GameController._open(instance_id) for instance_id in _get_instance_ids() if lib.SDL_IsGamepad(instance_id)
-    ]
+    return [GameController._open(instance_id) for instance_id in _get_instance_ids() if lib.SDL_IsGamepad(instance_id)]
 
 
 def _get_all() -> list[Joystick | GameController]:
