@@ -3127,7 +3127,7 @@ def __getattr__(name: str) -> int:
             FutureWarning,
             stacklevel=2,
         )
-        return replacement
+        return replacement  # type: ignore[return-value]
 
     if name.startswith("K_") and len(name) == 3:  # noqa: PLR2004
         name = name.upper()  # Silently fix single letter key symbols removed from SDL3, these are still deprecated

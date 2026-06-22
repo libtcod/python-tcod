@@ -775,7 +775,7 @@ class CustomGraph:
             cost = cost.T
             if condition is not None:
                 condition = condition.T
-        key = (_as_hashable(cost), _as_hashable(condition))  # type: ignore[arg-type]
+        key = (_as_hashable(cost), _as_hashable(condition))
         try:
             rule = self._graph[key]
         except KeyError:
@@ -897,16 +897,16 @@ class CustomGraph:
             # edge_map needs to be converted into C.
             # The other parameters are converted by the add_edge method.
             edge_map = edge_map.T
-        edge_center = tuple(i // 2 for i in edge_map.shape)  # type: ignore[union-attr]
-        edge_map[edge_center] = 0  # type: ignore[index]
-        edge_map[edge_map < 0] = 0  # type: ignore[index, operator]
-        edge_nz = edge_map.nonzero()  # type: ignore[union-attr]
-        edge_costs = edge_map[edge_nz]  # type: ignore[index]
+        edge_center = tuple(i // 2 for i in edge_map.shape)
+        edge_map[edge_center] = 0
+        edge_map[edge_map < 0] = 0
+        edge_nz = edge_map.nonzero()
+        edge_costs = edge_map[edge_nz]
         edge_array = np.transpose(edge_nz)
         edge_array -= edge_center
         for edge, edge_cost in zip(
             edge_array,
-            edge_costs,  # type: ignore[arg-type]
+            edge_costs,
             strict=True,
         ):
             self.add_edge(
@@ -1177,7 +1177,7 @@ class Pathfinder:
         """
         if self._order == "F":
             axes = range(self._travel.ndim)
-            return self._travel.transpose((*axes[-2::-1], axes[-1]))[..., ::-1]  # type: ignore[no-any-return]
+            return self._travel.transpose((*axes[-2::-1], axes[-1]))[..., ::-1]
         return self._travel
 
     def clear(self) -> None:

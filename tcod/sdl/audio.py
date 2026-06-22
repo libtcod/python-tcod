@@ -189,7 +189,7 @@ def convert_audio(
                 out_length,
             )
         )
-        return (  # type: ignore[no-any-return]
+        return (
             np.frombuffer(ffi.buffer(out_buffer[0], out_length[0]), dtype=out_format).reshape(-1, out_channels).copy()
         )
     except RuntimeError as exc:
