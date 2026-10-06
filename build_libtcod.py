@@ -29,7 +29,7 @@ import build_sdl
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
 
-Py_LIMITED_API: None | int = 0x03100000
+Py_LIMITED_API: int | None = 0x03100000
 
 HEADER_PARSE_PATHS = ("tcod/", "libtcod/src/libtcod/")
 HEADER_PARSE_EXCLUDES = ("gl2_ext_.h", "renderer_gl_internal.h", "event.h")

@@ -157,7 +157,7 @@ class Noise:
         self.implementation = implementation  # sanity check
 
     @staticmethod
-    def __rng_from_seed(seed: None | int | tcod.random.Random) -> tcod.random.Random:
+    def __rng_from_seed(seed: int | tcod.random.Random | None) -> tcod.random.Random:
         if seed is None or isinstance(seed, int):
             return tcod.random.Random(seed=seed, algorithm=tcod.random.MERSENNE_TWISTER)
         return seed

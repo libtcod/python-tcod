@@ -86,5 +86,4 @@ __all__ = [
     "path",
     "random",
     "tileset",
-    "tileset",
 ]

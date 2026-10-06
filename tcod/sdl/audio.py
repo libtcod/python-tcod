@@ -1019,7 +1019,7 @@ def open(  # noqa: A001, PLR0913
     samples: int = 0,  # noqa: ARG001
     allowed_changes: AllowedChanges = AllowedChanges.NONE,  # noqa: ARG001
     paused: bool = False,
-    callback: None | Literal[True] | Callable[[AudioDevice, NDArray[Any]], None] = None,
+    callback: Literal[True] | Callable[[AudioDevice, NDArray[Any]], None] | None = None,
 ) -> AudioDevice:
     """Open an audio device for playback or capture and return it.
 
