@@ -1326,7 +1326,13 @@ class Pathfinder:
                 goal = goal[::-1]
             if self._distance[goal] != np.iinfo(self._distance.dtype).max:  # noqa: SIM102
                 if not lib.frontier_has_index(self._frontier_p, goal):
-                    return
+                    if not lib.TCOD_frontier_size(self._frontier_p):
+                        return
+                    # A new root may improve an already visited goal.  Queue its
+                    # current distance so the search still stops at this goal
+                    # when the remaining frontier cannot improve it.
+                    distance = int(self._distance[goal])
+                    lib.TCOD_frontier_push(self._frontier_p, goal, distance, distance)
         self._update_heuristic(goal)
         self._graph._resolve(self)
 
