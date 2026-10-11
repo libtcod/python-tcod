@@ -1220,6 +1220,7 @@ class Pathfinder:
             msg = f"Index must be {self._distance.ndim} items, got {index!r}"
             raise TypeError(msg)
         self._distance[index] = value
+        self._travel[index] = index
         self._update_heuristic(None)
         lib.TCOD_frontier_push(self._frontier_p, index, value, value)
 

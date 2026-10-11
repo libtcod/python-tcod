@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Fixed
+
+- Adding a root to an already resolved `tcod.path.Pathfinder` no longer leaves a stale predecessor which can cause cyclic paths after resolving again.
+
 ## [21.2.1] - 2026-06-04
 
 ### Deployment
