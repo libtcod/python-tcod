@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Fixed
+
+- Lazy pathfinder queries reconsider previously visited goals after adding a root or lowering a root's distance.
+
 ## [21.2.1] - 2026-06-04
 
 ### Deployment
