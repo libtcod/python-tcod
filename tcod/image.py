@@ -110,6 +110,7 @@ class Image:
             rotations (int): Number of 90 degree clockwise rotations.
         """
         lib.TCOD_image_rotate90(self.image_c, rotations)
+        self.width, self.height = self._get_size()
 
     def vflip(self) -> None:
         """Vertically flip this Image."""
