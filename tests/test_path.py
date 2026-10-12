@@ -62,9 +62,9 @@ def test_add_root_preserves_better_distances(
     new_root = tuple(size // 2 for size in shape)
     pathfinder.add_root(origin, value=first_value)
     pathfinder.resolve(new_root if partial else None)
+    old_path = pathfinder.path_from(new_root).copy()
     old_distances = pathfinder.distance.copy()
     old_traversal = pathfinder.traversal.copy()
-    old_path = pathfinder.path_from(new_root).copy()
     value = int(old_distances[new_root]) + relative_value
     pathfinder.add_root(new_root, value=value)
     if relative_value >= 0:
