@@ -1212,6 +1212,7 @@ class Pathfinder:
 
         `value` is the distance to use for this root.  Zero is typical, but
         if multiple roots are added they can be given different weights.
+        The root is ignored if `value` is not less than its current distance.
         """
         index = tuple(index)  # Check for bad input.
         if self._order == "F":  # Convert to ij indexing order.
@@ -1219,6 +1220,8 @@ class Pathfinder:
         if len(index) != self._distance.ndim:
             msg = f"Index must be {self._distance.ndim} items, got {index!r}"
             raise TypeError(msg)
+        if value >= self._distance[index]:
+            return
         self._distance[index] = value
         self._travel[index] = index
         self._update_heuristic(None)

@@ -8,7 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ### Fixed
 
-- Adding a root to an already resolved `tcod.path.Pathfinder` no longer leaves a stale predecessor which can cause cyclic paths after resolving again.
+- Adding a root to an already resolved `tcod.path.Pathfinder` resets its predecessor only when its value improves the current distance. This prevents cyclic paths while preserving routes to cheaper roots.
 
 ## [21.2.1] - 2026-06-04
 
