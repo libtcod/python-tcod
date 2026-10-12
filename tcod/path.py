@@ -1205,14 +1205,15 @@ class Pathfinder:
         lib.TCOD_frontier_clear(self._frontier_p)
 
     def add_root(self, index: tuple[int, ...], value: int = 0) -> None:
-        """Add a root node and insert it into the pathfinder frontier.
+        """Add a root node for subsequent pathfinding.
 
         `index` is the root point to insert.  The length of `index` must match
         the dimensions of the graph.
 
         `value` is the distance to use for this root.  Zero is typical, but
         if multiple roots are added they can be given different weights.
-        The root is ignored if `value` is not less than its current distance.
+        Roots with lower `value` have higher priority and can suppress nearby
+        roots with higher values.
         """
         index = tuple(index)  # Check for bad input.
         if self._order == "F":  # Convert to ij indexing order.
@@ -1221,7 +1222,7 @@ class Pathfinder:
             msg = f"Index must be {self._distance.ndim} items, got {index!r}"
             raise TypeError(msg)
         if value >= self._distance[index]:
-            return
+            return  # Keep existing routes when they are at least as cheap.
         self._distance[index] = value
         self._travel[index] = index
         self._update_heuristic(None)
