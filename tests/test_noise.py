@@ -2,6 +2,7 @@
 
 import copy
 import pickle
+from collections.abc import Callable
 
 import numpy as np
 import pytest
@@ -103,3 +104,20 @@ def test_noise_copy() -> None:
 
 def test_noise_grid() -> None:
     tcod.noise.grid((2, 2), scale=2)  # Check int scale
+
+
+@pytest.mark.parametrize("algorithm", [tcod.noise.Algorithm.PERLIN, tcod.noise.Algorithm.SIMPLEX])
+@pytest.mark.parametrize("rng_algorithm", [tcod.random.MERSENNE_TWISTER, tcod.random.MULTIPLY_WITH_CARRY])
+@pytest.mark.parametrize("snapshot", [copy.copy, copy.deepcopy, lambda n: pickle.loads(pickle.dumps(n))])
+def test_noise_snapshot_preserves_shared_random(
+    algorithm: int, rng_algorithm: int, snapshot: Callable[[tcod.noise.Noise], tcod.noise.Noise]
+) -> None:
+    rng = tcod.random.Random(rng_algorithm, seed=42)
+    noise = tcod.noise.Noise(2, algorithm=algorithm, seed=rng)
+    expected = copy.deepcopy(rng)
+    noise_copy = snapshot(noise)
+    assert [rng.randint(0, 100) for _ in range(8)] == [expected.randint(0, 100) for _ in range(8)]
+    assert noise.algorithm == algorithm
+    # The lazy wavelet tile remains synchronized if this algorithm is selected later.
+    noise.algorithm = noise_copy.algorithm = tcod.noise.Algorithm.WAVELET
+    np.testing.assert_array_equal(noise.sample_ogrid(np.ogrid[:3, :4]), noise_copy.sample_ogrid(np.ogrid[:3, :4]))

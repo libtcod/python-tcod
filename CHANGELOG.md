@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ### Fixed
 
+- Copying or pickling Perlin and Simplex noise no longer advances a shared random generator while preparing an unused wavelet tile.
 - `tcod.image.Image.rotate90` updates the width and height of rectangular images, keeping NumPy array conversions consistent with the rotated pixels.
 - Adding a root to an already resolved `tcod.path.Pathfinder` resets its predecessor only when its value improves the current distance. This prevents cyclic paths while preserving routes to cheaper roots.
 - Lazy pathfinder queries reconsider previously visited goals after adding a root or lowering a root's distance.

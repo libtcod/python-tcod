@@ -357,9 +357,18 @@ class Noise:
         if self.dimensions < 4 and self.noise_c.waveletTileData == ffi.NULL:  # noqa: PLR2004
             # Trigger a side effect of wavelet, so that copies will be synced.
             saved_algo = self.algorithm
+            saved_random = self.noise_c.rand
+            wavelet_random = saved_random
+            if saved_algo != tcod.constants.NOISE_WAVELET:
+                # Preparing an unused algorithm must not advance a shared RNG.
+                wavelet_random = ffi.gc(lib.TCOD_random_save(saved_random), lib.TCOD_random_delete)
+            self.noise_c.rand = wavelet_random
             self.algorithm = tcod.constants.NOISE_WAVELET
-            self.get_point()
-            self.algorithm = saved_algo
+            try:
+                self.get_point()
+            finally:
+                self.algorithm = saved_algo
+                self.noise_c.rand = saved_random
 
         waveletTileData = None  # noqa: N806
         if self.noise_c.waveletTileData != ffi.NULL:
