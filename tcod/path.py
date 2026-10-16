@@ -1066,7 +1066,10 @@ class SimpleGraph:
         self._shape = self._subgraph._shape[0], self._subgraph._shape[1]
         self._shape_c = self._subgraph._shape_c
         self._subgraph.add_edges(edge_map=edge_map, cost=cost)
-        self.set_heuristic(cardinal=cardinal * greed, diagonal=diagonal * greed)
+        self.set_heuristic(
+            cardinal=cardinal * greed,
+            diagonal=(min(diagonal, cardinal * 2) if cardinal else diagonal) * greed,
+        )
 
     @property
     def ndim(self) -> int:
@@ -1091,7 +1094,8 @@ class SimpleGraph:
         `cardinal` and `diagonal` are weights for the heuristic.
         Higher values are more greedy.
         The default values are set to ``cardinal * greed`` and
-        ``diagonal * greed`` when the :any:`SimpleGraph` is created.
+        ``diagonal * greed`` when the :any:`SimpleGraph` is created, with the
+        diagonal estimate capped at two cardinal steps if cardinal movement is enabled.
         """
         self._subgraph.set_heuristic(cardinal=cardinal, diagonal=diagonal)
 
