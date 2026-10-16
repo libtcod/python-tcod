@@ -1,5 +1,7 @@
 """Automatic heuristics must account for cheaper cardinal alternatives."""
 
+from typing import Literal
+
 import numpy as np
 import pytest
 
@@ -7,7 +9,7 @@ import tcod.path
 
 
 @pytest.mark.parametrize("order", ["C", "F"])
-def test_expensive_diagonal_heuristic(order: str) -> None:
+def test_expensive_diagonal_heuristic(order: Literal["C", "F"]) -> None:
     """Eight cardinal steps beat the tempting nine-cost mixed route."""
     cost = np.array(
         [[1, 0, 0, 0, 1], [1, 1, 1, 1, 1], [1, 0, 1, 0, 1], [0, 1, 1, 1, 1], [0, 0, 1, 1, 1]],
