@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 ### Fixed
 
 - `tcod.path.SimpleGraph` caps its automatic diagonal heuristic at two cardinal steps when those are cheaper.
+- Many-to-many `tcod.path.path2d` queries retain weighted predecessors when reconstructing their route.
 - Copying or pickling Perlin and Simplex noise no longer advances a shared random generator while preparing an unused wavelet tile.
 - `tcod.image.Image.rotate90` updates the width and height of rectangular images, keeping NumPy array conversions consistent with the rotated pixels.
 - Adding a root to an already resolved `tcod.path.Pathfinder` resets its predecessor only when its value improves the current distance. This prevents cyclic paths while preserving routes to cheaper roots.

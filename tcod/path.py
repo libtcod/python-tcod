@@ -1563,10 +1563,10 @@ def path2d(  # noqa: C901, PLR0912, PLR0913
             out = out[::-1]
         return out
 
-    # Crude Dijkstra implementation until issues with Pathfinder are fixed
+    # Resolve every endpoint before choosing the nearest start.
     pf.resolve(None)
     best_distance, best_ij = min((pf.distance[ij], ij) for ij in start_points)
     if best_distance == np.iinfo(pf.distance.dtype).max:
         return np.zeros((0, 2), dtype=np.intc)  # All endpoints unreachable
 
-    return hillclimb2d(pf.distance, best_ij, cardinal=bool(cardinal), diagonal=bool(diagonal))
+    return pf.path_from(best_ij)
