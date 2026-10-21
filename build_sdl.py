@@ -46,9 +46,9 @@ def python_machine() -> str:
 # Reject versions of SDL older than this, update the requirements in the readme if you change this.
 SDL_MIN_VERSION = (3, 2, 0)
 # The SDL version to parse and export symbols from.
-SDL_PARSE_VERSION = os.environ.get("SDL_VERSION", "3.2.16")
+SDL_PARSE_VERSION = os.environ.get("SDL_VERSION", "3.4.18")
 # The SDL version to include in binary distributions.
-SDL_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "3.2.16")
+SDL_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "3.4.18")
 
 
 # Used to remove excessive newlines in debug outputs.
@@ -105,6 +105,7 @@ FLEXIBLE_STRUCTS = (
     "SDL_SensorEvent",
     "SDL_QuitEvent",
     "SDL_UserEvent",
+    "SDL_PinchFingerEvent",
 )
 
 # Other defined names which sometimes cause issues when parsed.
@@ -311,19 +312,16 @@ elif sys.platform == "win32" and SDL_PARSE_PATH is not None:
 elif sys.platform == "darwin" and SDL_PARSE_PATH is not None:
     SDL_INCLUDE = SDL_PARSE_PATH / "Versions/A/Headers"
 else:  # Unix
-    matches = re.findall(
-        r"-I(\S+)",
-        subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True),
-    )
-    if not matches:
-        matches = ["/usr/include"]
+    stdout = subprocess.check_output(["pkg-config", "sdl3", "--cflags"], universal_newlines=True)
+    matches = re.findall(r"-I(\S+)", stdout)
+    matches.append("/usr/include")
 
     for match in matches:
         if Path(match, "SDL3/SDL.h").is_file():
             SDL_INCLUDE = Path(match)
             break
     else:
-        raise AssertionError(matches)
+        raise AssertionError(stdout)
     assert SDL_INCLUDE
 
 logger.info(f"{SDL_INCLUDE=}")

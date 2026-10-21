@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Changed
+
+- Updated bundled SDL to 3.4.18
+
 ### Fixed
 
 - `tcod.path.SimpleGraph` caps its automatic diagonal heuristic at two cardinal steps when those are cheaper. https://github.com/libtcod/python-tcod/pull/198
