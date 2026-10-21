@@ -254,7 +254,7 @@ jobs:
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
       - name: Build wheels
-        uses: pypa/cibuildwheel@v4.0.0rc1
+        uses: pypa/cibuildwheel@v4.3.3
         env:
           CIBW_BUILD: ${{ matrix.build }}
           CIBW_ARCHS_LINUX: ${{ matrix.arch }}
@@ -320,7 +320,7 @@ jobs:
         # Downloads SDL for the later step.
         run: python build_sdl.py
       - name: Build wheels
-        uses: pypa/cibuildwheel@v4.0.0rc1
+        uses: pypa/cibuildwheel@v4.3.3
         env:
           CIBW_BUILD: ${{ matrix.python }}
           CIBW_ARCHS_MACOS: x86_64 arm64 universal2
@@ -359,7 +359,7 @@ jobs:
           install-linux-dependencies: true
           build-type: "Debug"
           version: "3.2.4" # Should be equal or less than the version used by Emscripten
-      - uses: pypa/cibuildwheel@v4.0.0rc1
+      - uses: pypa/cibuildwheel@v4.3.3
         env:
           CIBW_BUILD: cp313-pyodide_wasm32
           CIBW_PLATFORM: pyodide
