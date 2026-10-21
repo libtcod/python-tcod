@@ -182,7 +182,7 @@ def get_sdl_file(version: str) -> Path:
         assert sys.platform == "darwin"
         sdl_archive = f"SDL3-{version}.dmg"
     sdl_local_file = Path("dependencies", sdl_archive)
-    sdl_remote_url = f"https://www.libsdl.org/release/{sdl_archive}"
+    sdl_remote_url = f"https://github.com/libsdl-org/SDL/releases/download/release-{version}/{sdl_archive}"
     if not sdl_local_file.exists():
         logger.info(f"Downloading {sdl_remote_url}")
         Path("dependencies/").mkdir(parents=True, exist_ok=True)
