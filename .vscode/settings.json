@@ -133,6 +133,7 @@
         "DHLINE",
         "DISPLAYSWITCH",
         "distutils",
+        "DLNOTE",
         "dlopen",
         "docstrings",
         "doctest",

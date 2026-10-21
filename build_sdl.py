@@ -134,6 +134,11 @@ IGNORE_DEFINES = frozenset(
         "SDL_VIDEO_RENDER_D3D12",
         "SDL_SENSOR_WINDOWS",
         "SDL_SENSOR_DUMMY",
+        # Added around SDL3.4
+        "SDL_ASSERT_FILE",
+        "SDL_DLNOTE_UNIQUE_NAME",
+        "SDL_ELF_NOTE_DLOPEN_TYPE",
+        "SDL_RESTRICT",
     )
 )
 

@@ -347,6 +347,16 @@ jobs:
     needs: [ruff, mypy, sdist]
     runs-on: ubuntu-26.04
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include: # https://pyodide.org/en/stable/development/abi.html
+          - python: "cp313"
+            sdl-version: "3.2.4" # For Emscripten 4.0.9
+          - python: "cp314"
+            sdl-version: "3.2.30" # For Emscripten 5.0.3
+          - python: "cp315"
+            sdl-version: "3.4.2" # For Emscripten 6.0.5
     steps:
       - uses: actions/checkout@v7
         with:
@@ -354,19 +364,19 @@ jobs:
           fetch-depth: ${{ env.git-depth }}
       - name: Checkout submodules
         run: git submodule update --init --recursive --depth 1
-      - uses: libsdl-org/setup-sdl@1894460666e4fe0c6603ea0cce5733f1cca56ba1
+      - uses: libsdl-org/setup-sdl@v1.0.1
         with:
           install-linux-dependencies: true
           build-type: "Debug"
-          version: "3.2.4" # Should be equal or less than the version used by Emscripten
+          version: ${{ matrix.sdl-version }} # Should be equal or less than the version used by Emscripten
       - uses: pypa/cibuildwheel@v4.3.3
         env:
-          CIBW_BUILD: cp313-pyodide_wasm32
+          CIBW_BUILD: ${{ matrix.python }}-pyodide_wasm32
           CIBW_PLATFORM: pyodide
       - name: Archive wheel
         uses: actions/upload-artifact@v7
         with:
-          name: wheels-pyodide
+          name: wheels-pyodide-${{ matrix.python }}
           path: wheelhouse/*.whl
           retention-days: 30
           compression-level: 0
