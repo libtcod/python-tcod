@@ -156,7 +156,7 @@ class TrueColorSample(Sample):
                 [6, 7, 8],
                 [9, 10, 11],
             ],
-            time.perf_counter(),  # j coordinate is time broadcast to all samples
+            _get_elapsed_time(),  # j coordinate is time broadcast to all samples
         )
         colors = self.noise[noise_samples_ij]
         colors = ((colors + 1.0) * (0.5 * 255.0)).clip(min=0, max=255)  # Convert -1..1 to 0..255
