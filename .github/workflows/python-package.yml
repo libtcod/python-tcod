@@ -343,7 +343,7 @@ jobs:
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         python: ["cp313", "cp314", "cp315"] # https://pyodide.org/en/stable/development/abi.html
     steps:
