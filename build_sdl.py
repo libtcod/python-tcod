@@ -147,6 +147,8 @@ def check_sdl_version() -> None:
     """Check the local SDL3 version on Linux distributions."""
     if not sys.platform.startswith("linux"):
         return
+    if "PYODIDE" in os.environ:
+        return
     needed_version = f"{SDL_MIN_VERSION[0]}.{SDL_MIN_VERSION[1]}.{SDL_MIN_VERSION[2]}"
     try:
         sdl_version_str = subprocess.check_output(
@@ -280,12 +282,14 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore[misc]
         return super().on_directive_handle(directive, tokens, if_passthru, preceding_tokens)
 
 
-def get_emscripten_include_dir() -> Path:
-    """Find and return the Emscripten include dir."""
-    # None of the EMSDK environment variables exist! Search PATH for Emscripten as a workaround
+def get_emscripten_dir() -> Path:
+    """Find and return the Emscripten directory."""
+    if "EMSDK" in os.environ:
+        return Path(os.environ["EMSDK"], "upstream/emscripten")
+    # Search PATH for Emscripten as a workaround
     for path in os.environ["PATH"].split(os.pathsep)[::-1]:
-        if Path(path).match("upstream/emscripten"):
-            return Path(path, "system/include").resolve(strict=True)
+        if Path(path).match("emsdk/upstream/emscripten"):
+            return Path(path).resolve(strict=True)
     raise AssertionError(os.environ["PATH"])
 
 
@@ -298,7 +302,11 @@ if (sys.platform == "win32" or sys.platform == "darwin") and "PYODIDE" not in os
     SDL_BUNDLE_PATH = unpack_sdl(SDL_BUNDLE_VERSION)
 
 SDL_INCLUDE: Path
-if sys.platform == "win32" and SDL_PARSE_PATH is not None:
+if "PYODIDE" in os.environ:
+    embuilder = Path(get_emscripten_dir(), "embuilder")
+    subprocess.run([embuilder, "build", "sdl3"], check=True)
+    SDL_INCLUDE = Path(get_emscripten_dir(), "cache/sysroot/include").resolve(strict=True)
+elif sys.platform == "win32" and SDL_PARSE_PATH is not None:
     SDL_INCLUDE = SDL_PARSE_PATH / "include"
 elif sys.platform == "darwin" and SDL_PARSE_PATH is not None:
     SDL_INCLUDE = SDL_PARSE_PATH / "Versions/A/Headers"
