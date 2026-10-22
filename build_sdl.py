@@ -66,6 +66,9 @@ RE_ASSERT = re.compile(r"^.*SDL_COMPILE_TIME_ASSERT.*$", re.MULTILINE)
 # Padding values need to be scrubbed.
 RE_PADDING = re.compile(r"padding\[[^;]*\];")
 
+# Printf style functions cause issues on Pyodide builds
+RE_PRINTF = re.compile(r"^.*?\([^()]*\*fmt, \.\.\.\).*?;$", re.MULTILINE)
+
 # These structs have an unusual size when packed by SDL on 32-bit platforms.
 FLEXIBLE_STRUCTS = (
     "SDL_CommonEvent",
@@ -377,6 +380,9 @@ def get_cdef() -> tuple[str, dict[str, str]]:
         """
         )
         sdl_cdef = parser.get_output()
+
+    if "PYODIDE" in os.environ:
+        sdl_cdef = RE_PRINTF.sub("", sdl_cdef)
 
     sdl_cdef = sdl_cdef.replace("_Bool", "bool")
     sdl_cdef = RE_VAFUNC.sub("", sdl_cdef)
