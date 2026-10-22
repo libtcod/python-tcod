@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [21.2.2] - 2026-10-22
+
 ### Changed
 
 - Updated bundled SDL to 3.4.18
