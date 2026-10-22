@@ -2083,6 +2083,7 @@ class Scancode(enum.IntEnum):
     CLEARAGAIN          162
     CRSEL               163
     EXSEL               164
+    FRONT               165
     KP_00               176
     KP_000              177
     THOUSANDSSEPARATOR  178
@@ -2329,6 +2330,7 @@ class Scancode(enum.IntEnum):
     CLEARAGAIN = 162
     CRSEL = 163
     EXSEL = 164
+    FRONT = 165
     KP_00 = 176
     KP_000 = 177
     THOUSANDSSEPARATOR = 178
@@ -2654,6 +2656,7 @@ class KeySym(enum.IntEnum):
     CLEARAGAIN          1073741986
     CRSEL               1073741987
     EXSEL               1073741988
+    FRONT               1073741989
     KP_00               1073742000
     KP_000              1073742001
     THOUSANDSSEPARATOR  1073742002
@@ -2908,6 +2911,7 @@ class KeySym(enum.IntEnum):
     CLEARAGAIN = 1073741986
     CRSEL = 1073741987
     EXSEL = 1073741988
+    FRONT = 1073741989
     KP_00 = 1073742000
     KP_000 = 1073742001
     THOUSANDSSEPARATOR = 1073742002

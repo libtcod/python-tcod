@@ -69,6 +69,10 @@ class _lib:
         """int SDL_AddAtomicInt(SDL_AtomicInt *a, int v)"""
 
     @staticmethod
+    def SDL_AddAtomicU32(a: Any, v: int, /) -> Any:
+        """Uint32 SDL_AddAtomicU32(SDL_AtomicU32 *a, int v)"""
+
+    @staticmethod
     def SDL_AddEventWatch(filter: Any, userdata: Any, /) -> bool:
         """bool SDL_AddEventWatch(SDL_EventFilter filter, void *userdata)"""
 
@@ -444,6 +448,10 @@ class _lib:
         """bool SDL_CopyStorageFile(SDL_Storage *storage, const char *oldpath, const char *newpath)"""
 
     @staticmethod
+    def SDL_CreateAnimatedCursor(frames: Any, frame_count: int, hot_x: int, hot_y: int, /) -> Any:
+        """SDL_Cursor *SDL_CreateAnimatedCursor(SDL_CursorFrameInfo *frames, int frame_count, int hot_x, int hot_y)"""
+
+    @staticmethod
     def SDL_CreateAsyncIOQueue() -> Any:
         """SDL_AsyncIOQueue *SDL_CreateAsyncIOQueue(void)"""
 
@@ -492,6 +500,14 @@ class _lib:
         """SDL_GPUGraphicsPipeline *SDL_CreateGPUGraphicsPipeline(SDL_GPUDevice *device, const SDL_GPUGraphicsPipelineCreateInfo *createinfo)"""
 
     @staticmethod
+    def SDL_CreateGPURenderState(renderer: Any, createinfo: Any, /) -> Any:
+        """SDL_GPURenderState *SDL_CreateGPURenderState(SDL_Renderer *renderer, const SDL_GPURenderStateCreateInfo *createinfo)"""
+
+    @staticmethod
+    def SDL_CreateGPURenderer(device: Any, window: Any, /) -> Any:
+        """SDL_Renderer *SDL_CreateGPURenderer(SDL_GPUDevice *device, SDL_Window *window)"""
+
+    @staticmethod
     def SDL_CreateGPUSampler(device: Any, createinfo: Any, /) -> Any:
         """SDL_GPUSampler *SDL_CreateGPUSampler(SDL_GPUDevice *device, const SDL_GPUSamplerCreateInfo *createinfo)"""
 
@@ -508,8 +524,8 @@ class _lib:
         """SDL_GPUTransferBuffer *SDL_CreateGPUTransferBuffer(SDL_GPUDevice *device, const SDL_GPUTransferBufferCreateInfo *createinfo)"""
 
     @staticmethod
-    def SDL_CreateHapticEffect(haptic: Any, effect: Any, /) -> int:
-        """int SDL_CreateHapticEffect(SDL_Haptic *haptic, const SDL_HapticEffect *effect)"""
+    def SDL_CreateHapticEffect(haptic: Any, effect: Any, /) -> Any:
+        """SDL_HapticEffectID SDL_CreateHapticEffect(SDL_Haptic *haptic, const SDL_HapticEffect *effect)"""
 
     @staticmethod
     def SDL_CreateMutex() -> Any:
@@ -666,8 +682,12 @@ class _lib:
         """void SDL_DestroyGPUDevice(SDL_GPUDevice *device)"""
 
     @staticmethod
-    def SDL_DestroyHapticEffect(haptic: Any, effect: int, /) -> None:
-        """void SDL_DestroyHapticEffect(SDL_Haptic *haptic, int effect)"""
+    def SDL_DestroyGPURenderState(state: Any, /) -> None:
+        """void SDL_DestroyGPURenderState(SDL_GPURenderState *state)"""
+
+    @staticmethod
+    def SDL_DestroyHapticEffect(haptic: Any, effect: Any, /) -> None:
+        """void SDL_DestroyHapticEffect(SDL_Haptic *haptic, SDL_HapticEffectID effect)"""
 
     @staticmethod
     def SDL_DestroyMutex(mutex: Any, /) -> None:
@@ -1114,8 +1134,8 @@ class _lib:
         """const char *SDL_GetCameraName(SDL_CameraID instance_id)"""
 
     @staticmethod
-    def SDL_GetCameraPermissionState(camera: Any, /) -> int:
-        """int SDL_GetCameraPermissionState(SDL_Camera *camera)"""
+    def SDL_GetCameraPermissionState(camera: Any, /) -> Any:
+        """SDL_CameraPermissionState SDL_GetCameraPermissionState(SDL_Camera *camera)"""
 
     @staticmethod
     def SDL_GetCameraPosition(instance_id: Any, /) -> Any:
@@ -1220,6 +1240,10 @@ class _lib:
         """SDL_LogOutputFunction SDL_GetDefaultLogOutputFunction(void)"""
 
     @staticmethod
+    def SDL_GetDefaultTextureScaleMode(renderer: Any, scale_mode: Any, /) -> bool:
+        """bool SDL_GetDefaultTextureScaleMode(SDL_Renderer *renderer, SDL_ScaleMode *scale_mode)"""
+
+    @staticmethod
     def SDL_GetDesktopDisplayMode(displayID: Any, /) -> Any:
         """const SDL_DisplayMode *SDL_GetDesktopDisplayMode(SDL_DisplayID displayID)"""
 
@@ -1276,6 +1300,10 @@ class _lib:
         """const char *SDL_GetError(void)"""
 
     @staticmethod
+    def SDL_GetEventDescription(event: Any, buf: Any, buflen: int, /) -> int:
+        """int SDL_GetEventDescription(const SDL_Event *event, char *buf, int buflen)"""
+
+    @staticmethod
     def SDL_GetEventFilter(filter: Any, userdata: Any, /) -> bool:
         """bool SDL_GetEventFilter(SDL_EventFilter *filter, void **userdata)"""
 
@@ -1292,8 +1320,16 @@ class _lib:
         """const char *SDL_GetGPUDeviceDriver(SDL_GPUDevice *device)"""
 
     @staticmethod
+    def SDL_GetGPUDeviceProperties(device: Any, /) -> Any:
+        """SDL_PropertiesID SDL_GetGPUDeviceProperties(SDL_GPUDevice *device)"""
+
+    @staticmethod
     def SDL_GetGPUDriver(index: int, /) -> Any:
         """const char *SDL_GetGPUDriver(int index)"""
+
+    @staticmethod
+    def SDL_GetGPURendererDevice(renderer: Any, /) -> Any:
+        """SDL_GPUDevice *SDL_GetGPURendererDevice(SDL_Renderer *renderer)"""
 
     @staticmethod
     def SDL_GetGPUShaderFormats(device: Any, /) -> Any:
@@ -1302,6 +1338,10 @@ class _lib:
     @staticmethod
     def SDL_GetGPUSwapchainTextureFormat(device: Any, window: Any, /) -> Any:
         """SDL_GPUTextureFormat SDL_GetGPUSwapchainTextureFormat(SDL_GPUDevice *device, SDL_Window *window)"""
+
+    @staticmethod
+    def SDL_GetGPUTextureFormatFromPixelFormat(format: Any, /) -> Any:
+        """SDL_GPUTextureFormat SDL_GetGPUTextureFormatFromPixelFormat(SDL_PixelFormat format)"""
 
     @staticmethod
     def SDL_GetGamepadAppleSFSymbolsNameForAxis(gamepad: Any, axis: Any, /) -> Any:
@@ -1502,8 +1542,8 @@ class _lib:
         """SDL_Window *SDL_GetGrabbedWindow(void)"""
 
     @staticmethod
-    def SDL_GetHapticEffectStatus(haptic: Any, effect: int, /) -> bool:
-        """bool SDL_GetHapticEffectStatus(SDL_Haptic *haptic, int effect)"""
+    def SDL_GetHapticEffectStatus(haptic: Any, effect: Any, /) -> bool:
+        """bool SDL_GetHapticEffectStatus(SDL_Haptic *haptic, SDL_HapticEffectID effect)"""
 
     @staticmethod
     def SDL_GetHapticFeatures(haptic: Any, /) -> Any:
@@ -1820,6 +1860,10 @@ class _lib:
         """bool SDL_GetPathInfo(const char *path, SDL_PathInfo *info)"""
 
     @staticmethod
+    def SDL_GetPenDeviceType(instance_id: Any, /) -> Any:
+        """SDL_PenDeviceType SDL_GetPenDeviceType(SDL_PenID instance_id)"""
+
+    @staticmethod
     def SDL_GetPerformanceCounter() -> Any:
         """Uint64 SDL_GetPerformanceCounter(void)"""
 
@@ -1834,6 +1878,10 @@ class _lib:
     @staticmethod
     def SDL_GetPixelFormatForMasks(bpp: int, Rmask: Any, Gmask: Any, Bmask: Any, Amask: Any, /) -> Any:
         """SDL_PixelFormat SDL_GetPixelFormatForMasks(int bpp, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask)"""
+
+    @staticmethod
+    def SDL_GetPixelFormatFromGPUTextureFormat(format: Any, /) -> Any:
+        """SDL_PixelFormat SDL_GetPixelFormatFromGPUTextureFormat(SDL_GPUTextureFormat format)"""
 
     @staticmethod
     def SDL_GetPixelFormatName(format: Any, /) -> Any:
@@ -1884,12 +1932,12 @@ class _lib:
         """SDL_PropertyType SDL_GetPropertyType(SDL_PropertiesID props, const char *name)"""
 
     @staticmethod
-    def SDL_GetRGB(pixel: Any, format: Any, palette: Any, r: Any, g: Any, b: Any, /) -> None:
-        """void SDL_GetRGB(Uint32 pixel, const SDL_PixelFormatDetails *format, const SDL_Palette *palette, Uint8 *r, Uint8 *g, Uint8 *b)"""
+    def SDL_GetRGB(pixelvalue: Any, format: Any, palette: Any, r: Any, g: Any, b: Any, /) -> None:
+        """void SDL_GetRGB(Uint32 pixelvalue, const SDL_PixelFormatDetails *format, const SDL_Palette *palette, Uint8 *r, Uint8 *g, Uint8 *b)"""
 
     @staticmethod
-    def SDL_GetRGBA(pixel: Any, format: Any, palette: Any, r: Any, g: Any, b: Any, a: Any, /) -> None:
-        """void SDL_GetRGBA(Uint32 pixel, const SDL_PixelFormatDetails *format, const SDL_Palette *palette, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a)"""
+    def SDL_GetRGBA(pixelvalue: Any, format: Any, palette: Any, r: Any, g: Any, b: Any, a: Any, /) -> None:
+        """void SDL_GetRGBA(Uint32 pixelvalue, const SDL_PixelFormatDetails *format, const SDL_Palette *palette, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a)"""
 
     @staticmethod
     def SDL_GetRealGamepadType(gamepad: Any, /) -> Any:
@@ -1990,6 +2038,10 @@ class _lib:
     @staticmethod
     def SDL_GetRenderTarget(renderer: Any, /) -> Any:
         """SDL_Texture *SDL_GetRenderTarget(SDL_Renderer *renderer)"""
+
+    @staticmethod
+    def SDL_GetRenderTextureAddressMode(renderer: Any, u_mode: Any, v_mode: Any, /) -> bool:
+        """bool SDL_GetRenderTextureAddressMode(SDL_Renderer *renderer, SDL_TextureAddressMode *u_mode, SDL_TextureAddressMode *v_mode)"""
 
     @staticmethod
     def SDL_GetRenderVSync(renderer: Any, vsync: Any, /) -> bool:
@@ -2148,6 +2200,10 @@ class _lib:
         """SDL_PropertiesID SDL_GetSurfaceProperties(SDL_Surface *surface)"""
 
     @staticmethod
+    def SDL_GetSystemPageSize() -> int:
+        """int SDL_GetSystemPageSize(void)"""
+
+    @staticmethod
     def SDL_GetSystemRAM() -> int:
         """int SDL_GetSystemRAM(void)"""
 
@@ -2182,6 +2238,10 @@ class _lib:
     @staticmethod
     def SDL_GetTextureColorModFloat(texture: Any, r: Any, g: Any, b: Any, /) -> bool:
         """bool SDL_GetTextureColorModFloat(SDL_Texture *texture, float *r, float *g, float *b)"""
+
+    @staticmethod
+    def SDL_GetTexturePalette(texture: Any, /) -> Any:
+        """SDL_Palette *SDL_GetTexturePalette(SDL_Texture *texture)"""
 
     @staticmethod
     def SDL_GetTextureProperties(texture: Any, /) -> Any:
@@ -2354,6 +2414,14 @@ class _lib:
     @staticmethod
     def SDL_GetWindowPosition(window: Any, x: Any, y: Any, /) -> bool:
         """bool SDL_GetWindowPosition(SDL_Window *window, int *x, int *y)"""
+
+    @staticmethod
+    def SDL_GetWindowProgressState(window: Any, /) -> Any:
+        """SDL_ProgressState SDL_GetWindowProgressState(SDL_Window *window)"""
+
+    @staticmethod
+    def SDL_GetWindowProgressValue(window: Any, /) -> float:
+        """float SDL_GetWindowProgressValue(SDL_Window *window)"""
 
     @staticmethod
     def SDL_GetWindowProperties(window: Any, /) -> Any:
@@ -2638,6 +2706,22 @@ class _lib:
     @staticmethod
     def SDL_LoadObject(sofile: Any, /) -> Any:
         """SDL_SharedObject *SDL_LoadObject(const char *sofile)"""
+
+    @staticmethod
+    def SDL_LoadPNG(file: Any, /) -> Any:
+        """SDL_Surface *SDL_LoadPNG(const char *file)"""
+
+    @staticmethod
+    def SDL_LoadPNG_IO(src: Any, closeio: bool, /) -> Any:
+        """SDL_Surface *SDL_LoadPNG_IO(SDL_IOStream *src, bool closeio)"""
+
+    @staticmethod
+    def SDL_LoadSurface(file: Any, /) -> Any:
+        """SDL_Surface *SDL_LoadSurface(const char *file)"""
+
+    @staticmethod
+    def SDL_LoadSurface_IO(src: Any, closeio: bool, /) -> Any:
+        """SDL_Surface *SDL_LoadSurface_IO(SDL_IOStream *src, bool closeio)"""
 
     @staticmethod
     def SDL_LoadWAV(path: Any, spec: Any, audio_buf: Any, audio_len: Any, /) -> bool:
@@ -2939,6 +3023,14 @@ class _lib:
         """bool SDL_PutAudioStreamData(SDL_AudioStream *stream, const void *buf, int len)"""
 
     @staticmethod
+    def SDL_PutAudioStreamDataNoCopy(stream: Any, buf: Any, len: int, callback: Any, userdata: Any, /) -> bool:
+        """bool SDL_PutAudioStreamDataNoCopy(SDL_AudioStream *stream, const void *buf, int len, SDL_AudioStreamDataCompleteCallback callback, void *userdata)"""
+
+    @staticmethod
+    def SDL_PutAudioStreamPlanarData(stream: Any, channel_buffers: Any, num_channels: int, num_samples: int, /) -> bool:
+        """bool SDL_PutAudioStreamPlanarData(SDL_AudioStream *stream, const void * const *channel_buffers, int num_channels, int num_samples)"""
+
+    @staticmethod
     def SDL_QueryGPUFence(device: Any, fence: Any, /) -> bool:
         """bool SDL_QueryGPUFence(SDL_GPUDevice *device, SDL_GPUFence *fence)"""
 
@@ -3226,6 +3318,22 @@ class _lib:
         """bool SDL_RenderTexture9Grid(SDL_Renderer *renderer, SDL_Texture *texture, const SDL_FRect *srcrect, float left_width, float right_width, float top_height, float bottom_height, float scale, const SDL_FRect *dstrect)"""
 
     @staticmethod
+    def SDL_RenderTexture9GridTiled(
+        renderer: Any,
+        texture: Any,
+        srcrect: Any,
+        left_width: float,
+        right_width: float,
+        top_height: float,
+        bottom_height: float,
+        scale: float,
+        dstrect: Any,
+        tileScale: float,
+        /,
+    ) -> bool:
+        """bool SDL_RenderTexture9GridTiled(SDL_Renderer *renderer, SDL_Texture *texture, const SDL_FRect *srcrect, float left_width, float right_width, float top_height, float bottom_height, float scale, const SDL_FRect *dstrect, float tileScale)"""
+
+    @staticmethod
     def SDL_RenderTextureAffine(
         renderer: Any, texture: Any, srcrect: Any, origin: Any, right: Any, down: Any, /
     ) -> bool:
@@ -3286,6 +3394,10 @@ class _lib:
         """bool SDL_ResumeHaptic(SDL_Haptic *haptic)"""
 
     @staticmethod
+    def SDL_RotateSurface(surface: Any, angle: float, /) -> Any:
+        """SDL_Surface *SDL_RotateSurface(SDL_Surface *surface, float angle)"""
+
+    @staticmethod
     def SDL_RumbleGamepad(
         gamepad: Any, low_frequency_rumble: Any, high_frequency_rumble: Any, duration_ms: Any, /
     ) -> bool:
@@ -3306,8 +3418,8 @@ class _lib:
         """bool SDL_RumbleJoystickTriggers(SDL_Joystick *joystick, Uint16 left_rumble, Uint16 right_rumble, Uint32 duration_ms)"""
 
     @staticmethod
-    def SDL_RunHapticEffect(haptic: Any, effect: int, iterations: Any, /) -> bool:
-        """bool SDL_RunHapticEffect(SDL_Haptic *haptic, int effect, Uint32 iterations)"""
+    def SDL_RunHapticEffect(haptic: Any, effect: Any, iterations: Any, /) -> bool:
+        """bool SDL_RunHapticEffect(SDL_Haptic *haptic, SDL_HapticEffectID effect, Uint32 iterations)"""
 
     @staticmethod
     def SDL_RunOnMainThread(callback: Any, userdata: Any, wait_complete: bool, /) -> bool:
@@ -3328,6 +3440,14 @@ class _lib:
     @staticmethod
     def SDL_SaveFile_IO(src: Any, data: Any, datasize: int, closeio: bool, /) -> bool:
         """bool SDL_SaveFile_IO(SDL_IOStream *src, const void *data, size_t datasize, bool closeio)"""
+
+    @staticmethod
+    def SDL_SavePNG(surface: Any, file: Any, /) -> bool:
+        """bool SDL_SavePNG(SDL_Surface *surface, const char *file)"""
+
+    @staticmethod
+    def SDL_SavePNG_IO(surface: Any, dst: Any, closeio: bool, /) -> bool:
+        """bool SDL_SavePNG_IO(SDL_Surface *surface, SDL_IOStream *dst, bool closeio)"""
 
     @staticmethod
     def SDL_ScaleSurface(surface: Any, width: int, height: int, scaleMode: Any, /) -> Any:
@@ -3427,7 +3547,7 @@ class _lib:
     def SDL_SetClipboardData(
         callback: Any, cleanup: Any, userdata: Any, mime_types: Any, num_mime_types: int, /
     ) -> bool:
-        """bool SDL_SetClipboardData(SDL_ClipboardDataCallback callback, SDL_ClipboardCleanupCallback cleanup, void *userdata, const char **mime_types, size_t num_mime_types)"""
+        """bool SDL_SetClipboardData(SDL_ClipboardDataCallback callback, SDL_ClipboardCleanupCallback cleanup, void *userdata, const char * const *mime_types, size_t num_mime_types)"""
 
     @staticmethod
     def SDL_SetClipboardText(text: Any, /) -> bool:
@@ -3440,6 +3560,10 @@ class _lib:
     @staticmethod
     def SDL_SetCursor(cursor: Any, /) -> bool:
         """bool SDL_SetCursor(SDL_Cursor *cursor)"""
+
+    @staticmethod
+    def SDL_SetDefaultTextureScaleMode(renderer: Any, scale_mode: Any, /) -> bool:
+        """bool SDL_SetDefaultTextureScaleMode(SDL_Renderer *renderer, SDL_ScaleMode scale_mode)"""
 
     @staticmethod
     def SDL_SetEnvironmentVariable(env: Any, name: Any, value: Any, overwrite: bool, /) -> bool:
@@ -3472,6 +3596,14 @@ class _lib:
     @staticmethod
     def SDL_SetGPUBufferName(device: Any, buffer: Any, text: Any, /) -> None:
         """void SDL_SetGPUBufferName(SDL_GPUDevice *device, SDL_GPUBuffer *buffer, const char *text)"""
+
+    @staticmethod
+    def SDL_SetGPURenderState(renderer: Any, state: Any, /) -> bool:
+        """bool SDL_SetGPURenderState(SDL_Renderer *renderer, SDL_GPURenderState *state)"""
+
+    @staticmethod
+    def SDL_SetGPURenderStateFragmentUniforms(state: Any, slot_index: Any, data: Any, length: Any, /) -> bool:
+        """bool SDL_SetGPURenderStateFragmentUniforms(SDL_GPURenderState *state, Uint32 slot_index, const void *data, Uint32 length)"""
 
     @staticmethod
     def SDL_SetGPUScissor(render_pass: Any, scissor: Any, /) -> None:
@@ -3614,6 +3746,10 @@ class _lib:
         """bool SDL_SetPrimarySelectionText(const char *text)"""
 
     @staticmethod
+    def SDL_SetRelativeMouseTransform(callback: Any, userdata: Any, /) -> bool:
+        """bool SDL_SetRelativeMouseTransform(SDL_MouseMotionTransformCallback callback, void *userdata)"""
+
+    @staticmethod
     def SDL_SetRenderClipRect(renderer: Any, rect: Any, /) -> bool:
         """bool SDL_SetRenderClipRect(SDL_Renderer *renderer, const SDL_Rect *rect)"""
 
@@ -3644,6 +3780,10 @@ class _lib:
     @staticmethod
     def SDL_SetRenderTarget(renderer: Any, texture: Any, /) -> bool:
         """bool SDL_SetRenderTarget(SDL_Renderer *renderer, SDL_Texture *texture)"""
+
+    @staticmethod
+    def SDL_SetRenderTextureAddressMode(renderer: Any, u_mode: Any, v_mode: Any, /) -> bool:
+        """bool SDL_SetRenderTextureAddressMode(SDL_Renderer *renderer, SDL_TextureAddressMode u_mode, SDL_TextureAddressMode v_mode)"""
 
     @staticmethod
     def SDL_SetRenderVSync(renderer: Any, vsync: int, /) -> bool:
@@ -3722,6 +3862,10 @@ class _lib:
         """bool SDL_SetTextureColorModFloat(SDL_Texture *texture, float r, float g, float b)"""
 
     @staticmethod
+    def SDL_SetTexturePalette(texture: Any, palette: Any, /) -> bool:
+        """bool SDL_SetTexturePalette(SDL_Texture *texture, SDL_Palette *palette)"""
+
+    @staticmethod
     def SDL_SetTextureScaleMode(texture: Any, scaleMode: Any, /) -> bool:
         """bool SDL_SetTextureScaleMode(SDL_Texture *texture, SDL_ScaleMode scaleMode)"""
 
@@ -3760,6 +3904,10 @@ class _lib:
     @staticmethod
     def SDL_SetWindowBordered(window: Any, bordered: bool, /) -> bool:
         """bool SDL_SetWindowBordered(SDL_Window *window, bool bordered)"""
+
+    @staticmethod
+    def SDL_SetWindowFillDocument(window: Any, fill: bool, /) -> bool:
+        """bool SDL_SetWindowFillDocument(SDL_Window *window, bool fill)"""
 
     @staticmethod
     def SDL_SetWindowFocusable(window: Any, focusable: bool, /) -> bool:
@@ -3816,6 +3964,14 @@ class _lib:
     @staticmethod
     def SDL_SetWindowPosition(window: Any, x: int, y: int, /) -> bool:
         """bool SDL_SetWindowPosition(SDL_Window *window, int x, int y)"""
+
+    @staticmethod
+    def SDL_SetWindowProgressState(window: Any, state: Any, /) -> bool:
+        """bool SDL_SetWindowProgressState(SDL_Window *window, SDL_ProgressState state)"""
+
+    @staticmethod
+    def SDL_SetWindowProgressValue(window: Any, value: float, /) -> bool:
+        """bool SDL_SetWindowProgressValue(SDL_Window *window, float value)"""
 
     @staticmethod
     def SDL_SetWindowRelativeMouseMode(window: Any, enabled: bool, /) -> bool:
@@ -3931,8 +4087,8 @@ class _lib:
         """Uint32 SDL_StepUTF8(const char **pstr, size_t *pslen)"""
 
     @staticmethod
-    def SDL_StopHapticEffect(haptic: Any, effect: int, /) -> bool:
-        """bool SDL_StopHapticEffect(SDL_Haptic *haptic, int effect)"""
+    def SDL_StopHapticEffect(haptic: Any, effect: Any, /) -> bool:
+        """bool SDL_StopHapticEffect(SDL_Haptic *haptic, SDL_HapticEffectID effect)"""
 
     @staticmethod
     def SDL_StopHapticEffects(haptic: Any, /) -> bool:
@@ -4083,8 +4239,8 @@ class _lib:
         """void SDL_UpdateGamepads(void)"""
 
     @staticmethod
-    def SDL_UpdateHapticEffect(haptic: Any, effect: int, data: Any, /) -> bool:
-        """bool SDL_UpdateHapticEffect(SDL_Haptic *haptic, int effect, const SDL_HapticEffect *data)"""
+    def SDL_UpdateHapticEffect(haptic: Any, effect: Any, data: Any, /) -> bool:
+        """bool SDL_UpdateHapticEffect(SDL_Haptic *haptic, SDL_HapticEffectID effect, const SDL_HapticEffect *data)"""
 
     @staticmethod
     def SDL_UpdateJoysticks() -> None:
@@ -4478,6 +4634,10 @@ class _lib:
     @staticmethod
     def SDL_hid_get_product_string(dev: Any, string: Any, maxlen: int, /) -> int:
         """int SDL_hid_get_product_string(SDL_hid_device *dev, wchar_t *string, size_t maxlen)"""
+
+    @staticmethod
+    def SDL_hid_get_properties(dev: Any, /) -> Any:
+        """SDL_PropertiesID SDL_hid_get_properties(SDL_hid_device *dev)"""
 
     @staticmethod
     def SDL_hid_get_report_descriptor(dev: Any, buf: Any, buf_size: int, /) -> int:
@@ -5308,7 +5468,7 @@ class _lib:
 
     @staticmethod
     def TCOD_console_from_xp(filename: Any, /) -> Any:
-        """TCOD_console_t TCOD_console_from_xp(const char *filename)"""
+        """TCOD_Console *TCOD_console_from_xp(const char *filename)"""
 
     @staticmethod
     def TCOD_console_get_alignment(con: Any, /) -> Any:
@@ -6276,91 +6436,91 @@ class _lib:
 
     @staticmethod
     def TCOD_list_add_all(l: Any, l2: Any, /) -> None:
-        """void TCOD_list_add_all(TCOD_list_t l, TCOD_list_t l2)"""
+        """void TCOD_list_add_all(TCOD_List *l, TCOD_List *l2)"""
 
     @staticmethod
     def TCOD_list_allocate(nb_elements: int, /) -> Any:
-        """TCOD_list_t TCOD_list_allocate(int nb_elements)"""
+        """TCOD_List *TCOD_list_allocate(int nb_elements)"""
 
     @staticmethod
     def TCOD_list_begin(l: Any, /) -> Any:
-        """void **TCOD_list_begin(TCOD_list_t l)"""
+        """void **TCOD_list_begin(TCOD_List *l)"""
 
     @staticmethod
     def TCOD_list_clear(l: Any, /) -> None:
-        """void TCOD_list_clear(TCOD_list_t l)"""
+        """void TCOD_list_clear(TCOD_List *l)"""
 
     @staticmethod
     def TCOD_list_clear_and_delete(l: Any, /) -> None:
-        """void TCOD_list_clear_and_delete(TCOD_list_t l)"""
+        """void TCOD_list_clear_and_delete(TCOD_List *l)"""
 
     @staticmethod
     def TCOD_list_contains(l: Any, elt: Any, /) -> bool:
-        """bool TCOD_list_contains(TCOD_list_t l, const void *elt)"""
+        """bool TCOD_list_contains(TCOD_List *l, const void *elt)"""
 
     @staticmethod
     def TCOD_list_delete(l: Any, /) -> None:
-        """void TCOD_list_delete(TCOD_list_t l)"""
+        """void TCOD_list_delete(TCOD_List *l)"""
 
     @staticmethod
     def TCOD_list_duplicate(l: Any, /) -> Any:
-        """TCOD_list_t TCOD_list_duplicate(TCOD_list_t l)"""
+        """TCOD_List *TCOD_list_duplicate(TCOD_List *l)"""
 
     @staticmethod
     def TCOD_list_end(l: Any, /) -> Any:
-        """void **TCOD_list_end(TCOD_list_t l)"""
+        """void **TCOD_list_end(TCOD_List *l)"""
 
     @staticmethod
     def TCOD_list_get(l: Any, idx: int, /) -> Any:
-        """void *TCOD_list_get(TCOD_list_t l, int idx)"""
+        """void *TCOD_list_get(TCOD_List *l, int idx)"""
 
     @staticmethod
     def TCOD_list_insert_before(l: Any, elt: Any, before: int, /) -> Any:
-        """void **TCOD_list_insert_before(TCOD_list_t l, const void *elt, int before)"""
+        """void **TCOD_list_insert_before(TCOD_List *l, const void *elt, int before)"""
 
     @staticmethod
     def TCOD_list_is_empty(l: Any, /) -> bool:
-        """bool TCOD_list_is_empty(TCOD_list_t l)"""
+        """bool TCOD_list_is_empty(TCOD_List *l)"""
 
     @staticmethod
     def TCOD_list_new() -> Any:
-        """TCOD_list_t TCOD_list_new(void)"""
+        """TCOD_List *TCOD_list_new(void)"""
 
     @staticmethod
     def TCOD_list_peek(l: Any, /) -> Any:
-        """void *TCOD_list_peek(TCOD_list_t l)"""
+        """void *TCOD_list_peek(TCOD_List *l)"""
 
     @staticmethod
     def TCOD_list_pop(l: Any, /) -> Any:
-        """void *TCOD_list_pop(TCOD_list_t l)"""
+        """void *TCOD_list_pop(TCOD_List *l)"""
 
     @staticmethod
     def TCOD_list_push(l: Any, elt: Any, /) -> None:
-        """void TCOD_list_push(TCOD_list_t l, const void *elt)"""
+        """void TCOD_list_push(TCOD_List *l, const void *elt)"""
 
     @staticmethod
     def TCOD_list_remove(l: Any, elt: Any, /) -> None:
-        """void TCOD_list_remove(TCOD_list_t l, const void *elt)"""
+        """void TCOD_list_remove(TCOD_List *l, const void *elt)"""
 
     @staticmethod
     def TCOD_list_remove_fast(l: Any, elt: Any, /) -> None:
-        """void TCOD_list_remove_fast(TCOD_list_t l, const void *elt)"""
+        """void TCOD_list_remove_fast(TCOD_List *l, const void *elt)"""
 
     @staticmethod
     def TCOD_list_remove_iterator(l: Any, elt: Any, /) -> Any:
-        """void **TCOD_list_remove_iterator(TCOD_list_t l, void **elt)"""
+        """void **TCOD_list_remove_iterator(TCOD_List *l, void **elt)"""
 
     @staticmethod
     def TCOD_list_remove_iterator_fast(l: Any, elt: Any, /) -> Any:
-        """void **TCOD_list_remove_iterator_fast(TCOD_list_t l, void **elt)"""
+        """void **TCOD_list_remove_iterator_fast(TCOD_List *l, void **elt)"""
 
     @staticmethod
     def TCOD_list_reverse(l: Any, /) -> None:
-        """void TCOD_list_reverse(TCOD_list_t l)"""
+        """void TCOD_list_reverse(TCOD_List *l)"""
 
     @staticmethod
     def TCOD_list_set(l: Any, elt: Any, idx: int, /) -> None:
-        """void TCOD_list_set(TCOD_list_t l, const void *elt, int idx)"""
+        """void TCOD_list_set(TCOD_List *l, const void *elt, int idx)"""
 
     @staticmethod
     def TCOD_list_set_size(l: Any, size: int, /) -> None:
@@ -6368,7 +6528,7 @@ class _lib:
 
     @staticmethod
     def TCOD_list_size(l: Any, /) -> int:
-        """int TCOD_list_size(TCOD_list_t l)"""
+        """int TCOD_list_size(TCOD_List *l)"""
 
     @staticmethod
     def TCOD_load_bdf(path: Any, /) -> Any:
@@ -7585,8 +7745,8 @@ class _lib:
         """void _sdl_audio_stream_callback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount)"""
 
     @staticmethod
-    def _sdl_event_watcher(userdata: Any, event: Any, /) -> int:
-        """int _sdl_event_watcher(void *userdata, SDL_Event *event)"""
+    def _sdl_event_watcher(userdata: Any, event: Any, /) -> bool:
+        """bool _sdl_event_watcher(void *userdata, SDL_Event *event)"""
 
     @staticmethod
     def _sdl_log_output_function(userdata: Any, category: int, priority: Any, message: Any, /) -> None:
@@ -7755,6 +7915,7 @@ class _lib:
     SDLK_F9: Final[int]
     SDLK_F: Final[int]
     SDLK_FIND: Final[int]
+    SDLK_FRONT: Final[int]
     SDLK_G: Final[int]
     SDLK_GRAVE: Final[int]
     SDLK_GREATER: Final[int]
@@ -8003,6 +8164,9 @@ class _lib:
     SDL_BUTTON_X2MASK: Final[int]
     SDL_BYTEORDER: Final[int]
     SDL_CACHELINE_SIZE: Final[int]
+    SDL_CAMERA_PERMISSION_STATE_APPROVED: Final[int]
+    SDL_CAMERA_PERMISSION_STATE_DENIED: Final[Literal[-1]] = -1
+    SDL_CAMERA_PERMISSION_STATE_PENDING: Final[int]
     SDL_CAMERA_POSITION_BACK_FACING: Final[int]
     SDL_CAMERA_POSITION_FRONT_FACING: Final[int]
     SDL_CAMERA_POSITION_UNKNOWN: Final[int]
@@ -8073,6 +8237,7 @@ class _lib:
     SDL_EVENT_DISPLAY_MOVED: Final[int]
     SDL_EVENT_DISPLAY_ORIENTATION: Final[Literal[337]] = 337
     SDL_EVENT_DISPLAY_REMOVED: Final[int]
+    SDL_EVENT_DISPLAY_USABLE_BOUNDS_CHANGED: Final[int]
     SDL_EVENT_DROP_BEGIN: Final[int]
     SDL_EVENT_DROP_COMPLETE: Final[int]
     SDL_EVENT_DROP_FILE: Final[Literal[4096]] = 4096
@@ -8127,6 +8292,9 @@ class _lib:
     SDL_EVENT_PEN_PROXIMITY_IN: Final[Literal[4864]] = 4864
     SDL_EVENT_PEN_PROXIMITY_OUT: Final[int]
     SDL_EVENT_PEN_UP: Final[int]
+    SDL_EVENT_PINCH_BEGIN: Final[Literal[1808]] = 1808
+    SDL_EVENT_PINCH_END: Final[int]
+    SDL_EVENT_PINCH_UPDATE: Final[int]
     SDL_EVENT_POLL_SENTINEL: Final[Literal[32512]] = 32512
     SDL_EVENT_PRIVATE0: Final[Literal[16384]] = 16384
     SDL_EVENT_PRIVATE1: Final[int]
@@ -8136,6 +8304,8 @@ class _lib:
     SDL_EVENT_RENDER_DEVICE_LOST: Final[int]
     SDL_EVENT_RENDER_DEVICE_RESET: Final[int]
     SDL_EVENT_RENDER_TARGETS_RESET: Final[Literal[8192]] = 8192
+    SDL_EVENT_SCREEN_KEYBOARD_HIDDEN: Final[int]
+    SDL_EVENT_SCREEN_KEYBOARD_SHOWN: Final[int]
     SDL_EVENT_SENSOR_UPDATE: Final[Literal[4608]] = 4608
     SDL_EVENT_SYSTEM_THEME_CHANGED: Final[int]
     SDL_EVENT_TERMINATING: Final[int]
@@ -8179,6 +8349,7 @@ class _lib:
     SDL_FLASH_CANCEL: Final[int]
     SDL_FLASH_UNTIL_FOCUSED: Final[int]
     SDL_FLIP_HORIZONTAL: Final[int]
+    SDL_FLIP_HORIZONTAL_AND_VERTICAL: Final[int]
     SDL_FLIP_NONE: Final[int]
     SDL_FLIP_VERTICAL: Final[int]
     SDL_FLOATWORDORDER: Final[int]
@@ -8244,6 +8415,7 @@ class _lib:
     SDL_GAMEPAD_BUTTON_TOUCHPAD: Final[int]
     SDL_GAMEPAD_BUTTON_WEST: Final[int]
     SDL_GAMEPAD_TYPE_COUNT: Final[int]
+    SDL_GAMEPAD_TYPE_GAMECUBE: Final[int]
     SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_LEFT: Final[int]
     SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_PAIR: Final[int]
     SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_RIGHT: Final[int]
@@ -8252,6 +8424,7 @@ class _lib:
     SDL_GAMEPAD_TYPE_PS4: Final[int]
     SDL_GAMEPAD_TYPE_PS5: Final[int]
     SDL_GAMEPAD_TYPE_STANDARD: Final[int]
+    SDL_GAMEPAD_TYPE_STEAM: Final[int]
     SDL_GAMEPAD_TYPE_UNKNOWN: Final[Literal[0]] = 0
     SDL_GAMEPAD_TYPE_XBOX360: Final[int]
     SDL_GAMEPAD_TYPE_XBOXONE: Final[int]
@@ -8791,6 +8964,10 @@ class _lib:
     SDL_PEN_AXIS_TANGENTIAL_PRESSURE: Final[int]
     SDL_PEN_AXIS_XTILT: Final[int]
     SDL_PEN_AXIS_YTILT: Final[int]
+    SDL_PEN_DEVICE_TYPE_DIRECT: Final[int]
+    SDL_PEN_DEVICE_TYPE_INDIRECT: Final[int]
+    SDL_PEN_DEVICE_TYPE_INVALID: Final[Literal[-1]] = -1
+    SDL_PEN_DEVICE_TYPE_UNKNOWN: Final[int]
     SDL_PEN_INPUT_BUTTON_1: Final[int]
     SDL_PEN_INPUT_BUTTON_2: Final[int]
     SDL_PEN_INPUT_BUTTON_3: Final[int]
@@ -8798,6 +8975,7 @@ class _lib:
     SDL_PEN_INPUT_BUTTON_5: Final[int]
     SDL_PEN_INPUT_DOWN: Final[int]
     SDL_PEN_INPUT_ERASER_TIP: Final[int]
+    SDL_PEN_INPUT_IN_PROXIMITY: Final[int]
     SDL_PEN_MOUSEID: Final[int]
     SDL_PEN_TOUCHID: Final[int]
     SDL_PIXELFORMAT_ABGR128_FLOAT: int
@@ -8896,6 +9074,12 @@ class _lib:
     SDL_PROCESS_STDIO_INHERITED: Final[int]
     SDL_PROCESS_STDIO_NULL: Final[int]
     SDL_PROCESS_STDIO_REDIRECT: Final[int]
+    SDL_PROGRESS_STATE_ERROR: Final[int]
+    SDL_PROGRESS_STATE_INDETERMINATE: Final[int]
+    SDL_PROGRESS_STATE_INVALID: Final[Literal[-1]] = -1
+    SDL_PROGRESS_STATE_NONE: Final[int]
+    SDL_PROGRESS_STATE_NORMAL: Final[int]
+    SDL_PROGRESS_STATE_PAUSED: Final[int]
     SDL_PROPERTY_TYPE_BOOLEAN: Final[int]
     SDL_PROPERTY_TYPE_FLOAT: Final[int]
     SDL_PROPERTY_TYPE_INVALID: Final[int]
@@ -8912,6 +9096,7 @@ class _lib:
     SDL_SCALEMODE_INVALID: Final[Literal[-1]] = -1
     SDL_SCALEMODE_LINEAR: Final[int]
     SDL_SCALEMODE_NEAREST: Final[int]
+    SDL_SCALEMODE_PIXELART: Final[int]
     SDL_SCANCODE_0: Final[Literal[39]] = 39
     SDL_SCANCODE_1: Final[Literal[30]] = 30
     SDL_SCANCODE_2: Final[Literal[31]] = 31
@@ -8996,6 +9181,7 @@ class _lib:
     SDL_SCANCODE_F9: Final[Literal[66]] = 66
     SDL_SCANCODE_F: Final[Literal[9]] = 9
     SDL_SCANCODE_FIND: Final[Literal[126]] = 126
+    SDL_SCANCODE_FRONT: Final[Literal[165]] = 165
     SDL_SCANCODE_G: Final[Literal[10]] = 10
     SDL_SCANCODE_GRAVE: Final[Literal[53]] = 53
     SDL_SCANCODE_H: Final[Literal[11]] = 11
@@ -9164,6 +9350,7 @@ class _lib:
     SDL_SENSOR_ACCEL: Final[int]
     SDL_SENSOR_ACCEL_L: Final[int]
     SDL_SENSOR_ACCEL_R: Final[int]
+    SDL_SENSOR_COUNT: Final[int]
     SDL_SENSOR_GYRO: Final[int]
     SDL_SENSOR_GYRO_L: Final[int]
     SDL_SENSOR_GYRO_R: Final[int]
@@ -9210,6 +9397,10 @@ class _lib:
     SDL_TEXTUREACCESS_STATIC: Final[int]
     SDL_TEXTUREACCESS_STREAMING: Final[int]
     SDL_TEXTUREACCESS_TARGET: Final[int]
+    SDL_TEXTURE_ADDRESS_AUTO: Final[int]
+    SDL_TEXTURE_ADDRESS_CLAMP: Final[int]
+    SDL_TEXTURE_ADDRESS_INVALID: Final[Literal[-1]] = -1
+    SDL_TEXTURE_ADDRESS_WRAP: Final[int]
     SDL_THREAD_ALIVE: Final[int]
     SDL_THREAD_COMPLETE: Final[int]
     SDL_THREAD_DETACHED: Final[int]
@@ -9258,6 +9449,7 @@ class _lib:
     SDL_WINDOW_ALWAYS_ON_TOP: Final[int]
     SDL_WINDOW_BORDERLESS: Final[int]
     SDL_WINDOW_EXTERNAL: Final[int]
+    SDL_WINDOW_FILL_DOCUMENT: Final[int]
     SDL_WINDOW_FULLSCREEN: Final[int]
     SDL_WINDOW_HIDDEN: Final[int]
     SDL_WINDOW_HIGH_PIXEL_DENSITY: Final[int]
@@ -9520,7 +9712,7 @@ class _lib:
     TCOD_NOISE_PERLIN: Final[Literal[1]] = 1
     TCOD_NOISE_SIMPLEX: Final[Literal[2]] = 2
     TCOD_NOISE_WAVELET: Final[Literal[4]] = 4
-    TCOD_PATCHLEVEL: Final[Literal[1]] = 1
+    TCOD_PATCHLEVEL: Final[Literal[2]] = 2
     TCOD_PATHFINDER_MAX_DIMENSIONS: Final[Literal[4]] = 4
     TCOD_RENDERER_GLSL: Final[int]
     TCOD_RENDERER_OPENGL2: Final[int]
