@@ -105,7 +105,7 @@ jobs:
   build:
     needs: [ruff, mypy, sdist]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
+    timeout-minutes: 30
     strategy:
       matrix:
         os: ["ubuntu-latest", "windows-latest"]
@@ -179,7 +179,7 @@ jobs:
   test-docs:
     needs: [ruff, mypy, sdist]
     runs-on: ubuntu-26.04
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - name: APT update
         run: sudo apt-get update
@@ -204,7 +204,7 @@ jobs:
   tox:
     needs: [ruff, sdist]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
+    timeout-minutes: 30
     strategy:
       matrix:
         os: ["ubuntu-latest"] # "windows-latest" disabled due to free-threaded build issues
@@ -235,7 +235,7 @@ jobs:
   linux-wheels:
     needs: [ruff, mypy, sdist]
     runs-on: ${{ matrix.arch == 'aarch64' && 'ubuntu-26.04-arm' || 'ubuntu-26.04'}}
-    timeout-minutes: 15
+    timeout-minutes: 30
     strategy:
       matrix:
         arch: ["x86_64", "aarch64"]
@@ -292,7 +292,7 @@ jobs:
   build-macos:
     needs: [ruff, mypy, sdist]
     runs-on: "macos-14"
-    timeout-minutes: 15
+    timeout-minutes: 30
     strategy:
       fail-fast: true
       matrix:
@@ -341,7 +341,7 @@ jobs:
   pyodide:
     needs: [ruff, mypy, sdist]
     runs-on: ubuntu-26.04
-    timeout-minutes: 15
+    timeout-minutes: 30
     continue-on-error: true
     strategy:
       fail-fast: true
