@@ -15,6 +15,7 @@
     "files.associations": {
         "*.spec": "python"
     },
+    "cmake.ignoreCMakeListsMissing": true,
     "mypy-type-checker.importStrategy": "fromEnvironment",
     "cSpell.words": [
         "aarch",
