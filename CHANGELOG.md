@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Changed
+
+- `tcod.map.compute_fov` now raises `ValueError` instead of warning when `pov` is outside the transparency array, as previously announced by the warning.
+
 ## [21.2.2] - 2026-10-22
 
 ### Changed

@@ -60,6 +60,21 @@ def test_tcod_bsp() -> None:
     str(bsp)
 
 
+@pytest.mark.parametrize("pov", [(-1, 0), (0, -1), (3, 0), (0, 5)])
+def test_compute_fov_out_of_bounds(pov: tuple[int, int]) -> None:
+    transparency = np.ones((3, 5), dtype=bool)
+    with pytest.raises(ValueError, match="outside the array"):
+        tcod.map.compute_fov(transparency, pov)
+
+
+@pytest.mark.parametrize("pov", [(0, 0), (0, 4), (2, 0), (2, 4)])
+def test_compute_fov_at_boundary(pov: tuple[int, int]) -> None:
+    transparency = np.ones((3, 5), dtype=bool)
+    visible = tcod.map.compute_fov(transparency, pov)
+    assert visible.shape == transparency.shape
+    assert visible.all()
+
+
 @pytest.mark.filterwarnings("ignore:Use map.+ to check for this")
 @pytest.mark.filterwarnings("ignore:This class may perform poorly")
 def test_tcod_map_set_bits() -> None:
