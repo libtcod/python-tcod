@@ -180,7 +180,7 @@ def compute_fov(
     `pov` is the point-of-view origin point.  Areas are visible if they can
     be seen from this position.  `pov` should be a 2D index matching the axes
     of the `transparency` array, and must be within the bounds of the
-    `transparency` array.
+    `transparency` array.  A `ValueError` is raised if `pov` is out of bounds.
 
     `radius` is the maximum view distance from `pov`.  If this is zero then
     the maximum distance is used.
@@ -240,13 +240,9 @@ def compute_fov(
         msg = "The tcod.map.compute_fov function has changed.  The `x` and `y` parameters should now be given as a single tuple."
         raise TypeError(msg)
     if not (0 <= pov[0] < transparency.shape[0] and 0 <= pov[1] < transparency.shape[1]):
-        warnings.warn(
-            f"Given pov index {pov!r} is outside the array of shape {transparency.shape!r}."
-            "\nThis will raise an error in future versions.",
-            RuntimeWarning,
-            stacklevel=2,
-        )
-    map_buffer: NDArray[np.bool_] = np.zeros(
+        msg = f"Given pov index {pov!r} is outside the array of shape {transparency.shape!r}."
+        raise ValueError(msg)
+    map_buffer: NDArray[np.bool_] = np.empty(
         transparency.shape,
         dtype=[("transparent", bool), ("walkable", bool), ("fov", bool)],
     )
