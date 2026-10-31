@@ -246,7 +246,7 @@ def compute_fov(
             RuntimeWarning,
             stacklevel=2,
         )
-    map_buffer: NDArray[np.bool_] = np.empty(
+    map_buffer: NDArray[np.bool_] = np.zeros(
         transparency.shape,
         dtype=[("transparent", bool), ("walkable", bool), ("fov", bool)],
     )

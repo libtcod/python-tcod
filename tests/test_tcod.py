@@ -60,6 +60,17 @@ def test_tcod_bsp() -> None:
     str(bsp)
 
 
+@pytest.mark.parametrize("pov", [(-1, 0), (0, -1), (3, 0), (0, 5)])
+def test_compute_fov_out_of_bounds(pov: tuple[int, int], monkeypatch: pytest.MonkeyPatch) -> None:
+    transparency = np.ones((3, 5), dtype=bool)
+    # Model an uninitialized allocation containing stale visible cells.
+    monkeypatch.setattr(np, "empty", np.ones)
+    with pytest.warns(RuntimeWarning, match="outside the array"):
+        visible = tcod.map.compute_fov(transparency, pov)
+    assert visible.shape == transparency.shape
+    assert not visible.any()
+
+
 @pytest.mark.filterwarnings("ignore:Use map.+ to check for this")
 @pytest.mark.filterwarnings("ignore:This class may perform poorly")
 def test_tcod_map_set_bits() -> None:
