@@ -46,9 +46,9 @@ def python_machine() -> str:
 # Reject versions of SDL older than this, update the requirements in the readme if you change this.
 SDL_MIN_VERSION = (3, 2, 0)
 # The SDL version to parse and export symbols from.
-SDL_PARSE_VERSION = os.environ.get("SDL_VERSION", "3.4.18")
+SDL_PARSE_VERSION = os.environ.get("SDL_VERSION", "3.4.20")
 # The SDL version to include in binary distributions.
-SDL_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "3.4.18")
+SDL_BUNDLE_VERSION = os.environ.get("SDL_VERSION", "3.4.20")
 
 
 # Used to remove excessive newlines in debug outputs.
