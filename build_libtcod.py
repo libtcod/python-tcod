@@ -42,13 +42,13 @@ RE_CPLUSPLUS = re.compile(r"#ifdef __cplusplus.*?#endif.*?$", re.DOTALL | re.MUL
 RE_PREPROCESSOR = re.compile(r"(?!#define\s+\w+\s+\d+$)#.*?(?<!\\)$", re.DOTALL | re.MULTILINE)
 RE_INCLUDE = re.compile(r'#include "([^"]*)"')
 RE_TAGS = re.compile(
-    r"TCODLIB_C?API|TCOD_PUBLIC|TCOD_NODISCARD|TCOD_DEPRECATED_NOMESSAGE|TCOD_DEPRECATED_ENUM"
+    r"TCODLIB_C?API|TCOD_PUBLIC|TCOD_PRIVATE|TCOD_NODISCARD|TCOD_DEPRECATED_NOMESSAGE|TCOD_DEPRECATED_ENUM"
     r"|(TCOD_DEPRECATED\(\".*?\"\))"
     r"|(TCOD_DEPRECATED|TCODLIB_FORMAT)\([^)]*\)|__restrict"
     r"|TCODLIB_(BEGIN|END)_IGNORE_DEPRECATIONS"
 )
 RE_VAFUNC = re.compile(r"^[^;]*\([^;]*va_list.*\);", re.MULTILINE)
-RE_INLINE = re.compile(r"(^.*?inline.*?\(.*?\))\s*\{.*?\}$", re.DOTALL | re.MULTILINE)
+RE_INLINE = re.compile(r"(^[^\n]*?inline.*?\(.*?\))\s*\{.*?\n\}$", re.DOTALL | re.MULTILINE)
 
 
 class ParsedHeader:
@@ -197,6 +197,7 @@ if sys.platform != "win32":
     # Fix implicit declaration of multiple functions in zlib.
     define_macros.append(("HAVE_UNISTD_H", 1))
 
+define_macros.append(("UTF8PROC_STATIC", None))
 
 tdl_build = os.environ.get("TDL_BUILD", "RELEASE").upper()
 
@@ -232,7 +233,7 @@ for include in includes:
         # Print the source, for debugging.
         print(f"Error with: {include.path}")
         for i, line in enumerate(include.header.split("\n"), 1):
-            print(f"{i:03i} {line}")
+            print(f"{i:03d} {line}")
         raise
 ffi.cdef(
     """

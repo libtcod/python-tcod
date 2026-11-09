@@ -5464,7 +5464,7 @@ class _lib:
 
     @staticmethod
     def TCOD_console_from_file(filename: Any, /) -> Any:
-        """TCOD_console_t TCOD_console_from_file(const char *filename)"""
+        """TCOD_Console *TCOD_console_from_file(const char *filename)"""
 
     @staticmethod
     def TCOD_console_from_xp(filename: Any, /) -> Any:
@@ -5602,11 +5602,11 @@ class _lib:
 
     @staticmethod
     def TCOD_console_load_apf(con: Any, filename: Any, /) -> bool:
-        """bool TCOD_console_load_apf(TCOD_console_t con, const char *filename)"""
+        """bool TCOD_console_load_apf(TCOD_Console *con, const char *filename)"""
 
     @staticmethod
     def TCOD_console_load_asc(con: Any, filename: Any, /) -> bool:
-        """bool TCOD_console_load_asc(TCOD_console_t con, const char *filename)"""
+        """bool TCOD_console_load_asc(TCOD_Console *con, const char *filename)"""
 
     @staticmethod
     def TCOD_console_load_xp(con: Any, filename: Any, /) -> bool:
@@ -5810,11 +5810,11 @@ class _lib:
 
     @staticmethod
     def TCOD_console_save_apf(con: Any, filename: Any, /) -> bool:
-        """bool TCOD_console_save_apf(TCOD_console_t con, const char *filename)"""
+        """bool TCOD_console_save_apf(TCOD_Console *con, const char *filename)"""
 
     @staticmethod
     def TCOD_console_save_asc(con: Any, filename: Any, /) -> bool:
-        """bool TCOD_console_save_asc(TCOD_console_t con, const char *filename)"""
+        """bool TCOD_console_save_asc(TCOD_Console *con, const char *filename)"""
 
     @staticmethod
     def TCOD_console_save_xp(con: Any, filename: Any, compress_level: int, /) -> bool:
@@ -6103,7 +6103,7 @@ class _lib:
         scale: float,
         /,
     ) -> None:
-        """void TCOD_heightmap_add_fbm(TCOD_heightmap_t *hm, TCOD_noise_t noise, float mul_x, float mul_y, float add_x, float add_y, float octaves, float delta, float scale)"""
+        """void TCOD_heightmap_add_fbm(TCOD_heightmap_t *hm, TCOD_Noise *noise, float mul_x, float mul_y, float add_x, float add_y, float octaves, float delta, float scale)"""
 
     @staticmethod
     def TCOD_heightmap_add_hill(hm: Any, hx: float, hy: float, h_radius: float, h_height: float, /) -> None:
@@ -6152,8 +6152,8 @@ class _lib:
         """float TCOD_heightmap_get_interpolated_value(const TCOD_heightmap_t *hm, float x, float y)"""
 
     @staticmethod
-    def TCOD_heightmap_get_minmax(hm: Any, min: Any, max: Any, /) -> None:
-        """void TCOD_heightmap_get_minmax(const TCOD_heightmap_t *hm, float *min, float *max)"""
+    def TCOD_heightmap_get_minmax(heightmap: Any, min_out: Any, max_out: Any, /) -> None:
+        """void TCOD_heightmap_get_minmax(const TCOD_heightmap_t *heightmap, float *min_out, float *max_out)"""
 
     @staticmethod
     def TCOD_heightmap_get_normal(hm: Any, x: float, y: float, n: Any, waterLevel: float, /) -> None:
@@ -6164,12 +6164,20 @@ class _lib:
         """float TCOD_heightmap_get_slope(const TCOD_heightmap_t *hm, int x, int y)"""
 
     @staticmethod
-    def TCOD_heightmap_get_value(hm: Any, x: int, y: int, /) -> float:
-        """float TCOD_heightmap_get_value(const TCOD_heightmap_t *hm, int x, int y)"""
+    def TCOD_heightmap_get_value(heightmap: Any, x: int, y: int, /) -> float:
+        """inline static float TCOD_heightmap_get_value(const TCOD_heightmap_t *heightmap, int x, int y)"""
 
     @staticmethod
     def TCOD_heightmap_has_land_on_border(hm: Any, waterLevel: float, /) -> bool:
         """bool TCOD_heightmap_has_land_on_border(const TCOD_heightmap_t *hm, float waterLevel)"""
+
+    @staticmethod
+    def TCOD_heightmap_in_bounds(heightmap: Any, x: int, y: int, /) -> bool:
+        """inline static bool TCOD_heightmap_in_bounds(const TCOD_heightmap_t *heightmap, int x, int y)"""
+
+    @staticmethod
+    def TCOD_heightmap_is_valid(heightmap: Any, /) -> bool:
+        """inline static bool TCOD_heightmap_is_valid(const TCOD_heightmap_t *heightmap)"""
 
     @staticmethod
     def TCOD_heightmap_islandify(hm: Any, seaLevel: float, rnd: Any, /) -> None:
@@ -6180,6 +6188,12 @@ class _lib:
         hm: Any, kernel_size: int, dx: Any, dy: Any, weight: Any, minLevel: float, maxLevel: float, /
     ) -> None:
         """void TCOD_heightmap_kernel_transform(TCOD_heightmap_t *hm, int kernel_size, const int *dx, const int *dy, const float *weight, float minLevel, float maxLevel)"""
+
+    @staticmethod
+    def TCOD_heightmap_kernel_transform_out(
+        hm_src: Any, hm_dst: Any, kernel_size: int, dx: Any, dy: Any, weight: Any, mask: Any, /
+    ) -> None:
+        """void TCOD_heightmap_kernel_transform_out(const TCOD_heightmap_t *hm_src, TCOD_heightmap_t *hm_dst, int kernel_size, const int *dx, const int *dy, const float *weight, const uint8_t *mask)"""
 
     @staticmethod
     def TCOD_heightmap_lerp_hm(hm1: Any, hm2: Any, out: Any, coef: float, /) -> None:
@@ -6224,11 +6238,15 @@ class _lib:
         scale: float,
         /,
     ) -> None:
-        """void TCOD_heightmap_scale_fbm(TCOD_heightmap_t *hm, TCOD_noise_t noise, float mul_x, float mul_y, float add_x, float add_y, float octaves, float delta, float scale)"""
+        """void TCOD_heightmap_scale_fbm(TCOD_heightmap_t *hm, TCOD_Noise *noise, float mul_x, float mul_y, float add_x, float add_y, float octaves, float delta, float scale)"""
 
     @staticmethod
-    def TCOD_heightmap_set_value(hm: Any, x: int, y: int, value: float, /) -> None:
-        """void TCOD_heightmap_set_value(TCOD_heightmap_t *hm, int x, int y, float value)"""
+    def TCOD_heightmap_set_value(heightmap: Any, x: int, y: int, value: float, /) -> None:
+        """inline static void TCOD_heightmap_set_value(TCOD_heightmap_t *heightmap, int x, int y, float value)"""
+
+    @staticmethod
+    def TCOD_heightmap_threshold_mask(hm: Any, mask: Any, minLevel: float, maxLevel: float, /) -> None:
+        """void TCOD_heightmap_threshold_mask(const TCOD_heightmap_t *hm, uint8_t *mask, float minLevel, float maxLevel)"""
 
     @staticmethod
     def TCOD_image_blit(
@@ -7181,6 +7199,10 @@ class _lib:
         """int TCOD_strncasecmp(const char *s1, const char *s2, size_t n)"""
 
     @staticmethod
+    def TCOD_strscpy(dest: Any, src: Any, count: int, /) -> int:
+        """inline static size_t TCOD_strscpy(char *dest, const char *src, size_t count)"""
+
+    @staticmethod
     def TCOD_struct_add_flag(def_: Any, propname: Any, /) -> None:
         """void TCOD_struct_add_flag(TCOD_ParserStruct *def, const char *propname)"""
 
@@ -7645,40 +7667,40 @@ class _lib:
         """TCOD_zip_t TCOD_zip_new(void)"""
 
     @staticmethod
-    def TCOD_zip_put_char(zip: Any, val: Any, /) -> None:
-        """void TCOD_zip_put_char(TCOD_zip_t zip, char val)"""
+    def TCOD_zip_put_char(zip: Any, value: Any, /) -> None:
+        """void TCOD_zip_put_char(TCOD_zip_t zip, char value)"""
 
     @staticmethod
-    def TCOD_zip_put_color(zip: Any, val: Any, /) -> None:
-        """void TCOD_zip_put_color(TCOD_zip_t zip, const TCOD_color_t val)"""
+    def TCOD_zip_put_color(zip: Any, value: Any, /) -> None:
+        """void TCOD_zip_put_color(TCOD_zip_t zip, const TCOD_color_t value)"""
 
     @staticmethod
-    def TCOD_zip_put_console(zip: Any, val: Any, /) -> None:
-        """void TCOD_zip_put_console(TCOD_zip_t zip, const TCOD_Console *val)"""
+    def TCOD_zip_put_console(zip: Any, value: Any, /) -> None:
+        """void TCOD_zip_put_console(TCOD_zip_t zip, const TCOD_Console *value)"""
 
     @staticmethod
     def TCOD_zip_put_data(zip: Any, nbBytes: int, data: Any, /) -> None:
         """void TCOD_zip_put_data(TCOD_zip_t zip, int nbBytes, const void *data)"""
 
     @staticmethod
-    def TCOD_zip_put_float(zip: Any, val: float, /) -> None:
-        """void TCOD_zip_put_float(TCOD_zip_t zip, float val)"""
+    def TCOD_zip_put_float(zip: Any, value: float, /) -> None:
+        """void TCOD_zip_put_float(TCOD_zip_t zip, float value)"""
 
     @staticmethod
-    def TCOD_zip_put_image(zip: Any, val: Any, /) -> None:
-        """void TCOD_zip_put_image(TCOD_zip_t zip, const TCOD_Image *val)"""
+    def TCOD_zip_put_image(zip: Any, value: Any, /) -> None:
+        """void TCOD_zip_put_image(TCOD_zip_t zip, const TCOD_Image *value)"""
 
     @staticmethod
-    def TCOD_zip_put_int(zip: Any, val: int, /) -> None:
-        """void TCOD_zip_put_int(TCOD_zip_t zip, int val)"""
+    def TCOD_zip_put_int(zip: Any, value: int, /) -> None:
+        """void TCOD_zip_put_int(TCOD_zip_t zip, int value)"""
 
     @staticmethod
-    def TCOD_zip_put_random(zip: Any, val: Any, /) -> None:
-        """void TCOD_zip_put_random(TCOD_zip_t zip, const TCOD_Random *val)"""
+    def TCOD_zip_put_random(zip: Any, value: Any, /) -> None:
+        """void TCOD_zip_put_random(TCOD_zip_t zip, const TCOD_Random *value)"""
 
     @staticmethod
-    def TCOD_zip_put_string(zip: Any, val: Any, /) -> None:
-        """void TCOD_zip_put_string(TCOD_zip_t zip, const char *val)"""
+    def TCOD_zip_put_string(zip: Any, value: Any, /) -> None:
+        """void TCOD_zip_put_string(TCOD_zip_t zip, const char *value)"""
 
     @staticmethod
     def TCOD_zip_save_to_file(zip: Any, filename: Any, /) -> int:
@@ -9704,7 +9726,7 @@ class _lib:
     TCOD_LOG_INFO: Final[Literal[20]] = 20
     TCOD_LOG_WARNING: Final[Literal[30]] = 30
     TCOD_MAJOR_VERSION: Final[Literal[2]] = 2
-    TCOD_MINOR_VERSION: Final[Literal[2]] = 2
+    TCOD_MINOR_VERSION: Final[Literal[3]] = 3
     TCOD_NB_RENDERERS: Final[int]
     TCOD_NOISE_DEFAULT: Final[Literal[0]] = 0
     TCOD_NOISE_MAX_DIMENSIONS: Final[Literal[4]] = 4
@@ -9712,7 +9734,7 @@ class _lib:
     TCOD_NOISE_PERLIN: Final[Literal[1]] = 1
     TCOD_NOISE_SIMPLEX: Final[Literal[2]] = 2
     TCOD_NOISE_WAVELET: Final[Literal[4]] = 4
-    TCOD_PATCHLEVEL: Final[Literal[2]] = 2
+    TCOD_PATCHLEVEL: Final[Literal[0]] = 0
     TCOD_PATHFINDER_MAX_DIMENSIONS: Final[Literal[4]] = 4
     TCOD_RENDERER_GLSL: Final[int]
     TCOD_RENDERER_OPENGL2: Final[int]

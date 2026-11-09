@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+### Changed
+
+- Updated libtcod to 2.3.0
+
 ## [21.2.2] - 2026-10-22
 
 ### Changed
