@@ -5629,8 +5629,8 @@ class _lib:
         """void TCOD_console_map_string_to_font_utf(const wchar_t *s, int fontCharX, int fontCharY)"""
 
     @staticmethod
-    def TCOD_console_new(w: int, h: int, /) -> Any:
-        """TCOD_Console *TCOD_console_new(int w, int h)"""
+    def TCOD_console_new(width: int, height: int, /) -> Any:
+        """TCOD_Console *TCOD_console_new(int width, int height)"""
 
     @staticmethod
     def TCOD_console_print(con: Any, x: int, y: int, fmt: Any, /, *__args: Any) -> None:
@@ -6453,100 +6453,100 @@ class _lib:
         """bool TCOD_line_step_mt(int *xCur, int *yCur, TCOD_bresenham_data_t *data)"""
 
     @staticmethod
-    def TCOD_list_add_all(l: Any, l2: Any, /) -> None:
-        """void TCOD_list_add_all(TCOD_List *l, TCOD_List *l2)"""
+    def TCOD_list_add_all(lst: Any, extend: Any, /) -> None:
+        """void TCOD_list_add_all(TCOD_List *lst, TCOD_List *extend)"""
 
     @staticmethod
     def TCOD_list_allocate(nb_elements: int, /) -> Any:
         """TCOD_List *TCOD_list_allocate(int nb_elements)"""
 
     @staticmethod
-    def TCOD_list_begin(l: Any, /) -> Any:
-        """void **TCOD_list_begin(TCOD_List *l)"""
+    def TCOD_list_begin(lst: Any, /) -> Any:
+        """void **TCOD_list_begin(TCOD_List *lst)"""
 
     @staticmethod
-    def TCOD_list_clear(l: Any, /) -> None:
-        """void TCOD_list_clear(TCOD_List *l)"""
+    def TCOD_list_clear(lst: Any, /) -> None:
+        """void TCOD_list_clear(TCOD_List *lst)"""
 
     @staticmethod
-    def TCOD_list_clear_and_delete(l: Any, /) -> None:
-        """void TCOD_list_clear_and_delete(TCOD_List *l)"""
+    def TCOD_list_clear_and_delete(lst: Any, /) -> None:
+        """void TCOD_list_clear_and_delete(TCOD_List *lst)"""
 
     @staticmethod
-    def TCOD_list_contains(l: Any, elt: Any, /) -> bool:
-        """bool TCOD_list_contains(TCOD_List *l, const void *elt)"""
+    def TCOD_list_contains(lst: Any, element: Any, /) -> bool:
+        """bool TCOD_list_contains(TCOD_List *lst, const void *element)"""
 
     @staticmethod
-    def TCOD_list_delete(l: Any, /) -> None:
-        """void TCOD_list_delete(TCOD_List *l)"""
+    def TCOD_list_delete(lst: Any, /) -> None:
+        """void TCOD_list_delete(TCOD_List *lst)"""
 
     @staticmethod
-    def TCOD_list_duplicate(l: Any, /) -> Any:
-        """TCOD_List *TCOD_list_duplicate(TCOD_List *l)"""
+    def TCOD_list_duplicate(lst: Any, /) -> Any:
+        """TCOD_List *TCOD_list_duplicate(TCOD_List *lst)"""
 
     @staticmethod
-    def TCOD_list_end(l: Any, /) -> Any:
-        """void **TCOD_list_end(TCOD_List *l)"""
+    def TCOD_list_end(lst: Any, /) -> Any:
+        """void **TCOD_list_end(TCOD_List *lst)"""
 
     @staticmethod
-    def TCOD_list_get(l: Any, idx: int, /) -> Any:
-        """void *TCOD_list_get(TCOD_List *l, int idx)"""
+    def TCOD_list_get(lst: Any, index: int, /) -> Any:
+        """void *TCOD_list_get(TCOD_List *lst, int index)"""
 
     @staticmethod
-    def TCOD_list_insert_before(l: Any, elt: Any, before: int, /) -> Any:
-        """void **TCOD_list_insert_before(TCOD_List *l, const void *elt, int before)"""
+    def TCOD_list_insert_before(lst: Any, element: Any, index: int, /) -> Any:
+        """void **TCOD_list_insert_before(TCOD_List *lst, const void *element, int index)"""
 
     @staticmethod
-    def TCOD_list_is_empty(l: Any, /) -> bool:
-        """bool TCOD_list_is_empty(TCOD_List *l)"""
+    def TCOD_list_is_empty(lst: Any, /) -> bool:
+        """bool TCOD_list_is_empty(TCOD_List *lst)"""
 
     @staticmethod
     def TCOD_list_new() -> Any:
         """TCOD_List *TCOD_list_new(void)"""
 
     @staticmethod
-    def TCOD_list_peek(l: Any, /) -> Any:
-        """void *TCOD_list_peek(TCOD_List *l)"""
+    def TCOD_list_peek(lst: Any, /) -> Any:
+        """void *TCOD_list_peek(TCOD_List *lst)"""
 
     @staticmethod
-    def TCOD_list_pop(l: Any, /) -> Any:
-        """void *TCOD_list_pop(TCOD_List *l)"""
+    def TCOD_list_pop(lst: Any, /) -> Any:
+        """void *TCOD_list_pop(TCOD_List *lst)"""
 
     @staticmethod
-    def TCOD_list_push(l: Any, elt: Any, /) -> None:
-        """void TCOD_list_push(TCOD_List *l, const void *elt)"""
+    def TCOD_list_push(lst: Any, element: Any, /) -> None:
+        """void TCOD_list_push(TCOD_List *lst, const void *element)"""
 
     @staticmethod
-    def TCOD_list_remove(l: Any, elt: Any, /) -> None:
-        """void TCOD_list_remove(TCOD_List *l, const void *elt)"""
+    def TCOD_list_remove(lst: Any, element: Any, /) -> None:
+        """void TCOD_list_remove(TCOD_List *lst, const void *element)"""
 
     @staticmethod
-    def TCOD_list_remove_fast(l: Any, elt: Any, /) -> None:
-        """void TCOD_list_remove_fast(TCOD_List *l, const void *elt)"""
+    def TCOD_list_remove_fast(lst: Any, element: Any, /) -> None:
+        """void TCOD_list_remove_fast(TCOD_List *lst, const void *element)"""
 
     @staticmethod
-    def TCOD_list_remove_iterator(l: Any, elt: Any, /) -> Any:
-        """void **TCOD_list_remove_iterator(TCOD_List *l, void **elt)"""
+    def TCOD_list_remove_iterator(lst: Any, iter_element: Any, /) -> Any:
+        """void **TCOD_list_remove_iterator(TCOD_List *lst, void **iter_element)"""
 
     @staticmethod
-    def TCOD_list_remove_iterator_fast(l: Any, elt: Any, /) -> Any:
-        """void **TCOD_list_remove_iterator_fast(TCOD_List *l, void **elt)"""
+    def TCOD_list_remove_iterator_fast(lst: Any, iter_element: Any, /) -> Any:
+        """void **TCOD_list_remove_iterator_fast(TCOD_List *lst, void **iter_element)"""
 
     @staticmethod
-    def TCOD_list_reverse(l: Any, /) -> None:
-        """void TCOD_list_reverse(TCOD_List *l)"""
+    def TCOD_list_reverse(lst: Any, /) -> None:
+        """void TCOD_list_reverse(TCOD_List *lst)"""
 
     @staticmethod
-    def TCOD_list_set(l: Any, elt: Any, idx: int, /) -> None:
-        """void TCOD_list_set(TCOD_List *l, const void *elt, int idx)"""
+    def TCOD_list_set(lst: Any, element: Any, index: int, /) -> None:
+        """void TCOD_list_set(TCOD_List *lst, const void *element, int index)"""
 
     @staticmethod
-    def TCOD_list_set_size(l: Any, size: int, /) -> None:
-        """void TCOD_list_set_size(TCOD_list_t l, int size)"""
+    def TCOD_list_set_size(lst: Any, size: int, /) -> None:
+        """void TCOD_list_set_size(TCOD_list_t lst, int size)"""
 
     @staticmethod
-    def TCOD_list_size(l: Any, /) -> int:
-        """int TCOD_list_size(TCOD_List *l)"""
+    def TCOD_list_size(lst: Any, /) -> int:
+        """int TCOD_list_size(TCOD_List *lst)"""
 
     @staticmethod
     def TCOD_load_bdf(path: Any, /) -> Any:
@@ -9734,7 +9734,7 @@ class _lib:
     TCOD_NOISE_PERLIN: Final[Literal[1]] = 1
     TCOD_NOISE_SIMPLEX: Final[Literal[2]] = 2
     TCOD_NOISE_WAVELET: Final[Literal[4]] = 4
-    TCOD_PATCHLEVEL: Final[Literal[0]] = 0
+    TCOD_PATCHLEVEL: Final[Literal[2]] = 2
     TCOD_PATHFINDER_MAX_DIMENSIONS: Final[Literal[4]] = 4
     TCOD_RENDERER_GLSL: Final[int]
     TCOD_RENDERER_OPENGL2: Final[int]
