@@ -201,7 +201,7 @@ define_macros.append(("UTF8PROC_STATIC", None))
 
 tdl_build = os.environ.get("TDL_BUILD", "RELEASE").upper()
 
-MSVC_CFLAGS = {"DEBUG": ["/Od"], "RELEASE": ["/GL", "/O2", "/GS-", "/wd4996"]}
+MSVC_CFLAGS = {"DEBUG": ["/Od"], "RELEASE": ["/GL", "/O2", "/wd4996"]}
 MSVC_LDFLAGS: dict[str, list[str]] = {"DEBUG": [], "RELEASE": ["/LTCG"]}
 GCC_CFLAGS = {
     "DEBUG": ["-std=c99", "-Og", "-g", "-fPIC"],
