@@ -6,9 +6,15 @@ This project adheres to [Semantic Versioning](https://semver.org/) since version
 
 ## [Unreleased]
 
+## [21.2.4] - 2026-11-13
+
 ### Changed
 
 - Updated libtcod to 2.3.2
+
+### Security
+
+- Safer handling of untrusted REXPaint files.
 
 ## [21.2.3] - 2026-11-09
 
