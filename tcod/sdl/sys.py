@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import enum
 import warnings
-
-from typing_extensions import Self
+from typing import Self
 
 from tcod.cffi import ffi, lib
 from tcod.sdl._internal import _check, _get_error

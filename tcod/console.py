@@ -9,10 +9,10 @@ from __future__ import annotations
 
 import warnings
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, overload
+from typing import TYPE_CHECKING, Any, Literal, Self, overload
 
 import numpy as np
-from typing_extensions import Self, deprecated
+from typing_extensions import deprecated
 
 import tcod._internal
 import tcod.constants

@@ -44,10 +44,10 @@ import sys
 import threading
 import weakref
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Final, Literal, NamedTuple
+from typing import TYPE_CHECKING, Any, Final, Literal, NamedTuple, Self
 
 import numpy as np
-from typing_extensions import Self, deprecated
+from typing_extensions import deprecated
 
 import tcod.sdl.sys
 from tcod.cffi import ffi, lib

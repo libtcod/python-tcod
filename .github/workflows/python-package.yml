@@ -109,17 +109,17 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-latest", "windows-latest"]
-        python-version: ["3.10", "3.14t", "pypy-3.10"]
+        python-version: ["3.12", "3.14t", "pypy-3.12"]
         architecture: ["x64"]
         include:
           - os: "windows-latest"
-            python-version: "3.10"
+            python-version: "3.12"
             architecture: "x86"
           - os: "windows-latest"
             python-version: "3.14t"
             architecture: "x86"
           - os: "windows-11-arm"
-            python-version: "3.11"
+            python-version: "3.12"
             architecture: "arm64"
           - os: "windows-11-arm"
             python-version: "3.14t"
@@ -239,7 +239,7 @@ jobs:
     strategy:
       matrix:
         arch: ["x86_64", "aarch64"]
-        build: ["cp310-manylinux*", "pp311-manylinux*", "cp314t-manylinux*"]
+        build: ["cp312-manylinux*", "pp312-manylinux*", "cp314t-manylinux*"]
     env:
       BUILD_DESC: ""
     steps:
@@ -296,7 +296,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python: ["cp310-*_universal2", "cp314t-*_universal2", "pp311-*"]
+        python: ["cp312-*_universal2", "cp314t-*_universal2", "pp312-*"]
     env:
       PYTHON_DESC: ""
     steps:

@@ -29,7 +29,7 @@ import build_sdl
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
 
-Py_LIMITED_API: int | None = 0x03100000
+Py_LIMITED_API: int | None = 0x03120000
 
 HEADER_PARSE_PATHS = ("tcod/", "libtcod/src/libtcod/")
 HEADER_PARSE_EXCLUDES = ("gl2_ext_.h", "renderer_gl_internal.h", "event.h")
@@ -227,7 +227,7 @@ ffi.cdef(sdl_cdef)
 for include in includes:
     try:
         ffi.cdef(include.header)
-    except Exception:  # noqa: PERF203
+    except Exception:
         # Print the source, for debugging.
         print(f"Error with: {include.path}")
         for i, line in enumerate(include.header.split("\n"), 1):

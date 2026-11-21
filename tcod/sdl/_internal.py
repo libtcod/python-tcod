@@ -5,9 +5,7 @@ from __future__ import annotations
 import logging
 import sys
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, NoReturn, Protocol, TypeVar, overload, runtime_checkable
-
-from typing_extensions import Self
+from typing import TYPE_CHECKING, Any, NoReturn, Protocol, Self, TypeVar, overload, runtime_checkable
 
 from tcod.cffi import ffi, lib
 

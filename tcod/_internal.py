@@ -19,7 +19,6 @@ if TYPE_CHECKING:
 
 FuncType = Callable[..., Any]
 F = TypeVar("F", bound=FuncType)
-T = TypeVar("T")
 
 
 def _deprecate_passthrough(
@@ -61,7 +60,7 @@ def _check(error: int) -> int:
     return error
 
 
-def _check_p(pointer: T) -> T:
+def _check_p[T](pointer: T) -> T:
     """Treats NULL pointers as errors and raises a libtcod exception."""
     if not pointer:
         _raise_tcod_error()
@@ -94,13 +93,13 @@ def _int(int_or_str: SupportsInt | str | bytes) -> int:
     return int(int_or_str)
 
 
-def _bytes(string: AnyStr) -> bytes:
+def _bytes(string: AnyStr) -> bytes:  # noqa: UP047
     if isinstance(string, str):
         return string.encode("utf-8")
     return string
 
 
-def _unicode(string: AnyStr, stacklevel: int = 2) -> str:
+def _unicode(string: AnyStr, stacklevel: int = 2) -> str:  # noqa: UP047
     if isinstance(string, bytes):
         warnings.warn(
             "Passing byte strings as parameters to Unicode functions is deprecated.",
@@ -129,8 +128,7 @@ def _path_encode(path: Path) -> bytes:
     try:
         return str(path).encode(locale.getlocale()[1] or "utf-8")  # Stay classy, Windows
     except UnicodeEncodeError as exc:
-        if sys.version_info >= (3, 11):
-            exc.add_note("""Consider calling 'locale.setlocale(locale.LC_CTYPES, ".UTF8")' to support Unicode paths.""")
+        exc.add_note("""Consider calling 'locale.setlocale(locale.LC_CTYPES, ".UTF8")' to support Unicode paths.""")
         raise
 
 

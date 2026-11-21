@@ -11,10 +11,10 @@ from __future__ import annotations
 
 import enum
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 
 import numpy as np
-from typing_extensions import Self, deprecated
+from typing_extensions import deprecated
 
 import tcod.sdl.constants
 from tcod.cffi import ffi, lib

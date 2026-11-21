@@ -31,9 +31,9 @@ import sys
 import warnings
 from math import floor
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, NoReturn, TypeVar
+from typing import TYPE_CHECKING, Any, Literal, NoReturn, Self, TypeVar
 
-from typing_extensions import Self, deprecated
+from typing_extensions import deprecated
 
 import tcod.console
 import tcod.event

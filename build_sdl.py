@@ -168,8 +168,7 @@ def check_sdl_version() -> None:
             )
             raise RuntimeError(msg) from exc
     except subprocess.CalledProcessError as exc:
-        if sys.version_info >= (3, 11):
-            exc.add_note(f"Note: {os.environ.get('PKG_CONFIG_PATH')=}")
+        exc.add_note(f"Note: {os.environ.get('PKG_CONFIG_PATH')=}")
         raise
     logger.info(f"Found SDL {sdl_version_str}.")
     sdl_version = tuple(int(s) for s in sdl_version_str.split("."))

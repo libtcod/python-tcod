@@ -17,10 +17,10 @@ import copy
 import itertools
 from collections.abc import Iterator, Mapping, MutableMapping
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, SupportsInt, overload
+from typing import TYPE_CHECKING, Any, Self, SupportsInt, overload
 
 import numpy as np
-from typing_extensions import Self, deprecated
+from typing_extensions import deprecated
 
 from tcod._internal import _check, _check_p, _console, _path_encode, _raise_tcod_error
 from tcod.cffi import ffi, lib

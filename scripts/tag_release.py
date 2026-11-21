@@ -36,7 +36,7 @@ def parse_changelog(args: argparse.Namespace) -> tuple[str, str]:
     assert match
     header, changes, tail = match.groups()
 
-    iso_date = datetime.datetime.now(tz=datetime.timezone.utc).date().isoformat()
+    iso_date = datetime.datetime.now(tz=datetime.UTC).date().isoformat()
     tagged = f"\n## [{args.tag}] - {iso_date}\n{changes}"
     if args.verbose:
         print("--- Tagged section:")

@@ -42,7 +42,7 @@ if not (SETUP_DIR / "libtcod/src").exists():
 
 options = {
     "bdist_wheel": {
-        "py_limited_api": "cp310",
+        "py_limited_api": "cp312",
     }
 }
 if "free-threading build" in sys.version:

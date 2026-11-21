@@ -21,7 +21,7 @@ dynamic = ["version"]
 description = "The official Python port of libtcod."
 authors = [{ name = "Kyle Benesch", email = "4b796c65+tcod@gmail.com" }]
 readme = "README.rst"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 license = "BSD-2-Clause"
 license-files = [
     "LICENSE.txt",

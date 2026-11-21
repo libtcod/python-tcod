@@ -93,20 +93,18 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Final,
-    Generic,
     Literal,
     NamedTuple,
     Protocol,
-    TypeAlias,
+    Self,
     TypedDict,
-    TypeVar,
     overload,
     runtime_checkable,
 )
 
 import attrs
 import numpy as np
-from typing_extensions import Self, deprecated
+from typing_extensions import deprecated
 
 import tcod.context
 import tcod.event_constants
@@ -120,10 +118,7 @@ from tcod.sdl.joystick import _HAT_DIRECTIONS
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-T = TypeVar("T")
-_EventType = TypeVar("_EventType", bound="Event")
-
-_C_SDL_Event: TypeAlias = Any
+type _C_SDL_Event = Any
 """A CFFI pointer to an SDL_Event union.
 
 See SDL docs: https://wiki.libsdl.org/SDL3/SDL_Event
@@ -173,27 +168,20 @@ def _pixel_to_tile(xy: tuple[float, float], /) -> Point[float] | None:
     return Point(float(xy_out[0]), float(xy_out[1]))
 
 
-if sys.version_info >= (3, 11) or TYPE_CHECKING:
+class Point[T](NamedTuple):
+    """A 2D position used for events with mouse coordinates.
 
-    class Point(NamedTuple, Generic[T]):
-        """A 2D position used for events with mouse coordinates.
+    .. seealso::
+        :any:`MouseMotion` :any:`MouseButtonDown` :any:`MouseButtonUp`
 
-        .. seealso::
-            :any:`MouseMotion` :any:`MouseButtonDown` :any:`MouseButtonUp`
+    .. versionchanged:: 19.0
+        Now uses floating point coordinates due to the port to SDL3.
+    """
 
-        .. versionchanged:: 19.0
-            Now uses floating point coordinates due to the port to SDL3.
-        """
-
-        x: T
-        """A pixel or tile coordinate starting with zero as the left-most position."""
-        y: T
-        """A pixel or tile coordinate starting with zero as the top-most position."""
-else:
-
-    class Point(NamedTuple):  # noqa: D101
-        x: Any
-        y: Any
+    x: T
+    """A pixel or tile coordinate starting with zero as the left-most position."""
+    y: T
+    """A pixel or tile coordinate starting with zero as the top-most position."""
 
 
 def _verify_tile_coordinates(xy: Point[int] | None) -> Point[int]:
@@ -1429,7 +1417,7 @@ def wait(timeout: float | None = None) -> Iterator[Event]:
 Event dispatching should be handled via a single custom method in a Protocol instead of this class.""",
     category=DeprecationWarning,
 )
-class EventDispatch(Generic[T]):
+class EventDispatch[T]:
     '''Dispatches events to methods depending on the events type attribute.
 
     To use this class, make a sub-class and override the relevant `ev_*` methods.
@@ -1741,13 +1729,13 @@ def get_mouse_state() -> MouseState:
 
 
 @overload
-def convert_coordinates_from_window(
-    event: _EventType,
+def convert_coordinates_from_window[EventType: Event](
+    event: EventType,
     /,
     context: tcod.context.Context | tcod.sdl.render.Renderer,
     console: tcod.console.Console | tuple[int, int],
     dest_rect: tuple[int, int, int, int] | None = None,
-) -> _EventType: ...
+) -> EventType: ...
 @overload
 def convert_coordinates_from_window(
     xy: tuple[float, float],
@@ -1756,13 +1744,13 @@ def convert_coordinates_from_window(
     console: tcod.console.Console | tuple[int, int],
     dest_rect: tuple[int, int, int, int] | None = None,
 ) -> tuple[float, float]: ...
-def convert_coordinates_from_window(
-    event: _EventType | tuple[float, float],
+def convert_coordinates_from_window[EventType: Event](
+    event: EventType | tuple[float, float],
     /,
     context: tcod.context.Context | tcod.sdl.render.Renderer,
     console: tcod.console.Console | tuple[int, int],
     dest_rect: tuple[int, int, int, int] | None = None,
-) -> _EventType | tuple[float, float]:
+) -> EventType | tuple[float, float]:
     """Return an event or position with window mouse coordinates converted into console tile coordinates.
 
     Args:
@@ -1819,11 +1807,10 @@ def _sdl_event_watcher(userdata: Any, sdl_event: _C_SDL_Event) -> int:  # noqa: 
     return 0
 
 
-_EventCallback = TypeVar("_EventCallback", bound=Callable[[Event], None])
 _event_watch_handles: dict[Callable[[Event], None], Any] = {}  # Callbacks and their FFI handles.
 
 
-def add_watch(callback: _EventCallback) -> _EventCallback:
+def add_watch[EventCallback: Callable[[Event], None]](callback: EventCallback) -> EventCallback:
     """Add a callback for watching events.
 
     This function can be called with the callback to register, or be used as a decorator.

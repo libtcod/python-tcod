@@ -46,9 +46,8 @@ For the most part it's just::
 ==============
  Requirements
 ==============
-* Python 3.10+
-* Windows, Linux, or MacOS X 10.9+.
-* On Linux, requires libsdl3
+* Python 3
+* Windows, Linux, or MacOS X 10.15+.
 
 ===========
  Changelog

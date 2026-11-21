@@ -21,10 +21,9 @@ from __future__ import annotations
 import functools
 import itertools
 import warnings
-from typing import TYPE_CHECKING, Any, Final, Literal
+from typing import TYPE_CHECKING, Any, Final, Literal, Self
 
 import numpy as np
-from typing_extensions import Self
 
 import tcod.map
 from tcod._internal import _check
