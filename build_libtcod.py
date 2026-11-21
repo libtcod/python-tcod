@@ -209,7 +209,6 @@ GCC_CFLAGS = {
         "-std=c99",
         "-flto",
         "-O3",
-        "-g",
         "-fPIC",
         "-Wno-deprecated-declarations",
         "-Wno-discarded-qualifiers",  # Ignore discarded restrict qualifiers.
