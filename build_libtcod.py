@@ -44,7 +44,7 @@ RE_INCLUDE = re.compile(r'#include "([^"]*)"')
 RE_TAGS = re.compile(
     r"TCODLIB_C?API|TCOD_PUBLIC|TCOD_PRIVATE|TCOD_NODISCARD|TCOD_DEPRECATED_NOMESSAGE|TCOD_DEPRECATED_ENUM"
     r"|(TCOD_DEPRECATED\(\".*?\"\))"
-    r"|(TCOD_DEPRECATED|TCODLIB_FORMAT)\([^)]*\)|__restrict"
+    r"|(TCOD_DEPRECATED|TCODLIB_FORMAT)\([^)]*\)"
     r"|TCODLIB_(BEGIN|END)_IGNORE_DEPRECATIONS"
 )
 RE_VAFUNC = re.compile(r"^[^;]*\([^;]*va_list.*\);", re.MULTILINE)
@@ -74,6 +74,7 @@ class ParsedHeader:
         header = RE_TAGS.sub("", header)
         header = RE_VAFUNC.sub("", header)
         header = RE_INLINE.sub(r"\1;", header)
+        header = header.replace("__restrict", "restrict")  # Resolve header qualifier
         self.header = header.strip()
         self.depends = frozenset(depends)
         self.all_headers[self.path] = self
@@ -210,7 +211,6 @@ GCC_CFLAGS = {
         "-O3",
         "-fPIC",
         "-Wno-deprecated-declarations",
-        "-Wno-discarded-qualifiers",  # Ignore discarded restrict qualifiers.
     ],
 }
 
